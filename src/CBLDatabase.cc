@@ -68,9 +68,9 @@ bool cbl_copyDB(const char* fromPath,
 }
 
 
-bool cbl_deleteDatabase(const char *name,
-                        const char *inDirectory,
-                        CBLError* outError)
+bool cbl_deleteDB(const char *name,
+                  const char *inDirectory,
+                  CBLError* outError)
 {
     string path = dbPath(name, inDirectory);
     return c4db_deleteAtPath(slice(path), internal(outError));
@@ -113,4 +113,12 @@ bool cbl_db_beginBatch(CBLDatabase* db, CBLError* outError) {
 
 bool cbl_db_endBatch(CBLDatabase* db, CBLError* outError) {
     return c4db_endTransaction(internal(db), true, internal(outError));
+}
+
+bool cbl_db_compact(CBLDatabase* db, CBLError* outError) {
+    return c4db_compact(internal(db), internal(outError));
+}
+
+bool cbl_db_delete(CBLDatabase* db, CBLError* outError) {
+    return c4db_delete(internal(db), internal(outError));
 }

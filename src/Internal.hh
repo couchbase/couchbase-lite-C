@@ -13,7 +13,11 @@
 #include <string>
 
 
-struct CBLDatabase : public fleece::RefCounted {
+struct CBLRefCounted : public fleece::RefCounted {
+};
+
+
+struct CBLDatabase : public CBLRefCounted {
     C4Database* const c4db;
     std::string const name;
     std::string const path;

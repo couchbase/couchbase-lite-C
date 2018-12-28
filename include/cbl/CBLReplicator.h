@@ -1,8 +1,27 @@
-//////// Couchbase Lite 2 C API Proposal -- DRAFT
-
+//
+// CBLReplicator.h
+//
+// Copyright (c) 2018 Couchbase, Inc All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 
 #include "CBLBase.h"
 #include "fleece/FLSlice.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 // Configuration
@@ -62,3 +81,7 @@ typedef void (*CBLReplicatorListener)(void *context,
 CBLListenerToken* cbl_repl_addListener(CBLReplicator* _cblnonnull,
                                        CBLReplicatorListener _cblnonnull, 
                                        void *context);
+
+#ifdef __cplusplus
+}
+#endif

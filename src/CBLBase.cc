@@ -17,12 +17,7 @@
 //
 
 #include "CBLBase.h"
-#include "RefCounted.hh"
-
-
-struct CBLRefCounted : public fleece::RefCounted {
-
-};
+#include "Internal.hh"
 
 
 CBLRefCounted* cbl_retain(CBLRefCounted *self) {

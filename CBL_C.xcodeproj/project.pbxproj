@@ -18,6 +18,7 @@
 		271C2A7621CC4BD60045856E /* Util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7421CC4BD60045856E /* Util.cc */; };
 		271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7721CC750E0045856E /* CBLDocument.cc */; };
 		271C2A7D21CC86EB0045856E /* libLiteCore-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A4F21CAD5950045856E /* libLiteCore-static.a */; };
+		27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -157,6 +158,7 @@
 		271C2A7421CC4BD60045856E /* Util.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Util.cc; sourceTree = "<group>"; };
 		271C2A7721CC750E0045856E /* CBLDocument.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDocument.cc; sourceTree = "<group>"; };
 		271C2A7921CC756A0045856E /* Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Internal.hh; sourceTree = "<group>"; };
+		27B61D5521D5ABA60027CCDB /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +219,7 @@
 				271C2A6E21CAD5B30045856E /* CBLBase.cc */,
 				271C2A7121CADB170045856E /* CBLDatabase.cc */,
 				271C2A7721CC750E0045856E /* CBLDocument.cc */,
+				27B61D5521D5ABA60027CCDB /* CBLQuery.cc */,
 				271C2A7921CC756A0045856E /* Internal.hh */,
 				271C2A7321CC4BD60045856E /* Util.hh */,
 				271C2A7421CC4BD60045856E /* Util.cc */,
@@ -456,6 +459,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
 				271C2A7621CC4BD60045856E /* Util.cc in Sources */,
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
