@@ -4,10 +4,11 @@
 #  Created by Jens Alfke on 12/28/18.
 #  Copyright © 2018 Couchbase. All rights reserved.
 
+_cbl_error_message
 #_cbl_setLogLevel
 _cbl_retain
 _cbl_release
-_cbl_listener_remove
+#_cbl_listener_remove
 
 _cbl_databaseExists
 _cbl_copyDB
@@ -26,9 +27,8 @@ _cbl_db_endBatch
 _cbl_db_getDocument
 _cbl_db_saveDocument
 _cbl_db_deleteDocument
-_cbl_db_deleteDocumentID
 _cbl_db_purgeDocument
-_cbl_db_purgeDocumentID
+
 _cbl_doc_id
 _cbl_doc_sequence
 _cbl_db_getMutableDocument
@@ -36,6 +36,8 @@ _cbl_doc_new
 _cbl_doc_mutableCopy
 _cbl_doc_properties
 _cbl_doc_mutableProperties
+_cbl_doc_delete
+_cbl_doc_purge
 
 _cbl_query_new
 _cbl_query_setParameters
@@ -171,41 +173,6 @@ _FLMutableDict_RemoveAll
 _FLMutableDict_GetMutableArray
 _FLMutableDict_GetMutableDict
 
-_FLEncoder_GetExtraInfo
-_FLEncoder_SetExtraInfo
-_FLEncoder_New
-_FLEncoder_NewWithOptions
-_FLEncoder_Amend
-_FLEncoder_Free
-_FLEncoder_Reset
-_FLEncoder_SetSharedKeys
-_FLEncoder_WriteNull
-_FLEncoder_WriteUndefined
-_FLEncoder_WriteBool
-_FLEncoder_WriteInt
-_FLEncoder_WriteUInt
-_FLEncoder_WriteFloat
-_FLEncoder_WriteDouble
-_FLEncoder_WriteString
-_FLEncoder_WriteData
-_FLEncoder_WriteValue
-_FLEncoder_WriteRaw
-_FLEncoder_BeginArray
-_FLEncoder_EndArray
-_FLEncoder_BeginDict
-_FLEncoder_WriteKey
-_FLEncoder_EndDict
-_FLEncoder_ConvertJSON
-_FLEncoder_BytesWritten
-_FLEncoder_Finish
-_FLEncoder_FinishDoc
-_FLEncoder_GetError
-_FLEncoder_GetErrorMessage
-_FLEncoder_FinishItem
-_FLEncoder_GetBase
-_FLEncoder_GetNextWritePos
-_FLEncoder_SuppressTrailer
-
 _FLKeyPath_New
 _FLKeyPath_Free
 _FLKeyPath_Eval
@@ -222,16 +189,3 @@ _FLDeepIterator_Next
 _FLDeepIterator_GetPath
 _FLDeepIterator_GetPathString
 _FLDeepIterator_GetJSONPointer
-
-_FLSharedKeys_Create
-_FLSharedKeys_CreateFromStateData
-_FLSharedKeys_GetStateData
-_FLSharedKeys_Encode
-_FLSharedKeys_Decode
-_FLSharedKeys_Release
-_FLSharedKeys_Retain
-
-_FLCreateJSONDelta
-_FLEncodeJSONDelta
-_FLApplyJSONDelta
-_FLEncodeApplyingJSONDelta

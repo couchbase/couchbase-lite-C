@@ -8,4 +8,5 @@
 
 #include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib.xcconfig"
 
-EXPORTED_SYMBOLS_FILE = src/CBL.exp
+PRODUCT_NAME            = couchbase_lite
+EXPORTED_SYMBOLS_FILE   = src/CBL.exp

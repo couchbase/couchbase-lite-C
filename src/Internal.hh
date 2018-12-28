@@ -34,5 +34,10 @@ struct CBLDatabase : public CBLRefCounted {
 };
 
 
-static inline C4Error* internal(CBLError *error)       {return (C4Error*)error;}
-static inline C4Database* internal(CBLDatabase *db)    {return db->c4db;}
+namespace cbl {
+    static inline const C4Error* internal(const CBLError *error) {return (const C4Error*)error;}
+    static inline C4Error* internal(CBLError *error)       {return (C4Error*)error;}
+    static inline C4Database* internal(CBLDatabase *db)    {return db->c4db;}
+}
+
+using namespace cbl;

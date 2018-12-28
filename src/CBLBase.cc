@@ -18,6 +18,12 @@
 
 #include "CBLBase.h"
 #include "Internal.hh"
+#include "Util.hh"
+
+
+char* cbl_error_message(const CBLError* error _cblnonnull) {
+    return allocCString(c4error_getMessage(*internal(error)));
+}
 
 
 CBLRefCounted* cbl_retain(CBLRefCounted *self) {

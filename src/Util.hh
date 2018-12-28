@@ -6,6 +6,7 @@
 
 #pragma once
 #include "CBLBase.h"
+#include "fleece/FLSlice.h"
 #include <string>
 
 namespace cbl {
@@ -16,4 +17,5 @@ namespace cbl {
     /** Like vsprintf(), but returns a std::string */
     std::string vformat(const char *fmt _cblnonnull, va_list);
 
+    char* allocCString(FLSliceResult result);
 }

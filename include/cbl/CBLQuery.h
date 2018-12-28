@@ -28,42 +28,62 @@ extern "C" {
 
 CBL_REFCOUNTED(CBLQuery*, query);
 
-CBLQuery* cbl_query_new(CBLDatabase* _cblnonnull, 
+/** Creates a new query.
+    @param db  The database to query.
+    @param jsonQuery  The query expressed in the JSON syntax.
+    @param error  On failure, the error will be written here.
+    @return  The new query object. */
+CBLQuery* cbl_query_new(CBLDatabase* db _cblnonnull,
                         const char *jsonQuery _cblnonnull, 
-                        CBLError*);
+                        CBLError* error);
 
-void cbl_query_setParameters(CBLQuery* _cblnonnull, FLSlice encodedParameters);
+/** Assigns values to the query's parameters. */
+void cbl_query_setParameters(CBLQuery* _cblnonnull query,
+                             FLDict _cblnonnull parameters);
 
+/** Runs the query, returning the results. */
 CBLResultSet* cbl_query_execute(CBLQuery* _cblnonnull, CBLError*);
 
+/** Returns information about the query, including the translated SQL form, and the search
+    strategy. You can use this to help optimize the query. */
 FLSliceResult cbl_query_explain(CBLQuery* _cblnonnull);
 
+/** Returns the number of columns in each result. */
 unsigned cbl_query_columnCount(CBLQuery* _cblnonnull);
 
-FLSlice cbl_query_columnName(CBLQuery* _cblnonnull, unsigned col);
-
-
-// Change Listener
-
-typedef void (*CBLQueryListener)(void *context, 
-                                 CBLQuery* _cblnonnull, 
-                                 CBLResultSet*, 
-                                 CBLError*);
-
-CBLListenerToken* cbl_query_addListener(CBLQuery* _cblnonnull, 
-                                        CBLQueryListener* _cblnonnull,
-                                        void *context);
+/** Returns the name of a column in the result. */
+FLSlice cbl_query_columnName(CBLQuery* _cblnonnull,
+                             unsigned columnIndex);
 
 
 // Result Set
 
 CBL_REFCOUNTED(CBLResultSet*, results);
 
+/** Moves the result-set iterator to the next result.
+    Returns false if there are no more results.
+    @note This must be called _before_ examining the first result. */
 bool cbl_results_next(CBLResultSet* _cblnonnull);
 
-FLValue cbl_results_column(CBLResultSet* _cblnonnull, unsigned column);
+/** Returns the value of a column of the current result, given its (zero-based) numeric index. */
+FLValue cbl_results_column(CBLResultSet* _cblnonnull,
+                           unsigned column);
 
-FLValue cbl_results_property(CBLResultSet* _cblnonnull, const char* property _cblnonnull);
+/** Returns the value of a column of the current result, given its name. */
+FLValue cbl_results_property(CBLResultSet* _cblnonnull,
+                             const char* property _cblnonnull);
+
+
+// Change Listener
+
+typedef void (*CBLQueryListener)(void *context,
+                                 CBLQuery* _cblnonnull,
+                                 CBLResultSet*,
+                                 CBLError*);
+
+CBLListenerToken* cbl_query_addListener(CBLQuery* _cblnonnull,
+                                        CBLQueryListener* _cblnonnull,
+                                        void *context);
 
 #ifdef __cplusplus
 }

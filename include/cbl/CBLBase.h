@@ -26,10 +26,11 @@ extern "C" {
 
 // Errors
 
+/** Error domains, serving as namespaces for numeric error codes. */
 typedef CBL_ENUM(uint32_t, CBLErrorDomain) {
     CBLDomain = 1, // code is a Couchbase Lite Core error code (see below)
     CBLPOSIXDomain,        // code is an errno
-    CBLSQLiteDomain,       // code is a SQLite error; see "sqlite3.h">"
+    CBLSQLiteDomain,       // code is a SQLite error; see "sqlite3.h"
     CBLFleeceDomain,       // code is a Fleece error; see "FleeceException.h"
     CBLNetworkDomain,      // code is a network error; see enum C4NetworkErrorCode, below
     CBLWebSocketDomain,    // code is a WebSocket close code (1000...1015) or HTTP error (300..599)
@@ -37,6 +38,7 @@ typedef CBL_ENUM(uint32_t, CBLErrorDomain) {
     CBLMaxErrorDomainPlus1
 };
 
+/** Couchbase Lite error codes, in the CBLDomain. */
 typedef CBL_ENUM(int32_t,  CBLErrorCode) {
     CBLErrorAssertionFailed = 1,    // Internal assertion failure
     CBLErrorUnimplemented,          // Oops, an unimplemented API call
@@ -72,6 +74,7 @@ typedef CBL_ENUM(int32_t,  CBLErrorCode) {
     CBLNumErrorCodesPlus1
 };
 
+/** Network error codes, in the CBLNetworkDomain. */
 typedef CBL_ENUM(int32_t,  CBLNetworkErrorCode) {
     CBLNetErrDNSFailure = 1,            // DNS lookup failed
     CBLNetErrUnknownHost,               // DNS server doesn't know the hostname
@@ -88,22 +91,28 @@ typedef CBL_ENUM(int32_t,  CBLNetworkErrorCode) {
 };
 
 
+/** A struct holding information about an error. It's declared on the stack by a caller, and
+    its address is passed to an API function. If the function's return value indicates that
+    there was an error (usually by returning NULL or false), then the CBLError will have been
+    filled in with the details. */
 typedef struct {
-    CBLErrorDomain domain;
-    int32_t code;
+    CBLErrorDomain domain;      ///< Domain of errors; a namespace for the `code`.
+    int32_t code;               ///< Error code, specific to the domain.
     int32_t internal_info;
 } CBLError;
 
+/** Returns a message describing an error.
+    @note  It is the caller's responsibility to free the returned string by calling `free`. */
 char* cbl_error_message(const CBLError* _cblnonnull);
-    // NOTE: Where a function returns "char*", that implies the string is heap-allocated
-    // and it's the caller's responsibility to free it with free().
 
 // Logging
 
+/** Subsystems that log information. */
 typedef CBL_ENUM(uint8_t, CBLLogDomain) {
     // TODO: Add domains
 };
 
+/** Levels of log messages. Higher values are more important/severe. */
 typedef CBL_ENUM(uint8_t, CBLLogLevel) {
     CBLLogDebug,
     CBLLogVerbose,
@@ -113,13 +122,22 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
     CBLLogNone
 };
 
+/** Sets the detail level of logging. */
 void cbl_setLogLevel(CBLLogLevel, CBLLogDomain);
 
 
 // Ref-Counting
 
 typedef struct CBLRefCounted CBLRefCounted;
+
+/** Increments an object's reference-count.
+    Usually you'll call one of the type-safe synonyms specific to the object type,
+    like `cbl_db_retain`. */
 CBLRefCounted* cbl_retain(CBLRefCounted* _cblnonnull);
+
+/** Decrements an object's reference-count, freeing the object if the count hits zero.
+    Usually you'll call one of the type-safe synonyms specific to the object type,
+    like `cbl_db_release`. */
 void cbl_release(CBLRefCounted*);
 
 // Declares retain/release functions for TYPE
@@ -130,20 +148,26 @@ void cbl_release(CBLRefCounted*);
 
 // Object "classes"
 
+/** A connection to an open database. */
 typedef struct CBLDatabase   CBLDatabase;
+/** An in-memory copy of a document. */
 typedef struct CBLDocument   CBLDocument;
+/** A compiled database query. */
 typedef struct CBLQuery      CBLQuery;
+/** An iterator over the rows resulting from running a query. */
 typedef struct CBLResultSet  CBLResultSet;
+/** A background task that syncs a CBLDatabase with a remote server or peer. */
 typedef struct CBLReplicator CBLReplicator;
 
 
 // Listeners
 
+/** An opaque 'cookie' representing a registered listener callback.
+    It's returned from functions that register listeners, and used to remove a listener. */
 typedef struct CBLListenerToken CBLListenerToken;
 
-void cbl_listener_remove(CBLListenerToken*);
-    // NOTE: Instead of a separate function to remove each type of listener,
-    // we can hide the listener type & owner in the token, and just use one function.
+/** Removes a listener callback, given the token that was returned when it was added. */
+void cbl_listener_remove(CBLListenerToken* _cblnonnull);
 
 
 #ifdef __cplusplus

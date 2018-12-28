@@ -45,6 +45,7 @@ typedef struct CBLEncryptionKey {
 } CBLEncryptionKey;
 #endif
 
+/** Database configuration options. */
 typedef struct {
     const char *directory;
 #ifdef COUCHBASE_ENTERPRISE
@@ -55,13 +56,25 @@ typedef struct {
 
 // Static methods
 
+/** Returns true if a database with the given name exists in the given directory.
+    @param name  The database name (without the ".cblite2" extension.)
+    @param inDirectory  The directory containing the database. If NULL, `name` must be an
+                        absolute or relative path to the database. */
 bool cbl_databaseExists(const char* _cblnonnull name, const char *inDirectory);
 
+/** Copies a database file to a new location and assigns it a new UUID.
+    @param fromPath  The full filesystem path to the original database (including extension).
+    @param toName  The new database name (without the ".cblite2" extension.)
+    @param config  The database configuration (directory and encryption option.) */
 bool cbl_copyDB(const char* _cblnonnull fromPath,
                 const char* _cblnonnull toName, 
-                const CBLDatabaseConfiguration*, 
+                const CBLDatabaseConfiguration* config,
                 CBLError*);
 
+/** Deletes a database file. If the database is open, an error is returned.
+    @param name  The database name (without the ".cblite2" extension.)
+    @param inDirectory  The directory containing the database. If NULL, `name` must be an
+                        absolute or relative path to the database. */
 bool cbl_deleteDB(const char _cblnonnull *name, 
                   const char *inDirectory,
                   CBLError*);
@@ -71,41 +84,73 @@ bool cbl_deleteDB(const char _cblnonnull *name,
 
 CBL_REFCOUNTED(CBLDatabase*, db);
 
+/** Opens a database, or creates it if it doesn't exist yet.
+    @param name  The database name (without the ".cblite2" extension.)
+    @param config  The database configuration (directory and encryption option.) */
 CBLDatabase* cbl_db_open(const char *name _cblnonnull, 
-                         const CBLDatabaseConfiguration*, 
-                         CBLError*);
+                         const CBLDatabaseConfiguration* config,
+                         CBLError* error);
 
+/** Closes an open database. */
 bool cbl_db_close(CBLDatabase* _cblnonnull, CBLError*);
 
+/** Returns the database's name. */
 const char* cbl_db_name(CBLDatabase* _cblnonnull);
+
+/** Returns the database's full filesystem path. */
 const char* cbl_db_path(CBLDatabase* _cblnonnull);
+
+/** Returns the number of documents in the database. */
 uint64_t cbl_db_count(CBLDatabase* _cblnonnull);
+
+/** Returns the database's configuration, as given when it was opened. */
 const CBLDatabaseConfiguration* cbl_db_config(CBLDatabase* _cblnonnull);
 
+/** Compacts a database file. */
 bool cbl_db_compact(CBLDatabase* _cblnonnull, CBLError*);
 
+/** Closes and deletes a database. */
 bool cbl_db_delete(CBLDatabase* _cblnonnull, CBLError*);
 
+/** Begins a batch operation, similar to a transaction.
+    @note  Multiple writes are much faster when grouped inside a single batch.
+    @note  Changes will not be visible to other CBLDatabase instances on the same database until
+            the batch operation ends.
+    @note  Batch operations can nest. Changes are not committed until the outer batch ends. */
 bool cbl_db_beginBatch(CBLDatabase* _cblnonnull, CBLError*);
+
+/** Ends a batch operation. This MUST be called after `cbl_db_beginBatch`. */
 bool cbl_db_endBatch(CBLDatabase* _cblnonnull, CBLError*);
-    // NOTE: Without blocks/lambdas, an `inBatch` function that takes a callback would be 
-    // quite awkward to use!
-    // Instead, expose the begin/end functions and trust the developer to balance them.
 
 
 // Listeners
 
-typedef void (*CBLDatabaseListener)(void *context, CBLDatabase* _cblnonnull,
+/** A database change listener callback, invoked after one or more documents are changed on disk.
+    @param context  An arbitrary value given when the callback was registered.
+    @param db  The database that changed.
+    @param docIDs  The IDs of the documents that changed, as a C array of C strings,
+                    ending with a NULL. */
+typedef void (*CBLDatabaseListener)(void *context,
+                                    CBLDatabase* db _cblnonnull,
                                     const char **docIDs);
     // NOTE: docIDs is a C array of C strings, ending with a NULL.
                                     
-typedef void (*CBLDocumentListener)(void *context, CBLDatabase* _cblnonnull, 
+/** A document change listener callback, invoked after a specific document is changed on disk.
+    @param context  An arbitrary value given when the callback was registered.
+    @param db  The database containing the document.
+    @param docID  The document's ID. */
+typedef void (*CBLDocumentListener)(void *context,
+                                    CBLDatabase* db _cblnonnull,
                                     const char *docID);
 
+/** Registers a database change listener callback.
+    It can be removed by calling `cbl_listener_remove`. */
 CBLListenerToken* cbl_db_addListener(CBLDatabase* _cblnonnull, 
                                      CBLDatabaseListener _cblnonnull,
                                      void *context);
                                      
+/** Registers a document change listener callback.
+    It can be removed by calling `cbl_listener_remove`. */
 CBLListenerToken* cbl_db_addDocumentListener(CBLDatabase* _cblnonnull,
                                              const char* _cblnonnull docID,
                                              CBLDocumentListener _cblnonnull, 

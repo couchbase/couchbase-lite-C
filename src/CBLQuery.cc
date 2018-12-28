@@ -121,7 +121,10 @@ CBLQuery* cbl_query_new(CBLDatabase* db _cblnonnull,
     return query->valid() ? retain(query.get()) : nullptr;
 }
 
-void cbl_query_setParameters(CBLQuery* query _cblnonnull, FLSlice encodedParameters) {
+void cbl_query_setParameters(CBLQuery* query _cblnonnull, FLDict parameters) {
+    Encoder enc;
+    enc.writeValue(Dict(parameters));
+    alloc_slice encodedParameters = enc.finish();
     query->setParameters(encodedParameters);
 }
 

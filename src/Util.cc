@@ -39,4 +39,16 @@ namespace cbl {
         return result;
     }
 
+    
+    char* allocCString(FLSliceResult result) {
+        if (result.buf == nullptr)
+            return nullptr;
+        char* str = (char*) malloc(result.size + 1);
+        if (!str)
+            return nullptr;
+        memcpy(str, result.buf, result.size);
+        str[result.size] = '\0';
+        FLSliceResult_Free(result);
+        return str;
+    }
 }

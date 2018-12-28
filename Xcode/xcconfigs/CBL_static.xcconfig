@@ -8,4 +8,5 @@
 
 #include "vendor/couchbase-lite-core/Xcode/xcconfigs/static_lib.xcconfig"
 
-HEADER_SEARCH_PATHS = vendor/couchbase-lite-core/C/include  vendor/couchbase-lite-core/vendor/Fleece/API  vendor/couchbase-lite-core/vendor/Fleece/fleece/Support
+HEADER_SEARCH_PATHS     = vendor/couchbase-lite-core/C/include  vendor/couchbase-lite-core/vendor/Fleece/API  vendor/couchbase-lite-core/vendor/Fleece/fleece/Support
+PRODUCT_NAME            = couchbase_lite
