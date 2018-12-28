@@ -6,5 +6,6 @@
 //  Copyright © 2018 Couchbase. All rights reserved.
 //
 
+#include "Project.xcconfig"
 #include "vendor/couchbase-lite-core/Xcode/xcconfigs/Project_Release.xcconfig"
 
