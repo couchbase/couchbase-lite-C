@@ -12,11 +12,15 @@ _cbl_release
 
 _cbl_databaseExists
 _cbl_copyDB
+_cbl_deleteDB
+
 _cbl_db_delete
 _cbl_db_open
 _cbl_db_close
 _cbl_db_name
+_cbl_db_path
 _cbl_db_count
+_cbl_db_lastSequence
 _cbl_db_compact
 _cbl_db_delete
 _cbl_db_beginBatch

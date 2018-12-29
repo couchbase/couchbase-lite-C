@@ -103,6 +103,10 @@ const char* cbl_db_path(CBLDatabase* _cblnonnull);
 /** Returns the number of documents in the database. */
 uint64_t cbl_db_count(CBLDatabase* _cblnonnull);
 
+/** Returns the last sequence number assigned in the database.
+    This starts at zero and increments every time a document is saved or deleted. */
+uint64_t cbl_db_lastSequence(CBLDatabase* _cblnonnull);
+
 /** Returns the database's configuration, as given when it was opened. */
 const CBLDatabaseConfiguration* cbl_db_config(CBLDatabase* _cblnonnull);
 

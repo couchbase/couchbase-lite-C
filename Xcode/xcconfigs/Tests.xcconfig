@@ -1,0 +1,10 @@
+//
+//  Tests.xcconfig
+//  CBL_C
+//
+//  Created by Jens Alfke on 12/28/18.
+//  Copyright © 2018 Couchbase. All rights reserved.
+//
+
+HEADER_SEARCH_PATHS     = include  $(FLEECE)/API  $(FLEECE)/Fleece/Support  $(FLEECE)/vendor/catch
+PRODUCT_NAME            = cbl_tests

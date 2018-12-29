@@ -16,10 +16,42 @@
 // limitations under the License.
 //
 
+#define CATCH_CONFIG_CONSOLE_WIDTH 120
+#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+
 #include "CBLTest.hh"
+#include "CaseListReporter.hh"
+#include <sys/stat.h>
 
-namespace NAMESPACE {
+
+std::string CBLTest::kDatabaseDir;
+const char* const CBLTest::kDatabaseName = "cbl_test";
 
 
-
+CBLTest::CBLTest() {
+    if (kDatabaseDir.empty()) {
+        kDatabaseDir = "/tmp/CBL_C_tests";  // TODO // COMPAT
+        if (mkdir(kDatabaseDir.c_str(), 0744) != 0 && errno != EEXIST)
+            FAIL("Can't create temp directory: errno " << errno);
+    }
+    CBLDatabaseConfiguration config = {kDatabaseDir.c_str()};
+    CBLError error;
+    if (!cbl_deleteDB(kDatabaseName, config.directory, &error) && error.code != 0)
+        FAIL("Can't delete temp database: " << error.domain << "/" << error.code);
+    db = cbl_db_open(kDatabaseName, &config, &error);
+    REQUIRE(db);
 }
+
+
+CBLTest::~CBLTest() {
+    if (db) {
+        CBLError error;
+        if (!cbl_db_close(db, &error))
+            WARN("Failed to close database: " << error.domain << "/" << error.code);
+        cbl_db_release(db);
+    }
+}
+
+
+#include "LibC++Debug.cc"
+#include "Backtrace.cc"

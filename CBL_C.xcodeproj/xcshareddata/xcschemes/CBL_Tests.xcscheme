@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "271C2A2221CAC8920045856E"
-               BuildableName = "libcouchbase_lite.a"
-               BlueprintName = "CBL_C"
+               BlueprintIdentifier = "27B61DA721D6E49D0027CCDB"
+               BuildableName = "CBL_Tests"
+               BlueprintName = "CBL_Tests"
                ReferencedContainer = "container:CBL_C.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,6 +29,15 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "27B61DA721D6E49D0027CCDB"
+            BuildableName = "CBL_Tests"
+            BlueprintName = "CBL_Tests"
+            ReferencedContainer = "container:CBL_C.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -36,31 +45,29 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      enableAddressSanitizer = "YES"
-      enableASanStackUseAfterReturn = "YES"
-      enableUBSanitizer = "YES"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
-      stopOnEveryUBSanitizerIssue = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "271C2A2221CAC8920045856E"
-            BuildableName = "libcouchbase_lite.a"
-            BlueprintName = "CBL_C"
+            BlueprintIdentifier = "27B61DA721D6E49D0027CCDB"
+            BuildableName = "CBL_Tests"
+            BlueprintName = "CBL_Tests"
             ReferencedContainer = "container:CBL_C.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
-      <AdditionalOptions>
-         <AdditionalOption
-            key = "MallocScribble"
-            value = ""
+      </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-r list --break"
             isEnabled = "YES">
-         </AdditionalOption>
+         </CommandLineArgument>
+      </CommandLineArguments>
+      <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
@@ -69,15 +76,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "271C2A2221CAC8920045856E"
-            BuildableName = "libcouchbase_lite.a"
-            BlueprintName = "CBL_C"
+            BlueprintIdentifier = "27B61DA721D6E49D0027CCDB"
+            BuildableName = "CBL_Tests"
+            BlueprintName = "CBL_Tests"
             ReferencedContainer = "container:CBL_C.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

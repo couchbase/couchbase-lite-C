@@ -107,6 +107,10 @@ uint64_t cbl_db_count(CBLDatabase* db) {
     return c4db_getDocumentCount(internal(db));
 }
 
+uint64_t cbl_db_lastSequence(CBLDatabase* db) {
+    return c4db_getLastSequence(internal(db));
+}
+
 bool cbl_db_beginBatch(CBLDatabase* db, CBLError* outError) {
     return c4db_beginTransaction(internal(db), internal(outError));
 }
