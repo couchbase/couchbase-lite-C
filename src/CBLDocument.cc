@@ -60,11 +60,6 @@ public:
             _properties = MutableDict::deepCopy(otherDoc->_properties.asDict());
     }
 
-    ~CBLDocument() {
-        if (_mutable)
-            FLValue_Release(_properties);
-    }
-
     CBLDatabase* database() const               {return _db;}
     const char* docID() const                   {return _docID.c_str();}
     bool exists() const                         {return _c4doc != nullptr;}
@@ -78,10 +73,10 @@ public:
         return _properties.asDict();
     }
 
-    const CBLDocument* save(CBLDatabase* db _cblnonnull,
-                            bool deleting,
-                            CBLConcurrencyControl concurrency,
-                            C4Error* outError) const
+    RetainedConst<CBLDocument> save(CBLDatabase* db _cblnonnull,
+                                    bool deleting,
+                                    CBLConcurrencyControl concurrency,
+                                    C4Error* outError) const
     {
         if (_db && _db != db) {
             if (outError)
@@ -92,19 +87,20 @@ public:
             return this;
         }
 
+        c4::Transaction t(internal(db));
+        if (!t.begin(outError))
+            return nullptr;
+
         // Encode properties:
         alloc_slice body;
         if (!deleting) {
             Encoder enc(c4db_getSharedFleeceEncoder(internal(db)));
-            enc.writeValue(_properties);
+            enc.writeValue(properties());
             body = enc.finish();
             enc.detach();
         }
 
         // Save:
-        c4::Transaction t(internal(db));
-        if (!t.begin(outError))
-            return nullptr;
         c4::ref<C4Document> savingDoc = c4doc_retain(_c4doc);
         c4::ref<C4Document> newDoc = nullptr;
         C4Error c4err;
@@ -238,7 +234,7 @@ const CBLDocument* cbl_db_saveDocument(CBLDatabase* db,
                                        CBLConcurrencyControl concurrency,
                                        CBLError* outError)
 {
-    return doc->save(db, false, concurrency, internal(outError));
+    return retain(doc->save(db, false, concurrency, internal(outError)).get());
 }
 
 bool cbl_doc_delete(const CBLDocument* doc _cblnonnull,
