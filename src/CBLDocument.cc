@@ -208,8 +208,8 @@ static CBLDocument* getDocument(CBLDatabase* db, const char* docID, bool isMutab
     return doc->exists() ? retain(doc.get()) : nullptr;
 }
 
-const CBLDocument* cbl_db_getDocument(CBLDatabase* db, const char* docID) {
-    return getDocument(db, docID, false);
+const CBLDocument* cbl_db_getDocument(const CBLDatabase* db, const char* docID) {
+    return getDocument((CBLDatabase*)db, docID, false);
 }
 
 CBLDocument* cbl_db_getMutableDocument(CBLDatabase* db, const char* docID) {

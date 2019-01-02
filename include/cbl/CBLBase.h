@@ -24,7 +24,8 @@ extern "C" {
 #endif
 
 
-// Errors
+/** \defgroup errors   Errors
+     @{ */
 
 /** Error domains, serving as namespaces for numeric error codes. */
 typedef CBL_ENUM(uint32_t, CBLErrorDomain) {
@@ -105,7 +106,12 @@ typedef struct {
     @note  It is the caller's responsibility to free the returned string by calling `free`. */
 char* cbl_error_message(const CBLError* _cblnonnull);
 
-// Logging
+/** @} */
+
+
+
+/** \defgroup logging   Logging
+     @{ */
 
 /** Subsystems that log information. */
 typedef CBL_ENUM(uint8_t, CBLLogDomain) {
@@ -125,8 +131,12 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
 /** Sets the detail level of logging. */
 void cbl_setLogLevel(CBLLogLevel, CBLLogDomain);
 
+/** @} */
 
-// Ref-Counting
+
+
+/** \defgroup refcounting   Reference Counting
+     @{ */
 
 typedef struct CBLRefCounted CBLRefCounted;
 
@@ -145,22 +155,40 @@ void cbl_release(CBLRefCounted*);
     static inline TYPE cbl_##NAME##_retain(TYPE _cblnonnull t)  {return (TYPE)cbl_retain((CBLRefCounted*)t);} \
     static inline void cbl_##NAME##_release(TYPE t) {cbl_release((CBLRefCounted*)t);}
 
+/** @} */
 
-// Object "classes"
 
+
+/** \defgroup database  Database
+     @{ */
 /** A connection to an open database. */
 typedef struct CBLDatabase   CBLDatabase;
+/** @} */
+
+/** \defgroup documents  Documents
+     @{ */
 /** An in-memory copy of a document. */
 typedef struct CBLDocument   CBLDocument;
+/** @} */
+
+/** \defgroup queries  Queries
+     @{ */
 /** A compiled database query. */
 typedef struct CBLQuery      CBLQuery;
 /** An iterator over the rows resulting from running a query. */
 typedef struct CBLResultSet  CBLResultSet;
+/** @} */
+
+/** \defgroup replication  Replication
+     @{ */
 /** A background task that syncs a CBLDatabase with a remote server or peer. */
 typedef struct CBLReplicator CBLReplicator;
+/** @} */
 
 
-// Listeners
+
+/** \defgroup listeners   Listeners
+     @{ */
 
 /** An opaque 'cookie' representing a registered listener callback.
     It's returned from functions that register listeners, and used to remove a listener. */
@@ -169,6 +197,8 @@ typedef struct CBLListenerToken CBLListenerToken;
 /** Removes a listener callback, given the token that was returned when it was added. */
 void cbl_listener_remove(CBLListenerToken* _cblnonnull);
 
+
+/** @} */
 
 #ifdef __cplusplus
 }

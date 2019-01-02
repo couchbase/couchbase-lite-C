@@ -30,7 +30,7 @@ using namespace fleece;
 class CBLQuery : public CBLRefCounted {
 public:
 
-    CBLQuery(CBLDatabase* db _cblnonnull,
+    CBLQuery(const CBLDatabase* db _cblnonnull,
              const char *jsonQuery _cblnonnull,
              C4Error* outError)
     :_c4query( c4query_new(internal(db), slice(jsonQuery), outError) )
@@ -113,7 +113,7 @@ Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
 #pragma mark - PUBLIC API:
 
 
-CBLQuery* cbl_query_new(CBLDatabase* db _cblnonnull,
+CBLQuery* cbl_query_new(const CBLDatabase* db _cblnonnull,
                         const char *jsonQuery _cblnonnull,
                         CBLError* outError)
 {

@@ -216,6 +216,7 @@
 		27B61DB021D6E53D0027CCDB /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DatabaseTest.cc; sourceTree = "<group>"; };
 		27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libfleeceBase.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		27B61DBF21DD33930027CCDB /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -251,6 +252,7 @@
 		271C2A1A21CAC8920045856E = {
 			isa = PBXGroup;
 			children = (
+				27B61DBF21DD33930027CCDB /* Doxyfile */,
 				271C2A2A21CAC93B0045856E /* include */,
 				271C2A3621CAC9A50045856E /* src */,
 				27B61D6721D6B5DA0027CCDB /* test */,

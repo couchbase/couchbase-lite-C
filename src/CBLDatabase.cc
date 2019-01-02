@@ -95,19 +95,19 @@ bool cbl_db_close(CBLDatabase* db, CBLError* outError) {
 }
 
 
-const char* cbl_db_name(CBLDatabase* db) {
+const char* cbl_db_name(const CBLDatabase* db) {
     return db->name.c_str();
 }
 
-const char* cbl_db_path(CBLDatabase* db) {
+const char* cbl_db_path(const CBLDatabase* db) {
     return db->path.c_str();
 }
 
-uint64_t cbl_db_count(CBLDatabase* db) {
+uint64_t cbl_db_count(const CBLDatabase* db) {
     return c4db_getDocumentCount(internal(db));
 }
 
-uint64_t cbl_db_lastSequence(CBLDatabase* db) {
+uint64_t cbl_db_lastSequence(const CBLDatabase* db) {
     return c4db_getLastSequence(internal(db));
 }
 
