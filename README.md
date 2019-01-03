@@ -43,9 +43,9 @@ cbl_doc_release(doc);
 
 // Read it back:
 const CBLDocument *readDoc = cbl_db_getDocument(db, "foo");
-FLDict readProps = cbl_doc_properties(doc);
+FLDict readProps = cbl_doc_properties(readDoc);
 FLSlice greeting = FLValue_AsString( FLDict_Get(readProps, "greeting"_sl) );
-cbl_doc_release(doc);
+cbl_doc_release(readDoc);
 ```
 
 ## Documentation
