@@ -25,7 +25,9 @@ extern "C" {
 #endif
 
 /** \defgroup documents   Documents
-    @{ */
+    @{
+    A CBLDocument is essentially a JSON object with an ID string that's unique in its database.
+ */
 
 /** \name  Document lifecycle
     @{ */
@@ -42,7 +44,7 @@ typedef CBL_ENUM(uint8_t, CBLConcurrencyControl) {
 /** Reads a document from the database, creating a new (immutable) CBLDocument object.
     Each call to this function creates a new object (which must later be released.)
     @note  If you are reading the document in order to make changes to it, call
-            `cbl_db_getMutableDocument` instead.
+            \ref cbl_db_getMutableDocument instead.
     @param database  The database.
     @param docID  The ID of the document.
     @return  A new CBLDocument instance, or NULL if no document with that ID exists. */
@@ -63,7 +65,8 @@ const CBLDocument* cbl_db_saveDocument(CBLDatabase* db _cblnonnull,
                                        CBLError* error);
 
 /** Deletes a document from the database. Deletions are replicated.
-    @note If you don't have the document in memory already, `cbl_db_deleteDocument` is a
+    @warning  You are still responsible for calling \ref cbl_document_release.
+    @note If you don't have the document in memory already, \ref cbl_db_deleteDocument is a
           simpler shortcut.
     @param document  The document to delete.
     @param concurrency  Conflict-handling strategy.
@@ -88,7 +91,8 @@ bool cbl_db_deleteDocument(CBLDatabase* database _cblnonnull,
 /** Purges a document. This removes all traces of the document from the database.
     Purges are not replicated. If the document is changed on a server, it will be re-created
     when pulled.
-    @note If you don't have the document in memory already, `cbl_db_purgeDocument` is a
+    @warning  You are still responsible for calling \ref cbl_document_release.
+    @note If you don't have the document in memory already, \ref cbl_db_purgeDocument is a
           simpler shortcut.
     @param document  The document to delete.
     @param error  On failure, the error will be written here.
@@ -114,14 +118,19 @@ bool cbl_db_purgeDocument(CBLDatabase* database _cblnonnull,
 
 /** \name  Mutable documents
     @{
-    The type `CBLDocument*` without a `const` qualifier refers to a mutable document instance.
+    The type `CBLDocument*` without a `const` qualifier refers to a _mutable_ document instance.
     A mutable document exposes its properties as a mutable dictionary, so you can change them
-    in place and then call `cbl_db_saveDocument` to persist the changes.
+    in place and then call \ref cbl_db_saveDocument to persist the changes.
  */
 
-/** Reads a document from the database, in mutable form that can be updated and saved. */
-CBLDocument* cbl_db_getMutableDocument(CBLDatabase* _cblnonnull,
-                                       const char* _cblnonnull docID);
+/** Reads a document from the database, in mutable form that can be updated and saved.
+    (This function is otherwise identical to \ref cbl_db_getDocument.)
+    @note  You must release the document when you're done with it.
+    @param database  The database.
+    @param docID  The ID of the document.
+    @return  A new mutable CBLDocument instance, or NULL if no document with that ID exists. */
+CBLDocument* cbl_db_getMutableDocument(CBLDatabase* database _cblnonnull,
+                                       const char* docID _cblnonnull);
 
 /** Creates a new, empty document in memory. It will not be added to a database until saved.
     @param docID  The ID of the new document, or NULL to assign a new unique ID.
@@ -130,7 +139,8 @@ CBLDocument* cbl_doc_new(const char *docID);
 
 /** Creates a new CBLDocument instance that refers to the same document as the original.
     If the original document has unsaved changes, the new one will also start out with the same
-    changes; but mutating one document thereafter will not affect the other. */
+    changes; but mutating one document thereafter will not affect the other.
+    @note  You must release the new reference when you're done with it. */
 CBLDocument* cbl_doc_mutableCopy(const CBLDocument* original _cblnonnull);
 
 /** @} */
@@ -138,7 +148,10 @@ CBLDocument* cbl_doc_mutableCopy(const CBLDocument* original _cblnonnull);
 
 
 /** \name  Document properties and metadata
-    @{ */
+    @{
+    A document's body is essentially a JSON object. The properties are accessed in memory
+    using the Fleece API, with the body itself being a \ref FLDict "dictionary").
+ */
 
 /** Returns a document's ID. */
 const char* _cblnonnull cbl_doc_id(const CBLDocument* _cblnonnull);
@@ -146,20 +159,22 @@ const char* _cblnonnull cbl_doc_id(const CBLDocument* _cblnonnull);
 /** Returns a document's current sequence in the local database.
     This number increases every time the document is saved, and a more recently saved document
     will have a greater sequence number than one saved earlier, so sequences may be used as an
-    abstract 'clock' to tell modification time. */
+    abstract 'clock' to tell relative modification times. */
 uint64_t cbl_doc_sequence(const CBLDocument* _cblnonnull);
 
 /** Returns a document's properties as a dictionary.
+    @note  The dictionary object is owned by the document; you do not need to release it.
     @warning  This dictionary _reference_ is immutable, but if the document is mutable the
            underlying dictionary itself is mutable and could be modified through a mutable
-           reference obtained via `cbl_doc_mutableProperties`. If you need to preserve the
-           properties in immutable form, call `FLDict_Copy` to make a deep copy. */
+           reference obtained via \ref cbl_doc_mutableProperties. If you need to preserve the
+           properties in immutable form, call \ref FLDict_Copy to make a deep copy. */
 FLDict cbl_doc_properties(const CBLDocument* _cblnonnull);
 
 /** Returns a mutable document's properties as a mutable dictionary.
-    You may modify this dictionary and then call `cbl_db_saveDocument` to persist the changes.
+    You may modify this dictionary and then call \ref cbl_db_saveDocument to persist the changes.
+    @note  The dictionary object is owned by the document; you do not need to release it.
     @note  Every call to this function returns the same mutable collection. This is the
-           same collection returned by `cbl_doc_properties`. */
+           same collection returned by \ref cbl_doc_properties. */
 FLMutableDict cbl_doc_mutableProperties(CBLDocument* _cblnonnull);
 
 /** @} */
@@ -188,7 +203,7 @@ typedef void (*CBLDocumentListener)(void *context,
     @param docID  The ID of the document to observe.
     @param listener  The callback to be invoked.
     @param context  An opaque value that will be passed to the callback.
-    @return  A token to be passed to `cbl_listener_remove` when it's time to remove the
+    @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
 CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cblnonnull,
                                              const char* docID _cblnonnull,

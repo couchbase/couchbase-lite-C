@@ -25,70 +25,71 @@ extern "C" {
 
 
 /** \defgroup errors   Errors
-     @{ */
+     @{
+    Types and constants for communicating errors from API calls. */
 
 /** Error domains, serving as namespaces for numeric error codes. */
 typedef CBL_ENUM(uint32_t, CBLErrorDomain) {
-    CBLDomain = 1, // code is a Couchbase Lite Core error code (see below)
-    CBLPOSIXDomain,        // code is an errno
-    CBLSQLiteDomain,       // code is a SQLite error; see "sqlite3.h"
-    CBLFleeceDomain,       // code is a Fleece error; see "FleeceException.h"
-    CBLNetworkDomain,      // code is a network error; see enum C4NetworkErrorCode, below
-    CBLWebSocketDomain,    // code is a WebSocket close code (1000...1015) or HTTP error (300..599)
+    CBLDomain = 1,         ///< code is a Couchbase Lite error code; see \ref CBLErrorCode
+    CBLPOSIXDomain,        ///< code is a POSIX `errno`; see "errno.h"
+    CBLSQLiteDomain,       ///< code is a SQLite error; see "sqlite3.h"
+    CBLFleeceDomain,       ///< code is a Fleece error; see "FleeceException.h"
+    CBLNetworkDomain,      ///< code is a network error; see \ref CBLNetworkErrorCode
+    CBLWebSocketDomain,    ///< code is a WebSocket close code (1000...1015) or HTTP error (300..599)
 
     CBLMaxErrorDomainPlus1
 };
 
 /** Couchbase Lite error codes, in the CBLDomain. */
 typedef CBL_ENUM(int32_t,  CBLErrorCode) {
-    CBLErrorAssertionFailed = 1,    // Internal assertion failure
-    CBLErrorUnimplemented,          // Oops, an unimplemented API call
-    CBLErrorUnsupportedEncryption,  // Unsupported encryption algorithm
-    CBLErrorBadRevisionID,          // Invalid revision ID syntax
-    CBLErrorCorruptRevisionData,    // Revision contains corrupted/unreadable data
-    CBLErrorNotOpen,                // Database/KeyStore/index is not open
-    CBLErrorNotFound,               // Document not found
-    CBLErrorConflict,               // Document update conflict
-    CBLErrorInvalidParameter,       // Invalid function parameter or struct value
-    CBLErrorUnexpectedError, /*10*/ // Internal unexpected C++ exception
-    CBLErrorCantOpenFile,           // Database file can't be opened; may not exist
-    CBLErrorIOError,                // File I/O error
-    CBLErrorMemoryError,            // Memory allocation failed (out of memory?)
-    CBLErrorNotWriteable,           // File is not writeable
-    CBLErrorCorruptData,            // Data is corrupted
-    CBLErrorBusy,                   // Database is busy/locked
-    CBLErrorNotInTransaction,       // Function must be called while in a transaction
-    CBLErrorTransactionNotClosed,   // Database can't be closed while a transaction is open
-    CBLErrorUnsupported,            // Operation not supported in this database
-    CBLErrorNotADatabaseFile,/*20*/ // File is not a database, or encryption key is wrong
-    CBLErrorWrongFormat,            // Database exists but not in the format/storage requested
-    CBLErrorCrypto,                 // Encryption/decryption error
-    CBLErrorInvalidQuery,           // Invalid query
-    CBLErrorMissingIndex,           // No such index, or query requires a nonexistent index
-    CBLErrorInvalidQueryParam,      // Unknown query param name, or param number out of range
-    CBLErrorRemoteError,            // Unknown error from remote server
-    CBLErrorDatabaseTooOld,         // Database file format is older than what I can open
-    CBLErrorDatabaseTooNew,         // Database file format is newer than what I can open
-    CBLErrorBadDocID,               // Invalid document ID
-    CBLErrorCantUpgradeDatabase,/*30*/ // DB can't be upgraded (might be unsupported dev version)
+    CBLErrorAssertionFailed = 1,    ///< Internal assertion failure
+    CBLErrorUnimplemented,          ///< Oops, an unimplemented API call
+    CBLErrorUnsupportedEncryption,  ///< Unsupported encryption algorithm
+    CBLErrorBadRevisionID,          ///< Invalid revision ID syntax
+    CBLErrorCorruptRevisionData,    ///< Revision contains corrupted/unreadable data
+    CBLErrorNotOpen,                ///< Database/KeyStore/index is not open
+    CBLErrorNotFound,               ///< Document not found
+    CBLErrorConflict,               ///< Document update conflict
+    CBLErrorInvalidParameter,       ///< Invalid function parameter or struct value
+    CBLErrorUnexpectedError, /*10*/ ///< Internal unexpected C++ exception
+    CBLErrorCantOpenFile,           ///< Database file can't be opened; may not exist
+    CBLErrorIOError,                ///< File I/O error
+    CBLErrorMemoryError,            ///< Memory allocation failed (out of memory?)
+    CBLErrorNotWriteable,           ///< File is not writeable
+    CBLErrorCorruptData,            ///< Data is corrupted
+    CBLErrorBusy,                   ///< Database is busy/locked
+    CBLErrorNotInTransaction,       ///< Function must be called while in a transaction
+    CBLErrorTransactionNotClosed,   ///< Database can't be closed while a transaction is open
+    CBLErrorUnsupported,            ///< Operation not supported in this database
+    CBLErrorNotADatabaseFile,/*20*/ ///< File is not a database, or encryption key is wrong
+    CBLErrorWrongFormat,            ///< Database exists but not in the format/storage requested
+    CBLErrorCrypto,                 ///< Encryption/decryption error
+    CBLErrorInvalidQuery,           ///< Invalid query
+    CBLErrorMissingIndex,           ///< No such index, or query requires a nonexistent index
+    CBLErrorInvalidQueryParam,      ///< Unknown query param name, or param number out of range
+    CBLErrorRemoteError,            ///< Unknown error from remote server
+    CBLErrorDatabaseTooOld,         ///< Database file format is older than what I can open
+    CBLErrorDatabaseTooNew,         ///< Database file format is newer than what I can open
+    CBLErrorBadDocID,               ///< Invalid document ID
+    CBLErrorCantUpgradeDatabase,/*30*/ ///< DB can't be upgraded (might be unsupported dev version)
 
     CBLNumErrorCodesPlus1
 };
 
 /** Network error codes, in the CBLNetworkDomain. */
 typedef CBL_ENUM(int32_t,  CBLNetworkErrorCode) {
-    CBLNetErrDNSFailure = 1,            // DNS lookup failed
-    CBLNetErrUnknownHost,               // DNS server doesn't know the hostname
-    CBLNetErrTimeout,
-    CBLNetErrInvalidURL,
-    CBLNetErrTooManyRedirects,
-    CBLNetErrTLSHandshakeFailed,
-    CBLNetErrTLSCertExpired,
-    CBLNetErrTLSCertUntrusted,          // Cert isn't trusted for other reason
-    CBLNetErrTLSClientCertRequired,
-    CBLNetErrTLSClientCertRejected, // 10
-    CBLNetErrTLSCertUnknownRoot,        // Self-signed cert, or unknown anchor cert
-    CBLNetErrInvalidRedirect,           // Attempted redirect to invalid replication endpoint
+    CBLNetErrDNSFailure = 1,            ///< DNS lookup failed
+    CBLNetErrUnknownHost,               ///< DNS server doesn't know the hostname
+    CBLNetErrTimeout,                   ///< No response received before timeout
+    CBLNetErrInvalidURL,                ///< Invalid URL
+    CBLNetErrTooManyRedirects,          ///< HTTP redirect loop
+    CBLNetErrTLSHandshakeFailed,        ///< Low-level error establishing TLS
+    CBLNetErrTLSCertExpired,            ///< Server's TLS certificate has expired
+    CBLNetErrTLSCertUntrusted,          ///< Cert isn't trusted for other reason
+    CBLNetErrTLSClientCertRequired,     ///< Server requires client to have a TLS certificate
+    CBLNetErrTLSClientCertRejected,     ///< Server rejected my TLS client certificate
+    CBLNetErrTLSCertUnknownRoot,        ///< Self-signed cert, or unknown anchor cert
+    CBLNetErrInvalidRedirect,           ///< Attempted redirect to invalid URL
 };
 
 
@@ -98,12 +99,12 @@ typedef CBL_ENUM(int32_t,  CBLNetworkErrorCode) {
     filled in with the details. */
 typedef struct {
     CBLErrorDomain domain;      ///< Domain of errors; a namespace for the `code`.
-    int32_t code;               ///< Error code, specific to the domain.
+    int32_t code;               ///< Error code, specific to the domain. 0 always means no error.
     int32_t internal_info;
 } CBLError;
 
 /** Returns a message describing an error.
-    @note  It is the caller's responsibility to free the returned string by calling `free`. */
+    @note  It is the caller's responsibility to free the returned C string by calling `free`. */
 char* cbl_error_message(const CBLError* _cblnonnull);
 
 /** @} */
@@ -111,7 +112,8 @@ char* cbl_error_message(const CBLError* _cblnonnull);
 
 
 /** \defgroup logging   Logging
-     @{ */
+     @{
+    Managing messages that Couchbase Lite logs at runtime. */
 
 /** Subsystems that log information. */
 typedef CBL_ENUM(uint8_t, CBLLogDomain) {
@@ -136,18 +138,23 @@ void cbl_setLogLevel(CBLLogLevel, CBLLogDomain);
 
 
 /** \defgroup refcounting   Reference Counting
-     @{ */
+     @{
+    Couchbase Lite "objects" are reference-counted; these functions are the shared
+    `retain` and `release` operations. (But there are type-safe equivalents defined for each
+    class, so you can call \ref cbl_db_release() on a database, for instance, without having to
+    type-cast.)
+ */
 
 typedef struct CBLRefCounted CBLRefCounted;
 
 /** Increments an object's reference-count.
     Usually you'll call one of the type-safe synonyms specific to the object type,
-    like `cbl_db_retain`. */
+    like \ref cbl_db_retain` */
 CBLRefCounted* cbl_retain(CBLRefCounted* _cblnonnull);
 
 /** Decrements an object's reference-count, freeing the object if the count hits zero.
     Usually you'll call one of the type-safe synonyms specific to the object type,
-    like `cbl_db_release`. */
+    like \ref cbl_db_release. */
 void cbl_release(CBLRefCounted*);
 
 // Declares retain/release functions for TYPE
@@ -188,7 +195,10 @@ typedef struct CBLReplicator CBLReplicator;
 
 
 /** \defgroup listeners   Listeners
-     @{ */
+     @{
+    Every API function that registers a listener callback returns an opaque token representing
+    the registered callback. To unregister any type of listener, call \ref cbl_listener_remove.
+ */
 
 /** An opaque 'cookie' representing a registered listener callback.
     It's returned from functions that register listeners, and used to remove a listener. */

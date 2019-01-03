@@ -25,14 +25,21 @@ extern "C" {
 
 
 /** \defgroup queries   Queries
-    @{ */
+    @{
+    A CBLQuery represents a compiled N1QL-like database query.
+    The C API does not have the complex class structure that provides the "fluent" query builder
+    API in object-oriented languages; instead, queries are described using the raw
+    [JSON schema](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema)
+    understood by the core query engine.
+ */
 
 /** \name  Query objects
     @{ */
 
 /** Creates a new query.
+    @note  You must release the query when you're finished with it.
     @param db  The database to query.
-    @param jsonQuery  The query expressed in the JSON syntax.
+    @param jsonQuery  The query expressed in the [JSON syntax](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema).
     @param error  On failure, the error will be written here.
     @return  The new query object. */
 CBLQuery* cbl_query_new(const CBLDatabase* db _cblnonnull,
@@ -41,11 +48,17 @@ CBLQuery* cbl_query_new(const CBLDatabase* db _cblnonnull,
 
 CBL_REFCOUNTED(CBLQuery*, query);
 
-/** Assigns values to the query's parameters. */
+/** Assigns values to the query's parameters.
+    These values will be substited for those parameters the next time the query is executed.
+    @param query  The query.
+    @param parameters  The parameters in the form of a Fleece \ref FLDict "dictionary" whose
+            keys are the parameter names. (It's easiest to construct this by using the mutable
+            API, i.e. calling \ref FLMutableDict_New and adding keys/values.) */
 void cbl_query_setParameters(CBLQuery* _cblnonnull query,
                              FLDict _cblnonnull parameters);
 
-/** Runs the query, returning the results. */
+/** Runs the query, returning the results.
+    @note  You must release the result set when you're finished with it. */
 CBLResultSet* cbl_query_execute(CBLQuery* _cblnonnull, CBLError*);
 
 /** Returns information about the query, including the translated SQL form, and the search
@@ -72,7 +85,7 @@ FLSlice cbl_query_columnName(CBLQuery* _cblnonnull,
 
 /** Moves the result-set iterator to the next result.
     Returns false if there are no more results.
-    @note This must be called _before_ examining the first result. */
+    @warning This must be called _before_ examining the first result. */
 bool cbl_results_next(CBLResultSet* _cblnonnull);
 
 /** Returns the value of a column of the current result, given its (zero-based) numeric index. */
@@ -110,11 +123,11 @@ typedef void (*CBLQueryListener)(void *context,
                                  const CBLError* error);
 
 /** Registers a change listener callback with a query, turning it into a "live query" until
-    the listener is removed (via `cbl_listener_remove`).
+    the listener is removed (via \ref cbl_listener_remove).
     @param query  The query to observe.
     @param listener  The callback to be invoked.
     @param context  An opaque value that will be passed to the callback.
-    @return  A token to be passed to `cbl_listener_remove` when it's time to remove the
+    @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
 CBLListenerToken* cbl_query_addListener(CBLQuery* query _cblnonnull,
                                         CBLQueryListener* listener _cblnonnull,

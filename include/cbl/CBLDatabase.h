@@ -24,7 +24,9 @@ extern "C" {
 #endif
 
 /** \defgroup database   Database
-    @{ */
+    @{
+    A CBLDatabase is both a filesystem object and a container for documents.
+ */
 
 /** \name  Database configuration
     @{ */
@@ -120,14 +122,15 @@ bool cbl_db_delete(CBLDatabase* _cblnonnull, CBLError*);
 /** Compacts a database file. */
 bool cbl_db_compact(CBLDatabase* _cblnonnull, CBLError*);
 
-/** Begins a batch operation, similar to a transaction.
+/** Begins a batch operation, similar to a transaction. You **must** later call \ref
+    cbl_db_endBatch to end (commit) the batch.
     @note  Multiple writes are much faster when grouped inside a single batch.
     @note  Changes will not be visible to other CBLDatabase instances on the same database until
             the batch operation ends.
     @note  Batch operations can nest. Changes are not committed until the outer batch ends. */
 bool cbl_db_beginBatch(CBLDatabase* _cblnonnull, CBLError*);
 
-/** Ends a batch operation. This MUST be called after `cbl_db_beginBatch`. */
+/** Ends a batch operation. This **must** be called after \ref cbl_db_beginBatch. */
 bool cbl_db_endBatch(CBLDatabase* _cblnonnull, CBLError*);
 
 /** @} */
@@ -162,7 +165,7 @@ const CBLDatabaseConfiguration* cbl_db_config(const CBLDatabase* _cblnonnull);
 /** \name  Database listeners
     @{
     A database change listener lets you detect changes made to all documents in a database.
-    (If you only want to observe specific documents, use a `CBLDocumentListener` instead.)
+    (If you only want to observe specific documents, use a \ref CBLDocumentListener instead.)
     @note If there are multiple CBLDatabase instances on the same database file, each one's
     listeners will be notified of changes made by other database instances.
  */
@@ -181,7 +184,7 @@ typedef void (*CBLDatabaseListener)(void *context,
     @param db  The database to observe.
     @param listener  The callback to be invoked.
     @param context  An opaque value that will be passed to the callback.
-    @return  A token to be passed to `cbl_listener_remove` when it's time to remove the
+    @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
 CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cblnonnull,
                                      CBLDatabaseListener listener _cblnonnull,
