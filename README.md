@@ -56,10 +56,29 @@ These APIs are very preliminary, unreviewed, and probably incomplete!
 
 ## Building It
 
-(Currently only supports macOS, building with Xcode 10.)
+### With CMake
+
+1. Clone the repo
+2. Check out submodules (recursively)
+3. `mkdir build_cmake`
+4. `cd build_cmake`
+5. `cmake .. && make -j5`
+6. `./test/CBL_C_Tests -r list`
+
+The library is at `build_cmake/libCouchbaseLiteC.dylib`. (Or `.DLL` or `.so`)
+
+### With Xcode on macOS
 
 1. Clone the repo
 2. Check out submodules (recursively)
 3. Open the Xcode project
 4. Select scheme `CBL_Tests`
 5. Run
+
+The library is `libcouchbase_lite.dylib` in your `Xcode Build Products/Debug` directory (the path depends on your Xcode settings.)
+
+## Using It
+
+* In your build settings, add the paths `include` and `vendor/couchbase-lite-core/vendor/fleece/API` (relative to this repo) to your header search paths.
+* In your linker settings, add the dynamic library.
+* In source files, add `#include "cbl/CouchbaseLite.h"`.
