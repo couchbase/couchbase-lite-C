@@ -217,6 +217,8 @@
 		27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DatabaseTest.cc; sourceTree = "<group>"; };
 		27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libfleeceBase.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		27B61DBF21DD33930027CCDB /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
+		27B61DC321DEE1C20027CCDB /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -252,10 +254,11 @@
 		271C2A1A21CAC8920045856E = {
 			isa = PBXGroup;
 			children = (
-				27B61DBF21DD33930027CCDB /* Doxyfile */,
 				271C2A2A21CAC93B0045856E /* include */,
 				271C2A3621CAC9A50045856E /* src */,
 				27B61D6721D6B5DA0027CCDB /* test */,
+				27B61DBF21DD33930027CCDB /* Doxyfile */,
+				27B61DC321DEE1C20027CCDB /* CMakeLists.txt */,
 				27B61D8321D6B9F60027CCDB /* Xcode */,
 				271C2A3721CAC9B50045856E /* vendor */,
 				271C2A2421CAC8920045856E /* Products */,
@@ -357,6 +360,7 @@
 				27B61D6821D6B60D0027CCDB /* CBLTest.hh */,
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
+				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
 			);
 			path = test;
 			sourceTree = "<group>";
