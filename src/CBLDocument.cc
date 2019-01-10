@@ -43,7 +43,7 @@ public:
     { }
 
     // Construct on an existing document
-    CBLDocument(CBLDatabase *db,
+    CBLDocument(CBLDatabase *db, 
                 const string &docID,
                 bool isMutable)
     :CBLDocument(docID, db, c4doc_get(internal(db), slice(docID), true, nullptr), isMutable)

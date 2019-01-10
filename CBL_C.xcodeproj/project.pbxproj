@@ -17,6 +17,7 @@
 		271C2A7521CC4BD60045856E /* Util.hh in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A7321CC4BD60045856E /* Util.hh */; };
 		271C2A7621CC4BD60045856E /* Util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7421CC4BD60045856E /* Util.cc */; };
 		271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7721CC750E0045856E /* CBLDocument.cc */; };
+		277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */; };
 		27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery.cc */; };
 		27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61D6821D6B60D0027CCDB /* CBLTest.hh */; };
 		27B61D7D21D6B66F0027CCDB /* libcouchbase_lite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libcouchbase_lite.a */; };
@@ -199,6 +200,11 @@
 		271C2A7421CC4BD60045856E /* Util.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Util.cc; sourceTree = "<group>"; };
 		271C2A7721CC750E0045856E /* CBLDocument.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDocument.cc; sourceTree = "<group>"; };
 		271C2A7921CC756A0045856E /* Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Internal.hh; sourceTree = "<group>"; };
+		277FEE3D21DEF0C700B60E3C /* CBLBase.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLBase.hh; sourceTree = "<group>"; };
+		277FEE4E21DEF54D00B60E3C /* CBLDocument.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDocument.hh; sourceTree = "<group>"; };
+		277FEE4F21E6AB1100B60E3C /* CBLQuery.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLQuery.hh; sourceTree = "<group>"; };
+		277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CouchbaseLite.hh; sourceTree = "<group>"; };
+		277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DatabaseTest_Cpp.cc; sourceTree = "<group>"; };
 		27B61D5521D5ABA60027CCDB /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
 		27B61D6821D6B60D0027CCDB /* CBLTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTest.hh; sourceTree = "<group>"; };
 		27B61D6921D6B60D0027CCDB /* CBLTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTest.cc; sourceTree = "<group>"; };
@@ -219,6 +225,7 @@
 		27B61DBF21DD33930027CCDB /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
 		27B61DC321DEE1C20027CCDB /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		27B61DD821DEEC540027CCDB /* CBLDatabase.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDatabase.hh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -294,6 +301,11 @@
 				271C2A2C21CAC98F0045856E /* CBLReplicator.h */,
 				271C2A7021CAD6440045856E /* CBL_Compat.h */,
 				27B61DA321D6E40D0027CCDB /* CouchbaseLite.h */,
+				277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */,
+				277FEE3D21DEF0C700B60E3C /* CBLBase.hh */,
+				27B61DD821DEEC540027CCDB /* CBLDatabase.hh */,
+				277FEE4E21DEF54D00B60E3C /* CBLDocument.hh */,
+				277FEE4F21E6AB1100B60E3C /* CBLQuery.hh */,
 			);
 			path = cbl;
 			sourceTree = "<group>";
@@ -360,6 +372,7 @@
 				27B61D6821D6B60D0027CCDB /* CBLTest.hh */,
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
+				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
 				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
 			);
 			path = test;
@@ -654,6 +667,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
+				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -716,8 +730,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27B61D8821D6BAB10027CCDB /* CBL_dylib.xcconfig */;
 			buildSettings = {
-				EXPORTED_SYMBOLS_FILE = src/CBL.exp;
-				PRODUCT_NAME = couchbase_lite;
 			};
 			name = Debug;
 		};
@@ -725,8 +737,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27B61D8821D6BAB10027CCDB /* CBL_dylib.xcconfig */;
 			buildSettings = {
-				EXPORTED_SYMBOLS_FILE = src/CBL.exp;
-				PRODUCT_NAME = couchbase_lite;
 			};
 			name = Release;
 		};

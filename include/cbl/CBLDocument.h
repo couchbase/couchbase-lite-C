@@ -48,6 +48,7 @@ typedef CBL_ENUM(uint8_t, CBLConcurrencyControl) {
     @param database  The database.
     @param docID  The ID of the document.
     @return  A new CBLDocument instance, or NULL if no document with that ID exists. */
+_cbl_warn_unused
 const CBLDocument* cbl_db_getDocument(const CBLDatabase* database _cblnonnull,
                                       const char* _cblnonnull docID);
 
@@ -59,6 +60,7 @@ CBL_REFCOUNTED(const CBLDocument*, doc);
     @param concurrency  Conflict-handling strategy.
     @param error  On failure, the error will be written here.
     @return  An updated document reflecting the saved changes, or NULL on failure. */
+_cbl_warn_unused
 const CBLDocument* cbl_db_saveDocument(CBLDatabase* db _cblnonnull,
                                        CBLDocument* doc _cblnonnull,
                                        CBLConcurrencyControl concurrency,
@@ -129,18 +131,21 @@ bool cbl_db_purgeDocument(CBLDatabase* database _cblnonnull,
     @param database  The database.
     @param docID  The ID of the document.
     @return  A new mutable CBLDocument instance, or NULL if no document with that ID exists. */
+_cbl_warn_unused
 CBLDocument* cbl_db_getMutableDocument(CBLDatabase* database _cblnonnull,
                                        const char* docID _cblnonnull);
 
 /** Creates a new, empty document in memory. It will not be added to a database until saved.
     @param docID  The ID of the new document, or NULL to assign a new unique ID.
     @return  The mutable document instance. */
+_cbl_warn_unused
 CBLDocument* cbl_doc_new(const char *docID);
 
 /** Creates a new CBLDocument instance that refers to the same document as the original.
     If the original document has unsaved changes, the new one will also start out with the same
     changes; but mutating one document thereafter will not affect the other.
     @note  You must release the new reference when you're done with it. */
+_cbl_warn_unused
 CBLDocument* cbl_doc_mutableCopy(const CBLDocument* original _cblnonnull);
 
 /** @} */
@@ -205,6 +210,7 @@ typedef void (*CBLDocumentListener)(void *context,
     @param context  An opaque value that will be passed to the callback.
     @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
+_cbl_warn_unused
 CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cblnonnull,
                                              const char* docID _cblnonnull,
                                              CBLDocumentListener listener _cblnonnull,

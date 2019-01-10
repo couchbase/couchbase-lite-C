@@ -9,7 +9,7 @@
 #include "fleece/FLSlice.h"
 #include <string>
 
-namespace cbl {
+namespace cbl_internal {
 
     /** Like sprintf(), but returns a std::string */
     std::string format(const char *fmt _cblnonnull, ...) __printflike(1, 2);

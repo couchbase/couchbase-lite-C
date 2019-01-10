@@ -1,5 +1,5 @@
 //
-//  CouchbaseLite.h
+//  CouchbaseLite.hh
 //
 // Copyright (c) 2018 Couchbase, Inc All rights reserved.
 //
@@ -17,9 +17,8 @@
 //
 
 #pragma once
-#include "CBLBase.h"
-#include "CBLDatabase.h"
-#include "CBLDocument.h"
-#include "CBLQuery.h"
-//#include "CBLReplicator.h"
+#include "CBLDatabase.hh"
+#include "CBLDocument.hh"
+#include "CBLQuery.hh"
+//#include "CBLReplicator.hh"
 

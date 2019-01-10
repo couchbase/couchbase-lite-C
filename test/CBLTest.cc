@@ -24,16 +24,19 @@
 #include <sys/stat.h>
 
 
-std::string CBLTest::kDatabaseDir;
+static std::string databaseDir() {
+    std::string dir = "/tmp/CBL_C_tests";  // TODO // COMPAT
+    if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
+        FAIL("Can't create temp directory: errno " << errno);
+    return dir;
+}
+
+
+std::string CBLTest::kDatabaseDir = databaseDir();
 const char* const CBLTest::kDatabaseName = "cbl_test";
 
 
 CBLTest::CBLTest() {
-    if (kDatabaseDir.empty()) {
-        kDatabaseDir = "/tmp/CBL_C_tests";  // TODO // COMPAT
-        if (mkdir(kDatabaseDir.c_str(), 0744) != 0 && errno != EEXIST)
-            FAIL("Can't create temp directory: errno " << errno);
-    }
     CBLDatabaseConfiguration config = {kDatabaseDir.c_str()};
     CBLError error;
     if (!cbl_deleteDB(kDatabaseName, config.directory, &error) && error.code != 0)
@@ -50,6 +53,23 @@ CBLTest::~CBLTest() {
             WARN("Failed to close database: " << error.domain << "/" << error.code);
         cbl_db_release(db);
     }
+}
+
+
+std::string& CBLTest_Cpp::kDatabaseDir = CBLTest::kDatabaseDir;
+const char* const & CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
+
+
+
+CBLTest_Cpp::CBLTest_Cpp() {
+    cbl::Database::deleteDB(kDatabaseName, kDatabaseDir.c_str());
+    db = cbl::Database(kDatabaseName, {kDatabaseDir.c_str()});
+    REQUIRE(db);
+}
+
+
+CBLTest_Cpp::~CBLTest_Cpp() {
+    db.close();
 }
 
 

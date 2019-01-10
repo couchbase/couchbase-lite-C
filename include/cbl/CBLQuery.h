@@ -16,6 +16,7 @@
 // limitations under the License.
 //
 
+#pragma once
 #include "CBLBase.h"
 #include "fleece/Fleece.h"
 
@@ -42,6 +43,7 @@ extern "C" {
     @param jsonQuery  The query expressed in the [JSON syntax](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema).
     @param error  On failure, the error will be written here.
     @return  The new query object. */
+_cbl_warn_unused
 CBLQuery* cbl_query_new(const CBLDatabase* db _cblnonnull,
                         const char *jsonQuery _cblnonnull, 
                         CBLError* error);
@@ -59,6 +61,7 @@ void cbl_query_setParameters(CBLQuery* _cblnonnull query,
 
 /** Runs the query, returning the results.
     @note  You must release the result set when you're finished with it. */
+_cbl_warn_unused
 CBLResultSet* cbl_query_execute(CBLQuery* _cblnonnull, CBLError*);
 
 /** Returns information about the query, including the translated SQL form, and the search
@@ -129,6 +132,7 @@ typedef void (*CBLQueryListener)(void *context,
     @param context  An opaque value that will be passed to the callback.
     @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
+_cbl_warn_unused
 CBLListenerToken* cbl_query_addListener(CBLQuery* query _cblnonnull,
                                         CBLQueryListener* listener _cblnonnull,
                                         void *context);

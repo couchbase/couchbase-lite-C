@@ -24,7 +24,7 @@
 
 using namespace std;
 using namespace fleece;
-using namespace cbl;
+using namespace cbl_internal;
 
 
 static const char* defaultDbDir() {
@@ -91,7 +91,7 @@ CBLDatabase* cbl_db_open(const char *name,
 
 
 bool cbl_db_close(CBLDatabase* db, CBLError* outError) {
-    return c4db_close(internal(db), internal(outError));
+    return !db || c4db_close(internal(db), internal(outError));
 }
 
 

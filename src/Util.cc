@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <string>
 
-namespace cbl {
+namespace cbl_internal {
 
     std::string vformat(const char *fmt, va_list args) {
         char *cstr = nullptr;

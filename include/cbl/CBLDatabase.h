@@ -107,12 +107,13 @@ bool cbl_deleteDB(const char _cblnonnull *name,
     @param config  The database configuration (directory and encryption option.)
     @param error  On failure, the error will be written here.
     @return  The new database object, or NULL on failure. */
+_cbl_warn_unused
 CBLDatabase* cbl_db_open(const char *name _cblnonnull,
                          const CBLDatabaseConfiguration* config,
                          CBLError* error);
 
 /** Closes an open database. */
-bool cbl_db_close(CBLDatabase* _cblnonnull, CBLError*);
+bool cbl_db_close(CBLDatabase*, CBLError*);
 
 CBL_REFCOUNTED(CBLDatabase*, db);
 
@@ -186,6 +187,7 @@ typedef void (*CBLDatabaseListener)(void *context,
     @param context  An opaque value that will be passed to the callback.
     @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
+_cbl_warn_unused
 CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cblnonnull,
                                      CBLDatabaseListener listener _cblnonnull,
                                      void *context);

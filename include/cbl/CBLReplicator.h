@@ -16,6 +16,7 @@
 // limitations under the License.
 //
 
+#pragma once
 #include "CBLBase.h"
 #include "fleece/FLSlice.h"
 
