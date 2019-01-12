@@ -65,7 +65,8 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Empty Document") {
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
     MutableDocument doc("foo");
-    doc.set("greeting", "Howdy!");
+    doc["greeting"] = "Howdy!";
+    CHECK(doc["greeting"].asString() == "Howdy!"_sl);
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
     auto saved = db.saveDocument(doc);

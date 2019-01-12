@@ -68,7 +68,10 @@ namespace cbl {
         fleece::MutableDict properties()                {return cbl_doc_mutableProperties(ref());}
 
         template <typename T>
-        void set(const char *key _cblnonnull, T val)  {properties().set(fleece::slice(key), val);}
+        void set(const char *key _cblnonnull, T val)    {properties().set(fleece::slice(key), val);}
+
+        fleece::keyref<fleece::MutableDict,fleece::slice> operator[] (const char *key)
+                                                        {return properties()[fleece::slice(key)];}
 
         friend class Database;
         friend class Document;
