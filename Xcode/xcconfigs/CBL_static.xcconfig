@@ -8,5 +8,8 @@
 
 #include "vendor/couchbase-lite-core/Xcode/xcconfigs/static_lib.xcconfig"
 
-HEADER_SEARCH_PATHS     = $(LITECORE)/C/include  $(FLEECE)/API  $(FLEECE)/fleece/Support
-PRODUCT_NAME            = couchbase_lite
+DSTROOT                     = /tmp/couchbase_lite_C.dst
+HEADER_SEARCH_PATHS         = $(LITECORE)/C/include  $(FLEECE)/API  $(FLEECE)/fleece/Support
+PRODUCT_NAME                = couchbase_lite_static
+SKIP_INSTALL                = YES
+STRIP_INSTALLED_PRODUCT     = NO
