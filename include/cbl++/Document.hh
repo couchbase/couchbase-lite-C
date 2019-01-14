@@ -1,5 +1,5 @@
 //
-// CBLDocument.hh
+// Document.hh
 //
 // Copyright (c) 2019 Couchbase, Inc All rights reserved.
 //
@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "CBLDatabase.hh"
+#include "Database.hh"
 #include "CBLDocument.h"
 #include "fleece/Mutable.hh"
 

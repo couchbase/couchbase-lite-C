@@ -17,8 +17,8 @@
 //
 
 #pragma once
-#include "CBLDatabase.hh"
-#include "CBLDocument.hh"
-#include "CBLQuery.hh"
-//#include "CBLReplicator.hh"
+#include "Database.hh"
+#include "Document.hh"
+#include "Query.hh"
+//#include "Replicator.hh"
 

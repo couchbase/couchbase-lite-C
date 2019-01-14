@@ -1,5 +1,5 @@
 //
-//  CBLQuery.hh
+//  Query.hh
 //
 // Copyright (c) 2019 Couchbase, Inc All rights reserved.
 //
@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "CBLDatabase.hh"
+#include "Database.hh"
 #include "CBLQuery.h"
 
 namespace cbl {

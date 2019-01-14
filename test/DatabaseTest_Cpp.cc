@@ -21,7 +21,7 @@
 #include "fleece/Mutable.hh"
 #include <string>
 
-#include "CouchbaseLite.hh"
+#include "cbl++/CouchbaseLite.hh"
 
 using namespace std;
 using namespace fleece;

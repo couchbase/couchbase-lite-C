@@ -1,5 +1,5 @@
 //
-// CBLBase.hh
+// Base.hh
 //
 // Copyright (c) 2019 Couchbase, Inc All rights reserved.
 //

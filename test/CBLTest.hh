@@ -5,8 +5,8 @@
 //
 
 #pragma once
-#include "CouchbaseLite.h"
-#include "CouchbaseLite.hh"
+#include "cbl/CouchbaseLite.h"
+#include "cbl++/CouchbaseLite.hh"
 #include "catch.hpp"
 #include <string>
 

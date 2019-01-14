@@ -1,5 +1,5 @@
 //
-// CBLDatabase.hh
+// Database.hh
 //
 // Copyright (c) 2019 Couchbase, Inc All rights reserved.
 //
@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "CBLBase.hh"
+#include "Base.hh"
 #include "CBLDatabase.h"
 #include <functional>
 #include <vector>

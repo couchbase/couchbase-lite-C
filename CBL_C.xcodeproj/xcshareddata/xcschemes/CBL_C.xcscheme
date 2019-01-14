@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "271C2A2221CAC8920045856E"
-               BuildableName = "libcouchbase_lite.a"
+               BuildableName = "libcouchbase_lite_static.a"
                BlueprintName = "CBL_C"
                ReferencedContainer = "container:CBL_C.xcodeproj">
             </BuildableReference>
@@ -50,7 +50,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "271C2A2221CAC8920045856E"
-            BuildableName = "libcouchbase_lite.a"
+            BuildableName = "libcouchbase_lite_static.a"
             BlueprintName = "CBL_C"
             ReferencedContainer = "container:CBL_C.xcodeproj">
          </BuildableReference>
@@ -73,7 +73,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "271C2A2221CAC8920045856E"
-            BuildableName = "libcouchbase_lite.a"
+            BuildableName = "libcouchbase_lite_static.a"
             BlueprintName = "CBL_C"
             ReferencedContainer = "container:CBL_C.xcodeproj">
          </BuildableReference>
