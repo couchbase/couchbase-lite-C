@@ -17,17 +17,13 @@
 //
 
 #include "CBLDocument.h"
-#include "Internal.hh"
-#include "c4.hh"
-#include "c4Document+Fleece.h"
-#include "fleece/Fleece.hh"
-#include "fleece/Mutable.hh"
+#include "CBLDocument_Internal.hh"
 
 using namespace std;
 using namespace fleece;
 
 
-static inline string ensureDocID(const char *docID) {
+string CBLDocument::ensureDocID(const char *docID) {
     char docIDBuf[32];
     if (!docID)
         docID = c4doc_generateID(docIDBuf, sizeof(docIDBuf));
@@ -35,169 +31,118 @@ static inline string ensureDocID(const char *docID) {
 }
 
 
-class CBLDocument : public CBLRefCounted {
-public:
-    // Construct a new document (not in any database yet)
-    CBLDocument(const char *docID, bool isMutable)
-    :CBLDocument(ensureDocID(docID), nullptr, nullptr, isMutable)
-    { }
+Dict CBLDocument::properties() const {
+    if (!_properties)
+        const_cast<CBLDocument*>(this)->initProperties();
+    return _properties.asDict();
+}
 
-    // Construct on an existing document
-    CBLDocument(CBLDatabase *db, 
-                const string &docID,
-                bool isMutable)
-    :CBLDocument(docID, db, c4doc_get(internal(db), slice(docID), true, nullptr), isMutable)
-    { }
-
-    // Mutable copy of another CBLDocument
-    CBLDocument(const CBLDocument* otherDoc)
-    :CBLDocument(otherDoc->_docID,
-                 otherDoc->_db,
-                 c4doc_retain(otherDoc->_c4doc),
-                 true)
-    {
-        if (otherDoc->isMutable() && otherDoc->_properties)
-            _properties = MutableDict::deepCopy(otherDoc->_properties.asDict());
+RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cblnonnull,
+                                bool deleting,
+                                CBLConcurrencyControl concurrency,
+                                C4Error* outError) const
+{
+    if (_db && _db != db) {
+        if (outError)
+            *outError = c4error_make(LiteCoreDomain, kC4ErrorInvalidParameter,
+                                     "Saving doc to wrong database"_sl);
+        return nullptr;
+    } else if (!_mutable) {
+        return this;
     }
 
-    CBLDatabase* database() const               {return _db;}
-    const char* docID() const                   {return _docID.c_str();}
-    bool exists() const                         {return _c4doc != nullptr;}
-    uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence : 0;}
-    bool isMutable() const                      {return _mutable;}
-    MutableDict mutableProperties() const       {return properties().asMutable();}
+    c4::Transaction t(internal(db));
+    if (!t.begin(outError))
+        return nullptr;
 
-    Dict properties() const {
+    // Encode properties:
+    alloc_slice body;
+    if (!deleting) {
+        Encoder enc(c4db_getSharedFleeceEncoder(internal(db)));
+        enc.writeValue(properties());
+        body = enc.finish();
+        enc.detach();
+    }
+
+    // Save:
+    c4::ref<C4Document> savingDoc = c4doc_retain(_c4doc);
+    c4::ref<C4Document> newDoc = nullptr;
+    C4Error c4err;
+
+    bool retrying = false;
+    do {
+        C4RevisionFlags flags = (deleting ? kRevDeleted : 0);
+        if (savingDoc) {
+            newDoc = c4doc_update(savingDoc, body, flags, &c4err);
+        } else {
+            C4DocPutRequest rq = {};
+            rq.allocedBody = {body.buf, body.size};
+            rq.docID = slice(_docID);
+            rq.revFlags = flags;
+            rq.save = true;
+            newDoc = c4doc_put(internal(db), &rq, nullptr, &c4err);
+        }
+
+        if (!newDoc && c4err == C4Error{LiteCoreDomain, kC4ErrorConflict}
+                    && concurrency == kCBLConcurrencyControlLastWriteWins) {
+            // Conflict; in last-write-wins mode, load current revision and retry:
+            if (retrying)
+                break;  // (but only once)
+            savingDoc = c4doc_get(internal(db), slice(_docID), true, &c4err);
+            if (savingDoc || c4err == C4Error{LiteCoreDomain, kC4ErrorNotFound})
+                retrying = true;
+        }
+    } while (retrying);
+
+    if (newDoc && t.commit(&c4err)) {
+        // Success!
+        return new CBLDocument(_docID, db, c4doc_retain(newDoc), false);
+    } else {
+        // Failure:
+        if (outError)
+            *outError = c4err;
+        return nullptr;
+    }
+}
+
+bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency,
+               C4Error* outError) const
+{
+    if (!_db) {
+        if (outError) *outError = c4error_make(LiteCoreDomain, kC4ErrorNotFound,
+                                               "Document is not in any database"_sl);
+        return false;
+    }
+    RetainedConst<CBLDocument> deleted = save(_db, true, concurrency, outError);
+    return (deleted != nullptr);
+}
+
+bool CBLDocument::deleteDoc(CBLDatabase* db _cblnonnull,
+                      const char* docID _cblnonnull,
+                      C4Error* outError)
+{
+    c4::Transaction t(internal(db));
+    if (!t.begin(outError))
+        return false;
+    c4::ref<C4Document> c4doc = c4doc_get(internal(db), slice(docID), true, outError);
+    if (c4doc)
+        c4doc = c4doc_update(c4doc, nullslice, kRevDeleted, outError);
+    return c4doc && t.commit(outError);
+}
+
+void CBLDocument::initProperties() {
+    if (_c4doc && _c4doc->selectedRev.body.buf)
+        _properties = Value::fromData(_c4doc->selectedRev.body);
+    if (_mutable) {
+        if (_properties)
+            _properties = MutableDict::copy(_properties.asDict());
         if (!_properties)
-            const_cast<CBLDocument*>(this)->initProperties();
-        return _properties.asDict();
+            _properties = MutableDict::newDict();
+    } else {
+        if (!_properties)
+            _properties = Dict::emptyDict();
     }
-
-    RetainedConst<CBLDocument> save(CBLDatabase* db _cblnonnull,
-                                    bool deleting,
-                                    CBLConcurrencyControl concurrency,
-                                    C4Error* outError) const
-    {
-        if (_db && _db != db) {
-            if (outError)
-                *outError = c4error_make(LiteCoreDomain, kC4ErrorInvalidParameter,
-                                         "Saving doc to wrong database"_sl);
-            return nullptr;
-        } else if (!_mutable) {
-            return this;
-        }
-
-        c4::Transaction t(internal(db));
-        if (!t.begin(outError))
-            return nullptr;
-
-        // Encode properties:
-        alloc_slice body;
-        if (!deleting) {
-            Encoder enc(c4db_getSharedFleeceEncoder(internal(db)));
-            enc.writeValue(properties());
-            body = enc.finish();
-            enc.detach();
-        }
-
-        // Save:
-        c4::ref<C4Document> savingDoc = c4doc_retain(_c4doc);
-        c4::ref<C4Document> newDoc = nullptr;
-        C4Error c4err;
-
-        bool retrying = false;
-        do {
-            C4RevisionFlags flags = (deleting ? kRevDeleted : 0);
-            if (savingDoc) {
-                newDoc = c4doc_update(savingDoc, body, flags, &c4err);
-            } else {
-                C4DocPutRequest rq = {};
-                rq.allocedBody = {body.buf, body.size};
-                rq.docID = slice(_docID);
-                rq.revFlags = flags;
-                rq.save = true;
-                newDoc = c4doc_put(internal(db), &rq, nullptr, &c4err);
-            }
-
-            if (!newDoc && c4err == C4Error{LiteCoreDomain, kC4ErrorConflict}
-                        && concurrency == kCBLConcurrencyControlLastWriteWins) {
-                // Conflict; in last-write-wins mode, load current revision and retry:
-                if (retrying)
-                    break;  // (but only once)
-                savingDoc = c4doc_get(internal(db), slice(_docID), true, &c4err);
-                if (savingDoc || c4err == C4Error{LiteCoreDomain, kC4ErrorNotFound})
-                    retrying = true;
-            }
-        } while (retrying);
-
-        if (newDoc && t.commit(&c4err)) {
-            // Success!
-            return new CBLDocument(_docID, db, c4doc_retain(newDoc), false);
-        } else {
-            // Failure:
-            if (outError)
-                *outError = c4err;
-            return nullptr;
-        }
-    }
-
-    bool deleteDoc(CBLConcurrencyControl concurrency,
-                   C4Error* outError) const
-    {
-        if (!_db) {
-            if (outError) *outError = c4error_make(LiteCoreDomain, kC4ErrorNotFound,
-                                                   "Document is not in any database"_sl);
-            return false;
-        }
-        RetainedConst<CBLDocument> deleted = save(_db, true, concurrency, outError);
-        return (deleted != nullptr);
-    }
-
-    static bool deleteDoc(CBLDatabase* db _cblnonnull,
-                          const char* docID _cblnonnull,
-                          C4Error* outError)
-    {
-        c4::Transaction t(internal(db));
-        if (!t.begin(outError))
-            return false;
-        c4::ref<C4Document> c4doc = c4doc_get(internal(db), slice(docID), true, outError);
-        if (c4doc)
-            c4doc = c4doc_update(c4doc, nullslice, kRevDeleted, outError);
-        return c4doc && t.commit(outError);
-    }
-
-private:
-    // Core constructor
-    CBLDocument(const string &docID,
-                CBLDatabase *db,
-                C4Document *d,          // must be a +1 ref
-                bool isMutable)
-    :_docID(docID)
-    ,_db(db)
-    ,_c4doc(d)
-    ,_mutable(isMutable)
-    { }
-
-    void initProperties() {
-        if (_c4doc && _c4doc->selectedRev.body.buf)
-            _properties = Value::fromData(_c4doc->selectedRev.body);
-        if (_mutable) {
-            if (_properties)
-                _properties = MutableDict::copy(_properties.asDict());
-            if (!_properties)
-                _properties = MutableDict::newDict();
-        } else {
-            if (!_properties)
-                _properties = Dict::emptyDict();
-        }
-    }
-
-    string const                _docID;                 // Document ID (never empty)
-    Retained<CBLDatabase> const _db;                    // Database (null for new doc)
-    c4::ref<C4Document> const   _c4doc;                 // LiteCore doc (null for new doc)
-    RetainedValue               _properties;            // Properties, initialized lazily
-    bool const                  _mutable {false};       // True iff I am mutable
-};
+}
 
 
 #pragma mark - PUBLIC API:

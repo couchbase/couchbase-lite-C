@@ -165,6 +165,14 @@ Ref-counting (mutable values only)</h2></td></tr>
 <tr class="memitem:gad9722234a46fa70152469c2499e9246c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_value.html#gad9722234a46fa70152469c2499e9246c">FLValue_Release</a> (<a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>)</td></tr>
 <tr class="memdesc:gad9722234a46fa70152469c2499e9246c"><td class="mdescLeft">&#160;</td><td class="mdescRight">If this value is mutable (and thus heap-based) its ref-count is decremented, and if it reaches zero the value is freed.  <a href="#gad9722234a46fa70152469c2499e9246c">More...</a><br /></td></tr>
 <tr class="separator:gad9722234a46fa70152469c2499e9246c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa5c46cdbf9d49a49b9fbd52becf2bf78"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_value.html#gaa5c46cdbf9d49a49b9fbd52becf2bf78">FLArray_Retain</a> (<a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a> v)</td></tr>
+<tr class="separator:gaa5c46cdbf9d49a49b9fbd52becf2bf78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0ddab799a4c5a408b46b71c00ef945b2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_value.html#ga0ddab799a4c5a408b46b71c00ef945b2">FLArray_Release</a> (<a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a> v)</td></tr>
+<tr class="separator:ga0ddab799a4c5a408b46b71c00ef945b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6acff14f3e0893c06975a7b64079383f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_value.html#ga6acff14f3e0893c06975a7b64079383f">FLDict_Retain</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> v)</td></tr>
+<tr class="separator:ga6acff14f3e0893c06975a7b64079383f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaafc47667d4c5aea2ce19c7518ab2e896"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_value.html#gaafc47667d4c5aea2ce19c7518ab2e896">FLDict_Release</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> v)</td></tr>
+<tr class="separator:gaafc47667d4c5aea2ce19c7518ab2e896"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>The core Fleece data type is FLValue: a reference to a value in Fleece-encoded data. </p>
@@ -245,6 +253,110 @@ Ref-counting (mutable values only)</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="ga0ddab799a4c5a408b46b71c00ef945b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0ddab799a4c5a408b46b71c00ef945b2">&#9670;&nbsp;</a></span>FLArray_Release()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void FLArray_Release </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a>&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="gaa5c46cdbf9d49a49b9fbd52becf2bf78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa5c46cdbf9d49a49b9fbd52becf2bf78">&#9670;&nbsp;</a></span>FLArray_Retain()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a> FLArray_Retain </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a>&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="gaafc47667d4c5aea2ce19c7518ab2e896"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaafc47667d4c5aea2ce19c7518ab2e896">&#9670;&nbsp;</a></span>FLDict_Release()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void FLDict_Release </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ga6acff14f3e0893c06975a7b64079383f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6acff14f3e0893c06975a7b64079383f">&#9670;&nbsp;</a></span>FLDict_Retain()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> FLDict_Retain </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ga6f302f7635d45d894a0e8c0e7dc19879"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga6f302f7635d45d894a0e8c0e7dc19879">&#9670;&nbsp;</a></span>FLValue_AsArray()</h2>
 

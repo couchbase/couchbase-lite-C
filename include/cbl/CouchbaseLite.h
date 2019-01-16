@@ -21,5 +21,5 @@
 #include "CBLDatabase.h"
 #include "CBLDocument.h"
 #include "CBLQuery.h"
-//#include "CBLReplicator.h"
+#include "CBLReplicator.h"
 

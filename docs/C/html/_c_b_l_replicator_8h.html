@@ -67,300 +67,107 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Structures</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#nested-classes">Data Structures</a>  </div>
   <div class="headertitle">
 <div class="title">CBLReplicator.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="_c_b_l_base_8h_source.html">CBLBase.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="_f_l_slice_8h_source.html">fleece/FLSlice.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="_fleece_8h_source.html">fleece/Fleece.h</a>&quot;</code><br />
 </div>
 <p><a href="_c_b_l_replicator_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html">CBLReplicatorConfiguration</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The configuration of a replicator.  <a href="struct_c_b_l_replicator_configuration.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_progress.html">CBLReplicatorProgress</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A fractional progress value.  <a href="struct_c_b_l_replicator_progress.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_status.html">CBLReplicatorStatus</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A replicator's current status.  <a href="struct_c_b_l_replicator_status.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a4f3d23951fcdf2fa9e03b6b01f27bae0"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#a4f3d23951fcdf2fa9e03b6b01f27bae0">CBLReplicatorListener</a>) (void *context, <a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *, const <a class="el" href="struct_c_b_l_replicator_status.html">CBLReplicatorStatus</a> *)</td></tr>
-<tr class="separator:a4f3d23951fcdf2fa9e03b6b01f27bae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
-Enumerations</h2></td></tr>
-<tr class="memitem:ae4da222f876468553ef0c1dca113d0d3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#ae4da222f876468553ef0c1dca113d0d3">CBLReplicatorType</a> : uint8_t </td></tr>
-<tr class="separator:ae4da222f876468553ef0c1dca113d0d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9421513c63f1d16bf4740c4d2515dd22"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#a9421513c63f1d16bf4740c4d2515dd22">CBLReplicatorActivityLevel</a> : uint8_t </td></tr>
-<tr class="separator:a9421513c63f1d16bf4740c4d2515dd22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad5fa3c9627fe67ce03dec857d332c117"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#ad5fa3c9627fe67ce03dec857d332c117">cbl_repl_retain</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *t)</td></tr>
-<tr class="separator:ad5fa3c9627fe67ce03dec857d332c117"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a450ace7090e46859d9e950fb1fbd7d1b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#a450ace7090e46859d9e950fb1fbd7d1b">cbl_repl_release</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *t)</td></tr>
-<tr class="separator:a450ace7090e46859d9e950fb1fbd7d1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a789e0e7abd5a259784ba50dbebd535e7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#a789e0e7abd5a259784ba50dbebd535e7">cbl_repl_new</a> (<a class="el" href="struct_c_b_l_replicator_configuration.html">CBLReplicatorConfiguration</a> *)</td></tr>
-<tr class="separator:a789e0e7abd5a259784ba50dbebd535e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0889b123eab398423504cb262995b77c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_c_b_l_replicator_configuration.html">CBLReplicatorConfiguration</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#a0889b123eab398423504cb262995b77c">cbl_repl_config</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
-<tr class="separator:a0889b123eab398423504cb262995b77c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74719df0cf43de6996553a98d69257e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#a74719df0cf43de6996553a98d69257e0">cbl_repl_start</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
-<tr class="separator:a74719df0cf43de6996553a98d69257e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa451045191ddf56d1fe6b36f4ddf3f91"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#aa451045191ddf56d1fe6b36f4ddf3f91">cbl_repl_stop</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
-<tr class="separator:aa451045191ddf56d1fe6b36f4ddf3f91"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bc318e49f18e79bf8191b2d0737dea3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#a6bc318e49f18e79bf8191b2d0737dea3">cbl_repl_resetCheckpoint</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
-<tr class="separator:a6bc318e49f18e79bf8191b2d0737dea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79d60a9a9f43bf02ba889f204b6aef46"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_c_b_l_replicator_status.html">CBLReplicatorStatus</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#a79d60a9a9f43bf02ba889f204b6aef46">cbl_repl_status</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
-<tr class="separator:a79d60a9a9f43bf02ba889f204b6aef46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b6a3f816ebd2673bbe5b85cd2b527c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_replicator_8h.html#a8b6a3f816ebd2673bbe5b85cd2b527c5">cbl_repl_addListener</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *, <a class="el" href="_c_b_l_replicator_8h.html#a4f3d23951fcdf2fa9e03b6b01f27bae0">CBLReplicatorListener</a>, void *context)</td></tr>
-<tr class="separator:a8b6a3f816ebd2673bbe5b85cd2b527c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Lifecycle</div></td></tr>
+<tr class="memitem:gad5fa3c9627fe67ce03dec857d332c117"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#gad5fa3c9627fe67ce03dec857d332c117">cbl_repl_retain</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *t)</td></tr>
+<tr class="separator:gad5fa3c9627fe67ce03dec857d332c117"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga450ace7090e46859d9e950fb1fbd7d1b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga450ace7090e46859d9e950fb1fbd7d1b">cbl_repl_release</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *t)</td></tr>
+<tr class="separator:ga450ace7090e46859d9e950fb1fbd7d1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad8c49c274d1c15de05c969398d12bec7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#gad8c49c274d1c15de05c969398d12bec7">cbl_repl_new</a> (const <a class="el" href="struct_c_b_l_replicator_configuration.html">CBLReplicatorConfiguration</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
+<tr class="memdesc:gad8c49c274d1c15de05c969398d12bec7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a replicator with the given configuration.  <a href="group__replication.html#gad8c49c274d1c15de05c969398d12bec7">More...</a><br /></td></tr>
+<tr class="separator:gad8c49c274d1c15de05c969398d12bec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0889b123eab398423504cb262995b77c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_c_b_l_replicator_configuration.html">CBLReplicatorConfiguration</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga0889b123eab398423504cb262995b77c">cbl_repl_config</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
+<tr class="memdesc:ga0889b123eab398423504cb262995b77c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the configuration of an existing replicator.  <a href="group__replication.html#ga0889b123eab398423504cb262995b77c">More...</a><br /></td></tr>
+<tr class="separator:ga0889b123eab398423504cb262995b77c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6bc318e49f18e79bf8191b2d0737dea3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga6bc318e49f18e79bf8191b2d0737dea3">cbl_repl_resetCheckpoint</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
+<tr class="memdesc:ga6bc318e49f18e79bf8191b2d0737dea3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instructs the replicator to ignore existing checkpoints the next time it runs.  <a href="group__replication.html#ga6bc318e49f18e79bf8191b2d0737dea3">More...</a><br /></td></tr>
+<tr class="separator:ga6bc318e49f18e79bf8191b2d0737dea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga74719df0cf43de6996553a98d69257e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga74719df0cf43de6996553a98d69257e0">cbl_repl_start</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
+<tr class="memdesc:ga74719df0cf43de6996553a98d69257e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts a replicator, asynchronously.  <a href="group__replication.html#ga74719df0cf43de6996553a98d69257e0">More...</a><br /></td></tr>
+<tr class="separator:ga74719df0cf43de6996553a98d69257e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa451045191ddf56d1fe6b36f4ddf3f91"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#gaa451045191ddf56d1fe6b36f4ddf3f91">cbl_repl_stop</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
+<tr class="memdesc:gaa451045191ddf56d1fe6b36f4ddf3f91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stops a running replicator.  <a href="group__replication.html#gaa451045191ddf56d1fe6b36f4ddf3f91">More...</a><br /></td></tr>
+<tr class="separator:gaa451045191ddf56d1fe6b36f4ddf3f91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+Configuration</h2></td></tr>
+<tr class="memitem:gae4da222f876468553ef0c1dca113d0d3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#gae4da222f876468553ef0c1dca113d0d3">CBLReplicatorType</a> : uint8_t { <a class="el" href="group__replication.html#ggae4da222f876468553ef0c1dca113d0d3a74d2b6cfb4c0537be917a15ea1fe5f85">kCBLReplicatorTypePushAndPull</a> = 0, 
+<a class="el" href="group__replication.html#ggae4da222f876468553ef0c1dca113d0d3aa9df541ec5885e301ea8cf1de67139f5">kCBLReplicatorTypePush</a>, 
+<a class="el" href="group__replication.html#ggae4da222f876468553ef0c1dca113d0d3ad7887766994a898e4a927526083f196e">kCBLReplicatorTypePull</a>
+ }</td></tr>
+<tr class="memdesc:gae4da222f876468553ef0c1dca113d0d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direction of replication: push, pull, or both.  <a href="group__replication.html#gae4da222f876468553ef0c1dca113d0d3">More...</a><br /></td></tr>
+<tr class="separator:gae4da222f876468553ef0c1dca113d0d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga13b3c0a779ab66b887f77512591c7be2"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="group__replication.html#ga13b3c0a779ab66b887f77512591c7be2">CBLEndpoint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga13b3c0a779ab66b887f77512591c7be2">CBLEndpoint</a></td></tr>
+<tr class="memdesc:ga13b3c0a779ab66b887f77512591c7be2"><td class="mdescLeft">&#160;</td><td class="mdescRight">An opaque object representing a database to replicate with.  <a href="group__replication.html#ga13b3c0a779ab66b887f77512591c7be2">More...</a><br /></td></tr>
+<tr class="separator:ga13b3c0a779ab66b887f77512591c7be2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0af278188fb2ae398501088de034d2c5"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="group__replication.html#ga0af278188fb2ae398501088de034d2c5">CBLAuthenticator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga0af278188fb2ae398501088de034d2c5">CBLAuthenticator</a></td></tr>
+<tr class="memdesc:ga0af278188fb2ae398501088de034d2c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">An opaque object representing authentication credentials for a remote server.  <a href="group__replication.html#ga0af278188fb2ae398501088de034d2c5">More...</a><br /></td></tr>
+<tr class="separator:ga0af278188fb2ae398501088de034d2c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga247697173c6d36e9355af1a4497fadf4"><td class="memItemLeft" align="right" valign="top">typedef bool(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga247697173c6d36e9355af1a4497fadf4">CBLReplicationFilter</a>) (<a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *document, bool isDeleted)</td></tr>
+<tr class="memdesc:ga247697173c6d36e9355af1a4497fadf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback that can decide whether a particular document should be pushed or pulled.  <a href="group__replication.html#ga247697173c6d36e9355af1a4497fadf4">More...</a><br /></td></tr>
+<tr class="separator:ga247697173c6d36e9355af1a4497fadf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6ff4c14d2b14fc077598afbe21f965bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#ga13b3c0a779ab66b887f77512591c7be2">CBLEndpoint</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga6ff4c14d2b14fc077598afbe21f965bf">cblendpoint_newWithURL</a> (const char *url)</td></tr>
+<tr class="memdesc:ga6ff4c14d2b14fc077598afbe21f965bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new endpoint representing a server at the given URL.  <a href="group__replication.html#ga6ff4c14d2b14fc077598afbe21f965bf">More...</a><br /></td></tr>
+<tr class="separator:ga6ff4c14d2b14fc077598afbe21f965bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae89ae88e4bd42adc35780eab60596306"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#ga13b3c0a779ab66b887f77512591c7be2">CBLEndpoint</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#gae89ae88e4bd42adc35780eab60596306">cblendpoint_newWithLocalDB</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *)</td></tr>
+<tr class="memdesc:gae89ae88e4bd42adc35780eab60596306"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new endpoint representing another local database.  <a href="group__replication.html#gae89ae88e4bd42adc35780eab60596306">More...</a><br /></td></tr>
+<tr class="separator:gae89ae88e4bd42adc35780eab60596306"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1771bd874e8c05387e21aa2dffaa0ce2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga1771bd874e8c05387e21aa2dffaa0ce2">cblendpoint_free</a> (<a class="el" href="group__replication.html#ga13b3c0a779ab66b887f77512591c7be2">CBLEndpoint</a> *)</td></tr>
+<tr class="memdesc:ga1771bd874e8c05387e21aa2dffaa0ce2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees a CBLEndpoint object.  <a href="group__replication.html#ga1771bd874e8c05387e21aa2dffaa0ce2">More...</a><br /></td></tr>
+<tr class="separator:ga1771bd874e8c05387e21aa2dffaa0ce2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaaeec7c20bd067e3a6add3990bb739e6b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#ga0af278188fb2ae398501088de034d2c5">CBLAuthenticator</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#gaaeec7c20bd067e3a6add3990bb739e6b">cblauth_newBasic</a> (const char *username, const char *password)</td></tr>
+<tr class="memdesc:gaaeec7c20bd067e3a6add3990bb739e6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates an authenticator for HTTP Basic (username/password) auth.  <a href="group__replication.html#gaaeec7c20bd067e3a6add3990bb739e6b">More...</a><br /></td></tr>
+<tr class="separator:gaaeec7c20bd067e3a6add3990bb739e6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae5094e2e64f445ced5310d5c7a7ebe70"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#gae5094e2e64f445ced5310d5c7a7ebe70">cblauth_free</a> (<a class="el" href="group__replication.html#ga0af278188fb2ae398501088de034d2c5">CBLAuthenticator</a> *)</td></tr>
+<tr class="memdesc:gae5094e2e64f445ced5310d5c7a7ebe70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees a CBLAuthenticator object.  <a href="group__replication.html#gae5094e2e64f445ced5310d5c7a7ebe70">More...</a><br /></td></tr>
+<tr class="separator:gae5094e2e64f445ced5310d5c7a7ebe70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+Status and Progress</h2></td></tr>
+<tr class="memitem:ga9421513c63f1d16bf4740c4d2515dd22"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga9421513c63f1d16bf4740c4d2515dd22">CBLReplicatorActivityLevel</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="group__replication.html#gga9421513c63f1d16bf4740c4d2515dd22a2639bb3d51a15a854421a7ea61f191c8">kCBLReplicatorStopped</a>, 
+<a class="el" href="group__replication.html#gga9421513c63f1d16bf4740c4d2515dd22a2355501953e41bf3b804b69f59639b8a">kCBLReplicatorOffline</a>, 
+<a class="el" href="group__replication.html#gga9421513c63f1d16bf4740c4d2515dd22a05d0cfa131cf49f4f5cfba074f6719fe">kCBLReplicatorConnecting</a>, 
+<a class="el" href="group__replication.html#gga9421513c63f1d16bf4740c4d2515dd22a81dccc4a1dd815ec1e04ffbcae6f3257">kCBLReplicatorIdle</a>, 
+<br />
+&#160;&#160;<a class="el" href="group__replication.html#gga9421513c63f1d16bf4740c4d2515dd22ae8da1c81ecb8dc05f76f2fc3f6e9c64a">kCBLReplicatorBusy</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:ga9421513c63f1d16bf4740c4d2515dd22"><td class="mdescLeft">&#160;</td><td class="mdescRight">The possible states a replicator can be in during its lifecycle.  <a href="group__replication.html#ga9421513c63f1d16bf4740c4d2515dd22">More...</a><br /></td></tr>
+<tr class="separator:ga9421513c63f1d16bf4740c4d2515dd22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacb5d97a3594cac7bbbececc1eaedec9a"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#gacb5d97a3594cac7bbbececc1eaedec9a">CBLReplicatorListener</a>) (void *context, <a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *replicator, const <a class="el" href="struct_c_b_l_replicator_status.html">CBLReplicatorStatus</a> *status)</td></tr>
+<tr class="memdesc:gacb5d97a3594cac7bbbececc1eaedec9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback that notifies you when the replicator's status changes.  <a href="group__replication.html#gacb5d97a3594cac7bbbececc1eaedec9a">More...</a><br /></td></tr>
+<tr class="separator:gacb5d97a3594cac7bbbececc1eaedec9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga16a83a71805f182e0ea93e1d290345f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_c_b_l_replicator_status.html">CBLReplicatorStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga16a83a71805f182e0ea93e1d290345f6">cbl_repl_status</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *)</td></tr>
+<tr class="memdesc:ga16a83a71805f182e0ea93e1d290345f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the replicator's current status.  <a href="group__replication.html#ga16a83a71805f182e0ea93e1d290345f6">More...</a><br /></td></tr>
+<tr class="separator:ga16a83a71805f182e0ea93e1d290345f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8b6a3f816ebd2673bbe5b85cd2b527c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga8b6a3f816ebd2673bbe5b85cd2b527c5">cbl_repl_addListener</a> (<a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *, <a class="el" href="group__replication.html#gacb5d97a3594cac7bbbececc1eaedec9a">CBLReplicatorListener</a>, void *context)</td></tr>
+<tr class="memdesc:ga8b6a3f816ebd2673bbe5b85cd2b527c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a listener that will be called when the replicator's status changes.  <a href="group__replication.html#ga8b6a3f816ebd2673bbe5b85cd2b527c5">More...</a><br /></td></tr>
+<tr class="separator:ga8b6a3f816ebd2673bbe5b85cd2b527c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a id="a4f3d23951fcdf2fa9e03b6b01f27bae0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4f3d23951fcdf2fa9e03b6b01f27bae0">&#9670;&nbsp;</a></span>CBLReplicatorListener</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef void(* CBLReplicatorListener) (void *context, <a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *, const <a class="el" href="struct_c_b_l_replicator_status.html">CBLReplicatorStatus</a> *)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="a9421513c63f1d16bf4740c4d2515dd22"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9421513c63f1d16bf4740c4d2515dd22">&#9670;&nbsp;</a></span>CBLReplicatorActivityLevel</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="_c_b_l_replicator_8h.html#a9421513c63f1d16bf4740c4d2515dd22">CBLReplicatorActivityLevel</a> : uint8_t</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae4da222f876468553ef0c1dca113d0d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae4da222f876468553ef0c1dca113d0d3">&#9670;&nbsp;</a></span>CBLReplicatorType</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="_c_b_l_replicator_8h.html#ae4da222f876468553ef0c1dca113d0d3">CBLReplicatorType</a> : uint8_t</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a8b6a3f816ebd2673bbe5b85cd2b527c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b6a3f816ebd2673bbe5b85cd2b527c5">&#9670;&nbsp;</a></span>cbl_repl_addListener()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a>* cbl_repl_addListener </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_c_b_l_replicator_8h.html#a4f3d23951fcdf2fa9e03b6b01f27bae0">CBLReplicatorListener</a>&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>context</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a0889b123eab398423504cb262995b77c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0889b123eab398423504cb262995b77c">&#9670;&nbsp;</a></span>cbl_repl_config()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="struct_c_b_l_replicator_configuration.html">CBLReplicatorConfiguration</a>* cbl_repl_config </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a789e0e7abd5a259784ba50dbebd535e7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a789e0e7abd5a259784ba50dbebd535e7">&#9670;&nbsp;</a></span>cbl_repl_new()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">cbl_repl_new </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="struct_c_b_l_replicator_configuration.html">CBLReplicatorConfiguration</a> *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a450ace7090e46859d9e950fb1fbd7d1b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a450ace7090e46859d9e950fb1fbd7d1b">&#9670;&nbsp;</a></span>cbl_repl_release()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void cbl_repl_release </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a6bc318e49f18e79bf8191b2d0737dea3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6bc318e49f18e79bf8191b2d0737dea3">&#9670;&nbsp;</a></span>cbl_repl_resetCheckpoint()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void cbl_repl_resetCheckpoint </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad5fa3c9627fe67ce03dec857d332c117"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5fa3c9627fe67ce03dec857d332c117">&#9670;&nbsp;</a></span>cbl_repl_retain()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a>* cbl_repl_retain </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a74719df0cf43de6996553a98d69257e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74719df0cf43de6996553a98d69257e0">&#9670;&nbsp;</a></span>cbl_repl_start()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void cbl_repl_start </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a79d60a9a9f43bf02ba889f204b6aef46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a79d60a9a9f43bf02ba889f204b6aef46">&#9670;&nbsp;</a></span>cbl_repl_status()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="struct_c_b_l_replicator_status.html">CBLReplicatorStatus</a>* cbl_repl_status </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa451045191ddf56d1fe6b36f4ddf3f91"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa451045191ddf56d1fe6b36f4ddf3f91">&#9670;&nbsp;</a></span>cbl_repl_stop()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void cbl_repl_stop </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__replication.html#ga5ec56f6d72b96556612650bae8d28f04">CBLReplicator</a> *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -118,9 +118,9 @@ Database file operations</h2></td></tr>
 Database lifecycle</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p><a class="anchor" id="amgrpa5b295b465531f5ed62fe7d544d262a5"></a>Opening, closing, and managing open databases. </p>
 </td></tr>
-<tr class="memitem:ga3637395417e9c2070c1e9adb4c190a16"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__database.html#ga3637395417e9c2070c1e9adb4c190a16">cbl_db_open</a> (const char *name, const <a class="el" href="struct_c_b_l_database_configuration.html">CBLDatabaseConfiguration</a> *config, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
-<tr class="memdesc:ga3637395417e9c2070c1e9adb4c190a16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a database, or creates it if it doesn't exist yet, returning a new CBLDatabase instance.  <a href="#ga3637395417e9c2070c1e9adb4c190a16">More...</a><br /></td></tr>
-<tr class="separator:ga3637395417e9c2070c1e9adb4c190a16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga04c39927f58be9310c170c841c00ee09"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__database.html#ga04c39927f58be9310c170c841c00ee09">cbl_db_open</a> (const char *name, const <a class="el" href="struct_c_b_l_database_configuration.html">CBLDatabaseConfiguration</a> *config, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
+<tr class="memdesc:ga04c39927f58be9310c170c841c00ee09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a database, or creates it if it doesn't exist yet, returning a new CBLDatabase instance.  <a href="#ga04c39927f58be9310c170c841c00ee09">More...</a><br /></td></tr>
+<tr class="separator:ga04c39927f58be9310c170c841c00ee09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga023ec29511eb88bcd55347b3ab873c14"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__database.html#ga023ec29511eb88bcd55347b3ab873c14">cbl_db_close</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
 <tr class="memdesc:ga023ec29511eb88bcd55347b3ab873c14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes an open database.  <a href="#ga023ec29511eb88bcd55347b3ab873c14">More...</a><br /></td></tr>
 <tr class="separator:ga023ec29511eb88bcd55347b3ab873c14"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -169,9 +169,9 @@ Database listeners</h2></td></tr>
 <tr class="memitem:ga5dd4a73c8eea7f9a96f74e030fb3a56c"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__database.html#ga5dd4a73c8eea7f9a96f74e030fb3a56c">CBLDatabaseListener</a>) (void *context, const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char **docIDs)</td></tr>
 <tr class="memdesc:ga5dd4a73c8eea7f9a96f74e030fb3a56c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A database change listener callback, invoked after one or more documents are changed on disk.  <a href="#ga5dd4a73c8eea7f9a96f74e030fb3a56c">More...</a><br /></td></tr>
 <tr class="separator:ga5dd4a73c8eea7f9a96f74e030fb3a56c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1e893d4ba7afa5d4483710355bad5cae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__database.html#ga1e893d4ba7afa5d4483710355bad5cae">cbl_db_addListener</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__database.html#ga5dd4a73c8eea7f9a96f74e030fb3a56c">CBLDatabaseListener</a> listener, void *context)</td></tr>
-<tr class="memdesc:ga1e893d4ba7afa5d4483710355bad5cae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a database change listener callback.  <a href="#ga1e893d4ba7afa5d4483710355bad5cae">More...</a><br /></td></tr>
-<tr class="separator:ga1e893d4ba7afa5d4483710355bad5cae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga93b0bb772d52df80028e26c557aa1601"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__database.html#ga93b0bb772d52df80028e26c557aa1601">cbl_db_addListener</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__database.html#ga5dd4a73c8eea7f9a96f74e030fb3a56c">CBLDatabaseListener</a> listener, void *context)</td></tr>
+<tr class="memdesc:ga93b0bb772d52df80028e26c557aa1601"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a database change listener callback.  <a href="#ga93b0bb772d52df80028e26c557aa1601">More...</a><br /></td></tr>
+<tr class="separator:ga93b0bb772d52df80028e26c557aa1601"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>A CBLDatabase is both a filesystem object and a container for documents. </p>
@@ -346,14 +346,14 @@ Database listeners</h2></td></tr>
 
 </div>
 </div>
-<a id="ga1e893d4ba7afa5d4483710355bad5cae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1e893d4ba7afa5d4483710355bad5cae">&#9670;&nbsp;</a></span>cbl_db_addListener()</h2>
+<a id="ga93b0bb772d52df80028e26c557aa1601"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga93b0bb772d52df80028e26c557aa1601">&#9670;&nbsp;</a></span>cbl_db_addListener()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a>* cbl_db_addListener </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a>* cbl_db_addListener </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em>, </td>
@@ -628,14 +628,14 @@ Batch operations can nest. Changes are not committed until the outer batch ends.
 
 </div>
 </div>
-<a id="ga3637395417e9c2070c1e9adb4c190a16"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3637395417e9c2070c1e9adb4c190a16">&#9670;&nbsp;</a></span>cbl_db_open()</h2>
+<a id="ga04c39927f58be9310c170c841c00ee09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga04c39927f58be9310c170c841c00ee09">&#9670;&nbsp;</a></span>cbl_db_open()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a>* cbl_db_open </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a>* cbl_db_open </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>name</em>, </td>

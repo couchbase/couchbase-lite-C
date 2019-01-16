@@ -9,6 +9,7 @@
 #pragma once
 #include "c4.h"
 #include "fleece/slice.hh"
+#include "fleece/Fleece.hh"
 #include "RefCounted.hh"
 #include <string>
 
@@ -38,6 +39,20 @@ namespace cbl_internal {
     static inline const C4Error* internal(const CBLError *error) {return (const C4Error*)error;}
     static inline C4Error* internal(CBLError *error)       {return (C4Error*)error;}
     static inline C4Database* internal(const CBLDatabase *db)    {return db->c4db;}
+
+    template <typename T>
+    T* validated(T *obj, CBLError *outError) {
+        if (obj->validate(outError))
+            return obj;
+        delete obj;
+        return nullptr;
+    }
+
+    template <typename T>
+    static inline void writeOptionalKey(fleece::Encoder &enc, const char *propName, T value) {
+        if (value)
+            enc[fleece::slice(propName)] = value;
+    }
 }
 
 using namespace cbl_internal;

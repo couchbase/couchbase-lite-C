@@ -65,9 +65,12 @@ $(function() {
   <div class="summary">
 <a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">CBLReplicatorProgress Struct Reference</div>  </div>
+<div class="title">CBLReplicatorProgress Struct Reference<div class="ingroups"><a class="el" href="group__replication.html">Replication</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>A fractional progress value.  
+ <a href="struct_c_b_l_replicator_progress.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_c_b_l_replicator_8h_source.html">cbl/CBLReplicator.h</a>&gt;</code></p>
 <table class="memberdecls">
@@ -78,7 +81,10 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a2ec5e18c579e3a2cc768cd1cf22e9a72"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_progress.html#a2ec5e18c579e3a2cc768cd1cf22e9a72">total</a></td></tr>
 <tr class="separator:a2ec5e18c579e3a2cc768cd1cf22e9a72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Field Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A fractional progress value. </p>
+<p>The units are undefined; the only meaningful number is the (fractional) result of <code>completed</code> ÷ <code>total</code>, which will range from 0.0 to 1.0. Before anything happens, both <code>completed</code> and <code>total</code> will be 0. </p>
+</div><h2 class="groupheader">Field Documentation</h2>
 <a id="a33b4fe25c12e07dfe4f7150f18e7adc0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a33b4fe25c12e07dfe4f7150f18e7adc0">&#9670;&nbsp;</a></span>completed</h2>
 

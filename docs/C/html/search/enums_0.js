@@ -8,6 +8,6 @@ var searchData=
   ['cbllogdomain',['CBLLogDomain',['../group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39',1,'CBLBase.h']]],
   ['cblloglevel',['CBLLogLevel',['../group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195',1,'CBLBase.h']]],
   ['cblnetworkerrorcode',['CBLNetworkErrorCode',['../group__errors.html#ga2849714bdf45e1804e2c3e3e265c1ff3',1,'CBLBase.h']]],
-  ['cblreplicatoractivitylevel',['CBLReplicatorActivityLevel',['../_c_b_l_replicator_8h.html#a9421513c63f1d16bf4740c4d2515dd22',1,'CBLReplicator.h']]],
-  ['cblreplicatortype',['CBLReplicatorType',['../_c_b_l_replicator_8h.html#ae4da222f876468553ef0c1dca113d0d3',1,'CBLReplicator.h']]]
+  ['cblreplicatoractivitylevel',['CBLReplicatorActivityLevel',['../group__replication.html#ga9421513c63f1d16bf4740c4d2515dd22',1,'CBLReplicator.h']]],
+  ['cblreplicatortype',['CBLReplicatorType',['../group__replication.html#gae4da222f876468553ef0c1dca113d0d3',1,'CBLReplicator.h']]]
 ];

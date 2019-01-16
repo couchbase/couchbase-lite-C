@@ -67,7 +67,7 @@ const CBLDocument* cbl_db_saveDocument(CBLDatabase* db _cblnonnull,
                                        CBLError* error);
 
 /** Deletes a document from the database. Deletions are replicated.
-    @warning  You are still responsible for calling \ref cbl_document_release.
+    @warning  You are still responsible for releasing the CBLDocument.
     @note If you don't have the document in memory already, \ref cbl_db_deleteDocument is a
           simpler shortcut.
     @param document  The document to delete.
@@ -93,7 +93,7 @@ bool cbl_db_deleteDocument(CBLDatabase* database _cblnonnull,
 /** Purges a document. This removes all traces of the document from the database.
     Purges are not replicated. If the document is changed on a server, it will be re-created
     when pulled.
-    @warning  You are still responsible for calling \ref cbl_document_release.
+    @warning  You are still responsible for releasing the CBLDocument reference.
     @note If you don't have the document in memory already, \ref cbl_db_purgeDocument is a
           simpler shortcut.
     @param document  The document to delete.
@@ -172,7 +172,7 @@ uint64_t cbl_doc_sequence(const CBLDocument* _cblnonnull);
     @warning  This dictionary _reference_ is immutable, but if the document is mutable the
            underlying dictionary itself is mutable and could be modified through a mutable
            reference obtained via \ref cbl_doc_mutableProperties. If you need to preserve the
-           properties in immutable form, call \ref FLDict_Copy to make a deep copy. */
+           properties, call \ref FLDict_MutableCopy to make a deep copy. */
 FLDict cbl_doc_properties(const CBLDocument* _cblnonnull);
 
 /** Returns a mutable document's properties as a mutable dictionary.
