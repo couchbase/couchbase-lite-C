@@ -48,6 +48,7 @@ _cbl_doc_purge
 
 _cbl_query_new
 _cbl_query_setParameters
+_cbl_query_setParametersFromJSON
 _cbl_query_execute
 _cbl_query_explain
 _cbl_query_columnCount
@@ -79,6 +80,7 @@ _kFLEmptyDict
 
 _FLSlice_Equal
 _FLSlice_Compare
+_FLSlice_Copy
 _FLSliceResult_Retain
 _FLSliceResult_Release
 
@@ -171,6 +173,7 @@ _FLDictIterator_GetKey
 _FLDictIterator_GetKeyString
 _FLDictIterator_GetValue
 _FLDictIterator_Next
+_FLDictIterator_End
 
 _FLDictKey_Init
 _FLDictKey_GetString

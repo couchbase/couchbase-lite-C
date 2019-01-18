@@ -85,7 +85,12 @@ public:
     { }
 
     bool next() {
-        return c4queryenum_next(_enum, nullptr);
+        C4Error error;
+        bool more = c4queryenum_next(_enum, &error);
+        if (!more && error.code != 0)
+            C4LogToAt(kC4QueryLog, kC4LogWarning,
+                      "cbl_result_next: got error %d/%d", error.domain, error.code);
+        return more;
     }
 
     Value property(const char *prop) {
@@ -94,6 +99,8 @@ public:
     }
 
     Value column(unsigned col) {
+        if (col < 64 && (_enum->missingColumns & (1<<col)))
+            return nullptr;
         return FLArrayIterator_GetValueAt(&_enum->columns, uint32_t(col));
     }
 
@@ -128,8 +135,18 @@ void cbl_query_setParameters(CBLQuery* query _cblnonnull, FLDict parameters) {
     query->setParameters(encodedParameters);
 }
 
+bool cbl_query_setParametersFromJSON(CBLQuery* query, const char* json) {
+    Encoder enc;
+    enc.convertJSON(slice(json));
+    alloc_slice encodedParameters = enc.finish();
+    if (!encodedParameters)
+        return false;
+    query->setParameters(encodedParameters);
+    return true;
+}
+
 CBLResultSet* cbl_query_execute(CBLQuery* query _cblnonnull, CBLError* outError) {
-    return query->execute(internal(outError));
+    return retain(query->execute(internal(outError)).get());
 }
 
 FLSliceResult cbl_query_explain(CBLQuery* query _cblnonnull) {

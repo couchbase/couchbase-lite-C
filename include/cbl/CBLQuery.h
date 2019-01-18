@@ -59,6 +59,9 @@ CBL_REFCOUNTED(CBLQuery*, query);
 void cbl_query_setParameters(CBLQuery* _cblnonnull query,
                              FLDict _cblnonnull parameters);
 
+bool cbl_query_setParametersFromJSON(CBLQuery* _cblnonnull query,
+                                     const char* _cblnonnull json);
+
 /** Runs the query, returning the results.
     @note  You must release the result set when you're finished with it. */
 _cbl_warn_unused
