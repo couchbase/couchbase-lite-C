@@ -1,5 +1,6 @@
 from CouchbaseLite.Database import Database, DatabaseConfiguration
 from CouchbaseLite.Document import *
+from CouchbaseLite.Query import *
 
 Database.deleteFile("db", "/tmp")
 
@@ -36,7 +37,7 @@ with db:
     doc["color"] = "green"
     print "props=", props
 
-    db.save(doc)
+    db.saveDocument(doc)
 
     doc2 = db.getDocument("foo")
     assert(doc2.id == "foo")
@@ -48,5 +49,22 @@ with db:
 
     assert(db.count == 1)
     assert(db.lastSequence == 1)
+    
+    doc = MutableDocument("bar")
+    doc["color"] = "green"
+    doc["flavor"] = "pumpkin spice"
+    db["bar"] = doc # saves it
+
+    assert(db.count == 2)
+    assert(db.lastSequence == 2)
+
+q = Query(db, {'WHAT': [['.flavor'], ['.numbers']], 'WHERE': ['=', ['.color'], 'green']})
+print "-------- Explanation --------"
+print q.explanation
+print "-----------------------------"
+print "Columns: ", q.columnNames
+
+for row in q.execute():
+    print "row: ", row.asArray(), "  ...or...  ", row.asDictionary()
 
 db.close()

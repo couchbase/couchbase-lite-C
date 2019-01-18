@@ -4,6 +4,8 @@ This is a generic cross-platform version of Couchbase Lite.
 Or, it will be when it's done.  
 **It's in the very early stages of development.**
 
+The base API is in ANSI C, and there is a C++ API consisting of inline wrappers around that. There's also an embryonic Python binding.
+
 ## Goals
 
 (Unofficial; we have no PRD or design docs yet)
@@ -21,14 +23,19 @@ Or, it will be when it's done.
   - 32-bit and 64-bit
   - x86 and ARM
   - Hundreds of MB RAM, hundreds of MHz CPU, hundreds of MB storage
+* Maybe include some language bindings like Python or JavaScript
 
 ## Example
 
+### C
+
 ```c
-// Create a document:
+// Open a database:
 CBLError error;
 CBLDatabaseConfiguration config = {"/tmp"};
 CBLDatabase* db = cbl_db_open("my_db", &config, &error);
+
+// Create a document:
 CBLDocument* doc = cbl_doc_new("foo");
 FLMutableDict props = cbl_doc_mutableProperties(doc);
 FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
@@ -46,6 +53,40 @@ const CBLDocument *readDoc = cbl_db_getDocument(db, "foo");
 FLDict readProps = cbl_doc_properties(readDoc);
 FLSlice greeting = FLValue_AsString( FLDict_Get(readProps, "greeting"_sl) );
 cbl_doc_release(readDoc);
+```
+
+### C++
+
+```cpp
+// Open a database:
+cbl::Database db(kDatabaseName, {"/tmp"});
+
+// Create a document:
+cbl::MutableDocument doc("foo");
+doc["greeting"] = "Howdy!";
+db.saveDocument(doc);
+
+// Read it back:
+cbl::Document doc = db.getMutableDocument("foo");
+fleece::Dict readProps = doc->properties();
+fleece::slice greeting = readProps["greeting"].asString();
+```
+
+### Python
+
+```python
+# Open a database:
+db = Database("db", DatabaseConfiguration("/tmp"));
+
+# Create a document:
+doc = MutableDocument("foo")
+doc["greeting"] = "Howdy!"
+db.saveDocument(doc)
+
+# Read it back:
+readDoc = db.getDocument("foo")
+readProps = readDoc.properties
+greeting = readProps["greeting"]
 ```
 
 ## Documentation
@@ -76,6 +117,17 @@ The library is at `build_cmake/libCouchbaseLiteC.dylib`. (Or `.DLL` or `.so`)
 5. Run
 
 The library is `libcouchbase_lite.dylib` in your `Xcode Build Products/Debug` directory (the path depends on your Xcode settings.)
+
+### Python Bindings
+
+This only works on Mac so far. And it assumes that Xcode puts build output in a `build` subdirectory next to the project file. (Want to fix this? Edit `BuildPyCBL.py` and look at the "`# FIX`" lines.)
+
+1. Build the native library. (If using Xcode, build the "CBL_C Dylib" target.)
+2. `pip install cffi`
+3. `cd python/CouchbaseLite`
+4. `python BuildPyCBL.py`
+5. `cd ..`
+6. `python test.py` -- some tests. Should run without throwing exceptions.
 
 ## Using It
 

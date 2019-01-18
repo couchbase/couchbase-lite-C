@@ -74,7 +74,7 @@ class Database (CBLObject):
     def getMutableDocument(self, id):
         return MutableDocument._get(self, id)
 
-    def save(self, doc, concurrency = FailOnConflict):
+    def saveDocument(self, doc, concurrency = FailOnConflict):
         doc._prepareToSave()
         savedDocRef = lib.cbl_db_saveDocument(self._ref, doc._ref, concurrency, gError)
         if not savedDocRef:
@@ -91,6 +91,17 @@ class Database (CBLObject):
     def purgeDocument(self, id):
         if not lib.cbl_db_purgeDocument(self._ref, id, gError):
             raise CBLException("Couldn't purge document", gError)
+    
+    def __getitem__(self, id):
+        return self.getMutableDocument(id)
+    
+    def __setitem__(self, id, doc):
+        if id != doc.id:
+            raise CBLException("key does not match document ID")
+        self.saveDocument(doc)
+    
+    def __delitem__(self, id):
+        self.deleteDocument(id)
 
     # Batch operations:  (`with db: ...`)
     

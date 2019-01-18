@@ -236,6 +236,8 @@
 		27C9B5C021F12C970040BC45 /* Database.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Database.py; sourceTree = "<group>"; };
 		27C9B5C321F12C970040BC45 /* common.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = common.py; sourceTree = "<group>"; };
 		27C9B5C421F12C970040BC45 /* Document.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Document.py; sourceTree = "<group>"; };
+		27C9B5DB21F296C10040BC45 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		27C9B5DC21F29D500040BC45 /* Query.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Query.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -271,6 +273,7 @@
 		271C2A1A21CAC8920045856E = {
 			isa = PBXGroup;
 			children = (
+				27C9B5DB21F296C10040BC45 /* README.md */,
 				271C2A2A21CAC93B0045856E /* include */,
 				271C2A3621CAC9A50045856E /* src */,
 				27B61D6721D6B5DA0027CCDB /* test */,
@@ -437,6 +440,7 @@
 				27C9B5C321F12C970040BC45 /* common.py */,
 				27C9B5C021F12C970040BC45 /* Database.py */,
 				27C9B5C421F12C970040BC45 /* Document.py */,
+				27C9B5DC21F29D500040BC45 /* Query.py */,
 			);
 			path = CouchbaseLite;
 			sourceTree = "<group>";

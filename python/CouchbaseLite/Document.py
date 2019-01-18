@@ -59,10 +59,10 @@ class Document (CBLObject):
     
     def get(self, key, dflt = None):
         return self.properties.get(key, dflt)
-    def __contains__(self, key):
-        return key in self.properties
     def __getitem__(self, key):
         return self.properties[key]
+    def __contains__(self, key):
+        return key in self.properties
     
 
 class MutableDocument (Document):
@@ -97,5 +97,4 @@ class MutableDocument (Document):
                 raise CBLException("Couldn't store properties", gError)
 
     def save(self, concurrency = FailOnConflict):
-        assert(self.database)
-        return self.database.save(this, concurrency)
+        return self.database.saveDocument(this, concurrency)
