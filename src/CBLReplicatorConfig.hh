@@ -23,7 +23,7 @@ using namespace fleece;
 
 
 struct CBLEndpoint {
-    virtual ~CBLEndpoint();
+    virtual ~CBLEndpoint()                                      { }
     virtual bool valid() const =0;
     const C4Address& remoteAddress() const                      {return _address;}
     virtual C4String remoteDatabaseName() const =0;
@@ -58,7 +58,7 @@ namespace cbl_internal {
 
 
 struct CBLAuthenticator {
-    virtual ~CBLAuthenticator();
+    virtual ~CBLAuthenticator()                                 { }
     virtual void writeAuthDict(Encoder&) =0;
 };
 
@@ -90,9 +90,9 @@ namespace cbl_internal {
         ReplicatorConfiguration(const CBLReplicatorConfiguration &conf) {
             *(CBLReplicatorConfiguration*)this = conf;
             retain(database);
-            FLDict_Retain(headers);
-            FLArray_Retain(channels);
-            FLArray_Retain(documentIDs);
+            headers = FLDict_MutableCopy(headers, kFLDeepCopyImmutables);
+            channels = FLArray_MutableCopy(channels, kFLDeepCopyImmutables);
+            documentIDs = FLArray_MutableCopy(documentIDs, kFLDeepCopyImmutables);
         }
 
         ~ReplicatorConfiguration() {

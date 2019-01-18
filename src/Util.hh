@@ -17,5 +17,6 @@ namespace cbl_internal {
     /** Like vsprintf(), but returns a std::string */
     std::string vformat(const char *fmt _cblnonnull, va_list);
 
-    char* allocCString(FLSliceResult result);
+    char* allocCString(FLSlice);
+    char* allocCString(FLSliceResult);      // frees the input
 }

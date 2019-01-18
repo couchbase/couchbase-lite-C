@@ -77,7 +77,7 @@ namespace cbl {
         const char* path() const                        {return cbl_db_path(ref());}
         uint64_t count() const                          {return cbl_db_count(ref());}
         uint64_t lastSequence() const                   {return cbl_db_lastSequence(ref());}
-        const CBLDatabaseConfiguration* config() const  {return cbl_db_config(ref());}
+        CBLDatabaseConfiguration config() const         {return cbl_db_config(ref());}
 
         inline Document getDocument(const char *id _cblnonnull) const;
         inline MutableDocument getMutableDocument(const char *id _cblnonnull) const;

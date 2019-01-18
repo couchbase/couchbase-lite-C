@@ -21,6 +21,17 @@
 #include "Util.hh"
 
 
+void cbl_setLogLevel(CBLLogLevel level, CBLLogDomain domain) {
+    static C4LogDomain kC4Domains[5] = {kC4DefaultLog, kC4DatabaseLog, kC4QueryLog, kC4SyncLog, kC4WebSocketLog};
+    if (domain == kCBLLogDomainAll) {
+        c4log_setCallbackLevel(C4LogLevel(level));
+        for (int i = 0; i < 5; ++i)
+            c4log_setLevel(kC4Domains[i], C4LogLevel(level));
+    } else {
+        c4log_setLevel(kC4Domains[domain], C4LogLevel(level));
+    }
+}
+
 char* cbl_error_message(const CBLError* error _cblnonnull) {
     return allocCString(c4error_getMessage(*internal(error)));
 }

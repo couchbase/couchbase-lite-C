@@ -81,12 +81,14 @@ CBLDatabase* cbl_db_open(const char *name,
                          const CBLDatabaseConfiguration *config,
                          CBLError *outError)
 {
+    C4Log("name = %s  dir = %s", name, config->directory);//TEMP
     string path = dbPath(name, config);
+    C4Log("path = %s", path.c_str());//TEMP
     C4DatabaseConfig c4config {kC4DB_Create | kC4DB_AutoCompact | kC4DB_SharedKeys};
     C4Database *c4db = c4db_open(slice(path), &c4config, internal(outError));
     if (!c4db)
         return nullptr;
-    return retain(new CBLDatabase(c4db, name, path));
+    return retain(new CBLDatabase(c4db, name, path, (config->directory ?: "")));
 }
 
 
@@ -101,6 +103,11 @@ const char* cbl_db_name(const CBLDatabase* db) {
 
 const char* cbl_db_path(const CBLDatabase* db) {
     return db->path.c_str();
+}
+
+const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* db) {
+    const char *dir = db->dir.empty() ? nullptr : db->dir.c_str();
+    return {dir};
 }
 
 uint64_t cbl_db_count(const CBLDatabase* db) {

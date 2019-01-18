@@ -38,7 +38,7 @@ public:
                  true)
     {
         if (otherDoc->isMutable() && otherDoc->_properties)
-            _properties = MutableDict::deepCopy(otherDoc->_properties.asDict());
+            _properties = otherDoc->_properties.asDict().mutableCopy(kFLDeepCopyImmutables);
     }
 
     // Document loaded from db without a C4Document (e.g. a replicator validation callback)
@@ -59,8 +59,10 @@ public:
     uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence : 0;}
     bool isMutable() const                      {return _mutable;}
     MutableDict mutableProperties() const       {return properties().asMutable();}
-
     Dict properties() const;
+
+    char* propertiesAsJSON() const;
+    bool setPropertiesAsJSON(const char *json, C4Error* outError);
 
     RetainedConst<CBLDocument> save(CBLDatabase* db _cblnonnull,
                                     bool deleting,

@@ -182,6 +182,15 @@ FLDict cbl_doc_properties(const CBLDocument* _cblnonnull);
            same collection returned by \ref cbl_doc_properties. */
 FLMutableDict cbl_doc_mutableProperties(CBLDocument* _cblnonnull);
 
+/** Returns a document's properties as a null-terminated JSON string.
+    @note You are responsible for calling free() on the returned string. */
+char* _cblnonnull cbl_doc_propertiesAsJSON(const CBLDocument* _cblnonnull);
+
+/** Sets a mutable document's properties from a JSON string. */
+bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cblnonnull,
+                                 const char *json _cblnonnull,
+                                 CBLError*);
+
 /** @} */
 
 

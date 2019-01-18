@@ -122,9 +122,15 @@ Array iteration</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Mutable Arrays</h2></td></tr>
-<tr class="memitem:ga7aa46998e453edd5464471886a20dc0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_array.html#ga7aa46998e453edd5464471886a20dc0c">FLArray_MutableCopy</a> (<a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a>, bool deepCopy)</td></tr>
-<tr class="memdesc:ga7aa46998e453edd5464471886a20dc0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new mutable Array that's a copy of the source Array.  <a href="#ga7aa46998e453edd5464471886a20dc0c">More...</a><br /></td></tr>
-<tr class="separator:ga7aa46998e453edd5464471886a20dc0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1999c11ef3de128bc4448e84ff124150"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_array.html#ga1999c11ef3de128bc4448e84ff124150">FLCopyFlags</a> { <a class="el" href="group___f_l_array.html#gga1999c11ef3de128bc4448e84ff124150a586de20e5e5d9d9ed05858f0c72b1527">kFLDefaultCopy</a> = 0, 
+<a class="el" href="group___f_l_array.html#gga1999c11ef3de128bc4448e84ff124150a28c92428cf6729f0460672e0f6ff8fea">kFLDeepCopy</a> = 1, 
+<a class="el" href="group___f_l_array.html#gga1999c11ef3de128bc4448e84ff124150a4ac4e7b78499cd0fbab93af7d1269a68">kFLCopyImmutables</a> = 2, 
+<a class="el" href="group___f_l_array.html#gga1999c11ef3de128bc4448e84ff124150a5c653513f911bba81deb09ac21583632">kFLDeepCopyImmutables</a> = (kFLDeepCopy | kFLCopyImmutables)
+ }</td></tr>
+<tr class="separator:ga1999c11ef3de128bc4448e84ff124150"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae5f2c430619eaf5f4a70b59320405f34"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_array.html#gae5f2c430619eaf5f4a70b59320405f34">FLArray_MutableCopy</a> (<a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a>, <a class="el" href="group___f_l_array.html#ga1999c11ef3de128bc4448e84ff124150">FLCopyFlags</a>)</td></tr>
+<tr class="memdesc:gae5f2c430619eaf5f4a70b59320405f34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new mutable Array that's a copy of the source Array.  <a href="#gae5f2c430619eaf5f4a70b59320405f34">More...</a><br /></td></tr>
+<tr class="separator:gae5f2c430619eaf5f4a70b59320405f34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4c077d7b738e3f94522e79ddcc85b3ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_array.html#ga4c077d7b738e3f94522e79ddcc85b3ee">FLMutableArray_New</a> (void)</td></tr>
 <tr class="memdesc:ga4c077d7b738e3f94522e79ddcc85b3ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new empty mutable Array.  <a href="#ga4c077d7b738e3f94522e79ddcc85b3ee">More...</a><br /></td></tr>
 <tr class="separator:ga4c077d7b738e3f94522e79ddcc85b3ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -210,6 +216,27 @@ Mutable Arrays</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>FLArray is a "subclass" of FLValue, representing values that are arrays. </p>
 <p>It's always OK to pass an FLArray to a function parameter expecting an FLValue, even though the compiler makes you use an explicit type-cast. It's safe to type-cast the other direction, from FLValue to FLArray, <em>only</em> if you already know that the value is an array, e.g. by having called FLValue_GetType on it. But it's safer to call FLValue_AsArray instead, since it will return NULL if the value isn't an array. </p>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="ga1999c11ef3de128bc4448e84ff124150"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1999c11ef3de128bc4448e84ff124150">&#9670;&nbsp;</a></span>FLCopyFlags</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group___f_l_array.html#ga1999c11ef3de128bc4448e84ff124150">FLCopyFlags</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga1999c11ef3de128bc4448e84ff124150a586de20e5e5d9d9ed05858f0c72b1527"></a>kFLDefaultCopy&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="gga1999c11ef3de128bc4448e84ff124150a28c92428cf6729f0460672e0f6ff8fea"></a>kFLDeepCopy&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="gga1999c11ef3de128bc4448e84ff124150a4ac4e7b78499cd0fbab93af7d1269a68"></a>kFLCopyImmutables&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="gga1999c11ef3de128bc4448e84ff124150a5c653513f911bba81deb09ac21583632"></a>kFLDeepCopyImmutables&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ga5e5b41b9e2398e78fe34ff1716687cec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga5e5b41b9e2398e78fe34ff1716687cec">&#9670;&nbsp;</a></span>FLArray_AsMutable()</h2>
@@ -302,8 +329,8 @@ Mutable Arrays</h2></td></tr>
 
 </div>
 </div>
-<a id="ga7aa46998e453edd5464471886a20dc0c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7aa46998e453edd5464471886a20dc0c">&#9670;&nbsp;</a></span>FLArray_MutableCopy()</h2>
+<a id="gae5f2c430619eaf5f4a70b59320405f34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae5f2c430619eaf5f4a70b59320405f34">&#9670;&nbsp;</a></span>FLArray_MutableCopy()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -317,8 +344,8 @@ Mutable Arrays</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>deepCopy</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___f_l_array.html#ga1999c11ef3de128bc4448e84ff124150">FLCopyFlags</a>&#160;</td>
+          <td class="paramname">&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -330,8 +357,8 @@ Mutable Arrays</h2></td></tr>
 
 <p>Creates a new mutable Array that's a copy of the source Array. </p>
 <p>Its initial ref-count is 1, so a call to FLMutableArray_Release will free it.</p>
-<p>Copying an immutable Array is very cheap (only one small allocation.) The <code>deepCopy</code> flag is ignored.</p>
-<p>Copying a mutable Array is cheap if it's a shallow copy, but if <code>deepCopy</code> is true, nested mutable Arrays and Dicts are also copied, recursively.</p>
+<p>Copying an immutable Array is very cheap (only one small allocation) unless the flag kFLCopyImmutables is set.</p>
+<p>Copying a mutable Array is cheap if it's a shallow copy, but if <code>deepCopy</code> is true, nested mutable Arrays and Dicts are also copied, recursively; if kFLCopyImmutables is also set, immutable values are also copied.</p>
 <p>If the source Array is NULL, then NULL is returned. </p>
 
 </div>

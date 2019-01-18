@@ -5,7 +5,7 @@
 #  Copyright © 2018 Couchbase. All rights reserved.
 
 _cbl_error_message
-#_cbl_setLogLevel
+_cbl_setLogLevel
 _cbl_retain
 _cbl_release
 #_cbl_listener_remove
@@ -19,6 +19,7 @@ _cbl_db_open
 _cbl_db_close
 _cbl_db_name
 _cbl_db_path
+_cbl_db_config
 _cbl_db_count
 _cbl_db_lastSequence
 _cbl_db_compact
@@ -29,17 +30,19 @@ _cbl_db_endBatch
 #_cbl_db_addDocumentListener
 
 _cbl_db_getDocument
+_cbl_db_getMutableDocument
 _cbl_db_saveDocument
 _cbl_db_deleteDocument
 _cbl_db_purgeDocument
 
 _cbl_doc_id
 _cbl_doc_sequence
-_cbl_db_getMutableDocument
 _cbl_doc_new
 _cbl_doc_mutableCopy
 _cbl_doc_properties
 _cbl_doc_mutableProperties
+_cbl_doc_propertiesAsJSON
+_cbl_doc_setPropertiesAsJSON
 _cbl_doc_delete
 _cbl_doc_purge
 
@@ -53,6 +56,17 @@ _cbl_query_columnName
 _cbl_results_next
 _cbl_results_column
 _cbl_results_property
+
+_cblendpoint_newWithURL
+_cblendpoint_free
+_cblauth_newBasic
+_cblauth_free
+_cbl_repl_new
+_cbl_repl_config
+_cbl_repl_resetCheckpoint
+_cbl_repl_start
+_cbl_repl_stop
+#_cbl_repl_addListener
 
 
 #  Fleece.exp

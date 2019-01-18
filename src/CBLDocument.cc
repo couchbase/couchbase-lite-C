@@ -18,6 +18,7 @@
 
 #include "CBLDocument.h"
 #include "CBLDocument_Internal.hh"
+#include "Util.hh"
 
 using namespace std;
 using namespace fleece;
@@ -38,9 +39,9 @@ Dict CBLDocument::properties() const {
 }
 
 RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cblnonnull,
-                                bool deleting,
-                                CBLConcurrencyControl concurrency,
-                                C4Error* outError) const
+                                             bool deleting,
+                                             CBLConcurrencyControl concurrency,
+                                             C4Error* outError) const
 {
     if (_db && _db != db) {
         if (outError)
@@ -135,7 +136,7 @@ void CBLDocument::initProperties() {
         _properties = Value::fromData(_c4doc->selectedRev.body);
     if (_mutable) {
         if (_properties)
-            _properties = MutableDict::copy(_properties.asDict());
+            _properties = _properties.asDict().mutableCopy();
         if (!_properties)
             _properties = MutableDict::newDict();
     } else {
@@ -143,6 +144,27 @@ void CBLDocument::initProperties() {
             _properties = Dict::emptyDict();
     }
 }
+
+char* CBLDocument::propertiesAsJSON() const {
+    return allocCString(properties().toJSON());
+}
+
+bool CBLDocument::setPropertiesAsJSON(const char *json, C4Error* outError) {
+    Doc doc = Doc::fromJSON(slice(json));
+    if (!doc) {
+        if (outError) *outError = c4error_make(FleeceDomain, kFLJSONError, "Invalid JSON"_sl);
+        return false;
+    }
+    Dict root = doc.root().asDict();
+    if (!root) {
+        if (outError) *outError = c4error_make(FleeceDomain, kFLJSONError,
+                                               "properties must be a JSON dictionary"_sl);
+        return false;
+    }
+    _properties = root.mutableCopy(kFLDeepCopyImmutables);
+    return true;
+}
+
 
 
 #pragma mark - PUBLIC API:
@@ -173,6 +195,12 @@ const char* cbl_doc_id(const CBLDocument* doc)              {return doc->docID()
 uint64_t cbl_doc_sequence(const CBLDocument* doc)           {return doc->sequence();}
 FLDict cbl_doc_properties(const CBLDocument* doc)           {return doc->properties();}
 FLMutableDict cbl_doc_mutableProperties(CBLDocument* doc)   {return doc->mutableProperties();}
+
+char* cbl_doc_propertiesAsJSON(const CBLDocument* doc)      {return doc->propertiesAsJSON();}
+
+bool cbl_doc_setPropertiesAsJSON(CBLDocument* doc, const char *json, CBLError* outError) {
+    return doc->setPropertiesAsJSON(json, internal(outError));
+}
 
 const CBLDocument* cbl_db_saveDocument(CBLDatabase* db,
                                        CBLDocument* doc,

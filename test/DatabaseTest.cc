@@ -38,7 +38,7 @@ TEST_CASE_METHOD(CBLTest, "New Document") {
     CHECK(doc != nullptr);
     CHECK(string(cbl_doc_id(doc)) == "foo");
     CHECK(cbl_doc_sequence(doc) == 0);
-    CHECK(Dict(cbl_doc_properties(doc)).toJSONString() == "{}");
+    CHECK(string(cbl_doc_propertiesAsJSON(doc)) == "{}");
     CHECK(cbl_doc_mutableProperties(doc) == cbl_doc_properties(doc));
     cbl_doc_release(doc);
 }
@@ -51,14 +51,14 @@ TEST_CASE_METHOD(CBLTest, "Save Empty Document") {
     REQUIRE(saved);
     CHECK(string(cbl_doc_id(saved)) == "foo");
     CHECK(cbl_doc_sequence(saved) == 1);
-    CHECK(Dict(cbl_doc_properties(saved)).toJSONString() == "{}");
+    CHECK(string(cbl_doc_propertiesAsJSON(saved)) == "{}");
     cbl_doc_release(saved);
     cbl_doc_release(doc);
 
     doc = cbl_db_getMutableDocument(db, "foo");
     CHECK(string(cbl_doc_id(doc)) == "foo");
     CHECK(cbl_doc_sequence(doc) == 1);
-    CHECK(Dict(cbl_doc_properties(doc)).toJSONString() == "{}");
+    CHECK(string(cbl_doc_propertiesAsJSON(doc)) == "{}");
     cbl_doc_release(doc);
 }
 
@@ -68,6 +68,7 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
     MutableDict props = cbl_doc_mutableProperties(doc);
     props["greeting"_sl] = "Howdy!"_sl;
     // or alternatively:  FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
+    CHECK(string(cbl_doc_propertiesAsJSON(doc)) == "{\"greeting\":\"Howdy!\"}");
     CHECK(Dict(cbl_doc_properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
     CBLError error;
@@ -75,6 +76,7 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
     REQUIRE(saved);
     CHECK(string(cbl_doc_id(saved)) == "foo");
     CHECK(cbl_doc_sequence(saved) == 1);
+    CHECK(string(cbl_doc_propertiesAsJSON(saved)) == "{\"greeting\":\"Howdy!\"}");
     CHECK(Dict(cbl_doc_properties(saved)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     cbl_doc_release(saved);
     cbl_doc_release(doc);
@@ -82,6 +84,7 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
     doc = cbl_db_getMutableDocument(db, "foo");
     CHECK(string(cbl_doc_id(doc)) == "foo");
     CHECK(cbl_doc_sequence(doc) == 1);
+    CHECK(string(cbl_doc_propertiesAsJSON(doc)) == "{\"greeting\":\"Howdy!\"}");
     CHECK(Dict(cbl_doc_properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     cbl_doc_release(doc);
 }

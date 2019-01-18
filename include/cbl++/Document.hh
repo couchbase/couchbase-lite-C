@@ -50,7 +50,12 @@ namespace cbl {
 
         fleece::Dict properties() const                 {return cbl_doc_properties(ref());}
 
-        fleece::Value operator[] (const char *key) const {return properties()[key];}
+        char* _cblnonnull propertiesAsJSON(const CBLDocument* _cblnonnull);
+
+        bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cblnonnull,
+                                         const char *json _cblnonnull,
+                                         CBLError*);
+        fleece::Value operator[] (const char *key _cblnonnull) const {return properties()[key];}
 
 
     protected:

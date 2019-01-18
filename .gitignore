@@ -1,1 +1,6 @@
 build_cmake
+*.pyc
+*.o
+*.so
+python/CouchbaseLite/libcouchbase_lite.dylib
+python/CouchbaseLite/PyCBL.c

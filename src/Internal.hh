@@ -22,11 +22,16 @@ struct CBLDatabase : public CBLRefCounted {
     C4Database* const c4db;
     std::string const name;
     std::string const path;
+    std::string const dir;
 
-    CBLDatabase(C4Database* _cblnonnull db, const std::string &name_, const std::string &path_)
+    CBLDatabase(C4Database* _cblnonnull db,
+                const std::string &name_,
+                const std::string &path_,
+                const std::string &dir_)
     :c4db(db)
     ,name(name_)
     ,path(path_)
+    ,dir(dir_)
     { }
 
     virtual ~CBLDatabase() {

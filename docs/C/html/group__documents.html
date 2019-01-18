@@ -140,6 +140,12 @@ Document properties and metadata</h2></td></tr>
 <tr class="memitem:ga89eef600d6af276d0dc49be123067090"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga89eef600d6af276d0dc49be123067090">cbl_doc_mutableProperties</a> (<a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *)</td></tr>
 <tr class="memdesc:ga89eef600d6af276d0dc49be123067090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a mutable document's properties as a mutable dictionary.  <a href="#ga89eef600d6af276d0dc49be123067090">More...</a><br /></td></tr>
 <tr class="separator:ga89eef600d6af276d0dc49be123067090"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9fc446ab1f26f42132753d88e11ee28b"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga9fc446ab1f26f42132753d88e11ee28b">cbl_doc_propertiesAsJSON</a> (const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *)</td></tr>
+<tr class="memdesc:ga9fc446ab1f26f42132753d88e11ee28b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a document's properties as a null-terminated JSON string.  <a href="#ga9fc446ab1f26f42132753d88e11ee28b">More...</a><br /></td></tr>
+<tr class="separator:ga9fc446ab1f26f42132753d88e11ee28b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga63405a6f2a3789f47ba0b4d263592ab4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga63405a6f2a3789f47ba0b4d263592ab4">cbl_doc_setPropertiesAsJSON</a> (<a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *, const char *json, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
+<tr class="memdesc:ga63405a6f2a3789f47ba0b4d263592ab4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a mutable document's properties from a JSON string.  <a href="#ga63405a6f2a3789f47ba0b4d263592ab4">More...</a><br /></td></tr>
+<tr class="separator:ga63405a6f2a3789f47ba0b4d263592ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Document listeners</h2></td></tr>
@@ -650,7 +656,28 @@ Every call to this function returns the same mutable collection. This is the sam
 
 <p>Returns a document's properties as a dictionary. </p>
 <dl class="section note"><dt>Note</dt><dd>The dictionary object is owned by the document; you do not need to release it. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>This dictionary <em>reference</em> is immutable, but if the document is mutable the underlying dictionary itself is mutable and could be modified through a mutable reference obtained via <a class="el" href="group__documents.html#ga89eef600d6af276d0dc49be123067090">cbl_doc_mutableProperties</a>. If you need to preserve the properties, call <a class="el" href="group___f_l_dict.html#ga79431c7d62c29a3997b54761a0a7ed18">FLDict_MutableCopy</a> to make a deep copy. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>This dictionary <em>reference</em> is immutable, but if the document is mutable the underlying dictionary itself is mutable and could be modified through a mutable reference obtained via <a class="el" href="group__documents.html#ga89eef600d6af276d0dc49be123067090">cbl_doc_mutableProperties</a>. If you need to preserve the properties, call <a class="el" href="group___f_l_dict.html#ga84d978fb3a009aa736d92fb5bff053f8">FLDict_MutableCopy</a> to make a deep copy. </dd></dl>
+
+</div>
+</div>
+<a id="ga9fc446ab1f26f42132753d88e11ee28b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9fc446ab1f26f42132753d88e11ee28b">&#9670;&nbsp;</a></span>cbl_doc_propertiesAsJSON()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* cbl_doc_propertiesAsJSON </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns a document's properties as a null-terminated JSON string. </p>
+<dl class="section note"><dt>Note</dt><dd>You are responsible for calling free() on the returned string. </dd></dl>
 
 </div>
 </div>
@@ -764,6 +791,42 @@ Every call to this function returns the same mutable collection. This is the sam
 
 <p>Returns a document's current sequence in the local database. </p>
 <p>This number increases every time the document is saved, and a more recently saved document will have a greater sequence number than one saved earlier, so sequences may be used as an abstract 'clock' to tell relative modification times. </p>
+
+</div>
+</div>
+<a id="ga63405a6f2a3789f47ba0b4d263592ab4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga63405a6f2a3789f47ba0b4d263592ab4">&#9670;&nbsp;</a></span>cbl_doc_setPropertiesAsJSON()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool cbl_doc_setPropertiesAsJSON </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>json</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_c_b_l_error.html">CBLError</a> *&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets a mutable document's properties from a JSON string. </p>
 
 </div>
 </div>

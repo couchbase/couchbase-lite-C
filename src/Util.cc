@@ -39,8 +39,8 @@ namespace cbl_internal {
         return result;
     }
 
-    
-    char* allocCString(FLSliceResult result) {
+
+    char* allocCString(FLSlice result) {
         if (result.buf == nullptr)
             return nullptr;
         char* str = (char*) malloc(result.size + 1);
@@ -48,6 +48,12 @@ namespace cbl_internal {
             return nullptr;
         memcpy(str, result.buf, result.size);
         str[result.size] = '\0';
+        return str;
+    }
+
+
+    char* allocCString(FLSliceResult result) {
+        char *str = allocCString(FLSlice{result.buf, result.size});
         FLSliceResult_Free(result);
         return str;
     }

@@ -117,7 +117,11 @@ char* cbl_error_message(const CBLError* _cblnonnull);
 
 /** Subsystems that log information. */
 typedef CBL_ENUM(uint8_t, CBLLogDomain) {
-    // TODO: Add domains
+    kCBLLogDomainAll,
+    kCBLLogDomainDatabase,
+    kCBLLogDomainQuery,
+    kCBLLogDomainReplicator,
+    kCBLLogDomainNetwork,
 };
 
 /** Levels of log messages. Higher values are more important/severe. */

@@ -157,7 +157,7 @@ uint64_t cbl_db_count(const CBLDatabase* _cblnonnull);
 uint64_t cbl_db_lastSequence(const CBLDatabase* _cblnonnull);
 
 /** Returns the database's configuration, as given when it was opened. */
-const CBLDatabaseConfiguration* cbl_db_config(const CBLDatabase* _cblnonnull);
+const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cblnonnull);
 
 /** @} */
 
