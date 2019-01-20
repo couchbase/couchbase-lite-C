@@ -41,12 +41,12 @@ typedef struct CBLEndpoint CBLEndpoint;
     and its path must be the name of the database on that server.
     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
     For example: `wss://example.org/dbname` */
-CBLEndpoint* cblendpoint_newWithURL(const char *url _cblnonnull);
+CBLEndpoint* cblendpoint_newWithURL(const char *url _cbl_nonnull);
 
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Creates a new endpoint representing another local database. */
-CBLEndpoint* cblendpoint_newWithLocalDB(CBLDatabase* _cblnonnull);
+CBLEndpoint* cblendpoint_newWithLocalDB(CBLDatabase* _cbl_nonnull);
 #endif
 
 /** Frees a CBLEndpoint object. */
@@ -57,8 +57,8 @@ void cblendpoint_free(CBLEndpoint*);
 typedef struct CBLAuthenticator CBLAuthenticator;
 
 /** Creates an authenticator for HTTP Basic (username/password) auth. */
-CBLAuthenticator* cblauth_newBasic(const char *username _cblnonnull,
-                                   const char *password _cblnonnull);
+CBLAuthenticator* cblauth_newBasic(const char *username _cbl_nonnull,
+                                   const char *password _cbl_nonnull);
 
 /** Frees a CBLAuthenticator object. */
 void cblauth_free(CBLAuthenticator*);
@@ -100,20 +100,20 @@ typedef struct {
 CBL_REFCOUNTED(CBLReplicator*, repl);
 
 /** Creates a replicator with the given configuration. */
-CBLReplicator* cbl_repl_new(const CBLReplicatorConfiguration* _cblnonnull,
+CBLReplicator* cbl_repl_new(const CBLReplicatorConfiguration* _cbl_nonnull,
                             CBLError*);
 
 /** Returns the configuration of an existing replicator. */
-const CBLReplicatorConfiguration* cbl_repl_config(CBLReplicator* _cblnonnull);
+const CBLReplicatorConfiguration* cbl_repl_config(CBLReplicator* _cbl_nonnull);
 
 /** Instructs the replicator to ignore existing checkpoints the next time it runs. */
-void cbl_repl_resetCheckpoint(CBLReplicator* _cblnonnull);
+void cbl_repl_resetCheckpoint(CBLReplicator* _cbl_nonnull);
 
 /** Starts a replicator, asynchronously. Does nothing if it's already started. */
-void cbl_repl_start(CBLReplicator* _cblnonnull);
+void cbl_repl_start(CBLReplicator* _cbl_nonnull);
 
 /** Stops a running replicator. Does nothing if it's not already started. */
-void cbl_repl_stop(CBLReplicator* _cblnonnull);
+void cbl_repl_stop(CBLReplicator* _cbl_nonnull);
 
 /** @} */
 
@@ -146,19 +146,19 @@ typedef struct {
 } CBLReplicatorStatus;
 
 /** Returns the replicator's current status. */
-CBLReplicatorStatus cbl_repl_status(CBLReplicator* _cblnonnull);
+CBLReplicatorStatus cbl_repl_status(CBLReplicator* _cbl_nonnull);
 
 /** A callback that notifies you when the replicator's status changes.
     @param context  The value given when the listener was added.
     @param replicator  The replicator.
     @param status  The replicator's status. */
 typedef void (*CBLReplicatorListener)(void *context, 
-                                      CBLReplicator *replicator _cblnonnull,
-                                      const CBLReplicatorStatus *status _cblnonnull);
+                                      CBLReplicator *replicator _cbl_nonnull,
+                                      const CBLReplicatorStatus *status _cbl_nonnull);
 
 /** Adds a listener that will be called when the replicator's status changes. */
-CBLListenerToken* cbl_repl_addListener(CBLReplicator* _cblnonnull,
-                                       CBLReplicatorListener _cblnonnull, 
+CBLListenerToken* cbl_repl_addListener(CBLReplicator* _cbl_nonnull,
+                                       CBLReplicatorListener _cbl_nonnull, 
                                        void *context);
 
 /** @} */

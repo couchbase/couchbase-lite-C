@@ -64,7 +64,7 @@ public:
     char* propertiesAsJSON() const;
     bool setPropertiesAsJSON(const char *json, C4Error* outError);
 
-    RetainedConst<CBLDocument> save(CBLDatabase* db _cblnonnull,
+    RetainedConst<CBLDocument> save(CBLDatabase* db _cbl_nonnull,
                                     bool deleting,
                                     CBLConcurrencyControl concurrency,
                                     C4Error* outError) const;
@@ -72,8 +72,8 @@ public:
     bool deleteDoc(CBLConcurrencyControl concurrency,
                    C4Error* outError) const;
 
-    static bool deleteDoc(CBLDatabase* db _cblnonnull,
-                          const char* docID _cblnonnull,
+    static bool deleteDoc(CBLDatabase* db _cbl_nonnull,
+                          const char* docID _cbl_nonnull,
                           C4Error* outError);
 
 private:

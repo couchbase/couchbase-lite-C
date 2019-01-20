@@ -31,12 +31,14 @@
 
 #ifdef _MSC_VER
 #define CBLINLINE           __forceinline
-#define _cblnonnull
+#define _cbl_nonnull
+#define _cbl_returns_nonnull
 #define _cbl_warn_unused
 #else
-#define CBLINLINE           inline
-#define _cblnonnull         __attribute((nonnull))
-#define _cbl_warn_unused    __attribute__((warn_unused_result))
+#define CBLINLINE            inline
+#define _cbl_nonnull         __attribute((nonnull))
+#define _cbl_returns_nonnull __attribute__((returns_nonnull))
+#define _cbl_warn_unused     __attribute__((warn_unused_result))
 #endif
 
 // Macros for defining typed enumerations and option flags.

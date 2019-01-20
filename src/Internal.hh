@@ -24,7 +24,7 @@ struct CBLDatabase : public CBLRefCounted {
     std::string const path;
     std::string const dir;
 
-    CBLDatabase(C4Database* _cblnonnull db,
+    CBLDatabase(C4Database* _cbl_nonnull db,
                 const std::string &name_,
                 const std::string &path_,
                 const std::string &dir_)

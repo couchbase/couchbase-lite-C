@@ -32,7 +32,7 @@ void cbl_setLogLevel(CBLLogLevel level, CBLLogDomain domain) {
     }
 }
 
-char* cbl_error_message(const CBLError* error _cblnonnull) {
+char* cbl_error_message(const CBLError* error _cbl_nonnull) {
     return allocCString(c4error_getMessage(*internal(error)));
 }
 

@@ -38,7 +38,7 @@ Dict CBLDocument::properties() const {
     return _properties.asDict();
 }
 
-RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cblnonnull,
+RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                                              bool deleting,
                                              CBLConcurrencyControl concurrency,
                                              C4Error* outError) const
@@ -118,8 +118,8 @@ bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency,
     return (deleted != nullptr);
 }
 
-bool CBLDocument::deleteDoc(CBLDatabase* db _cblnonnull,
-                      const char* docID _cblnonnull,
+bool CBLDocument::deleteDoc(CBLDatabase* db _cbl_nonnull,
+                      const char* docID _cbl_nonnull,
                       C4Error* outError)
 {
     c4::Transaction t(internal(db));
@@ -210,28 +210,28 @@ const CBLDocument* cbl_db_saveDocument(CBLDatabase* db,
     return retain(doc->save(db, false, concurrency, internal(outError)).get());
 }
 
-bool cbl_doc_delete(const CBLDocument* doc _cblnonnull,
+bool cbl_doc_delete(const CBLDocument* doc _cbl_nonnull,
                     CBLConcurrencyControl concurrency,
                     CBLError* outError)
 {
     return doc->deleteDoc(concurrency, internal(outError));
 }
 
-bool cbl_db_deleteDocument(CBLDatabase* db _cblnonnull,
-                           const char* docID _cblnonnull,
+bool cbl_db_deleteDocument(CBLDatabase* db _cbl_nonnull,
+                           const char* docID _cbl_nonnull,
                            CBLError* outError)
 {
     return CBLDocument::deleteDoc(db, docID, internal(outError));
 }
 
-bool cbl_doc_purge(const CBLDocument* doc _cblnonnull,
+bool cbl_doc_purge(const CBLDocument* doc _cbl_nonnull,
                    CBLError* outError)
 {
     return cbl_db_purgeDocument(doc->database(), doc->docID(), outError);
 }
 
-bool cbl_db_purgeDocument(CBLDatabase* db _cblnonnull,
-                          const char* docID _cblnonnull,
+bool cbl_db_purgeDocument(CBLDatabase* db _cbl_nonnull,
+                          const char* docID _cbl_nonnull,
                           CBLError* outError)
 {
     return c4db_purgeDoc(internal(db), slice(docID), internal(outError));

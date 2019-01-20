@@ -33,7 +33,7 @@ static const char* defaultDbDir() {
 }
 
 
-static string dbPath(const char* _cblnonnull name, const char *inDirectory) {
+static string dbPath(const char* _cbl_nonnull name, const char *inDirectory) {
     if (!inDirectory)
         inDirectory = defaultDbDir();
     string path(inDirectory);
@@ -45,7 +45,7 @@ static string dbPath(const char* _cblnonnull name, const char *inDirectory) {
 }
 
 
-static string dbPath(const char* _cblnonnull name, const CBLDatabaseConfiguration *config) {
+static string dbPath(const char* _cbl_nonnull name, const CBLDatabaseConfiguration *config) {
     return dbPath(name, (config ? config->directory : nullptr));
 }
 

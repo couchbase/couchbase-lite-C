@@ -27,7 +27,7 @@ namespace cbl {
     /** A database query. */
     class Query : protected RefCounted {
     public:
-        Query(const Database& db, const char *jsonQuery _cblnonnull)
+        Query(const Database& db, const char *jsonQuery _cbl_nonnull)
         {
             CBLError error;
             auto q = cbl_query_new(db.ref(), jsonQuery, &error);
@@ -54,10 +54,10 @@ namespace cbl {
     class Result {
     public:
         fleece::Value column(unsigned col)                  {return cbl_results_column(_ref, col);}
-        fleece::Value property(const char *name _cblnonnull){return cbl_results_property(_ref, name);}
+        fleece::Value property(const char *name _cbl_nonnull){return cbl_results_property(_ref, name);}
 
         fleece::Value operator[] (unsigned col)                 {return column(col);}
-        fleece::Value operator[] (const char *name _cblnonnull) {return property(name);}
+        fleece::Value operator[] (const char *name _cbl_nonnull) {return property(name);}
 
     protected:
         explicit Result(CBLResultSet *ref)    :_ref(ref) { }

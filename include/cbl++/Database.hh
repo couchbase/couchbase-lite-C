@@ -29,28 +29,28 @@ namespace cbl {
 
     class Database : private RefCounted {
     public:
-        static bool exists(const char* _cblnonnull name,
+        static bool exists(const char* _cbl_nonnull name,
                            const char *inDirectory)
         {
             return cbl_databaseExists(name, inDirectory);
         }
 
-        static void copyDB(const char* _cblnonnull fromPath,
-                           const char* _cblnonnull toName,
+        static void copyDB(const char* _cbl_nonnull fromPath,
+                           const char* _cbl_nonnull toName,
                            const CBLDatabaseConfiguration* config)
         {
             CBLError error;
             check( cbl_copyDB(fromPath, toName, config, &error), error );
         }
 
-        static void deleteDB(const char _cblnonnull *name,
+        static void deleteDB(const char _cbl_nonnull *name,
                              const char *inDirectory)
         {
             CBLError error;
             check( cbl_deleteDB(name, inDirectory, &error), error);
         }
 
-        Database(const char *name _cblnonnull,
+        Database(const char *name _cbl_nonnull,
                  const CBLDatabaseConfiguration& config)
         {
             CBLError error;
@@ -73,14 +73,14 @@ namespace cbl {
             check(cbl_db_compact(ref(), &error), error);
         }
 
-        const char* name() const                        {return cbl_db_name(ref());}
-        const char* path() const                        {return cbl_db_path(ref());}
-        uint64_t count() const                          {return cbl_db_count(ref());}
-        uint64_t lastSequence() const                   {return cbl_db_lastSequence(ref());}
-        CBLDatabaseConfiguration config() const         {return cbl_db_config(ref());}
+        const char* name() const _cbl_nonnull               {return cbl_db_name(ref());}
+        const char* path() const _cbl_nonnull               {return cbl_db_path(ref());}
+        uint64_t count() const                              {return cbl_db_count(ref());}
+        uint64_t lastSequence() const                       {return cbl_db_lastSequence(ref());}
+        CBLDatabaseConfiguration config() const             {return cbl_db_config(ref());}
 
-        inline Document getDocument(const char *id _cblnonnull) const;
-        inline MutableDocument getMutableDocument(const char *id _cblnonnull) const;
+        inline Document getDocument(const char *id _cbl_nonnull) const;
+        inline MutableDocument getMutableDocument(const char *id _cbl_nonnull) const;
 
         inline Document saveDocument(MutableDocument &doc,
                                      CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);

@@ -105,7 +105,7 @@ typedef struct {
 
 /** Returns a message describing an error.
     @note  It is the caller's responsibility to free the returned C string by calling `free`. */
-char* cbl_error_message(const CBLError* _cblnonnull);
+char* cbl_error_message(const CBLError* _cbl_nonnull);
 
 /** @} */
 
@@ -154,7 +154,7 @@ typedef struct CBLRefCounted CBLRefCounted;
 /** Increments an object's reference-count.
     Usually you'll call one of the type-safe synonyms specific to the object type,
     like \ref cbl_db_retain` */
-CBLRefCounted* cbl_retain(CBLRefCounted* _cblnonnull);
+CBLRefCounted* cbl_retain(CBLRefCounted*);
 
 /** Decrements an object's reference-count, freeing the object if the count hits zero.
     Usually you'll call one of the type-safe synonyms specific to the object type,
@@ -163,7 +163,8 @@ void cbl_release(CBLRefCounted*);
 
 // Declares retain/release functions for TYPE
 #define CBL_REFCOUNTED(TYPE, NAME) \
-    static inline TYPE cbl_##NAME##_retain(TYPE _cblnonnull t)  {return (TYPE)cbl_retain((CBLRefCounted*)t);} \
+    static inline TYPE cbl_##NAME##_retain(TYPE _cbl_nonnull t) \
+                                                    {return (TYPE)cbl_retain((CBLRefCounted*)t);} \
     static inline void cbl_##NAME##_release(TYPE t) {cbl_release((CBLRefCounted*)t);}
 
 /** @} */
@@ -209,7 +210,7 @@ typedef struct CBLReplicator CBLReplicator;
 typedef struct CBLListenerToken CBLListenerToken;
 
 /** Removes a listener callback, given the token that was returned when it was added. */
-void cbl_listener_remove(CBLListenerToken* _cblnonnull);
+void cbl_listener_remove(CBLListenerToken*);
 
 
 /** @} */

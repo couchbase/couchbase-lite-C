@@ -30,8 +30,8 @@ using namespace fleece;
 class CBLQuery : public CBLRefCounted {
 public:
 
-    CBLQuery(const CBLDatabase* db _cblnonnull,
-             const char *jsonQuery _cblnonnull,
+    CBLQuery(const CBLDatabase* db _cbl_nonnull,
+             const char *jsonQuery _cbl_nonnull,
              C4Error* outError)
     :_c4query( c4query_new(internal(db), slice(jsonQuery), outError) )
     { }
@@ -79,7 +79,7 @@ private:
 
 class CBLResultSet : public CBLRefCounted {
 public:
-    CBLResultSet(CBLQuery* query, C4QueryEnumerator* qe _cblnonnull)
+    CBLResultSet(CBLQuery* query, C4QueryEnumerator* qe _cbl_nonnull)
     :_query(query)
     ,_enum(qe)
     { }
@@ -120,15 +120,15 @@ Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
 #pragma mark - PUBLIC API:
 
 
-CBLQuery* cbl_query_new(const CBLDatabase* db _cblnonnull,
-                        const char *jsonQuery _cblnonnull,
+CBLQuery* cbl_query_new(const CBLDatabase* db _cbl_nonnull,
+                        const char *jsonQuery _cbl_nonnull,
                         CBLError* outError)
 {
     auto query = retained(new CBLQuery(db, jsonQuery, internal(outError)));
     return query->valid() ? retain(query.get()) : nullptr;
 }
 
-void cbl_query_setParameters(CBLQuery* query _cblnonnull, FLDict parameters) {
+void cbl_query_setParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) {
     Encoder enc;
     enc.writeValue(Dict(parameters));
     alloc_slice encodedParameters = enc.finish();
@@ -145,31 +145,31 @@ bool cbl_query_setParametersFromJSON(CBLQuery* query, const char* json) {
     return true;
 }
 
-CBLResultSet* cbl_query_execute(CBLQuery* query _cblnonnull, CBLError* outError) {
+CBLResultSet* cbl_query_execute(CBLQuery* query _cbl_nonnull, CBLError* outError) {
     return retain(query->execute(internal(outError)).get());
 }
 
-FLSliceResult cbl_query_explain(CBLQuery* query _cblnonnull) {
+FLSliceResult cbl_query_explain(CBLQuery* query _cbl_nonnull) {
     return FLSliceResult(query->explain());
 }
 
-unsigned cbl_query_columnCount(CBLQuery* query _cblnonnull) {
+unsigned cbl_query_columnCount(CBLQuery* query _cbl_nonnull) {
     return query->columnCount();
 }
 
-FLSlice cbl_query_columnName(CBLQuery* query _cblnonnull, unsigned col) {
+FLSlice cbl_query_columnName(CBLQuery* query _cbl_nonnull, unsigned col) {
     return query->columnName(col);
 }
 
 
-bool cbl_results_next(CBLResultSet* rs _cblnonnull) {
+bool cbl_results_next(CBLResultSet* rs _cbl_nonnull) {
     return rs->next();
 }
 
-FLValue cbl_results_property(CBLResultSet* rs _cblnonnull, const char *property) {
+FLValue cbl_results_property(CBLResultSet* rs _cbl_nonnull, const char *property) {
     return rs->property(property);
 }
 
-FLValue cbl_results_column(CBLResultSet* rs _cblnonnull, unsigned column) {
+FLValue cbl_results_column(CBLResultSet* rs _cbl_nonnull, unsigned column) {
     return rs->column(column);
 }

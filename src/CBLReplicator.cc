@@ -39,7 +39,7 @@ static inline const CBLReplicatorStatus& external(const C4ReplicatorStatus &stat
 
 class CBLReplicator : public CBLRefCounted {
 public:
-    CBLReplicator(const CBLReplicatorConfiguration *conf _cblnonnull)
+    CBLReplicator(const CBLReplicatorConfiguration *conf _cbl_nonnull)
     :_conf(*conf)
     { }
 
@@ -198,7 +198,7 @@ private:
 #pragma mark - C API:
 
 
-CBLEndpoint* cblendpoint_newWithURL(const char *url _cblnonnull) {
+CBLEndpoint* cblendpoint_newWithURL(const char *url _cbl_nonnull) {
     return new CBLURLEndpoint(url);
 }
 

@@ -44,18 +44,18 @@ namespace cbl {
             return purged;
         }
 
-        const char* _cblnonnull id() const              {return cbl_doc_id(ref());}
+        const char* id() const _cbl_returns_nonnull     {return cbl_doc_id(ref());}
 
         uint64_t sequence() const                       {return cbl_doc_sequence(ref());}
 
         fleece::Dict properties() const                 {return cbl_doc_properties(ref());}
 
-        char* _cblnonnull propertiesAsJSON(const CBLDocument* _cblnonnull);
+        char* _cbl_nonnull propertiesAsJSON(const CBLDocument* _cbl_nonnull);
 
-        bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cblnonnull,
-                                         const char *json _cblnonnull,
+        bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
+                                         const char *json _cbl_nonnull,
                                          CBLError*);
-        fleece::Value operator[] (const char *key _cblnonnull) const {return properties()[key];}
+        fleece::Value operator[] (const char *key _cbl_nonnull) const {return properties()[key];}
 
 
     protected:
@@ -73,7 +73,7 @@ namespace cbl {
         fleece::MutableDict properties()                {return cbl_doc_mutableProperties(ref());}
 
         template <typename T>
-        void set(const char *key _cblnonnull, T val)    {properties().set(fleece::slice(key), val);}
+        void set(const char *key _cbl_nonnull, T val)  {properties().set(fleece::slice(key), val);}
 
         fleece::keyref<fleece::MutableDict,fleece::slice> operator[] (const char *key)
                                                         {return properties()[fleece::slice(key)];}
@@ -84,11 +84,11 @@ namespace cbl {
     };
 
 
-    inline Document Database::getDocument(const char *id _cblnonnull) const {
+    inline Document Database::getDocument(const char *id _cbl_nonnull) const {
         return Document(cbl_db_getDocument(ref(), id));
     }
 
-    inline MutableDocument Database::getMutableDocument(const char *id _cblnonnull) const {
+    inline MutableDocument Database::getMutableDocument(const char *id _cbl_nonnull) const {
         return MutableDocument(cbl_db_getMutableDocument(ref(), id));
     }
 

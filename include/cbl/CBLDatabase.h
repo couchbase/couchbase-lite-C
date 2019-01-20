@@ -71,14 +71,14 @@ typedef struct {
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
                         absolute or relative path to the database. */
-bool cbl_databaseExists(const char* _cblnonnull name, const char *inDirectory);
+bool cbl_databaseExists(const char* _cbl_nonnull name, const char *inDirectory);
 
 /** Copies a database file to a new location and assigns it a new UUID.
     @param fromPath  The full filesystem path to the original database (including extension).
     @param toName  The new database name (without the ".cblite2" extension.)
     @param config  The database configuration (directory and encryption option.) */
-bool cbl_copyDB(const char* _cblnonnull fromPath,
-                const char* _cblnonnull toName, 
+bool cbl_copyDB(const char* _cbl_nonnull fromPath,
+                const char* _cbl_nonnull toName, 
                 const CBLDatabaseConfiguration* config,
                 CBLError*);
 
@@ -86,7 +86,7 @@ bool cbl_copyDB(const char* _cblnonnull fromPath,
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
                         absolute or relative path to the database. */
-bool cbl_deleteDB(const char _cblnonnull *name, 
+bool cbl_deleteDB(const char _cbl_nonnull *name, 
                   const char *inDirectory,
                   CBLError*);
 
@@ -108,7 +108,7 @@ bool cbl_deleteDB(const char _cblnonnull *name,
     @param error  On failure, the error will be written here.
     @return  The new database object, or NULL on failure. */
 _cbl_warn_unused
-CBLDatabase* cbl_db_open(const char *name _cblnonnull,
+CBLDatabase* cbl_db_open(const char *name _cbl_nonnull,
                          const CBLDatabaseConfiguration* config,
                          CBLError* error);
 
@@ -118,10 +118,10 @@ bool cbl_db_close(CBLDatabase*, CBLError*);
 CBL_REFCOUNTED(CBLDatabase*, db);
 
 /** Closes and deletes a database. */
-bool cbl_db_delete(CBLDatabase* _cblnonnull, CBLError*);
+bool cbl_db_delete(CBLDatabase* _cbl_nonnull, CBLError*);
 
 /** Compacts a database file. */
-bool cbl_db_compact(CBLDatabase* _cblnonnull, CBLError*);
+bool cbl_db_compact(CBLDatabase* _cbl_nonnull, CBLError*);
 
 /** Begins a batch operation, similar to a transaction. You **must** later call \ref
     cbl_db_endBatch to end (commit) the batch.
@@ -129,10 +129,10 @@ bool cbl_db_compact(CBLDatabase* _cblnonnull, CBLError*);
     @note  Changes will not be visible to other CBLDatabase instances on the same database until
             the batch operation ends.
     @note  Batch operations can nest. Changes are not committed until the outer batch ends. */
-bool cbl_db_beginBatch(CBLDatabase* _cblnonnull, CBLError*);
+bool cbl_db_beginBatch(CBLDatabase* _cbl_nonnull, CBLError*);
 
 /** Ends a batch operation. This **must** be called after \ref cbl_db_beginBatch. */
-bool cbl_db_endBatch(CBLDatabase* _cblnonnull, CBLError*);
+bool cbl_db_endBatch(CBLDatabase* _cbl_nonnull, CBLError*);
 
 /** @} */
 
@@ -144,20 +144,20 @@ bool cbl_db_endBatch(CBLDatabase* _cblnonnull, CBLError*);
  */
 
 /** Returns the database's name. */
-const char* cbl_db_name(const CBLDatabase* _cblnonnull);
+const char* cbl_db_name(const CBLDatabase* _cbl_nonnull) _cbl_returns_nonnull;
 
 /** Returns the database's full filesystem path. */
-const char* cbl_db_path(const CBLDatabase* _cblnonnull);
+const char* cbl_db_path(const CBLDatabase* _cbl_nonnull) _cbl_returns_nonnull;
 
 /** Returns the number of documents in the database. */
-uint64_t cbl_db_count(const CBLDatabase* _cblnonnull);
+uint64_t cbl_db_count(const CBLDatabase* _cbl_nonnull);
 
 /** Returns the last sequence number assigned in the database.
     This starts at zero and increments every time a document is saved or deleted. */
-uint64_t cbl_db_lastSequence(const CBLDatabase* _cblnonnull);
+uint64_t cbl_db_lastSequence(const CBLDatabase* _cbl_nonnull);
 
 /** Returns the database's configuration, as given when it was opened. */
-const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cblnonnull);
+const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull);
 
 /** @} */
 
@@ -177,8 +177,8 @@ const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cblnonnull);
     @param docIDs  The IDs of the documents that changed, as a C array of C strings,
                     ending with a NULL. */
 typedef void (*CBLDatabaseListener)(void *context,
-                                    const CBLDatabase* db _cblnonnull,
-                                    const char **docIDs);
+                                    const CBLDatabase* db _cbl_nonnull,
+                                    const char **docIDs _cbl_nonnull);
 
 /** Registers a database change listener callback. It will be called after one or more
     documents are changed on disk.
@@ -188,8 +188,8 @@ typedef void (*CBLDatabaseListener)(void *context,
     @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
 _cbl_warn_unused
-CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cblnonnull,
-                                     CBLDatabaseListener listener _cblnonnull,
+CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cbl_nonnull,
+                                     CBLDatabaseListener listener _cbl_nonnull,
                                      void *context);
                                      
 /** @} */

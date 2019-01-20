@@ -12,10 +12,10 @@
 namespace cbl_internal {
 
     /** Like sprintf(), but returns a std::string */
-    std::string format(const char *fmt _cblnonnull, ...) __printflike(1, 2);
+    std::string format(const char *fmt _cbl_nonnull, ...) __printflike(1, 2);
 
     /** Like vsprintf(), but returns a std::string */
-    std::string vformat(const char *fmt _cblnonnull, va_list);
+    std::string vformat(const char *fmt _cbl_nonnull, va_list);
 
     char* allocCString(FLSlice);
     char* allocCString(FLSliceResult);      // frees the input

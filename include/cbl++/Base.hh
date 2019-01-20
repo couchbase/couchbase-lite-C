@@ -70,6 +70,7 @@ protected: \
 
     class Listener {
     public:
+        Listener()                                  :_token(nullptr) { }
         explicit Listener(CBLListenerToken* token)  :_token(token) { }
         ~Listener()                                 {cbl_listener_remove(_token);}
     private:

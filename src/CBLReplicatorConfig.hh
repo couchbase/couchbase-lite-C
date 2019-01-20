@@ -37,7 +37,7 @@ protected:
 namespace cbl_internal {
     // Concrete Endpoint for remote URLs
     struct CBLURLEndpoint : public CBLEndpoint {
-        CBLURLEndpoint(const char *url _cblnonnull)
+        CBLURLEndpoint(const char *url _cbl_nonnull)
         :_url(url)
         {
             if (!c4address_fromURL(_url, &_address, &_dbName))
@@ -66,7 +66,7 @@ struct CBLAuthenticator {
 namespace cbl_internal {
     // Concrete Authenticator for HTTP Basic auth:
     struct CBLBasicAuthenticator : public CBLAuthenticator {
-        CBLBasicAuthenticator(const char *username _cblnonnull, const char *password _cblnonnull)
+        CBLBasicAuthenticator(const char *username _cbl_nonnull, const char *password _cbl_nonnull)
         :_username(username)
         ,_password(password)
         { }

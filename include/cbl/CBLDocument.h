@@ -49,8 +49,8 @@ typedef CBL_ENUM(uint8_t, CBLConcurrencyControl) {
     @param docID  The ID of the document.
     @return  A new CBLDocument instance, or NULL if no document with that ID exists. */
 _cbl_warn_unused
-const CBLDocument* cbl_db_getDocument(const CBLDatabase* database _cblnonnull,
-                                      const char* _cblnonnull docID);
+const CBLDocument* cbl_db_getDocument(const CBLDatabase* database _cbl_nonnull,
+                                      const char* _cbl_nonnull docID);
 
 CBL_REFCOUNTED(const CBLDocument*, doc);
 
@@ -61,8 +61,8 @@ CBL_REFCOUNTED(const CBLDocument*, doc);
     @param error  On failure, the error will be written here.
     @return  An updated document reflecting the saved changes, or NULL on failure. */
 _cbl_warn_unused
-const CBLDocument* cbl_db_saveDocument(CBLDatabase* db _cblnonnull,
-                                       CBLDocument* doc _cblnonnull,
+const CBLDocument* cbl_db_saveDocument(CBLDatabase* db _cbl_nonnull,
+                                       CBLDocument* doc _cbl_nonnull,
                                        CBLConcurrencyControl concurrency,
                                        CBLError* error);
 
@@ -74,7 +74,7 @@ const CBLDocument* cbl_db_saveDocument(CBLDatabase* db _cblnonnull,
     @param concurrency  Conflict-handling strategy.
     @param error  On failure, the error will be written here.
     @return  True if the document was deleted, false if an error occurred. */
-bool cbl_doc_delete(const CBLDocument* document _cblnonnull,
+bool cbl_doc_delete(const CBLDocument* document _cbl_nonnull,
                     CBLConcurrencyControl concurrency,
                     CBLError* error);
 
@@ -86,8 +86,8 @@ bool cbl_doc_delete(const CBLDocument* document _cblnonnull,
     @param error  On failure, the error will be written here.
     @return  True if the document was deleted, false if it doesn't exist or the deletion failed.
  */
-bool cbl_db_deleteDocument(CBLDatabase* database _cblnonnull,
-                           const char* docID _cblnonnull,
+bool cbl_db_deleteDocument(CBLDatabase* database _cbl_nonnull,
+                           const char* docID _cbl_nonnull,
                            CBLError* error);
 
 /** Purges a document. This removes all traces of the document from the database.
@@ -99,7 +99,7 @@ bool cbl_db_deleteDocument(CBLDatabase* database _cblnonnull,
     @param document  The document to delete.
     @param error  On failure, the error will be written here.
     @return  True if the document was purged, false if it doesn't exist or the purge failed. */
-bool cbl_doc_purge(const CBLDocument* document _cblnonnull,
+bool cbl_doc_purge(const CBLDocument* document _cbl_nonnull,
                    CBLError* error);
 
 /** Purges a document given only its ID.
@@ -110,8 +110,8 @@ bool cbl_doc_purge(const CBLDocument* document _cblnonnull,
     @param error  On failure, the error will be written here.
     @return  True if the document was purged, false if it doesn't exist or the purge failed.
  */
-bool cbl_db_purgeDocument(CBLDatabase* database _cblnonnull,
-                          const char* docID _cblnonnull,
+bool cbl_db_purgeDocument(CBLDatabase* database _cbl_nonnull,
+                          const char* docID _cbl_nonnull,
                           CBLError* error);
 
 /** @} */
@@ -132,21 +132,20 @@ bool cbl_db_purgeDocument(CBLDatabase* database _cblnonnull,
     @param docID  The ID of the document.
     @return  A new mutable CBLDocument instance, or NULL if no document with that ID exists. */
 _cbl_warn_unused
-CBLDocument* cbl_db_getMutableDocument(CBLDatabase* database _cblnonnull,
-                                       const char* docID _cblnonnull);
+CBLDocument* cbl_db_getMutableDocument(CBLDatabase* database _cbl_nonnull,
+                                       const char* docID _cbl_nonnull);
 
 /** Creates a new, empty document in memory. It will not be added to a database until saved.
     @param docID  The ID of the new document, or NULL to assign a new unique ID.
     @return  The mutable document instance. */
-_cbl_warn_unused
-CBLDocument* cbl_doc_new(const char *docID);
+CBLDocument* cbl_doc_new(const char *docID) _cbl_warn_unused _cbl_returns_nonnull;
 
 /** Creates a new CBLDocument instance that refers to the same document as the original.
     If the original document has unsaved changes, the new one will also start out with the same
     changes; but mutating one document thereafter will not affect the other.
     @note  You must release the new reference when you're done with it. */
-_cbl_warn_unused
-CBLDocument* cbl_doc_mutableCopy(const CBLDocument* original _cblnonnull);
+CBLDocument* cbl_doc_mutableCopy(const CBLDocument* original _cbl_nonnull)
+    _cbl_warn_unused _cbl_returns_nonnull;
 
 /** @} */
 
@@ -159,13 +158,13 @@ CBLDocument* cbl_doc_mutableCopy(const CBLDocument* original _cblnonnull);
  */
 
 /** Returns a document's ID. */
-const char* _cblnonnull cbl_doc_id(const CBLDocument* _cblnonnull);
+const char* cbl_doc_id(const CBLDocument* _cbl_nonnull) _cbl_returns_nonnull;
 
 /** Returns a document's current sequence in the local database.
     This number increases every time the document is saved, and a more recently saved document
     will have a greater sequence number than one saved earlier, so sequences may be used as an
     abstract 'clock' to tell relative modification times. */
-uint64_t cbl_doc_sequence(const CBLDocument* _cblnonnull);
+uint64_t cbl_doc_sequence(const CBLDocument* _cbl_nonnull);
 
 /** Returns a document's properties as a dictionary.
     @note  The dictionary object is owned by the document; you do not need to release it.
@@ -173,22 +172,22 @@ uint64_t cbl_doc_sequence(const CBLDocument* _cblnonnull);
            underlying dictionary itself is mutable and could be modified through a mutable
            reference obtained via \ref cbl_doc_mutableProperties. If you need to preserve the
            properties, call \ref FLDict_MutableCopy to make a deep copy. */
-FLDict cbl_doc_properties(const CBLDocument* _cblnonnull);
+FLDict cbl_doc_properties(const CBLDocument* _cbl_nonnull);
 
 /** Returns a mutable document's properties as a mutable dictionary.
     You may modify this dictionary and then call \ref cbl_db_saveDocument to persist the changes.
     @note  The dictionary object is owned by the document; you do not need to release it.
     @note  Every call to this function returns the same mutable collection. This is the
            same collection returned by \ref cbl_doc_properties. */
-FLMutableDict cbl_doc_mutableProperties(CBLDocument* _cblnonnull);
+FLMutableDict cbl_doc_mutableProperties(CBLDocument* _cbl_nonnull) _cbl_returns_nonnull;
 
 /** Returns a document's properties as a null-terminated JSON string.
     @note You are responsible for calling free() on the returned string. */
-char* _cblnonnull cbl_doc_propertiesAsJSON(const CBLDocument* _cblnonnull);
+char* _cbl_nonnull cbl_doc_propertiesAsJSON(const CBLDocument* _cbl_nonnull);
 
 /** Sets a mutable document's properties from a JSON string. */
-bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cblnonnull,
-                                 const char *json _cblnonnull,
+bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
+                                 const char *json _cbl_nonnull,
                                  CBLError*);
 
 /** @} */
@@ -208,8 +207,8 @@ bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cblnonnull,
     @param db  The database containing the document.
     @param docID  The document's ID. */
 typedef void (*CBLDocumentListener)(void *context,
-                                    const CBLDatabase* db _cblnonnull,
-                                    const char *docID _cblnonnull);
+                                    const CBLDatabase* db _cbl_nonnull,
+                                    const char *docID _cbl_nonnull);
 
 /** Registers a document change listener callback. It will be called after a specific document
     is changed on disk.
@@ -220,9 +219,9 @@ typedef void (*CBLDocumentListener)(void *context,
     @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
 _cbl_warn_unused
-CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cblnonnull,
-                                             const char* docID _cblnonnull,
-                                             CBLDocumentListener listener _cblnonnull,
+CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cbl_nonnull,
+                                             const char* docID _cbl_nonnull,
+                                             CBLDocumentListener listener _cbl_nonnull,
                                              void *context);
 
 /** @} */

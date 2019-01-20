@@ -44,8 +44,8 @@ extern "C" {
     @param error  On failure, the error will be written here.
     @return  The new query object. */
 _cbl_warn_unused
-CBLQuery* cbl_query_new(const CBLDatabase* db _cblnonnull,
-                        const char *jsonQuery _cblnonnull, 
+CBLQuery* cbl_query_new(const CBLDatabase* db _cbl_nonnull,
+                        const char *jsonQuery _cbl_nonnull, 
                         CBLError* error);
 
 CBL_REFCOUNTED(CBLQuery*, query);
@@ -56,26 +56,26 @@ CBL_REFCOUNTED(CBLQuery*, query);
     @param parameters  The parameters in the form of a Fleece \ref FLDict "dictionary" whose
             keys are the parameter names. (It's easiest to construct this by using the mutable
             API, i.e. calling \ref FLMutableDict_New and adding keys/values.) */
-void cbl_query_setParameters(CBLQuery* _cblnonnull query,
-                             FLDict _cblnonnull parameters);
+void cbl_query_setParameters(CBLQuery* _cbl_nonnull query,
+                             FLDict _cbl_nonnull parameters);
 
-bool cbl_query_setParametersFromJSON(CBLQuery* _cblnonnull query,
-                                     const char* _cblnonnull json);
+bool cbl_query_setParametersFromJSON(CBLQuery* _cbl_nonnull query,
+                                     const char* _cbl_nonnull json);
 
 /** Runs the query, returning the results.
     @note  You must release the result set when you're finished with it. */
 _cbl_warn_unused
-CBLResultSet* cbl_query_execute(CBLQuery* _cblnonnull, CBLError*);
+CBLResultSet* cbl_query_execute(CBLQuery* _cbl_nonnull, CBLError*);
 
 /** Returns information about the query, including the translated SQL form, and the search
     strategy. You can use this to help optimize the query. */
-FLSliceResult cbl_query_explain(CBLQuery* _cblnonnull);
+FLSliceResult cbl_query_explain(CBLQuery* _cbl_nonnull);
 
 /** Returns the number of columns in each result. */
-unsigned cbl_query_columnCount(CBLQuery* _cblnonnull);
+unsigned cbl_query_columnCount(CBLQuery* _cbl_nonnull);
 
 /** Returns the name of a column in the result. */
-FLSlice cbl_query_columnName(CBLQuery* _cblnonnull,
+FLSlice cbl_query_columnName(CBLQuery* _cbl_nonnull,
                              unsigned columnIndex);
 
 /** @} */
@@ -92,15 +92,15 @@ FLSlice cbl_query_columnName(CBLQuery* _cblnonnull,
 /** Moves the result-set iterator to the next result.
     Returns false if there are no more results.
     @warning This must be called _before_ examining the first result. */
-bool cbl_results_next(CBLResultSet* _cblnonnull);
+bool cbl_results_next(CBLResultSet* _cbl_nonnull);
 
 /** Returns the value of a column of the current result, given its (zero-based) numeric index. */
-FLValue cbl_results_column(CBLResultSet* _cblnonnull,
+FLValue cbl_results_column(CBLResultSet* _cbl_nonnull,
                            unsigned column);
 
 /** Returns the value of a column of the current result, given its name. */
-FLValue cbl_results_property(CBLResultSet* _cblnonnull,
-                             const char* property _cblnonnull);
+FLValue cbl_results_property(CBLResultSet* _cbl_nonnull,
+                             const char* property _cbl_nonnull);
 
 CBL_REFCOUNTED(CBLResultSet*, results);
 
@@ -124,7 +124,7 @@ CBL_REFCOUNTED(CBLResultSet*, results);
     @param newResults  The entire new result set, or NULL if there was an error.
     @param error  The error that occurred, or NULL if the query ran successfully. */
 typedef void (*CBLQueryListener)(void *context,
-                                 CBLQuery* query _cblnonnull,
+                                 CBLQuery* query _cbl_nonnull,
                                  CBLResultSet* newResults,
                                  const CBLError* error);
 
@@ -136,8 +136,8 @@ typedef void (*CBLQueryListener)(void *context,
     @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
 _cbl_warn_unused
-CBLListenerToken* cbl_query_addListener(CBLQuery* query _cblnonnull,
-                                        CBLQueryListener* listener _cblnonnull,
+CBLListenerToken* cbl_query_addListener(CBLQuery* query _cbl_nonnull,
+                                        CBLQueryListener* listener _cbl_nonnull,
                                         void *context);
 
 /** @} */
