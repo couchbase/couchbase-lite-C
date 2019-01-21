@@ -179,10 +179,11 @@ const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull);
 /** A database change listener callback, invoked after one or more documents are changed on disk.
     @param context  An arbitrary value given when the callback was registered.
     @param db  The database that changed.
-    @param docIDs  The IDs of the documents that changed, as a C array of C strings,
-                    ending with a NULL. */
+    @param numDocs  The number of documents that changed (size of the docIDs array)
+    @param docIDs  The IDs of the documents that changed, as a C array of `numDocs` C strings. */
 typedef void (*CBLDatabaseListener)(void *context,
                                     const CBLDatabase* db _cbl_nonnull,
+                                    unsigned numDocs,
                                     const char **docIDs _cbl_nonnull);
 
 /** Registers a database change listener callback. It will be called after one or more
@@ -222,8 +223,8 @@ CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cbl_nonnull,
                 you will not be informed that any listeners are ready.
         @warning  This can be called from arbitrary threads. It should do as little work as
                   possible, just scheduling a future call to `cbl_db_callListeners`. */
-    typedef void (*CBLNotificationsReadyCallback)(CBLDatabase* db _cbl_nonnull,
-                                              void *context);
+    typedef void (*CBLNotificationsReadyCallback)(void *context,
+                                                  CBLDatabase* db _cbl_nonnull);
 
     /** Switches the database to buffered-notification mode. Notifications for objects belonging
         to this database will not be called immediately.

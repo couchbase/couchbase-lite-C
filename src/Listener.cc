@@ -20,32 +20,7 @@
 #include "CBLDatabase.h"
 
 
-namespace cbl_internal {
-
-
-
-}
-
-
 void CBLListenerToken::remove() {
     assert(_owner);
     _owner->remove(this);
-}
-
-
-
-#pragma mark - BUFFERING:
-
-
-void cbl_db_bufferNotifications(CBLDatabase *db,
-                                CBLNotificationsReadyCallback callback,
-                                void *context)
-{
-    // TODO
-}
-
-/** Immediately issues all pending notifications for this database, by calling their listener
- callbacks. */
-void cbl_db_sendNotifications(CBLDatabase *db) {
-    // TODO
 }

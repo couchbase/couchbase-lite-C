@@ -146,12 +146,25 @@ CBLDatabase::~CBLDatabase() {
 }
 
 
+bool CBLDatabase::shouldNotifyNow() {
+    if (_notificationsCallback) {
+        if (!_notificationsAnnounced) {
+            _notificationsAnnounced = true;
+            _notificationsCallback(_notificationsContext, this);
+        }
+        return false;
+    } else {
+        return true;
+    }
+}
+
+
 CBLListenerToken* CBLDatabase::addListener(CBLDatabaseListener listener, void *context) {
     auto token = _listeners.add(listener, context);
     if (!_observer) {
         _observer = c4dbobs_create(c4db,
                                    [](C4DatabaseObserver* observer, void *context) {
-                                       ((CBLDatabase*)context)->callListeners();
+                                       ((CBLDatabase*)context)->databaseChanged();
                                    },
                                    this);
     }
@@ -159,7 +172,13 @@ CBLListenerToken* CBLDatabase::addListener(CBLDatabaseListener listener, void *c
 }
 
 
-void CBLDatabase::callListeners() {
+void CBLDatabase::databaseChanged() {
+    if (shouldNotifyNow())
+        callDBListeners();
+}
+
+
+void CBLDatabase::callDBListeners() {
     static const uint32_t kMaxChanges = 100;
     while (true) {
         C4DatabaseChange c4changes[kMaxChanges];
@@ -181,7 +200,7 @@ void CBLDatabase::callListeners() {
         }
         assert(next - buf == bufSize);
         // Call the listener(s):
-        _listeners.call(this, docIDs);
+        _listeners.call(this, nChanges, docIDs);
         delete [] buf;
     }
 }
@@ -200,10 +219,11 @@ CBLListenerToken* cbl_db_addListener(const CBLDatabase* constdb _cbl_nonnull,
 
 namespace cbl_internal {
 
-    class DocListenerToken : public ListenerToken<CBLDocumentListener> {
+    template<>
+    class ListenerToken<CBLDocumentListener> : public CBLListenerToken {
     public:
-        DocListenerToken(CBLDatabase *db, const char *docID, CBLDocumentListener callback, void *context)
-        :ListenerToken(callback, context)
+        ListenerToken(CBLDatabase *db, const char *docID, CBLDocumentListener callback, void *context)
+        :CBLListenerToken((const void*)callback, context)
         ,_db(db)
         ,_docID(docID)
         ,_c4obs( c4docobs_create(internal(db),
@@ -211,23 +231,36 @@ namespace cbl_internal {
                                  [](C4DocumentObserver* observer, C4String docID,
                                     C4SequenceNumber sequence, void *context)
                                  {
-                                     ((DocListenerToken*)context)->callListener();
+                                     ((ListenerToken*)context)->docChanged();
                                  },
                                  this) )
         { }
 
-        ~DocListenerToken() {
+        ~ListenerToken() {
             c4docobs_free(_c4obs);
         }
 
+        CBLDocumentListener callback() const           {return (CBLDocumentListener)_callback;}
+
+        // this is called indirectly by CBLDatabase::sendNotifications
+        void call(const CBLDatabase*, const char*) {
+            if (_scheduled) {
+                _scheduled = false;
+                callback()(_context, _db, _docID.c_str());
+            }
+        }
+
     private:
-        void callListener() {
-            call(_db, _docID.c_str());
+        void docChanged() {
+            _scheduled = true;
+            if (_db->shouldNotifyNow())
+                call(nullptr, nullptr);
         }
 
         CBLDatabase* _db;
         string _docID;
         C4DocumentObserver* _c4obs {nullptr};
+        bool _scheduled {false};
     };
 
 }
@@ -236,7 +269,7 @@ namespace cbl_internal {
 CBLListenerToken* CBLDatabase::addDocListener(const char* docID _cbl_nonnull,
                                               CBLDocumentListener listener, void *context)
 {
-    auto token = new DocListenerToken(this, docID, listener, context);
+    auto token = new ListenerToken<CBLDocumentListener>(this, docID, listener, context);
     _docListeners.add(token);
     return token;
 }
@@ -250,3 +283,35 @@ CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cbl_nonnull,
     return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context);
 
 }
+
+
+#pragma mark - SCHEDULING
+
+
+void CBLDatabase::bufferNotifications(CBLNotificationsReadyCallback callback, void *context) {
+    _notificationsContext = context;
+    _notificationsCallback = callback;
+}
+
+
+void CBLDatabase::sendNotifications() {
+    if (!_notificationsAnnounced)
+        return;
+    _notificationsAnnounced = false;
+    callDBListeners();
+    _docListeners.call(this, nullptr);
+}
+
+
+
+void cbl_db_bufferNotifications(CBLDatabase *db,
+                                CBLNotificationsReadyCallback callback,
+                                void *context)
+{
+    db->bufferNotifications(callback, context);
+}
+
+void cbl_db_sendNotifications(CBLDatabase *db) {
+    db->sendNotifications();
+}
+

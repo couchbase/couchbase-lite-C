@@ -28,6 +28,8 @@ _cbl_db_beginBatch
 _cbl_db_endBatch
 _cbl_db_addListener
 _cbl_db_addDocumentListener
+_cbl_db_bufferNotifications
+_cbl_db_sendNotifications
 
 _cbl_db_getDocument
 _cbl_db_getMutableDocument

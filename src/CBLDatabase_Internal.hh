@@ -36,12 +36,23 @@ struct CBLDatabase : public CBLRefCounted {
     CBLListenerToken* addDocListener(const char *docID _cbl_nonnull,
                                      CBLDocumentListener listener _cbl_nonnull, void *context);
 
-private:
-    void callListeners();
+    void bufferNotifications(CBLNotificationsReadyCallback callback, void *context);
+    void sendNotifications();
 
-    cbl_internal::Listeners<CBLDatabaseListener> _listeners;
+    bool shouldNotifyNow();
+
+private:
+    void databaseChanged();
+    void callDBListeners();
+    void callDocListeners();
+
     C4DatabaseObserver* _observer {nullptr};
+    cbl_internal::Listeners<CBLDatabaseListener> _listeners;
     cbl_internal::Listeners<CBLDocumentListener> _docListeners;
+
+    CBLNotificationsReadyCallback _notificationsCallback {nullptr};
+    void* _notificationsContext;
+    bool _notificationsAnnounced {false};
 };
 
 
