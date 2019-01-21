@@ -17,6 +17,7 @@
 //
 
 #include "CBLDatabase_Internal.hh"
+#include "CBLDocument.h"
 #include "Internal.hh"
 #include "Util.hh"
 #include <sys/stat.h>
@@ -135,11 +136,12 @@ bool cbl_db_delete(CBLDatabase* db, CBLError* outError) {
 }
 
 
-#pragma mark - LISTENERS:
+#pragma mark - DATABASE LISTENERS:
 
 
 CBLDatabase::~CBLDatabase() {
     c4dbobs_free(_observer);
+    _docListeners.clear();
     c4db_release(c4db);
 }
 
@@ -190,4 +192,61 @@ CBLListenerToken* cbl_db_addListener(const CBLDatabase* constdb _cbl_nonnull,
                                      void *context)
 {
     return const_cast<CBLDatabase*>(constdb)->addListener(listener, context);
+}
+
+
+#pragma mark - DOCUMENT LISTENERS:
+
+
+namespace cbl_internal {
+
+    class DocListenerToken : public ListenerToken<CBLDocumentListener> {
+    public:
+        DocListenerToken(CBLDatabase *db, const char *docID, CBLDocumentListener callback, void *context)
+        :ListenerToken(callback, context)
+        ,_db(db)
+        ,_docID(docID)
+        ,_c4obs( c4docobs_create(internal(db),
+                                 slice(docID),
+                                 [](C4DocumentObserver* observer, C4String docID,
+                                    C4SequenceNumber sequence, void *context)
+                                 {
+                                     ((DocListenerToken*)context)->callListener();
+                                 },
+                                 this) )
+        { }
+
+        ~DocListenerToken() {
+            c4docobs_free(_c4obs);
+        }
+
+    private:
+        void callListener() {
+            call(_db, _docID.c_str());
+        }
+
+        CBLDatabase* _db;
+        string _docID;
+        C4DocumentObserver* _c4obs {nullptr};
+    };
+
+}
+
+
+CBLListenerToken* CBLDatabase::addDocListener(const char* docID _cbl_nonnull,
+                                              CBLDocumentListener listener, void *context)
+{
+    auto token = new DocListenerToken(this, docID, listener, context);
+    _docListeners.add(token);
+    return token;
+}
+
+
+CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cbl_nonnull,
+                                             const char* docID _cbl_nonnull,
+                                             CBLDocumentListener listener _cbl_nonnull,
+                                             void *context)
+{
+    return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context);
+
 }

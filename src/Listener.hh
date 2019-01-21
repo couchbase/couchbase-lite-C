@@ -22,6 +22,8 @@ public:
     ,_context(context)
     { }
 
+    virtual ~CBLListenerToken()  { }
+
     void addedTo(cbl_internal::ListenersBase *owner _cbl_nonnull) {
         assert(!_owner);
         _owner = owner;
@@ -72,6 +74,10 @@ namespace cbl_internal {
             assert(false);
         }
 
+        void clear() {
+            _tokens.clear();
+        }
+
     protected:
         std::vector<std::unique_ptr<CBLListenerToken>> _tokens;
     };
@@ -83,9 +89,12 @@ namespace cbl_internal {
     public:
         CBLListenerToken* add(LISTENER listener, void *context) {
             auto t = new ListenerToken<LISTENER>(listener, context);
-            ListenersBase::add(t);
+            add(t);
             return t;
         }
+
+        void add(ListenerToken<LISTENER> *token)                {ListenersBase::add(token);}
+        void clear()                                            {ListenersBase::clear();}
 
             template <class... Args>
         void call(Args... args) {

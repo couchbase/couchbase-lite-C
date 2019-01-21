@@ -8,6 +8,7 @@
 
 #pragma once
 #include "CBLDatabase.h"
+#include "CBLDocument.h"
 #include "Internal.hh"
 #include "Listener.hh"
 
@@ -32,12 +33,15 @@ struct CBLDatabase : public CBLRefCounted {
     std::string const dir;
 
     CBLListenerToken* addListener(CBLDatabaseListener listener _cbl_nonnull, void *context);
+    CBLListenerToken* addDocListener(const char *docID _cbl_nonnull,
+                                     CBLDocumentListener listener _cbl_nonnull, void *context);
 
 private:
     void callListeners();
 
     cbl_internal::Listeners<CBLDatabaseListener> _listeners;
     C4DatabaseObserver* _observer {nullptr};
+    cbl_internal::Listeners<CBLDocumentListener> _docListeners;
 };
 
 

@@ -91,6 +91,7 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
 
 
 static int dbListenerCalls = 0;
+static int docListenerCalls = 0;
 
 static void dbListener(void *context, const CBLDatabase *db, const char** docIDs) {
     ++dbListenerCalls;
@@ -100,11 +101,19 @@ static void dbListener(void *context, const CBLDatabase *db, const char** docIDs
     CHECK(docIDs[1] == nullptr);
 }
 
+static void docListener(void *context, const CBLDatabase *db, const char *docID) {
+    ++docListenerCalls;
+    auto test = (CBLTest*)context;
+    CHECK(test->db == db);
+    CHECK(string(docID) == "foo");
+}
+
 
 TEST_CASE_METHOD(CBLTest, "Database notifications") {
     // Add a listener:
     dbListenerCalls = 0;
     auto token = cbl_db_addListener(db, dbListener, this);
+    auto docToken = cbl_db_addDocumentListener(db, "foo", docListener, this);
 
     // Create a doc, check that the listener was called:
     CBLDocument* doc = cbl_doc_new("foo");
@@ -114,18 +123,22 @@ TEST_CASE_METHOD(CBLTest, "Database notifications") {
     const CBLDocument *saved = cbl_db_saveDocument(db, doc, kCBLConcurrencyControlFailOnConflict, &error);
     REQUIRE(saved);
     CHECK(dbListenerCalls == 1);
+    CHECK(docListenerCalls == 1);
     cbl_doc_release(saved);
     cbl_doc_release(doc);
 
     cbl_listener_remove(token);
+    cbl_listener_remove(docToken);
 
     // After being removed, the listener should not be called:
     dbListenerCalls = 0;
+    docListenerCalls = 0;
     doc = cbl_doc_new("bar");
     props = cbl_doc_mutableProperties(doc);
     FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
     saved = cbl_db_saveDocument(db, doc, kCBLConcurrencyControlFailOnConflict, &error);
     REQUIRE(saved);
     CHECK(dbListenerCalls == 0);
+    CHECK(docListenerCalls == 0);
     cbl_doc_release(saved);
 }
