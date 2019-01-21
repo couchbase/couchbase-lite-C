@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBLDatabase.h"
+#include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
 #include "Util.hh"
 #include <sys/stat.h>
@@ -132,4 +132,62 @@ bool cbl_db_compact(CBLDatabase* db, CBLError* outError) {
 
 bool cbl_db_delete(CBLDatabase* db, CBLError* outError) {
     return c4db_delete(internal(db), internal(outError));
+}
+
+
+#pragma mark - LISTENERS:
+
+
+CBLDatabase::~CBLDatabase() {
+    c4dbobs_free(_observer);
+    c4db_release(c4db);
+}
+
+
+CBLListenerToken* CBLDatabase::addListener(CBLDatabaseListener listener, void *context) {
+    auto token = _listeners.add(listener, context);
+    if (!_observer) {
+        _observer = c4dbobs_create(c4db,
+                                   [](C4DatabaseObserver* observer, void *context) {
+                                       ((CBLDatabase*)context)->callListeners();
+                                   },
+                                   this);
+    }
+    return token;
+}
+
+
+void CBLDatabase::callListeners() {
+    static const uint32_t kMaxChanges = 100;
+    while (true) {
+        C4DatabaseChange c4changes[kMaxChanges];
+        bool external;
+        uint32_t nChanges = c4dbobs_getChanges(_observer, c4changes, kMaxChanges, &external);
+        if (nChanges == 0)
+            break;
+        // Convert docID slices to C strings:
+        const char* docIDs[kMaxChanges];
+        size_t bufSize = 0;
+        for (uint32_t i = 0; i < nChanges; ++i)
+            bufSize += c4changes[i].docID.size + 1;
+        char *buf = new char[bufSize], *next = buf;
+        for (uint32_t i = 0; i < nChanges; ++i) {
+            docIDs[i] = next;
+            memcpy(next, (const char*)c4changes[i].docID.buf, c4changes[i].docID.size);
+            next += c4changes[i].docID.size;
+            *(next++) = '\0';
+        }
+        assert(next - buf == bufSize);
+        // Call the listener(s):
+        _listeners.call(this, docIDs);
+        delete [] buf;
+    }
+}
+
+
+CBLListenerToken* cbl_db_addListener(const CBLDatabase* constdb _cbl_nonnull,
+                                     CBLDatabaseListener listener _cbl_nonnull,
+                                     void *context)
+{
+    return const_cast<CBLDatabase*>(constdb)->addListener(listener, context);
 }

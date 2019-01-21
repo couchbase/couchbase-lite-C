@@ -9,6 +9,7 @@
 #pragma once
 #include "CBLDocument.h"
 #include "Internal.hh"
+#include "CBLDatabase_Internal.hh"
 #include "c4.hh"
 #include "c4Document+Fleece.h"
 #include "fleece/Fleece.hh"

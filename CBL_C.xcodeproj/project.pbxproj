@@ -20,6 +20,8 @@
 		277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */; };
 		277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */; };
 		277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */; };
+		27886C8D21F64C1400069BEA /* Listener.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27886C8B21F64C1400069BEA /* Listener.hh */; };
+		27886C8E21F64C1400069BEA /* Listener.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27886C8C21F64C1400069BEA /* Listener.cc */; };
 		27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery.cc */; };
 		27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61D6821D6B60D0027CCDB /* CBLTest.hh */; };
 		27B61D7D21D6B66F0027CCDB /* libcouchbase_lite_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libcouchbase_lite_static.a */; };
@@ -210,6 +212,9 @@
 		277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLReplicator.cc; sourceTree = "<group>"; };
 		277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLReplicatorConfig.hh; sourceTree = "<group>"; };
 		277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDocument_Internal.hh; sourceTree = "<group>"; };
+		27886C8721F5419100069BEA /* CBLListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLListener.h; sourceTree = "<group>"; };
+		27886C8B21F64C1400069BEA /* Listener.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Listener.hh; sourceTree = "<group>"; };
+		27886C8C21F64C1400069BEA /* Listener.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Listener.cc; sourceTree = "<group>"; };
 		27B61D5521D5ABA60027CCDB /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
 		27B61D6821D6B60D0027CCDB /* CBLTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTest.hh; sourceTree = "<group>"; };
 		27B61D6921D6B60D0027CCDB /* CBLTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTest.cc; sourceTree = "<group>"; };
@@ -238,6 +243,7 @@
 		27C9B5C421F12C970040BC45 /* Document.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Document.py; sourceTree = "<group>"; };
 		27C9B5DB21F296C10040BC45 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		27C9B5DC21F29D500040BC45 /* Query.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Query.py; sourceTree = "<group>"; };
+		27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDatabase_Internal.hh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -311,6 +317,7 @@
 			children = (
 				27B61DA321D6E40D0027CCDB /* CouchbaseLite.h */,
 				271C2A2D21CAC98F0045856E /* CBLBase.h */,
+				27886C8721F5419100069BEA /* CBLListener.h */,
 				271C2A2F21CAC98F0045856E /* CBLDatabase.h */,
 				271C2A2E21CAC98F0045856E /* CBLDocument.h */,
 				271C2A3021CAC98F0045856E /* CBLQuery.h */,
@@ -325,12 +332,15 @@
 			children = (
 				271C2A6E21CAD5B30045856E /* CBLBase.cc */,
 				271C2A7121CADB170045856E /* CBLDatabase.cc */,
+				27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */,
 				271C2A7721CC750E0045856E /* CBLDocument.cc */,
 				277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */,
 				27B61D5521D5ABA60027CCDB /* CBLQuery.cc */,
 				277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */,
 				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
 				271C2A7921CC756A0045856E /* Internal.hh */,
+				27886C8C21F64C1400069BEA /* Listener.cc */,
+				27886C8B21F64C1400069BEA /* Listener.hh */,
 				271C2A7321CC4BD60045856E /* Util.hh */,
 				271C2A7421CC4BD60045856E /* Util.cc */,
 				27B61D7E21D6B6900027CCDB /* dylib_main.cc */,
@@ -460,6 +470,7 @@
 				271C2A7521CC4BD60045856E /* Util.hh in Headers */,
 				271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */,
 				271C2A3221CAC98F0045856E /* CBLBase.h in Headers */,
+				27886C8D21F64C1400069BEA /* Listener.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -697,6 +708,7 @@
 				271C2A7621CC4BD60045856E /* Util.cc in Sources */,
 				277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */,
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
+				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
 				271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */,
 			);

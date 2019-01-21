@@ -28,6 +28,7 @@ extern "C" {
     A CBLDatabase is both a filesystem object and a container for documents.
  */
 
+#pragma mark - CONFIGURATION
 /** \name  Database configuration
     @{ */
 
@@ -62,6 +63,7 @@ typedef struct {
 
 
 
+#pragma mark - FILE OPERATIONS
 /** \name  Database file operations
     @{
     These functions operate on database files without opening them.
@@ -94,6 +96,7 @@ bool cbl_deleteDB(const char _cbl_nonnull *name,
 
 
 
+#pragma mark - LIFECYCLE
 /** \name  Database lifecycle
     @{
     Opening, closing, and managing open databases.
@@ -138,6 +141,7 @@ bool cbl_db_endBatch(CBLDatabase* _cbl_nonnull, CBLError*);
 
 
 
+#pragma mark - ACCESSORS
 /** \name  Database accessors
     @{
     Getting information about a database.
@@ -163,6 +167,7 @@ const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull);
 
 
 
+#pragma mark - LISTENERS
 /** \name  Database listeners
     @{
     A database change listener lets you detect changes made to all documents in a database.
@@ -191,6 +196,47 @@ _cbl_warn_unused
 CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cbl_nonnull,
                                      CBLDatabaseListener listener _cbl_nonnull,
                                      void *context);
+
+/** @} */
+
+
+
+#pragma mark - NOTIFICATION SCHEDULING
+/** \name  Scheduling notifications
+    @{
+    Applications may want control over when Couchbase Lite notifications (i.e. listener callbacks)
+    happen. They may want them called on a specific thread, or at certain times during an event
+    loop. This behavior may vary by database, if for instance each database is associated with a
+    separate thread.
+
+    The API calls here enable this. When notifications are "buffered" for a database, calls to
+    listeners will be deferred until the application explicitly allows them. Instead, a single
+    callback will be issued when the first notification becomes available; this gives the app a
+    chance to schedule a time when the notifications should be sent and callbacks called.
+ */
+
+    /** Callback indicating that the database (or an object belonging to it) is ready to call one
+        or more listeners. You should call `cbl_db_callListeners` at your earliest convenience.
+        @note  This callback is called _only once_ until the next time `cbl_db_callListeners`
+                is called. If you don't respond by (sooner or later) calling that function,
+                you will not be informed that any listeners are ready.
+        @warning  This can be called from arbitrary threads. It should do as little work as
+                  possible, just scheduling a future call to `cbl_db_callListeners`. */
+    typedef void (*CBLNotificationsReadyCallback)(CBLDatabase* db _cbl_nonnull,
+                                              void *context);
+
+    /** Switches the database to buffered-notification mode. Notifications for objects belonging
+        to this database will not be called immediately.
+        @param db  The database whose notifications are to be buffered.
+        @param callback  The function to be called when a notification is available.
+        @param context  An arbitrary value that will be passed to the callback. */
+    void cbl_db_bufferNotifications(CBLDatabase *db _cbl_nonnull,
+                                CBLNotificationsReadyCallback callback _cbl_nonnull,
+                                void *context);
+
+    /** Immediately issues all pending notifications for this database, by calling their listener
+        callbacks. */
+    void cbl_db_sendNotifications(CBLDatabase *db _cbl_nonnull);
                                      
 /** @} */
 

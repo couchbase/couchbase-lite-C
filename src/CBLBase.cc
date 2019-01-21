@@ -18,6 +18,7 @@
 
 #include "CBLBase.h"
 #include "Internal.hh"
+#include "Listener.hh"
 #include "Util.hh"
 
 
@@ -47,12 +48,6 @@ void cbl_release(CBLRefCounted *self) {
 }
 
 
-struct CBLListenerToken {
-    ~CBLListenerToken() {
-        // TODO
-    }
-};
-
 void cbl_listener_remove(CBLListenerToken *token) {
-    delete token;
+    token->remove();
 }

@@ -8,7 +8,7 @@ _cbl_error_message
 _cbl_setLogLevel
 _cbl_retain
 _cbl_release
-#_cbl_listener_remove
+_cbl_listener_remove
 
 _cbl_databaseExists
 _cbl_copyDB
@@ -26,7 +26,7 @@ _cbl_db_compact
 _cbl_db_delete
 _cbl_db_beginBatch
 _cbl_db_endBatch
-#_cbl_db_addListener
+_cbl_db_addListener
 #_cbl_db_addDocumentListener
 
 _cbl_db_getDocument

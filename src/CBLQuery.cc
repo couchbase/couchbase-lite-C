@@ -17,6 +17,7 @@
 //
 
 #include "CBLQuery.h"
+#include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
 #include "c4.hh"
 #include "c4Query.h"
