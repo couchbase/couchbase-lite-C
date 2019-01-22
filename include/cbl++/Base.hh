@@ -25,7 +25,8 @@ namespace cbl {
     // Artificial base class of the C++ wrapper classes; just manages ref-counting.
     class RefCounted {
     protected:
-        explicit RefCounted(CBLRefCounted *ref =nullptr) noexcept :_ref(ref) { }
+        RefCounted() noexcept                            :_ref(nullptr) { }
+        explicit RefCounted(CBLRefCounted *ref) noexcept :_ref(cbl_retain(ref)) { }
         RefCounted(const RefCounted &other) noexcept     :_ref(cbl_retain(other._ref)) { }
         RefCounted(RefCounted &&other) noexcept          :_ref(other._ref) {other._ref = nullptr;}
         ~RefCounted() noexcept                           {cbl_release(_ref);}
@@ -46,7 +47,9 @@ namespace cbl {
             return *this;
         }
 
-        static void check(bool ok, CBLError &error)      {if (!ok) throw error;}
+        void clear()                                    {cbl_release(_ref); _ref = nullptr;}
+
+        static void check(bool ok, CBLError &error)     {if (!ok) throw error;}
 
         CBLRefCounted* _ref;
     };
@@ -59,6 +62,7 @@ public: \
     CLASS(CLASS &&other) noexcept                 :SUPER((CLASS&&)other) { } \
     CLASS& operator=(const CLASS &other) noexcept {SUPER::operator=(other); return *this;} \
     CLASS& operator=(CLASS &&other) noexcept      {SUPER::operator=((SUPER&&)other); return *this;}\
+    CLASS& operator=(std::nullptr_t)              {clear(); return *this;} \
     bool valid() const                            {return _ref != nullptr;} \
     explicit operator bool() const                {return valid();} \
     bool operator==(const CLASS &other) const     {return _ref == other._ref;} \

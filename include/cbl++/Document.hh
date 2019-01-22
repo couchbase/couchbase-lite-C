@@ -60,6 +60,13 @@ namespace cbl {
 
     protected:
         Document(CBLRefCounted* r)                      :RefCounted(r) { }
+
+        static Document adopt(const CBLDocument *d) {
+            Document doc;
+            doc._ref = (CBLRefCounted*)d;
+            return doc;
+        }
+
         friend class Database;
 
         CBL_REFCOUNTED_BOILERPLATE(Document, RefCounted, const CBLDocument)
@@ -68,7 +75,7 @@ namespace cbl {
 
     class MutableDocument : public Document {
     public:
-        explicit MutableDocument(const char *docID)     :Document(cbl_doc_new(docID)) { }
+        explicit MutableDocument(const char *docID)     {_ref = (CBLRefCounted*)cbl_doc_new(docID);}
 
         fleece::MutableDict properties()                {return cbl_doc_mutableProperties(ref());}
 
@@ -78,18 +85,27 @@ namespace cbl {
         fleece::keyref<fleece::MutableDict,fleece::slice> operator[] (const char *key)
                                                         {return properties()[fleece::slice(key)];}
 
+    protected:
+        static MutableDocument adopt(CBLDocument *d) {
+            MutableDocument doc;
+            doc._ref = (CBLRefCounted*)d;
+            return doc;
+        }
+
         friend class Database;
         friend class Document;
         CBL_REFCOUNTED_BOILERPLATE(MutableDocument, Document, CBLDocument)
     };
 
 
+    // Database method bodies:
+
     inline Document Database::getDocument(const char *id _cbl_nonnull) const {
-        return Document(cbl_db_getDocument(ref(), id));
+        return Document::adopt(cbl_db_getDocument(ref(), id));
     }
 
     inline MutableDocument Database::getMutableDocument(const char *id _cbl_nonnull) const {
-        return MutableDocument(cbl_db_getMutableDocument(ref(), id));
+        return MutableDocument::adopt(cbl_db_getMutableDocument(ref(), id));
     }
 
 
@@ -97,12 +113,12 @@ namespace cbl {
         CBLError error;
         auto saved = cbl_db_saveDocument(ref(), doc.ref(), c, &error);
         check(saved, error);
-        return Document(saved);
+        return Document::adopt(saved);
     }
 
 
     inline MutableDocument Document::mutableCopy() const {
-        return MutableDocument(cbl_doc_mutableCopy(ref()));
+        return MutableDocument::adopt(cbl_doc_mutableCopy(ref()));
     }
 
 

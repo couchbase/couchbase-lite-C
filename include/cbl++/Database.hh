@@ -111,7 +111,7 @@ namespace cbl {
             auto callbackPtr = new NotificationsReadyCallback(callback);    //FIX: This is leaked
             cbl_db_bufferNotifications(ref(),
                                        [](void *context, CBLDatabase *db) {
-                                           (*(NotificationsReadyCallback*)context)(wrap(db));
+                                           (*(NotificationsReadyCallback*)context)(Database(db));
                                        },
                                        callbackPtr);
         }
@@ -122,19 +122,15 @@ namespace cbl {
         CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)
 
     private:
-        static inline Database wrap(const CBLDatabase *db) {
-            return Database((CBLDatabase*)cbl_db_retain(db));
-        }
-
         static void _callListener(void *context, const CBLDatabase *db,
                                   unsigned nDocs, const char **docIDs)
         {
             std::vector<const char*> vec(&docIDs[0], &docIDs[nDocs]);
-            Listener::call(context, wrap(db), vec);
+            Listener::call(context, Database((CBLDatabase*)db), vec);
         }
 
         static void _callDocListener(void *context, const CBLDatabase *db, const char *docID) {
-            DocumentListener::call(context, wrap(db), docID);
+            DocumentListener::call(context, Database((CBLDatabase*)db), docID);
         }
     };
 

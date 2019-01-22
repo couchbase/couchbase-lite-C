@@ -75,6 +75,13 @@ namespace cbl {
  
         friend class Query;
         CBL_REFCOUNTED_BOILERPLATE(ResultSet, RefCounted, CBLResultSet)
+
+    private:
+        static ResultSet adopt(const CBLResultSet *d) {
+            ResultSet rs;
+            rs._ref = (CBLRefCounted*)d;
+            return rs;
+        }
     };
 
 
@@ -105,7 +112,7 @@ namespace cbl {
         CBLError error;
         auto rs = cbl_query_execute(ref(), &error);
         check(rs, error);
-        return ResultSet(rs);
+        return ResultSet::adopt(rs);
     }
 
 
