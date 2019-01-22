@@ -46,7 +46,7 @@ extern "C" {
 _cbl_warn_unused
 CBLQuery* cbl_query_new(const CBLDatabase* db _cbl_nonnull,
                         const char *jsonQuery _cbl_nonnull, 
-                        CBLError* error);
+                        CBLError* error) CBLAPI;
 
 CBL_REFCOUNTED(CBLQuery*, query);
 
@@ -57,26 +57,26 @@ CBL_REFCOUNTED(CBLQuery*, query);
             keys are the parameter names. (It's easiest to construct this by using the mutable
             API, i.e. calling \ref FLMutableDict_New and adding keys/values.) */
 void cbl_query_setParameters(CBLQuery* _cbl_nonnull query,
-                             FLDict _cbl_nonnull parameters);
+                             FLDict _cbl_nonnull parameters) CBLAPI;
 
 bool cbl_query_setParametersFromJSON(CBLQuery* _cbl_nonnull query,
-                                     const char* _cbl_nonnull json);
+                                     const char* _cbl_nonnull json) CBLAPI;
 
 /** Runs the query, returning the results.
     @note  You must release the result set when you're finished with it. */
 _cbl_warn_unused
-CBLResultSet* cbl_query_execute(CBLQuery* _cbl_nonnull, CBLError*);
+CBLResultSet* cbl_query_execute(CBLQuery* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** Returns information about the query, including the translated SQL form, and the search
     strategy. You can use this to help optimize the query. */
-FLSliceResult cbl_query_explain(CBLQuery* _cbl_nonnull);
+FLSliceResult cbl_query_explain(CBLQuery* _cbl_nonnull) CBLAPI;
 
 /** Returns the number of columns in each result. */
-unsigned cbl_query_columnCount(CBLQuery* _cbl_nonnull);
+unsigned cbl_query_columnCount(CBLQuery* _cbl_nonnull) CBLAPI;
 
 /** Returns the name of a column in the result. */
 FLSlice cbl_query_columnName(CBLQuery* _cbl_nonnull,
-                             unsigned columnIndex);
+                             unsigned columnIndex) CBLAPI;
 
 /** @} */
 
@@ -92,15 +92,15 @@ FLSlice cbl_query_columnName(CBLQuery* _cbl_nonnull,
 /** Moves the result-set iterator to the next result.
     Returns false if there are no more results.
     @warning This must be called _before_ examining the first result. */
-bool cbl_results_next(CBLResultSet* _cbl_nonnull);
+bool cbl_results_next(CBLResultSet* _cbl_nonnull) CBLAPI;
 
 /** Returns the value of a column of the current result, given its (zero-based) numeric index. */
 FLValue cbl_results_column(CBLResultSet* _cbl_nonnull,
-                           unsigned column);
+                           unsigned column) CBLAPI;
 
 /** Returns the value of a column of the current result, given its name. */
 FLValue cbl_results_property(CBLResultSet* _cbl_nonnull,
-                             const char* property _cbl_nonnull);
+                             const char* property _cbl_nonnull) CBLAPI;
 
 CBL_REFCOUNTED(CBLResultSet*, results);
 
@@ -138,7 +138,7 @@ typedef void (*CBLQueryListener)(void *context,
 _cbl_warn_unused
 CBLListenerToken* cbl_query_addListener(CBLQuery* query _cbl_nonnull,
                                         CBLQueryListener* listener _cbl_nonnull,
-                                        void *context);
+                                        void *context) CBLAPI;
 
 /** @} */
 /** @} */

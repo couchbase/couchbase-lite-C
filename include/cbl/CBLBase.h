@@ -105,7 +105,7 @@ typedef struct {
 
 /** Returns a message describing an error.
     @note  It is the caller's responsibility to free the returned C string by calling `free`. */
-char* cbl_error_message(const CBLError* _cbl_nonnull);
+char* cbl_error_message(const CBLError* _cbl_nonnull) CBLAPI;
 
 /** @} */
 
@@ -135,7 +135,7 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
 };
 
 /** Sets the detail level of logging. */
-void cbl_setLogLevel(CBLLogLevel, CBLLogDomain);
+void cbl_setLogLevel(CBLLogLevel, CBLLogDomain) CBLAPI;
 
 /** @} */
 
@@ -154,19 +154,19 @@ typedef struct CBLRefCounted CBLRefCounted;
 /** Increments an object's reference-count.
     Usually you'll call one of the type-safe synonyms specific to the object type,
     like \ref cbl_db_retain` */
-CBLRefCounted* cbl_retain(CBLRefCounted*);
+CBLRefCounted* cbl_retain(CBLRefCounted*) CBLAPI;
 
 /** Decrements an object's reference-count, freeing the object if the count hits zero.
     Usually you'll call one of the type-safe synonyms specific to the object type,
     like \ref cbl_db_release. */
-void cbl_release(CBLRefCounted*);
+void cbl_release(CBLRefCounted*) CBLAPI;
 
 /** Returns the total number of Couchbase Lite objects. Useful for leak checking. */
-unsigned cbl_instanceCount(void);
+unsigned cbl_instanceCount(void) CBLAPI;
 
 /** Logs the class and address of each Couchbase Lite object. Useful for leak checking.
     @note  May only be functional in debug builds of Couchbase Lite. */
-void cbl_dumpInstances(void);
+void cbl_dumpInstances(void) CBLAPI;
 
 // Declares retain/release functions for TYPE
 #ifdef __cplusplus
@@ -226,7 +226,7 @@ typedef struct CBLReplicator CBLReplicator;
 typedef struct CBLListenerToken CBLListenerToken;
 
 /** Removes a listener callback, given the token that was returned when it was added. */
-void cbl_listener_remove(CBLListenerToken*);
+void cbl_listener_remove(CBLListenerToken*) CBLAPI;
 
 
 /** @} */

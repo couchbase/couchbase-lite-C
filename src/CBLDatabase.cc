@@ -65,7 +65,7 @@ static string dbPath(const char* _cbl_nonnull name, const CBLDatabaseConfigurati
 #pragma mark - STATIC "METHODS":
 
 
-bool cbl_databaseExists(const char *name, const char *inDirectory) {
+bool cbl_databaseExists(const char *name, const char *inDirectory) CBLAPI {
     string path = dbPath(name, inDirectory);
     struct stat info;
     return stat(path.c_str(), &info) == 0 && (info.st_mode & S_IFMT) == S_IFDIR;
@@ -75,7 +75,7 @@ bool cbl_databaseExists(const char *name, const char *inDirectory) {
 bool cbl_copyDB(const char* fromPath,
                 const char* toName,
                 const CBLDatabaseConfiguration *config,
-                CBLError* outError)
+                CBLError* outError) CBLAPI
 {
     string toPath = dbPath(toName, config);
     C4DatabaseConfig c4config {kC4DB_Create | kC4DB_AutoCompact | kC4DB_SharedKeys};
@@ -85,7 +85,7 @@ bool cbl_copyDB(const char* fromPath,
 
 bool cbl_deleteDB(const char *name,
                   const char *inDirectory,
-                  CBLError* outError)
+                  CBLError* outError) CBLAPI
 {
     string path = dbPath(name, inDirectory);
     return c4db_deleteAtPath(slice(path), internal(outError));
@@ -97,7 +97,7 @@ bool cbl_deleteDB(const char *name,
 
 CBLDatabase* cbl_db_open(const char *name,
                          const CBLDatabaseConfiguration *config,
-                         CBLError *outError)
+                         CBLError *outError) CBLAPI
 {
     C4Log("name = %s  dir = %s", name, config->directory);//TEMP
     string path = dbPath(name, config);
@@ -110,23 +110,23 @@ CBLDatabase* cbl_db_open(const char *name,
 }
 
 
-bool cbl_db_close(CBLDatabase* db, CBLError* outError) {
+bool cbl_db_close(CBLDatabase* db, CBLError* outError) CBLAPI {
     return !db || c4db_close(internal(db), internal(outError));
 }
 
-bool cbl_db_beginBatch(CBLDatabase* db, CBLError* outError) {
+bool cbl_db_beginBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
     return c4db_beginTransaction(internal(db), internal(outError));
 }
 
-bool cbl_db_endBatch(CBLDatabase* db, CBLError* outError) {
+bool cbl_db_endBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
     return c4db_endTransaction(internal(db), true, internal(outError));
 }
 
-bool cbl_db_compact(CBLDatabase* db, CBLError* outError) {
+bool cbl_db_compact(CBLDatabase* db, CBLError* outError) CBLAPI {
     return c4db_compact(internal(db), internal(outError));
 }
 
-bool cbl_db_delete(CBLDatabase* db, CBLError* outError) {
+bool cbl_db_delete(CBLDatabase* db, CBLError* outError) CBLAPI {
     return c4db_delete(internal(db), internal(outError));
 }
 
@@ -134,24 +134,24 @@ bool cbl_db_delete(CBLDatabase* db, CBLError* outError) {
 #pragma mark - ACCESSORS:
 
 
-const char* cbl_db_name(const CBLDatabase* db) {
+const char* cbl_db_name(const CBLDatabase* db) CBLAPI {
     return db->name.c_str();
 }
 
-const char* cbl_db_path(const CBLDatabase* db) {
+const char* cbl_db_path(const CBLDatabase* db) CBLAPI {
     return db->path.c_str();
 }
 
-const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* db) {
+const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* db) CBLAPI {
     const char *dir = db->dir.empty() ? nullptr : db->dir.c_str();
     return {dir};
 }
 
-uint64_t cbl_db_count(const CBLDatabase* db) {
+uint64_t cbl_db_count(const CBLDatabase* db) CBLAPI {
     return c4db_getDocumentCount(internal(db));
 }
 
-uint64_t cbl_db_lastSequence(const CBLDatabase* db) {
+uint64_t cbl_db_lastSequence(const CBLDatabase* db) CBLAPI {
     return c4db_getLastSequence(internal(db));
 }
 
@@ -228,7 +228,7 @@ void CBLDatabase::callDBListeners() {
 
 CBLListenerToken* cbl_db_addListener(const CBLDatabase* constdb _cbl_nonnull,
                                      CBLDatabaseListener listener _cbl_nonnull,
-                                     void *context)
+                                     void *context) CBLAPI
 {
     return const_cast<CBLDatabase*>(constdb)->addListener(listener, context);
 }
@@ -300,7 +300,7 @@ CBLListenerToken* CBLDatabase::addDocListener(const char* docID _cbl_nonnull,
 CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cbl_nonnull,
                                              const char* docID _cbl_nonnull,
                                              CBLDocumentListener listener _cbl_nonnull,
-                                             void *context)
+                                             void *context) CBLAPI
 {
     return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context);
 
@@ -328,12 +328,12 @@ void CBLDatabase::sendNotifications() {
 
 void cbl_db_bufferNotifications(CBLDatabase *db,
                                 CBLNotificationsReadyCallback callback,
-                                void *context)
+                                void *context) CBLAPI
 {
     db->bufferNotifications(callback, context);
 }
 
-void cbl_db_sendNotifications(CBLDatabase *db) {
+void cbl_db_sendNotifications(CBLDatabase *db) CBLAPI {
     db->sendNotifications();
 }
 

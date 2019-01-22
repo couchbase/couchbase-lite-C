@@ -22,7 +22,7 @@
 #include "Util.hh"
 
 
-void cbl_setLogLevel(CBLLogLevel level, CBLLogDomain domain) {
+void cbl_setLogLevel(CBLLogLevel level, CBLLogDomain domain) CBLAPI {
     static C4LogDomain kC4Domains[5] = {kC4DefaultLog, kC4DatabaseLog, kC4QueryLog, kC4SyncLog, kC4WebSocketLog};
     if (domain == kCBLLogDomainAll) {
         c4log_setCallbackLevel(C4LogLevel(level));
@@ -33,34 +33,34 @@ void cbl_setLogLevel(CBLLogLevel level, CBLLogDomain domain) {
     }
 }
 
-char* cbl_error_message(const CBLError* error _cbl_nonnull) {
+char* cbl_error_message(const CBLError* error _cbl_nonnull) CBLAPI {
     return allocCString(c4error_getMessage(*internal(error)));
 }
 
 
-CBLRefCounted* cbl_retain(CBLRefCounted *self) {
+CBLRefCounted* cbl_retain(CBLRefCounted *self) CBLAPI {
     return retain(self);
 }
 
 
-void cbl_release(CBLRefCounted *self) {
+void cbl_release(CBLRefCounted *self) CBLAPI {
     release(self);
 }
 
 
-unsigned cbl_instanceCount() {
+unsigned cbl_instanceCount() CBLAPI {
     return fleece::InstanceCounted::count();
 }
 
 
-void cbl_dumpInstances(void) {
+void cbl_dumpInstances(void) CBLAPI {
 #if INSTANCECOUNTED_TRACK
     fleece::InstanceCounted::dumpInstances();
 #endif
 }
 
 
-void cbl_listener_remove(CBLListenerToken *token) {
+void cbl_listener_remove(CBLListenerToken *token) CBLAPI {
     if (token)
         token->remove();
 }

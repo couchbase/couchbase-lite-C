@@ -123,20 +123,20 @@ Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
 
 CBLQuery* cbl_query_new(const CBLDatabase* db _cbl_nonnull,
                         const char *jsonQuery _cbl_nonnull,
-                        CBLError* outError)
+                        CBLError* outError) CBLAPI
 {
     auto query = retained(new CBLQuery(db, jsonQuery, internal(outError)));
     return query->valid() ? retain(query.get()) : nullptr;
 }
 
-void cbl_query_setParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) {
+void cbl_query_setParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBLAPI {
     Encoder enc;
     enc.writeValue(Dict(parameters));
     alloc_slice encodedParameters = enc.finish();
     query->setParameters(encodedParameters);
 }
 
-bool cbl_query_setParametersFromJSON(CBLQuery* query, const char* json) {
+bool cbl_query_setParametersFromJSON(CBLQuery* query, const char* json) CBLAPI {
     Encoder enc;
     enc.convertJSON(slice(json));
     alloc_slice encodedParameters = enc.finish();
@@ -146,31 +146,31 @@ bool cbl_query_setParametersFromJSON(CBLQuery* query, const char* json) {
     return true;
 }
 
-CBLResultSet* cbl_query_execute(CBLQuery* query _cbl_nonnull, CBLError* outError) {
+CBLResultSet* cbl_query_execute(CBLQuery* query _cbl_nonnull, CBLError* outError) CBLAPI {
     return retain(query->execute(internal(outError)).get());
 }
 
-FLSliceResult cbl_query_explain(CBLQuery* query _cbl_nonnull) {
+FLSliceResult cbl_query_explain(CBLQuery* query _cbl_nonnull) CBLAPI {
     return FLSliceResult(query->explain());
 }
 
-unsigned cbl_query_columnCount(CBLQuery* query _cbl_nonnull) {
+unsigned cbl_query_columnCount(CBLQuery* query _cbl_nonnull) CBLAPI {
     return query->columnCount();
 }
 
-FLSlice cbl_query_columnName(CBLQuery* query _cbl_nonnull, unsigned col) {
+FLSlice cbl_query_columnName(CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI {
     return query->columnName(col);
 }
 
 
-bool cbl_results_next(CBLResultSet* rs _cbl_nonnull) {
+bool cbl_results_next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
     return rs->next();
 }
 
-FLValue cbl_results_property(CBLResultSet* rs _cbl_nonnull, const char *property) {
+FLValue cbl_results_property(CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
     return rs->property(property);
 }
 
-FLValue cbl_results_column(CBLResultSet* rs _cbl_nonnull, unsigned column) {
+FLValue cbl_results_column(CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
     return rs->column(column);
 }

@@ -1,4 +1,4 @@
-from CouchbaseLite.Database import Database, DatabaseConfiguration
+from CouchbaseLite.Database import *
 from CouchbaseLite.Document import *
 from CouchbaseLite.Query import *
 

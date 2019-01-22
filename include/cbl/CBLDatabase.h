@@ -73,7 +73,7 @@ typedef struct {
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
                         absolute or relative path to the database. */
-bool cbl_databaseExists(const char* _cbl_nonnull name, const char *inDirectory);
+bool cbl_databaseExists(const char* _cbl_nonnull name, const char *inDirectory) CBLAPI;
 
 /** Copies a database file to a new location and assigns it a new UUID.
     @param fromPath  The full filesystem path to the original database (including extension).
@@ -82,7 +82,7 @@ bool cbl_databaseExists(const char* _cbl_nonnull name, const char *inDirectory);
 bool cbl_copyDB(const char* _cbl_nonnull fromPath,
                 const char* _cbl_nonnull toName, 
                 const CBLDatabaseConfiguration* config,
-                CBLError*);
+                CBLError*) CBLAPI;
 
 /** Deletes a database file. If the database is open, an error is returned.
     @param name  The database name (without the ".cblite2" extension.)
@@ -90,7 +90,7 @@ bool cbl_copyDB(const char* _cbl_nonnull fromPath,
                         absolute or relative path to the database. */
 bool cbl_deleteDB(const char _cbl_nonnull *name, 
                   const char *inDirectory,
-                  CBLError*);
+                  CBLError*) CBLAPI;
 
 /** @} */
 
@@ -113,18 +113,18 @@ bool cbl_deleteDB(const char _cbl_nonnull *name,
 _cbl_warn_unused
 CBLDatabase* cbl_db_open(const char *name _cbl_nonnull,
                          const CBLDatabaseConfiguration* config,
-                         CBLError* error);
+                         CBLError* error) CBLAPI;
 
 /** Closes an open database. */
-bool cbl_db_close(CBLDatabase*, CBLError*);
+bool cbl_db_close(CBLDatabase*, CBLError*) CBLAPI;
 
 CBL_REFCOUNTED(CBLDatabase*, db);
 
 /** Closes and deletes a database. */
-bool cbl_db_delete(CBLDatabase* _cbl_nonnull, CBLError*);
+bool cbl_db_delete(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** Compacts a database file. */
-bool cbl_db_compact(CBLDatabase* _cbl_nonnull, CBLError*);
+bool cbl_db_compact(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** Begins a batch operation, similar to a transaction. You **must** later call \ref
     cbl_db_endBatch to end (commit) the batch.
@@ -132,10 +132,10 @@ bool cbl_db_compact(CBLDatabase* _cbl_nonnull, CBLError*);
     @note  Changes will not be visible to other CBLDatabase instances on the same database until
             the batch operation ends.
     @note  Batch operations can nest. Changes are not committed until the outer batch ends. */
-bool cbl_db_beginBatch(CBLDatabase* _cbl_nonnull, CBLError*);
+bool cbl_db_beginBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** Ends a batch operation. This **must** be called after \ref cbl_db_beginBatch. */
-bool cbl_db_endBatch(CBLDatabase* _cbl_nonnull, CBLError*);
+bool cbl_db_endBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** @} */
 
@@ -148,20 +148,20 @@ bool cbl_db_endBatch(CBLDatabase* _cbl_nonnull, CBLError*);
  */
 
 /** Returns the database's name. */
-const char* cbl_db_name(const CBLDatabase* _cbl_nonnull) _cbl_returns_nonnull;
+const char* cbl_db_name(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
 
 /** Returns the database's full filesystem path. */
-const char* cbl_db_path(const CBLDatabase* _cbl_nonnull) _cbl_returns_nonnull;
+const char* cbl_db_path(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
 
 /** Returns the number of documents in the database. */
-uint64_t cbl_db_count(const CBLDatabase* _cbl_nonnull);
+uint64_t cbl_db_count(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Returns the last sequence number assigned in the database.
     This starts at zero and increments every time a document is saved or deleted. */
-uint64_t cbl_db_lastSequence(const CBLDatabase* _cbl_nonnull);
+uint64_t cbl_db_lastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Returns the database's configuration, as given when it was opened. */
-const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull);
+const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** @} */
 
@@ -196,7 +196,7 @@ typedef void (*CBLDatabaseListener)(void *context,
 _cbl_warn_unused
 CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cbl_nonnull,
                                      CBLDatabaseListener listener _cbl_nonnull,
-                                     void *context);
+                                     void *context) CBLAPI;
 
 /** @} */
 /** @} */    // end of outer \defgroup
@@ -236,11 +236,11 @@ CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cbl_nonnull,
         @param context  An arbitrary value that will be passed to the callback. */
     void cbl_db_bufferNotifications(CBLDatabase *db _cbl_nonnull,
                                 CBLNotificationsReadyCallback callback _cbl_nonnull,
-                                void *context);
+                                void *context) CBLAPI;
 
     /** Immediately issues all pending notifications for this database, by calling their listener
         callbacks. */
-    void cbl_db_sendNotifications(CBLDatabase *db _cbl_nonnull);
+    void cbl_db_sendNotifications(CBLDatabase *db _cbl_nonnull) CBLAPI;
                                      
 /** @} */
 /** @} */    // end of outer \defgroup

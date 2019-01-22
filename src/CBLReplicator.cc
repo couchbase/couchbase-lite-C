@@ -198,34 +198,34 @@ private:
 #pragma mark - C API:
 
 
-CBLEndpoint* cblendpoint_newWithURL(const char *url _cbl_nonnull) {
+CBLEndpoint* cblendpoint_newWithURL(const char *url _cbl_nonnull) CBLAPI {
     return new CBLURLEndpoint(url);
 }
 
-void cblendpoint_free(CBLEndpoint *endpoint) {
+void cblendpoint_free(CBLEndpoint *endpoint) CBLAPI {
     delete endpoint;
 }
 
-CBLAuthenticator* cblauth_newBasic(const char *username, const char *password) {
+CBLAuthenticator* cblauth_newBasic(const char *username, const char *password) CBLAPI {
     return new CBLBasicAuthenticator(username, password);
 }
 
-void cblauth_free(CBLAuthenticator *auth) {
+void cblauth_free(CBLAuthenticator *auth) CBLAPI {
     delete auth;
 }
 
-CBLReplicator* cbl_repl_new(const CBLReplicatorConfiguration* conf, CBLError *outError) {
+CBLReplicator* cbl_repl_new(const CBLReplicatorConfiguration* conf, CBLError *outError) CBLAPI {
     return validated(new CBLReplicator(conf), outError);
 }
 
-const CBLReplicatorConfiguration* cbl_repl_config(CBLReplicator* repl) {
+const CBLReplicatorConfiguration* cbl_repl_config(CBLReplicator* repl) CBLAPI {
     return repl->configuration();
 }
 
-CBLReplicatorStatus cbl_repl_status(CBLReplicator* repl) {
+CBLReplicatorStatus cbl_repl_status(CBLReplicator* repl) CBLAPI {
     return repl->status();
 }
 
-void cbl_repl_start(CBLReplicator* repl)            {repl->start();}
-void cbl_repl_stop(CBLReplicator* repl)             {repl->stop();}
-void cbl_repl_resetCheckpoint(CBLReplicator* repl)  {repl->resetCheckpoint();}
+void cbl_repl_start(CBLReplicator* repl) CBLAPI            {repl->start();}
+void cbl_repl_stop(CBLReplicator* repl) CBLAPI             {repl->stop();}
+void cbl_repl_resetCheckpoint(CBLReplicator* repl) CBLAPI  {repl->resetCheckpoint();}
