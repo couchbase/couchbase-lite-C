@@ -2,17 +2,16 @@
 
 This is a generic cross-platform version of Couchbase Lite.  
 Or, it will be when it's done.  
-**It's in the very early stages of development.**
-
-The base API is in ANSI C, and there is a C++ API consisting of inline wrappers around that. There's also an embryonic Python binding.
+**It's in the early stages of development.**
 
 ## Goals
 
 (Unofficial; we have no PRD or design docs yet)
 
 * C API
-  - C++ is a stretch goal but easily achieved
-  - Can be bound to other languages like JavaScript or Python
+  - There's a C++ wrapper API, implemented as inline calls to C
+  - There's a partial Python binding (made using `cffi`)
+  - Can be bound to other languages like JavaScript
 * API similar to other Couchbase Lite platforms
 * Same feature set as other Couchbase Lite platforms
 * Support common Linux distros, esp. Ubuntu and Raspbian
@@ -23,7 +22,6 @@ The base API is in ANSI C, and there is a C++ API consisting of inline wrappers 
   - 32-bit and 64-bit
   - x86 and ARM
   - Hundreds of MB RAM, hundreds of MHz CPU, hundreds of MB storage
-* Maybe include some language bindings like Python or JavaScript
 
 ## Example
 
