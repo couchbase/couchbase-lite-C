@@ -44,7 +44,8 @@ namespace cbl {
 
         fleece::alloc_slice explain()           {return cbl_query_explain(ref());}
 
-        [[nodiscard]] Listener addListener(std::function<void(CBLQuery, CBLResultSet, CBLError*)>);
+        using Listener = cbl::Listener<CBLQuery, CBLResultSet, CBLError*>;
+        [[nodiscard]] Listener addListener(Listener::Callback);
 
         CBL_REFCOUNTED_BOILERPLATE(Query, RefCounted, CBLQuery)
     };

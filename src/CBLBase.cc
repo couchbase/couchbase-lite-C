@@ -49,5 +49,6 @@ void cbl_release(CBLRefCounted *self) {
 
 
 void cbl_listener_remove(CBLListenerToken *token) {
-    token->remove();
+    if (token)
+        token->remove();
 }

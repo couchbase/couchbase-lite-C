@@ -18,6 +18,7 @@
 
 #pragma once
 #include "CBLBase.h"
+#include <functional>
 
 namespace cbl {
 
@@ -67,14 +68,52 @@ protected: \
 
 
 
-
+    template <class... Args>
     class Listener {
     public:
-        Listener()                                  :_token(nullptr) { }
-        explicit Listener(CBLListenerToken* token)  :_token(token) { }
+        using Callback = std::function<void(Args...)>;
+
+        Listener()                                  { }
         ~Listener()                                 {cbl_listener_remove(_token);}
+
+        Listener(Callback cb)
+        :_callback(new Callback(cb))
+        { }
+
+        Listener(Listener &&other)
+        :_token(other._token),
+        _callback(std::move(other._callback))
+        {other._token = nullptr;}
+
+        Listener& operator=(Listener &&other) {
+            cbl_listener_remove(_token);
+            _token = other._token;
+            _callback = other._callback;
+            other._token = nullptr;
+            return *this;
+        }
+
+        void remove() {
+            cbl_listener_remove(_token);
+            _token = nullptr;
+            _callback = nullptr;
+        }
+
+        void* context()                             {return _callback.get();}
+        void setToken(CBLListenerToken* token)      {assert(!_token); _token = token;}
+
+        static void call(void* context, Args... args) {
+            auto listener = (Callback*)context;
+            (*listener)(args...);
+        }
+
     private:
-        CBLListenerToken* _token;
+        CBLListenerToken* _token {nullptr};
+        std::unique_ptr<Callback> _callback;
+
+        Listener(const Listener&) =delete;
+        Listener& operator=(const Listener &other) =delete;
     };
+
 
 }

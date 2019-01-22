@@ -85,9 +85,45 @@ namespace cbl {
         inline Document saveDocument(MutableDocument &doc,
                                      CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);
 
-        [[nodiscard]] Listener addListener(std::function<void(Database,std::vector<const char*>)>);
+
+        using Listener = cbl::Listener<Database,std::vector<const char*>>;
+
+        [[nodiscard]] Listener addListener(Listener::Callback f) {
+            auto l = Listener(f);
+            l.setToken( cbl_db_addListener(ref(), &_callListener, l.context()) );
+            return l;
+        }
+
+
+        using DocumentListener = cbl::Listener<Database,const char*>;
+
+        [[nodiscard]] DocumentListener addDocumentListener(const char *docID,
+                                                           DocumentListener::Callback f)
+        {
+            auto l = DocumentListener(f);
+            l.setToken( cbl_db_addDocumentListener(ref(), docID, &_callDocListener, l.context()) );
+            return l;
+        }
+
+
 
         CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)
+
+    private:
+        explicit Database(const CBLDatabase *db)
+        :RefCounted(cbl_retain((CBLRefCounted*)db))
+        { }
+
+        static void _callListener(void *context, const CBLDatabase *db,
+                                  unsigned nDocs, const char **docIDs)
+        {
+            std::vector<const char*> vec(&docIDs[0], &docIDs[nDocs]);
+            Listener::call(context, Database(db), vec);
+        }
+
+        static void _callDocListener(void *context, const CBLDatabase *db, const char *docID) {
+            DocumentListener::call(context, Database(db), docID);
+        }
     };
 
 }
