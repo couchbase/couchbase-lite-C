@@ -212,7 +212,6 @@
 		277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLReplicator.cc; sourceTree = "<group>"; };
 		277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLReplicatorConfig.hh; sourceTree = "<group>"; };
 		277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDocument_Internal.hh; sourceTree = "<group>"; };
-		27886C8721F5419100069BEA /* CBLListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLListener.h; sourceTree = "<group>"; };
 		27886C8B21F64C1400069BEA /* Listener.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Listener.hh; sourceTree = "<group>"; };
 		27886C8C21F64C1400069BEA /* Listener.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Listener.cc; sourceTree = "<group>"; };
 		27B61D5521D5ABA60027CCDB /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
@@ -317,7 +316,6 @@
 			children = (
 				27B61DA321D6E40D0027CCDB /* CouchbaseLite.h */,
 				271C2A2D21CAC98F0045856E /* CBLBase.h */,
-				27886C8721F5419100069BEA /* CBLListener.h */,
 				271C2A2F21CAC98F0045856E /* CBLDatabase.h */,
 				271C2A2E21CAC98F0045856E /* CBLDocument.h */,
 				271C2A3021CAC98F0045856E /* CBLQuery.h */,

@@ -199,13 +199,16 @@ CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cbl_nonnull,
                                      void *context);
 
 /** @} */
+/** @} */    // end of outer \defgroup
 
 
 
 #pragma mark - NOTIFICATION SCHEDULING
+/** \defgroup listeners   Listeners
+    @{ */
 /** \name  Scheduling notifications
     @{
-    Applications may want control over when Couchbase Lite notifications (i.e. listener callbacks)
+    Applications may want control over when Couchbase Lite notifications (listener callbacks)
     happen. They may want them called on a specific thread, or at certain times during an event
     loop. This behavior may vary by database, if for instance each database is associated with a
     separate thread.
@@ -240,7 +243,6 @@ CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cbl_nonnull,
     void cbl_db_sendNotifications(CBLDatabase *db _cbl_nonnull);
                                      
 /** @} */
-
 /** @} */    // end of outer \defgroup
 
 #ifdef __cplusplus
