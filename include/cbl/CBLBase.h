@@ -161,6 +161,13 @@ CBLRefCounted* cbl_retain(CBLRefCounted*);
     like \ref cbl_db_release. */
 void cbl_release(CBLRefCounted*);
 
+/** Returns the total number of Couchbase Lite objects. Useful for leak checking. */
+unsigned cbl_instanceCount(void);
+
+/** Logs the class and address of each Couchbase Lite object. Useful for leak checking.
+    @note  May only be functional in debug builds of Couchbase Lite. */
+void cbl_dumpInstances(void);
+
 // Declares retain/release functions for TYPE
 #ifdef __cplusplus
     #define CBL_REFCOUNTED(TYPE, NAME) \

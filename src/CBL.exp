@@ -8,6 +8,8 @@ _cbl_error_message
 _cbl_setLogLevel
 _cbl_retain
 _cbl_release
+_cbl_instanceCount
+_cbl_dumpInstances
 _cbl_listener_remove
 
 _cbl_databaseExists

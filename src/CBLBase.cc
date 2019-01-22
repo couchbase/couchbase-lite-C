@@ -48,6 +48,18 @@ void cbl_release(CBLRefCounted *self) {
 }
 
 
+unsigned cbl_instanceCount() {
+    return fleece::InstanceCounted::count();
+}
+
+
+void cbl_dumpInstances(void) {
+#if INSTANCECOUNTED_TRACK
+    fleece::InstanceCounted::dumpInstances();
+#endif
+}
+
+
 void cbl_listener_remove(CBLListenerToken *token) {
     if (token)
         token->remove();

@@ -11,12 +11,13 @@
 #include "fleece/slice.hh"
 #include "fleece/Fleece.hh"
 #include "RefCounted.hh"
+#include "InstanceCounted.hh"
 #include <memory>
 #include <string>
 #include <vector>
 
 
-struct CBLRefCounted : public fleece::RefCounted {
+struct CBLRefCounted : public fleece::RefCounted, fleece::InstanceCountedIn<CBLRefCounted> {
 };
 
 

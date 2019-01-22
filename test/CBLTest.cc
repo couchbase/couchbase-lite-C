@@ -53,12 +53,17 @@ CBLTest::~CBLTest() {
             WARN("Failed to close database: " << error.domain << "/" << error.code);
         cbl_db_release(db);
     }
+    if (cbl_instanceCount() > 0)
+        cbl_dumpInstances();
+    CHECK(cbl_instanceCount() == 0);
 }
+
+
+#pragma mark - C++ TEST CLASS:
 
 
 std::string& CBLTest_Cpp::kDatabaseDir = CBLTest::kDatabaseDir;
 const char* const & CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
-
 
 
 CBLTest_Cpp::CBLTest_Cpp() {
@@ -70,6 +75,11 @@ CBLTest_Cpp::CBLTest_Cpp() {
 
 CBLTest_Cpp::~CBLTest_Cpp() {
     db.close();
+    db = nullptr;
+
+    if (cbl_instanceCount() > 0)
+        cbl_dumpInstances();
+    CHECK(cbl_instanceCount() == 0);
 }
 
 
