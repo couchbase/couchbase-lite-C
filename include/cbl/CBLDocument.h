@@ -52,7 +52,7 @@ _cbl_warn_unused
 const CBLDocument* cbl_db_getDocument(const CBLDatabase* database _cbl_nonnull,
                                       const char* _cbl_nonnull docID);
 
-CBL_REFCOUNTED(const CBLDocument*, doc);
+CBL_REFCOUNTED(CBLDocument*, doc);
 
 /** Saves a (mutable) document to the database.
     @param db  The database to save to.

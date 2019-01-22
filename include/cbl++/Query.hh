@@ -27,24 +27,23 @@ namespace cbl {
     /** A database query. */
     class Query : protected RefCounted {
     public:
-        Query(const Database& db, const char *jsonQuery _cbl_nonnull)
-        {
+        Query(const Database& db, const char *jsonQuery _cbl_nonnull) {
             CBLError error;
             auto q = cbl_query_new(db.ref(), jsonQuery, &error);
             check(q, error);
             _ref = (CBLRefCounted*)q;
         }
 
-        unsigned columnCount()                  {return cbl_query_columnCount(ref());}
-        fleece::slice columnName(unsigned index) {return cbl_query_columnName(ref(), index);}
+        unsigned columnCount()                      {return cbl_query_columnCount(ref());}
+        fleece::slice columnName(unsigned index)    {return cbl_query_columnName(ref(), index);}
 
-        void setParameters(fleece::Dict parameters)   {cbl_query_setParameters(ref(), parameters);}
+        void setParameters(fleece::Dict parameters) {cbl_query_setParameters(ref(), parameters);}
 
         inline ResultSet execute();
 
-        fleece::alloc_slice explain()           {return cbl_query_explain(ref());}
+        fleece::alloc_slice explain()               {return cbl_query_explain(ref());}
 
-        using Listener = cbl::Listener<CBLQuery, CBLResultSet, CBLError*>;
+        using Listener = cbl::ListenerToken<CBLQuery, CBLResultSet, CBLError*>;
         [[nodiscard]] Listener addListener(Listener::Callback);
 
         CBL_REFCOUNTED_BOILERPLATE(Query, RefCounted, CBLQuery)
@@ -54,14 +53,14 @@ namespace cbl {
     /** A single query result; ResultSet::iterator iterates over these. */
     class Result {
     public:
-        fleece::Value column(unsigned col)                  {return cbl_results_column(_ref, col);}
-        fleece::Value property(const char *name _cbl_nonnull){return cbl_results_property(_ref, name);}
+        fleece::Value column(unsigned c)                     {return cbl_results_column(_ref, c);}
+        fleece::Value property(const char *p _cbl_nonnull)   {return cbl_results_property(_ref, p);}
 
-        fleece::Value operator[] (unsigned col)                 {return column(col);}
-        fleece::Value operator[] (const char *name _cbl_nonnull) {return property(name);}
+        fleece::Value operator[](unsigned col)               {return column(col);}
+        fleece::Value operator[](const char *p _cbl_nonnull) {return property(p);}
 
     protected:
-        explicit Result(CBLResultSet *ref)    :_ref(ref) { }
+        explicit Result(CBLResultSet *ref)                   :_ref(ref) { }
         CBLResultSet* _ref;
         friend class ResultSetIterator;
     };
@@ -92,8 +91,8 @@ namespace cbl {
             return *this;
         }
     protected:
-        ResultSetIterator()                         :_rs() { }
-        explicit ResultSetIterator(ResultSet rs)    :_rs(rs) { }
+        ResultSetIterator()                                 :_rs() { }
+        explicit ResultSetIterator(ResultSet rs)            :_rs(rs) { }
 
         ResultSet _rs;
         friend class ResultSet;

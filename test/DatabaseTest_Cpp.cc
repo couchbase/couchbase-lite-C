@@ -82,3 +82,91 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CHECK(doc["greeting"].asString() == "Howdy!"_sl);
 }
+
+
+static void createDocument(Database db, const char *docID,
+                           const char *property, const char *value)
+{
+    MutableDocument doc(docID);
+    doc[property] = value;
+    db.saveDocument(doc);
+}
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
+    int dbListenerCalls = 0, fooListenerCalls = 0;
+    {
+        // Add a listener:
+        auto dbListener = db.addListener([&](Database callbackdb, vector<const char*> docIDs) {
+            ++dbListenerCalls;
+            CHECK(callbackdb == db);
+            CHECK(docIDs.size() == 1);
+            CHECK(string(docIDs[0]) == "foo");
+        });
+        auto fooListener = db.addDocumentListener("foo", [&](Database callbackdb, const char* docID) {
+            ++fooListenerCalls;
+            CHECK(callbackdb == db);
+            CHECK(string(docID) == "foo");
+        });
+        // Create a doc, check that the listener was called:
+        createDocument(db, "foo", "greeting", "Howdy!");
+        CHECK(dbListenerCalls == 1);
+        CHECK(fooListenerCalls == 1);
+    }
+    // After being removed, the listener should not be called:
+    dbListenerCalls = fooListenerCalls = 0;
+    createDocument(db, "bar", "greeting", "yo.");
+    CHECK(dbListenerCalls == 0);
+    CHECK(fooListenerCalls == 0);
+}
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
+    // Add a listener:
+    int dbListenerCalls = 0, fooListenerCalls = 0, barListenerCalls = 0, notificationsReadyCalls = 0;
+    auto dbListener = db.addListener([&](Database callbackdb, vector<const char*> docIDs) {
+        ++dbListenerCalls;
+        CHECK(callbackdb == db);
+        CHECK(docIDs.size() == 2);
+        CHECK(string(docIDs[0]) == "foo");
+        CHECK(string(docIDs[1]) == "bar");
+    });
+    auto fooListener = db.addDocumentListener("foo", [&](Database callbackdb, const char* docID) {
+        ++fooListenerCalls;
+        CHECK(callbackdb == db);
+        CHECK(string(docID) == "foo");
+    });
+    auto barListener = db.addDocumentListener("bar", [&](Database callbackdb, const char* docID) {
+        ++barListenerCalls;
+        CHECK(callbackdb == db);
+        CHECK(string(docID) == "bar");
+    });
+
+    db.bufferNotifications([&](Database callbackdb) {
+        ++notificationsReadyCalls;
+        CHECK(callbackdb == db);
+    });
+
+    // Create two docs; no listeners should be called yet:
+    createDocument(db, "foo", "greeting", "Howdy!");
+    CHECK(dbListenerCalls == 0);
+    CHECK(fooListenerCalls == 0);
+    CHECK(barListenerCalls == 0);
+
+    createDocument(db, "bar", "greeting", "yo.");
+    CHECK(dbListenerCalls == 0);
+    CHECK(fooListenerCalls == 0);
+    CHECK(barListenerCalls == 0);
+
+    // Now the listeners will be called:
+    db.sendNotifications();
+    CHECK(dbListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+    CHECK(barListenerCalls == 1);
+
+    // There should be no more notifications:
+    db.sendNotifications();
+    CHECK(dbListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+    CHECK(barListenerCalls == 1);
+}

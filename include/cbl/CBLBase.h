@@ -162,11 +162,20 @@ CBLRefCounted* cbl_retain(CBLRefCounted*);
 void cbl_release(CBLRefCounted*);
 
 // Declares retain/release functions for TYPE
-#define CBL_REFCOUNTED(TYPE, NAME) \
-    static inline TYPE cbl_##NAME##_retain(TYPE _cbl_nonnull t) \
-                                                    {return (TYPE)cbl_retain((CBLRefCounted*)t);} \
-    static inline void cbl_##NAME##_release(TYPE t) {cbl_release((CBLRefCounted*)t);}
-
+#ifdef __cplusplus
+    #define CBL_REFCOUNTED(TYPE, NAME) \
+        static inline TYPE cbl_##NAME##_retain(TYPE _cbl_nonnull t) \
+                                                {return (TYPE)cbl_retain((CBLRefCounted*)t);} \
+        static inline void cbl_##NAME##_release(TYPE t) {cbl_release((CBLRefCounted*)t);} \
+        static inline const TYPE cbl_##NAME##_retain(const TYPE _cbl_nonnull t) \
+                                                {return (const TYPE)cbl_retain((CBLRefCounted*)t);} \
+        static inline void cbl_##NAME##_release(const TYPE t) {cbl_release((CBLRefCounted*)t);}
+#else
+    #define CBL_REFCOUNTED(TYPE, NAME) \
+        static inline TYPE cbl_##NAME##_retain(TYPE _cbl_nonnull t) \
+                                                {return (TYPE)cbl_retain((CBLRefCounted*)t);} \
+        static inline void cbl_##NAME##_release(TYPE t) {cbl_release((CBLRefCounted*)t);}
+#endif
 /** @} */
 
 

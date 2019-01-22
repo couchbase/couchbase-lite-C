@@ -86,7 +86,7 @@ namespace cbl {
                                      CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);
 
 
-        using Listener = cbl::Listener<Database,std::vector<const char*>>;
+        using Listener = cbl::ListenerToken<Database,std::vector<const char*>>;
 
         [[nodiscard]] Listener addListener(Listener::Callback f) {
             auto l = Listener(f);
@@ -95,7 +95,7 @@ namespace cbl {
         }
 
 
-        using DocumentListener = cbl::Listener<Database,const char*>;
+        using DocumentListener = cbl::ListenerToken<Database,const char*>;
 
         [[nodiscard]] DocumentListener addDocumentListener(const char *docID,
                                                            DocumentListener::Callback f)
@@ -105,24 +105,36 @@ namespace cbl {
             return l;
         }
 
+        using NotificationsReadyCallback = std::function<void(Database)>;
+
+        void bufferNotifications(NotificationsReadyCallback callback) {
+            auto callbackPtr = new NotificationsReadyCallback(callback);    //FIX: This is leaked
+            cbl_db_bufferNotifications(ref(),
+                                       [](void *context, CBLDatabase *db) {
+                                           (*(NotificationsReadyCallback*)context)(wrap(db));
+                                       },
+                                       callbackPtr);
+        }
+
+        void sendNotifications()                            {cbl_db_sendNotifications(ref());}
 
 
         CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)
 
     private:
-        explicit Database(const CBLDatabase *db)
-        :RefCounted(cbl_retain((CBLRefCounted*)db))
-        { }
+        static inline Database wrap(const CBLDatabase *db) {
+            return Database((CBLDatabase*)cbl_db_retain(db));
+        }
 
         static void _callListener(void *context, const CBLDatabase *db,
                                   unsigned nDocs, const char **docIDs)
         {
             std::vector<const char*> vec(&docIDs[0], &docIDs[nDocs]);
-            Listener::call(context, Database(db), vec);
+            Listener::call(context, wrap(db), vec);
         }
 
         static void _callDocListener(void *context, const CBLDatabase *db, const char *docID) {
-            DocumentListener::call(context, Database(db), docID);
+            DocumentListener::call(context, wrap(db), docID);
         }
     };
 

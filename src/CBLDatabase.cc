@@ -28,27 +28,41 @@ using namespace fleece;
 using namespace cbl_internal;
 
 
-static const char* defaultDbDir() {
-    static const string kDir = string(getcwd(nullptr, 0)) + "/";    // FIX COMPAT
-    return kDir.c_str();
+#ifdef _MSC_VER
+static const char kPathSeparator = '\\';
+#else
+static const char kPathSeparator = '/';
+#endif
+
+
+// Default location for databases: the current directory
+static const string& defaultDbDir() {
+    static const string kDir = getcwd(nullptr, 0);
+    return kDir;
 }
 
 
+// Given a database name and an optional directory, returns the complete path.
+// * If no directory is given, uses the defaultDbDir().
+// * Appends ".cblite2" to the database name.
 static string dbPath(const char* _cbl_nonnull name, const char *inDirectory) {
-    if (!inDirectory)
-        inDirectory = defaultDbDir();
-    string path(inDirectory);
-    if (path[path.size()] != '/')
-        path += '/';
-    path += name;
-    path += ".cblite2";
-    return path;
+    string path;
+    if (inDirectory)
+        path = inDirectory;
+    else
+        path = defaultDbDir();
+    if (path[path.size()-1] != kPathSeparator)
+        path += kPathSeparator;
+    return path + name + ".cblite2";
 }
 
 
 static string dbPath(const char* _cbl_nonnull name, const CBLDatabaseConfiguration *config) {
     return dbPath(name, (config ? config->directory : nullptr));
 }
+
+
+#pragma mark - STATIC "METHODS":
 
 
 bool cbl_databaseExists(const char *name, const char *inDirectory) {
@@ -78,6 +92,9 @@ bool cbl_deleteDB(const char *name,
 }
 
 
+#pragma mark - LIFECYCLE & OPERATIONS:
+
+
 CBLDatabase* cbl_db_open(const char *name,
                          const CBLDatabaseConfiguration *config,
                          CBLError *outError)
@@ -96,6 +113,25 @@ CBLDatabase* cbl_db_open(const char *name,
 bool cbl_db_close(CBLDatabase* db, CBLError* outError) {
     return !db || c4db_close(internal(db), internal(outError));
 }
+
+bool cbl_db_beginBatch(CBLDatabase* db, CBLError* outError) {
+    return c4db_beginTransaction(internal(db), internal(outError));
+}
+
+bool cbl_db_endBatch(CBLDatabase* db, CBLError* outError) {
+    return c4db_endTransaction(internal(db), true, internal(outError));
+}
+
+bool cbl_db_compact(CBLDatabase* db, CBLError* outError) {
+    return c4db_compact(internal(db), internal(outError));
+}
+
+bool cbl_db_delete(CBLDatabase* db, CBLError* outError) {
+    return c4db_delete(internal(db), internal(outError));
+}
+
+
+#pragma mark - ACCESSORS:
 
 
 const char* cbl_db_name(const CBLDatabase* db) {
@@ -117,22 +153,6 @@ uint64_t cbl_db_count(const CBLDatabase* db) {
 
 uint64_t cbl_db_lastSequence(const CBLDatabase* db) {
     return c4db_getLastSequence(internal(db));
-}
-
-bool cbl_db_beginBatch(CBLDatabase* db, CBLError* outError) {
-    return c4db_beginTransaction(internal(db), internal(outError));
-}
-
-bool cbl_db_endBatch(CBLDatabase* db, CBLError* outError) {
-    return c4db_endTransaction(internal(db), true, internal(outError));
-}
-
-bool cbl_db_compact(CBLDatabase* db, CBLError* outError) {
-    return c4db_compact(internal(db), internal(outError));
-}
-
-bool cbl_db_delete(CBLDatabase* db, CBLError* outError) {
-    return c4db_delete(internal(db), internal(outError));
 }
 
 
@@ -219,6 +239,8 @@ CBLListenerToken* cbl_db_addListener(const CBLDatabase* constdb _cbl_nonnull,
 
 namespace cbl_internal {
 
+    // Custom subclass of CBLListenerToken for document listeners.
+    // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
     template<>
     class ListenerToken<CBLDocumentListener> : public CBLListenerToken {
     public:
@@ -285,7 +307,7 @@ CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cbl_nonnull,
 }
 
 
-#pragma mark - SCHEDULING
+#pragma mark - SCHEDULING NOTIFICATIONS:
 
 
 void CBLDatabase::bufferNotifications(CBLNotificationsReadyCallback callback, void *context) {

@@ -22,7 +22,7 @@
 
 namespace cbl {
 
-    // Internal base class of CBL classes.
+    // Artificial base class of the C++ wrapper classes; just manages ref-counting.
     class RefCounted {
     protected:
         explicit RefCounted(CBLRefCounted *ref =nullptr) noexcept :_ref(ref) { }
@@ -68,24 +68,27 @@ protected: \
 
 
 
+    /** A token representing a registered listener; instances are returned from the various
+        methods that register listeners, such as \ref Database::addListener.
+        When this object goes out of scope, the listener will be unregistered. */
     template <class... Args>
-    class Listener {
+    class ListenerToken {
     public:
         using Callback = std::function<void(Args...)>;
 
-        Listener()                                  { }
-        ~Listener()                                 {cbl_listener_remove(_token);}
+        ListenerToken()                                  { }
+        ~ListenerToken()                                 {cbl_listener_remove(_token);}
 
-        Listener(Callback cb)
+        ListenerToken(Callback cb)
         :_callback(new Callback(cb))
         { }
 
-        Listener(Listener &&other)
+        ListenerToken(ListenerToken &&other)
         :_token(other._token),
         _callback(std::move(other._callback))
         {other._token = nullptr;}
 
-        Listener& operator=(Listener &&other) {
+        ListenerToken& operator=(ListenerToken &&other) {
             cbl_listener_remove(_token);
             _token = other._token;
             _callback = other._callback;
@@ -93,6 +96,7 @@ protected: \
             return *this;
         }
 
+        /** Unregisters the listener early, before it leaves scope. */
         void remove() {
             cbl_listener_remove(_token);
             _token = nullptr;
@@ -111,8 +115,8 @@ protected: \
         CBLListenerToken* _token {nullptr};
         std::unique_ptr<Callback> _callback;
 
-        Listener(const Listener&) =delete;
-        Listener& operator=(const Listener &other) =delete;
+        ListenerToken(const ListenerToken&) =delete;
+        ListenerToken& operator=(const ListenerToken &other) =delete;
     };
 
 

@@ -183,11 +183,13 @@ TEST_CASE_METHOD(CBLTest, "Scheduled database notifications") {
 
     // Create two docs; no listeners should be called yet:
     createDocument(db, "foo", "greeting", "Howdy!");
+    CHECK(notificationsReadyCalls == 1);
     CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);
 
     createDocument(db, "bar", "greeting", "yo.");
+    CHECK(notificationsReadyCalls == 1);
     CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);
