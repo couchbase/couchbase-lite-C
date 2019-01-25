@@ -19,6 +19,9 @@
 #pragma once
 #include "Database.hh"
 #include "CBLQuery.h"
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace cbl {
     class ResultSet;

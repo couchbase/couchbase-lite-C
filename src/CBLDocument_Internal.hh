@@ -90,6 +90,7 @@ private:
     { }
 
     void initProperties();
+    bool checkMutable(C4Error *outError) const;
 
     static string ensureDocID(const char *docID);
 

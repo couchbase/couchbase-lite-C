@@ -18,6 +18,7 @@
 
 #pragma once
 #include "CBLReplicator.h"
+#include <functional>
 
 namespace cbl {
 

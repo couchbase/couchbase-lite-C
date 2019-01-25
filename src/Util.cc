@@ -64,10 +64,14 @@ namespace cbl_internal {
     alloc_slice convertJSON5(const char *json5, C4Error *outError) {
         FLError flError;
         alloc_slice json(FLJSON5_ToJSON(slice(json5), &flError));
-        if (!json) {
-            if (outError) *outError = c4error_make(FleeceDomain, flError, "Invalid JSON in query"_sl);
-        }
+        if (!json)
+            setError(outError, FleeceDomain, flError, "Invalid JSON in query"_sl);
         return json;
+    }
+
+    void setError(C4Error* outError, C4ErrorDomain domain, int code, C4String message) {
+        if (outError)
+            *outError = c4error_make(domain, code, message);
     }
 
 }

@@ -18,8 +18,9 @@
 
 #pragma once
 #include "CBLBase.h"
+#include <algorithm>
 #include <functional>
-#include <string>
+#include <memory>
 
 namespace cbl {
 

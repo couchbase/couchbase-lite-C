@@ -24,6 +24,14 @@ using namespace std;
 using namespace fleece;
 
 
+bool CBLDocument::checkMutable(C4Error *outError) const {
+    if (_usuallyTrue(_mutable))
+        return true;
+    setError(outError, LiteCoreDomain, kC4ErrorNotWriteable, "Document object is immutable"_sl);
+    return false;
+}
+
+
 string CBLDocument::ensureDocID(const char *docID) {
     char docIDBuf[32];
     if (!docID)
@@ -32,21 +40,16 @@ string CBLDocument::ensureDocID(const char *docID) {
 }
 
 
-Dict CBLDocument::properties() const {
-    if (!_properties)
-        const_cast<CBLDocument*>(this)->initProperties();
-    return _properties.asDict();
-}
-
 RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                                              bool deleting,
                                              CBLConcurrencyControl concurrency,
                                              C4Error* outError) const
 {
+    if (!checkMutable(outError))
+        return nullptr;
     if (_db && _db != db) {
-        if (outError)
-            *outError = c4error_make(LiteCoreDomain, kC4ErrorInvalidParameter,
-                                     "Saving doc to wrong database"_sl);
+        setError(outError, LiteCoreDomain, kC4ErrorInvalidParameter,
+                 "Saving doc to wrong database"_sl);
         return nullptr;
     } else if (!_mutable) {
         return this;
@@ -106,21 +109,20 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
     }
 }
 
-bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency,
-               C4Error* outError) const
-{
+
+bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError) const {
     if (!_db) {
-        if (outError) *outError = c4error_make(LiteCoreDomain, kC4ErrorNotFound,
-                                               "Document is not in any database"_sl);
+        setError(outError, LiteCoreDomain, kC4ErrorNotFound, "Document is not in any database"_sl);
         return false;
     }
     RetainedConst<CBLDocument> deleted = save(_db, true, concurrency, outError);
     return (deleted != nullptr);
 }
 
+
 bool CBLDocument::deleteDoc(CBLDatabase* db _cbl_nonnull,
-                      const char* docID _cbl_nonnull,
-                      C4Error* outError)
+                            const char* docID _cbl_nonnull,
+                            C4Error* outError)
 {
     c4::Transaction t(internal(db));
     if (!t.begin(outError))
@@ -130,6 +132,7 @@ bool CBLDocument::deleteDoc(CBLDatabase* db _cbl_nonnull,
         c4doc = c4doc_update(c4doc, nullslice, kRevDeleted, outError);
     return c4doc && t.commit(outError);
 }
+
 
 void CBLDocument::initProperties() {
     if (_c4doc && _c4doc->selectedRev.body.buf)
@@ -145,26 +148,40 @@ void CBLDocument::initProperties() {
     }
 }
 
-char* CBLDocument::propertiesAsJSON() const {
-    return allocCString(properties().toJSON());
+
+Dict CBLDocument::properties() const {
+    if (!_properties)
+        const_cast<CBLDocument*>(this)->initProperties();
+    return _properties.asDict();
 }
 
+
+char* CBLDocument::propertiesAsJSON() const {
+    alloc_slice json;
+    if (!_mutable && _c4doc)
+        json = c4doc_bodyAsJSON(_c4doc, false, nullptr);        // fast path
+    else
+        json = allocCString(properties().toJSON());
+    return allocCString(json);
+}
+
+
 bool CBLDocument::setPropertiesAsJSON(const char *json, C4Error* outError) {
+    if (!checkMutable(outError))
+        return false;
     Doc doc = Doc::fromJSON(slice(json));
     if (!doc) {
-        if (outError) *outError = c4error_make(FleeceDomain, kFLJSONError, "Invalid JSON"_sl);
+        setError(outError, FleeceDomain, kFLJSONError, "Invalid JSON"_sl);
         return false;
     }
     Dict root = doc.root().asDict();
     if (!root) {
-        if (outError) *outError = c4error_make(FleeceDomain, kFLJSONError,
-                                               "properties must be a JSON dictionary"_sl);
+        setError(outError, FleeceDomain, kFLJSONError, "properties must be a JSON dictionary"_sl);
         return false;
     }
     _properties = root.mutableCopy(kFLDeepCopyImmutables);
     return true;
 }
-
 
 
 #pragma mark - PUBLIC API:
