@@ -19,6 +19,7 @@ class Database (CBLObject):
         if config != None:
             config = config._cblConfig()
         self.name = name
+        self.listeners = set()
         CBLObject.__init__(self, lib.cbl_db_open(name, config, gError),
                            "Couldn't open database", gError)
     
@@ -112,4 +113,22 @@ class Database (CBLObject):
     def __exit__(self, exc_type, exc_value, traceback):
         if not lib.cbl_db_endBatch(self._ref, gError) and not exc_type:
             raise CBLException("Couldn't commit a batch operation", gError)
+
+    # Listeners:
+    
+    def addListener(self, listener):
+        handle = ffi.new_handle(listener)
+        self.listeners.add(handle)
+        c_token = lib.cbl_db_addListener(self._ref, lib.databaseListenerCallback, handle)
+        return ListenerToken(self, handle, c_token)
+
+    def removeListener(self, token):
+        self.listeners.remove(token.handle)
         
+@ffi.def_extern()
+def databaseListenerCallback(context, db, numDocs, c_docIDs):
+    docIDs = []
+    for i in xrange(numDocs):
+        docIDs.append(ffi.string(c_docIDs[i]))
+    listener = ffi.from_handle(context)
+    listener(db, docIDs)

@@ -120,6 +120,8 @@ typedef struct {
     ...;
 } CBLDatabaseConfiguration;
 
+void cbl_listener_remove(CBLListenerToken*);
+
 //////// CBLDatabase.h
 bool cbl_databaseExists(const char* name, const char *inDirectory);
 bool cbl_copyDB(const char* fromPath,
@@ -142,6 +144,16 @@ const char* cbl_db_path(const CBLDatabase*);
 uint64_t cbl_db_count(const CBLDatabase*);
 uint64_t cbl_db_lastSequence(const CBLDatabase*);
 CBLDatabaseConfiguration cbl_db_config(const CBLDatabase*);
+
+typedef void (*CBLDatabaseListener)(void *context,
+                                     const CBLDatabase* db,
+                                     unsigned numDocs,
+                                     const char **docIDs);
+extern "Python" void databaseListenerCallback(void *context, const CBLDatabase* db,
+                                              unsigned numDocs, const char **docIDs);
+CBLListenerToken* cbl_db_addListener(const CBLDatabase* db,
+                                     CBLDatabaseListener listener,
+                                     void *context);
 
 //////// CBLDocument.h
 typedef uint8_t CBLConcurrencyControl;

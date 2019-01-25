@@ -18,6 +18,10 @@ assert(db.path == "/tmp/db.cblite2")
 assert(db.count == 0)
 assert(db.lastSequence == 0)
 
+def dbListener(db, docIDs):
+    print "######## DB changed!", docIDs
+dbListenerToken = db.addListener(dbListener)
+
 with db:
     doc = db.getDocument("foo")
     assert(not doc)
@@ -57,6 +61,8 @@ with db:
 
     assert(db.count == 2)
     assert(db.lastSequence == 2)
+
+dbListenerToken.remove()
 
 q = Query(db, {'WHAT': [['.flavor'], ['.numbers']], 'WHERE': ['=', ['.color'], 'green']})
 print "-------- Explanation --------"

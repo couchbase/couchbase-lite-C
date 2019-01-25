@@ -34,7 +34,23 @@ class CBLObject (object):
     def __del__(self):
         if lib != None and self._ref != None:
             lib.cbl_release(self._ref)
-    
+
+class ListenerToken (object):
+    def __init__(self, owner, handle, c_token):
+        self.owner = owner
+        self.handle = handle
+        self.c_token = c_token
+
+    def __del__(self):
+        self.remove()
+
+    def remove(self):
+        if self.owner != None:
+            lib.cbl_listener_remove(self.c_token)
+            self.owner.removeListener(self)
+            self.owner = None
+            self.handle = None
+
 def decodeFleece(f):
     typ = lib.FLValue_GetType(f)
     if typ == lib.kFLUndefined:
@@ -73,4 +89,3 @@ def decodeFleece(f):
             result[key] = decodeFleece(value)
             lib.FLDictIter_Next(i)
         return result
-        
