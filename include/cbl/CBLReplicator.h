@@ -72,7 +72,7 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorType) {
 };
 
 /** A callback that can decide whether a particular document should be pushed or pulled. */
-typedef bool (*CBLReplicationFilter)(CBLDocument* document, bool isDeleted);
+typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool isDeleted);
 
 
 /** The configuration of a replicator. */
@@ -88,6 +88,7 @@ typedef struct {
     FLArray documentIDs;                ///< Optional set of document IDs to replicate
     CBLReplicationFilter pushFilter;    ///< Optional callback to filter which docs are pushed
     CBLReplicationFilter pullFilter;    ///< Optional callback to validate incoming docs
+    void* filterContext;                ///< Arbitrary value passed to filter callbacks
 } CBLReplicatorConfiguration;
 
 /** @} */

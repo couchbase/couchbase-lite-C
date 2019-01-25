@@ -25,7 +25,7 @@ namespace cbl {
     class ResultSetIterator;
 
     /** A database query. */
-    class Query : protected RefCounted {
+    class Query : private RefCounted {
     public:
         Query(const Database& db, const char *jsonQuery _cbl_nonnull) {
             CBLError error;
@@ -34,14 +34,13 @@ namespace cbl {
             _ref = (CBLRefCounted*)q;
         }
 
-        unsigned columnCount()                      {return cbl_query_columnCount(ref());}
-        fleece::slice columnName(unsigned index)    {return cbl_query_columnName(ref(), index);}
+        inline std::vector<std::string> columnNames() const;
 
         void setParameters(fleece::Dict parameters) {cbl_query_setParameters(ref(), parameters);}
 
         inline ResultSet execute();
 
-        fleece::alloc_slice explain()               {return cbl_query_explain(ref());}
+        std::string explain()   {return fleece::alloc_slice(cbl_query_explain(ref())).asString();}
 
         using Listener = cbl::ListenerToken<CBLQuery, CBLResultSet, CBLError*>;
         [[nodiscard]] Listener addListener(Listener::Callback);
@@ -67,14 +66,11 @@ namespace cbl {
 
 
     /** The results of a query. The only access to the individual Results is to iterate them. */
-    class ResultSet : protected RefCounted {
+    class ResultSet : private RefCounted {
     public:
         using iterator = ResultSetIterator;
         inline iterator begin();
         inline iterator end();
- 
-        friend class Query;
-        CBL_REFCOUNTED_BOILERPLATE(ResultSet, RefCounted, CBLResultSet)
 
     private:
         static ResultSet adopt(const CBLResultSet *d) {
@@ -82,6 +78,9 @@ namespace cbl {
             rs._ref = (CBLRefCounted*)d;
             return rs;
         }
+
+        friend class Query;
+        CBL_REFCOUNTED_BOILERPLATE(ResultSet, RefCounted, CBLResultSet)
     };
 
 
@@ -106,7 +105,21 @@ namespace cbl {
     };
 
 
+
     // Method implementations:
+
+
+    inline std::vector<std::string> Query::columnNames() const {
+        unsigned n = cbl_query_columnCount(ref());
+        std::vector<std::string> cols;
+        cols.reserve(n);
+        for (unsigned i = 0; i < n ; ++i) {
+            fleece::slice name = cbl_query_columnName(ref(), i);
+            cols.push_back(name.asString());
+        }
+        return cols;
+    }
+
 
     inline ResultSet Query::execute() {
         CBLError error;

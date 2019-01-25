@@ -6,7 +6,8 @@
 
 #pragma once
 #include "CBLBase.h"
-#include "fleece/FLSlice.h"
+#include "fleece/slice.hh"
+#include "c4Base.h"
 #include <string>
 
 namespace cbl_internal {
@@ -19,4 +20,6 @@ namespace cbl_internal {
 
     char* allocCString(FLSlice);
     char* allocCString(FLSliceResult);      // frees the input
+
+    fleece::alloc_slice convertJSON5(const char *json5, C4Error *outError);
 }

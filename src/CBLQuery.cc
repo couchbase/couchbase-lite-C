@@ -19,6 +19,7 @@
 #include "CBLQuery.h"
 #include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
+#include "Util.hh"
 #include "c4.hh"
 #include "c4Query.h"
 #include "fleece/Fleece.hh"
@@ -32,10 +33,13 @@ class CBLQuery : public CBLRefCounted {
 public:
 
     CBLQuery(const CBLDatabase* db _cbl_nonnull,
-             const char *jsonQuery _cbl_nonnull,
+             const char *json5Query _cbl_nonnull,
              C4Error* outError)
-    :_c4query( c4query_new(internal(db), slice(jsonQuery), outError) )
-    { }
+    {
+        alloc_slice json = convertJSON5(json5Query, outError);
+        if (json)
+            _c4query = c4query_new(internal(db), json, outError);
+    }
 
     bool valid() const {
         return _c4query != nullptr;
@@ -72,7 +76,7 @@ public:
     }
 
 private:
-    c4::ref<C4Query> const _c4query;
+    c4::ref<C4Query> _c4query;
     alloc_slice _parameters;
     unique_ptr<std::unordered_map<slice, unsigned>> _columnNames;
 };
@@ -136,9 +140,12 @@ void cbl_query_setParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CB
     query->setParameters(encodedParameters);
 }
 
-bool cbl_query_setParametersFromJSON(CBLQuery* query, const char* json) CBLAPI {
+bool cbl_query_setParametersFromJSON(CBLQuery* query, const char* json5) CBLAPI {
+    alloc_slice json = convertJSON5(json5, nullptr);
+    if (!json)
+        return false;
     Encoder enc;
-    enc.convertJSON(slice(json));
+    enc.convertJSON(json);
     alloc_slice encodedParameters = enc.finish();
     if (!encodedParameters)
         return false;

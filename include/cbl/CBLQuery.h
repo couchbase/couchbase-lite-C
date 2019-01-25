@@ -40,7 +40,7 @@ extern "C" {
 /** Creates a new query.
     @note  You must release the query when you're finished with it.
     @param db  The database to query.
-    @param jsonQuery  The query expressed in the [JSON syntax](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema).
+    @param jsonQuery  The query expressed in the [JSON schema](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema). You may use JSON5 syntax.
     @param error  On failure, the error will be written here.
     @return  The new query object. */
 _cbl_warn_unused
@@ -59,6 +59,11 @@ CBL_REFCOUNTED(CBLQuery*, query);
 void cbl_query_setParameters(CBLQuery* _cbl_nonnull query,
                              FLDict _cbl_nonnull parameters) CBLAPI;
 
+/** Assigns values to the query's parameters, from JSON data.
+    These values will be substited for those parameters the next time the query is executed.
+    @param query  The query.
+    @param json  The parameters in the form of a JSON-encoded object whose
+            keys are the parameter names. (You may use JSON5 syntax.) */
 bool cbl_query_setParametersFromJSON(CBLQuery* _cbl_nonnull query,
                                      const char* _cbl_nonnull json) CBLAPI;
 

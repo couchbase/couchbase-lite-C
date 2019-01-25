@@ -20,5 +20,5 @@
 #include "Database.hh"
 #include "Document.hh"
 #include "Query.hh"
-//#include "Replicator.hh"
+#include "Replicator.hh"
 

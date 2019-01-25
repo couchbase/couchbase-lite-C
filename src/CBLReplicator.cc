@@ -180,7 +180,7 @@ private:
     bool _filter(slice docID, C4RevisionFlags flags, Dict body, bool pushing) {
         Retained<CBLDocument> doc = new CBLDocument(_conf.database, string(docID), flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
-        return filter(doc, (flags & kRevDeleted) != 0);
+        return filter(_conf.filterContext, doc, (flags & kRevDeleted) != 0);
     }
 
 
@@ -207,7 +207,7 @@ void cblendpoint_free(CBLEndpoint *endpoint) CBLAPI {
 }
 
 CBLAuthenticator* cblauth_newBasic(const char *username, const char *password) CBLAPI {
-    return new CBLBasicAuthenticator(username, password);
+    return new BasicAuthenticator(username, password);
 }
 
 void cblauth_free(CBLAuthenticator *auth) CBLAPI {

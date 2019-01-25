@@ -65,8 +65,8 @@ struct CBLAuthenticator {
 
 namespace cbl_internal {
     // Concrete Authenticator for HTTP Basic auth:
-    struct CBLBasicAuthenticator : public CBLAuthenticator {
-        CBLBasicAuthenticator(const char *username _cbl_nonnull, const char *password _cbl_nonnull)
+    struct BasicAuthenticator : public CBLAuthenticator {
+        BasicAuthenticator(const char *username _cbl_nonnull, const char *password _cbl_nonnull)
         :_username(username)
         ,_password(password)
         { }
@@ -111,6 +111,7 @@ namespace cbl_internal {
             return true;
         }
 
+        // Writes a LiteCore replicator optionsDict
         void writeOptions(Encoder &enc) const {
             writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders,  Dict(headers));
             writeOptionalKey(enc, kC4ReplicatorOptionDocIDs,        Array(documentIDs));

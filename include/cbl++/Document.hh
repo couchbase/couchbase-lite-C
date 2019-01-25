@@ -26,6 +26,25 @@ namespace cbl {
 
     class Document : protected RefCounted {
     public:
+        // Metadata:
+
+        const char* id() const _cbl_returns_nonnull     {return cbl_doc_id(ref());}
+
+        uint64_t sequence() const                       {return cbl_doc_sequence(ref());}
+
+        // Properties:
+
+        fleece::Dict properties() const                 {return cbl_doc_properties(ref());}
+
+        char* _cbl_nonnull propertiesAsJSON(const CBLDocument* _cbl_nonnull);
+
+        bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
+                                         const char *json _cbl_nonnull,
+                                         CBLError*);
+        fleece::Value operator[] (const char *key _cbl_nonnull) const {return properties()[key];}
+
+        // Operations:
+
         inline MutableDocument mutableCopy() const;
 
         bool deleteDoc(CBLConcurrencyControl concurrency =kCBLConcurrencyControlFailOnConflict) const {
@@ -44,20 +63,6 @@ namespace cbl {
             return purged;
         }
 
-        const char* id() const _cbl_returns_nonnull     {return cbl_doc_id(ref());}
-
-        uint64_t sequence() const                       {return cbl_doc_sequence(ref());}
-
-        fleece::Dict properties() const                 {return cbl_doc_properties(ref());}
-
-        char* _cbl_nonnull propertiesAsJSON(const CBLDocument* _cbl_nonnull);
-
-        bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
-                                         const char *json _cbl_nonnull,
-                                         CBLError*);
-        fleece::Value operator[] (const char *key _cbl_nonnull) const {return properties()[key];}
-
-
     protected:
         Document(CBLRefCounted* r)                      :RefCounted(r) { }
 
@@ -68,6 +73,7 @@ namespace cbl {
         }
 
         friend class Database;
+        friend class Replicator;
 
         CBL_REFCOUNTED_BOILERPLATE(Document, RefCounted, const CBLDocument)
     };

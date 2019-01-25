@@ -19,6 +19,7 @@
 #pragma once
 #include "CBLBase.h"
 #include <functional>
+#include <string>
 
 namespace cbl {
 

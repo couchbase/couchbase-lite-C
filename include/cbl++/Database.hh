@@ -29,6 +29,8 @@ namespace cbl {
 
     class Database : private RefCounted {
     public:
+        // Static database-file operations:
+
         static bool exists(const char* _cbl_nonnull name,
                            const char *inDirectory)
         {
@@ -36,11 +38,18 @@ namespace cbl {
         }
 
         static void copyDB(const char* _cbl_nonnull fromPath,
-                           const char* _cbl_nonnull toName,
-                           const CBLDatabaseConfiguration* config)
+                           const char* _cbl_nonnull toName)
         {
             CBLError error;
-            check( cbl_copyDB(fromPath, toName, config, &error), error );
+            check( cbl_copyDB(fromPath, toName, nullptr, &error), error );
+        }
+
+        static void copyDB(const char* _cbl_nonnull fromPath,
+                           const char* _cbl_nonnull toName,
+                           const CBLDatabaseConfiguration& config)
+        {
+            CBLError error;
+            check( cbl_copyDB(fromPath, toName, &config, &error), error );
         }
 
         static void deleteDB(const char _cbl_nonnull *name,
@@ -48,6 +57,14 @@ namespace cbl {
         {
             CBLError error;
             check( cbl_deleteDB(name, inDirectory, &error), error);
+        }
+
+        // Lifecycle:
+
+        Database(const char *name _cbl_nonnull) {
+            CBLError error;
+            _ref = (CBLRefCounted*) cbl_db_open(name, nullptr, &error);
+            check(_ref != nullptr, error);
         }
 
         Database(const char *name _cbl_nonnull,
@@ -73,11 +90,15 @@ namespace cbl {
             check(cbl_db_compact(ref(), &error), error);
         }
 
+        // Accessors:
+
         const char* name() const _cbl_nonnull               {return cbl_db_name(ref());}
         const char* path() const _cbl_nonnull               {return cbl_db_path(ref());}
         uint64_t count() const                              {return cbl_db_count(ref());}
         uint64_t lastSequence() const                       {return cbl_db_lastSequence(ref());}
         CBLDatabaseConfiguration config() const             {return cbl_db_config(ref());}
+
+        // Documents:
 
         inline Document getDocument(const char *id _cbl_nonnull) const;
         inline MutableDocument getMutableDocument(const char *id _cbl_nonnull) const;
@@ -85,8 +106,9 @@ namespace cbl {
         inline Document saveDocument(MutableDocument &doc,
                                      CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);
 
+        // Listeners:
 
-        using Listener = cbl::ListenerToken<Database,std::vector<const char*>>;
+        using Listener = cbl::ListenerToken<Database,const std::vector<const char*>&>;
 
         [[nodiscard]] Listener addListener(Listener::Callback f) {
             auto l = Listener(f);
@@ -105,6 +127,8 @@ namespace cbl {
             return l;
         }
 
+        // Notifications:
+
         using NotificationsReadyCallback = std::function<void(Database)>;
 
         void bufferNotifications(NotificationsReadyCallback callback) {
@@ -118,9 +142,6 @@ namespace cbl {
 
         void sendNotifications()                            {cbl_db_sendNotifications(ref());}
 
-
-        CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)
-
     private:
         static void _callListener(void *context, const CBLDatabase *db,
                                   unsigned nDocs, const char **docIDs)
@@ -132,6 +153,8 @@ namespace cbl {
         static void _callDocListener(void *context, const CBLDatabase *db, const char *docID) {
             DocumentListener::call(context, Database((CBLDatabase*)db), docID);
         }
+
+        CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)
     };
 
 }

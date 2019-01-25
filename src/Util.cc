@@ -17,8 +17,11 @@
 //
 
 #include "Util.hh"
+#include "fleece/Fleece.h"
 #include <stdio.h>
 #include <string>
+
+using namespace fleece;
 
 namespace cbl_internal {
 
@@ -57,4 +60,14 @@ namespace cbl_internal {
         FLSliceResult_Free(result);
         return str;
     }
+
+    alloc_slice convertJSON5(const char *json5, C4Error *outError) {
+        FLError flError;
+        alloc_slice json(FLJSON5_ToJSON(slice(json5), &flError));
+        if (!json) {
+            if (outError) *outError = c4error_make(FleeceDomain, flError, "Invalid JSON in query"_sl);
+        }
+        return json;
+    }
+
 }

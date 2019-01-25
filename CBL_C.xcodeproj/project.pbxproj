@@ -32,6 +32,7 @@
 		27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */; };
 		27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
 		27B61DBC21D7075C0027CCDB /* libLiteCore-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A4F21CAD5950045856E /* libLiteCore-static.a */; };
+		27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -243,6 +244,8 @@
 		27C9B5DB21F296C10040BC45 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		27C9B5DC21F29D500040BC45 /* Query.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = Query.py; sourceTree = "<group>"; };
 		27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDatabase_Internal.hh; sourceTree = "<group>"; };
+		27C9B5F121F7D74A0040BC45 /* Replicator.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Replicator.hh; sourceTree = "<group>"; };
+		27C9B5F221F7EE670040BC45 /* CBLTest.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = CBLTest.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -395,6 +398,7 @@
 				27B61DD821DEEC540027CCDB /* Database.hh */,
 				277FEE4E21DEF54D00B60E3C /* Document.hh */,
 				277FEE4F21E6AB1100B60E3C /* Query.hh */,
+				27C9B5F121F7D74A0040BC45 /* Replicator.hh */,
 			);
 			path = "cbl++";
 			sourceTree = "<group>";
@@ -407,6 +411,7 @@
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
 				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
+				27C9B5F221F7EE670040BC45 /* CBLTest.c */,
 			);
 			path = test;
 			sourceTree = "<group>";
@@ -727,6 +732,7 @@
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
+				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
