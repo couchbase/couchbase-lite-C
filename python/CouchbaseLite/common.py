@@ -27,7 +27,7 @@ class CBLException (EnvironmentError):
 
 class CBLObject (object):
     def __init__(self, ref, message =None, error =None):
-        self._ref = ref;
+        self._ref = ref
         if not ref and message:
             raise CBLException(message, error)
 
@@ -80,7 +80,7 @@ def decodeFleece(f):
         assert(typ == lib.kFLDict)
         result = {}
         i = ffi.new("FLDictIterator")
-        lib.FLDictIterator_Begin(FLValue_AsDict(f), i)
+        lib.FLDictIterator_Begin(lib.FLValue_AsDict(f), i)
         while True:
             value = lib.FLDictIter_GetValue(i)
             if value == None:

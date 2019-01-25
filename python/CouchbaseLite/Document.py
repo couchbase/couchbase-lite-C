@@ -26,12 +26,12 @@ class Document (CBLObject):
 
     def delete(self, concurrency = LastWriteWins):
         assert(self._ref)
-        if not cbl_doc_delete(self._ref, concurrency, gError):
+        if not lib.cbl_doc_delete(self._ref, concurrency, gError):
             raise CBLException("Couldn't delete document", gError)
     
     def purge(self):
         assert(self._ref)
-        if not cbl_doc_purge(self._ref, gError):
+        if not lib.cbl_doc_purge(self._ref, gError):
             raise CBLException("Couldn't purge document", gError)
     
     def mutableCopy(self):
@@ -97,4 +97,4 @@ class MutableDocument (Document):
                 raise CBLException("Couldn't store properties", gError)
 
     def save(self, concurrency = FailOnConflict):
-        return self.database.saveDocument(this, concurrency)
+        return self.database.saveDocument(self, concurrency)

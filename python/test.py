@@ -1,10 +1,10 @@
-from CouchbaseLite.Database import *
-from CouchbaseLite.Document import *
-from CouchbaseLite.Query import *
+from CouchbaseLite.Database import Database, DatabaseConfiguration
+from CouchbaseLite.Document import Document, MutableDocument
+from CouchbaseLite.Query import Query
 
 Database.deleteFile("db", "/tmp")
 
-db = Database("db", DatabaseConfiguration("/tmp"));
+db = Database("db", DatabaseConfiguration("/tmp"))
 
 print "db   = ", db
 print "name = ", db.name

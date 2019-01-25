@@ -14,7 +14,7 @@ class Query (CBLObject):
         self.jsonRepresentation = jsonQuery
         
     def __repr__(self):
-        return self.__class__.__name__ + "['" + self.self.jsonRepresentation + "']"
+        return self.__class__.__name__ + "['" + self.jsonRepresentation + "']"
 
     @property
     def explanation(self):
@@ -90,12 +90,12 @@ class QueryResult (object):
             raise CBLException("Accessing a non-current query result row")
         if isinstance(key, int):
             if key < 0 or key >= self.query.columnCount:
-                return false
+                return False
             return (lib.cbl_results_column(self._ref, key) != None)
         elif isinstance(key, str):
             return (lib.cbl_results_property(self._ref, key) != None)
         else:
-            return false
+            return False
     
     def asArray(self):
         result = []
