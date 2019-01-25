@@ -33,7 +33,8 @@ class Database (CBLObject):
     def delete(self):
         if not lib.cbl_db_delete(self._ref, gError):
             raise CBLException("Couldn't delete database", gError)
-    
+
+    @staticmethod
     def deleteFile(name, dir):
         if lib.cbl_deleteDB(name, dir, gError):
             return True
@@ -41,8 +42,7 @@ class Database (CBLObject):
             return False
         else:
             raise CBLException("Couldn't delete database file", gError)
-    deleteFile = staticmethod(deleteFile)
-    
+
     def compact(self):
         if not lib.cbl_db_compact(self._ref, gError):
             raise CBLException("Couldn't compact database", gError)
@@ -52,20 +52,20 @@ class Database (CBLObject):
     def getPath(self):
         return ffi.string(lib.cbl_db_path(self._ref))
     path = property(getPath)
-    
-    def getConfig(self):
+
+    @property
+    def config(self):
         c_config = lib.cbl_db_config(self._ref)
         dir = ffi.string(c_config.directory)
         return DatabaseConfiguration(dir)
-    config = property(getConfig)
-    
-    def getCount(self):
+
+    @property
+    def count(self):
         return lib.cbl_db_count(self._ref)
-    count = property(getCount)
-    
-    def getLastSequence(self):
+
+    @property
+    def lastSequence(self):
         return lib.cbl_db_lastSequence(self._ref)
-    lastSequence = property(getLastSequence)
 
     # Documents:
 

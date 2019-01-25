@@ -14,6 +14,7 @@ class Document (CBLObject):
     def __repr__(self):
         return self.__class__.__name__ + "['" + self.id + "']"
     
+    @staticmethod
     def _get(database, id):
         ref = lib.cbl_db_getDocument(database._ref, id)
         if not ref:
@@ -22,8 +23,7 @@ class Document (CBLObject):
         doc.database = database
         doc._ref = ref
         return doc
-    _get = staticmethod(_get)
-    
+
     def delete(self, concurrency = LastWriteWins):
         assert(self._ref)
         if not cbl_doc_delete(self._ref, concurrency, gError):
@@ -39,12 +39,12 @@ class Document (CBLObject):
         mdoc.database = self.database
         mdoc._ref = lib.cbl_doc_mutableCopy(self._ref)
         return mdoc
-    
-    def getSequence(self):
+
+    @property
+    def sequence(self):
         if not self._ref:
             return 0
         return lib.cbl_doc_sequence(self._ref)
-    sequence = property(getSequence)
     
     def getProperties(self):
         if not self.__dict__.has_key("_properties"):
@@ -68,7 +68,8 @@ class Document (CBLObject):
 class MutableDocument (Document):
     def __init__(self, id):
         Document.__init__(self, id)
-        
+
+    @staticmethod
     def _get(database, id):
         ref = lib.cbl_db_getMutableDocument(database._ref, id)
         if not ref:
@@ -77,7 +78,6 @@ class MutableDocument (Document):
         doc.database = database
         doc._ref = ref
         return doc
-    _get = staticmethod(_get)
     
     def setProperties(self, props):
         self._properties = props

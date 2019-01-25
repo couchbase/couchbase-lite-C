@@ -15,12 +15,13 @@ class Query (CBLObject):
         
     def __repr__(self):
         return self.__class__.__name__ + "['" + self.self.jsonRepresentation + "']"
-        
-    def explain(self):
+
+    @property
+    def explanation(self):
         return sliceToString(lib.cbl_query_explain(self._ref))
-    explanation = property(explain)
-    
-    def getColumnNames(self):
+
+    @property
+    def columnNames(self):
         if not self.__dict__.has_key("_columns"):
             cols = []
             for i in xrange(self.columnCount):
@@ -28,7 +29,6 @@ class Query (CBLObject):
                 cols.append(name)
             self._columns = cols
         return self._columns
-    columnNames = property(getColumnNames)
     
     def setParameters(self, params):
         jsonStr = json.dumps(params)
