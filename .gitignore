@@ -4,3 +4,4 @@ build_cmake
 *.so
 python/CouchbaseLite/libcouchbase_lite.dylib
 python/CouchbaseLite/PyCBL.c
+.vscode

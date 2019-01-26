@@ -51,14 +51,32 @@ class ListenerToken (object):
             self.owner = None
             self.handle = None
 
+
+#### FLEECE DECODING:
+
+
+FLArrayType = ffi.typeof("struct $$FLArray *")
+FLDictType = ffi.typeof("struct $$FLDict *")
+
+# Most general function, accepts params of type FLValue, FLDict or FLArray.
 def decodeFleece(f):
+    ffitype = ffi.typeof(f)
+    if ffitype == FLDictType:
+        return decodeFleeceDict(f)
+    elif ffitype == FLArrayType:
+        return decodeFleeceArray(f)
+    else:
+        return decodeFleeceValue(f)
+
+# Decodes an FLValue (which may of course turn out to be an FLArray or FLDict)
+def decodeFleeceValue(f):
     typ = lib.FLValue_GetType(f)
-    if typ == lib.kFLUndefined:
-        return None
-    elif typ == lib.kFLNull:
-        return None     # ???
-    elif typ == lib.kFLBoolean:
-        return not not lib.FLValue_AsBool(f)
+    if typ == lib.kFLString:
+        return sliceToString(lib.FLValue_AsString(f))
+    elif typ == lib.kFLDict:
+        return decodeFleeceDict(ffi.cast(FLDictType, f))
+    elif typ == lib.kFLArray:
+        return decodeFleeceArray(ffi.cast(FLArrayType, f))
     elif typ == lib.kFLNumber:
         if lib.FLValue_IsInteger(f):
             return lib.FLValue_AsInt(f)
@@ -66,26 +84,33 @@ def decodeFleece(f):
             return lib.FLValue_AsDouble(f)
         else:
             return lib.FLValue_AsFloat(f)
-    elif typ == lib.kFLString:
-        return sliceToString(lib.FLValue_AsString(f))
-    elif typ == lib.kFLArray:
-        array = lib.FLValue_AsArray(f)
-        result = []
-        n = lib.FLArray_Count(array)
-        for i in xrange(n):
-            value = lib.FLArray_Get(array, i)
-            result.append(decodeFleece(value))
-        return result
+    elif typ == lib.kFLBoolean:
+        return not not lib.FLValue_AsBool(f)
+    elif typ == lib.kFLNull:
+        return None     # ???
     else:
-        assert(typ == lib.kFLDict)
-        result = {}
-        i = ffi.new("FLDictIterator")
-        lib.FLDictIterator_Begin(lib.FLValue_AsDict(f), i)
-        while True:
-            value = lib.FLDictIter_GetValue(i)
-            if value == None:
-                break
-            key = ffi.string( lib.FLDictIter_GetKeyString(i) )
-            result[key] = decodeFleece(value)
-            lib.FLDictIter_Next(i)
-        return result
+        assert(typ == lib.kFLUndefined)
+        return None
+
+# Decodes an FLArray
+def decodeFleeceArray(farray):
+    result = []
+    n = lib.FLArray_Count(farray)
+    for i in xrange(n):
+        value = lib.FLArray_Get(farray, i)
+        result.append(decodeFleeceValue(value))
+    return result
+
+# Decodes an FLDict
+def decodeFleeceDict(fdict):
+    result = {}
+    i = ffi.new("FLDictIterator*")
+    lib.FLDictIterator_Begin(fdict, i)
+    while True:
+        value = lib.FLDictIterator_GetValue(i)
+        if not value:
+            break
+        key = sliceToString( lib.FLDictIterator_GetKeyString(i) )
+        result[key] = decodeFleeceValue(value)
+        lib.FLDictIterator_Next(i)
+    return result

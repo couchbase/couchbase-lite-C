@@ -49,9 +49,8 @@ class Document (CBLObject):
     def getProperties(self):
         if not self.__dict__.has_key("_properties"):
             if self._ref:
-                c_str = lib.cbl_doc_propertiesAsJSON(self._ref)
-                self._properties = json.loads(ffi.string(c_str))
-                lib.free(c_str)
+                fleeceProps = lib.cbl_doc_properties(self._ref)
+                self._properties = decodeFleeceDict(fleeceProps)
             else:
                 self._properties = {}
         return self._properties
