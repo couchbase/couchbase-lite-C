@@ -1,5 +1,6 @@
-from PyCBL import ffi, lib
-from common import *
+from ._PyCBL import ffi, lib
+from .common import *
+from .Collections import *
 import json
 
 class Query (CBLObject):
@@ -7,7 +8,7 @@ class Query (CBLObject):
         if not isinstance(jsonQuery, str):
             jsonQuery = json.dumps(jsonQuery)
         CBLObject.__init__(self,
-                           lib.cbl_query_new(database._ref, jsonQuery, gError),
+                           lib.cbl_query_new(database._ref, cstr(jsonQuery), gError),
                            "Couldn't create query", gError)
         self.database = database
         self.columnCount = lib.cbl_query_columnCount(self._ref)
@@ -22,9 +23,9 @@ class Query (CBLObject):
 
     @property
     def columnNames(self):
-        if not self.__dict__.has_key("_columns"):
+        if not "_columns" in self.__dict__:
             cols = []
-            for i in xrange(self.columnCount):
+            for i in range(self.columnCount):
                 name = sliceToString( lib.cbl_query_columnName(self._ref, i) )
                 cols.append(name)
             self._columns = cols
@@ -32,7 +33,7 @@ class Query (CBLObject):
     
     def setParameters(self, params):
         jsonStr = json.dumps(params)
-        lib.cbl_query_setParametersFromJSON(self._ref, jsonStr)
+        lib.cbl_query_setParametersFromJSON(self._ref, cstr(jsonStr))
     
     def execute(self):
         """Executes the query and returns a Generator of QueryResult objects."""
@@ -99,14 +100,14 @@ class QueryResult (object):
     
     def asArray(self):
         result = []
-        for i in xrange(0, self.query.columnCount):
+        for i in range(0, self.query.columnCount):
             result.append(self[i])
         return result
     
     def asDictionary(self):
         result = {}
         keys = self.query.columnNames
-        for i in xrange(0, self.query.columnCount):
+        for i in range(0, self.query.columnCount):
             item = lib.cbl_results_column(self._ref, i)
             if lib.FLValue_GetType(item) != lib.kFLUndefined:
                 result[keys[i]] = decodeFleece(item)

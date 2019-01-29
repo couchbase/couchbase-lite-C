@@ -6,12 +6,12 @@ Database.deleteFile("db", "/tmp")
 
 db = Database("db", DatabaseConfiguration("/tmp"))
 
-print "db   = ", db
-print "name = ", db.name
-print "dir  = ", db.config
-print "path = ", db.path
-print "docs = ", db.count
-print "seq  = ", db.lastSequence
+print ("db   = ", db)
+print ("name = ", db.name)
+print ("dir  = ", db.config)
+print ("path = ", db.path)
+print ("docs = ", db.count)
+print ("seq  = ", db.lastSequence)
 
 assert(db.name == "db")
 assert(db.path == "/tmp/db.cblite2")
@@ -19,7 +19,7 @@ assert(db.count == 0)
 assert(db.lastSequence == 0)
 
 def dbListener(db, docIDs):
-    print "######## DB changed!", docIDs
+    print ("######## DB changed!", docIDs)
 dbListenerToken = db.addListener(dbListener)
 
 with db:
@@ -30,24 +30,24 @@ with db:
     doc = MutableDocument("foo")
     assert(doc.id == "foo")
 
-    print "doc  = ", doc
+    print ("doc  = ", doc)
 
     props = doc.properties
-    print "props=", props
+    print ("props=", props)
     assert(props == {})
 
     props["flavor"] = "cardamom"
     props["numbers"] = [1, 0, 3.125]
     doc["color"] = "green"
-    print "props=", props
+    print ("props=", props)
 
     db.saveDocument(doc)
 
     doc2 = db.getDocument("foo")
     assert(doc2.id == "foo")
-    print "doc2 = ", doc2
+    print ("doc2 = ", doc2)
     props2 = doc2.properties
-    print "props2=", props2
+    print ("props2=", props2)
     assert(props2 == props)
     assert(doc2["color"] == "green")
 
@@ -65,12 +65,12 @@ with db:
 dbListenerToken.remove()
 
 q = Query(db, {'WHAT': [['.flavor'], ['.numbers']], 'WHERE': ['=', ['.color'], 'green']})
-print "-------- Explanation --------"
-print q.explanation
-print "-----------------------------"
-print "Columns: ", q.columnNames
+print ("-------- Explanation --------")
+print (q.explanation)
+print ("-----------------------------")
+print ("Columns: ", q.columnNames)
 
 for row in q.execute():
-    print "row: ", row.asArray(), "  ...or...  ", row.asDictionary()
+    print ("row: ", row.asArray(), "  ...or...  ", row.asDictionary())
 
 db.close()

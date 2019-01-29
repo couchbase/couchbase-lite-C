@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # Run this to build the PyCBL native glue library
 # See https://cffi.readthedocs.io/en/latest/index.html
 
@@ -10,7 +10,7 @@ LibraryName = "couchbase_lite"
 LibraryFilename = "lib" + LibraryName + ".dylib"    # FIX: Mac/iOS specific
 
 ffibuilder = FFI()
-ffibuilder.set_source("PyCBL",
+ffibuilder.set_source("_PyCBL",
    r""" // passed to the real C compiler,
         // contains implementation of things declared in cdef()
         #include <cbl/CouchbaseLite.h>

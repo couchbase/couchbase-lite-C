@@ -1,13 +1,13 @@
-from PyCBL import ffi, lib
-from common import *
-from Document import *
+from ._PyCBL import ffi, lib
+from .common import *
+from .Document import *
 
 class DatabaseConfiguration:
     def __init__(self, directory):
         self.directory = directory
     
     def _cblConfig(self):
-        self._cblDir = cstr(self.directory)
+        self._cblDir = cstr(self.directory)  # to keep string from being GC'd
         return ffi.new("CBLDatabaseConfiguration*", [self._cblDir])
     
     def __repr__(self):
@@ -20,7 +20,7 @@ class Database (CBLObject):
             config = config._cblConfig()
         self.name = name
         self.listeners = set()
-        CBLObject.__init__(self, lib.cbl_db_open(name, config, gError),
+        CBLObject.__init__(self, lib.cbl_db_open(cstr(name), config, gError),
                            "Couldn't open database", gError)
     
     def __repr__(self):
@@ -28,7 +28,7 @@ class Database (CBLObject):
     
     def close(self):
         if not lib.cbl_db_close(self._ref, gError):
-            print "WARNING: Database.close() failed"
+            print ("WARNING: Database.close() failed")
         
     def delete(self):
         if not lib.cbl_db_delete(self._ref, gError):
@@ -36,7 +36,7 @@ class Database (CBLObject):
 
     @staticmethod
     def deleteFile(name, dir):
-        if lib.cbl_deleteDB(name, dir, gError):
+        if lib.cbl_deleteDB(cstr(name), cstr(dir), gError):
             return True
         elif gError.code == 0:
             return False
@@ -50,13 +50,13 @@ class Database (CBLObject):
     # Attributes:
         
     def getPath(self):
-        return ffi.string(lib.cbl_db_path(self._ref))
+        return pystr(lib.cbl_db_path(self._ref))
     path = property(getPath)
 
     @property
     def config(self):
         c_config = lib.cbl_db_config(self._ref)
-        dir = ffi.string(c_config.directory)
+        dir = pystr(c_config.directory)
         return DatabaseConfiguration(dir)
 
     @property
@@ -86,11 +86,11 @@ class Database (CBLObject):
         return savedDoc
 
     def deleteDocument(self, id):
-        if not lib.cbl_db_deleteDocument(self._ref, id, gError):
+        if not lib.cbl_db_deleteDocument(self._ref, cstr(id), gError):
             raise CBLException("Couldn't delete document", gError)
 
     def purgeDocument(self, id):
-        if not lib.cbl_db_purgeDocument(self._ref, id, gError):
+        if not lib.cbl_db_purgeDocument(self._ref, cstr(id), gError):
             raise CBLException("Couldn't purge document", gError)
     
     def __getitem__(self, id):
@@ -128,7 +128,7 @@ class Database (CBLObject):
 @ffi.def_extern()
 def databaseListenerCallback(context, db, numDocs, c_docIDs):
     docIDs = []
-    for i in xrange(numDocs):
-        docIDs.append(ffi.string(c_docIDs[i]))
+    for i in range(numDocs):
+        docIDs.append(pystr(c_docIDs[i]))
     listener = ffi.from_handle(context)
     listener(db, docIDs)

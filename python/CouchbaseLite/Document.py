@@ -1,5 +1,6 @@
-from PyCBL import ffi, lib
-from common import *
+from ._PyCBL import ffi, lib
+from .common import *
+from .Collections import *
 import json
 
 # Concurrency control:
@@ -16,7 +17,7 @@ class Document (CBLObject):
     
     @staticmethod
     def _get(database, id):
-        ref = lib.cbl_db_getDocument(database._ref, id)
+        ref = lib.cbl_db_getDocument(database._ref, cstr(id))
         if not ref:
             return None
         doc = Document(id)
@@ -47,7 +48,7 @@ class Document (CBLObject):
         return lib.cbl_doc_sequence(self._ref)
     
     def getProperties(self):
-        if not self.__dict__.has_key("_properties"):
+        if not "_properties" in self.__dict__:
             if self._ref:
                 fleeceProps = lib.cbl_doc_properties(self._ref)
                 self._properties = decodeFleeceDict(fleeceProps)
@@ -70,7 +71,7 @@ class MutableDocument (Document):
 
     @staticmethod
     def _get(database, id):
-        ref = lib.cbl_db_getMutableDocument(database._ref, id)
+        ref = lib.cbl_db_getMutableDocument(database._ref, cstr(id))
         if not ref:
             return None
         doc = MutableDocument(id)
@@ -89,10 +90,10 @@ class MutableDocument (Document):
     
     def _prepareToSave(self):
         if not self._ref:
-            self._ref = lib.cbl_doc_new(self.id)
-        if self.__dict__.has_key("_properties"):
+            self._ref = lib.cbl_doc_new(cstr(self.id))
+        if "_properties" in self.__dict__:
             jsonStr = json.dumps(self._properties)
-            if not lib.cbl_doc_setPropertiesAsJSON(self._ref, jsonStr, gError):
+            if not lib.cbl_doc_setPropertiesAsJSON(self._ref, cstr(jsonStr), gError):
                 raise CBLException("Couldn't store properties", gError)
 
     def save(self, concurrency = FailOnConflict):
