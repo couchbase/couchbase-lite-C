@@ -39,6 +39,10 @@ _cbl_db_saveDocument
 _cbl_db_deleteDocument
 _cbl_db_purgeDocument
 
+_cbl_db_createIndex
+_cbl_db_deleteIndex
+_cbl_db_indexNames
+
 _cbl_doc_id
 _cbl_doc_sequence
 _cbl_doc_new

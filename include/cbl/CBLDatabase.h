@@ -219,28 +219,28 @@ CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cbl_nonnull,
     chance to schedule a time when the notifications should be sent and callbacks called.
  */
 
-    /** Callback indicating that the database (or an object belonging to it) is ready to call one
-        or more listeners. You should call `cbl_db_callListeners` at your earliest convenience.
-        @note  This callback is called _only once_ until the next time `cbl_db_callListeners`
-                is called. If you don't respond by (sooner or later) calling that function,
-                you will not be informed that any listeners are ready.
-        @warning  This can be called from arbitrary threads. It should do as little work as
-                  possible, just scheduling a future call to `cbl_db_callListeners`. */
-    typedef void (*CBLNotificationsReadyCallback)(void *context,
-                                                  CBLDatabase* db _cbl_nonnull);
+/** Callback indicating that the database (or an object belonging to it) is ready to call one
+    or more listeners. You should call `cbl_db_callListeners` at your earliest convenience.
+    @note  This callback is called _only once_ until the next time `cbl_db_callListeners`
+            is called. If you don't respond by (sooner or later) calling that function,
+            you will not be informed that any listeners are ready.
+    @warning  This can be called from arbitrary threads. It should do as little work as
+              possible, just scheduling a future call to `cbl_db_callListeners`. */
+typedef void (*CBLNotificationsReadyCallback)(void *context,
+                                              CBLDatabase* db _cbl_nonnull);
 
-    /** Switches the database to buffered-notification mode. Notifications for objects belonging
-        to this database will not be called immediately.
-        @param db  The database whose notifications are to be buffered.
-        @param callback  The function to be called when a notification is available.
-        @param context  An arbitrary value that will be passed to the callback. */
-    void cbl_db_bufferNotifications(CBLDatabase *db _cbl_nonnull,
-                                CBLNotificationsReadyCallback callback _cbl_nonnull,
-                                void *context) CBLAPI;
+/** Switches the database to buffered-notification mode. Notifications for objects belonging
+    to this database will not be called immediately.
+    @param db  The database whose notifications are to be buffered.
+    @param callback  The function to be called when a notification is available.
+    @param context  An arbitrary value that will be passed to the callback. */
+void cbl_db_bufferNotifications(CBLDatabase *db _cbl_nonnull,
+                            CBLNotificationsReadyCallback callback _cbl_nonnull,
+                            void *context) CBLAPI;
 
-    /** Immediately issues all pending notifications for this database, by calling their listener
-        callbacks. */
-    void cbl_db_sendNotifications(CBLDatabase *db _cbl_nonnull) CBLAPI;
+/** Immediately issues all pending notifications for this database, by calling their listener
+    callbacks. */
+void cbl_db_sendNotifications(CBLDatabase *db _cbl_nonnull) CBLAPI;
                                      
 /** @} */
 /** @} */    // end of outer \defgroup

@@ -146,6 +146,45 @@ CBLListenerToken* cbl_query_addListener(CBLQuery* query _cbl_nonnull,
                                         void *context) CBLAPI;
 
 /** @} */
+
+
+
+/** \name  Database Indexes
+    @{
+ */
+
+/** Types of database indexes. */
+typedef CBL_ENUM(uint32_t, CBLIndexType) {
+    kCBLValueIndex,
+    kCBLFullTextIndex
+};
+
+/** Parameters for creating a database index. */
+typedef struct {
+    CBLIndexType    type;
+    const char*     keyExpressionsJSON;
+    bool            ignoreAccents;
+    const char*     language;
+} CBLIndexSpec;
+
+/** Creates a database index.
+    If an identical index with that name already exists, nothing happens (and no error is returned.)
+    If a non-identical index with that name already exists, it is deleted and re-created. */
+bool cbl_db_createIndex(CBLDatabase *db _cbl_nonnull,
+                        const char* name _cbl_nonnull,
+                        CBLIndexSpec,
+                        CBLError *outError) CBLAPI;
+
+/** Deletes an index given its name. */
+bool cbl_db_deleteIndex(CBLDatabase *db _cbl_nonnull,
+                        const char *name _cbl_nonnull,
+                        CBLError *outError) CBLAPI;
+
+/** Returns the names of the indexes on this database, as an array of strings.
+    @note  You are responsible for releasing the returned Fleece array. */
+FLMutableArray cbl_db_indexNames(CBLDatabase *db _cbl_nonnull) CBLAPI;
+
+/** @} */
 /** @} */
 
 #ifdef __cplusplus

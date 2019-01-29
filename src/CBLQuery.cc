@@ -23,6 +23,7 @@
 #include "c4.hh"
 #include "c4Query.h"
 #include "fleece/Fleece.hh"
+#include "fleece/Mutable.hh"
 #include <unordered_map>
 
 using namespace std;
@@ -181,3 +182,37 @@ FLValue cbl_results_property(CBLResultSet* rs _cbl_nonnull, const char *property
 FLValue cbl_results_column(CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
     return rs->column(column);
 }
+
+
+#pragma mark - INDEXES:
+
+
+bool cbl_db_createIndex(CBLDatabase *db _cbl_nonnull,
+                        const char* name _cbl_nonnull,
+                        CBLIndexSpec spec,
+                        CBLError *outError) CBLAPI
+{
+    C4IndexOptions options = {};
+    options.language = spec.language;
+    options.ignoreDiacritics = spec.ignoreAccents;
+    return c4db_createIndex(internal(db),
+                            slice(name),
+                            slice(spec.keyExpressionsJSON),
+                            (C4IndexType)spec.type,
+                            &options,
+                            internal(outError));
+}
+
+bool cbl_db_deleteIndex(CBLDatabase *db _cbl_nonnull,
+                        const char *name _cbl_nonnull,
+                        CBLError *outError) CBLAPI
+{
+    return c4db_deleteIndex(internal(db), slice(name), internal(outError));
+}
+
+FLMutableArray cbl_db_indexNames(CBLDatabase *db _cbl_nonnull) CBLAPI {
+    Doc doc(alloc_slice(c4db_getIndexes(internal(db), nullptr)));
+    MutableArray indexes = doc.root().asArray().mutableCopy(kFLDeepCopyImmutables);
+    return FLMutableArray_Retain(indexes);
+}
+
