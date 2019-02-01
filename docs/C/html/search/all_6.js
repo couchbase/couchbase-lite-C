@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['filtercontext',['filterContext',['../struct_c_b_l_replicator_configuration.html#afdf4d770f7caf4292acbee4c871a0d92',1,'CBLReplicatorConfiguration']]],
   ['flapplyjsondelta',['FLApplyJSONDelta',['../group__delta.html#ga080c06c45f2553464732452ce6c44db3',1,'Fleece.h']]],
   ['flarray',['FLArray',['../group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90',1,'Fleece.h']]],
   ['flarray_5fasmutable',['FLArray_AsMutable',['../group___f_l_array.html#ga5e5b41b9e2398e78fe34ff1716687cec',1,'Fleece.h']]],
@@ -181,7 +182,7 @@ var searchData=
   ['flsliceresult_5ffree',['FLSliceResult_Free',['../group___f_l_slice.html#ga2980fae9cd4be8393e53c8a4ffea51c3',1,'FLSlice.h']]],
   ['flsliceresult_5frelease',['FLSliceResult_Release',['../group___f_l_slice.html#gacd776b2964afee4cb555e4184331a939',1,'FLSlice.h']]],
   ['flsliceresult_5fretain',['FLSliceResult_Retain',['../group___f_l_slice.html#ga82a31179da936705136d2ff854123add',1,'FLSlice.h']]],
-  ['flstr',['FLStr',['../group___f_l_slice.html#gae9d0af13963246fd37fbf16c4b237f53',1,'FLStr(const char *str):&#160;FLSlice.h'],['../group___f_l_slice.html#ga0e82def46e214a706216353705768453',1,'FLSTR():&#160;FLSlice.h']]],
+  ['flstr',['FLSTR',['../group___f_l_slice.html#ga0e82def46e214a706216353705768453',1,'FLSTR():&#160;FLSlice.h'],['../group___f_l_slice.html#gae9d0af13963246fd37fbf16c4b237f53',1,'FLStr(const char *str):&#160;FLSlice.h']]],
   ['flstring',['FLString',['../group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76',1,'FLSlice.h']]],
   ['flstringresult',['FLStringResult',['../group___f_l_slice.html#gab08438b1f08efeefe09ece8079734fdd',1,'FLSlice.h']]],
   ['fltimestamp',['FLTimestamp',['../group___f_l_value.html#ga154a21cd670c72d154c8bb78b4b3a5d3',1,'Fleece.h']]],

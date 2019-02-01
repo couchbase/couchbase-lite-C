@@ -20,6 +20,7 @@
 #include "CBLBase.h"
 #include "CBLDatabase.h"
 #include "CBLDocument.h"
+#include "CBLBlob.h"
 #include "CBLQuery.h"
 #include "CBLReplicator.h"
 

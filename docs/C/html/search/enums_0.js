@@ -5,6 +5,7 @@ var searchData=
   ['cblencryptionkeysize',['CBLEncryptionKeySize',['../group__database.html#gae2052559ec3de163e276aa8ec3955d1b',1,'CBLDatabase.h']]],
   ['cblerrorcode',['CBLErrorCode',['../group__errors.html#gad43e348ca76e9a8fe7c10ec916bf0528',1,'CBLBase.h']]],
   ['cblerrordomain',['CBLErrorDomain',['../group__errors.html#ga2e112f0e281d3bc5f3732f854e902b20',1,'CBLBase.h']]],
+  ['cblindextype',['CBLIndexType',['../group__queries.html#gac5266cfb9be1fb0441d87df7bb022356',1,'CBLQuery.h']]],
   ['cbllogdomain',['CBLLogDomain',['../group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39',1,'CBLBase.h']]],
   ['cblloglevel',['CBLLogLevel',['../group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195',1,'CBLBase.h']]],
   ['cblnetworkerrorcode',['CBLNetworkErrorCode',['../group__errors.html#ga2849714bdf45e1804e2c3e3e265c1ff3',1,'CBLBase.h']]],

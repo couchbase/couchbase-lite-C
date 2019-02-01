@@ -66,6 +66,8 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#nested-classes">Data Structures</a>  </div>
   <div class="headertitle">
 <div class="title">CBLQuery.h File Reference</div>  </div>
 </div><!--header-->
@@ -75,6 +77,12 @@ $(function() {
 </div>
 <p><a href="_c_b_l_query_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_index_spec.html">CBLIndexSpec</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parameters for creating a database index.  <a href="struct_c_b_l_index_spec.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader">Query objects</div></td></tr>
@@ -89,6 +97,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:ga8a5536a0aa7d173368a5f3cde76148c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns values to the query's parameters.  <a href="group__queries.html#ga8a5536a0aa7d173368a5f3cde76148c4">More...</a><br /></td></tr>
 <tr class="separator:ga8a5536a0aa7d173368a5f3cde76148c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae76198df69c83a08301db5f7871607af"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gae76198df69c83a08301db5f7871607af">cbl_query_setParametersFromJSON</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, const char *json)</td></tr>
+<tr class="memdesc:gae76198df69c83a08301db5f7871607af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns values to the query's parameters, from JSON data.  <a href="group__queries.html#gae76198df69c83a08301db5f7871607af">More...</a><br /></td></tr>
 <tr class="separator:gae76198df69c83a08301db5f7871607af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3356ef28f75699cd06db70016140db02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga3356ef28f75699cd06db70016140db02">cbl_query_execute</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
 <tr class="memdesc:ga3356ef28f75699cd06db70016140db02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the query, returning the results.  <a href="group__queries.html#ga3356ef28f75699cd06db70016140db02">More...</a><br /></td></tr>
@@ -132,6 +141,23 @@ Change listener</h2></td></tr>
 <tr class="memitem:ga8a78e20659bcb4c4b05a279092c7e17b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga8a78e20659bcb4c4b05a279092c7e17b">cbl_query_addListener</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__queries.html#ga957d2ae5c55a213c4b33bfa935dcad51">CBLQueryListener</a> *listener, void *context)</td></tr>
 <tr class="memdesc:ga8a78e20659bcb4c4b05a279092c7e17b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a change listener callback with a query, turning it into a "live query" until the listener is removed (via <a class="el" href="group__listeners.html#gadcb6c78fa3e976af3d2c11421dff66a4">cbl_listener_remove</a>).  <a href="group__queries.html#ga8a78e20659bcb4c4b05a279092c7e17b">More...</a><br /></td></tr>
 <tr class="separator:ga8a78e20659bcb4c4b05a279092c7e17b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
+Database Indexes</h2></td></tr>
+<tr class="memitem:gac5266cfb9be1fb0441d87df7bb022356"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gac5266cfb9be1fb0441d87df7bb022356">CBLIndexType</a> : uint32_t { <a class="el" href="group__queries.html#ggac5266cfb9be1fb0441d87df7bb022356a3b0da6ae4a2575692a23677fbd26205b">kCBLValueIndex</a>, 
+<a class="el" href="group__queries.html#ggac5266cfb9be1fb0441d87df7bb022356ac5432e0a103a264be9eaddb01070b1ff">kCBLFullTextIndex</a>
+ }</td></tr>
+<tr class="memdesc:gac5266cfb9be1fb0441d87df7bb022356"><td class="mdescLeft">&#160;</td><td class="mdescRight">Types of database indexes.  <a href="group__queries.html#gac5266cfb9be1fb0441d87df7bb022356">More...</a><br /></td></tr>
+<tr class="separator:gac5266cfb9be1fb0441d87df7bb022356"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga06352f0eed3f133bcc5cd96f082e0f9c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga06352f0eed3f133bcc5cd96f082e0f9c">cbl_db_createIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *name, <a class="el" href="struct_c_b_l_index_spec.html">CBLIndexSpec</a>, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:ga06352f0eed3f133bcc5cd96f082e0f9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a database index.  <a href="group__queries.html#ga06352f0eed3f133bcc5cd96f082e0f9c">More...</a><br /></td></tr>
+<tr class="separator:ga06352f0eed3f133bcc5cd96f082e0f9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad2e627b29bc37ac2261bda4dfbb2d68b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gad2e627b29bc37ac2261bda4dfbb2d68b">cbl_db_deleteIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *name, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:gad2e627b29bc37ac2261bda4dfbb2d68b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes an index given its name.  <a href="group__queries.html#gad2e627b29bc37ac2261bda4dfbb2d68b">More...</a><br /></td></tr>
+<tr class="separator:gad2e627b29bc37ac2261bda4dfbb2d68b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac7e0f7bd26c246532ef393b8afe40ba3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gac7e0f7bd26c246532ef393b8afe40ba3">cbl_db_indexNames</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db)</td></tr>
+<tr class="memdesc:gac7e0f7bd26c246532ef393b8afe40ba3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the names of the indexes on this database, as an array of strings.  <a href="group__queries.html#gac7e0f7bd26c246532ef393b8afe40ba3">More...</a><br /></td></tr>
+<tr class="separator:gac7e0f7bd26c246532ef393b8afe40ba3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->

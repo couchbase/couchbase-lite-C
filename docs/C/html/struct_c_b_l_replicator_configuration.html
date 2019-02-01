@@ -103,12 +103,15 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a5e95df883feb7ab11de8591edc49d38f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#a5e95df883feb7ab11de8591edc49d38f">documentIDs</a></td></tr>
 <tr class="memdesc:a5e95df883feb7ab11de8591edc49d38f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional set of document IDs to replicate.  <a href="#a5e95df883feb7ab11de8591edc49d38f">More...</a><br /></td></tr>
 <tr class="separator:a5e95df883feb7ab11de8591edc49d38f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5dd0e159101e207d212d025361634e55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#ga247697173c6d36e9355af1a4497fadf4">CBLReplicationFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#a5dd0e159101e207d212d025361634e55">pushFilter</a></td></tr>
+<tr class="memitem:a5dd0e159101e207d212d025361634e55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#gac38a5f7dfa7dc2ef84fa6a7735dc053e">CBLReplicationFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#a5dd0e159101e207d212d025361634e55">pushFilter</a></td></tr>
 <tr class="memdesc:a5dd0e159101e207d212d025361634e55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional callback to filter which docs are pushed.  <a href="#a5dd0e159101e207d212d025361634e55">More...</a><br /></td></tr>
 <tr class="separator:a5dd0e159101e207d212d025361634e55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26b39bb156af554893766ca7ea2c9f26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#ga247697173c6d36e9355af1a4497fadf4">CBLReplicationFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#a26b39bb156af554893766ca7ea2c9f26">pullFilter</a></td></tr>
+<tr class="memitem:a26b39bb156af554893766ca7ea2c9f26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#gac38a5f7dfa7dc2ef84fa6a7735dc053e">CBLReplicationFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#a26b39bb156af554893766ca7ea2c9f26">pullFilter</a></td></tr>
 <tr class="memdesc:a26b39bb156af554893766ca7ea2c9f26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional callback to validate incoming docs.  <a href="#a26b39bb156af554893766ca7ea2c9f26">More...</a><br /></td></tr>
 <tr class="separator:a26b39bb156af554893766ca7ea2c9f26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdf4d770f7caf4292acbee4c871a0d92"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#afdf4d770f7caf4292acbee4c871a0d92">filterContext</a></td></tr>
+<tr class="memdesc:afdf4d770f7caf4292acbee4c871a0d92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Arbitrary value passed to filter callbacks.  <a href="#afdf4d770f7caf4292acbee4c871a0d92">More...</a><br /></td></tr>
+<tr class="separator:afdf4d770f7caf4292acbee4c871a0d92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The configuration of a replicator. </p>
@@ -209,6 +212,22 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
+<a id="afdf4d770f7caf4292acbee4c871a0d92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdf4d770f7caf4292acbee4c871a0d92">&#9670;&nbsp;</a></span>filterContext</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* CBLReplicatorConfiguration::filterContext</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Arbitrary value passed to filter callbacks. </p>
+
+</div>
+</div>
 <a id="a13f1129289f6556ae07fc8e33079855e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a13f1129289f6556ae07fc8e33079855e">&#9670;&nbsp;</a></span>headers</h2>
 
@@ -248,7 +267,7 @@ Data Fields</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__replication.html#ga247697173c6d36e9355af1a4497fadf4">CBLReplicationFilter</a> CBLReplicatorConfiguration::pullFilter</td>
+          <td class="memname"><a class="el" href="group__replication.html#gac38a5f7dfa7dc2ef84fa6a7735dc053e">CBLReplicationFilter</a> CBLReplicatorConfiguration::pullFilter</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -264,7 +283,7 @@ Data Fields</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__replication.html#ga247697173c6d36e9355af1a4497fadf4">CBLReplicationFilter</a> CBLReplicatorConfiguration::pushFilter</td>
+          <td class="memname"><a class="el" href="group__replication.html#gac38a5f7dfa7dc2ef84fa6a7735dc053e">CBLReplicationFilter</a> CBLReplicatorConfiguration::pushFilter</td>
         </tr>
       </table>
 </div><div class="memdoc">

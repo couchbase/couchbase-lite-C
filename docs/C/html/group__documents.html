@@ -88,10 +88,10 @@ Document lifecycle</h2></td></tr>
 <tr class="memitem:ga8fb0274bd776c651faf3301dcfc4d2b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga8fb0274bd776c651faf3301dcfc4d2b0">cbl_db_getDocument</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *database, const char *docID)</td></tr>
 <tr class="memdesc:ga8fb0274bd776c651faf3301dcfc4d2b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a document from the database, creating a new (immutable) CBLDocument object.  <a href="#ga8fb0274bd776c651faf3301dcfc4d2b0">More...</a><br /></td></tr>
 <tr class="separator:ga8fb0274bd776c651faf3301dcfc4d2b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8acaa123d8e0431a48ddc1af644ac3d6"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga8acaa123d8e0431a48ddc1af644ac3d6">cbl_doc_retain</a> (const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *t)</td></tr>
-<tr class="separator:ga8acaa123d8e0431a48ddc1af644ac3d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab596e8e9765a381188c7b24161e7b41a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#gab596e8e9765a381188c7b24161e7b41a">cbl_doc_release</a> (const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *t)</td></tr>
-<tr class="separator:gab596e8e9765a381188c7b24161e7b41a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga845592a3039ed752cbcb657d466c03e6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga845592a3039ed752cbcb657d466c03e6">cbl_doc_retain</a> (<a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *t)</td></tr>
+<tr class="separator:ga845592a3039ed752cbcb657d466c03e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacccbe9c013416ce526d471140f974a0c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#gacccbe9c013416ce526d471140f974a0c">cbl_doc_release</a> (<a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *t)</td></tr>
+<tr class="separator:gacccbe9c013416ce526d471140f974a0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2ea216b5a0a68590d95355ee0f69e3f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga2ea216b5a0a68590d95355ee0f69e3f7">cbl_db_saveDocument</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *doc, <a class="el" href="group__documents.html#ga28ee39fe30ede5c39ded9b8fdb0be4aa">CBLConcurrencyControl</a> concurrency, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
 <tr class="memdesc:ga2ea216b5a0a68590d95355ee0f69e3f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves a (mutable) document to the database.  <a href="#ga2ea216b5a0a68590d95355ee0f69e3f7">More...</a><br /></td></tr>
 <tr class="separator:ga2ea216b5a0a68590d95355ee0f69e3f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -721,8 +721,8 @@ Every call to this function returns the same mutable collection. This is the sam
 
 </div>
 </div>
-<a id="gab596e8e9765a381188c7b24161e7b41a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gab596e8e9765a381188c7b24161e7b41a">&#9670;&nbsp;</a></span>cbl_doc_release()</h2>
+<a id="gacccbe9c013416ce526d471140f974a0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacccbe9c013416ce526d471140f974a0c">&#9670;&nbsp;</a></span>cbl_doc_release()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -733,7 +733,7 @@ Every call to this function returns the same mutable collection. This is the sam
         <tr>
           <td class="memname">static void cbl_doc_release </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
           <td class="paramname"><em>t</em></td><td>)</td>
           <td></td>
         </tr>
@@ -747,8 +747,8 @@ Every call to this function returns the same mutable collection. This is the sam
 
 </div>
 </div>
-<a id="ga8acaa123d8e0431a48ddc1af644ac3d6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga8acaa123d8e0431a48ddc1af644ac3d6">&#9670;&nbsp;</a></span>cbl_doc_retain()</h2>
+<a id="ga845592a3039ed752cbcb657d466c03e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga845592a3039ed752cbcb657d466c03e6">&#9670;&nbsp;</a></span>cbl_doc_retain()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -757,9 +757,9 @@ Every call to this function returns the same mutable collection. This is the sam
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a>* cbl_doc_retain </td>
+          <td class="memname">static <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a>* cbl_doc_retain </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
           <td class="paramname"><em>t</em></td><td>)</td>
           <td></td>
         </tr>

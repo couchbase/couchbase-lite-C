@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['key',['key',['../struct_f_l_path_component.html#ab5ede4b7db1f077681b2230bfec8346c',1,'FLPathComponent']]],
-  ['kflemptyarray',['kFLEmptyArray',['../group___f_l_array.html#ga131e9df2ebf23e9e08ec461db521563c',1,'Fleece.h']]],
-  ['kflemptydict',['kFLEmptyDict',['../group___f_l_dict.html#gafa124957aa8dac8d1fd551b4e1ea863d',1,'Fleece.h']]],
-  ['kflnullvalue',['kFLNullValue',['../group___f_l_value.html#gaeef39ddda39c325fe22eb7090707110a',1,'Fleece.h']]]
+  ['ignoreaccents',['ignoreAccents',['../struct_c_b_l_index_spec.html#a3783fc620dc25c491f6c9e0b38a01cae',1,'CBLIndexSpec']]],
+  ['index',['index',['../struct_f_l_path_component.html#a960feda464a7d4e499111a82efc13081',1,'FLPathComponent']]],
+  ['internal_5finfo',['internal_info',['../struct_c_b_l_error.html#add97fd30bfe681d9cb2048641d5a6d55',1,'CBLError']]]
 ];

@@ -199,6 +199,12 @@ typedef struct CBLDatabase   CBLDatabase;
 typedef struct CBLDocument   CBLDocument;
 /** @} */
 
+/** \defgroup blobs Blobs
+     @{ */
+/** A binary data value associated with a document. */
+typedef struct CBLBlob      CBLBlob;
+/** @} */
+
 /** \defgroup queries  Queries
      @{ */
 /** A compiled database query. */

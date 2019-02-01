@@ -41,6 +41,8 @@ struct CBLDatabase : public CBLRefCounted {
 
     bool shouldNotifyNow();
 
+    C4BlobStore* blobStore() const                      {return c4db_getBlobStore(c4db, nullptr);}
+
 private:
     void databaseChanged();
     void callDBListeners();

@@ -54,6 +54,26 @@ _cbl_doc_setPropertiesAsJSON
 _cbl_doc_delete
 _cbl_doc_purge
 
+_cbl_isBlob
+_cbl_db_getBlob
+_cbl_db_getMutableBlob
+_cbl_blob_contentType
+_cbl_blob_setContentType
+_cbl_blob_length
+_cbl_blob_digest
+_cbl_blob_properties
+_cbl_blob_mutableProperties
+_cbl_blob_getContents
+_cbl_blob_freeContents
+_cbl_blob_openContentStream
+_cbl_blob_readContent
+_cbl_blob_closeContentStream
+_cbl_db_createBlobWithData
+_cbl_db_createBlobWithStream
+_cbl_blobwriter_new
+_cbl_blobwriter_free
+_cbl_blobwriter_write
+
 _cbl_query_new
 _cbl_query_setParameters
 _cbl_query_setParametersFromJSON
