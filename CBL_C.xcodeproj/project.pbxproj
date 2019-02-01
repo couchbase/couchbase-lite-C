@@ -18,6 +18,7 @@
 		271C2A7621CC4BD60045856E /* Util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7421CC4BD60045856E /* Util.cc */; };
 		271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7721CC750E0045856E /* CBLDocument.cc */; };
 		275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4DD2201323700DBE7D2 /* CBLBlob.cc */; };
+		275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
 		277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */; };
 		277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */; };
 		277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */; };
@@ -208,6 +209,8 @@
 		271C2A7921CC756A0045856E /* Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Internal.hh; sourceTree = "<group>"; };
 		275BC4CC22012D8700DBE7D2 /* CBLBlob.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLBlob.h; sourceTree = "<group>"; };
 		275BC4DD2201323700DBE7D2 /* CBLBlob.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBlob.cc; sourceTree = "<group>"; };
+		275BC4E22204E6A800DBE7D2 /* Blob.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Blob.hh; sourceTree = "<group>"; };
+		275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlobTest_Cpp.cc; sourceTree = "<group>"; };
 		277FEE3D21DEF0C700B60E3C /* Base.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Base.hh; sourceTree = "<group>"; };
 		277FEE4E21DEF54D00B60E3C /* Document.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Document.hh; sourceTree = "<group>"; };
 		277FEE4F21E6AB1100B60E3C /* Query.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Query.hh; sourceTree = "<group>"; };
@@ -400,6 +403,7 @@
 			children = (
 				277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */,
 				277FEE3D21DEF0C700B60E3C /* Base.hh */,
+				275BC4E22204E6A800DBE7D2 /* Blob.hh */,
 				27B61DD821DEEC540027CCDB /* Database.hh */,
 				277FEE4E21DEF54D00B60E3C /* Document.hh */,
 				277FEE4F21E6AB1100B60E3C /* Query.hh */,
@@ -415,6 +419,7 @@
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
+				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
 				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
 				27C9B5F221F7EE670040BC45 /* CBLTest.c */,
 			);
@@ -739,6 +744,7 @@
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
 				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
+				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

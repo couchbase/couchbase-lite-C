@@ -54,6 +54,12 @@ _cbl_doc_setPropertiesAsJSON
 _cbl_doc_delete
 _cbl_doc_purge
 
+_kCBLTypeProperty
+_kCBLBlobType
+_kCBLBlobDigestProperty
+_kCBLBlobLengthProperty
+_kCBLBlobContentTypeProperty
+
 _cbl_isBlob
 _cbl_db_getBlob
 _cbl_db_getMutableBlob

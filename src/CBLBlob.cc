@@ -76,6 +76,7 @@ public:
 
         _db = db;
         _properties = MutableDict::newDict();
+        _properties[kCBLTypeProperty] = kCBLBlobType;
         _properties[kCBLBlobDigestProperty] = digest();
         _properties[kCBLBlobLengthProperty] = length;
         if (contentType)
@@ -104,15 +105,15 @@ public:
     }
 
     const char* contentType() const {
-        if (!_contentType) {
-            slice type = _properties[kCBLBlobContentTypeProperty].asString();
-            const_cast<CBLBlob*>(this)->_contentType.reset(new string(type));
-        }
-        return _contentType->c_str();
+        slice type = _properties[kCBLBlobContentTypeProperty].asString();
+        if (!type)
+            return nullptr;
+        if (type != slice(_contentTypeCache))
+            const_cast<CBLBlob*>(this)->_contentTypeCache = string(type);
+        return _contentTypeCache.c_str();
     }
 
     void setContentType(const char *type) {
-        _contentType.reset();
         if (type)
             _properties[kCBLBlobContentTypeProperty] = type;
         else
@@ -151,7 +152,7 @@ private:
     CBLDatabase*    _db {nullptr};
     C4BlobKey       _key {};
     string          _digest;
-    unique_ptr<string> _contentType;
+    string          _contentTypeCache;
     MutableDict     _properties;
     C4ReadStream*   _reader {nullptr};
 };

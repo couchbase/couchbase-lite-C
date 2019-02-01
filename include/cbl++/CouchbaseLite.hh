@@ -17,6 +17,7 @@
 //
 
 #pragma once
+#include "Blob.hh"
 #include "Database.hh"
 #include "Document.hh"
 #include "Query.hh"
