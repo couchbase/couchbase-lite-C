@@ -170,6 +170,39 @@ extern "C" {
                                          CBLBlobWriteStream* writer _cbl_nonnull,
                                          CBLError *outError) CBLAPI;
 
+#pragma mark - FLEECE UTILITIES:
+
+    /** Returns true if a value in a document is a blob reference.
+        If so, you can call \ref FLValue_GetBlob to access it. */
+    static inline bool FLValue_IsBlob(FLValue v) {
+        return cbl_isBlob(FLValue_AsDict(v));
+    }
+
+    /** Instantiates a CBLBlob object corresponding to a blob dictionary in a document.
+        @param value  The value (dictionary) in the document.
+        @param db  The database containing this dictionary.
+        @return  A CBLBlob instance for this blob, or NULL if the value is not a blob.
+        @note You are responsible for releasing the CBLBlob object.  */
+    static inline const CBLBlob* FLValue_GetBlob(FLValue value, CBLDatabase *db) {
+        return cbl_db_getBlob(db, FLValue_AsDict(value));
+    }
+
+    /** Stores a blob in a mutable array. */
+    static inline void CBLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
+                                               uint32_t index,
+                                               CBLBlob* blob _cbl_nonnull)
+    {
+        FLMutableArray_SetValue(array, index, (FLValue)cbl_blob_mutableProperties(blob));
+    }
+
+    /** Stores a blob in a mutable dictionary. */
+    static inline void CBLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
+                                FLString key,
+                                CBLBlob* blob _cbl_nonnull)
+    {
+        FLMutableDict_SetValue(dict, key, (FLValue)cbl_blob_mutableProperties(blob));
+    }
+
 /** @} */
 
 #ifdef __cplusplus
