@@ -44,20 +44,16 @@ extern "C" {
     
     CBL_REFCOUNTED(CBLBlob*, blob);
 
-    /** Instantiates a CBLBlob object corresponding to a blob dictionary in a document.
-        @param db  The database containing this dictionary.
+    /** Returns a CBLBlob object corresponding to a blob dictionary in a document.
         @param blobDict  A dictionary in a document.
         @return  A CBLBlob instance for this blob, or NULL if the dictionary is not a blob. */
-    const CBLBlob* cbl_db_getBlob(CBLDatabase *db _cbl_nonnull,
-                                  FLDict blobDict) CBLAPI;
+    const CBLBlob* cbl_blob_get(FLDict blobDict) CBLAPI;
 
-    /** Instantiates a mutable CBLBlob object corresponding to a blob in a mutable document.
+    /** Returns a mutable CBLBlob object corresponding to a blob in a mutable document.
         Changes made to the blob's properties will be reflected in the dictionary.
-        @param db  The database containing this dictionary.
         @param blobDict  A dictionary in a document.
         @return  A CBLBlob instance for this blob, or NULL if the dictionary is not a blob. */
-    CBLBlob* cbl_db_getMutableBlob(CBLDatabase *db _cbl_nonnull,
-                                   FLMutableDict blobDict _cbl_nonnull) CBLAPI;
+    CBLBlob* cbl_blob_getMutable(FLMutableDict blobDict _cbl_nonnull) CBLAPI;
 
 
 #pragma mark - BLOB METADATA:
@@ -120,31 +116,27 @@ extern "C" {
 #pragma mark - CREATING:
 
     /** Creates a new blob given its contents as a single block of data.
-        @note  The memory pointed to by `contents` is no longer needed after this call completes
-                (it will have been written to the database.)
-        @param db  The database the blob will be added to.
+        @note  You are responsible for releasing the CBLBlob, but not until after its document
+                has been saved.
         @param contentType  The MIME type (optional).
         @param contents  The data's address and length.
-        @param outError  On failure, error info will be written here.
-        @return  A new CBLBlob instance, or NULL on error. */
-    CBLBlob* cbl_db_createBlobWithData(CBLDatabase *db _cbl_nonnull,
-                                       const char *contentType,
-                                       FLSlice contents,
-                                       CBLError *outError) CBLAPI;
+        @return  A new CBLBlob instance. */
+    CBLBlob* cbl_doc_createBlobWithData(const char *contentType,
+                                        FLSlice contents) CBLAPI;
 
     /** A stream for writing a new blob to the database. */
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
 
     /** Opens a stream for writing a new blob.
         You should call \ref cbl_blobwriter_write one or more times to write the data,
-        then \ref cbl_db_createBlobWithStream to create the blob, then \ref cbl_blobwriter_free.
+        then \ref cbl_doc_createBlobWithStream to create the blob, then \ref cbl_blobwriter_free.
 
         If for some reason you need to abort, just free the writer without calling
         \ref cbl_db_createBlobWithStream. */
-    CBLBlobWriteStream* cbl_blobwriter_new(CBLDatabase* _cbl_nonnull,
+    CBLBlobWriteStream* cbl_blobwriter_new(CBLDatabase *db _cbl_nonnull,
                                            CBLError *outError) CBLAPI;
 
-    /** Closes a blob-writing stream after you're finished. */
+    /** Closes a blob-writing stream if you need to give up without creating a CBLBlob. */
     void cbl_blobwriter_free(CBLBlobWriteStream*) CBLAPI;
 
     /** Writes data to a blob.
@@ -159,16 +151,14 @@ extern "C" {
                               CBLError *outError) CBLAPI;
 
     /** Creates a new blob after its data has been written to a \ref CBLBlobWriteStream.
-        @note  You still need to free the stream afterwards.
-        @param db  The database the blob will be added to.
+        @note  You are responsible for releasing the CBLBlob, but not until after its document
+                has been saved.
+        @note  Do not free the stream until after the document has been saved.
         @param contentType  The MIME type (optional).
         @param writer  The blob-writing stream the data was written to.
-        @param outError  On failure, error info will be written here.
-        @return  A new CBLBlob instance, or NULL on error. */
-    CBLBlob* cbl_db_createBlobWithStream(CBLDatabase *db _cbl_nonnull,
-                                         const char *contentType,
-                                         CBLBlobWriteStream* writer _cbl_nonnull,
-                                         CBLError *outError) CBLAPI;
+        @return  A new CBLBlob instance. */
+    CBLBlob* cbl_doc_createBlobWithStream(const char *contentType,
+                                          CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
 
 #pragma mark - FLEECE UTILITIES:
 
@@ -180,11 +170,10 @@ extern "C" {
 
     /** Instantiates a CBLBlob object corresponding to a blob dictionary in a document.
         @param value  The value (dictionary) in the document.
-        @param db  The database containing this dictionary.
         @return  A CBLBlob instance for this blob, or NULL if the value is not a blob.
         @note You are responsible for releasing the CBLBlob object.  */
-    static inline const CBLBlob* FLValue_GetBlob(FLValue value, CBLDatabase *db) {
-        return cbl_db_getBlob(db, FLValue_AsDict(value));
+    static inline const CBLBlob* FLValue_GetBlob(FLValue value) {
+        return cbl_blob_get(FLValue_AsDict(value));
     }
 
     /** Stores a blob in a mutable array. */

@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "Database.hh"
+#include "Document.hh"
 #include "CBLBlob.h"
 #include "fleece/Mutable.hh"
 
@@ -28,12 +28,12 @@ namespace cbl {
         To work with a blob, you construct a Blob object with that dictionary. */
     class Blob : protected RefCounted {
     public:
-        static bool isBlob(fleece::Dict d)            {return cbl_isBlob(d);}
+        static bool isBlob(fleece::Dict d)          {return cbl_isBlob(d);}
 
         /** Constructs a Blob instance on an existing blob reference in a document. */
-        Blob(Database db, fleece::Dict d) {
-            _ref = (CBLRefCounted*) cbl_db_getBlob(db.ref(), d);
-        }
+        Blob(fleece::Dict d)
+        :RefCounted((CBLRefCounted*) cbl_blob_get(d))
+        { }
 
         uint64_t length() const                     {return cbl_blob_length(ref()); }
         const char* contentType() const             {return cbl_blob_contentType(ref()); }
@@ -121,38 +121,29 @@ namespace cbl {
     class MutableBlob : public Blob {
     public:
         /** Constructs a Blob instance on an existing blob reference in a mutable document. */
-        MutableBlob(Database db, fleece::MutableDict dict)
-        :Blob(db, dict)
+        MutableBlob(fleece::MutableDict dict)
+        :Blob(dict)
         { }
 
         /* Creates a new blob in the database given its contents as a single block of data.
             @note  The memory pointed to by `contents` is no longer needed after this call completes
                     (it will have been written to the database.)
-            @param db  The database the blob will be added to.
             @param contentType  The MIME type (optional).
             @param contents  The data's address and length. */
-        MutableBlob(Database db,
-                    const char *contentType,
+        MutableBlob(const char *contentType,
                     fleece::slice contents)
         {
-            CBLError error;
-            _ref = (CBLRefCounted*) cbl_db_createBlobWithData(db.ref(), contentType,
-                                                              contents, &error);
-            if (!_ref) throw error;
+            _ref = (CBLRefCounted*) cbl_doc_createBlobWithData(contentType, contents);
         }
 
         /** Creates a new blob after its data has been written to a \ref CBLBlobWriteStream.
-            @param db  The database the blob will be added to.
             @param contentType  The MIME type (optional).
             @param writer  The blob-writing stream the data was written to. */
-        MutableBlob(Database db,
-                    const char *contentType,
+        MutableBlob(const char *contentType,
                     BlobWriteStream& writer)
         {
-            CBLError error;
-            _ref = (CBLRefCounted*) cbl_db_createBlobWithStream(db.ref(), contentType,
-                                                                writer._writer, &error);
-            if (!_ref) throw error;
+            _ref = (CBLRefCounted*) cbl_doc_createBlobWithStream(contentType, writer._writer);
+            writer._writer = nullptr;
         }
 
         fleece::MutableDict properties() {

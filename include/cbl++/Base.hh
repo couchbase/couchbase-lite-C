@@ -51,7 +51,17 @@ namespace cbl {
 
         void clear()                                    {cbl_release(_ref); _ref = nullptr;}
 
-        static void check(bool ok, CBLError &error)     {if (!ok) throw error;}
+        static void check(bool ok, CBLError &error) {
+            if (!ok) {
+#if DEBUG
+                char *message = cbl_error_message(&error);
+                cbl_log(kCBLLogDomainAll, CBLLogError, "API returning error %d/%d: %s",
+                        error.domain, error.code, message);
+                free(message);
+#endif
+                throw error;
+            }
+        }
 
         CBLRefCounted* _ref;
     };

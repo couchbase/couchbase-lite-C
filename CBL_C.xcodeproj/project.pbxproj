@@ -211,6 +211,7 @@
 		275BC4DD2201323700DBE7D2 /* CBLBlob.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBlob.cc; sourceTree = "<group>"; };
 		275BC4E22204E6A800DBE7D2 /* Blob.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Blob.hh; sourceTree = "<group>"; };
 		275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlobTest_Cpp.cc; sourceTree = "<group>"; };
+		275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLBlob_Internal.hh; sourceTree = "<group>"; };
 		277FEE3D21DEF0C700B60E3C /* Base.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Base.hh; sourceTree = "<group>"; };
 		277FEE4E21DEF54D00B60E3C /* Document.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Document.hh; sourceTree = "<group>"; };
 		277FEE4F21E6AB1100B60E3C /* Query.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Query.hh; sourceTree = "<group>"; };
@@ -340,6 +341,7 @@
 			children = (
 				271C2A6E21CAD5B30045856E /* CBLBase.cc */,
 				275BC4DD2201323700DBE7D2 /* CBLBlob.cc */,
+				275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */,
 				271C2A7121CADB170045856E /* CBLDatabase.cc */,
 				27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */,
 				271C2A7721CC750E0045856E /* CBLDocument.cc */,

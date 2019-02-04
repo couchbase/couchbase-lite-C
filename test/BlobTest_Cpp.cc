@@ -35,24 +35,26 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
     {
         MutableDocument doc("blobbo");
 
-        unique_ptr<MutableBlob> blob;
+        MutableBlob blob;
         SECTION("Create with data") {
-            blob.reset(new MutableBlob(db, contentType, contents));
+            blob = MutableBlob(contentType, contents);
         }
         SECTION("Create with stream") {
             BlobWriteStream writer(db);
             writer.write("This is the content "_sl);
             writer.write("of the blob."_sl);
-            blob.reset(new MutableBlob(db, contentType, writer));
+            blob = MutableBlob(contentType, writer);
         }
-        CHECK(blob->digest() == digest);
-        CHECK(string(blob->contentType()) == contentType);
-        CHECK(blob->length() == contents.size);
-        MutableDict props = blob->properties();
+        CHECK(blob.digest() == digest);
+        CHECK(string(blob.contentType()) == contentType);
+        CHECK(blob.length() == contents.size);
+        MutableDict props = blob.properties();
         CHECK(props[kCBLTypeProperty].asString() == kCBLBlobType);
         CHECK(props[kCBLBlobDigestProperty].asString().asString() == digest);
         CHECK(props[kCBLBlobLengthProperty].asInt() == contents.size);
         CHECK(props[kCBLBlobContentTypeProperty].asString().asString() == contentType);
+
+        // Add blob to document:
         doc["picture"] = props;
         db.saveDocument(doc);
     }
@@ -61,7 +63,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
     CHECK(doc.properties().toJSON(true,true).asString() == "{picture:{\"@type\":\"blob\","
           "content_type:\"text/plain\",digest:\"sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=\",length:32}}");
     CHECK(Blob::isBlob(doc["picture"].asDict()));
-    Blob blob(db, doc["picture"].asDict());
+    Blob blob(doc["picture"].asDict());
     CHECK(string(blob.contentType()) == contentType);
     CHECK(blob.length() == contents.size);
 
@@ -87,4 +89,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
     blob.openContentStream();
     n = blob.readContent(buf, 10);
     CHECK(string(buf, n) == "This is th");
+
+    Blob blob2(doc["picture"].asDict());
+    CHECK(blob2 == blob);
 }

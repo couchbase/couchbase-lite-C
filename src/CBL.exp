@@ -6,6 +6,7 @@
 
 _cbl_error_message
 _cbl_setLogLevel
+_cbl_log
 _cbl_retain
 _cbl_release
 _cbl_instanceCount
@@ -61,8 +62,8 @@ _kCBLBlobLengthProperty
 _kCBLBlobContentTypeProperty
 
 _cbl_isBlob
-_cbl_db_getBlob
-_cbl_db_getMutableBlob
+_cbl_blob_get
+_cbl_blob_getMutable
 _cbl_blob_contentType
 _cbl_blob_setContentType
 _cbl_blob_length
@@ -74,8 +75,8 @@ _cbl_blob_freeContents
 _cbl_blob_openContentStream
 _cbl_blob_readContent
 _cbl_blob_closeContentStream
-_cbl_db_createBlobWithData
-_cbl_db_createBlobWithStream
+_cbl_doc_createBlobWithData
+_cbl_doc_createBlobWithStream
 _cbl_blobwriter_new
 _cbl_blobwriter_free
 _cbl_blobwriter_write

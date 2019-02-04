@@ -18,10 +18,66 @@
 
 #include "CBLDocument.h"
 #include "CBLDocument_Internal.hh"
+#include "CBLBlob_Internal.hh"
 #include "Util.hh"
+#include <mutex>
 
 using namespace std;
 using namespace fleece;
+
+
+// Core constructor
+CBLDocument::CBLDocument(const string &docID,
+                         CBLDatabase *db,
+                         C4Document *d,          // must be a +1 ref
+                         bool isMutable)
+:_docID(docID)
+,_db(db)
+,_c4doc(d)
+,_mutable(isMutable)
+{
+    if (_c4doc)
+        _c4doc->extraInfo = {this, nullptr};
+}
+
+
+// Construct a new document (not in any database yet)
+CBLDocument::CBLDocument(const char *docID, bool isMutable)
+:CBLDocument(ensureDocID(docID), nullptr, nullptr, isMutable)
+{ }
+
+
+// Construct on an existing document
+CBLDocument::CBLDocument(CBLDatabase *db, const string &docID, bool isMutable)
+:CBLDocument(docID, db, c4doc_get(internal(db), slice(docID), true, nullptr), isMutable)
+{ }
+
+
+// Mutable copy of another CBLDocument
+CBLDocument::CBLDocument(const CBLDocument* otherDoc)
+:CBLDocument(otherDoc->_docID,
+             otherDoc->_db,
+             c4doc_retain(otherDoc->_c4doc),
+             true)
+{
+    if (otherDoc->isMutable() && otherDoc->_properties)
+        _properties = otherDoc->_properties.asDict().mutableCopy(kFLDeepCopyImmutables);
+}
+
+
+// Document loaded from db without a C4Document (e.g. a replicator validation callback)
+CBLDocument::CBLDocument(CBLDatabase *db,
+            const string &docID,
+            C4RevisionFlags revFlags,
+            Dict body)
+:CBLDocument(docID, db, nullptr, false)
+{
+    _properties = body;
+}
+
+
+CBLDocument::~CBLDocument() {
+}
 
 
 bool CBLDocument::checkMutable(C4Error *outError) const {
@@ -43,7 +99,7 @@ string CBLDocument::ensureDocID(const char *docID) {
 RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                                              bool deleting,
                                              CBLConcurrencyControl concurrency,
-                                             C4Error* outError) const
+                                             C4Error* outError)
 {
     if (!checkMutable(outError))
         return nullptr;
@@ -58,6 +114,23 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
     c4::Transaction t(internal(db));
     if (!t.begin(outError))
         return nullptr;
+
+    // Install new blobs:
+    for (DeepIterator i(properties()); i; ++i) {
+        Dict dict = i.value().asDict();
+        if (dict) {
+            if (!dict.asMutable()) {
+                i.skipChildren();
+            } else if (cbl_isBlob(dict)) {
+                CBLNewBlob *blob = findNewBlob(dict);
+                if (blob) {
+                    if (!blob->install(db, outError))
+                        return nullptr;
+                }
+                i.skipChildren();
+            }
+        }
+    }
 
     // Encode properties:
     alloc_slice body;
@@ -110,7 +183,7 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
 }
 
 
-bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError) const {
+bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError) {
     if (!_db) {
         setError(outError, LiteCoreDomain, kC4ErrorNotFound, "Document is not in any database"_sl);
         return false;
@@ -184,6 +257,55 @@ bool CBLDocument::setPropertiesAsJSON(const char *json, C4Error* outError) {
 }
 
 
+CBLDocument::UnretainedValueToBlobMap* CBLDocument::sNewBlobs = nullptr;
+mutex sNewBlobsMutex;
+
+
+CBLBlob* CBLDocument::getBlob(FLDict dict) {
+    assert(cbl_isBlob(dict));
+    auto i = _blobs.find(dict);
+    if (i != _blobs.end())
+        return i->second;
+
+    if (Dict(dict).asMutable()) {
+        CBLNewBlob *newBlob = findNewBlob(dict);
+        if (newBlob)
+            return newBlob;
+    }
+
+    // Not found; create a new blob and remember it:
+    auto blob = retained(new CBLBlob(this, dict));
+    if (!blob->valid())
+        return nullptr;
+    _blobs.insert({dict, blob});
+    return blob;
+}
+
+
+void CBLDocument::registerNewBlob(CBLNewBlob* blob) {
+    lock_guard<mutex> lock(sNewBlobsMutex);
+    if (!sNewBlobs)
+        sNewBlobs = new UnretainedValueToBlobMap;
+    sNewBlobs->insert({blob->properties(), blob});
+}
+
+
+void CBLDocument::unregisterNewBlob(CBLNewBlob* blob) {
+    lock_guard<mutex> lock(sNewBlobsMutex);
+    if (sNewBlobs)
+        sNewBlobs->erase(blob->properties());
+}
+
+
+CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
+    lock_guard<mutex> lock(sNewBlobsMutex);
+    auto i = sNewBlobs->find(dict);
+    if (i == sNewBlobs->end())
+        return nullptr;
+    return i->second;
+}
+
+
 #pragma mark - PUBLIC API:
 
 
@@ -231,7 +353,7 @@ bool cbl_doc_delete(const CBLDocument* doc _cbl_nonnull,
                     CBLConcurrencyControl concurrency,
                     CBLError* outError) CBLAPI
 {
-    return doc->deleteDoc(concurrency, internal(outError));
+    return const_cast<CBLDocument*>(doc)->deleteDoc(concurrency, internal(outError));
 }
 
 bool cbl_db_deleteDocument(CBLDatabase* db _cbl_nonnull,

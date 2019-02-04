@@ -137,6 +137,8 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
 /** Sets the detail level of logging. */
 void cbl_setLogLevel(CBLLogLevel, CBLLogDomain) CBLAPI;
 
+void cbl_log(CBLLogDomain, CBLLogLevel, const char *format _cbl_nonnull, ...);
+
 /** @} */
 
 

@@ -14,45 +14,36 @@
 #include "c4Document+Fleece.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <unordered_map>
 
 using namespace std;
 using namespace fleece;
+
+class CBLBlob;
+class CBLNewBlob;
 
 
 class CBLDocument : public CBLRefCounted {
 public:
     // Construct a new document (not in any database yet)
-    CBLDocument(const char *docID, bool isMutable)
-    :CBLDocument(ensureDocID(docID), nullptr, nullptr, isMutable)
-    { }
+    CBLDocument(const char *docID, bool isMutable);
 
     // Construct on an existing document
-    CBLDocument(CBLDatabase *db, const string &docID, bool isMutable)
-    :CBLDocument(docID, db, c4doc_get(internal(db), slice(docID), true, nullptr), isMutable)
-    { }
+    CBLDocument(CBLDatabase *db, const string &docID, bool isMutable);
 
     // Mutable copy of another CBLDocument
-    CBLDocument(const CBLDocument* otherDoc)
-    :CBLDocument(otherDoc->_docID,
-                 otherDoc->_db,
-                 c4doc_retain(otherDoc->_c4doc),
-                 true)
-    {
-        if (otherDoc->isMutable() && otherDoc->_properties)
-            _properties = otherDoc->_properties.asDict().mutableCopy(kFLDeepCopyImmutables);
-    }
+    CBLDocument(const CBLDocument* otherDoc);
 
     // Document loaded from db without a C4Document (e.g. a replicator validation callback)
     CBLDocument(CBLDatabase *db,
                 const string &docID,
                 C4RevisionFlags revFlags,
-                Dict body)
-    :CBLDocument(docID, db, nullptr, false)
-    {
-        _properties = body;
-    }
+                Dict body);
 
-    virtual ~CBLDocument()                      { }
+    static CBLDocument* containing(Value value) {
+        C4Document* doc = c4doc_containingValue(value);
+        return doc ? (CBLDocument*)doc->extraInfo.pointer : nullptr;
+    }
 
     CBLDatabase* database() const               {return _db;}
     const char* docID() const                   {return _docID.c_str();}
@@ -68,35 +59,39 @@ public:
     RetainedConst<CBLDocument> save(CBLDatabase* db _cbl_nonnull,
                                     bool deleting,
                                     CBLConcurrencyControl concurrency,
-                                    C4Error* outError) const;
+                                    C4Error* outError);
 
     bool deleteDoc(CBLConcurrencyControl concurrency,
-                   C4Error* outError) const;
+                   C4Error* outError);
 
     static bool deleteDoc(CBLDatabase* db _cbl_nonnull,
                           const char* docID _cbl_nonnull,
                           C4Error* outError);
 
+    CBLBlob* getBlob(FLDict _cbl_nonnull);
+
+    static void registerNewBlob(CBLNewBlob* _cbl_nonnull);
+    static void unregisterNewBlob(CBLNewBlob* _cbl_nonnull);
+    static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
+
 private:
-    // Core constructor
-    CBLDocument(const string &docID,
-                CBLDatabase *db,
-                C4Document *d,          // must be a +1 ref
-                bool isMutable)
-    :_docID(docID)
-    ,_db(db)
-    ,_c4doc(d)
-    ,_mutable(isMutable)
-    { }
+    CBLDocument(const string &docID, CBLDatabase *db, C4Document *d, bool isMutable);
+    virtual ~CBLDocument();
 
     void initProperties();
     bool checkMutable(C4Error *outError) const;
 
     static string ensureDocID(const char *docID);
 
+    using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
+    using UnretainedValueToBlobMap = std::unordered_map<FLDict, CBLNewBlob*>;
+
+    static UnretainedValueToBlobMap* sNewBlobs;
+
     string const                _docID;                 // Document ID (never empty)
     Retained<CBLDatabase> const _db;                    // Database (null for new doc)
     c4::ref<C4Document> const   _c4doc;                 // LiteCore doc (null for new doc)
     RetainedValue               _properties;            // Properties, initialized lazily
+    ValueToBlobMap              _blobs;
     bool const                  _mutable {false};       // True iff I am mutable
 };
