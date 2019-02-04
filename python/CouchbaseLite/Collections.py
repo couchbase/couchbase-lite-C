@@ -48,7 +48,7 @@ def decodeFleeceValue(f, *, depth =1):
 # Decodes an FLArray
 def decodeFleeceArray(farray, *, depth =1):
     if depth <= 0:
-        return Array(farray)
+        return Array(fleece=farray)
     result = []
     n = lib.FLArray_Count(farray)
     for i in range(n):
@@ -59,7 +59,7 @@ def decodeFleeceArray(farray, *, depth =1):
 # Decodes an FLDict
 def decodeFleeceDict(fdict, *, depth =1):
     if depth <= 0:
-        return Dictionary(fdict)
+        return Dictionary(fleece=fdict)
     result = {}
     i = ffi.new("FLDictIterator*")
     lib.FLDictIterator_Begin(fdict, i)
@@ -79,10 +79,13 @@ def decodeFleeceDict(fdict, *, depth =1):
 @total_ordering
 class Array (Sequence):
     "A Couchbase Lite array, decoded from a Document or Query. Behaves like a regular Python sequence."
-    def __init__(self, fleeceArray):
+
+    def __init__(self, *, fleece=None):
         "Constructor: takes an FLArray"
-        self._flArray = fleeceArray
-        print ("Created Array")
+        if fleece != None:
+            self._flArray = fleece
+        else:
+            self._pyList = []
 
     def __len__(self):
         if not "_list" in self.__dict__:
@@ -119,8 +122,11 @@ class Array (Sequence):
 
 class Dictionary (Mapping):
     "A Couchbase Lite dictionary, decoded from a Document or Query. Behaves like a regular Python mapping."
-    def __init__(self, fleeceDict):
-        self._flDict = fleeceDict
+    def __init__(self, *, fleece=None):
+        if fleece != None:
+            self._flDict = fleece
+        else:
+            self._pyDict = {}
 
     def __len__(self):
         if not "_pyMap" in self.__dict__:
