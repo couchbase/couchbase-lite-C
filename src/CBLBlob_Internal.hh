@@ -41,8 +41,7 @@ public:
     CBLBlob(CBLDocument *doc, Dict properties)
     :_db(doc->database())
     {
-        slice digest = properties[kCBLBlobDigestProperty].asString();
-        if (_db && cbl_isBlob(properties) && c4blob_keyFromString(digest, &_key)) {
+        if (_db && c4doc_dictIsBlob(properties, &_key)) {
             _properties = properties.asMutable();
             if (!_properties)
                 _properties = properties.mutableCopy();

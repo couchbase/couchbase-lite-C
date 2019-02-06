@@ -28,31 +28,38 @@ using namespace fleece;
 using namespace cbl;
 
 
+static const slice kBlobContents("This is the content of the blob.");
+static const char *kBlobContentType = "text/plain";
+static const string kBlobDigest("sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=");
+
+
+static void checkBlob(Dict props) {
+    CHECK(props[kCBLTypeProperty].asString() == kCBLBlobType);
+    CHECK(props[kCBLBlobDigestProperty].asString().asString() == kBlobDigest);
+    CHECK(props[kCBLBlobLengthProperty].asInt() == kBlobContents.size);
+    CHECK(props[kCBLBlobContentTypeProperty].asString().asString() == kBlobContentType);
+}
+
+
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
-    const slice contents("This is the content of the blob.");
-    const char *contentType = "text/plain";
-    const string digest("sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=");
     {
         MutableDocument doc("blobbo");
 
         MutableBlob blob;
         SECTION("Create with data") {
-            blob = MutableBlob(contentType, contents);
+            blob = MutableBlob(kBlobContentType, kBlobContents);
         }
         SECTION("Create with stream") {
             BlobWriteStream writer(db);
             writer.write("This is the content "_sl);
             writer.write("of the blob."_sl);
-            blob = MutableBlob(contentType, writer);
+            blob = MutableBlob(kBlobContentType, writer);
         }
-        CHECK(blob.digest() == digest);
-        CHECK(string(blob.contentType()) == contentType);
-        CHECK(blob.length() == contents.size);
+        CHECK(blob.digest() == kBlobDigest);
+        CHECK(string(blob.contentType()) == kBlobContentType);
+        CHECK(blob.length() == kBlobContents.size);
         MutableDict props = blob.properties();
-        CHECK(props[kCBLTypeProperty].asString() == kCBLBlobType);
-        CHECK(props[kCBLBlobDigestProperty].asString().asString() == digest);
-        CHECK(props[kCBLBlobLengthProperty].asInt() == contents.size);
-        CHECK(props[kCBLBlobContentTypeProperty].asString().asString() == contentType);
+        checkBlob(props);
 
         // Add blob to document:
         doc["picture"] = props;
@@ -64,12 +71,12 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
           "content_type:\"text/plain\",digest:\"sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=\",length:32}}");
     CHECK(Blob::isBlob(doc["picture"].asDict()));
     Blob blob(doc["picture"].asDict());
-    CHECK(string(blob.contentType()) == contentType);
-    CHECK(blob.length() == contents.size);
+    CHECK(string(blob.contentType()) == kBlobContentType);
+    CHECK(blob.length() == kBlobContents.size);
 
     {
         Blob::Contents c = blob.getContents();
-        CHECK(slice(c.data, c.length) == contents);
+        CHECK(slice(c.data, c.length) == kBlobContents);
     }
 
     char buf[10];
@@ -92,4 +99,22 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
 
     Blob blob2(doc["picture"].asDict());
     CHECK(blob2 == blob);
+}
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob in mutable doc") {
+    MutableDocument doc("blobbo");
+    MutableBlob blob;
+    blob = MutableBlob(kBlobContentType, kBlobContents);
+    MutableDict props = blob.properties();
+    doc["picture"] = props;
+    db.saveDocument(doc);
+
+    doc = db.getMutableDocument("blobbo");
+    props = doc.properties().getMutableDict("picture"_sl);
+    checkBlob(props);
+
+    blob = MutableBlob(props);
+    REQUIRE(blob);
+    CHECK((FLDict)blob.properties() == (FLDict)props);
 }

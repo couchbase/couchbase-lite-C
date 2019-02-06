@@ -72,7 +72,6 @@ public:
 
     static void registerNewBlob(CBLNewBlob* _cbl_nonnull);
     static void unregisterNewBlob(CBLNewBlob* _cbl_nonnull);
-    static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
 
 private:
     CBLDocument(const string &docID, CBLDatabase *db, C4Document *d, bool isMutable);
@@ -82,6 +81,9 @@ private:
     bool checkMutable(C4Error *outError) const;
 
     static string ensureDocID(const char *docID);
+
+    static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
+    bool saveBlobs(CBLDatabase *db, C4Error *outError);
 
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
     using UnretainedValueToBlobMap = std::unordered_map<FLDict, CBLNewBlob*>;

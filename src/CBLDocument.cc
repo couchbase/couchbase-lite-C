@@ -115,22 +115,9 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
     if (!t.begin(outError))
         return nullptr;
 
-    // Install new blobs:
-    for (DeepIterator i(properties()); i; ++i) {
-        Dict dict = i.value().asDict();
-        if (dict) {
-            if (!dict.asMutable()) {
-                i.skipChildren();
-            } else if (cbl_isBlob(dict)) {
-                CBLNewBlob *blob = findNewBlob(dict);
-                if (blob) {
-                    if (!blob->install(db, outError))
-                        return nullptr;
-                }
-                i.skipChildren();
-            }
-        }
-    }
+    // Save new blobs:
+    if (!saveBlobs(db, outError))
+        return nullptr;
 
     // Encode properties:
     alloc_slice body;
@@ -207,6 +194,9 @@ bool CBLDocument::deleteDoc(CBLDatabase* db _cbl_nonnull,
 }
 
 
+#pragma mark - PROPERTIES:
+
+
 void CBLDocument::initProperties() {
     if (_c4doc && _c4doc->selectedRev.body.buf)
         _properties = Value::fromData(_c4doc->selectedRev.body);
@@ -257,22 +247,24 @@ bool CBLDocument::setPropertiesAsJSON(const char *json, C4Error* outError) {
 }
 
 
+#pragma mark - BLOBS:
+
+
 CBLDocument::UnretainedValueToBlobMap* CBLDocument::sNewBlobs = nullptr;
 mutex sNewBlobsMutex;
 
 
 CBLBlob* CBLDocument::getBlob(FLDict dict) {
-    assert(cbl_isBlob(dict));
+    // Is it already registered by a previous call to getBlob?
     auto i = _blobs.find(dict);
     if (i != _blobs.end())
         return i->second;
-
+    // Is it a NewBlob?
     if (Dict(dict).asMutable()) {
         CBLNewBlob *newBlob = findNewBlob(dict);
         if (newBlob)
             return newBlob;
     }
-
     // Not found; create a new blob and remember it:
     auto blob = retained(new CBLBlob(this, dict));
     if (!blob->valid())
@@ -303,6 +295,32 @@ CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
     if (i == sNewBlobs->end())
         return nullptr;
     return i->second;
+}
+
+
+bool CBLDocument::saveBlobs(CBLDatabase *db, C4Error *outError) {
+    // Walk through the Fleece object tree, looking for mutable blob Dicts to install.
+    // We can skip any immutable collections (they can't contain new blobs.)
+    if (!isMutable())
+        return true;
+    for (DeepIterator i(properties()); i; ++i) {
+        Dict dict = i.value().asDict();
+        if (dict) {
+            if (!dict.asMutable()) {
+                i.skipChildren();
+            } else if (cbl_isBlob(dict)) {
+                CBLNewBlob *blob = findNewBlob(dict);
+                if (blob) {
+                    if (!blob->install(db, outError))
+                        return false;
+                }
+                i.skipChildren();
+            }
+        } else if (!i.value().asArray().asMutable()) {
+            i.skipChildren();
+        }
+    }
+    return true;
 }
 
 
