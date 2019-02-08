@@ -17,20 +17,19 @@ struct CBLDatabase : public CBLRefCounted {
 
     CBLDatabase(C4Database* _cbl_nonnull db,
                 const std::string &name_,
-                const std::string &path_,
                 const std::string &dir_)
     :c4db(db)
     ,name(name_)
-    ,path(path_)
+    ,path(fleece::alloc_slice(c4db_getPath(c4db)))
     ,dir(dir_)
     { }
 
     virtual ~CBLDatabase();
 
     C4Database* const c4db;
-    std::string const name;
-    std::string const path;
-    std::string const dir;
+    std::string const name;         // Cached copy so API can return a C string
+    std::string const path;         // Cached copy so API can return a C string
+    std::string const dir;          // Cached copy so API can return a C string
 
     CBLListenerToken* addListener(CBLDatabaseListener listener _cbl_nonnull, void *context);
     CBLListenerToken* addDocListener(const char *docID _cbl_nonnull,

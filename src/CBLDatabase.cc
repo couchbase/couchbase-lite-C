@@ -28,37 +28,24 @@ using namespace fleece;
 using namespace cbl_internal;
 
 
-#ifdef _MSC_VER
-static const char kPathSeparator = '\\';
-#else
-static const char kPathSeparator = '/';
-#endif
-
-
 // Default location for databases: the current directory
-static const string& defaultDbDir() {
+static const char* defaultDbDir() {
     static const string kDir = getcwd(nullptr, 0);
-    return kDir;
+    return kDir.c_str();
 }
 
-
-// Given a database name and an optional directory, returns the complete path.
-// * If no directory is given, uses the defaultDbDir().
-// * Appends ".cblite2" to the database name.
-static string dbPath(const char* _cbl_nonnull name, const char *inDirectory) {
-    string path;
-    if (inDirectory)
-        path = inDirectory;
-    else
-        path = defaultDbDir();
-    if (path[path.size()-1] != kPathSeparator)
-        path += kPathSeparator;
-    return path + name + ".cblite2";
+static slice effectiveDir(const char *inDirectory) {
+    return slice(inDirectory ? inDirectory : defaultDbDir());
 }
 
-
-static string dbPath(const char* _cbl_nonnull name, const CBLDatabaseConfiguration *config) {
-    return dbPath(name, (config ? config->directory : nullptr));
+static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
+    C4DatabaseConfig2 c4config { effectiveDir(config->directory) };
+#ifdef COUCHBASE_ENTERPRISE
+    c4Config->encryptionKey.algorithm = config->encryptionKey.algorithm;
+    static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes));
+    memcpy(c4Config->encryptionKey.bytes, config->encryptionKey.bytes, sizeof(CBLEncryptionKey::bytes));
+#endif
+    return c4config;
 }
 
 
@@ -66,9 +53,7 @@ static string dbPath(const char* _cbl_nonnull name, const CBLDatabaseConfigurati
 
 
 bool cbl_databaseExists(const char *name, const char *inDirectory) CBLAPI {
-    string path = dbPath(name, inDirectory);
-    struct stat info;
-    return stat(path.c_str(), &info) == 0 && (info.st_mode & S_IFMT) == S_IFDIR;
+    return c4db_exists(slice(name), effectiveDir(inDirectory));
 }
 
 
@@ -77,9 +62,8 @@ bool cbl_copyDB(const char* fromPath,
                 const CBLDatabaseConfiguration *config,
                 CBLError* outError) CBLAPI
 {
-    string toPath = dbPath(toName, config);
-    C4DatabaseConfig c4config {kC4DB_Create | kC4DB_AutoCompact | kC4DB_SharedKeys};
-    return c4db_copy(slice(fromPath), slice(toPath), &c4config, internal(outError));
+    C4DatabaseConfig2 c4config = asC4Config(config);
+    return c4db_copyNamed(slice(fromPath), slice(toName), &c4config, internal(outError));
 }
 
 
@@ -87,8 +71,7 @@ bool cbl_deleteDB(const char *name,
                   const char *inDirectory,
                   CBLError* outError) CBLAPI
 {
-    string path = dbPath(name, inDirectory);
-    return c4db_deleteAtPath(slice(path), internal(outError));
+    return c4db_deleteNamed(slice(name), effectiveDir(inDirectory), internal(outError));
 }
 
 
@@ -99,14 +82,11 @@ CBLDatabase* cbl_db_open(const char *name,
                          const CBLDatabaseConfiguration *config,
                          CBLError *outError) CBLAPI
 {
-    C4Log("name = %s  dir = %s", name, config->directory);//TEMP
-    string path = dbPath(name, config);
-    C4Log("path = %s", path.c_str());//TEMP
-    C4DatabaseConfig c4config {kC4DB_Create | kC4DB_AutoCompact | kC4DB_SharedKeys};
-    C4Database *c4db = c4db_open(slice(path), &c4config, internal(outError));
+    C4DatabaseConfig2 c4config = asC4Config(config);
+    C4Database *c4db = c4db_openNamed(slice(name), &c4config, internal(outError));
     if (!c4db)
         return nullptr;
-    return retain(new CBLDatabase(c4db, name, path, (config->directory ?: "")));
+    return retain(new CBLDatabase(c4db, name, (config->directory ?: "")));
 }
 
 

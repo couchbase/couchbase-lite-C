@@ -27,7 +27,7 @@ using namespace fleece;
 
 TEST_CASE_METHOD(CBLTest, "Database") {
     CHECK(string(cbl_db_name(db)) == kDatabaseName);
-    CHECK(string(cbl_db_path(db)) == string(kDatabaseDir) + "/" + kDatabaseName + ".cblite2");
+    CHECK(string(cbl_db_path(db)) == string(kDatabaseDir) + "/" + kDatabaseName + ".cblite2/");
     CHECK(cbl_db_count(db) == 0);
     CHECK(cbl_db_lastSequence(db) == 0);
 }
