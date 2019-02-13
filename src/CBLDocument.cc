@@ -49,7 +49,9 @@ CBLDocument::CBLDocument(const char *docID, bool isMutable)
 
 // Construct on an existing document
 CBLDocument::CBLDocument(CBLDatabase *db, const string &docID, bool isMutable)
-:CBLDocument(docID, db, c4doc_get(internal(db), slice(docID), true, nullptr), isMutable)
+:CBLDocument(docID, db,
+             c4doc_getSingleRevision(internal(db), slice(docID), nullslice, true, nullptr),
+             isMutable)
 { }
 
 
@@ -152,7 +154,8 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
             // Conflict; in last-write-wins mode, load current revision and retry:
             if (retrying)
                 break;  // (but only once)
-            savingDoc = c4doc_get(internal(db), slice(_docID), true, &c4err);
+            savingDoc = c4doc_getSingleRevision(internal(db), slice(_docID), nullslice, true,
+                                                &c4err);
             if (savingDoc || c4err == C4Error{LiteCoreDomain, kC4ErrorNotFound})
                 retrying = true;
         }
@@ -187,7 +190,8 @@ bool CBLDocument::deleteDoc(CBLDatabase* db _cbl_nonnull,
     c4::Transaction t(internal(db));
     if (!t.begin(outError))
         return false;
-    c4::ref<C4Document> c4doc = c4doc_get(internal(db), slice(docID), true, outError);
+    c4::ref<C4Document> c4doc = c4doc_getSingleRevision(internal(db), slice(docID), nullslice,
+                                                        false, outError);
     if (c4doc)
         c4doc = c4doc_update(c4doc, nullslice, kRevDeleted, outError);
     return c4doc && t.commit(outError);

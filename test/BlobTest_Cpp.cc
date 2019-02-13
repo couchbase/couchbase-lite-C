@@ -71,6 +71,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
           "content_type:\"text/plain\",digest:\"sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=\",length:32}}");
     CHECK(Blob::isBlob(doc["picture"].asDict()));
     Blob blob(doc["picture"].asDict());
+    REQUIRE(blob);
     CHECK(string(blob.contentType()) == kBlobContentType);
     CHECK(blob.length() == kBlobContents.size);
 
