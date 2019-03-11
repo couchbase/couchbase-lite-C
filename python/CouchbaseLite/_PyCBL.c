@@ -498,26 +498,26 @@ static void (*_cffi_call_python_org)(struct _cffi_externpy_s *, char *);
 
 static void *_cffi_types[] = {
 /*  0 */ _CFFI_OP(_CFFI_OP_FUNCTION, 9), // CBLDatabase *()(char const *, CBLDatabaseConfiguration const *, CBLError *)
-/*  1 */ _CFFI_OP(_CFFI_OP_POINTER, 263), // char const *
-/*  2 */ _CFFI_OP(_CFFI_OP_POINTER, 247), // CBLDatabaseConfiguration const *
-/*  3 */ _CFFI_OP(_CFFI_OP_POINTER, 249), // CBLError *
+/*  1 */ _CFFI_OP(_CFFI_OP_POINTER, 266), // char const *
+/*  2 */ _CFFI_OP(_CFFI_OP_POINTER, 250), // CBLDatabaseConfiguration const *
+/*  3 */ _CFFI_OP(_CFFI_OP_POINTER, 252), // CBLError *
 /*  4 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/*  5 */ _CFFI_OP(_CFFI_OP_FUNCTION, 247), // CBLDatabaseConfiguration()(CBLDatabase const *)
-/*  6 */ _CFFI_OP(_CFFI_OP_POINTER, 246), // CBLDatabase const *
+/*  5 */ _CFFI_OP(_CFFI_OP_FUNCTION, 250), // CBLDatabaseConfiguration()(CBLDatabase const *)
+/*  6 */ _CFFI_OP(_CFFI_OP_POINTER, 249), // CBLDatabase const *
 /*  7 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
 /*  8 */ _CFFI_OP(_CFFI_OP_FUNCTION, 20), // CBLDocument *()(CBLDatabase *, char const *)
-/*  9 */ _CFFI_OP(_CFFI_OP_POINTER, 246), // CBLDatabase *
+/*  9 */ _CFFI_OP(_CFFI_OP_POINTER, 249), // CBLDatabase *
 /* 10 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 11 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
 /* 12 */ _CFFI_OP(_CFFI_OP_FUNCTION, 20), // CBLDocument *()(CBLDocument const *)
-/* 13 */ _CFFI_OP(_CFFI_OP_POINTER, 248), // CBLDocument const *
+/* 13 */ _CFFI_OP(_CFFI_OP_POINTER, 251), // CBLDocument const *
 /* 14 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
 /* 15 */ _CFFI_OP(_CFFI_OP_FUNCTION, 20), // CBLDocument *()(char const *)
 /* 16 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 17 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
 /* 18 */ _CFFI_OP(_CFFI_OP_FUNCTION, 13), // CBLDocument const *()(CBLDatabase *, CBLDocument *, uint8_t, CBLError *)
 /* 19 */ _CFFI_OP(_CFFI_OP_NOOP, 9),
-/* 20 */ _CFFI_OP(_CFFI_OP_POINTER, 248), // CBLDocument *
+/* 20 */ _CFFI_OP(_CFFI_OP_POINTER, 251), // CBLDocument *
 /* 21 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 18), // uint8_t
 /* 22 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
 /* 23 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
@@ -525,256 +525,259 @@ static void *_cffi_types[] = {
 /* 25 */ _CFFI_OP(_CFFI_OP_NOOP, 6),
 /* 26 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 27 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 28 */ _CFFI_OP(_CFFI_OP_FUNCTION, 209), // CBLListenerToken *()(CBLDatabase const *, void(*)(void *, CBLDatabase const *, unsigned int, char const * *), void *)
+/* 28 */ _CFFI_OP(_CFFI_OP_FUNCTION, 212), // CBLListenerToken *()(CBLDatabase const *, void(*)(void *, CBLDatabase const *, unsigned int, char const * *), void *)
 /* 29 */ _CFFI_OP(_CFFI_OP_NOOP, 6),
-/* 30 */ _CFFI_OP(_CFFI_OP_POINTER, 240), // void(*)(void *, CBLDatabase const *, unsigned int, char const * *)
-/* 31 */ _CFFI_OP(_CFFI_OP_POINTER, 277), // void *
+/* 30 */ _CFFI_OP(_CFFI_OP_POINTER, 243), // void(*)(void *, CBLDatabase const *, unsigned int, char const * *)
+/* 31 */ _CFFI_OP(_CFFI_OP_POINTER, 280), // void *
 /* 32 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
 /* 33 */ _CFFI_OP(_CFFI_OP_FUNCTION, 42), // CBLQuery *()(CBLDatabase const *, char const *, CBLError *)
 /* 34 */ _CFFI_OP(_CFFI_OP_NOOP, 6),
 /* 35 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 36 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
 /* 37 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 38 */ _CFFI_OP(_CFFI_OP_FUNCTION, 252), // CBLRefCounted *()(void *)
+/* 38 */ _CFFI_OP(_CFFI_OP_FUNCTION, 255), // CBLRefCounted *()(void *)
 /* 39 */ _CFFI_OP(_CFFI_OP_NOOP, 31),
 /* 40 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 41 */ _CFFI_OP(_CFFI_OP_FUNCTION, 77), // CBLResultSet *()(CBLQuery *, CBLError *)
-/* 42 */ _CFFI_OP(_CFFI_OP_POINTER, 251), // CBLQuery *
+/* 41 */ _CFFI_OP(_CFFI_OP_FUNCTION, 80), // CBLResultSet *()(CBLQuery *, CBLError *)
+/* 42 */ _CFFI_OP(_CFFI_OP_POINTER, 254), // CBLQuery *
 /* 43 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
 /* 44 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 45 */ _CFFI_OP(_CFFI_OP_FUNCTION, 85), // FLArray()(FLValue)
-/* 46 */ _CFFI_OP(_CFFI_OP_POINTER, 274), // FLValue
+/* 45 */ _CFFI_OP(_CFFI_OP_FUNCTION, 88), // FLArray()(FLValue)
+/* 46 */ _CFFI_OP(_CFFI_OP_POINTER, 277), // FLValue
 /* 47 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 48 */ _CFFI_OP(_CFFI_OP_FUNCTION, 96), // FLDict()(CBLDocument const *)
+/* 48 */ _CFFI_OP(_CFFI_OP_FUNCTION, 99), // FLDict()(CBLDocument const *)
 /* 49 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
 /* 50 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 51 */ _CFFI_OP(_CFFI_OP_FUNCTION, 96), // FLDict()(FLValue)
-/* 52 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 51 */ _CFFI_OP(_CFFI_OP_FUNCTION, 99), // FLDict()(CBLQuery *)
+/* 52 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
 /* 53 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 54 */ _CFFI_OP(_CFFI_OP_FUNCTION, 259), // FLMutableDict()(CBLDocument *)
-/* 55 */ _CFFI_OP(_CFFI_OP_NOOP, 20),
+/* 54 */ _CFFI_OP(_CFFI_OP_FUNCTION, 99), // FLDict()(FLValue)
+/* 55 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
 /* 56 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 57 */ _CFFI_OP(_CFFI_OP_FUNCTION, 71), // FLSlice()(CBLQuery *, unsigned int)
-/* 58 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
-/* 59 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 8), // unsigned int
-/* 60 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 61 */ _CFFI_OP(_CFFI_OP_FUNCTION, 71), // FLSlice()(FLDictIterator const *)
-/* 62 */ _CFFI_OP(_CFFI_OP_POINTER, 257), // FLDictIterator const *
+/* 57 */ _CFFI_OP(_CFFI_OP_FUNCTION, 262), // FLMutableDict()(CBLDocument *)
+/* 58 */ _CFFI_OP(_CFFI_OP_NOOP, 20),
+/* 59 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 60 */ _CFFI_OP(_CFFI_OP_FUNCTION, 74), // FLSlice()(CBLQuery *, unsigned int)
+/* 61 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
+/* 62 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 8), // unsigned int
 /* 63 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 64 */ _CFFI_OP(_CFFI_OP_FUNCTION, 71), // FLSlice()(FLValue)
-/* 65 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 64 */ _CFFI_OP(_CFFI_OP_FUNCTION, 74), // FLSlice()(FLDictIterator const *)
+/* 65 */ _CFFI_OP(_CFFI_OP_POINTER, 260), // FLDictIterator const *
 /* 66 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 67 */ _CFFI_OP(_CFFI_OP_FUNCTION, 74), // FLSliceResult()(CBLQuery *)
-/* 68 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
+/* 67 */ _CFFI_OP(_CFFI_OP_FUNCTION, 74), // FLSlice()(FLValue)
+/* 68 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
 /* 69 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 70 */ _CFFI_OP(_CFFI_OP_FUNCTION, 74), // FLSliceResult()(FLSlice)
-/* 71 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 16), // FLSlice
+/* 70 */ _CFFI_OP(_CFFI_OP_FUNCTION, 77), // FLSliceResult()(CBLQuery *)
+/* 71 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
 /* 72 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 73 */ _CFFI_OP(_CFFI_OP_FUNCTION, 74), // FLSliceResult()(FLSliceResult)
-/* 74 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 17), // FLSliceResult
+/* 73 */ _CFFI_OP(_CFFI_OP_FUNCTION, 77), // FLSliceResult()(FLSlice)
+/* 74 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 16), // FLSlice
 /* 75 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 76 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(CBLResultSet *, char const *)
-/* 77 */ _CFFI_OP(_CFFI_OP_POINTER, 255), // CBLResultSet *
-/* 78 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 79 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 80 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(CBLResultSet *, unsigned int)
-/* 81 */ _CFFI_OP(_CFFI_OP_NOOP, 77),
-/* 82 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 8),
-/* 83 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 84 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLArray, uint32_t)
-/* 85 */ _CFFI_OP(_CFFI_OP_POINTER, 270), // FLArray
-/* 86 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 22), // uint32_t
-/* 87 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 88 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLArrayIterator const *)
-/* 89 */ _CFFI_OP(_CFFI_OP_POINTER, 256), // FLArrayIterator const *
+/* 76 */ _CFFI_OP(_CFFI_OP_FUNCTION, 77), // FLSliceResult()(FLSliceResult)
+/* 77 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 17), // FLSliceResult
+/* 78 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 79 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(CBLResultSet *, char const *)
+/* 80 */ _CFFI_OP(_CFFI_OP_POINTER, 258), // CBLResultSet *
+/* 81 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 82 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 83 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(CBLResultSet *, unsigned int)
+/* 84 */ _CFFI_OP(_CFFI_OP_NOOP, 80),
+/* 85 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 8),
+/* 86 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 87 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLArray, uint32_t)
+/* 88 */ _CFFI_OP(_CFFI_OP_POINTER, 273), // FLArray
+/* 89 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 22), // uint32_t
 /* 90 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 91 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLArrayIterator const *, uint32_t)
-/* 92 */ _CFFI_OP(_CFFI_OP_NOOP, 89),
-/* 93 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 22),
-/* 94 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 95 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLDict, FLSlice)
-/* 96 */ _CFFI_OP(_CFFI_OP_POINTER, 271), // FLDict
-/* 97 */ _CFFI_OP(_CFFI_OP_NOOP, 71),
-/* 98 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 99 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLDictIterator const *)
-/* 100 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
+/* 91 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLArrayIterator const *)
+/* 92 */ _CFFI_OP(_CFFI_OP_POINTER, 259), // FLArrayIterator const *
+/* 93 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 94 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLArrayIterator const *, uint32_t)
+/* 95 */ _CFFI_OP(_CFFI_OP_NOOP, 92),
+/* 96 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 22),
+/* 97 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 98 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLDict, FLSlice)
+/* 99 */ _CFFI_OP(_CFFI_OP_POINTER, 274), // FLDict
+/* 100 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
 /* 101 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 102 */ _CFFI_OP(_CFFI_OP_FUNCTION, 260), // FLValueType()(FLValue)
-/* 103 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 102 */ _CFFI_OP(_CFFI_OP_FUNCTION, 46), // FLValue()(FLDictIterator const *)
+/* 103 */ _CFFI_OP(_CFFI_OP_NOOP, 65),
 /* 104 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 105 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(CBLDatabase *, CBLError *)
-/* 106 */ _CFFI_OP(_CFFI_OP_NOOP, 9),
-/* 107 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
-/* 108 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 109 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(CBLDatabase *, char const *, CBLError *)
-/* 110 */ _CFFI_OP(_CFFI_OP_NOOP, 9),
-/* 111 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 112 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
-/* 113 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 114 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(CBLDocument *, char const *, CBLError *)
-/* 115 */ _CFFI_OP(_CFFI_OP_NOOP, 20),
-/* 116 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 117 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
-/* 118 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 119 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(CBLDocument const *, CBLError *)
-/* 120 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
-/* 121 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
-/* 122 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 123 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(CBLDocument const *, uint8_t, CBLError *)
-/* 124 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
-/* 125 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 18),
-/* 126 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
-/* 127 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 128 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(CBLResultSet *)
-/* 129 */ _CFFI_OP(_CFFI_OP_NOOP, 77),
+/* 105 */ _CFFI_OP(_CFFI_OP_FUNCTION, 263), // FLValueType()(FLValue)
+/* 106 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 107 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 108 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(CBLDatabase *, CBLError *)
+/* 109 */ _CFFI_OP(_CFFI_OP_NOOP, 9),
+/* 110 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
+/* 111 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 112 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(CBLDatabase *, char const *, CBLError *)
+/* 113 */ _CFFI_OP(_CFFI_OP_NOOP, 9),
+/* 114 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 115 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
+/* 116 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 117 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(CBLDocument *, char const *, CBLError *)
+/* 118 */ _CFFI_OP(_CFFI_OP_NOOP, 20),
+/* 119 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 120 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
+/* 121 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 122 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(CBLDocument const *, CBLError *)
+/* 123 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
+/* 124 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
+/* 125 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 126 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(CBLDocument const *, uint8_t, CBLError *)
+/* 127 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
+/* 128 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 18),
+/* 129 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
 /* 130 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 131 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(FLArrayIterator *)
-/* 132 */ _CFFI_OP(_CFFI_OP_POINTER, 256), // FLArrayIterator *
+/* 131 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(CBLResultSet *)
+/* 132 */ _CFFI_OP(_CFFI_OP_NOOP, 80),
 /* 133 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 134 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(FLDictIterator *)
-/* 135 */ _CFFI_OP(_CFFI_OP_POINTER, 257), // FLDictIterator *
+/* 134 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(FLArrayIterator *)
+/* 135 */ _CFFI_OP(_CFFI_OP_POINTER, 259), // FLArrayIterator *
 /* 136 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 137 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(FLSlice, FLSlice)
-/* 138 */ _CFFI_OP(_CFFI_OP_NOOP, 71),
-/* 139 */ _CFFI_OP(_CFFI_OP_NOOP, 71),
-/* 140 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 141 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(FLValue)
-/* 142 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 137 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(FLDictIterator *)
+/* 138 */ _CFFI_OP(_CFFI_OP_POINTER, 260), // FLDictIterator *
+/* 139 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 140 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(FLSlice, FLSlice)
+/* 141 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
+/* 142 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
 /* 143 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 144 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(char const *, char const *)
-/* 145 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 146 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 147 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 148 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(char const *, char const *, CBLDatabaseConfiguration const *, CBLError *)
+/* 144 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(FLValue)
+/* 145 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 146 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 147 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(char const *, char const *)
+/* 148 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
 /* 149 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 150 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 151 */ _CFFI_OP(_CFFI_OP_NOOP, 2),
-/* 152 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
-/* 153 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 154 */ _CFFI_OP(_CFFI_OP_FUNCTION, 261), // _Bool()(char const *, char const *, CBLError *)
-/* 155 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 156 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 157 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
-/* 158 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 159 */ _CFFI_OP(_CFFI_OP_FUNCTION, 262), // char *()(CBLDocument const *)
-/* 160 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
+/* 150 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 151 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(char const *, char const *, CBLDatabaseConfiguration const *, CBLError *)
+/* 152 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 153 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 154 */ _CFFI_OP(_CFFI_OP_NOOP, 2),
+/* 155 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
+/* 156 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 157 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // _Bool()(char const *, char const *, CBLError *)
+/* 158 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 159 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 160 */ _CFFI_OP(_CFFI_OP_NOOP, 3),
 /* 161 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 162 */ _CFFI_OP(_CFFI_OP_FUNCTION, 262), // char *()(CBLError const *)
-/* 163 */ _CFFI_OP(_CFFI_OP_POINTER, 249), // CBLError const *
+/* 162 */ _CFFI_OP(_CFFI_OP_FUNCTION, 265), // char *()(CBLDocument const *)
+/* 163 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
 /* 164 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 165 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // char const *()(CBLDatabase const *)
-/* 166 */ _CFFI_OP(_CFFI_OP_NOOP, 6),
+/* 165 */ _CFFI_OP(_CFFI_OP_FUNCTION, 265), // char *()(CBLError const *)
+/* 166 */ _CFFI_OP(_CFFI_OP_POINTER, 252), // CBLError const *
 /* 167 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 168 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // char const *()(CBLDocument const *)
-/* 169 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
+/* 168 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // char const *()(CBLDatabase const *)
+/* 169 */ _CFFI_OP(_CFFI_OP_NOOP, 6),
 /* 170 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 171 */ _CFFI_OP(_CFFI_OP_FUNCTION, 264), // double()(FLValue)
-/* 172 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 171 */ _CFFI_OP(_CFFI_OP_FUNCTION, 1), // char const *()(CBLDocument const *)
+/* 172 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
 /* 173 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 174 */ _CFFI_OP(_CFFI_OP_FUNCTION, 265), // float()(FLValue)
+/* 174 */ _CFFI_OP(_CFFI_OP_FUNCTION, 267), // double()(FLValue)
 /* 175 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
 /* 176 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 177 */ _CFFI_OP(_CFFI_OP_FUNCTION, 268), // int()(FLSlice, FLSlice)
-/* 178 */ _CFFI_OP(_CFFI_OP_NOOP, 71),
-/* 179 */ _CFFI_OP(_CFFI_OP_NOOP, 71),
-/* 180 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 181 */ _CFFI_OP(_CFFI_OP_FUNCTION, 267), // int64_t()(FLValue)
-/* 182 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 177 */ _CFFI_OP(_CFFI_OP_FUNCTION, 268), // float()(FLValue)
+/* 178 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 179 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 180 */ _CFFI_OP(_CFFI_OP_FUNCTION, 271), // int()(FLSlice, FLSlice)
+/* 181 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
+/* 182 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
 /* 183 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 184 */ _CFFI_OP(_CFFI_OP_FUNCTION, 86), // uint32_t()(FLArray)
-/* 185 */ _CFFI_OP(_CFFI_OP_NOOP, 85),
+/* 184 */ _CFFI_OP(_CFFI_OP_FUNCTION, 270), // int64_t()(FLValue)
+/* 185 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
 /* 186 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 187 */ _CFFI_OP(_CFFI_OP_FUNCTION, 86), // uint32_t()(FLArrayIterator const *)
-/* 188 */ _CFFI_OP(_CFFI_OP_NOOP, 89),
+/* 187 */ _CFFI_OP(_CFFI_OP_FUNCTION, 89), // uint32_t()(FLArray)
+/* 188 */ _CFFI_OP(_CFFI_OP_NOOP, 88),
 /* 189 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 190 */ _CFFI_OP(_CFFI_OP_FUNCTION, 86), // uint32_t()(FLDict)
-/* 191 */ _CFFI_OP(_CFFI_OP_NOOP, 96),
+/* 190 */ _CFFI_OP(_CFFI_OP_FUNCTION, 89), // uint32_t()(FLArrayIterator const *)
+/* 191 */ _CFFI_OP(_CFFI_OP_NOOP, 92),
 /* 192 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 193 */ _CFFI_OP(_CFFI_OP_FUNCTION, 86), // uint32_t()(FLDictIterator const *)
-/* 194 */ _CFFI_OP(_CFFI_OP_NOOP, 62),
+/* 193 */ _CFFI_OP(_CFFI_OP_FUNCTION, 89), // uint32_t()(FLDict)
+/* 194 */ _CFFI_OP(_CFFI_OP_NOOP, 99),
 /* 195 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 196 */ _CFFI_OP(_CFFI_OP_FUNCTION, 275), // uint64_t()(CBLDatabase const *)
-/* 197 */ _CFFI_OP(_CFFI_OP_NOOP, 6),
+/* 196 */ _CFFI_OP(_CFFI_OP_FUNCTION, 89), // uint32_t()(FLDictIterator const *)
+/* 197 */ _CFFI_OP(_CFFI_OP_NOOP, 65),
 /* 198 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 199 */ _CFFI_OP(_CFFI_OP_FUNCTION, 275), // uint64_t()(CBLDocument const *)
-/* 200 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
+/* 199 */ _CFFI_OP(_CFFI_OP_FUNCTION, 278), // uint64_t()(CBLDatabase const *)
+/* 200 */ _CFFI_OP(_CFFI_OP_NOOP, 6),
 /* 201 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 202 */ _CFFI_OP(_CFFI_OP_FUNCTION, 275), // uint64_t()(FLValue)
-/* 203 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
+/* 202 */ _CFFI_OP(_CFFI_OP_FUNCTION, 278), // uint64_t()(CBLDocument const *)
+/* 203 */ _CFFI_OP(_CFFI_OP_NOOP, 13),
 /* 204 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 205 */ _CFFI_OP(_CFFI_OP_FUNCTION, 59), // unsigned int()(CBLQuery *)
-/* 206 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
+/* 205 */ _CFFI_OP(_CFFI_OP_FUNCTION, 278), // uint64_t()(FLValue)
+/* 206 */ _CFFI_OP(_CFFI_OP_NOOP, 46),
 /* 207 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 208 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(CBLListenerToken *)
-/* 209 */ _CFFI_OP(_CFFI_OP_POINTER, 250), // CBLListenerToken *
+/* 208 */ _CFFI_OP(_CFFI_OP_FUNCTION, 62), // unsigned int()(CBLQuery *)
+/* 209 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
 /* 210 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 211 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(CBLQuery *, FLDict)
-/* 212 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
-/* 213 */ _CFFI_OP(_CFFI_OP_NOOP, 96),
-/* 214 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 215 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(CBLQuery *, char const *)
-/* 216 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
-/* 217 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
-/* 218 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 219 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(FLArray, FLArrayIterator *)
-/* 220 */ _CFFI_OP(_CFFI_OP_NOOP, 85),
-/* 221 */ _CFFI_OP(_CFFI_OP_NOOP, 132),
-/* 222 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 223 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(FLDict, FLDictIterator *)
-/* 224 */ _CFFI_OP(_CFFI_OP_NOOP, 96),
-/* 225 */ _CFFI_OP(_CFFI_OP_NOOP, 135),
-/* 226 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 227 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(FLDictIterator *)
-/* 228 */ _CFFI_OP(_CFFI_OP_NOOP, 135),
+/* 211 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(CBLListenerToken *)
+/* 212 */ _CFFI_OP(_CFFI_OP_POINTER, 253), // CBLListenerToken *
+/* 213 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 214 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(CBLQuery *, FLDict)
+/* 215 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
+/* 216 */ _CFFI_OP(_CFFI_OP_NOOP, 99),
+/* 217 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 218 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(CBLQuery *, char const *)
+/* 219 */ _CFFI_OP(_CFFI_OP_NOOP, 42),
+/* 220 */ _CFFI_OP(_CFFI_OP_NOOP, 1),
+/* 221 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 222 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(FLArray, FLArrayIterator *)
+/* 223 */ _CFFI_OP(_CFFI_OP_NOOP, 88),
+/* 224 */ _CFFI_OP(_CFFI_OP_NOOP, 135),
+/* 225 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 226 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(FLDict, FLDictIterator *)
+/* 227 */ _CFFI_OP(_CFFI_OP_NOOP, 99),
+/* 228 */ _CFFI_OP(_CFFI_OP_NOOP, 138),
 /* 229 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 230 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(FLSliceResult)
-/* 231 */ _CFFI_OP(_CFFI_OP_NOOP, 74),
+/* 230 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(FLDictIterator *)
+/* 231 */ _CFFI_OP(_CFFI_OP_NOOP, 138),
 /* 232 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 233 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(uint8_t, uint8_t)
-/* 234 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 18),
-/* 235 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 18),
-/* 236 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 237 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(void *)
-/* 238 */ _CFFI_OP(_CFFI_OP_NOOP, 31),
+/* 233 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(FLSliceResult)
+/* 234 */ _CFFI_OP(_CFFI_OP_NOOP, 77),
+/* 235 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 236 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(uint8_t, uint8_t)
+/* 237 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 18),
+/* 238 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 18),
 /* 239 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 240 */ _CFFI_OP(_CFFI_OP_FUNCTION, 277), // void()(void *, CBLDatabase const *, unsigned int, char const * *)
+/* 240 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(void *)
 /* 241 */ _CFFI_OP(_CFFI_OP_NOOP, 31),
-/* 242 */ _CFFI_OP(_CFFI_OP_NOOP, 6),
-/* 243 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 8),
-/* 244 */ _CFFI_OP(_CFFI_OP_POINTER, 1), // char const * *
-/* 245 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
-/* 246 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 5), // CBLDatabase
-/* 247 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 6), // CBLDatabaseConfiguration
-/* 248 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 7), // CBLDocument
-/* 249 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 8), // CBLError
-/* 250 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 9), // CBLListenerToken
-/* 251 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 10), // CBLQuery
-/* 252 */ _CFFI_OP(_CFFI_OP_POINTER, 253), // CBLRefCounted *
-/* 253 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 11), // CBLRefCounted
-/* 254 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 12), // CBLReplicator
-/* 255 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 13), // CBLResultSet
-/* 256 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 14), // FLArrayIterator
-/* 257 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 15), // FLDictIterator
-/* 258 */ _CFFI_OP(_CFFI_OP_POINTER, 272), // FLMutableArray
-/* 259 */ _CFFI_OP(_CFFI_OP_POINTER, 273), // FLMutableDict
-/* 260 */ _CFFI_OP(_CFFI_OP_ENUM, 0), // FLValueType
-/* 261 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 1), // _Bool
-/* 262 */ _CFFI_OP(_CFFI_OP_POINTER, 263), // char *
-/* 263 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 2), // char
-/* 264 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 14), // double
-/* 265 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13), // float
-/* 266 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 21), // int32_t
-/* 267 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 23), // int64_t
-/* 268 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7), // int
-/* 269 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 28), // size_t
-/* 270 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 0), // struct $$FLArray
-/* 271 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 1), // struct $$FLDict
-/* 272 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 2), // struct $$FLMutableArray
-/* 273 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 3), // struct $$FLMutableDict
-/* 274 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 4), // struct $$FLValue
-/* 275 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 24), // uint64_t
-/* 276 */ _CFFI_OP(_CFFI_OP_POINTER, 277), // void const *
-/* 277 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 0), // void
+/* 242 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 243 */ _CFFI_OP(_CFFI_OP_FUNCTION, 280), // void()(void *, CBLDatabase const *, unsigned int, char const * *)
+/* 244 */ _CFFI_OP(_CFFI_OP_NOOP, 31),
+/* 245 */ _CFFI_OP(_CFFI_OP_NOOP, 6),
+/* 246 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 8),
+/* 247 */ _CFFI_OP(_CFFI_OP_POINTER, 1), // char const * *
+/* 248 */ _CFFI_OP(_CFFI_OP_FUNCTION_END, 0),
+/* 249 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 5), // CBLDatabase
+/* 250 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 6), // CBLDatabaseConfiguration
+/* 251 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 7), // CBLDocument
+/* 252 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 8), // CBLError
+/* 253 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 9), // CBLListenerToken
+/* 254 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 10), // CBLQuery
+/* 255 */ _CFFI_OP(_CFFI_OP_POINTER, 256), // CBLRefCounted *
+/* 256 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 11), // CBLRefCounted
+/* 257 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 12), // CBLReplicator
+/* 258 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 13), // CBLResultSet
+/* 259 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 14), // FLArrayIterator
+/* 260 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 15), // FLDictIterator
+/* 261 */ _CFFI_OP(_CFFI_OP_POINTER, 275), // FLMutableArray
+/* 262 */ _CFFI_OP(_CFFI_OP_POINTER, 276), // FLMutableDict
+/* 263 */ _CFFI_OP(_CFFI_OP_ENUM, 0), // FLValueType
+/* 264 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 1), // _Bool
+/* 265 */ _CFFI_OP(_CFFI_OP_POINTER, 266), // char *
+/* 266 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 2), // char
+/* 267 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 14), // double
+/* 268 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 13), // float
+/* 269 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 21), // int32_t
+/* 270 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 23), // int64_t
+/* 271 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 7), // int
+/* 272 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 28), // size_t
+/* 273 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 0), // struct $$FLArray
+/* 274 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 1), // struct $$FLDict
+/* 275 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 2), // struct $$FLMutableArray
+/* 276 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 3), // struct $$FLMutableDict
+/* 277 */ _CFFI_OP(_CFFI_OP_STRUCT_UNION, 4), // struct $$FLValue
+/* 278 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 24), // uint64_t
+/* 279 */ _CFFI_OP(_CFFI_OP_POINTER, 280), // void const *
+/* 280 */ _CFFI_OP(_CFFI_OP_PRIMITIVE, 0), // void
 };
 
 _CFFI_UNUSED_FN
@@ -921,24 +924,24 @@ _cffi_f_FLArrayIterator_Begin(PyObject *self, PyObject *args)
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(85), arg0, (char **)&x0);
+      _cffi_type(88), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLArray)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(85), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(88), arg0) < 0)
       return NULL;
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(132), arg1, (char **)&x1);
+      _cffi_type(135), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (FLArrayIterator *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(132), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(135), arg1) < 0)
       return NULL;
   }
 
@@ -969,13 +972,13 @@ _cffi_f_FLArrayIterator_GetCount(PyObject *self, PyObject *arg0)
   uint32_t result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(89), arg0, (char **)&x0);
+      _cffi_type(92), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLArrayIterator const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(89), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(92), arg0) < 0)
       return NULL;
   }
 
@@ -1005,13 +1008,13 @@ _cffi_f_FLArrayIterator_GetValue(PyObject *self, PyObject *arg0)
   FLValue result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(89), arg0, (char **)&x0);
+      _cffi_type(92), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLArrayIterator const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(89), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(92), arg0) < 0)
       return NULL;
   }
 
@@ -1047,13 +1050,13 @@ _cffi_f_FLArrayIterator_GetValueAt(PyObject *self, PyObject *args)
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(89), arg0, (char **)&x0);
+      _cffi_type(92), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLArrayIterator const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(89), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(92), arg0) < 0)
       return NULL;
   }
 
@@ -1087,13 +1090,13 @@ _cffi_f_FLArrayIterator_Next(PyObject *self, PyObject *arg0)
   _Bool result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(132), arg0, (char **)&x0);
+      _cffi_type(135), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLArrayIterator *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(132), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(135), arg0) < 0)
       return NULL;
   }
 
@@ -1123,13 +1126,13 @@ _cffi_f_FLArray_Count(PyObject *self, PyObject *arg0)
   uint32_t result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(85), arg0, (char **)&x0);
+      _cffi_type(88), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLArray)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(85), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(88), arg0) < 0)
       return NULL;
   }
 
@@ -1165,13 +1168,13 @@ _cffi_f_FLArray_Get(PyObject *self, PyObject *args)
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(85), arg0, (char **)&x0);
+      _cffi_type(88), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLArray)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(85), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(88), arg0) < 0)
       return NULL;
   }
 
@@ -1210,24 +1213,24 @@ _cffi_f_FLDictIterator_Begin(PyObject *self, PyObject *args)
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(96), arg0, (char **)&x0);
+      _cffi_type(99), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLDict)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(96), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(99), arg0) < 0)
       return NULL;
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(135), arg1, (char **)&x1);
+      _cffi_type(138), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (FLDictIterator *)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(135), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(138), arg1) < 0)
       return NULL;
   }
 
@@ -1257,13 +1260,13 @@ _cffi_f_FLDictIterator_End(PyObject *self, PyObject *arg0)
   Py_ssize_t datasize;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(135), arg0, (char **)&x0);
+      _cffi_type(138), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLDictIterator *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(135), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(138), arg0) < 0)
       return NULL;
   }
 
@@ -1294,13 +1297,13 @@ _cffi_f_FLDictIterator_GetCount(PyObject *self, PyObject *arg0)
   uint32_t result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(62), arg0, (char **)&x0);
+      _cffi_type(65), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLDictIterator const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(62), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(65), arg0) < 0)
       return NULL;
   }
 
@@ -1330,13 +1333,13 @@ _cffi_f_FLDictIterator_GetKeyString(PyObject *self, PyObject *arg0)
   FLSlice result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(62), arg0, (char **)&x0);
+      _cffi_type(65), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLDictIterator const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(62), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(65), arg0) < 0)
       return NULL;
   }
 
@@ -1347,7 +1350,7 @@ _cffi_f_FLDictIterator_GetKeyString(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(71));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(74));
 }
 #else
 static void _cffi_f_FLDictIterator_GetKeyString(FLSlice *result, FLDictIterator const * x0)
@@ -1369,13 +1372,13 @@ _cffi_f_FLDictIterator_GetValue(PyObject *self, PyObject *arg0)
   FLValue result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(62), arg0, (char **)&x0);
+      _cffi_type(65), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLDictIterator const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(62), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(65), arg0) < 0)
       return NULL;
   }
 
@@ -1405,13 +1408,13 @@ _cffi_f_FLDictIterator_Next(PyObject *self, PyObject *arg0)
   _Bool result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(135), arg0, (char **)&x0);
+      _cffi_type(138), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLDictIterator *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(135), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(138), arg0) < 0)
       return NULL;
   }
 
@@ -1441,13 +1444,13 @@ _cffi_f_FLDict_Count(PyObject *self, PyObject *arg0)
   uint32_t result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(96), arg0, (char **)&x0);
+      _cffi_type(99), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLDict)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(96), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(99), arg0) < 0)
       return NULL;
   }
 
@@ -1483,17 +1486,17 @@ _cffi_f_FLDict_Get(PyObject *self, PyObject *args)
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(96), arg0, (char **)&x0);
+      _cffi_type(99), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (FLDict)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(96), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(99), arg0) < 0)
       return NULL;
   }
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(71), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(74), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -1524,7 +1527,7 @@ _cffi_f_FLSliceResult_Release(PyObject *self, PyObject *arg0)
 {
   FLSliceResult x0;
 
-  if (_cffi_to_c((char *)&x0, _cffi_type(74), arg0) < 0)
+  if (_cffi_to_c((char *)&x0, _cffi_type(77), arg0) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -1555,7 +1558,7 @@ _cffi_f_FLSliceResult_Retain(PyObject *self, PyObject *arg0)
   FLSliceResult x0;
   FLSliceResult result;
 
-  if (_cffi_to_c((char *)&x0, _cffi_type(74), arg0) < 0)
+  if (_cffi_to_c((char *)&x0, _cffi_type(77), arg0) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -1565,7 +1568,7 @@ _cffi_f_FLSliceResult_Retain(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(74));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(77));
 }
 #else
 static void _cffi_f_FLSliceResult_Retain(FLSliceResult *result, FLSliceResult *x0)
@@ -1591,10 +1594,10 @@ _cffi_f_FLSlice_Compare(PyObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "FLSlice_Compare", 2, 2, &arg0, &arg1))
     return NULL;
 
-  if (_cffi_to_c((char *)&x0, _cffi_type(71), arg0) < 0)
+  if (_cffi_to_c((char *)&x0, _cffi_type(74), arg0) < 0)
     return NULL;
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(71), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(74), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -1626,7 +1629,7 @@ _cffi_f_FLSlice_Copy(PyObject *self, PyObject *arg0)
   FLSlice x0;
   FLSliceResult result;
 
-  if (_cffi_to_c((char *)&x0, _cffi_type(71), arg0) < 0)
+  if (_cffi_to_c((char *)&x0, _cffi_type(74), arg0) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -1636,7 +1639,7 @@ _cffi_f_FLSlice_Copy(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(74));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(77));
 }
 #else
 static void _cffi_f_FLSlice_Copy(FLSliceResult *result, FLSlice *x0)
@@ -1662,10 +1665,10 @@ _cffi_f_FLSlice_Equal(PyObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "FLSlice_Equal", 2, 2, &arg0, &arg1))
     return NULL;
 
-  if (_cffi_to_c((char *)&x0, _cffi_type(71), arg0) < 0)
+  if (_cffi_to_c((char *)&x0, _cffi_type(74), arg0) < 0)
     return NULL;
 
-  if (_cffi_to_c((char *)&x1, _cffi_type(71), arg1) < 0)
+  if (_cffi_to_c((char *)&x1, _cffi_type(74), arg1) < 0)
     return NULL;
 
   Py_BEGIN_ALLOW_THREADS
@@ -1716,7 +1719,7 @@ _cffi_f_FLValue_AsArray(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(85));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(88));
 }
 #else
 #  define _cffi_f_FLValue_AsArray _cffi_d_FLValue_AsArray
@@ -1788,7 +1791,7 @@ _cffi_f_FLValue_AsDict(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(96));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(99));
 }
 #else
 #  define _cffi_f_FLValue_AsDict _cffi_d_FLValue_AsDict
@@ -1932,7 +1935,7 @@ _cffi_f_FLValue_AsString(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(71));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(74));
 }
 #else
 static void _cffi_f_FLValue_AsString(FLSlice *result, FLValue x0)
@@ -2007,7 +2010,7 @@ _cffi_f_FLValue_GetType(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_deref((char *)&result, _cffi_type(260));
+  return _cffi_from_c_deref((char *)&result, _cffi_type(263));
 }
 #else
 #  define _cffi_f_FLValue_GetType _cffi_d_FLValue_GetType
@@ -2121,13 +2124,13 @@ _cffi_f_FLValue_IsUnsigned(PyObject *self, PyObject *arg0)
 #  define _cffi_f_FLValue_IsUnsigned _cffi_d_FLValue_IsUnsigned
 #endif
 
-static _Bool _cffi_d_cbl_copyDB(char const * x0, char const * x1, CBLDatabaseConfiguration const * x2, CBLError * x3)
+static _Bool _cffi_d_cbl_copyDatabase(char const * x0, char const * x1, CBLDatabaseConfiguration const * x2, CBLError * x3)
 {
-  return cbl_copyDB(x0, x1, x2, x3);
+  return cbl_copyDatabase(x0, x1, x2, x3);
 }
 #ifndef PYPY_VERSION
 static PyObject *
-_cffi_f_cbl_copyDB(PyObject *self, PyObject *args)
+_cffi_f_cbl_copyDatabase(PyObject *self, PyObject *args)
 {
   char const * x0;
   char const * x1;
@@ -2140,7 +2143,7 @@ _cffi_f_cbl_copyDB(PyObject *self, PyObject *args)
   PyObject *arg2;
   PyObject *arg3;
 
-  if (!PyArg_UnpackTuple(args, "cbl_copyDB", 4, 4, &arg0, &arg1, &arg2, &arg3))
+  if (!PyArg_UnpackTuple(args, "cbl_copyDatabase", 4, 4, &arg0, &arg1, &arg2, &arg3))
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
@@ -2189,7 +2192,7 @@ _cffi_f_cbl_copyDB(PyObject *self, PyObject *args)
 
   Py_BEGIN_ALLOW_THREADS
   _cffi_restore_errno();
-  { result = cbl_copyDB(x0, x1, x2, x3); }
+  { result = cbl_copyDatabase(x0, x1, x2, x3); }
   _cffi_save_errno();
   Py_END_ALLOW_THREADS
 
@@ -2197,7 +2200,7 @@ _cffi_f_cbl_copyDB(PyObject *self, PyObject *args)
   return _cffi_from_c__Bool(result);
 }
 #else
-#  define _cffi_f_cbl_copyDB _cffi_d_cbl_copyDB
+#  define _cffi_f_cbl_copyDatabase _cffi_d_cbl_copyDatabase
 #endif
 
 static _Bool _cffi_d_cbl_databaseExists(char const * x0, char const * x1)
@@ -2253,13 +2256,13 @@ _cffi_f_cbl_databaseExists(PyObject *self, PyObject *args)
 #  define _cffi_f_cbl_databaseExists _cffi_d_cbl_databaseExists
 #endif
 
-static CBLListenerToken * _cffi_d_cbl_db_addListener(CBLDatabase const * x0, void(* x1)(void *, CBLDatabase const *, unsigned int, char const * *), void * x2)
+static CBLListenerToken * _cffi_d_cbl_db_addChangeListener(CBLDatabase const * x0, void(* x1)(void *, CBLDatabase const *, unsigned int, char const * *), void * x2)
 {
-  return cbl_db_addListener(x0, x1, x2);
+  return cbl_db_addChangeListener(x0, x1, x2);
 }
 #ifndef PYPY_VERSION
 static PyObject *
-_cffi_f_cbl_db_addListener(PyObject *self, PyObject *args)
+_cffi_f_cbl_db_addChangeListener(PyObject *self, PyObject *args)
 {
   CBLDatabase const * x0;
   void(* x1)(void *, CBLDatabase const *, unsigned int, char const * *);
@@ -2270,7 +2273,7 @@ _cffi_f_cbl_db_addListener(PyObject *self, PyObject *args)
   PyObject *arg1;
   PyObject *arg2;
 
-  if (!PyArg_UnpackTuple(args, "cbl_db_addListener", 3, 3, &arg0, &arg1, &arg2))
+  if (!PyArg_UnpackTuple(args, "cbl_db_addChangeListener", 3, 3, &arg0, &arg1, &arg2))
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
@@ -2301,15 +2304,15 @@ _cffi_f_cbl_db_addListener(PyObject *self, PyObject *args)
 
   Py_BEGIN_ALLOW_THREADS
   _cffi_restore_errno();
-  { result = cbl_db_addListener(x0, x1, x2); }
+  { result = cbl_db_addChangeListener(x0, x1, x2); }
   _cffi_save_errno();
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(209));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(212));
 }
 #else
-#  define _cffi_f_cbl_db_addListener _cffi_d_cbl_db_addListener
+#  define _cffi_f_cbl_db_addChangeListener _cffi_d_cbl_db_addChangeListener
 #endif
 
 static _Bool _cffi_d_cbl_db_beginBatch(CBLDatabase * x0, CBLError * x1)
@@ -2501,7 +2504,7 @@ _cffi_f_cbl_db_config(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(247));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(250));
 }
 #else
 static void _cffi_f_cbl_db_config(CBLDatabaseConfiguration *result, CBLDatabase const * x0)
@@ -2597,72 +2600,6 @@ _cffi_f_cbl_db_delete(PyObject *self, PyObject *args)
 }
 #else
 #  define _cffi_f_cbl_db_delete _cffi_d_cbl_db_delete
-#endif
-
-static _Bool _cffi_d_cbl_db_deleteDocument(CBLDatabase * x0, char const * x1, CBLError * x2)
-{
-  return cbl_db_deleteDocument(x0, x1, x2);
-}
-#ifndef PYPY_VERSION
-static PyObject *
-_cffi_f_cbl_db_deleteDocument(PyObject *self, PyObject *args)
-{
-  CBLDatabase * x0;
-  char const * x1;
-  CBLError * x2;
-  Py_ssize_t datasize;
-  _Bool result;
-  PyObject *arg0;
-  PyObject *arg1;
-  PyObject *arg2;
-
-  if (!PyArg_UnpackTuple(args, "cbl_db_deleteDocument", 3, 3, &arg0, &arg1, &arg2))
-    return NULL;
-
-  datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(9), arg0, (char **)&x0);
-  if (datasize != 0) {
-    if (datasize < 0)
-      return NULL;
-    x0 = (CBLDatabase *)alloca((size_t)datasize);
-    memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(9), arg0) < 0)
-      return NULL;
-  }
-
-  datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(1), arg1, (char **)&x1);
-  if (datasize != 0) {
-    if (datasize < 0)
-      return NULL;
-    x1 = (char const *)alloca((size_t)datasize);
-    memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(1), arg1) < 0)
-      return NULL;
-  }
-
-  datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(3), arg2, (char **)&x2);
-  if (datasize != 0) {
-    if (datasize < 0)
-      return NULL;
-    x2 = (CBLError *)alloca((size_t)datasize);
-    memset((void *)x2, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x2, _cffi_type(3), arg2) < 0)
-      return NULL;
-  }
-
-  Py_BEGIN_ALLOW_THREADS
-  _cffi_restore_errno();
-  { result = cbl_db_deleteDocument(x0, x1, x2); }
-  _cffi_save_errno();
-  Py_END_ALLOW_THREADS
-
-  (void)self; /* unused */
-  return _cffi_from_c__Bool(result);
-}
-#else
-#  define _cffi_f_cbl_db_deleteDocument _cffi_d_cbl_db_deleteDocument
 #endif
 
 static _Bool _cffi_d_cbl_db_endBatch(CBLDatabase * x0, CBLError * x1)
@@ -2824,42 +2761,6 @@ _cffi_f_cbl_db_getMutableDocument(PyObject *self, PyObject *args)
 #  define _cffi_f_cbl_db_getMutableDocument _cffi_d_cbl_db_getMutableDocument
 #endif
 
-static uint64_t _cffi_d_cbl_db_lastSequence(CBLDatabase const * x0)
-{
-  return cbl_db_lastSequence(x0);
-}
-#ifndef PYPY_VERSION
-static PyObject *
-_cffi_f_cbl_db_lastSequence(PyObject *self, PyObject *arg0)
-{
-  CBLDatabase const * x0;
-  Py_ssize_t datasize;
-  uint64_t result;
-
-  datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(6), arg0, (char **)&x0);
-  if (datasize != 0) {
-    if (datasize < 0)
-      return NULL;
-    x0 = (CBLDatabase const *)alloca((size_t)datasize);
-    memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(6), arg0) < 0)
-      return NULL;
-  }
-
-  Py_BEGIN_ALLOW_THREADS
-  _cffi_restore_errno();
-  { result = cbl_db_lastSequence(x0); }
-  _cffi_save_errno();
-  Py_END_ALLOW_THREADS
-
-  (void)self; /* unused */
-  return _cffi_from_c_int(result, uint64_t);
-}
-#else
-#  define _cffi_f_cbl_db_lastSequence _cffi_d_cbl_db_lastSequence
-#endif
-
 static char const * _cffi_d_cbl_db_name(CBLDatabase const * x0)
 {
   return cbl_db_name(x0);
@@ -2998,13 +2899,13 @@ _cffi_f_cbl_db_path(PyObject *self, PyObject *arg0)
 #  define _cffi_f_cbl_db_path _cffi_d_cbl_db_path
 #endif
 
-static _Bool _cffi_d_cbl_db_purgeDocument(CBLDatabase * x0, char const * x1, CBLError * x2)
+static _Bool _cffi_d_cbl_db_purgeDocumentByID(CBLDatabase * x0, char const * x1, CBLError * x2)
 {
-  return cbl_db_purgeDocument(x0, x1, x2);
+  return cbl_db_purgeDocumentByID(x0, x1, x2);
 }
 #ifndef PYPY_VERSION
 static PyObject *
-_cffi_f_cbl_db_purgeDocument(PyObject *self, PyObject *args)
+_cffi_f_cbl_db_purgeDocumentByID(PyObject *self, PyObject *args)
 {
   CBLDatabase * x0;
   char const * x1;
@@ -3015,7 +2916,7 @@ _cffi_f_cbl_db_purgeDocument(PyObject *self, PyObject *args)
   PyObject *arg1;
   PyObject *arg2;
 
-  if (!PyArg_UnpackTuple(args, "cbl_db_purgeDocument", 3, 3, &arg0, &arg1, &arg2))
+  if (!PyArg_UnpackTuple(args, "cbl_db_purgeDocumentByID", 3, 3, &arg0, &arg1, &arg2))
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
@@ -3053,7 +2954,7 @@ _cffi_f_cbl_db_purgeDocument(PyObject *self, PyObject *args)
 
   Py_BEGIN_ALLOW_THREADS
   _cffi_restore_errno();
-  { result = cbl_db_purgeDocument(x0, x1, x2); }
+  { result = cbl_db_purgeDocumentByID(x0, x1, x2); }
   _cffi_save_errno();
   Py_END_ALLOW_THREADS
 
@@ -3061,7 +2962,7 @@ _cffi_f_cbl_db_purgeDocument(PyObject *self, PyObject *args)
   return _cffi_from_c__Bool(result);
 }
 #else
-#  define _cffi_f_cbl_db_purgeDocument _cffi_d_cbl_db_purgeDocument
+#  define _cffi_f_cbl_db_purgeDocumentByID _cffi_d_cbl_db_purgeDocumentByID
 #endif
 
 static CBLDocument const * _cffi_d_cbl_db_saveDocument(CBLDatabase * x0, CBLDocument * x1, uint8_t x2, CBLError * x3)
@@ -3136,13 +3037,13 @@ _cffi_f_cbl_db_saveDocument(PyObject *self, PyObject *args)
 #  define _cffi_f_cbl_db_saveDocument _cffi_d_cbl_db_saveDocument
 #endif
 
-static _Bool _cffi_d_cbl_deleteDB(char const * x0, char const * x1, CBLError * x2)
+static _Bool _cffi_d_cbl_deleteDatabase(char const * x0, char const * x1, CBLError * x2)
 {
-  return cbl_deleteDB(x0, x1, x2);
+  return cbl_deleteDatabase(x0, x1, x2);
 }
 #ifndef PYPY_VERSION
 static PyObject *
-_cffi_f_cbl_deleteDB(PyObject *self, PyObject *args)
+_cffi_f_cbl_deleteDatabase(PyObject *self, PyObject *args)
 {
   char const * x0;
   char const * x1;
@@ -3153,7 +3054,7 @@ _cffi_f_cbl_deleteDB(PyObject *self, PyObject *args)
   PyObject *arg1;
   PyObject *arg2;
 
-  if (!PyArg_UnpackTuple(args, "cbl_deleteDB", 3, 3, &arg0, &arg1, &arg2))
+  if (!PyArg_UnpackTuple(args, "cbl_deleteDatabase", 3, 3, &arg0, &arg1, &arg2))
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
@@ -3191,7 +3092,7 @@ _cffi_f_cbl_deleteDB(PyObject *self, PyObject *args)
 
   Py_BEGIN_ALLOW_THREADS
   _cffi_restore_errno();
-  { result = cbl_deleteDB(x0, x1, x2); }
+  { result = cbl_deleteDatabase(x0, x1, x2); }
   _cffi_save_errno();
   Py_END_ALLOW_THREADS
 
@@ -3199,7 +3100,7 @@ _cffi_f_cbl_deleteDB(PyObject *self, PyObject *args)
   return _cffi_from_c__Bool(result);
 }
 #else
-#  define _cffi_f_cbl_deleteDB _cffi_d_cbl_deleteDB
+#  define _cffi_f_cbl_deleteDatabase _cffi_d_cbl_deleteDatabase
 #endif
 
 static _Bool _cffi_d_cbl_doc_delete(CBLDocument const * x0, uint8_t x1, CBLError * x2)
@@ -3363,7 +3264,7 @@ _cffi_f_cbl_doc_mutableProperties(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(259));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(262));
 }
 #else
 #  define _cffi_f_cbl_doc_mutableProperties _cffi_d_cbl_doc_mutableProperties
@@ -3435,7 +3336,7 @@ _cffi_f_cbl_doc_properties(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(96));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(99));
 }
 #else
 #  define _cffi_f_cbl_doc_properties _cffi_d_cbl_doc_properties
@@ -3471,7 +3372,7 @@ _cffi_f_cbl_doc_propertiesAsJSON(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(262));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(265));
 }
 #else
 #  define _cffi_f_cbl_doc_propertiesAsJSON _cffi_d_cbl_doc_propertiesAsJSON
@@ -3645,13 +3546,13 @@ _cffi_f_cbl_error_message(PyObject *self, PyObject *arg0)
   char * result;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(163), arg0, (char **)&x0);
+      _cffi_type(166), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (CBLError const *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(163), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(166), arg0) < 0)
       return NULL;
   }
 
@@ -3662,7 +3563,7 @@ _cffi_f_cbl_error_message(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(262));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(265));
 }
 #else
 #  define _cffi_f_cbl_error_message _cffi_d_cbl_error_message
@@ -3680,13 +3581,13 @@ _cffi_f_cbl_listener_remove(PyObject *self, PyObject *arg0)
   Py_ssize_t datasize;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(209), arg0, (char **)&x0);
+      _cffi_type(212), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (CBLListenerToken *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(209), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(212), arg0) < 0)
       return NULL;
   }
 
@@ -3780,7 +3681,7 @@ _cffi_f_cbl_query_columnName(PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(71));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(74));
 }
 #else
 static void _cffi_f_cbl_query_columnName(FLSlice *result, CBLQuery * x0, unsigned int x1)
@@ -3836,7 +3737,7 @@ _cffi_f_cbl_query_execute(PyObject *self, PyObject *args)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(77));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(80));
 }
 #else
 #  define _cffi_f_cbl_query_execute _cffi_d_cbl_query_execute
@@ -3872,7 +3773,7 @@ _cffi_f_cbl_query_explain(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_struct((char *)&result, _cffi_type(74));
+  return _cffi_from_c_struct((char *)&result, _cffi_type(77));
 }
 #else
 static void _cffi_f_cbl_query_explain(FLSliceResult *result, CBLQuery * x0)
@@ -3947,6 +3848,42 @@ _cffi_f_cbl_query_new(PyObject *self, PyObject *args)
 #  define _cffi_f_cbl_query_new _cffi_d_cbl_query_new
 #endif
 
+static FLDict _cffi_d_cbl_query_parameters(CBLQuery * x0)
+{
+  return cbl_query_parameters(x0);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_cbl_query_parameters(PyObject *self, PyObject *arg0)
+{
+  CBLQuery * x0;
+  Py_ssize_t datasize;
+  FLDict result;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(42), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (CBLQuery *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(42), arg0) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = cbl_query_parameters(x0); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c_pointer((char *)result, _cffi_type(99));
+}
+#else
+#  define _cffi_f_cbl_query_parameters _cffi_d_cbl_query_parameters
+#endif
+
 static void _cffi_d_cbl_query_setParameters(CBLQuery * x0, FLDict x1)
 {
   cbl_query_setParameters(x0, x1);
@@ -3976,13 +3913,13 @@ _cffi_f_cbl_query_setParameters(PyObject *self, PyObject *args)
   }
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(96), arg1, (char **)&x1);
+      _cffi_type(99), arg1, (char **)&x1);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x1 = (FLDict)alloca((size_t)datasize);
     memset((void *)x1, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(96), arg1) < 0)
+    if (_cffi_convert_array_from_object((char *)x1, _cffi_type(99), arg1) < 0)
       return NULL;
   }
 
@@ -4000,13 +3937,13 @@ _cffi_f_cbl_query_setParameters(PyObject *self, PyObject *args)
 #  define _cffi_f_cbl_query_setParameters _cffi_d_cbl_query_setParameters
 #endif
 
-static void _cffi_d_cbl_query_setParametersFromJSON(CBLQuery * x0, char const * x1)
+static void _cffi_d_cbl_query_setParametersAsJSON(CBLQuery * x0, char const * x1)
 {
-  cbl_query_setParametersFromJSON(x0, x1);
+  cbl_query_setParametersAsJSON(x0, x1);
 }
 #ifndef PYPY_VERSION
 static PyObject *
-_cffi_f_cbl_query_setParametersFromJSON(PyObject *self, PyObject *args)
+_cffi_f_cbl_query_setParametersAsJSON(PyObject *self, PyObject *args)
 {
   CBLQuery * x0;
   char const * x1;
@@ -4014,7 +3951,7 @@ _cffi_f_cbl_query_setParametersFromJSON(PyObject *self, PyObject *args)
   PyObject *arg0;
   PyObject *arg1;
 
-  if (!PyArg_UnpackTuple(args, "cbl_query_setParametersFromJSON", 2, 2, &arg0, &arg1))
+  if (!PyArg_UnpackTuple(args, "cbl_query_setParametersAsJSON", 2, 2, &arg0, &arg1))
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
@@ -4041,7 +3978,7 @@ _cffi_f_cbl_query_setParametersFromJSON(PyObject *self, PyObject *args)
 
   Py_BEGIN_ALLOW_THREADS
   _cffi_restore_errno();
-  { cbl_query_setParametersFromJSON(x0, x1); }
+  { cbl_query_setParametersAsJSON(x0, x1); }
   _cffi_save_errno();
   Py_END_ALLOW_THREADS
 
@@ -4050,7 +3987,7 @@ _cffi_f_cbl_query_setParametersFromJSON(PyObject *self, PyObject *args)
   return Py_None;
 }
 #else
-#  define _cffi_f_cbl_query_setParametersFromJSON _cffi_d_cbl_query_setParametersFromJSON
+#  define _cffi_f_cbl_query_setParametersAsJSON _cffi_d_cbl_query_setParametersAsJSON
 #endif
 
 static void _cffi_d_cbl_release(void * x0)
@@ -4089,13 +4026,49 @@ _cffi_f_cbl_release(PyObject *self, PyObject *arg0)
 #  define _cffi_f_cbl_release _cffi_d_cbl_release
 #endif
 
-static FLValue _cffi_d_cbl_results_column(CBLResultSet * x0, unsigned int x1)
+static _Bool _cffi_d_cbl_resultset_next(CBLResultSet * x0)
 {
-  return cbl_results_column(x0, x1);
+  return cbl_resultset_next(x0);
 }
 #ifndef PYPY_VERSION
 static PyObject *
-_cffi_f_cbl_results_column(PyObject *self, PyObject *args)
+_cffi_f_cbl_resultset_next(PyObject *self, PyObject *arg0)
+{
+  CBLResultSet * x0;
+  Py_ssize_t datasize;
+  _Bool result;
+
+  datasize = _cffi_prepare_pointer_call_argument(
+      _cffi_type(80), arg0, (char **)&x0);
+  if (datasize != 0) {
+    if (datasize < 0)
+      return NULL;
+    x0 = (CBLResultSet *)alloca((size_t)datasize);
+    memset((void *)x0, 0, (size_t)datasize);
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(80), arg0) < 0)
+      return NULL;
+  }
+
+  Py_BEGIN_ALLOW_THREADS
+  _cffi_restore_errno();
+  { result = cbl_resultset_next(x0); }
+  _cffi_save_errno();
+  Py_END_ALLOW_THREADS
+
+  (void)self; /* unused */
+  return _cffi_from_c__Bool(result);
+}
+#else
+#  define _cffi_f_cbl_resultset_next _cffi_d_cbl_resultset_next
+#endif
+
+static FLValue _cffi_d_cbl_resultset_valueAtIndex(CBLResultSet * x0, unsigned int x1)
+{
+  return cbl_resultset_valueAtIndex(x0, x1);
+}
+#ifndef PYPY_VERSION
+static PyObject *
+_cffi_f_cbl_resultset_valueAtIndex(PyObject *self, PyObject *args)
 {
   CBLResultSet * x0;
   unsigned int x1;
@@ -4104,17 +4077,17 @@ _cffi_f_cbl_results_column(PyObject *self, PyObject *args)
   PyObject *arg0;
   PyObject *arg1;
 
-  if (!PyArg_UnpackTuple(args, "cbl_results_column", 2, 2, &arg0, &arg1))
+  if (!PyArg_UnpackTuple(args, "cbl_resultset_valueAtIndex", 2, 2, &arg0, &arg1))
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(77), arg0, (char **)&x0);
+      _cffi_type(80), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (CBLResultSet *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(77), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(80), arg0) < 0)
       return NULL;
   }
 
@@ -4124,7 +4097,7 @@ _cffi_f_cbl_results_column(PyObject *self, PyObject *args)
 
   Py_BEGIN_ALLOW_THREADS
   _cffi_restore_errno();
-  { result = cbl_results_column(x0, x1); }
+  { result = cbl_resultset_valueAtIndex(x0, x1); }
   _cffi_save_errno();
   Py_END_ALLOW_THREADS
 
@@ -4132,52 +4105,16 @@ _cffi_f_cbl_results_column(PyObject *self, PyObject *args)
   return _cffi_from_c_pointer((char *)result, _cffi_type(46));
 }
 #else
-#  define _cffi_f_cbl_results_column _cffi_d_cbl_results_column
+#  define _cffi_f_cbl_resultset_valueAtIndex _cffi_d_cbl_resultset_valueAtIndex
 #endif
 
-static _Bool _cffi_d_cbl_results_next(CBLResultSet * x0)
+static FLValue _cffi_d_cbl_resultset_valueForKey(CBLResultSet * x0, char const * x1)
 {
-  return cbl_results_next(x0);
+  return cbl_resultset_valueForKey(x0, x1);
 }
 #ifndef PYPY_VERSION
 static PyObject *
-_cffi_f_cbl_results_next(PyObject *self, PyObject *arg0)
-{
-  CBLResultSet * x0;
-  Py_ssize_t datasize;
-  _Bool result;
-
-  datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(77), arg0, (char **)&x0);
-  if (datasize != 0) {
-    if (datasize < 0)
-      return NULL;
-    x0 = (CBLResultSet *)alloca((size_t)datasize);
-    memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(77), arg0) < 0)
-      return NULL;
-  }
-
-  Py_BEGIN_ALLOW_THREADS
-  _cffi_restore_errno();
-  { result = cbl_results_next(x0); }
-  _cffi_save_errno();
-  Py_END_ALLOW_THREADS
-
-  (void)self; /* unused */
-  return _cffi_from_c__Bool(result);
-}
-#else
-#  define _cffi_f_cbl_results_next _cffi_d_cbl_results_next
-#endif
-
-static FLValue _cffi_d_cbl_results_property(CBLResultSet * x0, char const * x1)
-{
-  return cbl_results_property(x0, x1);
-}
-#ifndef PYPY_VERSION
-static PyObject *
-_cffi_f_cbl_results_property(PyObject *self, PyObject *args)
+_cffi_f_cbl_resultset_valueForKey(PyObject *self, PyObject *args)
 {
   CBLResultSet * x0;
   char const * x1;
@@ -4186,17 +4123,17 @@ _cffi_f_cbl_results_property(PyObject *self, PyObject *args)
   PyObject *arg0;
   PyObject *arg1;
 
-  if (!PyArg_UnpackTuple(args, "cbl_results_property", 2, 2, &arg0, &arg1))
+  if (!PyArg_UnpackTuple(args, "cbl_resultset_valueForKey", 2, 2, &arg0, &arg1))
     return NULL;
 
   datasize = _cffi_prepare_pointer_call_argument(
-      _cffi_type(77), arg0, (char **)&x0);
+      _cffi_type(80), arg0, (char **)&x0);
   if (datasize != 0) {
     if (datasize < 0)
       return NULL;
     x0 = (CBLResultSet *)alloca((size_t)datasize);
     memset((void *)x0, 0, (size_t)datasize);
-    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(77), arg0) < 0)
+    if (_cffi_convert_array_from_object((char *)x0, _cffi_type(80), arg0) < 0)
       return NULL;
   }
 
@@ -4213,7 +4150,7 @@ _cffi_f_cbl_results_property(PyObject *self, PyObject *args)
 
   Py_BEGIN_ALLOW_THREADS
   _cffi_restore_errno();
-  { result = cbl_results_property(x0, x1); }
+  { result = cbl_resultset_valueForKey(x0, x1); }
   _cffi_save_errno();
   Py_END_ALLOW_THREADS
 
@@ -4221,7 +4158,7 @@ _cffi_f_cbl_results_property(PyObject *self, PyObject *args)
   return _cffi_from_c_pointer((char *)result, _cffi_type(46));
 }
 #else
-#  define _cffi_f_cbl_results_property _cffi_d_cbl_results_property
+#  define _cffi_f_cbl_resultset_valueForKey _cffi_d_cbl_resultset_valueForKey
 #endif
 
 static CBLRefCounted * _cffi_d_cbl_retain(void * x0)
@@ -4254,7 +4191,7 @@ _cffi_f_cbl_retain(PyObject *self, PyObject *arg0)
   Py_END_ALLOW_THREADS
 
   (void)self; /* unused */
-  return _cffi_from_c_pointer((char *)result, _cffi_type(252));
+  return _cffi_from_c_pointer((char *)result, _cffi_type(255));
 }
 #else
 #  define _cffi_f_cbl_retain _cffi_d_cbl_retain
@@ -4335,85 +4272,84 @@ _cffi_f_free(PyObject *self, PyObject *arg0)
 #endif
 
 static const struct _cffi_global_s _cffi_globals[] = {
-  { "FLArrayIterator_Begin", (void *)_cffi_f_FLArrayIterator_Begin, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 219), (void *)_cffi_d_FLArrayIterator_Begin },
-  { "FLArrayIterator_GetCount", (void *)_cffi_f_FLArrayIterator_GetCount, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 187), (void *)_cffi_d_FLArrayIterator_GetCount },
-  { "FLArrayIterator_GetValue", (void *)_cffi_f_FLArrayIterator_GetValue, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 88), (void *)_cffi_d_FLArrayIterator_GetValue },
-  { "FLArrayIterator_GetValueAt", (void *)_cffi_f_FLArrayIterator_GetValueAt, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 91), (void *)_cffi_d_FLArrayIterator_GetValueAt },
-  { "FLArrayIterator_Next", (void *)_cffi_f_FLArrayIterator_Next, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 131), (void *)_cffi_d_FLArrayIterator_Next },
-  { "FLArray_Count", (void *)_cffi_f_FLArray_Count, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 184), (void *)_cffi_d_FLArray_Count },
-  { "FLArray_Get", (void *)_cffi_f_FLArray_Get, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 84), (void *)_cffi_d_FLArray_Get },
-  { "FLDictIterator_Begin", (void *)_cffi_f_FLDictIterator_Begin, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 223), (void *)_cffi_d_FLDictIterator_Begin },
-  { "FLDictIterator_End", (void *)_cffi_f_FLDictIterator_End, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 227), (void *)_cffi_d_FLDictIterator_End },
-  { "FLDictIterator_GetCount", (void *)_cffi_f_FLDictIterator_GetCount, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 193), (void *)_cffi_d_FLDictIterator_GetCount },
-  { "FLDictIterator_GetKeyString", (void *)_cffi_f_FLDictIterator_GetKeyString, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 61), (void *)_cffi_d_FLDictIterator_GetKeyString },
-  { "FLDictIterator_GetValue", (void *)_cffi_f_FLDictIterator_GetValue, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 99), (void *)_cffi_d_FLDictIterator_GetValue },
-  { "FLDictIterator_Next", (void *)_cffi_f_FLDictIterator_Next, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 134), (void *)_cffi_d_FLDictIterator_Next },
-  { "FLDict_Count", (void *)_cffi_f_FLDict_Count, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 190), (void *)_cffi_d_FLDict_Count },
-  { "FLDict_Get", (void *)_cffi_f_FLDict_Get, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 95), (void *)_cffi_d_FLDict_Get },
-  { "FLSliceResult_Release", (void *)_cffi_f_FLSliceResult_Release, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 230), (void *)_cffi_d_FLSliceResult_Release },
-  { "FLSliceResult_Retain", (void *)_cffi_f_FLSliceResult_Retain, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 73), (void *)_cffi_d_FLSliceResult_Retain },
-  { "FLSlice_Compare", (void *)_cffi_f_FLSlice_Compare, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 177), (void *)_cffi_d_FLSlice_Compare },
-  { "FLSlice_Copy", (void *)_cffi_f_FLSlice_Copy, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 70), (void *)_cffi_d_FLSlice_Copy },
-  { "FLSlice_Equal", (void *)_cffi_f_FLSlice_Equal, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 137), (void *)_cffi_d_FLSlice_Equal },
+  { "FLArrayIterator_Begin", (void *)_cffi_f_FLArrayIterator_Begin, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 222), (void *)_cffi_d_FLArrayIterator_Begin },
+  { "FLArrayIterator_GetCount", (void *)_cffi_f_FLArrayIterator_GetCount, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 190), (void *)_cffi_d_FLArrayIterator_GetCount },
+  { "FLArrayIterator_GetValue", (void *)_cffi_f_FLArrayIterator_GetValue, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 91), (void *)_cffi_d_FLArrayIterator_GetValue },
+  { "FLArrayIterator_GetValueAt", (void *)_cffi_f_FLArrayIterator_GetValueAt, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 94), (void *)_cffi_d_FLArrayIterator_GetValueAt },
+  { "FLArrayIterator_Next", (void *)_cffi_f_FLArrayIterator_Next, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 134), (void *)_cffi_d_FLArrayIterator_Next },
+  { "FLArray_Count", (void *)_cffi_f_FLArray_Count, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 187), (void *)_cffi_d_FLArray_Count },
+  { "FLArray_Get", (void *)_cffi_f_FLArray_Get, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 87), (void *)_cffi_d_FLArray_Get },
+  { "FLDictIterator_Begin", (void *)_cffi_f_FLDictIterator_Begin, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 226), (void *)_cffi_d_FLDictIterator_Begin },
+  { "FLDictIterator_End", (void *)_cffi_f_FLDictIterator_End, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 230), (void *)_cffi_d_FLDictIterator_End },
+  { "FLDictIterator_GetCount", (void *)_cffi_f_FLDictIterator_GetCount, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 196), (void *)_cffi_d_FLDictIterator_GetCount },
+  { "FLDictIterator_GetKeyString", (void *)_cffi_f_FLDictIterator_GetKeyString, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 64), (void *)_cffi_d_FLDictIterator_GetKeyString },
+  { "FLDictIterator_GetValue", (void *)_cffi_f_FLDictIterator_GetValue, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 102), (void *)_cffi_d_FLDictIterator_GetValue },
+  { "FLDictIterator_Next", (void *)_cffi_f_FLDictIterator_Next, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 137), (void *)_cffi_d_FLDictIterator_Next },
+  { "FLDict_Count", (void *)_cffi_f_FLDict_Count, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 193), (void *)_cffi_d_FLDict_Count },
+  { "FLDict_Get", (void *)_cffi_f_FLDict_Get, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 98), (void *)_cffi_d_FLDict_Get },
+  { "FLSliceResult_Release", (void *)_cffi_f_FLSliceResult_Release, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 233), (void *)_cffi_d_FLSliceResult_Release },
+  { "FLSliceResult_Retain", (void *)_cffi_f_FLSliceResult_Retain, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 76), (void *)_cffi_d_FLSliceResult_Retain },
+  { "FLSlice_Compare", (void *)_cffi_f_FLSlice_Compare, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 180), (void *)_cffi_d_FLSlice_Compare },
+  { "FLSlice_Copy", (void *)_cffi_f_FLSlice_Copy, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 73), (void *)_cffi_d_FLSlice_Copy },
+  { "FLSlice_Equal", (void *)_cffi_f_FLSlice_Equal, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 140), (void *)_cffi_d_FLSlice_Equal },
   { "FLValue_AsArray", (void *)_cffi_f_FLValue_AsArray, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 45), (void *)_cffi_d_FLValue_AsArray },
-  { "FLValue_AsBool", (void *)_cffi_f_FLValue_AsBool, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 141), (void *)_cffi_d_FLValue_AsBool },
-  { "FLValue_AsDict", (void *)_cffi_f_FLValue_AsDict, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 51), (void *)_cffi_d_FLValue_AsDict },
-  { "FLValue_AsDouble", (void *)_cffi_f_FLValue_AsDouble, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 171), (void *)_cffi_d_FLValue_AsDouble },
-  { "FLValue_AsFloat", (void *)_cffi_f_FLValue_AsFloat, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 174), (void *)_cffi_d_FLValue_AsFloat },
-  { "FLValue_AsInt", (void *)_cffi_f_FLValue_AsInt, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 181), (void *)_cffi_d_FLValue_AsInt },
-  { "FLValue_AsString", (void *)_cffi_f_FLValue_AsString, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 64), (void *)_cffi_d_FLValue_AsString },
-  { "FLValue_AsUnsigned", (void *)_cffi_f_FLValue_AsUnsigned, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_FLValue_AsUnsigned },
-  { "FLValue_GetType", (void *)_cffi_f_FLValue_GetType, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 102), (void *)_cffi_d_FLValue_GetType },
-  { "FLValue_IsDouble", (void *)_cffi_f_FLValue_IsDouble, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 141), (void *)_cffi_d_FLValue_IsDouble },
-  { "FLValue_IsInteger", (void *)_cffi_f_FLValue_IsInteger, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 141), (void *)_cffi_d_FLValue_IsInteger },
-  { "FLValue_IsUnsigned", (void *)_cffi_f_FLValue_IsUnsigned, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 141), (void *)_cffi_d_FLValue_IsUnsigned },
-  { "cbl_copyDB", (void *)_cffi_f_cbl_copyDB, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 148), (void *)_cffi_d_cbl_copyDB },
-  { "cbl_databaseExists", (void *)_cffi_f_cbl_databaseExists, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 144), (void *)_cffi_d_cbl_databaseExists },
-  { "cbl_db_addListener", (void *)_cffi_f_cbl_db_addListener, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 28), (void *)_cffi_d_cbl_db_addListener },
-  { "cbl_db_beginBatch", (void *)_cffi_f_cbl_db_beginBatch, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 105), (void *)_cffi_d_cbl_db_beginBatch },
-  { "cbl_db_close", (void *)_cffi_f_cbl_db_close, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 105), (void *)_cffi_d_cbl_db_close },
-  { "cbl_db_compact", (void *)_cffi_f_cbl_db_compact, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 105), (void *)_cffi_d_cbl_db_compact },
+  { "FLValue_AsBool", (void *)_cffi_f_FLValue_AsBool, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 144), (void *)_cffi_d_FLValue_AsBool },
+  { "FLValue_AsDict", (void *)_cffi_f_FLValue_AsDict, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 54), (void *)_cffi_d_FLValue_AsDict },
+  { "FLValue_AsDouble", (void *)_cffi_f_FLValue_AsDouble, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 174), (void *)_cffi_d_FLValue_AsDouble },
+  { "FLValue_AsFloat", (void *)_cffi_f_FLValue_AsFloat, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 177), (void *)_cffi_d_FLValue_AsFloat },
+  { "FLValue_AsInt", (void *)_cffi_f_FLValue_AsInt, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 184), (void *)_cffi_d_FLValue_AsInt },
+  { "FLValue_AsString", (void *)_cffi_f_FLValue_AsString, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 67), (void *)_cffi_d_FLValue_AsString },
+  { "FLValue_AsUnsigned", (void *)_cffi_f_FLValue_AsUnsigned, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 205), (void *)_cffi_d_FLValue_AsUnsigned },
+  { "FLValue_GetType", (void *)_cffi_f_FLValue_GetType, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 105), (void *)_cffi_d_FLValue_GetType },
+  { "FLValue_IsDouble", (void *)_cffi_f_FLValue_IsDouble, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 144), (void *)_cffi_d_FLValue_IsDouble },
+  { "FLValue_IsInteger", (void *)_cffi_f_FLValue_IsInteger, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 144), (void *)_cffi_d_FLValue_IsInteger },
+  { "FLValue_IsUnsigned", (void *)_cffi_f_FLValue_IsUnsigned, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 144), (void *)_cffi_d_FLValue_IsUnsigned },
+  { "cbl_copyDatabase", (void *)_cffi_f_cbl_copyDatabase, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 151), (void *)_cffi_d_cbl_copyDatabase },
+  { "cbl_databaseExists", (void *)_cffi_f_cbl_databaseExists, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 147), (void *)_cffi_d_cbl_databaseExists },
+  { "cbl_db_addChangeListener", (void *)_cffi_f_cbl_db_addChangeListener, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 28), (void *)_cffi_d_cbl_db_addChangeListener },
+  { "cbl_db_beginBatch", (void *)_cffi_f_cbl_db_beginBatch, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 108), (void *)_cffi_d_cbl_db_beginBatch },
+  { "cbl_db_close", (void *)_cffi_f_cbl_db_close, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 108), (void *)_cffi_d_cbl_db_close },
+  { "cbl_db_compact", (void *)_cffi_f_cbl_db_compact, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 108), (void *)_cffi_d_cbl_db_compact },
   { "cbl_db_config", (void *)_cffi_f_cbl_db_config, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 5), (void *)_cffi_d_cbl_db_config },
-  { "cbl_db_count", (void *)_cffi_f_cbl_db_count, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 196), (void *)_cffi_d_cbl_db_count },
-  { "cbl_db_delete", (void *)_cffi_f_cbl_db_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 105), (void *)_cffi_d_cbl_db_delete },
-  { "cbl_db_deleteDocument", (void *)_cffi_f_cbl_db_deleteDocument, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 109), (void *)_cffi_d_cbl_db_deleteDocument },
-  { "cbl_db_endBatch", (void *)_cffi_f_cbl_db_endBatch, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 105), (void *)_cffi_d_cbl_db_endBatch },
+  { "cbl_db_count", (void *)_cffi_f_cbl_db_count, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 199), (void *)_cffi_d_cbl_db_count },
+  { "cbl_db_delete", (void *)_cffi_f_cbl_db_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 108), (void *)_cffi_d_cbl_db_delete },
+  { "cbl_db_endBatch", (void *)_cffi_f_cbl_db_endBatch, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 108), (void *)_cffi_d_cbl_db_endBatch },
   { "cbl_db_getDocument", (void *)_cffi_f_cbl_db_getDocument, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 24), (void *)_cffi_d_cbl_db_getDocument },
   { "cbl_db_getMutableDocument", (void *)_cffi_f_cbl_db_getMutableDocument, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 8), (void *)_cffi_d_cbl_db_getMutableDocument },
-  { "cbl_db_lastSequence", (void *)_cffi_f_cbl_db_lastSequence, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 196), (void *)_cffi_d_cbl_db_lastSequence },
-  { "cbl_db_name", (void *)_cffi_f_cbl_db_name, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 165), (void *)_cffi_d_cbl_db_name },
+  { "cbl_db_name", (void *)_cffi_f_cbl_db_name, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 168), (void *)_cffi_d_cbl_db_name },
   { "cbl_db_open", (void *)_cffi_f_cbl_db_open, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 0), (void *)_cffi_d_cbl_db_open },
-  { "cbl_db_path", (void *)_cffi_f_cbl_db_path, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 165), (void *)_cffi_d_cbl_db_path },
-  { "cbl_db_purgeDocument", (void *)_cffi_f_cbl_db_purgeDocument, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 109), (void *)_cffi_d_cbl_db_purgeDocument },
+  { "cbl_db_path", (void *)_cffi_f_cbl_db_path, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 168), (void *)_cffi_d_cbl_db_path },
+  { "cbl_db_purgeDocumentByID", (void *)_cffi_f_cbl_db_purgeDocumentByID, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 112), (void *)_cffi_d_cbl_db_purgeDocumentByID },
   { "cbl_db_saveDocument", (void *)_cffi_f_cbl_db_saveDocument, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 18), (void *)_cffi_d_cbl_db_saveDocument },
-  { "cbl_deleteDB", (void *)_cffi_f_cbl_deleteDB, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 154), (void *)_cffi_d_cbl_deleteDB },
-  { "cbl_doc_delete", (void *)_cffi_f_cbl_doc_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 123), (void *)_cffi_d_cbl_doc_delete },
-  { "cbl_doc_id", (void *)_cffi_f_cbl_doc_id, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 168), (void *)_cffi_d_cbl_doc_id },
+  { "cbl_deleteDatabase", (void *)_cffi_f_cbl_deleteDatabase, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 157), (void *)_cffi_d_cbl_deleteDatabase },
+  { "cbl_doc_delete", (void *)_cffi_f_cbl_doc_delete, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 126), (void *)_cffi_d_cbl_doc_delete },
+  { "cbl_doc_id", (void *)_cffi_f_cbl_doc_id, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 171), (void *)_cffi_d_cbl_doc_id },
   { "cbl_doc_mutableCopy", (void *)_cffi_f_cbl_doc_mutableCopy, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 12), (void *)_cffi_d_cbl_doc_mutableCopy },
-  { "cbl_doc_mutableProperties", (void *)_cffi_f_cbl_doc_mutableProperties, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 54), (void *)_cffi_d_cbl_doc_mutableProperties },
+  { "cbl_doc_mutableProperties", (void *)_cffi_f_cbl_doc_mutableProperties, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 57), (void *)_cffi_d_cbl_doc_mutableProperties },
   { "cbl_doc_new", (void *)_cffi_f_cbl_doc_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 15), (void *)_cffi_d_cbl_doc_new },
   { "cbl_doc_properties", (void *)_cffi_f_cbl_doc_properties, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 48), (void *)_cffi_d_cbl_doc_properties },
-  { "cbl_doc_propertiesAsJSON", (void *)_cffi_f_cbl_doc_propertiesAsJSON, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 159), (void *)_cffi_d_cbl_doc_propertiesAsJSON },
-  { "cbl_doc_purge", (void *)_cffi_f_cbl_doc_purge, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 119), (void *)_cffi_d_cbl_doc_purge },
-  { "cbl_doc_sequence", (void *)_cffi_f_cbl_doc_sequence, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 199), (void *)_cffi_d_cbl_doc_sequence },
-  { "cbl_doc_setPropertiesAsJSON", (void *)_cffi_f_cbl_doc_setPropertiesAsJSON, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 114), (void *)_cffi_d_cbl_doc_setPropertiesAsJSON },
-  { "cbl_error_message", (void *)_cffi_f_cbl_error_message, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 162), (void *)_cffi_d_cbl_error_message },
-  { "cbl_listener_remove", (void *)_cffi_f_cbl_listener_remove, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 208), (void *)_cffi_d_cbl_listener_remove },
-  { "cbl_query_columnCount", (void *)_cffi_f_cbl_query_columnCount, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 205), (void *)_cffi_d_cbl_query_columnCount },
-  { "cbl_query_columnName", (void *)_cffi_f_cbl_query_columnName, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 57), (void *)_cffi_d_cbl_query_columnName },
+  { "cbl_doc_propertiesAsJSON", (void *)_cffi_f_cbl_doc_propertiesAsJSON, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 162), (void *)_cffi_d_cbl_doc_propertiesAsJSON },
+  { "cbl_doc_purge", (void *)_cffi_f_cbl_doc_purge, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 122), (void *)_cffi_d_cbl_doc_purge },
+  { "cbl_doc_sequence", (void *)_cffi_f_cbl_doc_sequence, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 202), (void *)_cffi_d_cbl_doc_sequence },
+  { "cbl_doc_setPropertiesAsJSON", (void *)_cffi_f_cbl_doc_setPropertiesAsJSON, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 117), (void *)_cffi_d_cbl_doc_setPropertiesAsJSON },
+  { "cbl_error_message", (void *)_cffi_f_cbl_error_message, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 165), (void *)_cffi_d_cbl_error_message },
+  { "cbl_listener_remove", (void *)_cffi_f_cbl_listener_remove, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 211), (void *)_cffi_d_cbl_listener_remove },
+  { "cbl_query_columnCount", (void *)_cffi_f_cbl_query_columnCount, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 208), (void *)_cffi_d_cbl_query_columnCount },
+  { "cbl_query_columnName", (void *)_cffi_f_cbl_query_columnName, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 60), (void *)_cffi_d_cbl_query_columnName },
   { "cbl_query_execute", (void *)_cffi_f_cbl_query_execute, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 41), (void *)_cffi_d_cbl_query_execute },
-  { "cbl_query_explain", (void *)_cffi_f_cbl_query_explain, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 67), (void *)_cffi_d_cbl_query_explain },
+  { "cbl_query_explain", (void *)_cffi_f_cbl_query_explain, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 70), (void *)_cffi_d_cbl_query_explain },
   { "cbl_query_new", (void *)_cffi_f_cbl_query_new, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 33), (void *)_cffi_d_cbl_query_new },
-  { "cbl_query_setParameters", (void *)_cffi_f_cbl_query_setParameters, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 211), (void *)_cffi_d_cbl_query_setParameters },
-  { "cbl_query_setParametersFromJSON", (void *)_cffi_f_cbl_query_setParametersFromJSON, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 215), (void *)_cffi_d_cbl_query_setParametersFromJSON },
-  { "cbl_release", (void *)_cffi_f_cbl_release, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 237), (void *)_cffi_d_cbl_release },
-  { "cbl_results_column", (void *)_cffi_f_cbl_results_column, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 80), (void *)_cffi_d_cbl_results_column },
-  { "cbl_results_next", (void *)_cffi_f_cbl_results_next, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 128), (void *)_cffi_d_cbl_results_next },
-  { "cbl_results_property", (void *)_cffi_f_cbl_results_property, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 76), (void *)_cffi_d_cbl_results_property },
+  { "cbl_query_parameters", (void *)_cffi_f_cbl_query_parameters, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 51), (void *)_cffi_d_cbl_query_parameters },
+  { "cbl_query_setParameters", (void *)_cffi_f_cbl_query_setParameters, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 214), (void *)_cffi_d_cbl_query_setParameters },
+  { "cbl_query_setParametersAsJSON", (void *)_cffi_f_cbl_query_setParametersAsJSON, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 218), (void *)_cffi_d_cbl_query_setParametersAsJSON },
+  { "cbl_release", (void *)_cffi_f_cbl_release, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 240), (void *)_cffi_d_cbl_release },
+  { "cbl_resultset_next", (void *)_cffi_f_cbl_resultset_next, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 131), (void *)_cffi_d_cbl_resultset_next },
+  { "cbl_resultset_valueAtIndex", (void *)_cffi_f_cbl_resultset_valueAtIndex, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 83), (void *)_cffi_d_cbl_resultset_valueAtIndex },
+  { "cbl_resultset_valueForKey", (void *)_cffi_f_cbl_resultset_valueForKey, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 79), (void *)_cffi_d_cbl_resultset_valueForKey },
   { "cbl_retain", (void *)_cffi_f_cbl_retain, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 38), (void *)_cffi_d_cbl_retain },
-  { "cbl_setLogLevel", (void *)_cffi_f_cbl_setLogLevel, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 233), (void *)_cffi_d_cbl_setLogLevel },
+  { "cbl_setLogLevel", (void *)_cffi_f_cbl_setLogLevel, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_V, 236), (void *)_cffi_d_cbl_setLogLevel },
   { "databaseListenerCallback", (void *)&_cffi_externpy__databaseListenerCallback, _CFFI_OP(_CFFI_OP_EXTERN_PYTHON, 30), (void *)databaseListenerCallback },
-  { "free", (void *)_cffi_f_free, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 237), (void *)_cffi_d_free },
+  { "free", (void *)_cffi_f_free, _CFFI_OP(_CFFI_OP_CPYTHON_BLTN_O, 240), (void *)_cffi_d_free },
   { "kFLArray", (void *)_cffi_const_kFLArray, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "kFLBoolean", (void *)_cffi_const_kFLBoolean, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
   { "kFLData", (void *)_cffi_const_kFLData, _CFFI_OP(_CFFI_OP_ENUM, -1), (void *)0 },
@@ -4430,100 +4366,100 @@ static const struct _cffi_field_s _cffi_fields[] = {
                  _CFFI_OP(_CFFI_OP_NOOP, 1) },
   { "domain", offsetof(CBLError, domain),
               sizeof(((CBLError *)0)->domain),
-              _CFFI_OP(_CFFI_OP_NOOP, 86) },
+              _CFFI_OP(_CFFI_OP_NOOP, 89) },
   { "code", offsetof(CBLError, code),
             sizeof(((CBLError *)0)->code),
-            _CFFI_OP(_CFFI_OP_NOOP, 266) },
+            _CFFI_OP(_CFFI_OP_NOOP, 269) },
   { "internal_info", offsetof(CBLError, internal_info),
                      sizeof(((CBLError *)0)->internal_info),
-                     _CFFI_OP(_CFFI_OP_NOOP, 266) },
+                     _CFFI_OP(_CFFI_OP_NOOP, 269) },
   { "buf", offsetof(FLSlice, buf),
            sizeof(((FLSlice *)0)->buf),
-           _CFFI_OP(_CFFI_OP_NOOP, 276) },
+           _CFFI_OP(_CFFI_OP_NOOP, 279) },
   { "size", offsetof(FLSlice, size),
             sizeof(((FLSlice *)0)->size),
-            _CFFI_OP(_CFFI_OP_NOOP, 269) },
+            _CFFI_OP(_CFFI_OP_NOOP, 272) },
   { "buf", offsetof(FLSliceResult, buf),
            sizeof(((FLSliceResult *)0)->buf),
-           _CFFI_OP(_CFFI_OP_NOOP, 276) },
+           _CFFI_OP(_CFFI_OP_NOOP, 279) },
   { "size", offsetof(FLSliceResult, size),
             sizeof(((FLSliceResult *)0)->size),
-            _CFFI_OP(_CFFI_OP_NOOP, 269) },
+            _CFFI_OP(_CFFI_OP_NOOP, 272) },
 };
 
 static const struct _cffi_struct_union_s _cffi_struct_unions[] = {
-  { "$$FLArray", 270, _CFFI_F_OPAQUE,
+  { "$$FLArray", 273, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$$FLDict", 271, _CFFI_F_OPAQUE,
+  { "$$FLDict", 274, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$$FLMutableArray", 272, _CFFI_F_OPAQUE,
+  { "$$FLMutableArray", 275, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$$FLMutableDict", 273, _CFFI_F_OPAQUE,
+  { "$$FLMutableDict", 276, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$$FLValue", 274, _CFFI_F_OPAQUE,
+  { "$$FLValue", 277, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$CBLDatabase", 246, _CFFI_F_OPAQUE,
+  { "$CBLDatabase", 249, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$CBLDatabaseConfiguration", 247, 0,
+  { "$CBLDatabaseConfiguration", 250, 0,
     sizeof(CBLDatabaseConfiguration), offsetof(struct _cffi_align_typedef_CBLDatabaseConfiguration, y), 0, 1 },
-  { "$CBLDocument", 248, _CFFI_F_OPAQUE,
+  { "$CBLDocument", 251, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$CBLError", 249, _CFFI_F_CHECK_FIELDS,
+  { "$CBLError", 252, _CFFI_F_CHECK_FIELDS,
     sizeof(CBLError), offsetof(struct _cffi_align_typedef_CBLError, y), 1, 3 },
-  { "$CBLListenerToken", 250, _CFFI_F_OPAQUE,
+  { "$CBLListenerToken", 253, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$CBLQuery", 251, _CFFI_F_OPAQUE,
+  { "$CBLQuery", 254, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$CBLRefCounted", 253, _CFFI_F_OPAQUE,
+  { "$CBLRefCounted", 256, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$CBLReplicator", 254, _CFFI_F_OPAQUE,
+  { "$CBLReplicator", 257, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$CBLResultSet", 255, _CFFI_F_OPAQUE,
+  { "$CBLResultSet", 258, _CFFI_F_OPAQUE,
     (size_t)-1, -1, -1, 0 /* opaque */ },
-  { "$FLArrayIterator", 256, 0,
+  { "$FLArrayIterator", 259, 0,
     sizeof(FLArrayIterator), offsetof(struct _cffi_align_typedef_FLArrayIterator, y), 4, 0 },
-  { "$FLDictIterator", 257, 0,
+  { "$FLDictIterator", 260, 0,
     sizeof(FLDictIterator), offsetof(struct _cffi_align_typedef_FLDictIterator, y), 4, 0 },
-  { "$FLSlice", 71, _CFFI_F_CHECK_FIELDS,
+  { "$FLSlice", 74, _CFFI_F_CHECK_FIELDS,
     sizeof(FLSlice), offsetof(struct _cffi_align_typedef_FLSlice, y), 4, 2 },
-  { "$FLSliceResult", 74, _CFFI_F_CHECK_FIELDS,
+  { "$FLSliceResult", 77, _CFFI_F_CHECK_FIELDS,
     sizeof(FLSliceResult), offsetof(struct _cffi_align_typedef_FLSliceResult, y), 6, 2 },
 };
 
 static const struct _cffi_enum_s _cffi_enums[] = {
-  { "$FLValueType", 260, _cffi_prim_int(sizeof(FLValueType), ((FLValueType)-1) <= 0),
+  { "$FLValueType", 263, _cffi_prim_int(sizeof(FLValueType), ((FLValueType)-1) <= 0),
     "kFLUndefined,kFLNull,kFLBoolean,kFLNumber,kFLString,kFLData,kFLArray,kFLDict" },
 };
 
 static const struct _cffi_typename_s _cffi_typenames[] = {
   { "CBLConcurrencyControl", 21 },
-  { "CBLDatabase", 246 },
-  { "CBLDatabaseConfiguration", 247 },
-  { "CBLDatabaseListener", 30 },
-  { "CBLDocument", 248 },
-  { "CBLError", 249 },
-  { "CBLErrorDomain", 86 },
-  { "CBLListenerToken", 250 },
+  { "CBLDatabase", 249 },
+  { "CBLDatabaseChangeListener", 30 },
+  { "CBLDatabaseConfiguration", 250 },
+  { "CBLDocument", 251 },
+  { "CBLError", 252 },
+  { "CBLErrorDomain", 89 },
+  { "CBLListenerToken", 253 },
   { "CBLLogDomain", 21 },
   { "CBLLogLevel", 21 },
-  { "CBLQuery", 251 },
-  { "CBLRefCounted", 253 },
-  { "CBLReplicator", 254 },
-  { "CBLResultSet", 255 },
-  { "FLArray", 85 },
-  { "FLArrayIterator", 256 },
-  { "FLDict", 96 },
-  { "FLDictIterator", 257 },
-  { "FLError", 59 },
-  { "FLHeapSlice", 71 },
-  { "FLMutableArray", 258 },
-  { "FLMutableDict", 259 },
-  { "FLSlice", 71 },
-  { "FLSliceResult", 74 },
-  { "FLString", 71 },
-  { "FLStringResult", 74 },
+  { "CBLQuery", 254 },
+  { "CBLRefCounted", 256 },
+  { "CBLReplicator", 257 },
+  { "CBLResultSet", 258 },
+  { "FLArray", 88 },
+  { "FLArrayIterator", 259 },
+  { "FLDict", 99 },
+  { "FLDictIterator", 260 },
+  { "FLError", 62 },
+  { "FLHeapSlice", 74 },
+  { "FLMutableArray", 261 },
+  { "FLMutableDict", 262 },
+  { "FLSlice", 74 },
+  { "FLSliceResult", 77 },
+  { "FLString", 74 },
+  { "FLStringResult", 77 },
   { "FLValue", 46 },
-  { "FLValueType", 260 },
+  { "FLValueType", 263 },
 };
 
 static const struct _cffi_type_context_s _cffi_type_context = {
@@ -4533,12 +4469,12 @@ static const struct _cffi_type_context_s _cffi_type_context = {
   _cffi_struct_unions,
   _cffi_enums,
   _cffi_typenames,
-  87,  /* num_globals */
+  86,  /* num_globals */
   18,  /* num_struct_unions */
   1,  /* num_enums */
   28,  /* num_typenames */
   NULL,  /* no includes */
-  278,  /* num_types */
+  281,  /* num_types */
   1,  /* flags */
 };
 

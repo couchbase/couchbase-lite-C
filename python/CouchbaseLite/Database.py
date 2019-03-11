@@ -36,7 +36,7 @@ class Database (CBLObject):
 
     @staticmethod
     def deleteFile(name, dir):
-        if lib.cbl_deleteDB(cstr(name), cstr(dir), gError):
+        if lib.cbl_deleteDatabase(cstr(name), cstr(dir), gError):
             return True
         elif gError.code == 0:
             return False
@@ -62,10 +62,6 @@ class Database (CBLObject):
     @property
     def count(self):
         return lib.cbl_db_count(self._ref)
-
-    @property
-    def lastSequence(self):
-        return lib.cbl_db_lastSequence(self._ref)
 
     # Documents:
 
@@ -119,7 +115,7 @@ class Database (CBLObject):
     def addListener(self, listener):
         handle = ffi.new_handle(listener)
         self.listeners.add(handle)
-        c_token = lib.cbl_db_addListener(self._ref, lib.databaseListenerCallback, handle)
+        c_token = lib.cbl_db_addChangeListener(self._ref, lib.databaseListenerCallback, handle)
         return ListenerToken(self, handle, c_token)
 
     def removeListener(self, token):

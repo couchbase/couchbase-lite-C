@@ -42,7 +42,7 @@ class Query (CBLObject):
             raise CBLException("Query failed", gError)
         try:
             lastResult = None
-            while lib.cbl_results_next(results):
+            while lib.cbl_resultset_next(results):
                 if lastResult:
                     lastResult.invalidate()
                 lastResult = QueryResult(self, results)
@@ -76,9 +76,9 @@ class QueryResult (object):
         if isinstance(key, int):
             if key < 0 or key >= self.query.columnCount:
                 raise IndexError("Column index out of range")
-            item = lib.cbl_results_column(self._ref, key)
+            item = lib.cbl_resultset_valueAtIndex(self._ref, key)
         elif isinstance(key, str):
-            item = lib.cbl_results_property(self._ref, key)
+            item = lib.cbl_resultset_valueForKey(self._ref, key)
             if item == None:
                 raise KeyError("No such column in Query")
         else:
@@ -108,7 +108,7 @@ class QueryResult (object):
         result = {}
         keys = self.query.columnNames
         for i in range(0, self.query.columnCount):
-            item = lib.cbl_results_column(self._ref, i)
+            item = lib.cbl_resultset_valueAtIndex(self._ref, i)
             if lib.FLValue_GetType(item) != lib.kFLUndefined:
                 result[keys[i]] = decodeFleece(item)
         return result

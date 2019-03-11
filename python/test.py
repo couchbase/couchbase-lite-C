@@ -11,12 +11,10 @@ print ("name = ", db.name)
 print ("dir  = ", db.config)
 print ("path = ", db.path)
 print ("docs = ", db.count)
-print ("seq  = ", db.lastSequence)
 
 assert(db.name == "db")
-assert(db.path == "/tmp/db.cblite2")
+assert(db.path == "/tmp/db.cblite2/")
 assert(db.count == 0)
-assert(db.lastSequence == 0)
 
 def dbListener(db, docIDs):
     print ("######## DB changed!", docIDs)
@@ -52,15 +50,13 @@ with db:
     assert(doc2["color"] == "green")
 
     assert(db.count == 1)
-    assert(db.lastSequence == 1)
-    
+
     doc = MutableDocument("bar")
     doc["color"] = "green"
     doc["flavor"] = "pumpkin spice"
     db["bar"] = doc # saves it
 
     assert(db.count == 2)
-    assert(db.lastSequence == 2)
 
 dbListenerToken.remove()
 

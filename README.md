@@ -123,9 +123,9 @@ This only works on Mac so far. And it assumes that Xcode puts build output in a 
 1. Build the native library. (If using Xcode, build the "CBL_C Dylib" target.)
 2. `pip install cffi`
 3. `cd python/CouchbaseLite`
-4. `python BuildPyCBL.py`
+4. `python3 BuildPyCBL.py`
 5. `cd ..`
-6. `python test.py` -- some tests. Should run without throwing exceptions.
+6. `python3 test.py` -- some tests. Should run without throwing exceptions.
 
 ## Using It
 
