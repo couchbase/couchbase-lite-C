@@ -51,16 +51,8 @@ FLDict cbl_blob_properties(const CBLBlob* blob) CBLAPI {
     return blob->properties();
 }
 
-FLMutableDict cbl_blob_mutableProperties(CBLBlob* blob) CBLAPI {
-    return blob->properties();
-}
-
 const char* cbl_blob_contentType(const CBLBlob* blob) CBLAPI {
     return blob->contentType();
-}
-
-void cbl_blob_setContentType(CBLBlob* blob, const char* contentType) CBLAPI {
-    blob->setContentType(contentType);
 }
 
 uint64_t cbl_blob_length(const CBLBlob* blob) CBLAPI {
@@ -71,29 +63,24 @@ const char* cbl_blob_digest(const CBLBlob* blob) CBLAPI {
     return blob->digest();
 }
 
-CBLBlobContents cbl_blob_getContents(const CBLBlob* blob, CBLError *outError) CBLAPI {
-    FLSliceResult c = blob->getContents(internal(outError));
-    return {c.buf, c.size};
+FLSliceResult cbl_blob_loadContent(const CBLBlob* blob, CBLError *outError) CBLAPI {
+    return blob->getContents(internal(outError));
 }
 
-void cbl_blob_freeContents(const CBLBlob* _cbl_nonnull, CBLBlobContents c) CBLAPI {
-    FLSliceResult_Free({c.data, c.length});
+CBLBlobReadStream* cbl_blob_openContentStream(const CBLBlob* blob, CBLError *outError) CBLAPI {
+    return (CBLBlobReadStream*)blob->openStream(internal(outError));
 }
 
-bool cbl_blob_openContentStream(const CBLBlob* blob, CBLError *outError) CBLAPI {
-    return blob->openStream(internal(outError));
-}
-
-ssize_t cbl_blob_readContent(const CBLBlob* blob,
-                             void *dst,
-                             size_t maxLength,
-                             CBLError *outError) CBLAPI
+ssize_t cbl_blobreader_read(CBLBlobReadStream* stream,
+                            void *dst,
+                            size_t maxLength,
+                            CBLError *outError) CBLAPI
 {
-    return blob->read(dst, maxLength, internal(outError));
+    return c4stream_read(internal(stream), dst, maxLength, internal(outError));
 }
 
-void cbl_blob_closeContentStream(const CBLBlob* blob) CBLAPI {
-    blob->close();
+void cbl_blobreader_close(CBLBlobReadStream* stream) CBLAPI {
+    c4stream_close(internal(stream));
 }
 
 
@@ -107,13 +94,13 @@ static CBLBlob* createNewBlob(const char *type,
     return retain(new CBLNewBlob(type, contents, internal(writer)));
 }
 
-CBLBlob* cbl_doc_createBlobWithData(const char *contentType,
+CBLBlob* cbl_blob_createWithData(const char *contentType,
                                     FLSlice contents) CBLAPI
 {
     return createNewBlob(contentType, contents, nullptr);
 }
 
-CBLBlob* cbl_doc_createBlobWithStream(const char *contentType,
+CBLBlob* cbl_blob_createWithStream(const char *contentType,
                                       CBLBlobWriteStream *writer) CBLAPI
 {
     return createNewBlob(contentType, nullslice, writer);
@@ -125,7 +112,7 @@ CBLBlobWriteStream* cbl_blobwriter_new(CBLDatabase *db, CBLError *outError) CBLA
                                                         internal(outError));
 }
 
-void cbl_blobwriter_free(CBLBlobWriteStream* writer) CBLAPI {
+void cbl_blobwriter_close(CBLBlobWriteStream* writer) CBLAPI {
     c4stream_closeWriter(internal(writer));
 }
 
@@ -136,3 +123,30 @@ bool cbl_blobwriter_write(CBLBlobWriteStream* writer,
 {
     return c4stream_write(internal(writer), data, length, internal(outError));
 }
+
+
+#pragma mark - FLEECE UTILITIES:
+
+
+static MutableDict blobMutableProperties(CBLBlob *blob _cbl_nonnull) {
+    Dict props = cbl_blob_properties(blob);
+    MutableDict mProps = props.asMutable();
+    return mProps ? mProps : props.mutableCopy();
+}
+
+
+void CBLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
+                             uint32_t index,
+                             CBLBlob* blob _cbl_nonnull)
+{
+    FLMutableArray_SetValue(array, index, blobMutableProperties(blob));
+}
+
+
+void CBLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
+                                          FLString key,
+                                          CBLBlob* blob _cbl_nonnull)
+{
+    FLMutableDict_SetValue(dict, key, blobMutableProperties(blob));
+}
+

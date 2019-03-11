@@ -45,20 +45,20 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
     {
         MutableDocument doc("blobbo");
 
-        MutableBlob blob;
+        Blob blob;
         SECTION("Create with data") {
-            blob = MutableBlob(kBlobContentType, kBlobContents);
+            blob = Blob(kBlobContentType, kBlobContents);
         }
         SECTION("Create with stream") {
             BlobWriteStream writer(db);
             writer.write("This is the content "_sl);
             writer.write("of the blob."_sl);
-            blob = MutableBlob(kBlobContentType, writer);
+            blob = Blob(kBlobContentType, writer);
         }
         CHECK(blob.digest() == kBlobDigest);
         CHECK(string(blob.contentType()) == kBlobContentType);
         CHECK(blob.length() == kBlobContents.size);
-        MutableDict props = blob.properties();
+        Dict props = blob.properties();
         checkBlob(props);
 
         // Add blob to document:
@@ -76,27 +76,29 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
     CHECK(blob.length() == kBlobContents.size);
 
     {
-        Blob::Contents c = blob.getContents();
-        CHECK(slice(c.data, c.length) == kBlobContents);
+        CHECK(blob.loadContent() == kBlobContents);
     }
 
     char buf[10];
-    blob.openContentStream();
-    size_t n = blob.readContent(buf, 10);
-    CHECK(string(buf, n) == "This is th");
-    n = blob.readContent(buf, 10);
-    CHECK(string(buf, n) == "e content ");
-    n = blob.readContent(buf, 10);
-    CHECK(string(buf, n) == "of the blo");
-    n = blob.readContent(buf, 10);
-    CHECK(string(buf, n) == "b.");
-    n = blob.readContent(buf, 10);
-    CHECK(n == 0);
-    blob.closeContentStream();
+    {
+        unique_ptr<BlobReadStream> in(blob.openContentStream());
+        size_t n = in->read(buf, 10);
+        CHECK(string(buf, n) == "This is th");
+        n = in->read(buf, 10);
+        CHECK(string(buf, n) == "e content ");
+        n = in->read(buf, 10);
+        CHECK(string(buf, n) == "of the blo");
+        n = in->read(buf, 10);
+        CHECK(string(buf, n) == "b.");
+        n = in->read(buf, 10);
+        CHECK(n == 0);
+    }
 
-    blob.openContentStream();
-    n = blob.readContent(buf, 10);
-    CHECK(string(buf, n) == "This is th");
+    {
+        unique_ptr<BlobReadStream> in(blob.openContentStream());
+        size_t n = in->read(buf, 10);
+        CHECK(string(buf, n) == "This is th");
+    }
 
     Blob blob2(doc["picture"].asDict());
     CHECK(blob2 == blob);
@@ -104,18 +106,20 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
 
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob in mutable doc") {
-    MutableDocument doc("blobbo");
-    MutableBlob blob;
-    blob = MutableBlob(kBlobContentType, kBlobContents);
-    MutableDict props = blob.properties();
-    doc["picture"] = props;
-    db.saveDocument(doc);
+    {
+        MutableDocument doc("blobbo");
+        Blob blob;
+        blob = Blob(kBlobContentType, kBlobContents);
+        Dict props = blob.properties();
+        doc["picture"] = props;
+        db.saveDocument(doc);
+    }
 
-    doc = db.getMutableDocument("blobbo");
-    props = doc.properties().getMutableDict("picture"_sl);
+    Document doc = db.getDocument("blobbo");
+    Dict props = doc["picture"].asDict();
     checkBlob(props);
 
-    blob = MutableBlob(props);
+    Blob blob = Blob(props);
     REQUIRE(blob);
     CHECK((FLDict)blob.properties() == (FLDict)props);
 }

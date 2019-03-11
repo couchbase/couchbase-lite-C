@@ -67,50 +67,37 @@ extern "C" {
     /** Returns a blob's MIME type, if its metadata has a kCBLBlobContentTypeProperty. */
     const char* cbl_blob_contentType(const CBLBlob* _cbl_nonnull) CBLAPI;
 
-    /** Sets the MIME type of a mutable blob (its kCBLBlobContentTypeProperty). */
-    void cbl_blob_setContentType(CBLBlob* _cbl_nonnull, const char* contentType) CBLAPI;
-
     /** Returns a blob's metadata. This includes the `digest`, `length` and `content_type`
         properties, as well as any custom ones that may have been added. */
     FLDict cbl_blob_properties(const CBLBlob* _cbl_nonnull) CBLAPI;
 
-    /** Returns a mutable blob's properties in mutable form.
-        @warning  Do not alter the `digest` or `length` properties! */
-    FLMutableDict cbl_blob_mutableProperties(CBLBlob* _cbl_nonnull) CBLAPI;
-
 
 #pragma mark - READING:
 
-    typedef struct {
-        const void *data;
-        size_t length;
-    } CBLBlobContents;
-
-    /** Reads the blob's contents from the database and returns them.
-        You are responsible for calling \ref cbl_blob_freeContents on the returned data when done.
+    /** Reads the blob's contents into memory and returns them.
+        You are responsible for calling \ref FLSliceResult_Free on the returned data when done.
         @warning  This can potentially allocate a very large heap block! */
-    CBLBlobContents cbl_blob_getContents(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
+    FLSliceResult cbl_blob_loadContent(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
 
-    /** Frees the memory allocated by \ref cbl_blob_getContents. */
-    void cbl_blob_freeContents(const CBLBlob* _cbl_nonnull, CBLBlobContents) CBLAPI;
+    /** A stream for reading a blob's content. */
+    typedef struct CBLBlobReadStream CBLBlobReadStream;
 
-    /** Opens a stream for reading a blob's contents.
-        If the stream is already open, resets it to the beginning. */
-    bool cbl_blob_openContentStream(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
+    /** Opens a stream for reading a blob's content. */
+    CBLBlobReadStream* cbl_blob_openContentStream(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
 
-    /** Reads data from a blob. The blob must have been opened via \ref cbl_blob_openContentStream.
-        @param blob  The blob to read from.
+    /** Reads data from a blob.
+        @param stream  The stream to read from.
         @param dst  The address to copy the read data to.
-        @param maxLength  The number of bytes to read.
+        @param maxLength  The maximum number of bytes to read.
         @param outError  On failure, an error will be stored here if non-NULL.
         @return  The actual number of bytes read; 0 if at EOF, -1 on error. */
-    ssize_t cbl_blob_readContent(const CBLBlob* blob _cbl_nonnull,
-                       void *dst _cbl_nonnull,
-                       size_t maxLength,
-                       CBLError *outError) CBLAPI;
+    ssize_t cbl_blobreader_read(CBLBlobReadStream* stream _cbl_nonnull,
+                                void *dst _cbl_nonnull,
+                                size_t maxLength,
+                                CBLError *outError) CBLAPI;
 
-    /** Closes a blob's input stream. */
-    void cbl_blob_closeContentStream(const CBLBlob* _cbl_nonnull) CBLAPI;
+    /** Closes a CBLBlobReadStream. */
+    void cbl_blobreader_close(CBLBlobReadStream*) CBLAPI;
 
 
 #pragma mark - CREATING:
@@ -121,23 +108,23 @@ extern "C" {
         @param contentType  The MIME type (optional).
         @param contents  The data's address and length.
         @return  A new CBLBlob instance. */
-    CBLBlob* cbl_doc_createBlobWithData(const char *contentType,
-                                        FLSlice contents) CBLAPI;
+    CBLBlob* cbl_blob_createWithData(const char *contentType,
+                                     FLSlice contents) CBLAPI;
 
     /** A stream for writing a new blob to the database. */
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
 
     /** Opens a stream for writing a new blob.
         You should call \ref cbl_blobwriter_write one or more times to write the data,
-        then \ref cbl_doc_createBlobWithStream to create the blob, then \ref cbl_blobwriter_free.
+        then \ref cbl_blob_createWithStream to create the blob, then \ref cbl_blobwriter_free.
 
         If for some reason you need to abort, just free the writer without calling
         \ref cbl_db_createBlobWithStream. */
     CBLBlobWriteStream* cbl_blobwriter_new(CBLDatabase *db _cbl_nonnull,
                                            CBLError *outError) CBLAPI;
 
-    /** Closes a blob-writing stream if you need to give up without creating a CBLBlob. */
-    void cbl_blobwriter_free(CBLBlobWriteStream*) CBLAPI;
+    /** Closes a blob-writing stream, if you need to give up without creating a CBLBlob. */
+    void cbl_blobwriter_close(CBLBlobWriteStream*) CBLAPI;
 
     /** Writes data to a blob.
         @param writer  The stream to write to.
@@ -151,14 +138,15 @@ extern "C" {
                               CBLError *outError) CBLAPI;
 
     /** Creates a new blob after its data has been written to a \ref CBLBlobWriteStream.
-        @note  You are responsible for releasing the CBLBlob, but not until after its document
-                has been saved.
-        @note  Do not free the stream until after the document has been saved.
+        You should then add the blob to a mutable document as a property -- see
+        \ref CBLMutableDict_SetBlob and \ref CBLMutableArray_SetBlob.
+        @note  You are responsible for releasing the CBLBlob reference.
+        @note  Do not free the stream; the blob will do that.
         @param contentType  The MIME type (optional).
         @param writer  The blob-writing stream the data was written to.
         @return  A new CBLBlob instance. */
-    CBLBlob* cbl_doc_createBlobWithStream(const char *contentType,
-                                          CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
+    CBLBlob* cbl_blob_createWithStream(const char *contentType,
+                                       CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
 
 #pragma mark - FLEECE UTILITIES:
 
@@ -177,20 +165,14 @@ extern "C" {
     }
 
     /** Stores a blob in a mutable array. */
-    static inline void CBLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
-                                               uint32_t index,
-                                               CBLBlob* blob _cbl_nonnull)
-    {
-        FLMutableArray_SetValue(array, index, (FLValue)cbl_blob_mutableProperties(blob));
-    }
+    void CBLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
+                                 uint32_t index,
+                                 CBLBlob* blob _cbl_nonnull);
 
     /** Stores a blob in a mutable dictionary. */
-    static inline void CBLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
+    void CBLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
                                 FLString key,
-                                CBLBlob* blob _cbl_nonnull)
-    {
-        FLMutableDict_SetValue(dict, key, (FLValue)cbl_blob_mutableProperties(blob));
-    }
+                                CBLBlob* blob _cbl_nonnull);
 
 /** @} */
 

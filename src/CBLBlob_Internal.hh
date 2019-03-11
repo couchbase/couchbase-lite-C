@@ -32,6 +32,7 @@ using namespace fleece;
 
 
 
+static inline C4ReadStream*  internal(CBLBlobReadStream *reader)  {return (C4ReadStream*)reader;}
 static inline C4WriteStream* internal(CBLBlobWriteStream *writer) {return (C4WriteStream*)writer;}
 
 
@@ -42,15 +43,12 @@ public:
     :_db(doc->database())
     {
         if (_db && c4doc_dictIsBlob(properties, &_key)) {
-            _properties = properties.asMutable();
-            if (!_properties)
-                _properties = properties.mutableCopy();
+            _properties = properties;
         }
     }
 
     bool valid() const              {return _properties != nullptr;}
     Dict properties() const         {return _properties;}
-    MutableDict properties()        {return _properties;}
 
     uint64_t contentLength() const {
         Value len = _properties[kCBLBlobLengthProperty];
@@ -77,36 +75,12 @@ public:
         return _contentTypeCache.c_str();
     }
 
-    void setContentType(const char *type) {
-        if (type)
-            _properties[kCBLBlobContentTypeProperty] = type;
-        else
-            _properties[kCBLBlobContentTypeProperty].remove();
-    }
-
     virtual FLSliceResult getContents(C4Error *outError) const {
         return c4blob_getContents(store(), _key, outError);
     }
 
-    virtual bool openStream(C4Error *outError) const {
-        close();
-        const_cast<CBLBlob*>(this)->_reader = c4blob_openReadStream(store(), _key, outError);
-        return (_reader != nullptr);
-    }
-
-    size_t read(void *dst, size_t maxLength, C4Error *outError) const {
-        if (!_reader) {
-            setError(outError, LiteCoreDomain, kC4ErrorNotOpen, "Blob is not open for reading"_sl);
-            return -1;
-        }
-        return c4stream_read(_reader, dst, maxLength, outError);
-    }
-
-    void close() const {
-        if (_reader) {
-            c4stream_close(_reader);
-            const_cast<CBLBlob*>(this)->_reader = nullptr;
-        }
+    virtual C4ReadStream* openStream(C4Error *outError) const {
+        return c4blob_openReadStream(store(), _key, outError);
     }
 
     virtual bool install(CBLDatabase *db _cbl_nonnull, C4Error *outError) {
@@ -114,16 +88,11 @@ public:
     }
 
 protected:
-    // constructor for MutableBlob to call
-    CBLBlob(const char *contentType)
-    :_properties(MutableDict::newDict())
-    {
-        _properties[kCBLTypeProperty] = kCBLBlobType;
-        if (contentType)
-            _properties[kCBLBlobContentTypeProperty] = contentType;
-    }
-
-    ~CBLBlob()                                          {close();}
+    // constructor for CBLNewBlob to call
+    CBLBlob()
+    :_mutableProperties(MutableDict::newDict())
+    ,_properties(_mutableProperties)
+    { }
 
     CBLDatabase* database() const                       {return _db;}
     void setDatabase(CBLDatabase *db)                   {_db = db;}
@@ -133,13 +102,10 @@ protected:
         return _db->blobStore();
     }
 
-    const C4BlobKey& key() const                        {return _key;}
+    MutableDict mutableProperties()                     {return _mutableProperties;}
 
-    void setKey(const C4BlobKey &key, uint64_t length) {
-        _key = key;
-        _properties[kCBLBlobDigestProperty] = digest();
-        _properties[kCBLBlobLengthProperty] = length;
-    }
+    const C4BlobKey& key() const                        {return _key;}
+    void setKey(const C4BlobKey &key)                   {_key = key;}
 
 private:
     bool findDatabase() {
@@ -150,12 +116,12 @@ private:
         return (_db != nullptr);
     }
 
-    CBLDatabase*            _db {nullptr};
-    C4BlobKey               _key {};
-    string                  _digest;
-    string                  _contentTypeCache;
-    MutableDict             _properties;
-    C4ReadStream*           _reader {nullptr};
+    CBLDatabase*    _db {nullptr};
+    C4BlobKey       _key {};
+    string          _digest;
+    string          _contentTypeCache;
+    MutableDict     _mutableProperties;
+    Dict            _properties;
 };
 
 
@@ -165,10 +131,15 @@ public:
     CBLNewBlob(const char *contentType,
                slice contents,
                C4WriteStream *writer)
-    :CBLBlob(contentType)
+    :CBLBlob()
     ,_contents(contents)
     ,_writer(writer)
     {
+        assert(mutableProperties() != nullptr);
+        mutableProperties()[kCBLTypeProperty] = kCBLBlobType;
+        if (contentType)
+            mutableProperties()[kCBLBlobContentTypeProperty] = contentType;
+
         C4BlobKey key;
         uint64_t length;
         if (contents) {
@@ -196,13 +167,13 @@ public:
         }
     }
 
-    virtual bool openStream(C4Error *outError) const override {
+    virtual c4ReadStream* openStream(C4Error *outError) const override {
         if (database()) {
             return CBLBlob::openStream(outError);
         } else {
             setError(outError, LiteCoreDomain, kC4ErrorNotFound,
                      "Can't stream blob until doc is saved"_sl);
-            return false;
+            return nullptr;
         }
     }
 
@@ -234,6 +205,12 @@ protected:
     }
 
 private:
-    alloc_slice _contents;              // Contents, before save
-    C4WriteStream* _writer {nullptr};   // Stream, before save
+    void setKey(const C4BlobKey &key, uint64_t length) {
+        CBLBlob::setKey(key);
+        mutableProperties()[kCBLBlobDigestProperty] = digest();
+        mutableProperties()[kCBLBlobLengthProperty] = length;
+    }
+
+    alloc_slice     _contents;              // Contents, before save
+    C4WriteStream*  _writer {nullptr};      // Stream, before save
 };
