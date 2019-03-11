@@ -78,23 +78,11 @@ bool cbl_doc_delete(const CBLDocument* document _cbl_nonnull,
                     CBLConcurrencyControl concurrency,
                     CBLError* error) CBLAPI;
 
-/** Deletes a document from the database, given only its ID.
-    @note  If no document with that ID exists, this function will return false but the error
-            code will be zero.
-    @param database  The database.
-    @param docID  The document ID to delete.
-    @param error  On failure, the error will be written here.
-    @return  True if the document was deleted, false if it doesn't exist or the deletion failed.
- */
-bool cbl_db_deleteDocument(CBLDatabase* database _cbl_nonnull,
-                           const char* docID _cbl_nonnull,
-                           CBLError* error) CBLAPI;
-
 /** Purges a document. This removes all traces of the document from the database.
     Purges are not replicated. If the document is changed on a server, it will be re-created
     when pulled.
     @warning  You are still responsible for releasing the CBLDocument reference.
-    @note If you don't have the document in memory already, \ref cbl_db_purgeDocument is a
+    @note If you don't have the document in memory already, \ref cbl_db_purgeDocumentByID is a
           simpler shortcut.
     @param document  The document to delete.
     @param error  On failure, the error will be written here.
@@ -110,9 +98,9 @@ bool cbl_doc_purge(const CBLDocument* document _cbl_nonnull,
     @param error  On failure, the error will be written here.
     @return  True if the document was purged, false if it doesn't exist or the purge failed.
  */
-bool cbl_db_purgeDocument(CBLDatabase* database _cbl_nonnull,
-                          const char* docID _cbl_nonnull,
-                          CBLError* error) CBLAPI;
+bool cbl_db_purgeDocumentByID(CBLDatabase* database _cbl_nonnull,
+                              const char* docID _cbl_nonnull,
+                              CBLError* error) CBLAPI;
 
 /** @} */
 
@@ -190,6 +178,29 @@ bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
                                  const char *json _cbl_nonnull,
                                  CBLError*) CBLAPI;
 
+/** Returns the time at which a given document will expire and be purged.
+    @param db  The database.
+    @param docID  The ID of the document.
+    @param error  On failure, an error is written here.
+    @return  The expiration as a standard timestamp (seconds since Unix epoch),
+             or 0 if the document does not have an expiration,
+             or -1 if the call failed. */
+time_t cbl_db_getDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+                                    const char *docID _cbl_nonnull,
+                                    CBLError* error);
+
+/** Sets or clears the expiration time of a document.
+    @param db  The database.
+    @param docID  The ID of the document.
+    @param expiration  The expiration time as a standard timestamp  (seconds since Unix epoch),
+                        or 0 if the document should never expire.
+    @param error  On failure, an error is written here.
+    @return  True on success, false on failure. */
+bool cbl_db_setDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+                                  const char *docID _cbl_nonnull,
+                                  time_t expiration,
+                                  CBLError* error);
+
 /** @} */
 
 
@@ -206,9 +217,9 @@ bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
     @param context  An arbitrary value given when the callback was registered.
     @param db  The database containing the document.
     @param docID  The document's ID. */
-typedef void (*CBLDocumentListener)(void *context,
-                                    const CBLDatabase* db _cbl_nonnull,
-                                    const char *docID _cbl_nonnull);
+typedef void (*CBLDocumentChangeListener)(void *context,
+                                          const CBLDatabase* db _cbl_nonnull,
+                                          const char *docID _cbl_nonnull);
 
 /** Registers a document change listener callback. It will be called after a specific document
     is changed on disk.
@@ -219,10 +230,10 @@ typedef void (*CBLDocumentListener)(void *context,
     @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
 _cbl_warn_unused
-CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cbl_nonnull,
-                                             const char* docID _cbl_nonnull,
-                                             CBLDocumentListener listener _cbl_nonnull,
-                                             void *context) CBLAPI;
+CBLListenerToken* cbl_db_addDocumentChangeListener(const CBLDatabase* db _cbl_nonnull,
+                                                   const char* docID _cbl_nonnull,
+                                                   CBLDocumentChangeListener listener _cbl_nonnull,
+                                                   void *context) CBLAPI;
 
 /** @} */
 /** @} */

@@ -19,6 +19,7 @@
 #pragma once
 #include "Base.hh"
 #include "CBLDatabase.h"
+#include "CBLDocument.h"
 #include <functional>
 #include <vector>
 
@@ -37,26 +38,26 @@ namespace cbl {
             return cbl_databaseExists(name, inDirectory);
         }
 
-        static void copyDB(const char* _cbl_nonnull fromPath,
-                           const char* _cbl_nonnull toName)
+        static void copyDatabase(const char* _cbl_nonnull fromPath,
+                                 const char* _cbl_nonnull toName)
         {
             CBLError error;
-            check( cbl_copyDB(fromPath, toName, nullptr, &error), error );
+            check( cbl_copyDatabase(fromPath, toName, nullptr, &error), error );
         }
 
-        static void copyDB(const char* _cbl_nonnull fromPath,
-                           const char* _cbl_nonnull toName,
-                           const CBLDatabaseConfiguration& config)
+        static void copyDatabase(const char* _cbl_nonnull fromPath,
+                                 const char* _cbl_nonnull toName,
+                                 const CBLDatabaseConfiguration& config)
         {
             CBLError error;
-            check( cbl_copyDB(fromPath, toName, &config, &error), error );
+            check( cbl_copyDatabase(fromPath, toName, &config, &error), error );
         }
 
-        static void deleteDB(const char _cbl_nonnull *name,
-                             const char *inDirectory)
+        static void deleteDatabase(const char _cbl_nonnull *name,
+                                   const char *inDirectory)
         {
             CBLError error;
-            check( cbl_deleteDB(name, inDirectory, &error), error);
+            check( cbl_deleteDatabase(name, inDirectory, &error), error);
         }
 
         // Lifecycle:
@@ -80,7 +81,7 @@ namespace cbl {
             check(cbl_db_close(ref(), &error), error);
         }
 
-        void deleteDB() {
+        void deleteDatabase() {
             CBLError error;
             check(cbl_db_delete(ref(), &error), error);
         }
@@ -95,7 +96,6 @@ namespace cbl {
         const char* name() const _cbl_nonnull               {return cbl_db_name(ref());}
         const char* path() const _cbl_nonnull               {return cbl_db_path(ref());}
         uint64_t count() const                              {return cbl_db_count(ref());}
-        uint64_t lastSequence() const                       {return cbl_db_lastSequence(ref());}
         CBLDatabaseConfiguration config() const             {return cbl_db_config(ref());}
 
         // Documents:
@@ -106,13 +106,30 @@ namespace cbl {
         inline Document saveDocument(MutableDocument &doc,
                                      CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);
 
+        time_t getDocumentExpiration(const char *docID) const {
+            CBLError error;
+            time_t exp = cbl_db_getDocumentExpiration(ref(), docID, &error);
+            check(exp >= 0, error);
+            return exp;
+        }
+
+        void setDocumentExpiration(const char *docID, time_t expiration) {
+            CBLError error;
+            check(cbl_db_setDocumentExpiration(ref(), docID, expiration, &error), error);
+        }
+
+        void purgeDocumentByID(const char *docID) {
+            CBLError error;
+            check(cbl_db_purgeDocumentByID(ref(), docID, &error), error);
+        }
+
         // Listeners:
 
         using Listener = cbl::ListenerToken<Database,const std::vector<const char*>&>;
 
         [[nodiscard]] Listener addListener(Listener::Callback f) {
             auto l = Listener(f);
-            l.setToken( cbl_db_addListener(ref(), &_callListener, l.context()) );
+            l.setToken( cbl_db_addChangeListener(ref(), &_callListener, l.context()) );
             return l;
         }
 
@@ -123,7 +140,7 @@ namespace cbl {
                                                            DocumentListener::Callback f)
         {
             auto l = DocumentListener(f);
-            l.setToken( cbl_db_addDocumentListener(ref(), docID, &_callDocListener, l.context()) );
+            l.setToken( cbl_db_addDocumentChangeListener(ref(), docID, &_callDocListener, l.context()) );
             return l;
         }
 

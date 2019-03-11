@@ -39,7 +39,7 @@ const char* const CBLTest::kDatabaseName = "cbl_test";
 CBLTest::CBLTest() {
     CBLDatabaseConfiguration config = {kDatabaseDir.c_str()};
     CBLError error;
-    if (!cbl_deleteDB(kDatabaseName, config.directory, &error) && error.code != 0)
+    if (!cbl_deleteDatabase(kDatabaseName, config.directory, &error) && error.code != 0)
         FAIL("Can't delete temp database: " << error.domain << "/" << error.code);
     db = cbl_db_open(kDatabaseName, &config, &error);
     REQUIRE(db);
@@ -67,7 +67,7 @@ const char* const & CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
 
 
 CBLTest_Cpp::CBLTest_Cpp() {
-    cbl::Database::deleteDB(kDatabaseName, kDatabaseDir.c_str());
+    cbl::Database::deleteDatabase(kDatabaseName, kDatabaseDir.c_str());
     db = cbl::Database(kDatabaseName, {kDatabaseDir.c_str()});
     REQUIRE(db);
 }

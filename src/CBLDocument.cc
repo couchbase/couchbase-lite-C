@@ -17,6 +17,7 @@
 //
 
 #include "CBLDocument.h"
+#include "CBLPrivate.h"
 #include "CBLDocument_Internal.hh"
 #include "CBLBlob_Internal.hh"
 #include "Util.hh"
@@ -378,9 +379,9 @@ bool cbl_doc_delete(const CBLDocument* doc _cbl_nonnull,
     return const_cast<CBLDocument*>(doc)->deleteDoc(concurrency, internal(outError));
 }
 
-bool cbl_db_deleteDocument(CBLDatabase* db _cbl_nonnull,
-                           const char* docID _cbl_nonnull,
-                           CBLError* outError) CBLAPI
+bool cbl_db_deleteDocumentByID(CBLDatabase* db _cbl_nonnull,
+                               const char* docID _cbl_nonnull,
+                               CBLError* outError) CBLAPI
 {
     return CBLDocument::deleteDoc(db, docID, internal(outError));
 }
@@ -388,12 +389,12 @@ bool cbl_db_deleteDocument(CBLDatabase* db _cbl_nonnull,
 bool cbl_doc_purge(const CBLDocument* doc _cbl_nonnull,
                    CBLError* outError) CBLAPI
 {
-    return cbl_db_purgeDocument(doc->database(), doc->docID(), outError);
+    return cbl_db_purgeDocumentByID(doc->database(), doc->docID(), outError);
 }
 
-bool cbl_db_purgeDocument(CBLDatabase* db _cbl_nonnull,
-                          const char* docID _cbl_nonnull,
-                          CBLError* outError) CBLAPI
+bool cbl_db_purgeDocumentByID(CBLDatabase* db _cbl_nonnull,
+                              const char* docID _cbl_nonnull,
+                              CBLError* outError) CBLAPI
 {
     return c4db_purgeDoc(internal(db), slice(docID), internal(outError));
 }

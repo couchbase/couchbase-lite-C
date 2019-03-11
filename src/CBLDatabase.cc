@@ -17,7 +17,7 @@
 //
 
 #include "CBLDatabase_Internal.hh"
-#include "CBLDocument.h"
+#include "CBLPrivate.h"
 #include "Internal.hh"
 #include "Util.hh"
 #include <sys/stat.h>
@@ -57,7 +57,7 @@ bool cbl_databaseExists(const char *name, const char *inDirectory) CBLAPI {
 }
 
 
-bool cbl_copyDB(const char* fromPath,
+bool cbl_copyDatabase(const char* fromPath,
                 const char* toName,
                 const CBLDatabaseConfiguration *config,
                 CBLError* outError) CBLAPI
@@ -67,7 +67,7 @@ bool cbl_copyDB(const char* fromPath,
 }
 
 
-bool cbl_deleteDB(const char *name,
+bool cbl_deleteDatabase(const char *name,
                   const char *inDirectory,
                   CBLError* outError) CBLAPI
 {
@@ -159,7 +159,7 @@ bool CBLDatabase::shouldNotifyNow() {
 }
 
 
-CBLListenerToken* CBLDatabase::addListener(CBLDatabaseListener listener, void *context) {
+CBLListenerToken* CBLDatabase::addListener(CBLDatabaseChangeListener listener, void *context) {
     auto token = _listeners.add(listener, context);
     if (!_observer) {
         _observer = c4dbobs_create(c4db,
@@ -206,8 +206,8 @@ void CBLDatabase::callDBListeners() {
 }
 
 
-CBLListenerToken* cbl_db_addListener(const CBLDatabase* constdb _cbl_nonnull,
-                                     CBLDatabaseListener listener _cbl_nonnull,
+CBLListenerToken* cbl_db_addChangeListener(const CBLDatabase* constdb _cbl_nonnull,
+                                     CBLDatabaseChangeListener listener _cbl_nonnull,
                                      void *context) CBLAPI
 {
     return const_cast<CBLDatabase*>(constdb)->addListener(listener, context);
@@ -222,9 +222,9 @@ namespace cbl_internal {
     // Custom subclass of CBLListenerToken for document listeners.
     // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
     template<>
-    class ListenerToken<CBLDocumentListener> : public CBLListenerToken {
+    class ListenerToken<CBLDocumentChangeListener> : public CBLListenerToken {
     public:
-        ListenerToken(CBLDatabase *db, const char *docID, CBLDocumentListener callback, void *context)
+        ListenerToken(CBLDatabase *db, const char *docID, CBLDocumentChangeListener callback, void *context)
         :CBLListenerToken((const void*)callback, context)
         ,_db(db)
         ,_docID(docID)
@@ -242,7 +242,7 @@ namespace cbl_internal {
             c4docobs_free(_c4obs);
         }
 
-        CBLDocumentListener callback() const           {return (CBLDocumentListener)_callback;}
+        CBLDocumentChangeListener callback() const           {return (CBLDocumentChangeListener)_callback;}
 
         // this is called indirectly by CBLDatabase::sendNotifications
         void call(const CBLDatabase*, const char*) {
@@ -269,17 +269,17 @@ namespace cbl_internal {
 
 
 CBLListenerToken* CBLDatabase::addDocListener(const char* docID _cbl_nonnull,
-                                              CBLDocumentListener listener, void *context)
+                                              CBLDocumentChangeListener listener, void *context)
 {
-    auto token = new ListenerToken<CBLDocumentListener>(this, docID, listener, context);
+    auto token = new ListenerToken<CBLDocumentChangeListener>(this, docID, listener, context);
     _docListeners.add(token);
     return token;
 }
 
 
-CBLListenerToken* cbl_db_addDocumentListener(const CBLDatabase* db _cbl_nonnull,
+CBLListenerToken* cbl_db_addDocumentChangeListener(const CBLDatabase* db _cbl_nonnull,
                                              const char* docID _cbl_nonnull,
-                                             CBLDocumentListener listener _cbl_nonnull,
+                                             CBLDocumentChangeListener listener _cbl_nonnull,
                                              void *context) CBLAPI
 {
     return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context);

@@ -212,6 +212,7 @@
 		275BC4E22204E6A800DBE7D2 /* Blob.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Blob.hh; sourceTree = "<group>"; };
 		275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlobTest_Cpp.cc; sourceTree = "<group>"; };
 		275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLBlob_Internal.hh; sourceTree = "<group>"; };
+		275FA3342236E54D001C392D /* CBLPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLPrivate.h; sourceTree = "<group>"; };
 		277FEE3D21DEF0C700B60E3C /* Base.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Base.hh; sourceTree = "<group>"; };
 		277FEE4E21DEF54D00B60E3C /* Document.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Document.hh; sourceTree = "<group>"; };
 		277FEE4F21E6AB1100B60E3C /* Query.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Query.hh; sourceTree = "<group>"; };
@@ -354,6 +355,7 @@
 				27886C8B21F64C1400069BEA /* Listener.hh */,
 				271C2A7321CC4BD60045856E /* Util.hh */,
 				271C2A7421CC4BD60045856E /* Util.cc */,
+				275FA3342236E54D001C392D /* CBLPrivate.h */,
 				27B61D7E21D6B6900027CCDB /* dylib_main.cc */,
 				27B61D8021D6B7400027CCDB /* CBL.exp */,
 			);

@@ -79,18 +79,18 @@ bool cbl_databaseExists(const char* _cbl_nonnull name, const char *inDirectory) 
     @param fromPath  The full filesystem path to the original database (including extension).
     @param toName  The new database name (without the ".cblite2" extension.)
     @param config  The database configuration (directory and encryption option.) */
-bool cbl_copyDB(const char* _cbl_nonnull fromPath,
-                const char* _cbl_nonnull toName, 
-                const CBLDatabaseConfiguration* config,
-                CBLError*) CBLAPI;
+bool cbl_copyDatabase(const char* _cbl_nonnull fromPath,
+                      const char* _cbl_nonnull toName,
+                      const CBLDatabaseConfiguration* config,
+                      CBLError*) CBLAPI;
 
 /** Deletes a database file. If the database is open, an error is returned.
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
                         absolute or relative path to the database. */
-bool cbl_deleteDB(const char _cbl_nonnull *name, 
-                  const char *inDirectory,
-                  CBLError*) CBLAPI;
+bool cbl_deleteDatabase(const char _cbl_nonnull *name, 
+                        const char *inDirectory,
+                        CBLError*) CBLAPI;
 
 /** @} */
 
@@ -156,10 +156,6 @@ const char* cbl_db_path(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_non
 /** Returns the number of documents in the database. */
 uint64_t cbl_db_count(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
-/** Returns the last sequence number assigned in the database.
-    This starts at zero and increments every time a document is saved or deleted. */
-uint64_t cbl_db_lastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
-
 /** Returns the database's configuration, as given when it was opened. */
 const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
@@ -171,7 +167,7 @@ const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull) CB
 /** \name  Database listeners
     @{
     A database change listener lets you detect changes made to all documents in a database.
-    (If you only want to observe specific documents, use a \ref CBLDocumentListener instead.)
+    (If you only want to observe specific documents, use a \ref CBLDocumentChangeListener instead.)
     @note If there are multiple CBLDatabase instances on the same database file, each one's
     listeners will be notified of changes made by other database instances.
  */
@@ -181,10 +177,10 @@ const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull) CB
     @param db  The database that changed.
     @param numDocs  The number of documents that changed (size of the docIDs array)
     @param docIDs  The IDs of the documents that changed, as a C array of `numDocs` C strings. */
-typedef void (*CBLDatabaseListener)(void *context,
-                                    const CBLDatabase* db _cbl_nonnull,
-                                    unsigned numDocs,
-                                    const char **docIDs _cbl_nonnull);
+    typedef void (*CBLDatabaseChangeListener)(void *context,
+                                              const CBLDatabase* db _cbl_nonnull,
+                                              unsigned numDocs,
+                                              const char **docIDs _cbl_nonnull);
 
 /** Registers a database change listener callback. It will be called after one or more
     documents are changed on disk.
@@ -194,9 +190,9 @@ typedef void (*CBLDatabaseListener)(void *context,
     @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
 _cbl_warn_unused
-CBLListenerToken* cbl_db_addListener(const CBLDatabase* db _cbl_nonnull,
-                                     CBLDatabaseListener listener _cbl_nonnull,
-                                     void *context) CBLAPI;
+CBLListenerToken* cbl_db_addChangeListener(const CBLDatabase* db _cbl_nonnull,
+                                           CBLDatabaseChangeListener listener _cbl_nonnull,
+                                           void *context) CBLAPI;
 
 /** @} */
 /** @} */    // end of outer \defgroup
@@ -235,8 +231,8 @@ typedef void (*CBLNotificationsReadyCallback)(void *context,
     @param callback  The function to be called when a notification is available.
     @param context  An arbitrary value that will be passed to the callback. */
 void cbl_db_bufferNotifications(CBLDatabase *db _cbl_nonnull,
-                            CBLNotificationsReadyCallback callback _cbl_nonnull,
-                            void *context) CBLAPI;
+                                CBLNotificationsReadyCallback callback _cbl_nonnull,
+                                void *context) CBLAPI;
 
 /** Immediately issues all pending notifications for this database, by calling their listener
     callbacks. */

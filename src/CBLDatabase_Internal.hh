@@ -31,9 +31,9 @@ struct CBLDatabase : public CBLRefCounted {
     std::string const path;         // Cached copy so API can return a C string
     std::string const dir;          // Cached copy so API can return a C string
 
-    CBLListenerToken* addListener(CBLDatabaseListener listener _cbl_nonnull, void *context);
+    CBLListenerToken* addListener(CBLDatabaseChangeListener listener _cbl_nonnull, void *context);
     CBLListenerToken* addDocListener(const char *docID _cbl_nonnull,
-                                     CBLDocumentListener listener _cbl_nonnull, void *context);
+                                     CBLDocumentChangeListener listener _cbl_nonnull, void *context);
 
     void bufferNotifications(CBLNotificationsReadyCallback callback, void *context);
     void sendNotifications();
@@ -48,8 +48,8 @@ private:
     void callDocListeners();
 
     C4DatabaseObserver* _observer {nullptr};
-    cbl_internal::Listeners<CBLDatabaseListener> _listeners;
-    cbl_internal::Listeners<CBLDocumentListener> _docListeners;
+    cbl_internal::Listeners<CBLDatabaseChangeListener> _listeners;
+    cbl_internal::Listeners<CBLDocumentChangeListener> _docListeners;
 
     CBLNotificationsReadyCallback _notificationsCallback {nullptr};
     void* _notificationsContext;

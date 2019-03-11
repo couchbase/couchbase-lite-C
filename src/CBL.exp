@@ -14,8 +14,8 @@ _cbl_dumpInstances
 _cbl_listener_remove
 
 _cbl_databaseExists
-_cbl_copyDB
-_cbl_deleteDB
+_cbl_copyDatabase
+_cbl_deleteDatabase
 
 _cbl_db_delete
 _cbl_db_open
@@ -24,21 +24,20 @@ _cbl_db_name
 _cbl_db_path
 _cbl_db_config
 _cbl_db_count
-_cbl_db_lastSequence
 _cbl_db_compact
 _cbl_db_delete
 _cbl_db_beginBatch
 _cbl_db_endBatch
-_cbl_db_addListener
-_cbl_db_addDocumentListener
+_cbl_db_addChangeListener
+_cbl_db_addDocumentChangeListener
 _cbl_db_bufferNotifications
 _cbl_db_sendNotifications
 
 _cbl_db_getDocument
 _cbl_db_getMutableDocument
 _cbl_db_saveDocument
-_cbl_db_deleteDocument
-_cbl_db_purgeDocument
+_cbl_db_deleteDocumentByID
+_cbl_db_purgeDocumentByID
 
 _cbl_db_createIndex
 _cbl_db_deleteIndex
