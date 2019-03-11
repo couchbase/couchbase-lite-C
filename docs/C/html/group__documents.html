@@ -88,25 +88,22 @@ Document lifecycle</h2></td></tr>
 <tr class="memitem:ga8fb0274bd776c651faf3301dcfc4d2b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga8fb0274bd776c651faf3301dcfc4d2b0">cbl_db_getDocument</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *database, const char *docID)</td></tr>
 <tr class="memdesc:ga8fb0274bd776c651faf3301dcfc4d2b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a document from the database, creating a new (immutable) CBLDocument object.  <a href="#ga8fb0274bd776c651faf3301dcfc4d2b0">More...</a><br /></td></tr>
 <tr class="separator:ga8fb0274bd776c651faf3301dcfc4d2b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga845592a3039ed752cbcb657d466c03e6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga845592a3039ed752cbcb657d466c03e6">cbl_doc_retain</a> (<a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *t)</td></tr>
-<tr class="separator:ga845592a3039ed752cbcb657d466c03e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacccbe9c013416ce526d471140f974a0c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#gacccbe9c013416ce526d471140f974a0c">cbl_doc_release</a> (<a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *t)</td></tr>
-<tr class="separator:gacccbe9c013416ce526d471140f974a0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8acaa123d8e0431a48ddc1af644ac3d6"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga8acaa123d8e0431a48ddc1af644ac3d6">cbl_doc_retain</a> (const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *t)</td></tr>
+<tr class="separator:ga8acaa123d8e0431a48ddc1af644ac3d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab596e8e9765a381188c7b24161e7b41a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#gab596e8e9765a381188c7b24161e7b41a">cbl_doc_release</a> (const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *t)</td></tr>
+<tr class="separator:gab596e8e9765a381188c7b24161e7b41a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2ea216b5a0a68590d95355ee0f69e3f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga2ea216b5a0a68590d95355ee0f69e3f7">cbl_db_saveDocument</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *doc, <a class="el" href="group__documents.html#ga28ee39fe30ede5c39ded9b8fdb0be4aa">CBLConcurrencyControl</a> concurrency, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
 <tr class="memdesc:ga2ea216b5a0a68590d95355ee0f69e3f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves a (mutable) document to the database.  <a href="#ga2ea216b5a0a68590d95355ee0f69e3f7">More...</a><br /></td></tr>
 <tr class="separator:ga2ea216b5a0a68590d95355ee0f69e3f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7383298c1da1100bf55609c86f5efcfc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga7383298c1da1100bf55609c86f5efcfc">cbl_doc_delete</a> (const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *document, <a class="el" href="group__documents.html#ga28ee39fe30ede5c39ded9b8fdb0be4aa">CBLConcurrencyControl</a> concurrency, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
 <tr class="memdesc:ga7383298c1da1100bf55609c86f5efcfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a document from the database.  <a href="#ga7383298c1da1100bf55609c86f5efcfc">More...</a><br /></td></tr>
 <tr class="separator:ga7383298c1da1100bf55609c86f5efcfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga54da8505145400147fbcd12fbe7d764a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga54da8505145400147fbcd12fbe7d764a">cbl_db_deleteDocument</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *database, const char *docID, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
-<tr class="memdesc:ga54da8505145400147fbcd12fbe7d764a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a document from the database, given only its ID.  <a href="#ga54da8505145400147fbcd12fbe7d764a">More...</a><br /></td></tr>
-<tr class="separator:ga54da8505145400147fbcd12fbe7d764a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9f0c8f53903c46aaa3075db0f21f6d02"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga9f0c8f53903c46aaa3075db0f21f6d02">cbl_doc_purge</a> (const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *document, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
 <tr class="memdesc:ga9f0c8f53903c46aaa3075db0f21f6d02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Purges a document.  <a href="#ga9f0c8f53903c46aaa3075db0f21f6d02">More...</a><br /></td></tr>
 <tr class="separator:ga9f0c8f53903c46aaa3075db0f21f6d02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1f60741f7e792ffda260144c776c047a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga1f60741f7e792ffda260144c776c047a">cbl_db_purgeDocument</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *database, const char *docID, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
-<tr class="memdesc:ga1f60741f7e792ffda260144c776c047a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Purges a document given only its ID.  <a href="#ga1f60741f7e792ffda260144c776c047a">More...</a><br /></td></tr>
-<tr class="separator:ga1f60741f7e792ffda260144c776c047a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafb91f32f6c9dad29c40c53e97855e27f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#gafb91f32f6c9dad29c40c53e97855e27f">cbl_db_purgeDocumentByID</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *database, const char *docID, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
+<tr class="memdesc:gafb91f32f6c9dad29c40c53e97855e27f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Purges a document given only its ID.  <a href="#gafb91f32f6c9dad29c40c53e97855e27f">More...</a><br /></td></tr>
+<tr class="separator:gafb91f32f6c9dad29c40c53e97855e27f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Mutable documents</h2></td></tr>
@@ -146,18 +143,24 @@ Document properties and metadata</h2></td></tr>
 <tr class="memitem:ga63405a6f2a3789f47ba0b4d263592ab4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga63405a6f2a3789f47ba0b4d263592ab4">cbl_doc_setPropertiesAsJSON</a> (<a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *, const char *json, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
 <tr class="memdesc:ga63405a6f2a3789f47ba0b4d263592ab4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a mutable document's properties from a JSON string.  <a href="#ga63405a6f2a3789f47ba0b4d263592ab4">More...</a><br /></td></tr>
 <tr class="separator:ga63405a6f2a3789f47ba0b4d263592ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1415b5493b2557841b89e3d9cf391c3d"><td class="memItemLeft" align="right" valign="top">time_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga1415b5493b2557841b89e3d9cf391c3d">cbl_db_getDocumentExpiration</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *docID, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
+<tr class="memdesc:ga1415b5493b2557841b89e3d9cf391c3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the time at which a given document will expire and be purged.  <a href="#ga1415b5493b2557841b89e3d9cf391c3d">More...</a><br /></td></tr>
+<tr class="separator:ga1415b5493b2557841b89e3d9cf391c3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga50d327798d4f84218fff6902f44940bd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga50d327798d4f84218fff6902f44940bd">cbl_db_setDocumentExpiration</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *docID, time_t expiration, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
+<tr class="memdesc:ga50d327798d4f84218fff6902f44940bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets or clears the expiration time of a document.  <a href="#ga50d327798d4f84218fff6902f44940bd">More...</a><br /></td></tr>
+<tr class="separator:ga50d327798d4f84218fff6902f44940bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Document listeners</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p><a class="anchor" id="amgrpc4dd4edcfb76bade06eaeafac3a4e24b"></a>A document change listener lets you detect changes made to a specific document after they are persisted to the database.</p>
 <dl class="section note"><dt>Note</dt><dd>If there are multiple CBLDatabase instances on the same database file, each one's document listeners will be notified of changes made by other database instances. </dd></dl>
 </td></tr>
-<tr class="memitem:ga15dddb4b363d8ae2d6ef62725be4536f"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga15dddb4b363d8ae2d6ef62725be4536f">CBLDocumentListener</a>) (void *context, const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *docID)</td></tr>
-<tr class="memdesc:ga15dddb4b363d8ae2d6ef62725be4536f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A document change listener callback, invoked after a specific document is changed on disk.  <a href="#ga15dddb4b363d8ae2d6ef62725be4536f">More...</a><br /></td></tr>
-<tr class="separator:ga15dddb4b363d8ae2d6ef62725be4536f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga61b0cf68c6d7395261be5801f8b89e69"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga61b0cf68c6d7395261be5801f8b89e69">cbl_db_addDocumentListener</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *docID, <a class="el" href="group__documents.html#ga15dddb4b363d8ae2d6ef62725be4536f">CBLDocumentListener</a> listener, void *context)</td></tr>
-<tr class="memdesc:ga61b0cf68c6d7395261be5801f8b89e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a document change listener callback.  <a href="#ga61b0cf68c6d7395261be5801f8b89e69">More...</a><br /></td></tr>
-<tr class="separator:ga61b0cf68c6d7395261be5801f8b89e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga174679a9e38565a3c7a82701c182fd93"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga174679a9e38565a3c7a82701c182fd93">CBLDocumentChangeListener</a>) (void *context, const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *docID)</td></tr>
+<tr class="memdesc:ga174679a9e38565a3c7a82701c182fd93"><td class="mdescLeft">&#160;</td><td class="mdescRight">A document change listener callback, invoked after a specific document is changed on disk.  <a href="#ga174679a9e38565a3c7a82701c182fd93">More...</a><br /></td></tr>
+<tr class="separator:ga174679a9e38565a3c7a82701c182fd93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga728babf1a9e50d2fc9acffb01d071be8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__documents.html#ga728babf1a9e50d2fc9acffb01d071be8">cbl_db_addDocumentChangeListener</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *docID, <a class="el" href="group__documents.html#ga174679a9e38565a3c7a82701c182fd93">CBLDocumentChangeListener</a> listener, void *context)</td></tr>
+<tr class="memdesc:ga728babf1a9e50d2fc9acffb01d071be8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a document change listener callback.  <a href="#ga728babf1a9e50d2fc9acffb01d071be8">More...</a><br /></td></tr>
+<tr class="separator:ga728babf1a9e50d2fc9acffb01d071be8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>A CBLDocument is essentially a JSON object with an ID string that's unique in its database. </p>
@@ -178,14 +181,14 @@ Document listeners</h2></td></tr>
 
 </div>
 </div>
-<a id="ga15dddb4b363d8ae2d6ef62725be4536f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga15dddb4b363d8ae2d6ef62725be4536f">&#9670;&nbsp;</a></span>CBLDocumentListener</h2>
+<a id="ga174679a9e38565a3c7a82701c182fd93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga174679a9e38565a3c7a82701c182fd93">&#9670;&nbsp;</a></span>CBLDocumentChangeListener</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef void(* CBLDocumentListener) (void *context, const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *docID)</td>
+          <td class="memname">typedef void(* CBLDocumentChangeListener) (void *context, const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *docID)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -226,14 +229,14 @@ Document listeners</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ga61b0cf68c6d7395261be5801f8b89e69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga61b0cf68c6d7395261be5801f8b89e69">&#9670;&nbsp;</a></span>cbl_db_addDocumentListener()</h2>
+<a id="ga728babf1a9e50d2fc9acffb01d071be8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga728babf1a9e50d2fc9acffb01d071be8">&#9670;&nbsp;</a></span>cbl_db_addDocumentChangeListener()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a>* cbl_db_addDocumentListener </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a>* cbl_db_addDocumentChangeListener </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em>, </td>
@@ -247,7 +250,7 @@ Document listeners</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__documents.html#ga15dddb4b363d8ae2d6ef62725be4536f">CBLDocumentListener</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group__documents.html#ga174679a9e38565a3c7a82701c182fd93">CBLDocumentChangeListener</a>&#160;</td>
           <td class="paramname"><em>listener</em>, </td>
         </tr>
         <tr>
@@ -275,52 +278,6 @@ Document listeners</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A token to be passed to <a class="el" href="group__listeners.html#gadcb6c78fa3e976af3d2c11421dff66a4">cbl_listener_remove</a> when it's time to remove the listener. </dd></dl>
-
-</div>
-</div>
-<a id="ga54da8505145400147fbcd12fbe7d764a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga54da8505145400147fbcd12fbe7d764a">&#9670;&nbsp;</a></span>cbl_db_deleteDocument()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool cbl_db_deleteDocument </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
-          <td class="paramname"><em>database</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>docID</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="struct_c_b_l_error.html">CBLError</a> *&#160;</td>
-          <td class="paramname"><em>error</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Deletes a document from the database, given only its ID. </p>
-<dl class="section note"><dt>Note</dt><dd>If no document with that ID exists, this function will return false but the error code will be zero. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">database</td><td>The database. </td></tr>
-    <tr><td class="paramname">docID</td><td>The document ID to delete. </td></tr>
-    <tr><td class="paramname">error</td><td>On failure, the error will be written here. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the document was deleted, false if it doesn't exist or the deletion failed. </dd></dl>
 
 </div>
 </div>
@@ -363,6 +320,51 @@ Document listeners</h2></td></tr>
 
 </div>
 </div>
+<a id="ga1415b5493b2557841b89e3d9cf391c3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1415b5493b2557841b89e3d9cf391c3d">&#9670;&nbsp;</a></span>cbl_db_getDocumentExpiration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">time_t cbl_db_getDocumentExpiration </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>docID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_c_b_l_error.html">CBLError</a> *&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the time at which a given document will expire and be purged. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>The database. </td></tr>
+    <tr><td class="paramname">docID</td><td>The ID of the document. </td></tr>
+    <tr><td class="paramname">error</td><td>On failure, an error is written here. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The expiration as a standard timestamp (seconds since Unix epoch), or 0 if the document does not have an expiration, or -1 if the call failed. </dd></dl>
+
+</div>
+</div>
 <a id="ga137e2e150996617e79a8fdc96f290f9e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga137e2e150996617e79a8fdc96f290f9e">&#9670;&nbsp;</a></span>cbl_db_getMutableDocument()</h2>
 
@@ -402,14 +404,14 @@ Document listeners</h2></td></tr>
 
 </div>
 </div>
-<a id="ga1f60741f7e792ffda260144c776c047a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1f60741f7e792ffda260144c776c047a">&#9670;&nbsp;</a></span>cbl_db_purgeDocument()</h2>
+<a id="gafb91f32f6c9dad29c40c53e97855e27f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gafb91f32f6c9dad29c40c53e97855e27f">&#9670;&nbsp;</a></span>cbl_db_purgeDocumentByID()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool cbl_db_purgeDocument </td>
+          <td class="memname">bool cbl_db_purgeDocumentByID </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>database</em>, </td>
@@ -500,6 +502,58 @@ Document listeners</h2></td></tr>
 
 </div>
 </div>
+<a id="ga50d327798d4f84218fff6902f44940bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga50d327798d4f84218fff6902f44940bd">&#9670;&nbsp;</a></span>cbl_db_setDocumentExpiration()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool cbl_db_setDocumentExpiration </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
+          <td class="paramname"><em>db</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>docID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">time_t&#160;</td>
+          <td class="paramname"><em>expiration</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_c_b_l_error.html">CBLError</a> *&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets or clears the expiration time of a document. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db</td><td>The database. </td></tr>
+    <tr><td class="paramname">docID</td><td>The ID of the document. </td></tr>
+    <tr><td class="paramname">expiration</td><td>The expiration time as a standard timestamp (seconds since Unix epoch), or 0 if the document should never expire. </td></tr>
+    <tr><td class="paramname">error</td><td>On failure, an error is written here. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True on success, false on failure. </dd></dl>
+
+</div>
+</div>
 <a id="ga7383298c1da1100bf55609c86f5efcfc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga7383298c1da1100bf55609c86f5efcfc">&#9670;&nbsp;</a></span>cbl_doc_delete()</h2>
 
@@ -534,7 +588,6 @@ Document listeners</h2></td></tr>
 
 <p>Deletes a document from the database. </p>
 <p>Deletions are replicated. </p><dl class="section warning"><dt>Warning</dt><dd>You are still responsible for releasing the CBLDocument. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>If you don't have the document in memory already, <a class="el" href="group__documents.html#ga54da8505145400147fbcd12fbe7d764a">cbl_db_deleteDocument</a> is a simpler shortcut. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">document</td><td>The document to delete. </td></tr>
@@ -709,7 +762,7 @@ Every call to this function returns the same mutable collection. This is the sam
 
 <p>Purges a document. </p>
 <p>This removes all traces of the document from the database. Purges are not replicated. If the document is changed on a server, it will be re-created when pulled. </p><dl class="section warning"><dt>Warning</dt><dd>You are still responsible for releasing the CBLDocument reference. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>If you don't have the document in memory already, <a class="el" href="group__documents.html#ga1f60741f7e792ffda260144c776c047a">cbl_db_purgeDocument</a> is a simpler shortcut. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>If you don't have the document in memory already, <a class="el" href="group__documents.html#gafb91f32f6c9dad29c40c53e97855e27f">cbl_db_purgeDocumentByID</a> is a simpler shortcut. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">document</td><td>The document to delete. </td></tr>
@@ -721,8 +774,8 @@ Every call to this function returns the same mutable collection. This is the sam
 
 </div>
 </div>
-<a id="gacccbe9c013416ce526d471140f974a0c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gacccbe9c013416ce526d471140f974a0c">&#9670;&nbsp;</a></span>cbl_doc_release()</h2>
+<a id="gab596e8e9765a381188c7b24161e7b41a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab596e8e9765a381188c7b24161e7b41a">&#9670;&nbsp;</a></span>cbl_doc_release()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -733,7 +786,7 @@ Every call to this function returns the same mutable collection. This is the sam
         <tr>
           <td class="memname">static void cbl_doc_release </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
           <td class="paramname"><em>t</em></td><td>)</td>
           <td></td>
         </tr>
@@ -747,8 +800,8 @@ Every call to this function returns the same mutable collection. This is the sam
 
 </div>
 </div>
-<a id="ga845592a3039ed752cbcb657d466c03e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga845592a3039ed752cbcb657d466c03e6">&#9670;&nbsp;</a></span>cbl_doc_retain()</h2>
+<a id="ga8acaa123d8e0431a48ddc1af644ac3d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8acaa123d8e0431a48ddc1af644ac3d6">&#9670;&nbsp;</a></span>cbl_doc_retain()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -757,9 +810,9 @@ Every call to this function returns the same mutable collection. This is the sam
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a>* cbl_doc_retain </td>
+          <td class="memname">static const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a>* cbl_doc_retain </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLDocument</a> *&#160;</td>
           <td class="paramname"><em>t</em></td><td>)</td>
           <td></td>
         </tr>

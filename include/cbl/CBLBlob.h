@@ -38,7 +38,7 @@ extern "C" {
 
 
     /** Returns true if a dictionary in a document is a blob reference.
-        If so, you can call \ref cbl_db_getBlob or \ref cbl_db_getMutableBlob to access it. */
+        If so, you can call \ref cbl_blob_get to access it. */
     bool cbl_isBlob(FLDict) CBLAPI;
 
     
@@ -48,12 +48,6 @@ extern "C" {
         @param blobDict  A dictionary in a document.
         @return  A CBLBlob instance for this blob, or NULL if the dictionary is not a blob. */
     const CBLBlob* cbl_blob_get(FLDict blobDict) CBLAPI;
-
-    /** Returns a mutable CBLBlob object corresponding to a blob in a mutable document.
-        Changes made to the blob's properties will be reflected in the dictionary.
-        @param blobDict  A dictionary in a document.
-        @return  A CBLBlob instance for this blob, or NULL if the dictionary is not a blob. */
-    CBLBlob* cbl_blob_getMutable(FLMutableDict blobDict _cbl_nonnull) CBLAPI;
 
 
 #pragma mark - BLOB METADATA:
@@ -116,10 +110,9 @@ extern "C" {
 
     /** Opens a stream for writing a new blob.
         You should call \ref cbl_blobwriter_write one or more times to write the data,
-        then \ref cbl_blob_createWithStream to create the blob, then \ref cbl_blobwriter_free.
+        then \ref cbl_blob_createWithStream to create the blob.
 
-        If for some reason you need to abort, just free the writer without calling
-        \ref cbl_db_createBlobWithStream. */
+        If for some reason you need to abort, just call \ref cbl_blobwriter_close. */
     CBLBlobWriteStream* cbl_blobwriter_new(CBLDatabase *db _cbl_nonnull,
                                            CBLError *outError) CBLAPI;
 

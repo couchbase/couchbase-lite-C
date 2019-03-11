@@ -68,8 +68,6 @@ const CBLDocument* cbl_db_saveDocument(CBLDatabase* db _cbl_nonnull,
 
 /** Deletes a document from the database. Deletions are replicated.
     @warning  You are still responsible for releasing the CBLDocument.
-    @note If you don't have the document in memory already, \ref cbl_db_deleteDocument is a
-          simpler shortcut.
     @param document  The document to delete.
     @param concurrency  Conflict-handling strategy.
     @param error  On failure, the error will be written here.

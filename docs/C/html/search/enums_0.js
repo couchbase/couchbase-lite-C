@@ -1,6 +1,7 @@
 var searchData=
 [
   ['cblconcurrencycontrol',['CBLConcurrencyControl',['../group__documents.html#ga28ee39fe30ede5c39ded9b8fdb0be4aa',1,'CBLDocument.h']]],
+  ['cbldocumentflags',['CBLDocumentFlags',['../group__replication.html#gab32e819862557ea3782119acb17d5801',1,'CBLReplicator.h']]],
   ['cblencryptionalgorithm',['CBLEncryptionAlgorithm',['../group__database.html#ga9a02654aa407ac33e9f9663c36e1b97b',1,'CBLDatabase.h']]],
   ['cblencryptionkeysize',['CBLEncryptionKeySize',['../group__database.html#gae2052559ec3de163e276aa8ec3955d1b',1,'CBLDatabase.h']]],
   ['cblerrorcode',['CBLErrorCode',['../group__errors.html#gad43e348ca76e9a8fe7c10ec916bf0528',1,'CBLBase.h']]],

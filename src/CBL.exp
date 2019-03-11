@@ -62,7 +62,6 @@ _kCBLBlobContentTypeProperty
 
 _cbl_isBlob
 _cbl_blob_get
-_cbl_blob_getMutable
 _cbl_blob_contentType
 _cbl_blob_length
 _cbl_blob_digest

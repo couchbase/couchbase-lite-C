@@ -43,10 +43,6 @@ const CBLBlob* cbl_blob_get(FLDict blobDict) CBLAPI {
     return doc->getBlob(blobDict);
 }
 
-CBLBlob* cbl_blob_getMutable(FLMutableDict blobDict) CBLAPI {
-    return const_cast<CBLBlob*>(cbl_blob_get(blobDict));
-}
-
 FLDict cbl_blob_properties(const CBLBlob* blob) CBLAPI {
     return blob->properties();
 }

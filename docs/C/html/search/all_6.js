@@ -1,6 +1,7 @@
 var searchData=
 [
   ['filtercontext',['filterContext',['../struct_c_b_l_replicator_configuration.html#afdf4d770f7caf4292acbee4c871a0d92',1,'CBLReplicatorConfiguration']]],
+  ['flags',['flags',['../struct_c_b_l_replicated_document.html#a698aef92c44acd65e16d8853ac10e696',1,'CBLReplicatedDocument']]],
   ['flapplyjsondelta',['FLApplyJSONDelta',['../group__delta.html#ga080c06c45f2553464732452ce6c44db3',1,'Fleece.h']]],
   ['flarray',['FLArray',['../group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90',1,'Fleece.h']]],
   ['flarray_5fasmutable',['FLArray_AsMutable',['../group___f_l_array.html#ga5e5b41b9e2398e78fe34ff1716687cec',1,'Fleece.h']]],
@@ -202,7 +203,9 @@ var searchData=
   ['flvalue_5fcopycfobject',['FLValue_CopyCFObject',['../group___c_f.html#gadeb7f157ad5cd6518c5c13b94622ecea',1,'Fleece+CoreFoundation.h']]],
   ['flvalue_5ffinddoc',['FLValue_FindDoc',['../group__reading.html#ga3de00eaf46769c61a3ec1aa5d08430a2',1,'Fleece.h']]],
   ['flvalue_5ffromdata',['FLValue_FromData',['../group__reading.html#gaa62ade926fa1042473f07dd57fe4076b',1,'Fleece.h']]],
+  ['flvalue_5fgetblob',['FLValue_GetBlob',['../group__blobs.html#ga0e8e3668ed1f5dbd46bb30edd9d27bca',1,'CBLBlob.h']]],
   ['flvalue_5fgettype',['FLValue_GetType',['../group___f_l_value.html#gae05bc2ee48a43823258e319a9fe9db94',1,'Fleece.h']]],
+  ['flvalue_5fisblob',['FLValue_IsBlob',['../group__blobs.html#ga736f587583ab975b2b50ae47c8f76a0e',1,'CBLBlob.h']]],
   ['flvalue_5fisdouble',['FLValue_IsDouble',['../group___f_l_value.html#gac5d1f1608c47b374da88f2cb93f90c00',1,'Fleece.h']]],
   ['flvalue_5fisequal',['FLValue_IsEqual',['../group___f_l_value.html#ga2d48a00d47bc4531caa59accb30e1c15',1,'Fleece.h']]],
   ['flvalue_5fisinteger',['FLValue_IsInteger',['../group___f_l_value.html#ga181277adb560b15226c9a09e64380ebd',1,'Fleece.h']]],

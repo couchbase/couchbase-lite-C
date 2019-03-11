@@ -6,6 +6,8 @@ var searchData=
   ['kcblblobtype',['kCBLBlobType',['../group__blobs.html#gaab7ece5c31a228bd5e5606eaf9ff63ea',1,'CBLBlob.h']]],
   ['kcblconcurrencycontrolfailonconflict',['kCBLConcurrencyControlFailOnConflict',['../group__documents.html#gga28ee39fe30ede5c39ded9b8fdb0be4aaa44b90bd103431cc659d432b1c8cce659',1,'CBLDocument.h']]],
   ['kcblconcurrencycontrollastwritewins',['kCBLConcurrencyControlLastWriteWins',['../group__documents.html#gga28ee39fe30ede5c39ded9b8fdb0be4aaa0ce98694beabf576d8614d5b55049fcd',1,'CBLDocument.h']]],
+  ['kcbldocumentflagsaccessremoved',['kCBLDocumentFlagsAccessRemoved',['../group__replication.html#ggab32e819862557ea3782119acb17d5801a015686b94024f35938899389d9c40869',1,'CBLReplicator.h']]],
+  ['kcbldocumentflagsdeleted',['kCBLDocumentFlagsDeleted',['../group__replication.html#ggab32e819862557ea3782119acb17d5801a69adb5bba21a2b0bc34b4f4d638fcc17',1,'CBLReplicator.h']]],
   ['kcblencryptionaes256',['kCBLEncryptionAES256',['../group__database.html#gga9a02654aa407ac33e9f9663c36e1b97ba11522902a57c0935d120db9cc68b8e63',1,'CBLDatabase.h']]],
   ['kcblencryptionkeysizeaes256',['kCBLEncryptionKeySizeAES256',['../group__database.html#ggae2052559ec3de163e276aa8ec3955d1baf7dc997f55a0f36d494ca0adc273d360',1,'CBLDatabase.h']]],
   ['kcblencryptionnone',['kCBLEncryptionNone',['../group__database.html#gga9a02654aa407ac33e9f9663c36e1b97ba0a355459e5cc308745fc9022e1a7c70e',1,'CBLDatabase.h']]],

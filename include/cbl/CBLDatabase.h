@@ -216,12 +216,12 @@ CBLListenerToken* cbl_db_addChangeListener(const CBLDatabase* db _cbl_nonnull,
  */
 
 /** Callback indicating that the database (or an object belonging to it) is ready to call one
-    or more listeners. You should call `cbl_db_callListeners` at your earliest convenience.
-    @note  This callback is called _only once_ until the next time `cbl_db_callListeners`
+    or more listeners. You should call \ref cbl_db_sendNotifications at your earliest convenience.
+    @note  This callback is called _only once_ until the next time \ref cbl_db_sendNotifications
             is called. If you don't respond by (sooner or later) calling that function,
             you will not be informed that any listeners are ready.
     @warning  This can be called from arbitrary threads. It should do as little work as
-              possible, just scheduling a future call to `cbl_db_callListeners`. */
+              possible, just scheduling a future call to \ref cbl_db_sendNotifications. */
 typedef void (*CBLNotificationsReadyCallback)(void *context,
                                               CBLDatabase* db _cbl_nonnull);
 

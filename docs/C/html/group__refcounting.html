@@ -101,7 +101,7 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Couchbase Lite "objects" are reference-counted; these functions are the shared <code>retain</code> and <code>release</code> operations. </p>
-<p>(But there are type-safe equivalents defined for each class, so you can call <a class="el" href="group__database.html#gac84bd45cef3bcee540df4bdd8116c34c">cbl_db_release()</a> on a database, for instance, without having to type-cast.) </p>
+<p>(But there are type-safe equivalents defined for each class, so you can call <a class="el" href="group__database.html#ga7e309bcfb930cc601033e67426eefce2">cbl_db_release()</a> on a database, for instance, without having to type-cast.) </p>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ga125c046d22c745f92d3801047c5121d3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga125c046d22c745f92d3801047c5121d3">&#9670;&nbsp;</a></span>CBL_REFCOUNTED</h2>
@@ -128,7 +128,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">inline</span> TYPE cbl_##NAME##_retain(TYPE <a class="code" href="_c_b_l___compat_8h.html#abecad636db79027c978fa1236ee8d283">_cbl_nonnull</a> t) \</div><div class="line">                                                {<span class="keywordflow">return</span> (TYPE)<a class="code" href="group__refcounting.html#ga2c7b26b2add8e9d2a753074cb7bae6a3">cbl_retain</a>((<a class="code" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a>*)t);} \</div><div class="line">        static <span class="keyword">inline</span> <span class="keywordtype">void</span> cbl_##NAME##_release(TYPE t) {<a class="code" href="group__refcounting.html#ga87e50c2286ec6b3d72ac52e554b71d64">cbl_release</a>((<a class="code" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a>*)t);}</div><div class="ttc" id="group__refcounting_html_ga0be63aade79a59250cccc4db68fece9f"><div class="ttname"><a href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a></div><div class="ttdeci">struct CBLRefCounted CBLRefCounted</div><div class="ttdef"><b>Definition:</b> CBLBase.h:152</div></div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">const</span> TYPE cbl_##NAME##_retain(<span class="keyword">const</span> TYPE <a class="code" href="_c_b_l___compat_8h.html#abecad636db79027c978fa1236ee8d283">_cbl_nonnull</a> t) \</div><div class="line">                                            {<span class="keywordflow">return</span> (<span class="keyword">const</span> TYPE)<a class="code" href="group__refcounting.html#ga2c7b26b2add8e9d2a753074cb7bae6a3">cbl_retain</a>((<a class="code" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a>*)t);} \</div><div class="line">    static <span class="keyword">inline</span> <span class="keywordtype">void</span> cbl_##NAME##_release(<span class="keyword">const</span> TYPE t) {<a class="code" href="group__refcounting.html#ga87e50c2286ec6b3d72ac52e554b71d64">cbl_release</a>((<a class="code" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a>*)t);}</div><div class="ttc" id="group__refcounting_html_ga0be63aade79a59250cccc4db68fece9f"><div class="ttname"><a href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a></div><div class="ttdeci">struct CBLRefCounted CBLRefCounted</div><div class="ttdef"><b>Definition:</b> CBLBase.h:154</div></div>
 <div class="ttc" id="group__refcounting_html_ga87e50c2286ec6b3d72ac52e554b71d64"><div class="ttname"><a href="group__refcounting.html#ga87e50c2286ec6b3d72ac52e554b71d64">cbl_release</a></div><div class="ttdeci">void cbl_release(CBLRefCounted *)</div><div class="ttdoc">Decrements an object&amp;#39;s reference-count, freeing the object if the count hits zero. </div></div>
 <div class="ttc" id="_c_b_l___compat_8h_html_abecad636db79027c978fa1236ee8d283"><div class="ttname"><a href="_c_b_l___compat_8h.html#abecad636db79027c978fa1236ee8d283">_cbl_nonnull</a></div><div class="ttdeci">#define _cbl_nonnull</div><div class="ttdef"><b>Definition:</b> CBL_Compat.h:39</div></div>
 <div class="ttc" id="group__refcounting_html_ga2c7b26b2add8e9d2a753074cb7bae6a3"><div class="ttname"><a href="group__refcounting.html#ga2c7b26b2add8e9d2a753074cb7bae6a3">cbl_retain</a></div><div class="ttdeci">CBLRefCounted * cbl_retain(CBLRefCounted *)</div><div class="ttdoc">Increments an object&amp;#39;s reference-count. </div></div>
@@ -210,7 +210,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Decrements an object's reference-count, freeing the object if the count hits zero. </p>
-<p>Usually you'll call one of the type-safe synonyms specific to the object type, like <a class="el" href="group__database.html#gac84bd45cef3bcee540df4bdd8116c34c">cbl_db_release</a>. </p>
+<p>Usually you'll call one of the type-safe synonyms specific to the object type, like <a class="el" href="group__database.html#ga7e309bcfb930cc601033e67426eefce2">cbl_db_release</a>. </p>
 
 </div>
 </div>
@@ -231,7 +231,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Increments an object's reference-count. </p>
-<p>Usually you'll call one of the type-safe synonyms specific to the object type, like <a class="el" href="group__database.html#gaa2235ac574cb9f890fb081e479ff774d">cbl_db_retain</a>` </p>
+<p>Usually you'll call one of the type-safe synonyms specific to the object type, like <a class="el" href="group__database.html#gaf01d566c23b65bf4171f76277a68bce4">cbl_db_retain</a>` </p>
 
 </div>
 </div>
