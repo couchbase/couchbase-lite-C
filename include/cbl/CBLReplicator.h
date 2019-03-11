@@ -41,27 +41,32 @@ typedef struct CBLEndpoint CBLEndpoint;
     and its path must be the name of the database on that server.
     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
     For example: `wss://example.org/dbname` */
-CBLEndpoint* cblendpoint_newWithURL(const char *url _cbl_nonnull) CBLAPI;
+CBLEndpoint* cbl_endpoint_newWithURL(const char *url _cbl_nonnull) CBLAPI;
 
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Creates a new endpoint representing another local database. */
-CBLEndpoint* cblendpoint_newWithLocalDB(CBLDatabase* _cbl_nonnull) CBLAPI;
+CBLEndpoint* cbl_endpoint_newWithLocalDB(CBLDatabase* _cbl_nonnull) CBLAPI;
 #endif
 
 /** Frees a CBLEndpoint object. */
-void cblendpoint_free(CBLEndpoint*) CBLAPI;
+void cbl_endpoint_free(CBLEndpoint*) CBLAPI;
 
 
 /** An opaque object representing authentication credentials for a remote server. */
 typedef struct CBLAuthenticator CBLAuthenticator;
 
 /** Creates an authenticator for HTTP Basic (username/password) auth. */
-CBLAuthenticator* cblauth_newBasic(const char *username _cbl_nonnull,
-                                   const char *password _cbl_nonnull) CBLAPI;
+CBLAuthenticator* cbl_auth_newBasic(const char *username _cbl_nonnull,
+                                    const char *password _cbl_nonnull) CBLAPI;
+
+/** Creates an authenticator using a Couchbase Sync Gateway login session identifier,
+    and optionally a cookie name (pass NULL for the default.) */
+CBLAuthenticator* cbl_auth_newSession(const char *sessionID _cbl_nonnull,
+                                      const char *cookieName) CBLAPI;
 
 /** Frees a CBLAuthenticator object. */
-void cblauth_free(CBLAuthenticator*) CBLAPI;
+void cbl_auth_free(CBLAuthenticator*) CBLAPI;
 
 
 /** Direction of replication: push, pull, or both. */
@@ -149,18 +154,51 @@ typedef struct {
 /** Returns the replicator's current status. */
 CBLReplicatorStatus cbl_repl_status(CBLReplicator* _cbl_nonnull) CBLAPI;
 
+
 /** A callback that notifies you when the replicator's status changes.
     @param context  The value given when the listener was added.
     @param replicator  The replicator.
     @param status  The replicator's status. */
-typedef void (*CBLReplicatorListener)(void *context, 
-                                      CBLReplicator *replicator _cbl_nonnull,
-                                      const CBLReplicatorStatus *status _cbl_nonnull);
+typedef void (*CBLReplicatorChangeListener)(void *context, 
+                                            CBLReplicator *replicator _cbl_nonnull,
+                                            const CBLReplicatorStatus *status _cbl_nonnull);
 
 /** Adds a listener that will be called when the replicator's status changes. */
-CBLListenerToken* cbl_repl_addListener(CBLReplicator* _cbl_nonnull,
-                                       CBLReplicatorListener _cbl_nonnull, 
-                                       void *context) CBLAPI;
+CBLListenerToken* cbl_repl_addChangeListener(CBLReplicator* _cbl_nonnull,
+                                             CBLReplicatorChangeListener _cbl_nonnull, 
+                                             void *context) CBLAPI;
+
+
+/** Flags describing a replicated document. */
+typedef CBL_ENUM(unsigned, CBLDocumentFlags) {
+    kCBLDocumentFlagsDeleted        = 1 << 0,   ///< The document has been deleted.
+    kCBLDocumentFlagsAccessRemoved  = 1 << 1    ///< Lost access to the document on the server.
+};
+
+
+/** Information about a document that's been pushed or pulled. */
+typedef struct {
+    const char *ID;             ///< The document ID
+    CBLDocumentFlags flags;     ///< Indicates whether the document was deleted or removed
+    CBLError error;             ///< If the code is nonzero, the document failed to replicate.
+} CBLReplicatedDocument;
+
+/** A callback that notifies you when documents are replicated.
+    @param context  The value given when the listener was added.
+    @param replicator  The replicator.
+    @param isPush  True if the document(s) were pushed, false if pulled.
+    @param numDocuments  The number of documents reported by this callback.
+    @param documents  An array of information about the documents. */
+typedef void (*CBLReplicatedDocumentListener)(void *context,
+                                              CBLReplicator *replicator _cbl_nonnull,
+                                              bool isPush,
+                                              unsigned numDocuments,
+                                              const CBLReplicatedDocument* documents);
+
+/** Adds a listener that will be called when the replicator's status changes. */
+CBLListenerToken* cbl_repl_addDocumentListener(CBLReplicator* _cbl_nonnull,
+                                               CBLReplicatedDocumentListener _cbl_nonnull,
+                                               void *context) CBLAPI;
 
 /** @} */
 /** @} */

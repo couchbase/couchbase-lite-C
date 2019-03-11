@@ -41,7 +41,7 @@ typedef CBL_ENUM(uint32_t, CBLErrorDomain) {
 };
 
 /** Couchbase Lite error codes, in the CBLDomain. */
-typedef CBL_ENUM(int32_t,  CBLErrorCode) {
+typedef CBL_ENUM(int32_t, CBLErrorCode) {
     CBLErrorAssertionFailed = 1,    ///< Internal assertion failure
     CBLErrorUnimplemented,          ///< Oops, an unimplemented API call
     CBLErrorUnsupportedEncryption,  ///< Unsupported encryption algorithm

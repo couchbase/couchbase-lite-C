@@ -24,11 +24,11 @@ namespace cbl {
 
     class Endpoint {
     public:
-        void setURL(const char *url _cbl_nonnull)   {_ref = cblendpoint_newWithURL(url);}
+        void setURL(const char *url _cbl_nonnull)   {_ref = cbl_endpoint_newWithURL(url);}
 #ifdef COUCHBASE_ENTERPRISE
-        void setLocalDB(Database db)                {_ref = cblendpoint_newWithLocalDB(db.ref());}
+        void setLocalDB(Database db)                {_ref = cbl_endpoint_newWithLocalDB(db.ref());}
 #endif
-        ~Endpoint()                                 {cblendpoint_free(_ref);}
+        ~Endpoint()                                 {cbl_endpoint_free(_ref);}
         CBLEndpoint* ref() const                    {return _ref;}
     private:
         CBLEndpoint* _ref {nullptr};
@@ -39,8 +39,8 @@ namespace cbl {
     public:
         void setBasic(const char *username _cbl_nonnull,
                       const char *password _cbl_nonnull)
-                                                    {_ref = cblauth_newBasic(username, password);}
-        ~Authenticator()                            {cblauth_free(_ref);}
+                                                    {_ref = cbl_auth_newBasic(username, password);}
+        ~Authenticator()                            {cbl_auth_free(_ref);}
         CBLAuthenticator* ref() const               {return _ref;}
     private:
         CBLAuthenticator* _ref {nullptr};
@@ -115,7 +115,7 @@ namespace cbl {
 
         [[nodiscard]] Listener addListener(Listener::Callback f) {
             auto l = Listener(f);
-            l.setToken( cbl_repl_addListener(ref(), &_callListener, l.context()) );
+            l.setToken( cbl_repl_addChangeListener(ref(), &_callListener, l.context()) );
             return l;
         }
 

@@ -75,7 +75,7 @@ public:
     }
 
 
-    void setListener(CBLReplicatorListener listener, void *context) {
+    void setListener(CBLReplicatorChangeListener listener, void *context) {
         lock_guard<mutex> lock(_mutex);
         _listener = listener;
         _listenerContext = context;
@@ -188,7 +188,7 @@ private:
     Retained<CBLDatabase> const _otherLocalDB;
     std::mutex _mutex;
     c4::ref<C4Replicator> _c4repl;
-    CBLReplicatorListener _listener {nullptr};
+    CBLReplicatorChangeListener _listener {nullptr};
     void* _listenerContext {nullptr};
     bool _resetCheckpoint {false};
     bool _stopping {false};
@@ -198,19 +198,23 @@ private:
 #pragma mark - C API:
 
 
-CBLEndpoint* cblendpoint_newWithURL(const char *url _cbl_nonnull) CBLAPI {
+CBLEndpoint* cbl_endpoint_newWithURL(const char *url _cbl_nonnull) CBLAPI {
     return new CBLURLEndpoint(url);
 }
 
-void cblendpoint_free(CBLEndpoint *endpoint) CBLAPI {
+void cbl_endpoint_free(CBLEndpoint *endpoint) CBLAPI {
     delete endpoint;
 }
 
-CBLAuthenticator* cblauth_newBasic(const char *username, const char *password) CBLAPI {
+CBLAuthenticator* cbl_auth_newBasic(const char *username, const char *password) CBLAPI {
     return new BasicAuthenticator(username, password);
 }
 
-void cblauth_free(CBLAuthenticator *auth) CBLAPI {
+CBLAuthenticator* cbl_auth_newSession(const char *sessionID, const char *cookieName) CBLAPI {
+    return new SessionAuthenticator(sessionID, cookieName);
+}
+
+void cbl_auth_free(CBLAuthenticator *auth) CBLAPI {
     delete auth;
 }
 

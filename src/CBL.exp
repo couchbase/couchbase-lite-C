@@ -80,28 +80,31 @@ _CBLMutableArray_SetBlob
 _CBLMutableDict_SetBlob
 
 _cbl_query_new
+_cbl_query_parameters
 _cbl_query_setParameters
-_cbl_query_setParametersFromJSON
+_cbl_query_setParametersAsJSON
 _cbl_query_execute
 _cbl_query_explain
 _cbl_query_columnCount
 _cbl_query_columnName
-#_cbl_query_addListener
-_cbl_results_next
-_cbl_results_column
-_cbl_results_property
+#_cbl_query_addChangeListener
+_cbl_resultset_next
+_cbl_resultset_valueAtIndex
+_cbl_resultset_valueForKey
 
-_cblendpoint_newWithURL
-_cblendpoint_free
-_cblauth_newBasic
-_cblauth_free
+_cbl_endpoint_newWithURL
+# cblendpoint_newWithLocalDB
+_cbl_endpoint_free
+_cbl_auth_newBasic
+_cbl_auth_newSession
+_cbl_auth_free
 _cbl_repl_new
 _cbl_repl_config
 _cbl_repl_resetCheckpoint
 _cbl_repl_start
 _cbl_repl_stop
-#_cbl_repl_addListener
-
+#_cbl_repl_addChangeListener
+#_cbl_repl_addDocumentListener
 
 #  Fleece.exp
 #

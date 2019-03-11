@@ -59,13 +59,16 @@ CBL_REFCOUNTED(CBLQuery*, query);
 void cbl_query_setParameters(CBLQuery* _cbl_nonnull query,
                              FLDict _cbl_nonnull parameters) CBLAPI;
 
+/** Returns the query's current parameter bindings, if any. */
+FLDict cbl_query_parameters(CBLQuery* _cbl_nonnull query) CBLAPI;
+
 /** Assigns values to the query's parameters, from JSON data.
     These values will be substited for those parameters the next time the query is executed.
     @param query  The query.
     @param json  The parameters in the form of a JSON-encoded object whose
             keys are the parameter names. (You may use JSON5 syntax.) */
-bool cbl_query_setParametersFromJSON(CBLQuery* _cbl_nonnull query,
-                                     const char* _cbl_nonnull json) CBLAPI;
+bool cbl_query_setParametersAsJSON(CBLQuery* _cbl_nonnull query,
+                                   const char* _cbl_nonnull json) CBLAPI;
 
 /** Runs the query, returning the results.
     @note  You must release the result set when you're finished with it. */
@@ -97,15 +100,15 @@ FLSlice cbl_query_columnName(CBLQuery* _cbl_nonnull,
 /** Moves the result-set iterator to the next result.
     Returns false if there are no more results.
     @warning This must be called _before_ examining the first result. */
-bool cbl_results_next(CBLResultSet* _cbl_nonnull) CBLAPI;
+bool cbl_resultset_next(CBLResultSet* _cbl_nonnull) CBLAPI;
 
 /** Returns the value of a column of the current result, given its (zero-based) numeric index. */
-FLValue cbl_results_column(CBLResultSet* _cbl_nonnull,
-                           unsigned column) CBLAPI;
+FLValue cbl_resultset_valueAtIndex(CBLResultSet* _cbl_nonnull,
+                                   unsigned index) CBLAPI;
 
 /** Returns the value of a column of the current result, given its name. */
-FLValue cbl_results_property(CBLResultSet* _cbl_nonnull,
-                             const char* property _cbl_nonnull) CBLAPI;
+FLValue cbl_resultset_valueForKey(CBLResultSet* _cbl_nonnull,
+                                  const char* key _cbl_nonnull) CBLAPI;
 
 CBL_REFCOUNTED(CBLResultSet*, results);
 
@@ -128,10 +131,10 @@ CBL_REFCOUNTED(CBLResultSet*, results);
     @param query  The query that triggered the listener.
     @param newResults  The entire new result set, or NULL if there was an error.
     @param error  The error that occurred, or NULL if the query ran successfully. */
-typedef void (*CBLQueryListener)(void *context,
-                                 CBLQuery* query _cbl_nonnull,
-                                 CBLResultSet* newResults,
-                                 const CBLError* error);
+typedef void (*CBLQueryChangeListener)(void *context,
+                                       CBLQuery* query _cbl_nonnull,
+                                       CBLResultSet* newResults,
+                                       const CBLError* error);
 
 /** Registers a change listener callback with a query, turning it into a "live query" until
     the listener is removed (via \ref cbl_listener_remove).
@@ -141,9 +144,9 @@ typedef void (*CBLQueryListener)(void *context,
     @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
             listener.*/
 _cbl_warn_unused
-CBLListenerToken* cbl_query_addListener(CBLQuery* query _cbl_nonnull,
-                                        CBLQueryListener* listener _cbl_nonnull,
-                                        void *context) CBLAPI;
+CBLListenerToken* cbl_query_addChangeListener(CBLQuery* query _cbl_nonnull,
+                                              CBLQueryChangeListener* listener _cbl_nonnull,
+                                              void *context) CBLAPI;
 
 /** @} */
 

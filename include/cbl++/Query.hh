@@ -40,13 +40,14 @@ namespace cbl {
         inline std::vector<std::string> columnNames() const;
 
         void setParameters(fleece::Dict parameters) {cbl_query_setParameters(ref(), parameters);}
+        fleece::Dict parameters() const             {return cbl_query_parameters(ref());}
 
         inline ResultSet execute();
 
         std::string explain()   {return fleece::alloc_slice(cbl_query_explain(ref())).asString();}
 
-        using Listener = cbl::ListenerToken<CBLQuery, CBLResultSet, CBLError*>;
-        [[nodiscard]] Listener addListener(Listener::Callback);
+        using ChangeListener = cbl::ListenerToken<CBLQuery, CBLResultSet, CBLError*>;
+        [[nodiscard]] ChangeListener addChangeListener(ChangeListener::Callback);
 
         CBL_REFCOUNTED_BOILERPLATE(Query, RefCounted, CBLQuery)
     };
@@ -55,14 +56,19 @@ namespace cbl {
     /** A single query result; ResultSet::iterator iterates over these. */
     class Result {
     public:
-        fleece::Value column(unsigned c)                     {return cbl_results_column(_ref, c);}
-        fleece::Value property(const char *p _cbl_nonnull)   {return cbl_results_property(_ref, p);}
+        fleece::Value valueAtIndex(unsigned i) {
+            return cbl_resultset_valueAtIndex(_ref, i);
+        }
 
-        fleece::Value operator[](unsigned col)               {return column(col);}
-        fleece::Value operator[](const char *p _cbl_nonnull) {return property(p);}
+        fleece::Value valueForKey(const char *key _cbl_nonnull) {
+            return cbl_resultset_valueForKey(_ref, key);
+        }
+
+        fleece::Value operator[](unsigned i)                    {return valueAtIndex(i);}
+        fleece::Value operator[](const char *key _cbl_nonnull)  {return valueForKey(key);}
 
     protected:
-        explicit Result(CBLResultSet *ref)                   :_ref(ref) { }
+        explicit Result(CBLResultSet *ref)                      :_ref(ref) { }
         CBLResultSet* _ref;
         friend class ResultSetIterator;
     };
@@ -95,7 +101,7 @@ namespace cbl {
         bool operator== (const ResultSetIterator &i) const {return _rs == i._rs;}
 
         ResultSetIterator& operator++() {
-            if (!cbl_results_next(_rs.ref()))
+            if (!cbl_resultset_next(_rs.ref()))
                 _rs = ResultSet{};
             return *this;
         }

@@ -59,7 +59,7 @@ namespace cbl_internal {
 
 struct CBLAuthenticator {
     virtual ~CBLAuthenticator()                                 { }
-    virtual void writeAuthDict(Encoder&) =0;
+    virtual void writeOptions(Encoder&) =0;
 };
 
 
@@ -71,13 +71,34 @@ namespace cbl_internal {
         ,_password(password)
         { }
 
-        virtual void writeAuthDict(Encoder &enc) override {
+        virtual void writeOptions(Encoder &enc) override {
+            enc.writeKey(slice(kC4ReplicatorOptionAuthentication));
+            enc.beginDict();
             enc[slice(kC4ReplicatorAuthUserName)] = _username;
             enc[slice(kC4ReplicatorAuthPassword)] = _password;
+            enc.endDict();
         }
 
     private:
         alloc_slice _username, _password;
+    };
+
+    // Concrete Authenticator for session-cookie auth:
+    struct SessionAuthenticator : public CBLAuthenticator {
+        SessionAuthenticator(const char *sessionID _cbl_nonnull, const char *cookieName)
+        :_sessionID(sessionID)
+        ,_cookieName(cookieName ? cookieName : kDefaultCookieName)
+        { }
+
+        static constexpr const char* kDefaultCookieName = "SyncGatewaySession";
+
+        virtual void writeOptions(Encoder &enc) override {
+            enc.writeKey(slice(kC4ReplicatorOptionCookies));
+            enc.writeString(_cookieName + "=" + _sessionID);
+        }
+
+    private:
+        string _sessionID, _cookieName;
     };
 }
 
@@ -120,12 +141,8 @@ namespace cbl_internal {
                 enc.writeKey(slice(kC4ReplicatorOptionPinnedServerCert));
                 enc.writeData(pinnedServerCertificate);
             }
-            if (authenticator) {
-                enc.writeKey(slice(kC4ReplicatorOptionAuthentication));
-                enc.beginDict();
-                authenticator->writeAuthDict(enc);
-                enc.endDict();
-            }
+            if (authenticator)
+                authenticator->writeOptions(enc);
         }
 
         ReplicatorConfiguration(const ReplicatorConfiguration&) =delete;

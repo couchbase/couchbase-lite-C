@@ -42,27 +42,14 @@ public:
             _c4query = c4query_new(internal(db), json, outError);
     }
 
-    bool valid() const {
-        return _c4query != nullptr;
-    }
-
-    void setParameters(FLSlice encodedParameters) {
-        _parameters = encodedParameters;
-    }
+    bool valid() const                              {return _c4query != nullptr;}
+    FLSlice parameters() const                      {return _parameters;}
+    void setParameters(FLSlice encodedParameters)   {_parameters = encodedParameters;}
+    alloc_slice explain() const                     {return c4query_explain(_c4query);}
+    unsigned columnCount() const                    {return c4query_columnCount(_c4query);}
+    slice columnName(unsigned col) const            {return c4query_columnTitle(_c4query, col);}
 
     Retained<CBLResultSet> execute(C4Error* outError);
-
-    alloc_slice explain() {
-        return c4query_explain(_c4query);
-    }
-
-    unsigned columnCount() {
-        return c4query_columnCount(_c4query);
-    }
-
-    slice columnName(unsigned col) {
-        return c4query_columnTitle(_c4query, col);
-    }
 
     int columnNamed(slice name) {
         if (!_columnNames) {
@@ -134,6 +121,10 @@ CBLQuery* cbl_query_new(const CBLDatabase* db _cbl_nonnull,
     return query->valid() ? retain(query.get()) : nullptr;
 }
 
+FLDict cbl_query_parameters(CBLQuery* _cbl_nonnull query) CBLAPI {
+    return FLValue_AsDict(FLValue_FromData(query->parameters(), kFLTrusted));
+}
+
 void cbl_query_setParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBLAPI {
     Encoder enc;
     enc.writeValue(Dict(parameters));
@@ -141,7 +132,7 @@ void cbl_query_setParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CB
     query->setParameters(encodedParameters);
 }
 
-bool cbl_query_setParametersFromJSON(CBLQuery* query, const char* json5) CBLAPI {
+bool cbl_query_setParametersAsJSON(CBLQuery* query, const char* json5) CBLAPI {
     alloc_slice json = convertJSON5(json5, nullptr);
     if (!json)
         return false;
@@ -171,15 +162,15 @@ FLSlice cbl_query_columnName(CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI 
 }
 
 
-bool cbl_results_next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
+bool cbl_resultset_next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
     return rs->next();
 }
 
-FLValue cbl_results_property(CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
+FLValue cbl_resultset_valueForKey(CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
     return rs->property(property);
 }
 
-FLValue cbl_results_column(CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
+FLValue cbl_resultset_valueAtIndex(CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
     return rs->column(column);
 }
 
