@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+CBL_CORE_API extern const char* kCBLAuthDefaultCookieName;
 
 /** \defgroup replication   Replication
     A replicator is a background task that synchronizes changes between a local database and
@@ -194,6 +195,19 @@ typedef void (*CBLReplicatedDocumentListener)(void *context,
                                               bool isPush,
                                               unsigned numDocuments,
                                               const CBLReplicatedDocument* documents);
+
+/** A callback that notifies you when events occurred on a replicator.  There are
+    multiple events per callback, each represented by a \ref CBLReplicatedDocument entry.
+    @param context  The value given when the listener was added.
+    @param replicator  The replicator.
+    @param documents  The events that occurred
+    @param documentCount  The size of the \ref documents array
+    @param isPush  Whether or not this replicator is a push replicator */
+typedef void (*CBLDocumentReplicationListener)(void *context, 
+                                              CBLReplicator *replicator _cbl_nonnull,
+                                              CBLReplicatedDocument** documents _cbl_nonnull,
+                                              size_t documentCount,
+                                              bool isPush);
 
 /** Adds a listener that will be called when the replicator's status changes. */
 CBLListenerToken* cbl_repl_addDocumentListener(CBLReplicator* _cbl_nonnull,

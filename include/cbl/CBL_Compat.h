@@ -29,11 +29,13 @@
 #define __has_extension(x) 0
 #endif
 
+
 #ifdef _MSC_VER
+#include <sal.h>
 #define CBLINLINE           __forceinline
-#define _cbl_nonnull
-#define _cbl_returns_nonnull
-#define _cbl_warn_unused
+#define _cbl_nonnull            _In_
+#define _cbl_returns_nonnull    _Ret_notnull_
+#define _cbl_warn_unused        _Check_return_
 #else
 #define CBLINLINE            inline
 #define _cbl_nonnull         __attribute((nonnull))

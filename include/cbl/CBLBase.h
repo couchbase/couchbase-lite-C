@@ -17,7 +17,13 @@
 //
 
 #pragma once
+#ifdef CMAKE
+#include "cbl_config.h"
+#endif
+
 #include "CBL_Compat.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {

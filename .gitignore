@@ -5,3 +5,4 @@ build_cmake
 python/CouchbaseLite/libcouchbase_lite.dylib
 python/CouchbaseLite/PyCBL.c
 .vscode
+empty.cpp

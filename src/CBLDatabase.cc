@@ -20,8 +20,12 @@
 #include "CBLPrivate.h"
 #include "Internal.hh"
 #include "Util.hh"
+#include "PlatformCompat.hh"
 #include <sys/stat.h>
+
+#ifndef CMAKE
 #include <unistd.h>
+#endif
 
 using namespace std;
 using namespace fleece;
@@ -30,7 +34,7 @@ using namespace cbl_internal;
 
 // Default location for databases: the current directory
 static const char* defaultDbDir() {
-    static const string kDir = getcwd(nullptr, 0);
+    static const string kDir = cbl_getcwd(nullptr, 0);
     return kDir.c_str();
 }
 
@@ -39,13 +43,13 @@ static slice effectiveDir(const char *inDirectory) {
 }
 
 static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
-    C4DatabaseConfig2 c4config { effectiveDir(config->directory) };
+    C4DatabaseConfig2 c4Config { effectiveDir(config->directory) };
 #ifdef COUCHBASE_ENTERPRISE
-    c4Config->encryptionKey.algorithm = config->encryptionKey.algorithm;
-    static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes));
-    memcpy(c4Config->encryptionKey.bytes, config->encryptionKey.bytes, sizeof(CBLEncryptionKey::bytes));
+    c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(config->encryptionKey.algorithm);
+    static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes), "C4EncryptionKey and CBLEncryptionKey size do not match");
+    memcpy(c4Config.encryptionKey.bytes, config->encryptionKey.bytes, sizeof(CBLEncryptionKey::bytes));
 #endif
-    return c4config;
+    return c4Config;
 }
 
 
@@ -86,7 +90,7 @@ CBLDatabase* cbl_db_open(const char *name,
     C4Database *c4db = c4db_openNamed(slice(name), &c4config, internal(outError));
     if (!c4db)
         return nullptr;
-    return retain(new CBLDatabase(c4db, name, (config->directory ?: "")));
+    return retain(new CBLDatabase(c4db, name, (config->directory ? config->directory : "")));
 }
 
 

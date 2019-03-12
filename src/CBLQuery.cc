@@ -92,7 +92,7 @@ public:
     }
 
     Value column(unsigned col) {
-        if (col < 64 && (_enum->missingColumns & (1<<col)))
+        if (col < 64 && (_enum->missingColumns & (1ULL<<col)))
             return nullptr;
         return FLArrayIterator_GetValueAt(&_enum->columns, uint32_t(col));
     }

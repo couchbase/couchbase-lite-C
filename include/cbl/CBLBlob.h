@@ -19,6 +19,7 @@
 #pragma once
 #include "CBLBase.h"
 #include "fleece/Fleece.h"
+#include "PlatformCompat.hh"
 
 #ifdef __cplusplus
 extern "C" {
