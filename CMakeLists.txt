@@ -27,7 +27,7 @@ include(CheckIncludeFile)
 include (CheckFunctionExists)
 check_include_file(unistd.h CBL_HAVE_UNISTD_H)
 check_include_file(direct.h CBL_HAVE_DIRECT_H)
-check_function_exists(vasprintf, CBL_HAVE_VASPRINTF)
+check_function_exists(vasprintf CBL_HAVE_VASPRINTF)
 
 configure_file(
     "${PROJECT_SOURCE_DIR}/include/cbl/cbl_config.h.in"
