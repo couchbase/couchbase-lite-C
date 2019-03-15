@@ -113,7 +113,7 @@ Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
 #pragma mark - PUBLIC API:
 
 
-CBLQuery* cbl_query_new(const CBLDatabase* db _cbl_nonnull,
+CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                         const char *jsonQuery _cbl_nonnull,
                         CBLError* outError) CBLAPI
 {
@@ -121,18 +121,18 @@ CBLQuery* cbl_query_new(const CBLDatabase* db _cbl_nonnull,
     return query->valid() ? retain(query.get()) : nullptr;
 }
 
-FLDict cbl_query_parameters(CBLQuery* _cbl_nonnull query) CBLAPI {
+FLDict CBLQuery_Parameters(CBLQuery* _cbl_nonnull query) CBLAPI {
     return FLValue_AsDict(FLValue_FromData(query->parameters(), kFLTrusted));
 }
 
-void cbl_query_setParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBLAPI {
+void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBLAPI {
     Encoder enc;
     enc.writeValue(Dict(parameters));
     alloc_slice encodedParameters = enc.finish();
     query->setParameters(encodedParameters);
 }
 
-bool cbl_query_setParametersAsJSON(CBLQuery* query, const char* json5) CBLAPI {
+bool CBLQuery_SetParametersAsJSON(CBLQuery* query, const char* json5) CBLAPI {
     alloc_slice json = convertJSON5(json5, nullptr);
     if (!json)
         return false;
@@ -145,32 +145,32 @@ bool cbl_query_setParametersAsJSON(CBLQuery* query, const char* json5) CBLAPI {
     return true;
 }
 
-CBLResultSet* cbl_query_execute(CBLQuery* query _cbl_nonnull, CBLError* outError) CBLAPI {
+CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError) CBLAPI {
     return retain(query->execute(internal(outError)).get());
 }
 
-FLSliceResult cbl_query_explain(CBLQuery* query _cbl_nonnull) CBLAPI {
+FLSliceResult CBLQuery_Explain(CBLQuery* query _cbl_nonnull) CBLAPI {
     return FLSliceResult(query->explain());
 }
 
-unsigned cbl_query_columnCount(CBLQuery* query _cbl_nonnull) CBLAPI {
+unsigned CBLQuery_ColumnCount(CBLQuery* query _cbl_nonnull) CBLAPI {
     return query->columnCount();
 }
 
-FLSlice cbl_query_columnName(CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI {
+FLSlice CBLQuery_ColumnName(CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI {
     return query->columnName(col);
 }
 
 
-bool cbl_resultset_next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
+bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
     return rs->next();
 }
 
-FLValue cbl_resultset_valueForKey(CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
+FLValue CBLResultSet_ValueForKey(CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
     return rs->property(property);
 }
 
-FLValue cbl_resultset_valueAtIndex(CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
+FLValue CBLResultSet_ValueAtIndex(CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
     return rs->column(column);
 }
 
@@ -178,7 +178,7 @@ FLValue cbl_resultset_valueAtIndex(CBLResultSet* rs _cbl_nonnull, unsigned colum
 #pragma mark - INDEXES:
 
 
-bool cbl_db_createIndex(CBLDatabase *db _cbl_nonnull,
+bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
                         const char* name _cbl_nonnull,
                         CBLIndexSpec spec,
                         CBLError *outError) CBLAPI
@@ -194,14 +194,14 @@ bool cbl_db_createIndex(CBLDatabase *db _cbl_nonnull,
                             internal(outError));
 }
 
-bool cbl_db_deleteIndex(CBLDatabase *db _cbl_nonnull,
+bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
                         const char *name _cbl_nonnull,
                         CBLError *outError) CBLAPI
 {
     return c4db_deleteIndex(internal(db), slice(name), internal(outError));
 }
 
-FLMutableArray cbl_db_indexNames(CBLDatabase *db _cbl_nonnull) CBLAPI {
+FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) CBLAPI {
     Doc doc(alloc_slice(c4db_getIndexes(internal(db), nullptr)));
     MutableArray indexes = doc.root().asArray().mutableCopy(kFLDeepCopyImmutables);
     return FLMutableArray_Retain(indexes);

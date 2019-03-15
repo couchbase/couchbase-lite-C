@@ -42,22 +42,22 @@ typedef struct {
 typedef void(*CBLLogCallback)(CBLLogLevel level, CBLLogDomain domain, const char* message);
 
 /** Gets the current log level for debug console logging */
-CBLLogLevel cbl_log_consoleLevel();
+CBLLogLevel CBLLog_ConsoleLevel();
 
 /** Sets the debug console log level */
-void cbl_log_setConsoleLevel(CBLLogLevel);
+void CBLLog_SetConsoleLevel(CBLLogLevel);
 
 /** Gets the current file logging config */
-const CBLLogFileConfiguration* cbl_log_fileConfig();
+const CBLLogFileConfiguration* CBLLog_FileConfig();
 
 /** Sets the file logging configuration */
-void cbl_log_setFileConfig(CBLLogFileConfiguration);
+void CBLLog_SetFileConfig(CBLLogFileConfiguration);
 
 /** Gets the current log callback */
-CBLLogCallback cbl_log_callback();
+CBLLogCallback CBLLog_Callback();
 
 /** Sets the callback for receiving log messages */
-void cbl_log_setCallback(CBLLogCallback);
+void CBLLog_SetCallback(CBLLogCallback);
 
 /** @} */
 

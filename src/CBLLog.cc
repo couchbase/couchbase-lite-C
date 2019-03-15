@@ -19,32 +19,32 @@
 #include "CBLLog.h"
 #include <cstdlib>
 
-CBLLogLevel cbl_log_consoleLevel()
+CBLLogLevel CBLLog_ConsoleLevel()
 {
     abort();
 }
 
-void cbl_log_setConsoleLevel(CBLLogLevel)
+void CBLLog_SetConsoleLevel(CBLLogLevel)
 {
     abort();
 }
 
-const CBLLogFileConfiguration* cbl_log_fileConfig()
+const CBLLogFileConfiguration* CBLLog_FileConfig()
 {
     abort();
 }
 
-void cbl_log_setFileConfig(CBLLogFileConfiguration)
+void CBLLog_SetFileConfig(CBLLogFileConfiguration)
 {
     abort();
 }
 
-CBLLogCallback cbl_log_callback()
+CBLLogCallback CBLLog_Callback()
 {
     abort();
 }
 
-void cbl_log_setCallback(CBLLogCallback)
+void CBLLog_SetCallback(CBLLogCallback)
 {
     abort();
 }

@@ -313,7 +313,7 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, C4Error *outError) {
         if (dict) {
             if (!dict.asMutable()) {
                 i.skipChildren();
-            } else if (cbl_isBlob(dict)) {
+            } else if (CBL_IsBlob(dict)) {
                 CBLNewBlob *blob = findNewBlob(dict);
                 if (blob) {
                     if (!blob->install(db, outError))
@@ -337,34 +337,34 @@ static CBLDocument* getDocument(CBLDatabase* db, const char* docID, bool isMutab
     return doc->exists() ? retain(doc.get()) : nullptr;
 }
 
-const CBLDocument* cbl_db_getDocument(const CBLDatabase* db, const char* docID) CBLAPI {
+const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, const char* docID) CBLAPI {
     return getDocument((CBLDatabase*)db, docID, false);
 }
 
-CBLDocument* cbl_db_getMutableDocument(CBLDatabase* db, const char* docID) CBLAPI {
+CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, const char* docID) CBLAPI {
     return getDocument(db, docID, true);
 }
 
-CBLDocument* cbl_doc_new(const char *docID) CBLAPI {
+CBLDocument* CBLDocument_New(const char *docID) CBLAPI {
     return retain(new CBLDocument(docID, true));
 }
 
-CBLDocument* cbl_doc_mutableCopy(const CBLDocument* doc) CBLAPI {
+CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
     return retain(new CBLDocument(doc));
 }
 
-const char* cbl_doc_id(const CBLDocument* doc) CBLAPI              {return doc->docID();}
-uint64_t cbl_doc_sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
-FLDict cbl_doc_properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
-FLMutableDict cbl_doc_mutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}
+const char* CBLDocument_Id(const CBLDocument* doc) CBLAPI              {return doc->docID();}
+uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
+FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
+FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}
 
-char* cbl_doc_propertiesAsJSON(const CBLDocument* doc) CBLAPI      {return doc->propertiesAsJSON();}
+char* CBLDocument_PropertiesAsJSON(const CBLDocument* doc) CBLAPI      {return doc->propertiesAsJSON();}
 
-bool cbl_doc_setPropertiesAsJSON(CBLDocument* doc, const char *json, CBLError* outError) CBLAPI {
+bool CBLDocument_SetPropertiesAsJSON(CBLDocument* doc, const char *json, CBLError* outError) CBLAPI {
     return doc->setPropertiesAsJSON(json, internal(outError));
 }
 
-const CBLDocument* cbl_db_saveDocument(CBLDatabase* db,
+const CBLDocument* CBLDatabase_SaveDocument(CBLDatabase* db,
                                        CBLDocument* doc,
                                        CBLConcurrencyControl concurrency,
                                        CBLError* outError) CBLAPI
@@ -372,27 +372,27 @@ const CBLDocument* cbl_db_saveDocument(CBLDatabase* db,
     return retain(doc->save(db, false, concurrency, internal(outError)).get());
 }
 
-bool cbl_doc_delete(const CBLDocument* doc _cbl_nonnull,
+bool CBLDocument_Delete(const CBLDocument* doc _cbl_nonnull,
                     CBLConcurrencyControl concurrency,
                     CBLError* outError) CBLAPI
 {
     return const_cast<CBLDocument*>(doc)->deleteDoc(concurrency, internal(outError));
 }
 
-bool cbl_db_deleteDocumentByID(CBLDatabase* db _cbl_nonnull,
+bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db _cbl_nonnull,
                                const char* docID _cbl_nonnull,
                                CBLError* outError) CBLAPI
 {
     return CBLDocument::deleteDoc(db, docID, internal(outError));
 }
 
-bool cbl_doc_purge(const CBLDocument* doc _cbl_nonnull,
+bool CBLDocument_Purge(const CBLDocument* doc _cbl_nonnull,
                    CBLError* outError) CBLAPI
 {
-    return cbl_db_purgeDocumentByID(doc->database(), doc->docID(), outError);
+    return CBLDatabase_PurgeDocumentByID(doc->database(), doc->docID(), outError);
 }
 
-bool cbl_db_purgeDocumentByID(CBLDatabase* db _cbl_nonnull,
+bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db _cbl_nonnull,
                               const char* docID _cbl_nonnull,
                               CBLError* outError) CBLAPI
 {

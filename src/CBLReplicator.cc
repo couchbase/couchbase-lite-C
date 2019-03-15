@@ -198,38 +198,38 @@ private:
 #pragma mark - C API:
 
 
-CBLEndpoint* cbl_endpoint_newWithURL(const char *url _cbl_nonnull) CBLAPI {
+CBLEndpoint* CBLEndpoint_NewWithURL(const char *url _cbl_nonnull) CBLAPI {
     return new CBLURLEndpoint(url);
 }
 
-void cbl_endpoint_free(CBLEndpoint *endpoint) CBLAPI {
+void CBLEndpoint_Free(CBLEndpoint *endpoint) CBLAPI {
     delete endpoint;
 }
 
-CBLAuthenticator* cbl_auth_newBasic(const char *username, const char *password) CBLAPI {
+CBLAuthenticator* CBLAuth_NewBasic(const char *username, const char *password) CBLAPI {
     return new BasicAuthenticator(username, password);
 }
 
-CBLAuthenticator* cbl_auth_newSession(const char *sessionID, const char *cookieName) CBLAPI {
+CBLAuthenticator* CBLAuth_NewSession(const char *sessionID, const char *cookieName) CBLAPI {
     return new SessionAuthenticator(sessionID, cookieName);
 }
 
-void cbl_auth_free(CBLAuthenticator *auth) CBLAPI {
+void CBLAuth_Free(CBLAuthenticator *auth) CBLAPI {
     delete auth;
 }
 
-CBLReplicator* cbl_repl_new(const CBLReplicatorConfiguration* conf, CBLError *outError) CBLAPI {
+CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* conf, CBLError *outError) CBLAPI {
     return validated(new CBLReplicator(conf), outError);
 }
 
-const CBLReplicatorConfiguration* cbl_repl_config(CBLReplicator* repl) CBLAPI {
+const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator* repl) CBLAPI {
     return repl->configuration();
 }
 
-CBLReplicatorStatus cbl_repl_status(CBLReplicator* repl) CBLAPI {
+CBLReplicatorStatus CBLReplicator_Status(CBLReplicator* repl) CBLAPI {
     return repl->status();
 }
 
-void cbl_repl_start(CBLReplicator* repl) CBLAPI            {repl->start();}
-void cbl_repl_stop(CBLReplicator* repl) CBLAPI             {repl->stop();}
-void cbl_repl_resetCheckpoint(CBLReplicator* repl) CBLAPI  {repl->resetCheckpoint();}
+void CBLReplicator_Start(CBLReplicator* repl) CBLAPI            {repl->start();}
+void CBLReplicator_Stop(CBLReplicator* repl) CBLAPI             {repl->stop();}
+void CBLReplicator_ResetCheckpoint(CBLReplicator* repl) CBLAPI  {repl->resetCheckpoint();}

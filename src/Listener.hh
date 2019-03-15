@@ -29,7 +29,7 @@ public:
         _owner = owner;
     }
 
-    /** Called by `cbl_listener_remove` */
+    /** Called by `CBLListener_Remove` */
     void remove();
 
 protected:

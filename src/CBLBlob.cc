@@ -22,19 +22,19 @@ using namespace std;
 using namespace fleece;
 
 
-const FLSlice kCBLTypeProperty              = FLSTR(kC4ObjectTypeProperty);
-const FLSlice kCBLBlobType                  = FLSTR(kC4ObjectType_Blob);
-const FLSlice kCBLBlobDigestProperty        = FLSTR(kC4BlobDigestProperty);
-const FLSlice kCBLBlobLengthProperty        = "length"_sl;
-const FLSlice kCBLBlobContentTypeProperty   = "content_type"_sl;
+CBL_CORE_API const FLSlice kCBLTypeProperty              = FLSTR(kC4ObjectTypeProperty);
+CBL_CORE_API const FLSlice kCBLBlobType                  = FLSTR(kC4ObjectType_Blob);
+CBL_CORE_API const FLSlice kCBLBlobDigestProperty        = FLSTR(kC4BlobDigestProperty);
+CBL_CORE_API const FLSlice kCBLBlobLengthProperty        = "length"_sl;
+CBL_CORE_API const FLSlice kCBLBlobContentTypeProperty   = "content_type"_sl;
 
 
-bool cbl_isBlob(FLDict dict) CBLAPI {
+bool CBL_IsBlob(FLDict dict) CBLAPI {
     C4BlobKey digest;
     return dict && c4doc_dictIsBlob(dict, &digest);
 }
 
-const CBLBlob* cbl_blob_get(FLDict blobDict) CBLAPI {
+const CBLBlob* CBLBlob_Get(FLDict blobDict) CBLAPI {
     auto doc = CBLDocument::containing(Dict(blobDict));
     if (!doc) {
         C4Warn("cbl_doc_getBlob: Dict at %p does not belong to any CBLDocument", blobDict);
@@ -43,31 +43,31 @@ const CBLBlob* cbl_blob_get(FLDict blobDict) CBLAPI {
     return doc->getBlob(blobDict);
 }
 
-FLDict cbl_blob_properties(const CBLBlob* blob) CBLAPI {
+FLDict CBLBlob_Properties(const CBLBlob* blob) CBLAPI {
     return blob->properties();
 }
 
-const char* cbl_blob_contentType(const CBLBlob* blob) CBLAPI {
+const char* CBLBlob_ContentType(const CBLBlob* blob) CBLAPI {
     return blob->contentType();
 }
 
-uint64_t cbl_blob_length(const CBLBlob* blob) CBLAPI {
+uint64_t CBLBlob_Length(const CBLBlob* blob) CBLAPI {
     return blob->contentLength();
 }
 
-const char* cbl_blob_digest(const CBLBlob* blob) CBLAPI {
+const char* CBLBlob_Digest(const CBLBlob* blob) CBLAPI {
     return blob->digest();
 }
 
-FLSliceResult cbl_blob_loadContent(const CBLBlob* blob, CBLError *outError) CBLAPI {
+FLSliceResult CBLBlob_LoadContent(const CBLBlob* blob, CBLError *outError) CBLAPI {
     return blob->getContents(internal(outError));
 }
 
-CBLBlobReadStream* cbl_blob_openContentStream(const CBLBlob* blob, CBLError *outError) CBLAPI {
+CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* blob, CBLError *outError) CBLAPI {
     return (CBLBlobReadStream*)blob->openStream(internal(outError));
 }
 
-ssize_t cbl_blobreader_read(CBLBlobReadStream* stream,
+ssize_t CBLBlobReader_Read(CBLBlobReadStream* stream,
                             void *dst,
                             size_t maxLength,
                             CBLError *outError) CBLAPI
@@ -75,7 +75,7 @@ ssize_t cbl_blobreader_read(CBLBlobReadStream* stream,
     return c4stream_read(internal(stream), dst, maxLength, internal(outError));
 }
 
-void cbl_blobreader_close(CBLBlobReadStream* stream) CBLAPI {
+void CBLBlobReader_Close(CBLBlobReadStream* stream) CBLAPI {
     c4stream_close(internal(stream));
 }
 
@@ -90,29 +90,29 @@ static CBLBlob* createNewBlob(const char *type,
     return retain(new CBLNewBlob(type, contents, internal(writer)));
 }
 
-CBLBlob* cbl_blob_createWithData(const char *contentType,
+CBLBlob* CBLBlob_CreateWithData(const char *contentType,
                                     FLSlice contents) CBLAPI
 {
     return createNewBlob(contentType, contents, nullptr);
 }
 
-CBLBlob* cbl_blob_createWithStream(const char *contentType,
+CBLBlob* CBLBlob_CreateWithStream(const char *contentType,
                                       CBLBlobWriteStream *writer) CBLAPI
 {
     return createNewBlob(contentType, nullslice, writer);
 }
 
 
-CBLBlobWriteStream* cbl_blobwriter_new(CBLDatabase *db, CBLError *outError) CBLAPI {
+CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError) CBLAPI {
     return (CBLBlobWriteStream*) c4blob_openWriteStream(db->blobStore(),
                                                         internal(outError));
 }
 
-void cbl_blobwriter_close(CBLBlobWriteStream* writer) CBLAPI {
+void CBLBlobWriter_Close(CBLBlobWriteStream* writer) CBLAPI {
     c4stream_closeWriter(internal(writer));
 }
 
-bool cbl_blobwriter_write(CBLBlobWriteStream* writer,
+bool CBLBlobWriter_Writer(CBLBlobWriteStream* writer,
                           const void *data,
                           size_t length,
                           CBLError *outError) CBLAPI
@@ -125,13 +125,13 @@ bool cbl_blobwriter_write(CBLBlobWriteStream* writer,
 
 
 static MutableDict blobMutableProperties(CBLBlob *blob _cbl_nonnull) {
-    Dict props = cbl_blob_properties(blob);
+    Dict props = CBLBlob_Properties(blob);
     MutableDict mProps = props.asMutable();
     return mProps ? mProps : props.mutableCopy();
 }
 
 
-void CBLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
+void FLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
                              uint32_t index,
                              CBLBlob* blob _cbl_nonnull)
 {
@@ -139,7 +139,7 @@ void CBLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
 }
 
 
-void CBLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
+void FLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
                                           FLString key,
                                           CBLBlob* blob _cbl_nonnull)
 {

@@ -73,13 +73,13 @@ typedef struct {
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
                         absolute or relative path to the database. */
-bool cbl_databaseExists(const char* _cbl_nonnull name, const char *inDirectory) CBLAPI;
+bool CBL_DatabaseExists(const char* _cbl_nonnull name, const char *inDirectory) CBLAPI;
 
 /** Copies a database file to a new location and assigns it a new UUID.
     @param fromPath  The full filesystem path to the original database (including extension).
     @param toName  The new database name (without the ".cblite2" extension.)
     @param config  The database configuration (directory and encryption option.) */
-bool cbl_copyDatabase(const char* _cbl_nonnull fromPath,
+bool CBL_CopyDatabase(const char* _cbl_nonnull fromPath,
                       const char* _cbl_nonnull toName,
                       const CBLDatabaseConfiguration* config,
                       CBLError*) CBLAPI;
@@ -88,7 +88,7 @@ bool cbl_copyDatabase(const char* _cbl_nonnull fromPath,
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
                         absolute or relative path to the database. */
-bool cbl_deleteDatabase(const char _cbl_nonnull *name, 
+bool CBL_DeleteDatabase(const char _cbl_nonnull *name, 
                         const char *inDirectory,
                         CBLError*) CBLAPI;
 
@@ -111,31 +111,31 @@ bool cbl_deleteDatabase(const char _cbl_nonnull *name,
     @param error  On failure, the error will be written here.
     @return  The new database object, or NULL on failure. */
 _cbl_warn_unused
-CBLDatabase* cbl_db_open(const char *name _cbl_nonnull,
-                         const CBLDatabaseConfiguration* config,
-                         CBLError* error) CBLAPI;
+CBLDatabase* CBLDatabase_Open(const char *name _cbl_nonnull,
+                              const CBLDatabaseConfiguration* config,
+                              CBLError* error) CBLAPI;
 
 /** Closes an open database. */
-bool cbl_db_close(CBLDatabase*, CBLError*) CBLAPI;
+bool CBLDatabase_Close(CBLDatabase*, CBLError*) CBLAPI;
 
-CBL_REFCOUNTED(CBLDatabase*, db);
+CBL_REFCOUNTED(CBLDatabase*, Database);
 
 /** Closes and deletes a database. */
-bool cbl_db_delete(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+bool CBLDatabase_Delete(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** Compacts a database file. */
-bool cbl_db_compact(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+bool CBLDatabase_Compact(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** Begins a batch operation, similar to a transaction. You **must** later call \ref
-    cbl_db_endBatch to end (commit) the batch.
+    CBLDatabase_EndBatch to end (commit) the batch.
     @note  Multiple writes are much faster when grouped inside a single batch.
     @note  Changes will not be visible to other CBLDatabase instances on the same database until
             the batch operation ends.
     @note  Batch operations can nest. Changes are not committed until the outer batch ends. */
-bool cbl_db_beginBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+bool CBLDatabase_BeginBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
-/** Ends a batch operation. This **must** be called after \ref cbl_db_beginBatch. */
-bool cbl_db_endBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+/** Ends a batch operation. This **must** be called after \ref CBLDatabase_BeginBatch. */
+bool CBLDatabase_EndBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** @} */
 
@@ -148,16 +148,16 @@ bool cbl_db_endBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
  */
 
 /** Returns the database's name. */
-const char* cbl_db_name(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
+const char* CBLDatabase_Name(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
 
 /** Returns the database's full filesystem path. */
-const char* cbl_db_path(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
+const char* CBLDatabase_Path(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
 
 /** Returns the number of documents in the database. */
-uint64_t cbl_db_count(const CBLDatabase* _cbl_nonnull) CBLAPI;
+uint64_t CBLDatabase_Count(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Returns the database's configuration, as given when it was opened. */
-const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull) CBLAPI;
+const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** @} */
 
@@ -187,12 +187,12 @@ const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* _cbl_nonnull) CB
     @param db  The database to observe.
     @param listener  The callback to be invoked.
     @param context  An opaque value that will be passed to the callback.
-    @return  A token to be passed to \ref cbl_listener_remove when it's time to remove the
+    @return  A token to be passed to \ref CBLListener_Remove when it's time to remove the
             listener.*/
 _cbl_warn_unused
-CBLListenerToken* cbl_db_addChangeListener(const CBLDatabase* db _cbl_nonnull,
-                                           CBLDatabaseChangeListener listener _cbl_nonnull,
-                                           void *context) CBLAPI;
+CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db _cbl_nonnull,
+                                                CBLDatabaseChangeListener listener _cbl_nonnull,
+                                                void *context) CBLAPI;
 
 /** @} */
 /** @} */    // end of outer \defgroup
@@ -216,12 +216,12 @@ CBLListenerToken* cbl_db_addChangeListener(const CBLDatabase* db _cbl_nonnull,
  */
 
 /** Callback indicating that the database (or an object belonging to it) is ready to call one
-    or more listeners. You should call \ref cbl_db_sendNotifications at your earliest convenience.
-    @note  This callback is called _only once_ until the next time \ref cbl_db_sendNotifications
+    or more listeners. You should call \ref CBLDatabase_SendNotifications at your earliest convenience.
+    @note  This callback is called _only once_ until the next time \ref CBLDatabase_SendNotifications
             is called. If you don't respond by (sooner or later) calling that function,
             you will not be informed that any listeners are ready.
     @warning  This can be called from arbitrary threads. It should do as little work as
-              possible, just scheduling a future call to \ref cbl_db_sendNotifications. */
+              possible, just scheduling a future call to \ref CBLDatabase_SendNotifications. */
 typedef void (*CBLNotificationsReadyCallback)(void *context,
                                               CBLDatabase* db _cbl_nonnull);
 
@@ -230,13 +230,13 @@ typedef void (*CBLNotificationsReadyCallback)(void *context,
     @param db  The database whose notifications are to be buffered.
     @param callback  The function to be called when a notification is available.
     @param context  An arbitrary value that will be passed to the callback. */
-void cbl_db_bufferNotifications(CBLDatabase *db _cbl_nonnull,
-                                CBLNotificationsReadyCallback callback _cbl_nonnull,
-                                void *context) CBLAPI;
+void CBLDatabase_BufferNotifications(CBLDatabase *db _cbl_nonnull,
+                                     CBLNotificationsReadyCallback callback _cbl_nonnull,
+                                     void *context) CBLAPI;
 
 /** Immediately issues all pending notifications for this database, by calling their listener
     callbacks. */
-void cbl_db_sendNotifications(CBLDatabase *db _cbl_nonnull) CBLAPI;
+void CBLDatabase_SendNotifications(CBLDatabase *db _cbl_nonnull) CBLAPI;
                                      
 /** @} */
 /** @} */    // end of outer \defgroup

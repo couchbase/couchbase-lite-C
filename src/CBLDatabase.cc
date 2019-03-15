@@ -56,12 +56,12 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
 #pragma mark - STATIC "METHODS":
 
 
-bool cbl_databaseExists(const char *name, const char *inDirectory) CBLAPI {
+bool CBL_DatabaseExists(const char *name, const char *inDirectory) CBLAPI {
     return c4db_exists(slice(name), effectiveDir(inDirectory));
 }
 
 
-bool cbl_copyDatabase(const char* fromPath,
+bool CBL_CopyDatabase(const char* fromPath,
                 const char* toName,
                 const CBLDatabaseConfiguration *config,
                 CBLError* outError) CBLAPI
@@ -71,7 +71,7 @@ bool cbl_copyDatabase(const char* fromPath,
 }
 
 
-bool cbl_deleteDatabase(const char *name,
+bool CBL_DeleteDatabase(const char *name,
                   const char *inDirectory,
                   CBLError* outError) CBLAPI
 {
@@ -82,7 +82,7 @@ bool cbl_deleteDatabase(const char *name,
 #pragma mark - LIFECYCLE & OPERATIONS:
 
 
-CBLDatabase* cbl_db_open(const char *name,
+CBLDatabase* CBLDatabase_Open(const char *name,
                          const CBLDatabaseConfiguration *config,
                          CBLError *outError) CBLAPI
 {
@@ -94,23 +94,23 @@ CBLDatabase* cbl_db_open(const char *name,
 }
 
 
-bool cbl_db_close(CBLDatabase* db, CBLError* outError) CBLAPI {
+bool CBLDatabase_Close(CBLDatabase* db, CBLError* outError) CBLAPI {
     return !db || c4db_close(internal(db), internal(outError));
 }
 
-bool cbl_db_beginBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
+bool CBLDatabase_BeginBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
     return c4db_beginTransaction(internal(db), internal(outError));
 }
 
-bool cbl_db_endBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
+bool CBLDatabase_EndBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
     return c4db_endTransaction(internal(db), true, internal(outError));
 }
 
-bool cbl_db_compact(CBLDatabase* db, CBLError* outError) CBLAPI {
+bool CBLDatabase_Compact(CBLDatabase* db, CBLError* outError) CBLAPI {
     return c4db_compact(internal(db), internal(outError));
 }
 
-bool cbl_db_delete(CBLDatabase* db, CBLError* outError) CBLAPI {
+bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
     return c4db_delete(internal(db), internal(outError));
 }
 
@@ -118,20 +118,20 @@ bool cbl_db_delete(CBLDatabase* db, CBLError* outError) CBLAPI {
 #pragma mark - ACCESSORS:
 
 
-const char* cbl_db_name(const CBLDatabase* db) CBLAPI {
+const char* CBLDatabase_Name(const CBLDatabase* db) CBLAPI {
     return db->name.c_str();
 }
 
-const char* cbl_db_path(const CBLDatabase* db) CBLAPI {
+const char* CBLDatabase_Path(const CBLDatabase* db) CBLAPI {
     return db->path.c_str();
 }
 
-const CBLDatabaseConfiguration cbl_db_config(const CBLDatabase* db) CBLAPI {
+const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) CBLAPI {
     const char *dir = db->dir.empty() ? nullptr : db->dir.c_str();
     return {dir};
 }
 
-uint64_t cbl_db_count(const CBLDatabase* db) CBLAPI {
+uint64_t CBLDatabase_Count(const CBLDatabase* db) CBLAPI {
     return c4db_getDocumentCount(internal(db));
 }
 
@@ -210,7 +210,7 @@ void CBLDatabase::callDBListeners() {
 }
 
 
-CBLListenerToken* cbl_db_addChangeListener(const CBLDatabase* constdb _cbl_nonnull,
+CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* constdb _cbl_nonnull,
                                      CBLDatabaseChangeListener listener _cbl_nonnull,
                                      void *context) CBLAPI
 {
@@ -281,7 +281,7 @@ CBLListenerToken* CBLDatabase::addDocListener(const char* docID _cbl_nonnull,
 }
 
 
-CBLListenerToken* cbl_db_addDocumentChangeListener(const CBLDatabase* db _cbl_nonnull,
+CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db _cbl_nonnull,
                                              const char* docID _cbl_nonnull,
                                              CBLDocumentChangeListener listener _cbl_nonnull,
                                              void *context) CBLAPI
@@ -310,14 +310,14 @@ void CBLDatabase::sendNotifications() {
 
 
 
-void cbl_db_bufferNotifications(CBLDatabase *db,
+void CBLDatabase_BufferNotifications(CBLDatabase *db,
                                 CBLNotificationsReadyCallback callback,
                                 void *context) CBLAPI
 {
     db->bufferNotifications(callback, context);
 }
 
-void cbl_db_sendNotifications(CBLDatabase *db) CBLAPI {
+void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI {
     db->sendNotifications();
 }
 

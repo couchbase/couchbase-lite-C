@@ -178,7 +178,7 @@ public:
     }
 
     virtual bool install(CBLDatabase *db _cbl_nonnull, C4Error *outError) override {
-        cbl_log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%s'", digest());
+        CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%s'", digest());
         assert(database() == nullptr || database() == db);
         const C4BlobKey &expectedKey = key();
         if (_contents) {
