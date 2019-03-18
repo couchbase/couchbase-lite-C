@@ -19,7 +19,6 @@
 #pragma once
 #include "CBLBase.h"
 #include "fleece/Fleece.h"
-#include "PlatformCompat.hh"
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,7 +85,7 @@ extern "C" {
         @param maxLength  The maximum number of bytes to read.
         @param outError  On failure, an error will be stored here if non-NULL.
         @return  The actual number of bytes read; 0 if at EOF, -1 on error. */
-    ssize_t CBLBlobReader_Read(CBLBlobReadStream* stream _cbl_nonnull,
+    int CBLBlobReader_Read(CBLBlobReadStream* stream _cbl_nonnull,
                                void *dst _cbl_nonnull,
                                size_t maxLength,
                                CBLError *outError) CBLAPI;

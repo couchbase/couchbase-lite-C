@@ -91,7 +91,7 @@ namespace cbl {
 
         size_t read(void *dst _cbl_nonnull, size_t maxLength) {
             CBLError error;
-            ssize_t bytesRead = CBLBlobReader_Read(_stream, dst, maxLength, &error);
+            int bytesRead = CBLBlobReader_Read(_stream, dst, maxLength, &error);
             if (bytesRead < 0)
                 throw error;
             return size_t(bytesRead);

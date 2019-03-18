@@ -67,12 +67,12 @@ CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* blob, CBLError *outE
     return (CBLBlobReadStream*)blob->openStream(internal(outError));
 }
 
-ssize_t CBLBlobReader_Read(CBLBlobReadStream* stream,
+int CBLBlobReader_Read(CBLBlobReadStream* stream,
                             void *dst,
                             size_t maxLength,
                             CBLError *outError) CBLAPI
 {
-    return c4stream_read(internal(stream), dst, maxLength, internal(outError));
+    return (int) c4stream_read(internal(stream), dst, maxLength, internal(outError));
 }
 
 void CBLBlobReader_Close(CBLBlobReadStream* stream) CBLAPI {
