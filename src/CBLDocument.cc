@@ -353,7 +353,7 @@ CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
     return retain(new CBLDocument(doc));
 }
 
-const char* CBLDocument_Id(const CBLDocument* doc) CBLAPI              {return doc->docID();}
+const char* CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->docID();}
 uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
 FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}

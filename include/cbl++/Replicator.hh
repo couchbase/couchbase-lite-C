@@ -24,11 +24,11 @@ namespace cbl {
 
     class Endpoint {
     public:
-        void setURL(const char *url _cbl_nonnull)   {_ref = cbl_endpoint_newWithURL(url);}
+        void setURL(const char *url _cbl_nonnull)   {_ref = CBLEndpoint_NewWithURL(url);}
 #ifdef COUCHBASE_ENTERPRISE
         void setLocalDB(Database db)                {_ref = cbl_endpoint_newWithLocalDB(db.ref());}
 #endif
-        ~Endpoint()                                 {cbl_endpoint_free(_ref);}
+        ~Endpoint()                                 {CBLEndpoint_Free(_ref);}
         CBLEndpoint* ref() const                    {return _ref;}
     private:
         CBLEndpoint* _ref {nullptr};
@@ -39,8 +39,8 @@ namespace cbl {
     public:
         void setBasic(const char *username _cbl_nonnull,
                       const char *password _cbl_nonnull)
-                                                    {_ref = cbl_auth_newBasic(username, password);}
-        ~Authenticator()                            {cbl_auth_free(_ref);}
+                                                    {_ref = CBLAuth_NewBasic(username, password);}
+        ~Authenticator()                            {CBLAuth_Free(_ref);}
         CBLAuthenticator* ref() const               {return _ref;}
     private:
         CBLAuthenticator* _ref {nullptr};
@@ -100,22 +100,22 @@ namespace cbl {
             }
             c_config.filterContext = this;
 #endif
-            _ref = (CBLRefCounted*) cbl_repl_new(&c_config, &error);
+            _ref = (CBLRefCounted*) CBLReplicator_New(&c_config, &error);
             check(_ref, error);
         }
 
-        void start()                {cbl_repl_start(ref());}
-        void stop()                 {cbl_repl_stop(ref());}
+        void start()                {CBLReplicator_Start(ref());}
+        void stop()                 {CBLReplicator_Stop(ref());}
 
-        void resetCheckpoint()      {cbl_repl_resetCheckpoint(ref());}
+        void resetCheckpoint()      {CBLReplicator_ResetCheckpoint(ref());}
 
-        CBLReplicatorStatus status() const  {return cbl_repl_status(ref());}
+        CBLReplicatorStatus status() const  {return CBLReplicator_Status(ref());}
 
         using Listener = cbl::ListenerToken<Replicator, const CBLReplicatorStatus&>;
 
         [[nodiscard]] Listener addListener(Listener::Callback f) {
             auto l = Listener(f);
-            l.setToken( cbl_repl_addChangeListener(ref(), &_callListener, l.context()) );
+            l.setToken( CBLReplicator_AddChangeListener(ref(), &_callListener, l.context()) );
             return l;
         }
 

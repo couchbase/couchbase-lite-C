@@ -32,19 +32,19 @@ namespace cbl {
     public:
         Query(const Database& db, const char *jsonQuery _cbl_nonnull) {
             CBLError error;
-            auto q = cbl_query_new(db.ref(), jsonQuery, &error);
+            auto q = CBLQuery_New(db.ref(), jsonQuery, &error);
             check(q, error);
             _ref = (CBLRefCounted*)q;
         }
 
         inline std::vector<std::string> columnNames() const;
 
-        void setParameters(fleece::Dict parameters) {cbl_query_setParameters(ref(), parameters);}
-        fleece::Dict parameters() const             {return cbl_query_parameters(ref());}
+        void setParameters(fleece::Dict parameters) {CBLQuery_SetParameters(ref(), parameters);}
+        fleece::Dict parameters() const             {return CBLQuery_Parameters(ref());}
 
         inline ResultSet execute();
 
-        std::string explain()   {return fleece::alloc_slice(cbl_query_explain(ref())).asString();}
+        std::string explain()   {return fleece::alloc_slice(CBLQuery_Explain(ref())).asString();}
 
         using ChangeListener = cbl::ListenerToken<CBLQuery, CBLResultSet, CBLError*>;
         [[nodiscard]] ChangeListener addChangeListener(ChangeListener::Callback);
@@ -57,11 +57,11 @@ namespace cbl {
     class Result {
     public:
         fleece::Value valueAtIndex(unsigned i) {
-            return cbl_resultset_valueAtIndex(_ref, i);
+            return CBLResultSet_ValueAtIndex(_ref, i);
         }
 
         fleece::Value valueForKey(const char *key _cbl_nonnull) {
-            return cbl_resultset_valueForKey(_ref, key);
+            return CBLResultSet_ValueForKey(_ref, key);
         }
 
         fleece::Value operator[](unsigned i)                    {return valueAtIndex(i);}
@@ -101,7 +101,7 @@ namespace cbl {
         bool operator== (const ResultSetIterator &i) const {return _rs == i._rs;}
 
         ResultSetIterator& operator++() {
-            if (!cbl_resultset_next(_rs.ref()))
+            if (!CBLResultSet_Next(_rs.ref()))
                 _rs = ResultSet{};
             return *this;
         }
@@ -119,11 +119,11 @@ namespace cbl {
 
 
     inline std::vector<std::string> Query::columnNames() const {
-        unsigned n = cbl_query_columnCount(ref());
+        unsigned n = CBLQuery_ColumnCount(ref());
         std::vector<std::string> cols;
         cols.reserve(n);
         for (unsigned i = 0; i < n ; ++i) {
-            fleece::slice name = cbl_query_columnName(ref(), i);
+            fleece::slice name = CBLQuery_ColumnName(ref(), i);
             cols.push_back(name.asString());
         }
         return cols;
@@ -132,7 +132,7 @@ namespace cbl {
 
     inline ResultSet Query::execute() {
         CBLError error;
-        auto rs = cbl_query_execute(ref(), &error);
+        auto rs = CBLQuery_Execute(ref(), &error);
         check(rs, error);
         return ResultSet::adopt(rs);
     }

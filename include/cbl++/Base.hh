@@ -28,34 +28,34 @@ namespace cbl {
     class RefCounted {
     protected:
         RefCounted() noexcept                            :_ref(nullptr) { }
-        explicit RefCounted(CBLRefCounted *ref) noexcept :_ref(cbl_retain(ref)) { }
-        RefCounted(const RefCounted &other) noexcept     :_ref(cbl_retain(other._ref)) { }
+        explicit RefCounted(CBLRefCounted *ref) noexcept :_ref(CBL_Retain(ref)) { }
+        RefCounted(const RefCounted &other) noexcept     :_ref(CBL_Retain(other._ref)) { }
         RefCounted(RefCounted &&other) noexcept          :_ref(other._ref) {other._ref = nullptr;}
-        ~RefCounted() noexcept                           {cbl_release(_ref);}
+        ~RefCounted() noexcept                           {CBL_Release(_ref);}
 
         RefCounted& operator= (const RefCounted &other) noexcept {
-            cbl_retain(other._ref);
-            cbl_release(_ref);
+            CBL_Retain(other._ref);
+            CBL_Release(_ref);
             _ref = other._ref;
             return *this;
         }
 
         RefCounted& operator= (RefCounted &&other) noexcept {
             if (other._ref != _ref) {
-                cbl_release(_ref);
+                CBL_Release(_ref);
                 _ref = other._ref;
                 other._ref = nullptr;
             }
             return *this;
         }
 
-        void clear()                                    {cbl_release(_ref); _ref = nullptr;}
+        void clear()                                    {CBL_Release(_ref); _ref = nullptr;}
 
         static void check(bool ok, CBLError &error) {
             if (!ok) {
 #if DEBUG
-                char *message = cbl_error_message(&error);
-                cbl_log(kCBLLogDomainAll, CBLLogError, "API returning error %d/%d: %s",
+                char *message = CBLError_Message(&error);
+                CBL_Log(kCBLLogDomainAll, CBLLogError, "API returning error %d/%d: %s",
                         error.domain, error.code, message);
                 free(message);
 #endif
@@ -93,7 +93,7 @@ protected: \
         using Callback = std::function<void(Args...)>;
 
         ListenerToken()                                  { }
-        ~ListenerToken()                                 {cbl_listener_remove(_token);}
+        ~ListenerToken()                                 {CBLListener_Remove(_token);}
 
         ListenerToken(Callback cb)
         :_callback(new Callback(cb))
@@ -105,7 +105,7 @@ protected: \
         {other._token = nullptr;}
 
         ListenerToken& operator=(ListenerToken &&other) {
-            cbl_listener_remove(_token);
+            CBLListener_remove(_token);
             _token = other._token;
             _callback = other._callback;
             other._token = nullptr;
@@ -114,7 +114,7 @@ protected: \
 
         /** Unregisters the listener early, before it leaves scope. */
         void remove() {
-            cbl_listener_remove(_token);
+            CBLListener_remove(_token);
             _token = nullptr;
             _callback = nullptr;
         }

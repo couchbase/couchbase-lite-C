@@ -144,7 +144,7 @@ CBLDocument* CBLDocument_MutableCopy(const CBLDocument* original _cbl_nonnull) C
  */
 
 /** Returns a document's ID. */
-const char* CBLDocument_Id(const CBLDocument* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
+const char* CBLDocument_ID(const CBLDocument* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
 
 /** Returns a document's current sequence in the local database.
     This number increases every time the document is saved, and a more recently saved document

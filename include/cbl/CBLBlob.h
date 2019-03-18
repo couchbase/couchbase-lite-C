@@ -110,7 +110,7 @@ extern "C" {
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
 
     /** Opens a stream for writing a new blob.
-        You should call \ref CBLBlobWriter_Writer one or more times to write the data,
+        You should call \ref CBLBlobWriter_Write one or more times to write the data,
         then \ref CBLBlob_CreateWithStream to create the blob.
 
         If for some reason you need to abort, just call \ref CBLBlobWriter_Close. */
@@ -126,7 +126,7 @@ extern "C" {
         @param length  The length of the data to write.
         @param outError  On failure, error info will be written here.
         @return  True on success, false on failure. */
-    bool CBLBlobWriter_Writer(CBLBlobWriteStream* writer _cbl_nonnull,
+    bool CBLBlobWriter_Write(CBLBlobWriteStream* writer _cbl_nonnull,
                               const void *data _cbl_nonnull,
                               size_t length,
                               CBLError *outError) CBLAPI;

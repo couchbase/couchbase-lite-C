@@ -33,15 +33,15 @@ static std::string databaseDir() {
 
 
 std::string CBLTest::kDatabaseDir = databaseDir();
-const char* const CBLTest::kDatabaseName = "cbl_test";
+const char* const CBLTest::kDatabaseName = "CBLtest";
 
 
 CBLTest::CBLTest() {
     CBLDatabaseConfiguration config = {kDatabaseDir.c_str()};
     CBLError error;
-    if (!cbl_deleteDatabase(kDatabaseName, config.directory, &error) && error.code != 0)
+    if (!CBL_DeleteDatabase(kDatabaseName, config.directory, &error) && error.code != 0)
         FAIL("Can't delete temp database: " << error.domain << "/" << error.code);
-    db = cbl_db_open(kDatabaseName, &config, &error);
+    db = CBLDatabase_Open(kDatabaseName, &config, &error);
     REQUIRE(db);
 }
 
@@ -49,13 +49,13 @@ CBLTest::CBLTest() {
 CBLTest::~CBLTest() {
     if (db) {
         CBLError error;
-        if (!cbl_db_close(db, &error))
+        if (!CBLDatabase_Close(db, &error))
             WARN("Failed to close database: " << error.domain << "/" << error.code);
-        cbl_db_release(db);
+        CBLDatabase_Release(db);
     }
-    if (cbl_instanceCount() > 0)
-        cbl_dumpInstances();
-    CHECK(cbl_instanceCount() == 0);
+    if (CBL_InstanceCount() > 0)
+        CBL_DumpInstances();
+    CHECK(CBL_InstanceCount() == 0);
 }
 
 
@@ -77,9 +77,9 @@ CBLTest_Cpp::~CBLTest_Cpp() {
     db.close();
     db = nullptr;
 
-    if (cbl_instanceCount() > 0)
-        cbl_dumpInstances();
-    CHECK(cbl_instanceCount() == 0);
+    if (CBL_InstanceCount() > 0)
+        CBL_DumpInstances();
+    CHECK(CBL_InstanceCount() == 0);
 }
 
 

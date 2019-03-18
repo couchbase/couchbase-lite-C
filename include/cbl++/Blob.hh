@@ -31,7 +31,7 @@ namespace cbl {
         To work with a blob, you construct a Blob object with that dictionary. */
     class Blob : protected RefCounted {
     public:
-        static bool isBlob(fleece::Dict d)          {return cbl_isBlob(d);}
+        static bool isBlob(fleece::Dict d)          {return CBL_IsBlob(d);}
 
         /* Creates a new blobgiven its contents as a single block of data.
             @note  The memory pointed to by `contents` is no longer needed after this call completes
@@ -41,7 +41,7 @@ namespace cbl {
         Blob(const char *contentType,
              fleece::slice contents)
         {
-            _ref = (CBLRefCounted*) cbl_blob_createWithData(contentType, contents);
+            _ref = (CBLRefCounted*) CBLBlob_CreateWithData(contentType, contents);
         }
 
         /** Creates a new blob from the data written to a \ref CBLBlobWriteStream.
@@ -52,17 +52,17 @@ namespace cbl {
 
         /** Constructs a Blob instance on an existing blob reference in a document. */
         Blob(fleece::Dict d)
-        :RefCounted((CBLRefCounted*) cbl_blob_get(d))
+        :RefCounted((CBLRefCounted*) CBLBlob_Get(d))
         { }
 
-        uint64_t length() const                     {return cbl_blob_length(ref()); }
-        const char* contentType() const             {return cbl_blob_contentType(ref()); }
-        const char* digest() const                  {return cbl_blob_digest(ref()); }
-        fleece::Dict properties() const             {return cbl_blob_properties(ref()); }
+        uint64_t length() const                     {return CBLBlob_Length(ref()); }
+        const char* contentType() const             {return CBLBlob_ContentType(ref()); }
+        const char* digest() const                  {return CBLBlob_Digest(ref()); }
+        fleece::Dict properties() const             {return CBLBlob_Properties(ref()); }
 
         fleece::alloc_slice loadContent() {
             CBLError error;
-            fleece::alloc_slice content = cbl_blob_loadContent(ref(), &error);
+            fleece::alloc_slice content = CBLBlob_LoadContent(ref(), &error);
             check(content.buf, error);
             return content;
         }
@@ -81,17 +81,17 @@ namespace cbl {
     public:
         BlobReadStream(Blob *blob) {
             CBLError error;
-            _stream = cbl_blob_openContentStream(blob->ref(), &error);
+            _stream = CBLBlob_OpenContentStream(blob->ref(), &error);
             if (!_stream) throw error;
         }
 
         ~BlobReadStream() {
-            cbl_blobreader_close(_stream);
+            CBLBlobReader_Close(_stream);
         }
 
         size_t read(void *dst _cbl_nonnull, size_t maxLength) {
             CBLError error;
-            ssize_t bytesRead = cbl_blobreader_read(_stream, dst, maxLength, &error);
+            ssize_t bytesRead = CBLBlobReader_Read(_stream, dst, maxLength, &error);
             if (bytesRead < 0)
                 throw error;
             return size_t(bytesRead);
@@ -112,17 +112,17 @@ namespace cbl {
     public:
         BlobWriteStream(Database db) {
             CBLError error;
-            _writer = cbl_blobwriter_new(db.ref(), &error);
+            _writer = CBLBlobWriter_New(db.ref(), &error);
             if (!_writer) throw error;
         }
 
         ~BlobWriteStream() {
-            cbl_blobwriter_close(_writer);
+            CBLBlobWriter_Close(_writer);
         }
 
         void write(fleece::slice data) {
             CBLError error;
-            if (!cbl_blobwriter_write(_writer, data.buf, data.size, &error))
+            if (!CBLBlobWriter_Write(_writer, data.buf, data.size, &error))
                 throw error;
         }
 
@@ -133,7 +133,7 @@ namespace cbl {
 
 
     inline Blob::Blob(const char *contentType, BlobWriteStream& writer) {
-        _ref = (CBLRefCounted*) cbl_blob_createWithStream(contentType, writer._writer);
+        _ref = (CBLRefCounted*) CBLBlob_CreateWithStream(contentType, writer._writer);
         writer._writer = nullptr;
     }
 

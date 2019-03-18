@@ -112,7 +112,7 @@ void CBLBlobWriter_Close(CBLBlobWriteStream* writer) CBLAPI {
     c4stream_closeWriter(internal(writer));
 }
 
-bool CBLBlobWriter_Writer(CBLBlobWriteStream* writer,
+bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
                           const void *data,
                           size_t length,
                           CBLError *outError) CBLAPI

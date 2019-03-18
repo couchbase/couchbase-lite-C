@@ -28,17 +28,17 @@ namespace cbl {
     public:
         // Metadata:
 
-        const char* id() const _cbl_returns_nonnull     {return cbl_doc_id(ref());}
+        const char* id() const _cbl_returns_nonnull     {return CBLDocument_ID(ref());}
 
-        uint64_t sequence() const                       {return cbl_doc_sequence(ref());}
+        uint64_t sequence() const                       {return CBLDocument_Sequence(ref());}
 
         // Properties:
 
-        fleece::Dict properties() const                 {return cbl_doc_properties(ref());}
+        fleece::Dict properties() const                 {return CBLDocument_Properties(ref());}
 
         char* _cbl_nonnull propertiesAsJSON(const CBLDocument* _cbl_nonnull);
 
-        bool cbl_doc_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
+        bool CBLDocument_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
                                          const char *json _cbl_nonnull,
                                          CBLError*);
         fleece::Value operator[] (const char *key _cbl_nonnull) const {return properties()[key];}
@@ -49,7 +49,7 @@ namespace cbl {
 
         bool deleteDoc(CBLConcurrencyControl concurrency =kCBLConcurrencyControlFailOnConflict) const {
             CBLError error;
-            bool deleted = cbl_doc_delete(ref(), concurrency, &error);
+            bool deleted = CBLDocument_Delete(ref(), concurrency, &error);
             if (!deleted && error.code != 0)
                 throw error;
             return deleted;
@@ -57,7 +57,7 @@ namespace cbl {
 
         bool purge() const {
             CBLError error;
-            bool purged = cbl_doc_purge(ref(), &error);
+            bool purged = CBLDocument_Purge(ref(), &error);
             if (!purged && error.code != 0)
                 throw error;
             return purged;
@@ -81,9 +81,9 @@ namespace cbl {
 
     class MutableDocument : public Document {
     public:
-        explicit MutableDocument(const char *docID)     {_ref = (CBLRefCounted*)cbl_doc_new(docID);}
+        explicit MutableDocument(const char *docID)     {_ref = (CBLRefCounted*)CBLDocument_New(docID);}
 
-        fleece::MutableDict properties()                {return cbl_doc_mutableProperties(ref());}
+        fleece::MutableDict properties()                {return CBLDocument_MutableProperties(ref());}
 
         template <typename T>
         void set(const char *key _cbl_nonnull, T val)  {properties().set(fleece::slice(key), val);}
@@ -107,24 +107,24 @@ namespace cbl {
     // Database method bodies:
 
     inline Document Database::getDocument(const char *id _cbl_nonnull) const {
-        return Document::adopt(cbl_db_getDocument(ref(), id));
+        return Document::adopt(CBLDatabase_GetDocument(ref(), id));
     }
 
     inline MutableDocument Database::getMutableDocument(const char *id _cbl_nonnull) const {
-        return MutableDocument::adopt(cbl_db_getMutableDocument(ref(), id));
+        return MutableDocument::adopt(CBLDatabase_GetMutableDocument(ref(), id));
     }
 
 
     inline Document Database::saveDocument(MutableDocument &doc, CBLConcurrencyControl c) {
         CBLError error;
-        auto saved = cbl_db_saveDocument(ref(), doc.ref(), c, &error);
+        auto saved = CBLDatabase_SaveDocument(ref(), doc.ref(), c, &error);
         check(saved, error);
         return Document::adopt(saved);
     }
 
 
     inline MutableDocument Document::mutableCopy() const {
-        return MutableDocument::adopt(cbl_doc_mutableCopy(ref()));
+        return MutableDocument::adopt(CBLDocument_MutableCopy(ref()));
     }
 
 

@@ -35,14 +35,14 @@ namespace cbl {
         static bool exists(const char* _cbl_nonnull name,
                            const char *inDirectory)
         {
-            return cbl_databaseExists(name, inDirectory);
+            return CBL_DatabaseExists(name, inDirectory);
         }
 
         static void copyDatabase(const char* _cbl_nonnull fromPath,
                                  const char* _cbl_nonnull toName)
         {
             CBLError error;
-            check( cbl_copyDatabase(fromPath, toName, nullptr, &error), error );
+            check( CBL_CopyDatabase(fromPath, toName, nullptr, &error), error );
         }
 
         static void copyDatabase(const char* _cbl_nonnull fromPath,
@@ -50,21 +50,21 @@ namespace cbl {
                                  const CBLDatabaseConfiguration& config)
         {
             CBLError error;
-            check( cbl_copyDatabase(fromPath, toName, &config, &error), error );
+            check( CBL_CopyDatabase(fromPath, toName, &config, &error), error );
         }
 
         static void deleteDatabase(const char _cbl_nonnull *name,
                                    const char *inDirectory)
         {
             CBLError error;
-            check( cbl_deleteDatabase(name, inDirectory, &error), error);
+            check( CBL_DeleteDatabase(name, inDirectory, &error), error);
         }
 
         // Lifecycle:
 
         Database(const char *name _cbl_nonnull) {
             CBLError error;
-            _ref = (CBLRefCounted*) cbl_db_open(name, nullptr, &error);
+            _ref = (CBLRefCounted*) CBLDatabase_Open(name, nullptr, &error);
             check(_ref != nullptr, error);
         }
 
@@ -72,31 +72,31 @@ namespace cbl {
                  const CBLDatabaseConfiguration& config)
         {
             CBLError error;
-            _ref = (CBLRefCounted*) cbl_db_open(name, &config, &error);
+            _ref = (CBLRefCounted*) CBLDatabase_Open(name, &config, &error);
             check(_ref != nullptr, error);
         }
 
         void close() {
             CBLError error;
-            check(cbl_db_close(ref(), &error), error);
+            check(CBLDatabase_Close(ref(), &error), error);
         }
 
         void deleteDatabase() {
             CBLError error;
-            check(cbl_db_delete(ref(), &error), error);
+            check(CBLDatabase_Delete(ref(), &error), error);
         }
 
         void compact()  {
             CBLError error;
-            check(cbl_db_compact(ref(), &error), error);
+            check(CBLDatabase_Compact(ref(), &error), error);
         }
 
         // Accessors:
 
-        const char* name() const _cbl_nonnull               {return cbl_db_name(ref());}
-        const char* path() const _cbl_nonnull               {return cbl_db_path(ref());}
-        uint64_t count() const                              {return cbl_db_count(ref());}
-        CBLDatabaseConfiguration config() const             {return cbl_db_config(ref());}
+        const char* name() const _cbl_nonnull               {return CBLDatabase_Name(ref());}
+        const char* path() const _cbl_nonnull               {return CBLDatabase_Path(ref());}
+        uint64_t count() const                              {return CBLDatabase_Count(ref());}
+        CBLDatabaseConfiguration config() const             {return CBLDatabase_Config(ref());}
 
         // Documents:
 
@@ -108,19 +108,19 @@ namespace cbl {
 
         time_t getDocumentExpiration(const char *docID) const {
             CBLError error;
-            time_t exp = cbl_db_getDocumentExpiration(ref(), docID, &error);
+            time_t exp = CBLDatabase_GetDocumentExpiration(ref(), docID, &error);
             check(exp >= 0, error);
             return exp;
         }
 
         void setDocumentExpiration(const char *docID, time_t expiration) {
             CBLError error;
-            check(cbl_db_setDocumentExpiration(ref(), docID, expiration, &error), error);
+            check(CBLDatabase_SetDocumentExpiration(ref(), docID, expiration, &error), error);
         }
 
         void purgeDocumentByID(const char *docID) {
             CBLError error;
-            check(cbl_db_purgeDocumentByID(ref(), docID, &error), error);
+            check(CBLDatabase_PurgeDocumentByID(ref(), docID, &error), error);
         }
 
         // Listeners:
@@ -129,7 +129,7 @@ namespace cbl {
 
         [[nodiscard]] Listener addListener(Listener::Callback f) {
             auto l = Listener(f);
-            l.setToken( cbl_db_addChangeListener(ref(), &_callListener, l.context()) );
+            l.setToken( CBLDatabase_AddChangeListener(ref(), &_callListener, l.context()) );
             return l;
         }
 
@@ -140,7 +140,7 @@ namespace cbl {
                                                            DocumentListener::Callback f)
         {
             auto l = DocumentListener(f);
-            l.setToken( cbl_db_addDocumentChangeListener(ref(), docID, &_callDocListener, l.context()) );
+            l.setToken( CBLDatabase_AddDocumentChangeListener(ref(), docID, &_callDocListener, l.context()) );
             return l;
         }
 
@@ -150,14 +150,14 @@ namespace cbl {
 
         void bufferNotifications(NotificationsReadyCallback callback) {
             auto callbackPtr = new NotificationsReadyCallback(callback);    //FIX: This is leaked
-            cbl_db_bufferNotifications(ref(),
+            CBLDatabase_BufferNotifications(ref(),
                                        [](void *context, CBLDatabase *db) {
                                            (*(NotificationsReadyCallback*)context)(Database(db));
                                        },
                                        callbackPtr);
         }
 
-        void sendNotifications()                            {cbl_db_sendNotifications(ref());}
+        void sendNotifications()                            {CBLDatabase_SendNotifications(ref());}
 
     private:
         static void _callListener(void *context, const CBLDatabase *db,
