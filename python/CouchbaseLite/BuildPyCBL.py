@@ -100,13 +100,14 @@ typedef struct {
     int32_t code;               ///< Error code, specific to the domain. 0 always means no error.
     int32_t internal_info;
 } CBLError;
-char* cbl_error_message(const CBLError*);
+char* CBLError_Message(const CBLError*);
 
-void cbl_setLogLevel(CBLLogLevel, CBLLogDomain);
+void CBL_SetLogLevel(CBLLogLevel, CBLLogDomain);
+void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format, ...);
 
 typedef ... CBLRefCounted;
-CBLRefCounted* cbl_retain(void*);
-void cbl_release(void*);
+CBLRefCounted* CBL_Retain(void*);
+void CBL_Release(void*);
 
 typedef ... CBLDatabase;
 typedef ... CBLDocument;
@@ -120,29 +121,29 @@ typedef struct {
     ...;
 } CBLDatabaseConfiguration;
 
-void cbl_listener_remove(CBLListenerToken*);
+void CBLListener_Remove(CBLListenerToken*);
 
 //////// CBLDatabase.h
-bool cbl_databaseExists(const char* name, const char *inDirectory);
-bool cbl_copyDatabase(const char* fromPath,
-                const char* toName, 
+bool CBL_DatabaseExists(const char* name, const char *inDirectory);
+bool CBL_CopyDatabase(const char* fromPath,
+                const char* toName,
                 const CBLDatabaseConfiguration* config,
                 CBLError*);
-bool cbl_deleteDatabase(const char *name,
+bool CBL_DeleteDatabase(const char *name,
                   const char *inDirectory,
                   CBLError*);
-CBLDatabase* cbl_db_open(const char *name,
+CBLDatabase* CBLDatabase_Open(const char *name,
                          const CBLDatabaseConfiguration* config,
                          CBLError* error);
-bool cbl_db_close(CBLDatabase*, CBLError*);
-bool cbl_db_delete(CBLDatabase*, CBLError*);
-bool cbl_db_compact(CBLDatabase*, CBLError*);
-bool cbl_db_beginBatch(CBLDatabase*, CBLError*);
-bool cbl_db_endBatch(CBLDatabase*, CBLError*);
-const char* cbl_db_name(const CBLDatabase*);
-const char* cbl_db_path(const CBLDatabase*);
-uint64_t cbl_db_count(const CBLDatabase*);
-CBLDatabaseConfiguration cbl_db_config(const CBLDatabase*);
+bool CBLDatabase_Close(CBLDatabase*, CBLError*);
+bool CBLDatabase_Delete(CBLDatabase*, CBLError*);
+bool CBLDatabase_Compact(CBLDatabase*, CBLError*);
+bool CBLDatabase_BeginBatch(CBLDatabase*, CBLError*);
+bool CBLDatabase_EndBatch(CBLDatabase*, CBLError*);
+const char* CBLDatabase_Name(const CBLDatabase*);
+const char* CBLDatabase_Path(const CBLDatabase*);
+uint64_t CBLDatabase_Count(const CBLDatabase*);
+CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*);
 
 typedef void (*CBLDatabaseChangeListener)(void *context,
                                      const CBLDatabase* db,
@@ -150,55 +151,55 @@ typedef void (*CBLDatabaseChangeListener)(void *context,
                                      const char **docIDs);
 extern "Python" void databaseListenerCallback(void *context, const CBLDatabase* db,
                                               unsigned numDocs, const char **docIDs);
-CBLListenerToken* cbl_db_addChangeListener(const CBLDatabase* db,
+CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
                                      CBLDatabaseChangeListener listener,
                                      void *context);
 
 //////// CBLDocument.h
 typedef uint8_t CBLConcurrencyControl;
-const CBLDocument* cbl_db_getDocument(const CBLDatabase* database,
+const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database,
                                       const char* docID);
-const CBLDocument* cbl_db_saveDocument(CBLDatabase* db,
+const CBLDocument* CBLDatabase_SaveDocument(CBLDatabase* db,
                                        CBLDocument* doc,
                                        CBLConcurrencyControl concurrency,
                                        CBLError* error);
-bool cbl_doc_delete(const CBLDocument* document,
+bool CBLDocument_Delete(const CBLDocument* document,
                     CBLConcurrencyControl concurrency,
                     CBLError* error);
-bool cbl_doc_purge(const CBLDocument* document,
+bool CBLDocument_Purge(const CBLDocument* document,
                    CBLError* error);
-bool cbl_db_purgeDocumentByID(CBLDatabase* database,
+bool CBLDatabase_PurgeDocumentByID(CBLDatabase* database,
                           const char* docID,
                           CBLError* error);
-CBLDocument* cbl_db_getMutableDocument(CBLDatabase* database,
+CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
                                        const char* docID);
-CBLDocument* cbl_doc_new(const char *docID);
-CBLDocument* cbl_doc_mutableCopy(const CBLDocument* original);
-const char* cbl_doc_id(const CBLDocument*);
-uint64_t cbl_doc_sequence(const CBLDocument*);
-FLDict cbl_doc_properties(const CBLDocument*);
-FLMutableDict cbl_doc_mutableProperties(CBLDocument*);
-char* cbl_doc_propertiesAsJSON(const CBLDocument*);
-bool cbl_doc_setPropertiesAsJSON(CBLDocument*, const char *json, CBLError*);
+CBLDocument* CBLDocument_New(const char *docID);
+CBLDocument* CBLDocument_MutableCopy(const CBLDocument* original);
+const char* CBLDocument_ID(const CBLDocument*);
+uint64_t CBLDocument_Sequence(const CBLDocument*);
+FLDict CBLDocument_Properties(const CBLDocument*);
+FLMutableDict CBLDocument_MutableProperties(CBLDocument*);
+char* CBLDocument_PropertiesAsJSON(const CBLDocument*);
+bool CBLDocument_SetPropertiesAsJSON(CBLDocument*, const char *json, CBLError*);
 
 //////// CBLQuery.h
-CBLQuery* cbl_query_new(const CBLDatabase* db,
-                        const char *jsonQuery, 
+CBLQuery* CBLQuery_New(const CBLDatabase* db,
+                        const char *jsonQuery,
                         CBLError* error);
-FLDict cbl_query_parameters(CBLQuery* query);
-void cbl_query_setParameters(CBLQuery* query,
+FLDict CBLQuery_Parameters(CBLQuery* query);
+void CBLQuery_SetParameters(CBLQuery* query,
                              FLDict parameters);
-void cbl_query_setParametersAsJSON(CBLQuery* query,
+void CBLQuery_SetParametersAsJSON(CBLQuery* query,
                                      const char* json);
-CBLResultSet* cbl_query_execute(CBLQuery*, CBLError*);
-FLSliceResult cbl_query_explain(CBLQuery*);
-unsigned cbl_query_columnCount(CBLQuery*);
-FLSlice cbl_query_columnName(CBLQuery*,
+CBLResultSet* CBLQuery_Execute(CBLQuery*, CBLError*);
+FLSliceResult CBLQuery_Explain(CBLQuery*);
+unsigned CBLQuery_ColumnCount(CBLQuery*);
+FLSlice CBLQuery_ColumnName(CBLQuery*,
                              unsigned columnIndex);
-bool cbl_resultset_next(CBLResultSet*);
-FLValue cbl_resultset_valueAtIndex(CBLResultSet*, unsigned index);
-FLValue cbl_resultset_valueForKey(CBLResultSet*, const char* key);
-//CBLListenerToken* cbl_query_addChangeListener(CBLQuery* query,
+bool CBLResultSet_Next(CBLResultSet*);
+FLValue CBLResultSet_ValueAtIndex(CBLResultSet*, unsigned index);
+FLValue CBLResultSet_ValueForKey(CBLResultSet*, const char* key);
+//CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query,
 //                                        CBLQueryListener* listener,
 //                                        void *context);
 """)

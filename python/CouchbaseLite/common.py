@@ -22,7 +22,7 @@ class CBLException (EnvironmentError):
         if cblError != None:
             self.domain = cblError.domain
             self.code = cblError.code
-            self.error = pystr(lib.cbl_error_message(cblError))
+            self.error = pystr(lib.CBLError_Message(cblError))
             EnvironmentError.__init__(self, message + ": " + self.error)
         else:
             EnvironmentError.__init__(self, message)
@@ -36,7 +36,7 @@ class CBLObject (object):
 
     def __del__(self):
         if lib != None and self._ref != None:
-            lib.cbl_release(self._ref)
+            lib.CBL_Release(self._ref)
 
 class ListenerToken (object):
     def __init__(self, owner, handle, c_token):
@@ -49,7 +49,7 @@ class ListenerToken (object):
 
     def remove(self):
         if self.owner != None:
-            lib.cbl_listener_remove(self.c_token)
+            lib.CBLListener_Remove(self.c_token)
             self.owner.removeListener(self)
             self.owner = None
             self.handle = None

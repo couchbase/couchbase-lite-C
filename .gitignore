@@ -3,6 +3,6 @@ build_cmake
 *.o
 *.so
 python/CouchbaseLite/libcouchbase_lite.dylib
-python/CouchbaseLite/PyCBL.c
+python/CouchbaseLite/*.c
 .vscode
 empty.cpp

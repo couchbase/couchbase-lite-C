@@ -120,12 +120,17 @@ The library is `libcouchbase_lite.dylib` in your `Xcode Build Products/Debug` di
 
 This only works on Mac so far. And it assumes that Xcode puts build output in a `build` subdirectory next to the project file. (Want to fix this? Edit `BuildPyCBL.py` and look at the "`# FIX`" lines.)
 
+Dependencies:
+* Python 3 (only tested with 3.7)
+* `pip` (which might be named `pip3` on your system)
+* The Python `cffi` package ... to install it, run `pip install cffi`
+
 1. Build the native library. (If using Xcode, build the "CBL_C Dylib" target.)
-2. `pip install cffi`
-3. `cd python/CouchbaseLite`
-4. `python3 BuildPyCBL.py`
-5. `cd ..`
-6. `python3 test.py` -- some tests. Should run without throwing exceptions.
+2. `cd python`
+3. `./build.sh`
+4. `python3 test.py` -- some tests. Should run without throwing exceptions.
+
+If the tests immediately crash after logging a message like "`ERROR: Interceptors are not working`", this means that your Couchbase Lite library was built with the Address sanitizer enabled, probably because you built the 'CBL_Tests' scheme. Instead, select the 'CBL_C Dylib' scheme and build that; then go back to step 3.
 
 ## Using It
 
