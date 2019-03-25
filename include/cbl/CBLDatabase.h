@@ -32,11 +32,19 @@ extern "C" {
 /** \name  Database configuration
     @{ */
 
-#ifdef COUCHBASE_ENTERPRISE
+/** Flags for how to open a database. */
+typedef CBL_OPTIONS(uint32_t, CBLDatabaseFlags) {
+    kCBLDatabase_Create        = 1,  ///< Create the file if it doesn't exist
+    kCBLDatabase_ReadOnly      = 2,  ///< Open file read-only
+    kCBLDatabase_NoUpgrade     = 4,  ///< Disable upgrading an older-version database
+};
+
 /** Encryption algorithms. */
 typedef CBL_ENUM(uint32_t, CBLEncryptionAlgorithm) {
     kCBLEncryptionNone = 0,      ///< No encryption (default)
+#ifdef COUCHBASE_ENTERPRISE
     kCBLEncryptionAES256,        ///< AES with 256-bit key
+#endif
 };
 
 /** Encryption key sizes (in bytes). */
@@ -49,14 +57,12 @@ typedef struct CBLEncryptionKey {
     CBLEncryptionAlgorithm algorithm;
     uint8_t bytes[32];
 } CBLEncryptionKey;
-#endif
 
 /** Database configuration options. */
 typedef struct {
     const char *directory;
-#ifdef COUCHBASE_ENTERPRISE
+    CBLDatabaseFlags flags;
     CBLEncryptionKey encryptionKey;
-#endif
 } CBLDatabaseConfiguration;
 
 /** @} */

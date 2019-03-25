@@ -38,6 +38,7 @@ const char* const CBLTest::kDatabaseName = "CBLtest";
 
 CBLTest::CBLTest() {
     CBLDatabaseConfiguration config = {kDatabaseDir.c_str()};
+    config.flags = kCBLDatabase_Create;
     CBLError error;
     if (!CBL_DeleteDatabase(kDatabaseName, config.directory, &error) && error.code != 0)
         FAIL("Can't delete temp database: " << error.domain << "/" << error.code);

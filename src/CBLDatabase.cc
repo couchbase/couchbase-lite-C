@@ -44,11 +44,15 @@ static slice effectiveDir(const char *inDirectory) {
 
 static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
     C4DatabaseConfig2 c4Config { effectiveDir(config->directory) };
-#ifdef COUCHBASE_ENTERPRISE
+    if (config->flags & kCBLDatabase_Create)
+        c4Config.flags |= kC4DB_Create;
+    if (config->flags & kCBLDatabase_ReadOnly)
+        c4Config.flags |= kC4DB_ReadOnly;
+    if (config->flags & kCBLDatabase_NoUpgrade)
+        c4Config.flags |= kC4DB_NoUpgrade;
     c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(config->encryptionKey.algorithm);
     static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes), "C4EncryptionKey and CBLEncryptionKey size do not match");
     memcpy(c4Config.encryptionKey.bytes, config->encryptionKey.bytes, sizeof(CBLEncryptionKey::bytes));
-#endif
     return c4Config;
 }
 
