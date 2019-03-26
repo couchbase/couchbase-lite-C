@@ -1,0 +1,10 @@
+//
+//  CBL_Dylib_Release.xcconfig
+//  CBL_C
+//
+//  Created by Jens Alfke on 3/25/19.
+//  Copyright © 2019 Couchbase. All rights reserved.
+//
+
+#include "CBL_dylib.xcconfig"
+#include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib_Release.xcconfig"

@@ -1,0 +1,19 @@
+//
+//  CBL_Framework.xcconfig
+//  CBL_C
+//
+//  Created by Jens Alfke on 3/25/19.
+//  Copyright © 2019 Couchbase. All rights reserved.
+//
+
+#include "CBL_dylib.xcconfig"
+
+INSTALL_PATH            = $(LOCAL_LIBRARY_DIR)/Frameworks
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/Frameworks
+DEFINES_MODULE          = YES
+EXECUTABLE_PREFIX       =
+FRAMEWORK_VERSION       = A
+INFOPLIST_FILE          = Xcode/Framework-Info.plist
+MODULEMAP_FILE          = Xcode/CouchbaseLite.modulemap
+PRODUCT_BUNDLE_IDENTIFIER = com.couchbase.CouchbaseLite-C
+PRODUCT_NAME            = CouchbaseLite
