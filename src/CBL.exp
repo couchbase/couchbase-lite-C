@@ -41,6 +41,8 @@ _CBLDatabase_GetMutableDocument
 _CBLDatabase_SaveDocument
 _CBLDatabase_DeleteDocumentByID
 _CBLDatabase_PurgeDocumentByID
+#_CBLDatabase_GetDocumentExpiration
+#_CBLDatabase_SetDocumentExpiration
 
 _CBLDatabase_CreateIndex
 _CBLDatabase_DeleteIndex
@@ -52,6 +54,8 @@ _CBLDocument_New
 _CBLDocument_MutableCopy
 _CBLDocument_Properties
 _CBLDocument_MutableProperties
+_CBLDocument_SetProperties
+_CBLDocument_CreateFleeceDoc
 _CBLDocument_PropertiesAsJSON
 _CBLDocument_SetPropertiesAsJSON
 _CBLDocument_Delete
@@ -199,6 +203,7 @@ _FLMutableArray_SetDouble
 _FLMutableArray_SetString
 _FLMutableArray_SetData
 _FLMutableArray_SetValue
+_FLMutableArray_Insert
 _FLMutableArray_Remove
 _FLMutableArray_Resize
 _FLMutableArray_GetMutableArray

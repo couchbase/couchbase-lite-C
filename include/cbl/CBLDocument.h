@@ -167,6 +167,15 @@ FLDict CBLDocument_Properties(const CBLDocument* _cbl_nonnull) CBLAPI;
            same collection returned by \ref CBLDocument_Properties. */
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
 
+/** Sets a mutable document's properties.
+    Call \ref CBLDatabase_SaveDocument to persist the changes.
+    @note  The dictionary object will be retained by the document. You are responsible for
+           releasing your own reference(s) to it. */
+void CBLDocument_SetProperties(CBLDocument* _cbl_nonnull,
+                               FLMutableDict properties _cbl_nonnull) CBLAPI;
+
+FLDoc CBLDocument_CreateFleeceDoc(const CBLDocument* _cbl_nonnull) CBLAPI;
+
 /** Returns a document's properties as a null-terminated JSON string.
     @note You are responsible for calling free() on the returned string. */
 char* CBLDocument_PropertiesAsJSON(const CBLDocument* _cbl_nonnull) CBLAPI _cbl_returns_nonnull; 

@@ -110,8 +110,6 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
         setError(outError, LiteCoreDomain, kC4ErrorInvalidParameter,
                  "Saving doc to wrong database"_sl);
         return nullptr;
-    } else if (!_mutable) {
-        return this;
     }
 
     c4::Transaction t(internal(db));
@@ -357,8 +355,13 @@ const char* CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return d
 uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
 FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}
+FLDoc CBLDocument_CreateFleeceDoc(const CBLDocument* doc) CBLAPI       {return doc->createFleeceDoc();}
 
 char* CBLDocument_PropertiesAsJSON(const CBLDocument* doc) CBLAPI      {return doc->propertiesAsJSON();}
+
+void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties _cbl_nonnull) CBLAPI {
+    doc->setProperties(properties);
+}
 
 bool CBLDocument_SetPropertiesAsJSON(CBLDocument* doc, const char *json, CBLError* outError) CBLAPI {
     return doc->setPropertiesAsJSON(json, internal(outError));

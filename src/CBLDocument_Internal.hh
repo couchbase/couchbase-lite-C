@@ -50,8 +50,11 @@ public:
     bool exists() const                         {return _c4doc != nullptr;}
     uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence : 0;}
     bool isMutable() const                      {return _mutable;}
-    MutableDict mutableProperties() const       {return properties().asMutable();}
+
+    FLDoc createFleeceDoc() const               {return c4doc_createFleeceDoc(_c4doc);}
     Dict properties() const;
+    MutableDict mutableProperties()             {return properties().asMutable();}
+    void setProperties(MutableDict d)           {if (checkMutable(nullptr)) _properties = d;}
 
     char* propertiesAsJSON() const;
     bool setPropertiesAsJSON(const char *json, C4Error* outError);
