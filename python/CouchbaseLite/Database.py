@@ -3,12 +3,19 @@ from .common import *
 from .Document import *
 
 class DatabaseConfiguration:
-    def __init__(self, directory):
+    def __init__(self, directory, create = True, readOnly = False, noUpgrade = False):
         self.directory = directory
+        self._flags = 0
+        if create:
+            self._flags |= lib.kCBLDatabase_Create
+        if readOnly:
+            self._flags |= lib.kCBLDatabase_ReadOnly
+        if noUpgrade:
+            self._flags |= lib.kCBLDatabase_NoUpgrade
 
     def _cblConfig(self):
         self._cblDir = cstr(self.directory)  # to keep string from being GC'd
-        return ffi.new("CBLDatabaseConfiguration*", [self._cblDir])
+        return ffi.new("CBLDatabaseConfiguration*", [self._cblDir, self._flags])
 
     def __repr__(self):
         return "DatabaseConfiguration['" + self.directory + "']"

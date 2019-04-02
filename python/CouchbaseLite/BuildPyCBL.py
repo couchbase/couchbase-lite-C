@@ -116,8 +116,15 @@ typedef ... CBLResultSet;
 typedef ... CBLReplicator;
 typedef ... CBLListenerToken;
 
+typedef enum {
+    kCBLDatabase_Create        = 1,  ///< Create the file if it doesn't exist
+    kCBLDatabase_ReadOnly      = 2,  ///< Open file read-only
+    kCBLDatabase_NoUpgrade     = 4,  ///< Disable upgrading an older-version database
+} CBLDatabaseFlags;
+
 typedef struct {
     const char *directory;
+    CBLDatabaseFlags flags;
     ...;
 } CBLDatabaseConfiguration;
 
