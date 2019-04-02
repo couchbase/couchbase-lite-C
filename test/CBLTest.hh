@@ -15,6 +15,7 @@ class CBLTest {
 public:
     static std::string kDatabaseDir;
     static const char* const kDatabaseName;
+    static const CBLDatabaseConfiguration kDatabaseConfiguration;
 
     CBLTest();
     ~CBLTest();

@@ -95,7 +95,7 @@ static void createDocument(CBLDatabase *db, const char *docID,
 {
     CBLDocument* doc = CBLDocument_New(docID);
     MutableDict props = CBLDocument_MutableProperties(doc);
-    FLMutableDict_SetString(props, slice(property), slice(value));
+    FLSlot_SetString(FLMutableDict_Set(props, slice(property)), slice(value));
     CBLError error;
     const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict,
                                                    &error);

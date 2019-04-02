@@ -135,7 +135,7 @@ void FLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
                              uint32_t index,
                              CBLBlob* blob _cbl_nonnull)
 {
-    FLMutableArray_SetValue(array, index, blobMutableProperties(blob));
+    FLSlot_SetValue(FLMutableArray_Set(array, index), blobMutableProperties(blob));
 }
 
 
@@ -143,6 +143,6 @@ void FLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
                                           FLString key,
                                           CBLBlob* blob _cbl_nonnull)
 {
-    FLMutableDict_SetValue(dict, key, blobMutableProperties(blob));
+    FLSlot_SetValue(FLMutableDict_Set(dict, key), blobMutableProperties(blob));
 }
 
