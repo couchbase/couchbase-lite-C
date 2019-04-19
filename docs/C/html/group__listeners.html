@@ -81,9 +81,9 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gadcb6c78fa3e976af3d2c11421dff66a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__listeners.html#gadcb6c78fa3e976af3d2c11421dff66a4">cbl_listener_remove</a> (<a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *)</td></tr>
-<tr class="memdesc:gadcb6c78fa3e976af3d2c11421dff66a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a listener callback, given the token that was returned when it was added.  <a href="#gadcb6c78fa3e976af3d2c11421dff66a4">More...</a><br /></td></tr>
-<tr class="separator:gadcb6c78fa3e976af3d2c11421dff66a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a> (<a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *)</td></tr>
+<tr class="memdesc:ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a listener callback, given the token that was returned when it was added.  <a href="#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">More...</a><br /></td></tr>
+<tr class="separator:ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Scheduling notifications</h2></td></tr>
@@ -94,16 +94,16 @@ Scheduling notifications</h2></td></tr>
 <tr class="memitem:ga20a2e8c2b93639e7a19294f91806369f"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__listeners.html#ga20a2e8c2b93639e7a19294f91806369f">CBLNotificationsReadyCallback</a>) (void *context, <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db)</td></tr>
 <tr class="memdesc:ga20a2e8c2b93639e7a19294f91806369f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback indicating that the database (or an object belonging to it) is ready to call one or more listeners.  <a href="#ga20a2e8c2b93639e7a19294f91806369f">More...</a><br /></td></tr>
 <tr class="separator:ga20a2e8c2b93639e7a19294f91806369f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaada7905cace27f77aa0033089d8f68d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__listeners.html#gaada7905cace27f77aa0033089d8f68d5">cbl_db_bufferNotifications</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__listeners.html#ga20a2e8c2b93639e7a19294f91806369f">CBLNotificationsReadyCallback</a> callback, void *context)</td></tr>
-<tr class="memdesc:gaada7905cace27f77aa0033089d8f68d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Switches the database to buffered-notification mode.  <a href="#gaada7905cace27f77aa0033089d8f68d5">More...</a><br /></td></tr>
-<tr class="separator:gaada7905cace27f77aa0033089d8f68d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3406bf40326fbf7f4621e29dff5211eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__listeners.html#ga3406bf40326fbf7f4621e29dff5211eb">cbl_db_sendNotifications</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db)</td></tr>
-<tr class="memdesc:ga3406bf40326fbf7f4621e29dff5211eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately issues all pending notifications for this database, by calling their listener callbacks.  <a href="#ga3406bf40326fbf7f4621e29dff5211eb">More...</a><br /></td></tr>
-<tr class="separator:ga3406bf40326fbf7f4621e29dff5211eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafe601a68e9e6a7f18904929aa04bce2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__listeners.html#gafe601a68e9e6a7f18904929aa04bce2b">CBLDatabase_BufferNotifications</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__listeners.html#ga20a2e8c2b93639e7a19294f91806369f">CBLNotificationsReadyCallback</a> callback, void *context)</td></tr>
+<tr class="memdesc:gafe601a68e9e6a7f18904929aa04bce2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Switches the database to buffered-notification mode.  <a href="#gafe601a68e9e6a7f18904929aa04bce2b">More...</a><br /></td></tr>
+<tr class="separator:gafe601a68e9e6a7f18904929aa04bce2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa867a51411258d6c0dce9480cd8e371c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__listeners.html#gaa867a51411258d6c0dce9480cd8e371c">CBLDatabase_SendNotifications</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db)</td></tr>
+<tr class="memdesc:gaa867a51411258d6c0dce9480cd8e371c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Immediately issues all pending notifications for this database, by calling their listener callbacks.  <a href="#gaa867a51411258d6c0dce9480cd8e371c">More...</a><br /></td></tr>
+<tr class="separator:gaa867a51411258d6c0dce9480cd8e371c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Every API function that registers a listener callback returns an opaque token representing the registered callback. </p>
-<p>To unregister any type of listener, call <a class="el" href="group__listeners.html#gadcb6c78fa3e976af3d2c11421dff66a4">cbl_listener_remove</a>. </p>
+<p>To unregister any type of listener, call <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>. </p>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="gae39d1de7cc3a46004b597f5eb80620c6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gae39d1de7cc3a46004b597f5eb80620c6">&#9670;&nbsp;</a></span>CBLListenerToken</h2>
@@ -135,20 +135,20 @@ Scheduling notifications</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Callback indicating that the database (or an object belonging to it) is ready to call one or more listeners. </p>
-<p>You should call <a class="el" href="group__listeners.html#ga3406bf40326fbf7f4621e29dff5211eb">cbl_db_sendNotifications</a> at your earliest convenience. </p><dl class="section note"><dt>Note</dt><dd>This callback is called <em>only once</em> until the next time <a class="el" href="group__listeners.html#ga3406bf40326fbf7f4621e29dff5211eb">cbl_db_sendNotifications</a> is called. If you don't respond by (sooner or later) calling that function, you will not be informed that any listeners are ready. </dd></dl>
-<dl class="section warning"><dt>Warning</dt><dd>This can be called from arbitrary threads. It should do as little work as possible, just scheduling a future call to <a class="el" href="group__listeners.html#ga3406bf40326fbf7f4621e29dff5211eb">cbl_db_sendNotifications</a>. </dd></dl>
+<p>You should call <a class="el" href="group__listeners.html#gaa867a51411258d6c0dce9480cd8e371c">CBLDatabase_SendNotifications</a> at your earliest convenience. </p><dl class="section note"><dt>Note</dt><dd>This callback is called <em>only once</em> until the next time <a class="el" href="group__listeners.html#gaa867a51411258d6c0dce9480cd8e371c">CBLDatabase_SendNotifications</a> is called. If you don't respond by (sooner or later) calling that function, you will not be informed that any listeners are ready. </dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>This can be called from arbitrary threads. It should do as little work as possible, just scheduling a future call to <a class="el" href="group__listeners.html#gaa867a51411258d6c0dce9480cd8e371c">CBLDatabase_SendNotifications</a>. </dd></dl>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="gaada7905cace27f77aa0033089d8f68d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaada7905cace27f77aa0033089d8f68d5">&#9670;&nbsp;</a></span>cbl_db_bufferNotifications()</h2>
+<a id="gafe601a68e9e6a7f18904929aa04bce2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gafe601a68e9e6a7f18904929aa04bce2b">&#9670;&nbsp;</a></span>CBLDatabase_BufferNotifications()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void cbl_db_bufferNotifications </td>
+          <td class="memname">void CBLDatabase_BufferNotifications </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em>, </td>
@@ -185,14 +185,14 @@ Scheduling notifications</h2></td></tr>
 
 </div>
 </div>
-<a id="ga3406bf40326fbf7f4621e29dff5211eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3406bf40326fbf7f4621e29dff5211eb">&#9670;&nbsp;</a></span>cbl_db_sendNotifications()</h2>
+<a id="gaa867a51411258d6c0dce9480cd8e371c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa867a51411258d6c0dce9480cd8e371c">&#9670;&nbsp;</a></span>CBLDatabase_SendNotifications()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void cbl_db_sendNotifications </td>
+          <td class="memname">void CBLDatabase_SendNotifications </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em></td><td>)</td>
@@ -205,14 +205,14 @@ Scheduling notifications</h2></td></tr>
 
 </div>
 </div>
-<a id="gadcb6c78fa3e976af3d2c11421dff66a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gadcb6c78fa3e976af3d2c11421dff66a4">&#9670;&nbsp;</a></span>cbl_listener_remove()</h2>
+<a id="ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">&#9670;&nbsp;</a></span>CBLListener_Remove()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void cbl_listener_remove </td>
+          <td class="memname">void CBLListener_Remove </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>

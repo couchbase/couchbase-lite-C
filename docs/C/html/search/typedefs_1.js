@@ -10,6 +10,7 @@ var searchData=
   ['flmutablearray',['FLMutableArray',['../group__types.html#ga384f95fe181d6050d5757ff85bb8bc82',1,'Fleece.h']]],
   ['flmutabledict',['FLMutableDict',['../group__types.html#ga1a873a1463aac47cc9a6381722049aa1',1,'Fleece.h']]],
   ['flsharedkeys',['FLSharedKeys',['../group__reading.html#gabbd898ed871a7b340c817b6facba7568',1,'Fleece.h']]],
+  ['flslot',['FLSlot',['../group__types.html#ga264f1860d2c09595ce7870ced22a5ca8',1,'Fleece.h']]],
   ['flstring',['FLString',['../group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76',1,'FLSlice.h']]],
   ['flstringresult',['FLStringResult',['../group___f_l_slice.html#gab08438b1f08efeefe09ece8079734fdd',1,'FLSlice.h']]],
   ['fltimestamp',['FLTimestamp',['../group___f_l_value.html#ga154a21cd670c72d154c8bb78b4b3a5d3',1,'Fleece.h']]],

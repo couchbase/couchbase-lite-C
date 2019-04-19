@@ -77,6 +77,8 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="_c_b_l___compat_8h_source.html">CBL_Compat.h</a>&quot;</code><br />
+<code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &lt;stdbool.h&gt;</code><br />
 </div>
 <p><a href="_c_b_l_base_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -220,29 +222,29 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaabb446942118d6510fff8fce14ec0b9a"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#gaabb446942118d6510fff8fce14ec0b9a">cbl_error_message</a> (const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
-<tr class="memdesc:gaabb446942118d6510fff8fce14ec0b9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a message describing an error.  <a href="group__errors.html#gaabb446942118d6510fff8fce14ec0b9a">More...</a><br /></td></tr>
-<tr class="separator:gaabb446942118d6510fff8fce14ec0b9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gabdb4ae231f05b93eb1e308af6a5a328b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#gabdb4ae231f05b93eb1e308af6a5a328b">cbl_setLogLevel</a> (<a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>, <a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a>)</td></tr>
-<tr class="memdesc:gabdb4ae231f05b93eb1e308af6a5a328b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the detail level of logging.  <a href="group__logging.html#gabdb4ae231f05b93eb1e308af6a5a328b">More...</a><br /></td></tr>
-<tr class="separator:gabdb4ae231f05b93eb1e308af6a5a328b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga940384b85d01b17356f01f64941d9f8f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga940384b85d01b17356f01f64941d9f8f">cbl_log</a> (<a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a>, <a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>, const char *format,...)</td></tr>
-<tr class="separator:ga940384b85d01b17356f01f64941d9f8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2c7b26b2add8e9d2a753074cb7bae6a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__refcounting.html#ga2c7b26b2add8e9d2a753074cb7bae6a3">cbl_retain</a> (<a class="el" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a> *)</td></tr>
-<tr class="memdesc:ga2c7b26b2add8e9d2a753074cb7bae6a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increments an object's reference-count.  <a href="group__refcounting.html#ga2c7b26b2add8e9d2a753074cb7bae6a3">More...</a><br /></td></tr>
-<tr class="separator:ga2c7b26b2add8e9d2a753074cb7bae6a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga87e50c2286ec6b3d72ac52e554b71d64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__refcounting.html#ga87e50c2286ec6b3d72ac52e554b71d64">cbl_release</a> (<a class="el" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a> *)</td></tr>
-<tr class="memdesc:ga87e50c2286ec6b3d72ac52e554b71d64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrements an object's reference-count, freeing the object if the count hits zero.  <a href="group__refcounting.html#ga87e50c2286ec6b3d72ac52e554b71d64">More...</a><br /></td></tr>
-<tr class="separator:ga87e50c2286ec6b3d72ac52e554b71d64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga01edfa89d015ba1ae2ed6443c7f864f3"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__refcounting.html#ga01edfa89d015ba1ae2ed6443c7f864f3">cbl_instanceCount</a> (void)</td></tr>
-<tr class="memdesc:ga01edfa89d015ba1ae2ed6443c7f864f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total number of Couchbase Lite objects.  <a href="group__refcounting.html#ga01edfa89d015ba1ae2ed6443c7f864f3">More...</a><br /></td></tr>
-<tr class="separator:ga01edfa89d015ba1ae2ed6443c7f864f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga98df80bc710c19c8ad89daf9248a172a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__refcounting.html#ga98df80bc710c19c8ad89daf9248a172a">cbl_dumpInstances</a> (void)</td></tr>
-<tr class="memdesc:ga98df80bc710c19c8ad89daf9248a172a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logs the class and address of each Couchbase Lite object.  <a href="group__refcounting.html#ga98df80bc710c19c8ad89daf9248a172a">More...</a><br /></td></tr>
-<tr class="separator:ga98df80bc710c19c8ad89daf9248a172a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gadcb6c78fa3e976af3d2c11421dff66a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__listeners.html#gadcb6c78fa3e976af3d2c11421dff66a4">cbl_listener_remove</a> (<a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *)</td></tr>
-<tr class="memdesc:gadcb6c78fa3e976af3d2c11421dff66a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a listener callback, given the token that was returned when it was added.  <a href="group__listeners.html#gadcb6c78fa3e976af3d2c11421dff66a4">More...</a><br /></td></tr>
-<tr class="separator:gadcb6c78fa3e976af3d2c11421dff66a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0ab89bedccf3bdda3caa6a089cac79b7"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#ga0ab89bedccf3bdda3caa6a089cac79b7">CBLError_Message</a> (const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
+<tr class="memdesc:ga0ab89bedccf3bdda3caa6a089cac79b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a message describing an error.  <a href="group__errors.html#ga0ab89bedccf3bdda3caa6a089cac79b7">More...</a><br /></td></tr>
+<tr class="separator:ga0ab89bedccf3bdda3caa6a089cac79b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga12c764bc7ccacce00632ceb586a8d879"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga12c764bc7ccacce00632ceb586a8d879">CBL_SetLogLevel</a> (<a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>, <a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a>)</td></tr>
+<tr class="memdesc:ga12c764bc7ccacce00632ceb586a8d879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the detail level of logging.  <a href="group__logging.html#ga12c764bc7ccacce00632ceb586a8d879">More...</a><br /></td></tr>
+<tr class="separator:ga12c764bc7ccacce00632ceb586a8d879"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8329d23585788637e8275d10760a18d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga8329d23585788637e8275d10760a18d4">CBL_Log</a> (<a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a>, <a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>, const char *format,...)</td></tr>
+<tr class="separator:ga8329d23585788637e8275d10760a18d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga99ce4b160db1a0f2a54cab3371a4cc16"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__refcounting.html#ga99ce4b160db1a0f2a54cab3371a4cc16">CBL_Retain</a> (<a class="el" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a> *)</td></tr>
+<tr class="memdesc:ga99ce4b160db1a0f2a54cab3371a4cc16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increments an object's reference-count.  <a href="group__refcounting.html#ga99ce4b160db1a0f2a54cab3371a4cc16">More...</a><br /></td></tr>
+<tr class="separator:ga99ce4b160db1a0f2a54cab3371a4cc16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga375760579a5e2fbe13c489f6afbe2990"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__refcounting.html#ga375760579a5e2fbe13c489f6afbe2990">CBL_Release</a> (<a class="el" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a> *)</td></tr>
+<tr class="memdesc:ga375760579a5e2fbe13c489f6afbe2990"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrements an object's reference-count, freeing the object if the count hits zero.  <a href="group__refcounting.html#ga375760579a5e2fbe13c489f6afbe2990">More...</a><br /></td></tr>
+<tr class="separator:ga375760579a5e2fbe13c489f6afbe2990"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaef1faa327746147bb06471bffe6979e2"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__refcounting.html#gaef1faa327746147bb06471bffe6979e2">CBL_InstanceCount</a> (void)</td></tr>
+<tr class="memdesc:gaef1faa327746147bb06471bffe6979e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total number of Couchbase Lite objects.  <a href="group__refcounting.html#gaef1faa327746147bb06471bffe6979e2">More...</a><br /></td></tr>
+<tr class="separator:gaef1faa327746147bb06471bffe6979e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7284e00a925f2e781dfb35f11e57deff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__refcounting.html#ga7284e00a925f2e781dfb35f11e57deff">CBL_DumpInstances</a> (void)</td></tr>
+<tr class="memdesc:ga7284e00a925f2e781dfb35f11e57deff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logs the class and address of each Couchbase Lite object.  <a href="group__refcounting.html#ga7284e00a925f2e781dfb35f11e57deff">More...</a><br /></td></tr>
+<tr class="separator:ga7284e00a925f2e781dfb35f11e57deff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a> (<a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *)</td></tr>
+<tr class="memdesc:ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a listener callback, given the token that was returned when it was added.  <a href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">More...</a><br /></td></tr>
+<tr class="separator:ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->

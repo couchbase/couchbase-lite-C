@@ -88,80 +88,80 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga1e75dd43193afc8f2c6cc47d8839d18a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga1e75dd43193afc8f2c6cc47d8839d18a">cbl_isBlob</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>)</td></tr>
-<tr class="memdesc:ga1e75dd43193afc8f2c6cc47d8839d18a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a dictionary in a document is a blob reference.  <a href="#ga1e75dd43193afc8f2c6cc47d8839d18a">More...</a><br /></td></tr>
-<tr class="separator:ga1e75dd43193afc8f2c6cc47d8839d18a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga886e8aa7e3925ac60c69b5acb8563e4d"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga886e8aa7e3925ac60c69b5acb8563e4d">cbl_blob_retain</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *t)</td></tr>
-<tr class="separator:ga886e8aa7e3925ac60c69b5acb8563e4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaececc3098e384e53f358343067544ead"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gaececc3098e384e53f358343067544ead">cbl_blob_release</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *t)</td></tr>
-<tr class="separator:gaececc3098e384e53f358343067544ead"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga023450233b8a6406a283381df3606006"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga023450233b8a6406a283381df3606006">cbl_blob_get</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> blobDict)</td></tr>
-<tr class="memdesc:ga023450233b8a6406a283381df3606006"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a CBLBlob object corresponding to a blob dictionary in a document.  <a href="#ga023450233b8a6406a283381df3606006">More...</a><br /></td></tr>
-<tr class="separator:ga023450233b8a6406a283381df3606006"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf75fb9b9072886d89df2771e096b5c58"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gaf75fb9b9072886d89df2771e096b5c58">cbl_blob_length</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *)</td></tr>
-<tr class="memdesc:gaf75fb9b9072886d89df2771e096b5c58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the length in bytes of a blob's content.  <a href="#gaf75fb9b9072886d89df2771e096b5c58">More...</a><br /></td></tr>
-<tr class="separator:gaf75fb9b9072886d89df2771e096b5c58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gabd6487bfdbac1441086d318034536764"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gabd6487bfdbac1441086d318034536764">cbl_blob_digest</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *)</td></tr>
-<tr class="memdesc:gabd6487bfdbac1441086d318034536764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the cryptographic digest of a blob's content.  <a href="#gabd6487bfdbac1441086d318034536764">More...</a><br /></td></tr>
-<tr class="separator:gabd6487bfdbac1441086d318034536764"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1197acee3d99d87bc212b6e826ae3301"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga1197acee3d99d87bc212b6e826ae3301">cbl_blob_contentType</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *)</td></tr>
-<tr class="memdesc:ga1197acee3d99d87bc212b6e826ae3301"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a blob's MIME type, if its metadata has a kCBLBlobContentTypeProperty.  <a href="#ga1197acee3d99d87bc212b6e826ae3301">More...</a><br /></td></tr>
-<tr class="separator:ga1197acee3d99d87bc212b6e826ae3301"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga440e2c58922a2ef175a82c21ec4605e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga440e2c58922a2ef175a82c21ec4605e4">cbl_blob_properties</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *)</td></tr>
-<tr class="memdesc:ga440e2c58922a2ef175a82c21ec4605e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a blob's metadata.  <a href="#ga440e2c58922a2ef175a82c21ec4605e4">More...</a><br /></td></tr>
-<tr class="separator:ga440e2c58922a2ef175a82c21ec4605e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad209d34613be63eda7ea985a3ca0f2e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gad209d34613be63eda7ea985a3ca0f2e0">cbl_blob_loadContent</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
-<tr class="memdesc:gad209d34613be63eda7ea985a3ca0f2e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the blob's contents into memory and returns them.  <a href="#gad209d34613be63eda7ea985a3ca0f2e0">More...</a><br /></td></tr>
-<tr class="separator:gad209d34613be63eda7ea985a3ca0f2e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa555c4aa26e6d5d0381e1734ce014788"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gaa555c4aa26e6d5d0381e1734ce014788">cbl_blob_openContentStream</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
-<tr class="memdesc:gaa555c4aa26e6d5d0381e1734ce014788"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a stream for reading a blob's content.  <a href="#gaa555c4aa26e6d5d0381e1734ce014788">More...</a><br /></td></tr>
-<tr class="separator:gaa555c4aa26e6d5d0381e1734ce014788"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga38cee746c0c2265def6c72f0045a328f"><td class="memItemLeft" align="right" valign="top">ssize_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga38cee746c0c2265def6c72f0045a328f">cbl_blobreader_read</a> (<a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a> *stream, void *dst, size_t maxLength, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
-<tr class="memdesc:ga38cee746c0c2265def6c72f0045a328f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads data from a blob.  <a href="#ga38cee746c0c2265def6c72f0045a328f">More...</a><br /></td></tr>
-<tr class="separator:ga38cee746c0c2265def6c72f0045a328f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga82142e41c2f7e5e00cc035bb22f7ab73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga82142e41c2f7e5e00cc035bb22f7ab73">cbl_blobreader_close</a> (<a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a> *)</td></tr>
-<tr class="memdesc:ga82142e41c2f7e5e00cc035bb22f7ab73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes a CBLBlobReadStream.  <a href="#ga82142e41c2f7e5e00cc035bb22f7ab73">More...</a><br /></td></tr>
-<tr class="separator:ga82142e41c2f7e5e00cc035bb22f7ab73"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7806edb119d63c492b0a5243d62c3d39"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga7806edb119d63c492b0a5243d62c3d39">cbl_blob_createWithData</a> (const char *contentType, <a class="el" href="struct_f_l_slice.html">FLSlice</a> contents)</td></tr>
-<tr class="memdesc:ga7806edb119d63c492b0a5243d62c3d39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new blob given its contents as a single block of data.  <a href="#ga7806edb119d63c492b0a5243d62c3d39">More...</a><br /></td></tr>
-<tr class="separator:ga7806edb119d63c492b0a5243d62c3d39"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaddecaeecd0c6ac7cedb3ff1331cf921b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gaddecaeecd0c6ac7cedb3ff1331cf921b">cbl_blobwriter_new</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
-<tr class="memdesc:gaddecaeecd0c6ac7cedb3ff1331cf921b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a stream for writing a new blob.  <a href="#gaddecaeecd0c6ac7cedb3ff1331cf921b">More...</a><br /></td></tr>
-<tr class="separator:gaddecaeecd0c6ac7cedb3ff1331cf921b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2daa7b73d4d7aac0598ee61077638ad1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga2daa7b73d4d7aac0598ee61077638ad1">cbl_blobwriter_close</a> (<a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *)</td></tr>
-<tr class="memdesc:ga2daa7b73d4d7aac0598ee61077638ad1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes a blob-writing stream, if you need to give up without creating a CBLBlob.  <a href="#ga2daa7b73d4d7aac0598ee61077638ad1">More...</a><br /></td></tr>
-<tr class="separator:ga2daa7b73d4d7aac0598ee61077638ad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae09ec26a32f21eb8e744b1c4b81637cd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gae09ec26a32f21eb8e744b1c4b81637cd">cbl_blobwriter_write</a> (<a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *writer, const void *data, size_t length, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
-<tr class="memdesc:gae09ec26a32f21eb8e744b1c4b81637cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes data to a blob.  <a href="#gae09ec26a32f21eb8e744b1c4b81637cd">More...</a><br /></td></tr>
-<tr class="separator:gae09ec26a32f21eb8e744b1c4b81637cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad4e0b33294ab1b98c2e0f8c34a031d08"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gad4e0b33294ab1b98c2e0f8c34a031d08">cbl_blob_createWithStream</a> (const char *contentType, <a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *writer)</td></tr>
-<tr class="memdesc:gad4e0b33294ab1b98c2e0f8c34a031d08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new blob after its data has been written to a <a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a>.  <a href="#gad4e0b33294ab1b98c2e0f8c34a031d08">More...</a><br /></td></tr>
-<tr class="separator:gad4e0b33294ab1b98c2e0f8c34a031d08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga02871be5e6c8cb102158ed674a1da588"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga02871be5e6c8cb102158ed674a1da588">CBL_IsBlob</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>)</td></tr>
+<tr class="memdesc:ga02871be5e6c8cb102158ed674a1da588"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a dictionary in a document is a blob reference.  <a href="#ga02871be5e6c8cb102158ed674a1da588">More...</a><br /></td></tr>
+<tr class="separator:ga02871be5e6c8cb102158ed674a1da588"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga87cf8e02b9d2c3a568a86383e22eea0e"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga87cf8e02b9d2c3a568a86383e22eea0e">CBLBlob_Retain</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *t)</td></tr>
+<tr class="separator:ga87cf8e02b9d2c3a568a86383e22eea0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga76611bccebe46f555a143a9d0eccad62"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga76611bccebe46f555a143a9d0eccad62">CBLBlob_Release</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *t)</td></tr>
+<tr class="separator:ga76611bccebe46f555a143a9d0eccad62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga109ea7776dbb0d10e647b90729c605c3"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga109ea7776dbb0d10e647b90729c605c3">CBLBlob_Get</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> blobDict)</td></tr>
+<tr class="memdesc:ga109ea7776dbb0d10e647b90729c605c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a CBLBlob object corresponding to a blob dictionary in a document.  <a href="#ga109ea7776dbb0d10e647b90729c605c3">More...</a><br /></td></tr>
+<tr class="separator:ga109ea7776dbb0d10e647b90729c605c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gace0dc8f2023b783066433a8bf0f73f29"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gace0dc8f2023b783066433a8bf0f73f29">CBLBlob_Length</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *)</td></tr>
+<tr class="memdesc:gace0dc8f2023b783066433a8bf0f73f29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the length in bytes of a blob's content.  <a href="#gace0dc8f2023b783066433a8bf0f73f29">More...</a><br /></td></tr>
+<tr class="separator:gace0dc8f2023b783066433a8bf0f73f29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa73f0b701afaefb4647544b310b00d7c"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gaa73f0b701afaefb4647544b310b00d7c">CBLBlob_Digest</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *)</td></tr>
+<tr class="memdesc:gaa73f0b701afaefb4647544b310b00d7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the cryptographic digest of a blob's content.  <a href="#gaa73f0b701afaefb4647544b310b00d7c">More...</a><br /></td></tr>
+<tr class="separator:gaa73f0b701afaefb4647544b310b00d7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1e19d589d07fda707a180b19e544e4d4"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga1e19d589d07fda707a180b19e544e4d4">CBLBlob_ContentType</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *)</td></tr>
+<tr class="memdesc:ga1e19d589d07fda707a180b19e544e4d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a blob's MIME type, if its metadata has a kCBLBlobContentTypeProperty.  <a href="#ga1e19d589d07fda707a180b19e544e4d4">More...</a><br /></td></tr>
+<tr class="separator:ga1e19d589d07fda707a180b19e544e4d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga92c85332d925612785eecf09015c2153"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga92c85332d925612785eecf09015c2153">CBLBlob_Properties</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *)</td></tr>
+<tr class="memdesc:ga92c85332d925612785eecf09015c2153"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a blob's metadata.  <a href="#ga92c85332d925612785eecf09015c2153">More...</a><br /></td></tr>
+<tr class="separator:ga92c85332d925612785eecf09015c2153"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6ffc5d42d1c030e3eab1d48a177a80ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga6ffc5d42d1c030e3eab1d48a177a80ee">CBLBlob_LoadContent</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:ga6ffc5d42d1c030e3eab1d48a177a80ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the blob's contents into memory and returns them.  <a href="#ga6ffc5d42d1c030e3eab1d48a177a80ee">More...</a><br /></td></tr>
+<tr class="separator:ga6ffc5d42d1c030e3eab1d48a177a80ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf49053b061d6c46d9ee43fd817e263bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gaf49053b061d6c46d9ee43fd817e263bd">CBLBlob_OpenContentStream</a> (const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:gaf49053b061d6c46d9ee43fd817e263bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a stream for reading a blob's content.  <a href="#gaf49053b061d6c46d9ee43fd817e263bd">More...</a><br /></td></tr>
+<tr class="separator:gaf49053b061d6c46d9ee43fd817e263bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac340e9fa34999c4ee5ea612438051d1c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gac340e9fa34999c4ee5ea612438051d1c">CBLBlobReader_Read</a> (<a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a> *stream, void *dst, size_t maxLength, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:gac340e9fa34999c4ee5ea612438051d1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads data from a blob.  <a href="#gac340e9fa34999c4ee5ea612438051d1c">More...</a><br /></td></tr>
+<tr class="separator:gac340e9fa34999c4ee5ea612438051d1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga760178e2b90dbafa8de0f12f94ec549b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga760178e2b90dbafa8de0f12f94ec549b">CBLBlobReader_Close</a> (<a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a> *)</td></tr>
+<tr class="memdesc:ga760178e2b90dbafa8de0f12f94ec549b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes a CBLBlobReadStream.  <a href="#ga760178e2b90dbafa8de0f12f94ec549b">More...</a><br /></td></tr>
+<tr class="separator:ga760178e2b90dbafa8de0f12f94ec549b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacb36a6c8d7580c27017a782eb9707383"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gacb36a6c8d7580c27017a782eb9707383">CBLBlob_CreateWithData</a> (const char *contentType, <a class="el" href="struct_f_l_slice.html">FLSlice</a> contents)</td></tr>
+<tr class="memdesc:gacb36a6c8d7580c27017a782eb9707383"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new blob given its contents as a single block of data.  <a href="#gacb36a6c8d7580c27017a782eb9707383">More...</a><br /></td></tr>
+<tr class="separator:gacb36a6c8d7580c27017a782eb9707383"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacf3ea04b3ecd4b0d3814a4ea70de1753"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gacf3ea04b3ecd4b0d3814a4ea70de1753">CBLBlobWriter_New</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:gacf3ea04b3ecd4b0d3814a4ea70de1753"><td class="mdescLeft">&#160;</td><td class="mdescRight">Opens a stream for writing a new blob.  <a href="#gacf3ea04b3ecd4b0d3814a4ea70de1753">More...</a><br /></td></tr>
+<tr class="separator:gacf3ea04b3ecd4b0d3814a4ea70de1753"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab554d7c2a99b73e437eccad5e7f24998"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gab554d7c2a99b73e437eccad5e7f24998">CBLBlobWriter_Close</a> (<a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *)</td></tr>
+<tr class="memdesc:gab554d7c2a99b73e437eccad5e7f24998"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes a blob-writing stream, if you need to give up without creating a CBLBlob.  <a href="#gab554d7c2a99b73e437eccad5e7f24998">More...</a><br /></td></tr>
+<tr class="separator:gab554d7c2a99b73e437eccad5e7f24998"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga476c2b270d027a7e8a757f6ed3f15e78"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga476c2b270d027a7e8a757f6ed3f15e78">CBLBlobWriter_Write</a> (<a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *writer, const void *data, size_t length, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:ga476c2b270d027a7e8a757f6ed3f15e78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes data to a blob.  <a href="#ga476c2b270d027a7e8a757f6ed3f15e78">More...</a><br /></td></tr>
+<tr class="separator:ga476c2b270d027a7e8a757f6ed3f15e78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2ff133a4d7928970482d8fd705912bf6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga2ff133a4d7928970482d8fd705912bf6">CBLBlob_CreateWithStream</a> (const char *contentType, <a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *writer)</td></tr>
+<tr class="memdesc:ga2ff133a4d7928970482d8fd705912bf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new blob after its data has been written to a <a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a>.  <a href="#ga2ff133a4d7928970482d8fd705912bf6">More...</a><br /></td></tr>
+<tr class="separator:ga2ff133a4d7928970482d8fd705912bf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga736f587583ab975b2b50ae47c8f76a0e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga736f587583ab975b2b50ae47c8f76a0e">FLValue_IsBlob</a> (<a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> v)</td></tr>
 <tr class="memdesc:ga736f587583ab975b2b50ae47c8f76a0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a value in a document is a blob reference.  <a href="#ga736f587583ab975b2b50ae47c8f76a0e">More...</a><br /></td></tr>
 <tr class="separator:ga736f587583ab975b2b50ae47c8f76a0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0e8e3668ed1f5dbd46bb30edd9d27bca"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga0e8e3668ed1f5dbd46bb30edd9d27bca">FLValue_GetBlob</a> (<a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> value)</td></tr>
 <tr class="memdesc:ga0e8e3668ed1f5dbd46bb30edd9d27bca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiates a CBLBlob object corresponding to a blob dictionary in a document.  <a href="#ga0e8e3668ed1f5dbd46bb30edd9d27bca">More...</a><br /></td></tr>
 <tr class="separator:ga0e8e3668ed1f5dbd46bb30edd9d27bca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga424dabbf9b64bd4ff9a21895bd6da79a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga424dabbf9b64bd4ff9a21895bd6da79a">CBLMutableArray_SetBlob</a> (<a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a> array, uint32_t index, <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *blob)</td></tr>
-<tr class="memdesc:ga424dabbf9b64bd4ff9a21895bd6da79a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a blob in a mutable array.  <a href="#ga424dabbf9b64bd4ff9a21895bd6da79a">More...</a><br /></td></tr>
-<tr class="separator:ga424dabbf9b64bd4ff9a21895bd6da79a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9788af5f87e015b0ef91951043678651"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga9788af5f87e015b0ef91951043678651">CBLMutableDict_SetBlob</a> (<a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a> dict, <a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> key, <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *blob)</td></tr>
-<tr class="memdesc:ga9788af5f87e015b0ef91951043678651"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a blob in a mutable dictionary.  <a href="#ga9788af5f87e015b0ef91951043678651">More...</a><br /></td></tr>
-<tr class="separator:ga9788af5f87e015b0ef91951043678651"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1906c0e1cba433386819854a07f7193b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga1906c0e1cba433386819854a07f7193b">FLMutableArray_SetBlob</a> (<a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a> array, uint32_t index, <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *blob)</td></tr>
+<tr class="memdesc:ga1906c0e1cba433386819854a07f7193b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a blob in a mutable array.  <a href="#ga1906c0e1cba433386819854a07f7193b">More...</a><br /></td></tr>
+<tr class="separator:ga1906c0e1cba433386819854a07f7193b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga34933d2e28b1405f6329cd765d4246b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga34933d2e28b1405f6329cd765d4246b5">FLMutableDict_SetBlob</a> (<a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a> dict, <a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> key, <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *blob)</td></tr>
+<tr class="memdesc:ga34933d2e28b1405f6329cd765d4246b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores a blob in a mutable dictionary.  <a href="#ga34933d2e28b1405f6329cd765d4246b5">More...</a><br /></td></tr>
+<tr class="separator:ga34933d2e28b1405f6329cd765d4246b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:ga1115a9b586d28514f7ee03d185bed4c1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga1115a9b586d28514f7ee03d185bed4c1">kCBLTypeProperty</a></td></tr>
-<tr class="separator:ga1115a9b586d28514f7ee03d185bed4c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaab7ece5c31a228bd5e5606eaf9ff63ea"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gaab7ece5c31a228bd5e5606eaf9ff63ea">kCBLBlobType</a></td></tr>
-<tr class="separator:gaab7ece5c31a228bd5e5606eaf9ff63ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga67e2f0aeb3a194066ba156929fe2f457"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga67e2f0aeb3a194066ba156929fe2f457">kCBLBlobDigestProperty</a></td></tr>
-<tr class="separator:ga67e2f0aeb3a194066ba156929fe2f457"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4084409acd6452ff68d50f0e23e941f6"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga4084409acd6452ff68d50f0e23e941f6">kCBLBlobLengthProperty</a></td></tr>
-<tr class="separator:ga4084409acd6452ff68d50f0e23e941f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga65f234e79b7b9fb3a683dfad8804a9ee"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga65f234e79b7b9fb3a683dfad8804a9ee">kCBLBlobContentTypeProperty</a></td></tr>
-<tr class="separator:ga65f234e79b7b9fb3a683dfad8804a9ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga40ce422d8a22e60edfc7986eb239840e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga40ce422d8a22e60edfc7986eb239840e">kCBLTypeProperty</a></td></tr>
+<tr class="separator:ga40ce422d8a22e60edfc7986eb239840e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6c47b776cf8625c9a890486517f3f460"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga6c47b776cf8625c9a890486517f3f460">kCBLBlobType</a></td></tr>
+<tr class="separator:ga6c47b776cf8625c9a890486517f3f460"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga866b2a87ea3aaeb5b9a3ce27775ebf77"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#ga866b2a87ea3aaeb5b9a3ce27775ebf77">kCBLBlobDigestProperty</a></td></tr>
+<tr class="separator:ga866b2a87ea3aaeb5b9a3ce27775ebf77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac920ba99c8307fcebbf8f8500064a909"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gac920ba99c8307fcebbf8f8500064a909">kCBLBlobLengthProperty</a></td></tr>
+<tr class="separator:gac920ba99c8307fcebbf8f8500064a909"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf33b1053a31640902b41ab79ce611020"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blobs.html#gaf33b1053a31640902b41ab79ce611020">kCBLBlobContentTypeProperty</a></td></tr>
+<tr class="separator:gaf33b1053a31640902b41ab79ce611020"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>A CBLBlob is a binary data blob associated with a document. </p>
@@ -215,14 +215,35 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ga1197acee3d99d87bc212b6e826ae3301"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1197acee3d99d87bc212b6e826ae3301">&#9670;&nbsp;</a></span>cbl_blob_contentType()</h2>
+<a id="ga02871be5e6c8cb102158ed674a1da588"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga02871be5e6c8cb102158ed674a1da588">&#9670;&nbsp;</a></span>CBL_IsBlob()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* cbl_blob_contentType </td>
+          <td class="memname">bool CBL_IsBlob </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns true if a dictionary in a document is a blob reference. </p>
+<p>If so, you can call <a class="el" href="group__blobs.html#ga109ea7776dbb0d10e647b90729c605c3">CBLBlob_Get</a> to access it. </p>
+
+</div>
+</div>
+<a id="ga1e19d589d07fda707a180b19e544e4d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1e19d589d07fda707a180b19e544e4d4">&#9670;&nbsp;</a></span>CBLBlob_ContentType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* CBLBlob_ContentType </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -235,14 +256,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ga7806edb119d63c492b0a5243d62c3d39"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7806edb119d63c492b0a5243d62c3d39">&#9670;&nbsp;</a></span>cbl_blob_createWithData()</h2>
+<a id="gacb36a6c8d7580c27017a782eb9707383"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacb36a6c8d7580c27017a782eb9707383">&#9670;&nbsp;</a></span>CBLBlob_CreateWithData()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a>* cbl_blob_createWithData </td>
+          <td class="memname"><a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a>* CBLBlob_CreateWithData </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>contentType</em>, </td>
@@ -274,14 +295,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="gad4e0b33294ab1b98c2e0f8c34a031d08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gad4e0b33294ab1b98c2e0f8c34a031d08">&#9670;&nbsp;</a></span>cbl_blob_createWithStream()</h2>
+<a id="ga2ff133a4d7928970482d8fd705912bf6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2ff133a4d7928970482d8fd705912bf6">&#9670;&nbsp;</a></span>CBLBlob_CreateWithStream()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a>* cbl_blob_createWithStream </td>
+          <td class="memname"><a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a>* CBLBlob_CreateWithStream </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>contentType</em>, </td>
@@ -301,7 +322,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Creates a new blob after its data has been written to a <a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a>. </p>
-<p>You should then add the blob to a mutable document as a property &ndash; see <a class="el" href="group__blobs.html#ga9788af5f87e015b0ef91951043678651">CBLMutableDict_SetBlob</a> and <a class="el" href="group__blobs.html#ga424dabbf9b64bd4ff9a21895bd6da79a">CBLMutableArray_SetBlob</a>. </p><dl class="section note"><dt>Note</dt><dd>You are responsible for releasing the CBLBlob reference. </dd>
+<p>You should then add the blob to a mutable document as a property &ndash; see <a class="el" href="group__blobs.html#ga34933d2e28b1405f6329cd765d4246b5">FLMutableDict_SetBlob</a> and <a class="el" href="group__blobs.html#ga1906c0e1cba433386819854a07f7193b">FLMutableArray_SetBlob</a>. </p><dl class="section note"><dt>Note</dt><dd>You are responsible for releasing the CBLBlob reference. </dd>
 <dd>
 Do not free the stream; the blob will do that. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -315,14 +336,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="gabd6487bfdbac1441086d318034536764"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gabd6487bfdbac1441086d318034536764">&#9670;&nbsp;</a></span>cbl_blob_digest()</h2>
+<a id="gaa73f0b701afaefb4647544b310b00d7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa73f0b701afaefb4647544b310b00d7c">&#9670;&nbsp;</a></span>CBLBlob_Digest()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* cbl_blob_digest </td>
+          <td class="memname">const char* CBLBlob_Digest </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -335,14 +356,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="ga023450233b8a6406a283381df3606006"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga023450233b8a6406a283381df3606006">&#9670;&nbsp;</a></span>cbl_blob_get()</h2>
+<a id="ga109ea7776dbb0d10e647b90729c605c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga109ea7776dbb0d10e647b90729c605c3">&#9670;&nbsp;</a></span>CBLBlob_Get()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a>* cbl_blob_get </td>
+          <td class="memname">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a>* CBLBlob_Get </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td>
           <td class="paramname"><em>blobDict</em></td><td>)</td>
@@ -362,14 +383,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="gaf75fb9b9072886d89df2771e096b5c58"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf75fb9b9072886d89df2771e096b5c58">&#9670;&nbsp;</a></span>cbl_blob_length()</h2>
+<a id="gace0dc8f2023b783066433a8bf0f73f29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gace0dc8f2023b783066433a8bf0f73f29">&#9670;&nbsp;</a></span>CBLBlob_Length()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint64_t cbl_blob_length </td>
+          <td class="memname">uint64_t CBLBlob_Length </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -382,14 +403,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="gad209d34613be63eda7ea985a3ca0f2e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gad209d34613be63eda7ea985a3ca0f2e0">&#9670;&nbsp;</a></span>cbl_blob_loadContent()</h2>
+<a id="ga6ffc5d42d1c030e3eab1d48a177a80ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6ffc5d42d1c030e3eab1d48a177a80ee">&#9670;&nbsp;</a></span>CBLBlob_LoadContent()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a> cbl_blob_loadContent </td>
+          <td class="memname"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a> CBLBlob_LoadContent </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td>
           <td class="paramname">, </td>
@@ -413,14 +434,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="gaa555c4aa26e6d5d0381e1734ce014788"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaa555c4aa26e6d5d0381e1734ce014788">&#9670;&nbsp;</a></span>cbl_blob_openContentStream()</h2>
+<a id="gaf49053b061d6c46d9ee43fd817e263bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf49053b061d6c46d9ee43fd817e263bd">&#9670;&nbsp;</a></span>CBLBlob_OpenContentStream()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a>* cbl_blob_openContentStream </td>
+          <td class="memname"><a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a>* CBLBlob_OpenContentStream </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td>
           <td class="paramname">, </td>
@@ -443,14 +464,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="ga440e2c58922a2ef175a82c21ec4605e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga440e2c58922a2ef175a82c21ec4605e4">&#9670;&nbsp;</a></span>cbl_blob_properties()</h2>
+<a id="ga92c85332d925612785eecf09015c2153"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga92c85332d925612785eecf09015c2153">&#9670;&nbsp;</a></span>CBLBlob_Properties()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> cbl_blob_properties </td>
+          <td class="memname"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> CBLBlob_Properties </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -464,8 +485,8 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="gaececc3098e384e53f358343067544ead"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaececc3098e384e53f358343067544ead">&#9670;&nbsp;</a></span>cbl_blob_release()</h2>
+<a id="ga76611bccebe46f555a143a9d0eccad62"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga76611bccebe46f555a143a9d0eccad62">&#9670;&nbsp;</a></span>CBLBlob_Release()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -474,7 +495,7 @@ Do not free the stream; the blob will do that. </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void cbl_blob_release </td>
+          <td class="memname">static void CBLBlob_Release </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td>
           <td class="paramname"><em>t</em></td><td>)</td>
@@ -490,8 +511,8 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="ga886e8aa7e3925ac60c69b5acb8563e4d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga886e8aa7e3925ac60c69b5acb8563e4d">&#9670;&nbsp;</a></span>cbl_blob_retain()</h2>
+<a id="ga87cf8e02b9d2c3a568a86383e22eea0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga87cf8e02b9d2c3a568a86383e22eea0e">&#9670;&nbsp;</a></span>CBLBlob_Retain()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -500,7 +521,7 @@ Do not free the stream; the blob will do that. </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a>* cbl_blob_retain </td>
+          <td class="memname">static const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a>* CBLBlob_Retain </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24">CBLBlob</a> *&#160;</td>
           <td class="paramname"><em>t</em></td><td>)</td>
@@ -516,14 +537,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="ga82142e41c2f7e5e00cc035bb22f7ab73"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga82142e41c2f7e5e00cc035bb22f7ab73">&#9670;&nbsp;</a></span>cbl_blobreader_close()</h2>
+<a id="ga760178e2b90dbafa8de0f12f94ec549b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga760178e2b90dbafa8de0f12f94ec549b">&#9670;&nbsp;</a></span>CBLBlobReader_Close()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void cbl_blobreader_close </td>
+          <td class="memname">void CBLBlobReader_Close </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -536,14 +557,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="ga38cee746c0c2265def6c72f0045a328f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga38cee746c0c2265def6c72f0045a328f">&#9670;&nbsp;</a></span>cbl_blobreader_read()</h2>
+<a id="gac340e9fa34999c4ee5ea612438051d1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac340e9fa34999c4ee5ea612438051d1c">&#9670;&nbsp;</a></span>CBLBlobReader_Read()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ssize_t cbl_blobreader_read </td>
+          <td class="memname">int CBLBlobReader_Read </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3">CBLBlobReadStream</a> *&#160;</td>
           <td class="paramname"><em>stream</em>, </td>
@@ -588,14 +609,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="ga2daa7b73d4d7aac0598ee61077638ad1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga2daa7b73d4d7aac0598ee61077638ad1">&#9670;&nbsp;</a></span>cbl_blobwriter_close()</h2>
+<a id="gab554d7c2a99b73e437eccad5e7f24998"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab554d7c2a99b73e437eccad5e7f24998">&#9670;&nbsp;</a></span>CBLBlobWriter_Close()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void cbl_blobwriter_close </td>
+          <td class="memname">void CBLBlobWriter_Close </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -608,14 +629,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="gaddecaeecd0c6ac7cedb3ff1331cf921b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaddecaeecd0c6ac7cedb3ff1331cf921b">&#9670;&nbsp;</a></span>cbl_blobwriter_new()</h2>
+<a id="gacf3ea04b3ecd4b0d3814a4ea70de1753"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacf3ea04b3ecd4b0d3814a4ea70de1753">&#9670;&nbsp;</a></span>CBLBlobWriter_New()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a>* cbl_blobwriter_new </td>
+          <td class="memname"><a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a>* CBLBlobWriter_New </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em>, </td>
@@ -635,19 +656,19 @@ Do not free the stream; the blob will do that. </dd></dl>
 </div><div class="memdoc">
 
 <p>Opens a stream for writing a new blob. </p>
-<p>You should call <a class="el" href="group__blobs.html#gae09ec26a32f21eb8e744b1c4b81637cd">cbl_blobwriter_write</a> one or more times to write the data, then <a class="el" href="group__blobs.html#gad4e0b33294ab1b98c2e0f8c34a031d08">cbl_blob_createWithStream</a> to create the blob.</p>
-<p>If for some reason you need to abort, just call <a class="el" href="group__blobs.html#ga2daa7b73d4d7aac0598ee61077638ad1">cbl_blobwriter_close</a>. </p>
+<p>You should call <a class="el" href="group__blobs.html#ga476c2b270d027a7e8a757f6ed3f15e78">CBLBlobWriter_Write</a> one or more times to write the data, then <a class="el" href="group__blobs.html#ga2ff133a4d7928970482d8fd705912bf6">CBLBlob_CreateWithStream</a> to create the blob.</p>
+<p>If for some reason you need to abort, just call <a class="el" href="group__blobs.html#gab554d7c2a99b73e437eccad5e7f24998">CBLBlobWriter_Close</a>. </p>
 
 </div>
 </div>
-<a id="gae09ec26a32f21eb8e744b1c4b81637cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gae09ec26a32f21eb8e744b1c4b81637cd">&#9670;&nbsp;</a></span>cbl_blobwriter_write()</h2>
+<a id="ga476c2b270d027a7e8a757f6ed3f15e78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga476c2b270d027a7e8a757f6ed3f15e78">&#9670;&nbsp;</a></span>CBLBlobWriter_Write()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool cbl_blobwriter_write </td>
+          <td class="memname">bool CBLBlobWriter_Write </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlobWriteStream</a> *&#160;</td>
           <td class="paramname"><em>writer</em>, </td>
@@ -692,35 +713,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="ga1e75dd43193afc8f2c6cc47d8839d18a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1e75dd43193afc8f2c6cc47d8839d18a">&#9670;&nbsp;</a></span>cbl_isBlob()</h2>
+<a id="ga1906c0e1cba433386819854a07f7193b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1906c0e1cba433386819854a07f7193b">&#9670;&nbsp;</a></span>FLMutableArray_SetBlob()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool cbl_isBlob </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns true if a dictionary in a document is a blob reference. </p>
-<p>If so, you can call <a class="el" href="group__blobs.html#ga023450233b8a6406a283381df3606006">cbl_blob_get</a> to access it. </p>
-
-</div>
-</div>
-<a id="ga424dabbf9b64bd4ff9a21895bd6da79a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga424dabbf9b64bd4ff9a21895bd6da79a">&#9670;&nbsp;</a></span>CBLMutableArray_SetBlob()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CBLMutableArray_SetBlob </td>
+          <td class="memname">void FLMutableArray_SetBlob </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a>&#160;</td>
           <td class="paramname"><em>array</em>, </td>
@@ -749,14 +749,14 @@ Do not free the stream; the blob will do that. </dd></dl>
 
 </div>
 </div>
-<a id="ga9788af5f87e015b0ef91951043678651"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga9788af5f87e015b0ef91951043678651">&#9670;&nbsp;</a></span>CBLMutableDict_SetBlob()</h2>
+<a id="ga34933d2e28b1405f6329cd765d4246b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga34933d2e28b1405f6329cd765d4246b5">&#9670;&nbsp;</a></span>FLMutableDict_SetBlob()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void CBLMutableDict_SetBlob </td>
+          <td class="memname">void FLMutableDict_SetBlob </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a>&#160;</td>
           <td class="paramname"><em>dict</em>, </td>
@@ -851,70 +851,70 @@ Do not free the stream; the blob will do that. </dd></dl>
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="ga65f234e79b7b9fb3a683dfad8804a9ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga65f234e79b7b9fb3a683dfad8804a9ee">&#9670;&nbsp;</a></span>kCBLBlobContentTypeProperty</h2>
+<a id="gaf33b1053a31640902b41ab79ce611020"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf33b1053a31640902b41ab79ce611020">&#9670;&nbsp;</a></span>kCBLBlobContentTypeProperty</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLBlobContentTypeProperty</td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLBlobContentTypeProperty</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="ga67e2f0aeb3a194066ba156929fe2f457"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga67e2f0aeb3a194066ba156929fe2f457">&#9670;&nbsp;</a></span>kCBLBlobDigestProperty</h2>
+<a id="ga866b2a87ea3aaeb5b9a3ce27775ebf77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga866b2a87ea3aaeb5b9a3ce27775ebf77">&#9670;&nbsp;</a></span>kCBLBlobDigestProperty</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLBlobDigestProperty</td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLBlobDigestProperty</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="ga4084409acd6452ff68d50f0e23e941f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4084409acd6452ff68d50f0e23e941f6">&#9670;&nbsp;</a></span>kCBLBlobLengthProperty</h2>
+<a id="gac920ba99c8307fcebbf8f8500064a909"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac920ba99c8307fcebbf8f8500064a909">&#9670;&nbsp;</a></span>kCBLBlobLengthProperty</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLBlobLengthProperty</td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLBlobLengthProperty</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="gaab7ece5c31a228bd5e5606eaf9ff63ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaab7ece5c31a228bd5e5606eaf9ff63ea">&#9670;&nbsp;</a></span>kCBLBlobType</h2>
+<a id="ga6c47b776cf8625c9a890486517f3f460"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6c47b776cf8625c9a890486517f3f460">&#9670;&nbsp;</a></span>kCBLBlobType</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLBlobType</td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLBlobType</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="ga1115a9b586d28514f7ee03d185bed4c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga1115a9b586d28514f7ee03d185bed4c1">&#9670;&nbsp;</a></span>kCBLTypeProperty</h2>
+<a id="ga40ce422d8a22e60edfc7986eb239840e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga40ce422d8a22e60edfc7986eb239840e">&#9670;&nbsp;</a></span>kCBLTypeProperty</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLTypeProperty</td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#a172b88317c4e1248e156ca77731f1650">CBL_CORE_API</a> const <a class="el" href="struct_f_l_slice.html">FLSlice</a> kCBLTypeProperty</td>
         </tr>
       </table>
 </div><div class="memdoc">

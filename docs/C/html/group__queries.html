@@ -64,7 +64,8 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a>  </div>
   <div class="headertitle">
 <div class="title">Queries</div>  </div>
 </div><!--header-->
@@ -88,55 +89,63 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:ga9ebc8432e036873fc95f9d575cc42ebd"><td class="mdescLeft">&#160;</td><td class="mdescRight">An iterator over the rows resulting from running a query.  <a href="#ga9ebc8432e036873fc95f9d575cc42ebd">More...</a><br /></td></tr>
 <tr class="separator:ga9ebc8432e036873fc95f9d575cc42ebd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:ga5b419d879de00f45eb417c451e21ac82"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga5b419d879de00f45eb417c451e21ac82">CBLQueryLanguage</a> : uint32_t { <a class="el" href="group__queries.html#gga5b419d879de00f45eb417c451e21ac82aa86d4532291fc8f17284dcb61e198d76">kCBLJSONLanguage</a>, 
+<a class="el" href="group__queries.html#gga5b419d879de00f45eb417c451e21ac82a25fd238b9aa83867526649ef2769446e">kCBLN1QLLanguage</a>
+ }</td></tr>
+<tr class="memdesc:ga5b419d879de00f45eb417c451e21ac82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query languages.  <a href="group__queries.html#ga5b419d879de00f45eb417c451e21ac82">More...</a><br /></td></tr>
+<tr class="separator:ga5b419d879de00f45eb417c451e21ac82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Query objects</h2></td></tr>
-<tr class="memitem:ga5dfdd31e610cdb41b3e7777c8c29e603"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga5dfdd31e610cdb41b3e7777c8c29e603">cbl_query_new</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *jsonQuery, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
-<tr class="memdesc:ga5dfdd31e610cdb41b3e7777c8c29e603"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new query.  <a href="#ga5dfdd31e610cdb41b3e7777c8c29e603">More...</a><br /></td></tr>
-<tr class="separator:ga5dfdd31e610cdb41b3e7777c8c29e603"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga125d74842875cceab3234d816adeac1c"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga125d74842875cceab3234d816adeac1c">cbl_query_retain</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *t)</td></tr>
-<tr class="separator:ga125d74842875cceab3234d816adeac1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga51f28264d1f91ab4daad4902fe4291fa"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga51f28264d1f91ab4daad4902fe4291fa">cbl_query_release</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *t)</td></tr>
-<tr class="separator:ga51f28264d1f91ab4daad4902fe4291fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8a5536a0aa7d173368a5f3cde76148c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga8a5536a0aa7d173368a5f3cde76148c4">cbl_query_setParameters</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> parameters)</td></tr>
-<tr class="memdesc:ga8a5536a0aa7d173368a5f3cde76148c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns values to the query's parameters.  <a href="#ga8a5536a0aa7d173368a5f3cde76148c4">More...</a><br /></td></tr>
-<tr class="separator:ga8a5536a0aa7d173368a5f3cde76148c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga80bd321d4b9d8f89fe5175eb670b30c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga80bd321d4b9d8f89fe5175eb670b30c8">cbl_query_parameters</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query)</td></tr>
-<tr class="memdesc:ga80bd321d4b9d8f89fe5175eb670b30c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the query's current parameter bindings, if any.  <a href="#ga80bd321d4b9d8f89fe5175eb670b30c8">More...</a><br /></td></tr>
-<tr class="separator:ga80bd321d4b9d8f89fe5175eb670b30c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4b764413c46750d7383a5952db93cfca"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga4b764413c46750d7383a5952db93cfca">cbl_query_setParametersAsJSON</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, const char *json)</td></tr>
-<tr class="memdesc:ga4b764413c46750d7383a5952db93cfca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns values to the query's parameters, from JSON data.  <a href="#ga4b764413c46750d7383a5952db93cfca">More...</a><br /></td></tr>
-<tr class="separator:ga4b764413c46750d7383a5952db93cfca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3356ef28f75699cd06db70016140db02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga3356ef28f75699cd06db70016140db02">cbl_query_execute</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
-<tr class="memdesc:ga3356ef28f75699cd06db70016140db02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the query, returning the results.  <a href="#ga3356ef28f75699cd06db70016140db02">More...</a><br /></td></tr>
-<tr class="separator:ga3356ef28f75699cd06db70016140db02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga38316d7a1fa900d9f5a9aa5d545e521c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga38316d7a1fa900d9f5a9aa5d545e521c">cbl_query_explain</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
-<tr class="memdesc:ga38316d7a1fa900d9f5a9aa5d545e521c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns information about the query, including the translated SQL form, and the search strategy.  <a href="#ga38316d7a1fa900d9f5a9aa5d545e521c">More...</a><br /></td></tr>
-<tr class="separator:ga38316d7a1fa900d9f5a9aa5d545e521c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga73dc10629346cbfdbdd2c9da88c07c20"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga73dc10629346cbfdbdd2c9da88c07c20">cbl_query_columnCount</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
-<tr class="memdesc:ga73dc10629346cbfdbdd2c9da88c07c20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of columns in each result.  <a href="#ga73dc10629346cbfdbdd2c9da88c07c20">More...</a><br /></td></tr>
-<tr class="separator:ga73dc10629346cbfdbdd2c9da88c07c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaba0b314bf56c7609c86b625056b20cae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaba0b314bf56c7609c86b625056b20cae">cbl_query_columnName</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *, unsigned columnIndex)</td></tr>
-<tr class="memdesc:gaba0b314bf56c7609c86b625056b20cae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of a column in the result.  <a href="#gaba0b314bf56c7609c86b625056b20cae">More...</a><br /></td></tr>
-<tr class="separator:gaba0b314bf56c7609c86b625056b20cae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadda0811bda58e431a1a4b30c3c65d20f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gadda0811bda58e431a1a4b30c3c65d20f">CBLQuery_New</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__queries.html#ga5b419d879de00f45eb417c451e21ac82">CBLQueryLanguage</a> language, const char *queryString, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
+<tr class="memdesc:gadda0811bda58e431a1a4b30c3c65d20f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new query.  <a href="#gadda0811bda58e431a1a4b30c3c65d20f">More...</a><br /></td></tr>
+<tr class="separator:gadda0811bda58e431a1a4b30c3c65d20f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5851da5f9dcd02be5ce0c54073c22d7d"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga5851da5f9dcd02be5ce0c54073c22d7d">CBLQuery_Retain</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *t)</td></tr>
+<tr class="separator:ga5851da5f9dcd02be5ce0c54073c22d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9e9d4b09cb767cdaa820996ea9992f43"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga9e9d4b09cb767cdaa820996ea9992f43">CBLQuery_Release</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *t)</td></tr>
+<tr class="separator:ga9e9d4b09cb767cdaa820996ea9992f43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3423414402261bfc1a8d66080b09ec96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga3423414402261bfc1a8d66080b09ec96">CBLQuery_SetParameters</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> parameters)</td></tr>
+<tr class="memdesc:ga3423414402261bfc1a8d66080b09ec96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns values to the query's parameters.  <a href="#ga3423414402261bfc1a8d66080b09ec96">More...</a><br /></td></tr>
+<tr class="separator:ga3423414402261bfc1a8d66080b09ec96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6ea36ae2b985b71892c1c515e033e773"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga6ea36ae2b985b71892c1c515e033e773">CBLQuery_Parameters</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query)</td></tr>
+<tr class="memdesc:ga6ea36ae2b985b71892c1c515e033e773"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the query's current parameter bindings, if any.  <a href="#ga6ea36ae2b985b71892c1c515e033e773">More...</a><br /></td></tr>
+<tr class="separator:ga6ea36ae2b985b71892c1c515e033e773"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa681edd999abac721fc4db7c12b5193a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaa681edd999abac721fc4db7c12b5193a">CBLQuery_SetParametersAsJSON</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, const char *json)</td></tr>
+<tr class="memdesc:gaa681edd999abac721fc4db7c12b5193a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns values to the query's parameters, from JSON data.  <a href="#gaa681edd999abac721fc4db7c12b5193a">More...</a><br /></td></tr>
+<tr class="separator:gaa681edd999abac721fc4db7c12b5193a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacf4a560b717dc9dd929cf4816a6e46d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gacf4a560b717dc9dd929cf4816a6e46d5">CBLQuery_Execute</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
+<tr class="memdesc:gacf4a560b717dc9dd929cf4816a6e46d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the query, returning the results.  <a href="#gacf4a560b717dc9dd929cf4816a6e46d5">More...</a><br /></td></tr>
+<tr class="separator:gacf4a560b717dc9dd929cf4816a6e46d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2ce033701d68ef4a20bba8a162a8f069"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga2ce033701d68ef4a20bba8a162a8f069">CBLQuery_Explain</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
+<tr class="memdesc:ga2ce033701d68ef4a20bba8a162a8f069"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns information about the query, including the translated SQL form, and the search strategy.  <a href="#ga2ce033701d68ef4a20bba8a162a8f069">More...</a><br /></td></tr>
+<tr class="separator:ga2ce033701d68ef4a20bba8a162a8f069"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf173d3368558a02792319a0044b83c63"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaf173d3368558a02792319a0044b83c63">CBLQuery_ColumnCount</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
+<tr class="memdesc:gaf173d3368558a02792319a0044b83c63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of columns in each result.  <a href="#gaf173d3368558a02792319a0044b83c63">More...</a><br /></td></tr>
+<tr class="separator:gaf173d3368558a02792319a0044b83c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4463d6260952ab1dab155410315a0c8d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga4463d6260952ab1dab155410315a0c8d">CBLQuery_ColumnName</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *, unsigned columnIndex)</td></tr>
+<tr class="memdesc:ga4463d6260952ab1dab155410315a0c8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of a column in the result.  <a href="#ga4463d6260952ab1dab155410315a0c8d">More...</a><br /></td></tr>
+<tr class="separator:ga4463d6260952ab1dab155410315a0c8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Result sets</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p><a class="anchor" id="amgrp927e39946158e696a616aeda4abc9749"></a>A <code>CBLResultSet</code> is an iterator over the results returned by a query.</p>
 <p>It exposes one result at a time &ndash; as a collection of values indexed either by position or by name &ndash; and can be stepped from one result to the next. </p>
 </td></tr>
-<tr class="memitem:ga253488437b02180d7511b3e10c13d6f5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga253488437b02180d7511b3e10c13d6f5">cbl_resultset_next</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *)</td></tr>
-<tr class="memdesc:ga253488437b02180d7511b3e10c13d6f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Moves the result-set iterator to the next result.  <a href="#ga253488437b02180d7511b3e10c13d6f5">More...</a><br /></td></tr>
-<tr class="separator:ga253488437b02180d7511b3e10c13d6f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3f24c7282e6d09b22441bc5ce10e5e71"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga3f24c7282e6d09b22441bc5ce10e5e71">cbl_resultset_valueAtIndex</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *, unsigned index)</td></tr>
-<tr class="memdesc:ga3f24c7282e6d09b22441bc5ce10e5e71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of a column of the current result, given its (zero-based) numeric index.  <a href="#ga3f24c7282e6d09b22441bc5ce10e5e71">More...</a><br /></td></tr>
-<tr class="separator:ga3f24c7282e6d09b22441bc5ce10e5e71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae51f797c5710dd5945338e188aa41dcd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gae51f797c5710dd5945338e188aa41dcd">cbl_resultset_valueForKey</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *, const char *key)</td></tr>
-<tr class="memdesc:gae51f797c5710dd5945338e188aa41dcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of a column of the current result, given its name.  <a href="#gae51f797c5710dd5945338e188aa41dcd">More...</a><br /></td></tr>
-<tr class="separator:gae51f797c5710dd5945338e188aa41dcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6486deb24ac4373ecf5dccdec8ba6b2c"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga6486deb24ac4373ecf5dccdec8ba6b2c">cbl_results_retain</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *t)</td></tr>
-<tr class="separator:ga6486deb24ac4373ecf5dccdec8ba6b2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5a959bf544a8e3c5b7ebf479eec214ed"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga5a959bf544a8e3c5b7ebf479eec214ed">cbl_results_release</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *t)</td></tr>
-<tr class="separator:ga5a959bf544a8e3c5b7ebf479eec214ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaba853a70756d12151e7c34df2c8fb1ad"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaba853a70756d12151e7c34df2c8fb1ad">CBLResultSet_Next</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *)</td></tr>
+<tr class="memdesc:gaba853a70756d12151e7c34df2c8fb1ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Moves the result-set iterator to the next result.  <a href="#gaba853a70756d12151e7c34df2c8fb1ad">More...</a><br /></td></tr>
+<tr class="separator:gaba853a70756d12151e7c34df2c8fb1ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6298e2a65b725dd5f5edc4296f5687aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga6298e2a65b725dd5f5edc4296f5687aa">CBLResultSet_ValueAtIndex</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *, unsigned index)</td></tr>
+<tr class="memdesc:ga6298e2a65b725dd5f5edc4296f5687aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of a column of the current result, given its (zero-based) numeric index.  <a href="#ga6298e2a65b725dd5f5edc4296f5687aa">More...</a><br /></td></tr>
+<tr class="separator:ga6298e2a65b725dd5f5edc4296f5687aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8e012b431aa192f2064fde2136bfbf5a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga8e012b431aa192f2064fde2136bfbf5a">CBLResultSet_ValueForKey</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *, const char *key)</td></tr>
+<tr class="memdesc:ga8e012b431aa192f2064fde2136bfbf5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of a column of the current result, given its name.  <a href="#ga8e012b431aa192f2064fde2136bfbf5a">More...</a><br /></td></tr>
+<tr class="separator:ga8e012b431aa192f2064fde2136bfbf5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3a20876309e1c7f9dadce80636662f06"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga3a20876309e1c7f9dadce80636662f06">CBLResultSet_Retain</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *t)</td></tr>
+<tr class="separator:ga3a20876309e1c7f9dadce80636662f06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa1c246d416e05c7e161fe2c894a645ae"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaa1c246d416e05c7e161fe2c894a645ae">CBLResultSet_Release</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *t)</td></tr>
+<tr class="separator:gaa1c246d416e05c7e161fe2c894a645ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Change listener</h2></td></tr>
@@ -147,9 +156,9 @@ Change listener</h2></td></tr>
 <tr class="memitem:gab5bd0136638986b4be7b451e811e4c37"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gab5bd0136638986b4be7b451e811e4c37">CBLQueryChangeListener</a>) (void *context, <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *newResults, const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
 <tr class="memdesc:gab5bd0136638986b4be7b451e811e4c37"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback to be invoked after the query's results have changed.  <a href="#gab5bd0136638986b4be7b451e811e4c37">More...</a><br /></td></tr>
 <tr class="separator:gab5bd0136638986b4be7b451e811e4c37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5513b0490fb505bf09f5aa83b8f3fb5e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga5513b0490fb505bf09f5aa83b8f3fb5e">cbl_query_addChangeListener</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__queries.html#gab5bd0136638986b4be7b451e811e4c37">CBLQueryChangeListener</a> *listener, void *context)</td></tr>
-<tr class="memdesc:ga5513b0490fb505bf09f5aa83b8f3fb5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a change listener callback with a query, turning it into a "live query" until the listener is removed (via <a class="el" href="group__listeners.html#gadcb6c78fa3e976af3d2c11421dff66a4">cbl_listener_remove</a>).  <a href="#ga5513b0490fb505bf09f5aa83b8f3fb5e">More...</a><br /></td></tr>
-<tr class="separator:ga5513b0490fb505bf09f5aa83b8f3fb5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga51a9d26025d35ea429a830d3093ed120"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga51a9d26025d35ea429a830d3093ed120">CBLQuery_AddChangeListener</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__queries.html#gab5bd0136638986b4be7b451e811e4c37">CBLQueryChangeListener</a> *listener, void *context)</td></tr>
+<tr class="memdesc:ga51a9d26025d35ea429a830d3093ed120"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a change listener callback with a query, turning it into a "live query" until the listener is removed (via <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>).  <a href="#ga51a9d26025d35ea429a830d3093ed120">More...</a><br /></td></tr>
+<tr class="separator:ga51a9d26025d35ea429a830d3093ed120"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Database Indexes</h2></td></tr>
@@ -158,15 +167,15 @@ Database Indexes</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:gac5266cfb9be1fb0441d87df7bb022356"><td class="mdescLeft">&#160;</td><td class="mdescRight">Types of database indexes.  <a href="group__queries.html#gac5266cfb9be1fb0441d87df7bb022356">More...</a><br /></td></tr>
 <tr class="separator:gac5266cfb9be1fb0441d87df7bb022356"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga06352f0eed3f133bcc5cd96f082e0f9c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga06352f0eed3f133bcc5cd96f082e0f9c">cbl_db_createIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *name, <a class="el" href="struct_c_b_l_index_spec.html">CBLIndexSpec</a>, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
-<tr class="memdesc:ga06352f0eed3f133bcc5cd96f082e0f9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a database index.  <a href="#ga06352f0eed3f133bcc5cd96f082e0f9c">More...</a><br /></td></tr>
-<tr class="separator:ga06352f0eed3f133bcc5cd96f082e0f9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad2e627b29bc37ac2261bda4dfbb2d68b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gad2e627b29bc37ac2261bda4dfbb2d68b">cbl_db_deleteIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *name, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
-<tr class="memdesc:gad2e627b29bc37ac2261bda4dfbb2d68b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes an index given its name.  <a href="#gad2e627b29bc37ac2261bda4dfbb2d68b">More...</a><br /></td></tr>
-<tr class="separator:gad2e627b29bc37ac2261bda4dfbb2d68b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac7e0f7bd26c246532ef393b8afe40ba3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gac7e0f7bd26c246532ef393b8afe40ba3">cbl_db_indexNames</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db)</td></tr>
-<tr class="memdesc:gac7e0f7bd26c246532ef393b8afe40ba3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the names of the indexes on this database, as an array of strings.  <a href="#gac7e0f7bd26c246532ef393b8afe40ba3">More...</a><br /></td></tr>
-<tr class="separator:gac7e0f7bd26c246532ef393b8afe40ba3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2ee9cab177b48e23cc014a7352845fe3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga2ee9cab177b48e23cc014a7352845fe3">CBLDatabase_CreateIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *name, <a class="el" href="struct_c_b_l_index_spec.html">CBLIndexSpec</a>, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:ga2ee9cab177b48e23cc014a7352845fe3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a database index.  <a href="#ga2ee9cab177b48e23cc014a7352845fe3">More...</a><br /></td></tr>
+<tr class="separator:ga2ee9cab177b48e23cc014a7352845fe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga422db1db49ee8f1b8eabfb309690bed1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga422db1db49ee8f1b8eabfb309690bed1">CBLDatabase_DeleteIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *name, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:ga422db1db49ee8f1b8eabfb309690bed1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes an index given its name.  <a href="#ga422db1db49ee8f1b8eabfb309690bed1">More...</a><br /></td></tr>
+<tr class="separator:ga422db1db49ee8f1b8eabfb309690bed1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaff42f742e1571e29975ca2c619602893"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaff42f742e1571e29975ca2c619602893">CBLDatabase_IndexNames</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db)</td></tr>
+<tr class="memdesc:gaff42f742e1571e29975ca2c619602893"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the names of the indexes on this database, as an array of strings.  <a href="#gaff42f742e1571e29975ca2c619602893">More...</a><br /></td></tr>
+<tr class="separator:gaff42f742e1571e29975ca2c619602893"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>A CBLQuery represents a compiled N1QL-like database query. </p>
@@ -250,15 +259,35 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="ga06352f0eed3f133bcc5cd96f082e0f9c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga06352f0eed3f133bcc5cd96f082e0f9c">&#9670;&nbsp;</a></span>cbl_db_createIndex()</h2>
+<a id="ga5b419d879de00f45eb417c451e21ac82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5b419d879de00f45eb417c451e21ac82">&#9670;&nbsp;</a></span>CBLQueryLanguage</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool cbl_db_createIndex </td>
+          <td class="memname">enum <a class="el" href="group__queries.html#ga5b419d879de00f45eb417c451e21ac82">CBLQueryLanguage</a> : uint32_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Query languages. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga5b419d879de00f45eb417c451e21ac82aa86d4532291fc8f17284dcb61e198d76"></a>kCBLJSONLanguage&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="gga5b419d879de00f45eb417c451e21ac82a25fd238b9aa83867526649ef2769446e"></a>kCBLN1QLLanguage&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ga2ee9cab177b48e23cc014a7352845fe3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2ee9cab177b48e23cc014a7352845fe3">&#9670;&nbsp;</a></span>CBLDatabase_CreateIndex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool CBLDatabase_CreateIndex </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em>, </td>
@@ -294,14 +323,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="gad2e627b29bc37ac2261bda4dfbb2d68b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gad2e627b29bc37ac2261bda4dfbb2d68b">&#9670;&nbsp;</a></span>cbl_db_deleteIndex()</h2>
+<a id="ga422db1db49ee8f1b8eabfb309690bed1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga422db1db49ee8f1b8eabfb309690bed1">&#9670;&nbsp;</a></span>CBLDatabase_DeleteIndex()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool cbl_db_deleteIndex </td>
+          <td class="memname">bool CBLDatabase_DeleteIndex </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em>, </td>
@@ -330,14 +359,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="gac7e0f7bd26c246532ef393b8afe40ba3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac7e0f7bd26c246532ef393b8afe40ba3">&#9670;&nbsp;</a></span>cbl_db_indexNames()</h2>
+<a id="gaff42f742e1571e29975ca2c619602893"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaff42f742e1571e29975ca2c619602893">&#9670;&nbsp;</a></span>CBLDatabase_IndexNames()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a> cbl_db_indexNames </td>
+          <td class="memname"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a> CBLDatabase_IndexNames </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em></td><td>)</td>
@@ -351,14 +380,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga5513b0490fb505bf09f5aa83b8f3fb5e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5513b0490fb505bf09f5aa83b8f3fb5e">&#9670;&nbsp;</a></span>cbl_query_addChangeListener()</h2>
+<a id="ga51a9d26025d35ea429a830d3093ed120"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga51a9d26025d35ea429a830d3093ed120">&#9670;&nbsp;</a></span>CBLQuery_AddChangeListener()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a>* cbl_query_addChangeListener </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a>* CBLQuery_AddChangeListener </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"><em>query</em>, </td>
@@ -383,7 +412,7 @@ Database Indexes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Registers a change listener callback with a query, turning it into a "live query" until the listener is removed (via <a class="el" href="group__listeners.html#gadcb6c78fa3e976af3d2c11421dff66a4">cbl_listener_remove</a>). </p>
+<p>Registers a change listener callback with a query, turning it into a "live query" until the listener is removed (via <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>The query to observe. </td></tr>
@@ -392,18 +421,18 @@ Database Indexes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A token to be passed to <a class="el" href="group__listeners.html#gadcb6c78fa3e976af3d2c11421dff66a4">cbl_listener_remove</a> when it's time to remove the listener. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A token to be passed to <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a> when it's time to remove the listener. </dd></dl>
 
 </div>
 </div>
-<a id="ga73dc10629346cbfdbdd2c9da88c07c20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga73dc10629346cbfdbdd2c9da88c07c20">&#9670;&nbsp;</a></span>cbl_query_columnCount()</h2>
+<a id="gaf173d3368558a02792319a0044b83c63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf173d3368558a02792319a0044b83c63">&#9670;&nbsp;</a></span>CBLQuery_ColumnCount()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned cbl_query_columnCount </td>
+          <td class="memname">unsigned CBLQuery_ColumnCount </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -416,14 +445,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="gaba0b314bf56c7609c86b625056b20cae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaba0b314bf56c7609c86b625056b20cae">&#9670;&nbsp;</a></span>cbl_query_columnName()</h2>
+<a id="ga4463d6260952ab1dab155410315a0c8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4463d6260952ab1dab155410315a0c8d">&#9670;&nbsp;</a></span>CBLQuery_ColumnName()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="struct_f_l_slice.html">FLSlice</a> cbl_query_columnName </td>
+          <td class="memname"><a class="el" href="struct_f_l_slice.html">FLSlice</a> CBLQuery_ColumnName </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname">, </td>
@@ -446,14 +475,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga3356ef28f75699cd06db70016140db02"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3356ef28f75699cd06db70016140db02">&#9670;&nbsp;</a></span>cbl_query_execute()</h2>
+<a id="gacf4a560b717dc9dd929cf4816a6e46d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gacf4a560b717dc9dd929cf4816a6e46d5">&#9670;&nbsp;</a></span>CBLQuery_Execute()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a>* cbl_query_execute </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a>* CBLQuery_Execute </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname">, </td>
@@ -477,14 +506,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga38316d7a1fa900d9f5a9aa5d545e521c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga38316d7a1fa900d9f5a9aa5d545e521c">&#9670;&nbsp;</a></span>cbl_query_explain()</h2>
+<a id="ga2ce033701d68ef4a20bba8a162a8f069"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2ce033701d68ef4a20bba8a162a8f069">&#9670;&nbsp;</a></span>CBLQuery_Explain()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a> cbl_query_explain </td>
+          <td class="memname"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a> CBLQuery_Explain </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -498,14 +527,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga5dfdd31e610cdb41b3e7777c8c29e603"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5dfdd31e610cdb41b3e7777c8c29e603">&#9670;&nbsp;</a></span>cbl_query_new()</h2>
+<a id="gadda0811bda58e431a1a4b30c3c65d20f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadda0811bda58e431a1a4b30c3c65d20f">&#9670;&nbsp;</a></span>CBLQuery_New()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a>* cbl_query_new </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a>* CBLQuery_New </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em>, </td>
@@ -513,8 +542,14 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group__queries.html#ga5b419d879de00f45eb417c451e21ac82">CBLQueryLanguage</a>&#160;</td>
+          <td class="paramname"><em>language</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>jsonQuery</em>, </td>
+          <td class="paramname"><em>queryString</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -535,7 +570,8 @@ Database Indexes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">db</td><td>The database to query. </td></tr>
-    <tr><td class="paramname">jsonQuery</td><td>The query expressed in the <a href="https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema">JSON schema</a>. You may use JSON5 syntax. </td></tr>
+    <tr><td class="paramname">language</td><td>The query language (<a href="https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema">JSON</a> or <a href="https://docs.couchbase.com/server/4.0/n1ql/n1ql-language-reference/index.html">N1QL</a>.) </td></tr>
+    <tr><td class="paramname">queryString</td><td>The query string. </td></tr>
     <tr><td class="paramname">error</td><td>On failure, the error will be written here. </td></tr>
   </table>
   </dd>
@@ -544,14 +580,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga80bd321d4b9d8f89fe5175eb670b30c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga80bd321d4b9d8f89fe5175eb670b30c8">&#9670;&nbsp;</a></span>cbl_query_parameters()</h2>
+<a id="ga6ea36ae2b985b71892c1c515e033e773"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6ea36ae2b985b71892c1c515e033e773">&#9670;&nbsp;</a></span>CBLQuery_Parameters()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> cbl_query_parameters </td>
+          <td class="memname"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> CBLQuery_Parameters </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"><em>query</em></td><td>)</td>
@@ -564,8 +600,8 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga51f28264d1f91ab4daad4902fe4291fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga51f28264d1f91ab4daad4902fe4291fa">&#9670;&nbsp;</a></span>cbl_query_release()</h2>
+<a id="ga9e9d4b09cb767cdaa820996ea9992f43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9e9d4b09cb767cdaa820996ea9992f43">&#9670;&nbsp;</a></span>CBLQuery_Release()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -574,7 +610,7 @@ Database Indexes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void cbl_query_release </td>
+          <td class="memname">static void CBLQuery_Release </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"><em>t</em></td><td>)</td>
@@ -590,8 +626,8 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga125d74842875cceab3234d816adeac1c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga125d74842875cceab3234d816adeac1c">&#9670;&nbsp;</a></span>cbl_query_retain()</h2>
+<a id="ga5851da5f9dcd02be5ce0c54073c22d7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5851da5f9dcd02be5ce0c54073c22d7d">&#9670;&nbsp;</a></span>CBLQuery_Retain()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -600,7 +636,7 @@ Database Indexes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a>* cbl_query_retain </td>
+          <td class="memname">static const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a>* CBLQuery_Retain </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"><em>t</em></td><td>)</td>
@@ -616,14 +652,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga8a5536a0aa7d173368a5f3cde76148c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga8a5536a0aa7d173368a5f3cde76148c4">&#9670;&nbsp;</a></span>cbl_query_setParameters()</h2>
+<a id="ga3423414402261bfc1a8d66080b09ec96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3423414402261bfc1a8d66080b09ec96">&#9670;&nbsp;</a></span>CBLQuery_SetParameters()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void cbl_query_setParameters </td>
+          <td class="memname">void CBLQuery_SetParameters </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"><em>query</em>, </td>
@@ -653,14 +689,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga4b764413c46750d7383a5952db93cfca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4b764413c46750d7383a5952db93cfca">&#9670;&nbsp;</a></span>cbl_query_setParametersAsJSON()</h2>
+<a id="gaa681edd999abac721fc4db7c12b5193a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa681edd999abac721fc4db7c12b5193a">&#9670;&nbsp;</a></span>CBLQuery_SetParametersAsJSON()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool cbl_query_setParametersAsJSON </td>
+          <td class="memname">bool CBLQuery_SetParametersAsJSON </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"><em>query</em>, </td>
@@ -690,66 +726,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga5a959bf544a8e3c5b7ebf479eec214ed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5a959bf544a8e3c5b7ebf479eec214ed">&#9670;&nbsp;</a></span>cbl_results_release()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void cbl_results_release </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ga6486deb24ac4373ecf5dccdec8ba6b2c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga6486deb24ac4373ecf5dccdec8ba6b2c">&#9670;&nbsp;</a></span>cbl_results_retain()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a>* cbl_results_retain </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ga253488437b02180d7511b3e10c13d6f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga253488437b02180d7511b3e10c13d6f5">&#9670;&nbsp;</a></span>cbl_resultset_next()</h2>
+<a id="gaba853a70756d12151e7c34df2c8fb1ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaba853a70756d12151e7c34df2c8fb1ad">&#9670;&nbsp;</a></span>CBLResultSet_Next()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool cbl_resultset_next </td>
+          <td class="memname">bool CBLResultSet_Next </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -763,14 +747,66 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga3f24c7282e6d09b22441bc5ce10e5e71"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3f24c7282e6d09b22441bc5ce10e5e71">&#9670;&nbsp;</a></span>cbl_resultset_valueAtIndex()</h2>
+<a id="gaa1c246d416e05c7e161fe2c894a645ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa1c246d416e05c7e161fe2c894a645ae">&#9670;&nbsp;</a></span>CBLResultSet_Release()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void CBLResultSet_Release </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
+          <td class="paramname"><em>t</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ga3a20876309e1c7f9dadce80636662f06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3a20876309e1c7f9dadce80636662f06">&#9670;&nbsp;</a></span>CBLResultSet_Retain()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a>* CBLResultSet_Retain </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
+          <td class="paramname"><em>t</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ga6298e2a65b725dd5f5edc4296f5687aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6298e2a65b725dd5f5edc4296f5687aa">&#9670;&nbsp;</a></span>CBLResultSet_ValueAtIndex()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> cbl_resultset_valueAtIndex </td>
+          <td class="memname"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> CBLResultSet_ValueAtIndex </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
           <td class="paramname">, </td>
@@ -793,14 +829,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="gae51f797c5710dd5945338e188aa41dcd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gae51f797c5710dd5945338e188aa41dcd">&#9670;&nbsp;</a></span>cbl_resultset_valueForKey()</h2>
+<a id="ga8e012b431aa192f2064fde2136bfbf5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8e012b431aa192f2064fde2136bfbf5a">&#9670;&nbsp;</a></span>CBLResultSet_ValueForKey()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> cbl_resultset_valueForKey </td>
+          <td class="memname"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> CBLResultSet_ValueForKey </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
           <td class="paramname">, </td>

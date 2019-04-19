@@ -5,6 +5,7 @@ var searchData=
   ['cblblob_2eh',['CBLBlob.h',['../_c_b_l_blob_8h.html',1,'']]],
   ['cbldatabase_2eh',['CBLDatabase.h',['../_c_b_l_database_8h.html',1,'']]],
   ['cbldocument_2eh',['CBLDocument.h',['../_c_b_l_document_8h.html',1,'']]],
+  ['cbllog_2eh',['CBLLog.h',['../_c_b_l_log_8h.html',1,'']]],
   ['cblquery_2eh',['CBLQuery.h',['../_c_b_l_query_8h.html',1,'']]],
   ['cblreplicator_2eh',['CBLReplicator.h',['../_c_b_l_replicator_8h.html',1,'']]],
   ['couchbaselite_2eh',['CouchbaseLite.h',['../_couchbase_lite_8h.html',1,'']]]
