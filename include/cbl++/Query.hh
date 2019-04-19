@@ -30,9 +30,9 @@ namespace cbl {
     /** A database query. */
     class Query : private RefCounted {
     public:
-        Query(const Database& db, const char *jsonQuery _cbl_nonnull) {
+        Query(const Database& db, CBLQueryLanguage language, const char *queryString _cbl_nonnull) {
             CBLError error;
-            auto q = CBLQuery_New(db.ref(), jsonQuery, &error);
+            auto q = CBLQuery_New(db.ref(), language, queryString, &error);
             check(q, error);
             _ref = (CBLRefCounted*)q;
         }

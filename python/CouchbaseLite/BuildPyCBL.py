@@ -190,9 +190,14 @@ char* CBLDocument_PropertiesAsJSON(const CBLDocument*);
 bool CBLDocument_SetPropertiesAsJSON(CBLDocument*, const char *json, CBLError*);
 
 //////// CBLQuery.h
+typedef enum {
+    kCBLJSONLanguage,
+    kCBLN1QLLanguage
+} CBLQueryLanguage;
 CBLQuery* CBLQuery_New(const CBLDatabase* db,
-                        const char *jsonQuery,
-                        CBLError* error);
+                       CBLQueryLanguage language,
+                       const char *queryString,
+                       CBLError* error);
 FLDict CBLQuery_Parameters(CBLQuery* query);
 void CBLQuery_SetParameters(CBLQuery* query,
                              FLDict parameters);

@@ -34,10 +34,19 @@ class CBLQuery : public CBLRefCounted {
 public:
 
     CBLQuery(const CBLDatabase* db _cbl_nonnull,
-             const char *json5Query _cbl_nonnull,
+             CBLQueryLanguage language,
+             const char *queryString _cbl_nonnull,
              C4Error* outError)
     {
-        alloc_slice json = convertJSON5(json5Query, outError);
+        alloc_slice json;
+        switch (language) {
+            case kCBLN1QLLanguage:
+                json = c4query_translateN1QL(slice(queryString), nullptr, outError);
+                break;
+            case kCBLJSONLanguage:
+                json = convertJSON5(queryString, outError);
+                break;
+        }
         if (json)
             _c4query = c4query_new(internal(db), json, outError);
     }
@@ -114,10 +123,11 @@ Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
 
 
 CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
-                        const char *jsonQuery _cbl_nonnull,
-                        CBLError* outError) CBLAPI
+                       CBLQueryLanguage language,
+                       const char *queryString _cbl_nonnull,
+                       CBLError* outError) CBLAPI
 {
-    auto query = retained(new CBLQuery(db, jsonQuery, internal(outError)));
+    auto query = retained(new CBLQuery(db, language, queryString, internal(outError)));
     return query->valid() ? retain(query.get()) : nullptr;
 }
 

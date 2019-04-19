@@ -1,6 +1,6 @@
 from CouchbaseLite.Database import Database, DatabaseConfiguration
 from CouchbaseLite.Document import Document, MutableDocument
-from CouchbaseLite.Query import Query
+from CouchbaseLite.Query import JSONQuery
 
 Database.deleteFile("db", "/tmp")
 
@@ -60,7 +60,7 @@ with db:
 
 dbListenerToken.remove()
 
-q = Query(db, {'WHAT': [['.flavor'], ['.numbers']], 'WHERE': ['=', ['.color'], 'green']})
+q = JSONQuery(db, {'WHAT': [['.flavor'], ['.numbers']], 'WHERE': ['=', ['.color'], 'green']})
 print ("-------- Explanation --------")
 print (q.explanation)
 print ("-----------------------------")

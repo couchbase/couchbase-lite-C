@@ -3,19 +3,21 @@ from .common import *
 from .Collections import *
 import json
 
+JSONLanguage = 0
+N1QLLanguage = 1
+
 class Query (CBLObject):
-    def __init__(self, database, jsonQuery):
-        if not isinstance(jsonQuery, str):
-            jsonQuery = json.dumps(jsonQuery)
+
+    def __init__(self, database, queryString, language = N1QLLanguage):
         CBLObject.__init__(self,
-                           lib.CBLQuery_New(database._ref, cstr(jsonQuery), gError),
+                           lib.CBLQuery_New(database._ref, language, cstr(queryString), gError),
                            "Couldn't create query", gError)
         self.database = database
         self.columnCount = lib.CBLQuery_ColumnCount(self._ref)
-        self.jsonRepresentation = jsonQuery
+        self.sourceCode = queryString
 
     def __repr__(self):
-        return self.__class__.__name__ + "['" + self.jsonRepresentation + "']"
+        return self.__class__.__name__ + "['" + self.sourceCode + "']"
 
     @property
     def explanation(self):
@@ -49,6 +51,18 @@ class Query (CBLObject):
                 yield lastResult
         finally:
             lib.CBL_Release(results)
+
+
+class JSONQuery (Query):
+    def __init__(self, database, jsonQuery):
+        if not isinstance(jsonQuery, str):
+            jsonQuery = json.dumps(jsonQuery)
+        Query.__init__(self, database, jsonQuery, JSONLanguage)
+
+class N1QLQuery (Query):
+    def __init__(self, database, n1ql):
+        Query.__init__(self, database, n1ql, N1QLLanguage)
+
 
 class QueryResult (object):
     """A container representing a query result. It can be indexed using either

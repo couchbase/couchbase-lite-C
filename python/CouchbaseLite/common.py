@@ -35,7 +35,7 @@ class CBLObject (object):
             raise CBLException(message, error)
 
     def __del__(self):
-        if lib != None and self._ref != None:
+        if lib != None and "_ref" in self.__dict__ and self._ref != None:
             lib.CBL_Release(self._ref)
 
 class ListenerToken (object):

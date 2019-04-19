@@ -34,18 +34,30 @@ extern "C" {
     understood by the core query engine.
  */
 
+
+/** Query languages */
+typedef CBL_ENUM(uint32_t, CBLQueryLanguage) {
+    kCBLJSONLanguage,
+    kCBLN1QLLanguage
+};
+
+
 /** \name  Query objects
     @{ */
 
 /** Creates a new query.
     @note  You must release the query when you're finished with it.
     @param db  The database to query.
-    @param jsonQuery  The query expressed in the [JSON schema](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema). You may use JSON5 syntax.
+    @param language  The query language
+            ([JSON](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema) or
+            [N1QL](https://docs.couchbase.com/server/4.0/n1ql/n1ql-language-reference/index.html).)
+    @param queryString  The query string.
     @param error  On failure, the error will be written here.
     @return  The new query object. */
 _cbl_warn_unused
 CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
-                       const char *jsonQuery _cbl_nonnull, 
+                       CBLQueryLanguage language,
+                       const char *queryString _cbl_nonnull,
                        CBLError* error) CBLAPI;
 
 CBL_REFCOUNTED(CBLQuery*, Query);
