@@ -26,7 +26,7 @@ extern "C" {
 
 /** Returns the last sequence number assigned in the database.
     This starts at zero and increments every time a document is saved or deleted. */
-uint64_t cbl_db_lastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
+uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Deletes a document from the database, given only its ID.
     @note  If no document with that ID exists, this function will return false but the error
@@ -35,9 +35,9 @@ uint64_t cbl_db_lastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
     @param docID  The document ID to delete.
     @param error  On failure, the error will be written here.
     @return  True if the document was deleted, false if it doesn't exist or the deletion failed. */
-bool CBLDatabase_DeleteDocumentByID(CBLDatabase* database _cbl_nonnull,
-                               const char* docID _cbl_nonnull,
-                               CBLError* error) CBLAPI;
+    bool CBLDatabase_DeleteDocumentByID(CBLDatabase* database _cbl_nonnull,
+                                        const char* docID _cbl_nonnull,
+                                        CBLError* error) CBLAPI;
 
 
 

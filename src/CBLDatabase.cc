@@ -139,7 +139,7 @@ uint64_t CBLDatabase_Count(const CBLDatabase* db) CBLAPI {
     return c4db_getDocumentCount(internal(db));
 }
 
-uint64_t cbl_db_lastSequence(const CBLDatabase* db) CBLAPI {
+uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) CBLAPI {
     return c4db_getLastSequence(internal(db));
 }
 
