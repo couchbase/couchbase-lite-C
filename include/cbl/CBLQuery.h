@@ -160,7 +160,7 @@ typedef void (*CBLQueryChangeListener)(void *context,
             listener.*/
 _cbl_warn_unused
 CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
-                                             CBLQueryChangeListener* listener _cbl_nonnull,
+                                             CBLQueryChangeListener listener _cbl_nonnull,
                                              void *context) CBLAPI;
 
 /** @} */

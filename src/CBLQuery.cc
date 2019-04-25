@@ -19,6 +19,7 @@
 #include "CBLQuery.h"
 #include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
+#include "Listener.hh"
 #include "Util.hh"
 #include "c4.hh"
 #include "c4Query.h"
@@ -28,6 +29,9 @@
 
 using namespace std;
 using namespace fleece;
+
+
+#pragma mark - QUERY CLASS:
 
 
 class CBLQuery : public CBLRefCounted {
@@ -74,11 +78,17 @@ public:
         return (i != _columnNames->end()) ? i->second : -1;
     }
 
+    CBLListenerToken* addChangeListener(CBLQueryChangeListener listener, void *context);
+
 private:
     c4::ref<C4Query> _c4query;
     alloc_slice _parameters;
     unique_ptr<std::unordered_map<slice, unsigned>> _columnNames;
+    Listeners<CBLQueryChangeListener> _listeners;
 };
+
+
+#pragma mark - RESULT SET CLASS:
 
 
 class CBLResultSet : public CBLRefCounted {
@@ -118,6 +128,64 @@ Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
     C4QueryOptions options = {};
     auto qe = c4query_run(_c4query, &options, _parameters, outError);
     return qe ? retained(new CBLResultSet(this, qe)) : nullptr;
+}
+
+
+#pragma mark - QUERY LISTENER:
+
+
+namespace cbl_internal {
+
+    // Custom subclass of CBLListenerToken for query listeners.
+    // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
+    template<>
+    class ListenerToken<CBLQueryChangeListener> : public CBLListenerToken {
+    public:
+        ListenerToken(CBLQuery *query, C4Query *c4query,
+                      CBLQueryChangeListener callback, void *context)
+        :CBLListenerToken((const void*)callback, context)
+        ,_query(query)
+        ,_c4obs( c4queryobs_create(c4query,
+                                   [](C4QueryObserver* observer, C4QueryEnumerator *e, C4Error error,
+                                      void *context)
+                                   {
+                                       ((ListenerToken*)context)->queryChanged(e, error);
+                                   },
+                                   this) )
+        { }
+
+        ~ListenerToken() {
+            c4queryobs_free(_c4obs);
+        }
+
+        CBLQueryChangeListener callback() const           {return (CBLQueryChangeListener)_callback;}
+
+        void call(C4QueryEnumerator *e, C4Error c4error) {
+            Retained<CBLResultSet> results;
+            const CBLError *error = nullptr;
+            if (e)
+                results = new CBLResultSet(_query, e);
+            else
+                error = external(&c4error);
+            callback()(_context, _query, results, error);
+        }
+
+    private:
+        void queryChanged(C4QueryEnumerator *e, C4Error error) {
+            call(e, error);
+        }
+
+        Retained<CBLQuery> _query;
+        C4QueryObserver* _c4obs {nullptr};
+    };
+
+}
+
+
+CBLListenerToken* CBLQuery::addChangeListener(CBLQueryChangeListener listener, void *context) {
+    auto token = new ListenerToken<CBLQueryChangeListener>(this, _c4query, listener, context);
+    _listeners.add(token);
+    return token;
 }
 
 
@@ -172,6 +240,13 @@ unsigned CBLQuery_ColumnCount(CBLQuery* query _cbl_nonnull) CBLAPI {
 
 FLSlice CBLQuery_ColumnName(CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI {
     return query->columnName(col);
+}
+
+CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
+                                             CBLQueryChangeListener listener _cbl_nonnull,
+                                             void *context) CBLAPI
+{
+    return query->addChangeListener(listener, context);
 }
 
 
