@@ -58,11 +58,24 @@ public:
     }
 
     bool valid() const                              {return _c4query != nullptr;}
-    FLSlice parameters() const                      {return _parameters;}
-    void setParameters(FLSlice encodedParameters)   {_parameters = encodedParameters;}
     alloc_slice explain() const                     {return c4query_explain(_c4query);}
     unsigned columnCount() const                    {return c4query_columnCount(_c4query);}
     slice columnName(unsigned col) const            {return c4query_columnTitle(_c4query, col);}
+
+    void setParameters(Dict parameters) {
+        Encoder enc;
+        enc.writeValue(parameters);
+        _encodeParameters(enc);
+    }
+
+    bool setParametersAsJSON(const char* json5) {
+        alloc_slice json = convertJSON5(json5, nullptr);
+        if (!json)
+            return false;
+        Encoder enc;
+        enc.convertJSON(json);
+        return _encodeParameters(enc);
+    }
 
     Retained<CBLResultSet> execute(C4Error* outError);
 
@@ -78,9 +91,24 @@ public:
         return (i != _columnNames->end()) ? i->second : -1;
     }
 
+    Dict parameters() {
+        if (!_parameters)
+            return nullptr;
+        return Value::fromData(_parameters, kFLTrusted).asDict();
+    }
+
     CBLListenerToken* addChangeListener(CBLQueryChangeListener listener, void *context);
 
 private:
+    bool _encodeParameters(Encoder &enc) {
+        alloc_slice encodedParameters = enc.finish();
+        if (!encodedParameters)
+            return false;
+        _parameters = encodedParameters;
+        c4query_setParameters(_c4query, encodedParameters);
+        return true;
+    }
+
     c4::ref<C4Query> _c4query;
     alloc_slice _parameters;
     unique_ptr<std::unordered_map<slice, unsigned>> _columnNames;
@@ -125,8 +153,7 @@ private:
 
 
 Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
-    C4QueryOptions options = {};
-    auto qe = c4query_run(_c4query, &options, _parameters, outError);
+    auto qe = c4query_run(_c4query, nullptr, nullslice, outError);
     return qe ? retained(new CBLResultSet(this, qe)) : nullptr;
 }
 
@@ -203,26 +230,15 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
 }
 
 FLDict CBLQuery_Parameters(CBLQuery* _cbl_nonnull query) CBLAPI {
-    return FLValue_AsDict(FLValue_FromData(query->parameters(), kFLTrusted));
+    return query->parameters();
 }
 
 void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBLAPI {
-    Encoder enc;
-    enc.writeValue(Dict(parameters));
-    alloc_slice encodedParameters = enc.finish();
-    query->setParameters(encodedParameters);
+    query->setParameters(parameters);
 }
 
 bool CBLQuery_SetParametersAsJSON(CBLQuery* query, const char* json5) CBLAPI {
-    alloc_slice json = convertJSON5(json5, nullptr);
-    if (!json)
-        return false;
-    Encoder enc;
-    enc.convertJSON(json);
-    alloc_slice encodedParameters = enc.finish();
-    if (!encodedParameters)
-        return false;
-    query->setParameters(encodedParameters);
+    query->setParametersAsJSON(json5);
     return true;
 }
 
