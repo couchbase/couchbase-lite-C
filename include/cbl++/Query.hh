@@ -32,7 +32,7 @@ namespace cbl {
     public:
         Query(const Database& db, CBLQueryLanguage language, const char *queryString _cbl_nonnull) {
             CBLError error;
-            auto q = CBLQuery_New(db.ref(), language, queryString, &error);
+            auto q = CBLQuery_New(db.ref(), language, queryString, nullptr, &error);
             check(q, error);
             _ref = (CBLRefCounted*)q;
         }

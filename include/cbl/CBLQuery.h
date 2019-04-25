@@ -52,12 +52,15 @@ typedef CBL_ENUM(uint32_t, CBLQueryLanguage) {
             ([JSON](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema) or
             [N1QL](https://docs.couchbase.com/server/4.0/n1ql/n1ql-language-reference/index.html).)
     @param queryString  The query string.
+    @param outErrorPos  If non-NULL, then on a parse error the approximate byte offset in the
+                    input expression will be stored here (or -1 if not known/applicable.)
     @param error  On failure, the error will be written here.
     @return  The new query object. */
 _cbl_warn_unused
 CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        CBLQueryLanguage language,
                        const char *queryString _cbl_nonnull,
+                       int *outErrorPos,
                        CBLError* error) CBLAPI;
 
 CBL_REFCOUNTED(CBLQuery*, Query);

@@ -35,20 +35,22 @@ public:
 
     CBLQuery(const CBLDatabase* db _cbl_nonnull,
              CBLQueryLanguage language,
-             const char *queryString _cbl_nonnull,
+             const char *queryCString _cbl_nonnull,
+             int *outErrPos,
              C4Error* outError)
     {
+        slice queryString;
         alloc_slice json;
-        switch (language) {
-            case kCBLN1QLLanguage:
-                json = c4query_translateN1QL(slice(queryString), nullptr, outError);
-                break;
-            case kCBLJSONLanguage:
-                json = convertJSON5(queryString, outError);
-                break;
+        if (language == kCBLJSONLanguage) {
+            json = convertJSON5(queryCString, outError);
+            if (!json)
+                return;
+            queryString = json;
+        } else {
+            queryString = slice(queryCString);
         }
-        if (json)
-            _c4query = c4query_new(internal(db), json, outError);
+        _c4query = c4query_new2(internal(db), (C4QueryLanguage)language, queryString,
+                                outErrPos, outError);
     }
 
     bool valid() const                              {return _c4query != nullptr;}
@@ -125,9 +127,10 @@ Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
 CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        CBLQueryLanguage language,
                        const char *queryString _cbl_nonnull,
+                       int *outErrorPos,
                        CBLError* outError) CBLAPI
 {
-    auto query = retained(new CBLQuery(db, language, queryString, internal(outError)));
+    auto query = retained(new CBLQuery(db, language, queryString, outErrorPos, internal(outError)));
     return query->valid() ? retain(query.get()) : nullptr;
 }
 
