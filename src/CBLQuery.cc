@@ -99,6 +99,10 @@ public:
 
     CBLListenerToken* addChangeListener(CBLQueryChangeListener listener, void *context);
 
+    ListenerToken<CBLQueryChangeListener>* getChangeListener(CBLListenerToken *token) {
+        return _listeners.find(token);
+    }
+
 private:
     bool _encodeParameters(Encoder &enc) {
         alloc_slice encodedParameters = enc.finish();
@@ -173,11 +177,8 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         ,_query(query)
         ,_c4obs( c4queryobs_create(c4query,
-                                   [](C4QueryObserver* observer, C4QueryEnumerator *e, C4Error error,
-                                      void *context)
-                                   {
-                                       ((ListenerToken*)context)->queryChanged(e, error);
-                                   },
+                                   [](C4QueryObserver*, C4Query*, void *context)
+                                        { ((ListenerToken*)context)->queryChanged(); },
                                    this) )
         { }
 
@@ -187,23 +188,24 @@ namespace cbl_internal {
 
         CBLQueryChangeListener callback() const           {return (CBLQueryChangeListener)_callback;}
 
-        void call(C4QueryEnumerator *e, C4Error c4error) {
-            Retained<CBLResultSet> results;
-            const CBLError *error = nullptr;
-            if (e)
-                results = new CBLResultSet(_query, e);
-            else
-                error = external(&c4error);
-            callback()(_context, _query, results, error);
+        void call() {
+            callback()(_context, _query);
+        }
+
+        CBLResultSet* resultSet(CBLError *error) {
+            auto e = c4queryobs_getEnumerator(_c4obs, internal(error));
+            _resultSet = e ? new CBLResultSet(_query, e) : nullptr;
+            return _resultSet;
         }
 
     private:
-        void queryChanged(C4QueryEnumerator *e, C4Error error) {
-            call(e, error);
+        void queryChanged() {
+            call();
         }
 
         Retained<CBLQuery> _query;
         C4QueryObserver* _c4obs {nullptr};
+        Retained<CBLResultSet> _resultSet;
     };
 
 }
@@ -265,6 +267,18 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
     return query->addChangeListener(listener, context);
 }
 
+CBLResultSet* CBLQuery_CurrentResults(CBLQuery* query,
+                                      CBLListenerToken *token,
+                                      CBLError *outError) CBLAPI
+{
+    auto listener = query->getChangeListener(token);
+    if (!listener) {
+        setError(internal(outError), LiteCoreDomain, kC4ErrorNotFound,
+                 "Listener token is not valid for this query"_sl);
+        return nullptr;
+    }
+    return listener->resultSet(outError);
+}
 
 bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
     return rs->next();

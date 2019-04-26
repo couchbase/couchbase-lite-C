@@ -142,17 +142,19 @@ CBL_REFCOUNTED(CBLResultSet*, ResultSet);
  */
 
 /** A callback to be invoked after the query's results have changed.
+    The actual result set can be obtained by calling \ref CBLQuery_CurrentResults, either during
+    the callback or at any time thereafter.
     @param context  The same `context` value that you passed when adding the listener.
-    @param query  The query that triggered the listener.
-    @param newResults  The entire new result set, or NULL if there was an error.
-    @param error  The error that occurred, or NULL if the query ran successfully. */
+    @param query  The query that triggered the listener. */
 typedef void (*CBLQueryChangeListener)(void *context,
-                                       CBLQuery* query _cbl_nonnull,
-                                       CBLResultSet* newResults,
-                                       const CBLError* error);
+                                       CBLQuery* query _cbl_nonnull);
 
 /** Registers a change listener callback with a query, turning it into a "live query" until
     the listener is removed (via \ref CBLListener_Remove).
+
+    When the first change listener is added, the query will run (in the background) and notify
+    the listener(s) of the results when ready. After that it will run in the background after
+    every database change, and only notify the listeners when the result set changes.
     @param query  The query to observe.
     @param listener  The callback to be invoked.
     @param context  An opaque value that will be passed to the callback.
@@ -162,6 +164,19 @@ _cbl_warn_unused
 CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
                                              CBLQueryChangeListener listener _cbl_nonnull,
                                              void *context) CBLAPI;
+
+/** Returns the query's _entire_ current result set, after it's been announced via a call to the
+    listener's callback.
+    The returned object is valid until the next call to \ref CBLQuery_CurrentResults (with the
+    same query and listener) or until you free the listener. If you need to keep it alive longer,
+    retain it yourself.
+    @param query  The query being listened to.
+    @param listener  The query listener that was notified.
+    @param error  If the query failed to run, the error will be stored here.
+    @return  The query's current result set, or NULL if the query failed to run. */
+CBLResultSet* CBLQuery_CurrentResults(CBLQuery* query _cbl_nonnull,
+                                      CBLListenerToken *listener _cbl_nonnull,
+                                      CBLError *error) CBLAPI;
 
 /** @} */
 

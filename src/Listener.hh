@@ -78,6 +78,14 @@ namespace cbl_internal {
             _tokens.clear();
         }
 
+        bool contains(CBLListenerToken *token) const {
+            for (auto &tok : _tokens) {
+                if (tok.get() == token)
+                    return true;
+            }
+            return false;
+        }
+
     protected:
         std::vector<std::unique_ptr<CBLListenerToken>> _tokens;
     };
@@ -95,6 +103,10 @@ namespace cbl_internal {
 
         void add(ListenerToken<LISTENER> *token)                {ListenersBase::add(token);}
         void clear()                                            {ListenersBase::clear();}
+
+        ListenerToken<LISTENER>* find(CBLListenerToken *token) {
+            return contains(token) ? (ListenerToken<LISTENER>*) token : nullptr;
+        }
 
             template <class... Args>
         void call(Args... args) {
