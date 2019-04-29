@@ -5,8 +5,12 @@
 //
 
 #pragma once
-#include "CBLBase.h"
+#include "CBLDatabase.h"
 #include "Internal.hh"
+#include <access_lock.hh>
+#include <atomic>
+#include <memory>
+#include <vector>
 
 
 namespace cbl_internal {
@@ -15,9 +19,9 @@ namespace cbl_internal {
 
 
 /** Abstract base class of listener tokens. (In the public API, as an opaque typeef.) */
-struct CBLListenerToken {
+struct CBLListenerToken : public fleece::RefCounted {
 public:
-    CBLListenerToken(const void *callback, void *context)
+    CBLListenerToken(const void *callback _cbl_nonnull, void *context)
     :_callback(callback)
     ,_context(context)
     { }
@@ -33,7 +37,7 @@ public:
     void remove();
 
 protected:
-    const void* _callback;          // Really a C fn pointer
+    std::atomic<const void*> _callback;          // Really a C fn pointer
     void* _context;
     cbl_internal::ListenersBase* _owner {nullptr};
 };
@@ -49,22 +53,27 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         { }
 
-        LISTENER callback() const           {return (LISTENER)_callback;}
+        LISTENER callback() const           {return (LISTENER)_callback.load();}
 
             template <class... Args>
-        void call(Args... args)             {callback()(_context, args...);}
+        void call(Args... args) {
+            LISTENER cb = callback();
+            if (cb)
+                cb(_context, args...);
+        }
     };
+
 
 
     /** Manages a set of CBLListenerTokens. */
     class ListenersBase {
     public:
-        void add(CBLListenerToken* t) {
+        void add(CBLListenerToken* t _cbl_nonnull) {
             _tokens.emplace_back(t);
             t->addedTo(this);
         }
 
-        void remove(CBLListenerToken* t) {
+        void remove(CBLListenerToken* t _cbl_nonnull) {
             for (auto i = _tokens.begin(); i != _tokens.end(); ++i) {
                 if (i->get() == t) {
                     _tokens.erase(i);
@@ -78,16 +87,16 @@ namespace cbl_internal {
             _tokens.clear();
         }
 
-        bool contains(CBLListenerToken *token) const {
+        bool contains(CBLListenerToken *token _cbl_nonnull) const {
             for (auto &tok : _tokens) {
-                if (tok.get() == token)
+                if (tok == token)
                     return true;
             }
             return false;
         }
 
     protected:
-        std::vector<std::unique_ptr<CBLListenerToken>> _tokens;
+        std::vector<fleece::Retained<CBLListenerToken>> _tokens;
     };
 
 
@@ -113,6 +122,42 @@ namespace cbl_internal {
             for (auto &lp : _tokens)
                 ((ListenerToken<LISTENER>*)lp.get())->call(args...);
         }
+    };
+
+
+    using Notification = std::function<void()>;
+
+
+    /** Manages a queue of pending calls to listeners. Owned by CBLDatabase. */
+    class NotificationQueue {
+    public:
+        NotificationQueue(CBLDatabase* _cbl_nonnull);
+
+        /** Sets or clears the client callback. */
+        void setCallback(CBLNotificationsReadyCallback callback, void *context);
+
+        /** If there is a callback, this adds a notification to the queue, and if the queue was
+            empty, invokes the callback to tell the client.
+            If there is no callback, it calls the notification directly. */
+        void add(Notification);
+
+        /** Calls all queued notifications and clears the queue. */
+        void notifyAll();
+
+
+    private:
+        using Notifications = std::unique_ptr<std::vector<Notification>>;
+
+        void call(const Notifications&);
+        
+        struct State {
+            CBLNotificationsReadyCallback callback {nullptr};
+            void* context;
+            Notifications queue;
+        };
+
+        CBLDatabase* const _database;
+        litecore::access_lock<State> _state;
     };
 
 }

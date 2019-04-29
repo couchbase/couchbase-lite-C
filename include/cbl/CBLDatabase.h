@@ -222,7 +222,8 @@ CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db _cbl_nonnu
  */
 
 /** Callback indicating that the database (or an object belonging to it) is ready to call one
-    or more listeners. You should call \ref CBLDatabase_SendNotifications at your earliest convenience.
+    or more listeners. You should call \ref CBLDatabase_SendNotifications at your earliest
+    convenience, in the context (thread, dispatch queue, etc.) you want them to run.
     @note  This callback is called _only once_ until the next time \ref CBLDatabase_SendNotifications
             is called. If you don't respond by (sooner or later) calling that function,
             you will not be informed that any listeners are ready.

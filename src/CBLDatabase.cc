@@ -144,27 +144,22 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) CBLAPI {
 }
 
 
-#pragma mark - DATABASE LISTENERS:
+#pragma mark - NOTIFICATIONS:
 
 
-CBLDatabase::~CBLDatabase() {
-    c4dbobs_free(_observer);
-    _docListeners.clear();
-    c4db_release(c4db);
+void CBLDatabase_BufferNotifications(CBLDatabase *db,
+                                     CBLNotificationsReadyCallback callback,
+                                     void *context) CBLAPI
+{
+    db->bufferNotifications(callback, context);
+}
+
+void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI {
+    db->sendNotifications();
 }
 
 
-bool CBLDatabase::shouldNotifyNow() {
-    if (_notificationsCallback) {
-        if (!_notificationsAnnounced) {
-            _notificationsAnnounced = true;
-            _notificationsCallback(_notificationsContext, this);
-        }
-        return false;
-    } else {
-        return true;
-    }
-}
+#pragma mark - DATABASE CHANGE LISTENERS:
 
 
 CBLListenerToken* CBLDatabase::addListener(CBLDatabaseChangeListener listener, void *context) {
@@ -181,8 +176,7 @@ CBLListenerToken* CBLDatabase::addListener(CBLDatabaseChangeListener listener, v
 
 
 void CBLDatabase::databaseChanged() {
-    if (shouldNotifyNow())
-        callDBListeners();
+    notify(bind(&CBLDatabase::callDBListeners, this));
 }
 
 
@@ -250,27 +244,25 @@ namespace cbl_internal {
             c4docobs_free(_c4obs);
         }
 
-        CBLDocumentChangeListener callback() const           {return (CBLDocumentChangeListener)_callback;}
+        CBLDocumentChangeListener callback() const {
+            return (CBLDocumentChangeListener)_callback.load();
+        }
 
         // this is called indirectly by CBLDatabase::sendNotifications
         void call(const CBLDatabase*, const char*) {
-            if (_scheduled) {
-                _scheduled = false;
-                callback()(_context, _db, _docID.c_str());
-            }
+            auto cb = callback();
+            if (cb)
+                cb(_context, _db, _docID.c_str());
         }
 
     private:
         void docChanged() {
-            _scheduled = true;
-            if (_db->shouldNotifyNow())
-                call(nullptr, nullptr);
+            _db->notify(this, nullptr, nullptr);
         }
 
         CBLDatabase* _db;
         string _docID;
         C4DocumentObserver* _c4obs {nullptr};
-        bool _scheduled {false};
     };
 
 }
@@ -293,35 +285,3 @@ CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db _c
     return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context);
 
 }
-
-
-#pragma mark - SCHEDULING NOTIFICATIONS:
-
-
-void CBLDatabase::bufferNotifications(CBLNotificationsReadyCallback callback, void *context) {
-    _notificationsContext = context;
-    _notificationsCallback = callback;
-}
-
-
-void CBLDatabase::sendNotifications() {
-    if (!_notificationsAnnounced)
-        return;
-    _notificationsAnnounced = false;
-    callDBListeners();
-    _docListeners.call(this, nullptr);
-}
-
-
-
-void CBLDatabase_BufferNotifications(CBLDatabase *db,
-                                CBLNotificationsReadyCallback callback,
-                                void *context) CBLAPI
-{
-    db->bufferNotifications(callback, context);
-}
-
-void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI {
-    db->sendNotifications();
-}
-

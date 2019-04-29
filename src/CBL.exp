@@ -94,7 +94,7 @@ _CBLQuery_Execute
 _CBLQuery_Explain
 _CBLQuery_ColumnCount
 _CBLQuery_ColumnName
-#_CBL_Query_AddChangeListener
+_CBLQuery_AddChangeListener
 
 _CBLResultSet_Next
 _CBLResultSet_ValueAtIndex
@@ -113,8 +113,8 @@ _CBLReplicator_Config
 _CBLReplicator_ResetCheckpoint
 _CBLReplicator_Start
 _CBLReplicator_Stop
-#_CBL_Replicator_AddChangeListener
-#_CBL_Replicator_AddDocumentListener
+#_CBLReplicator_AddChangeListener
+#_CBLReplicator_AddDocumentListener
 
 
 

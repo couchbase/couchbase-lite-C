@@ -42,6 +42,7 @@ public:
              const char *queryCString _cbl_nonnull,
              int *outErrPos,
              C4Error* outError)
+    :_database(db)
     {
         slice queryString;
         alloc_slice json;
@@ -58,6 +59,7 @@ public:
     }
 
     bool valid() const                              {return _c4query != nullptr;}
+    const CBLDatabase* database() const             {return _database;}
     alloc_slice explain() const                     {return c4query_explain(_c4query);}
     unsigned columnCount() const                    {return c4query_columnCount(_c4query);}
     slice columnName(unsigned col) const            {return c4query_columnTitle(_c4query, col);}
@@ -114,6 +116,7 @@ private:
     }
 
     c4::ref<C4Query> _c4query;
+    RetainedConst<CBLDatabase> _database;
     alloc_slice _parameters;
     unique_ptr<std::unordered_map<slice, unsigned>> _columnNames;
     Listeners<CBLQueryChangeListener> _listeners;
@@ -186,10 +189,12 @@ namespace cbl_internal {
             c4queryobs_free(_c4obs);
         }
 
-        CBLQueryChangeListener callback() const           {return (CBLQueryChangeListener)_callback;}
+        CBLQueryChangeListener callback() const           {return (CBLQueryChangeListener)_callback.load();}
 
         void call() {
-            callback()(_context, _query);
+            CBLQueryChangeListener cb = callback();
+            if (cb)
+                cb(_context, _query);
         }
 
         CBLResultSet* resultSet(CBLError *error) {
@@ -200,7 +205,7 @@ namespace cbl_internal {
 
     private:
         void queryChanged() {
-            call();
+            _query->database()->notify(this);
         }
 
         Retained<CBLQuery> _query;
