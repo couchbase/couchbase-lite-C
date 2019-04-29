@@ -197,6 +197,7 @@ typedef enum {
 CBLQuery* CBLQuery_New(const CBLDatabase* db,
                        CBLQueryLanguage language,
                        const char *queryString,
+                       int *outErrorPos,
                        CBLError* error);
 FLDict CBLQuery_Parameters(CBLQuery* query);
 void CBLQuery_SetParameters(CBLQuery* query,

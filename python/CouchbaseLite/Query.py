@@ -9,8 +9,10 @@ N1QLLanguage = 1
 class Query (CBLObject):
 
     def __init__(self, database, queryString, language = N1QLLanguage):
+        errorPos = ffi.new("int*")
         CBLObject.__init__(self,
-                           lib.CBLQuery_New(database._ref, language, cstr(queryString), gError),
+                           lib.CBLQuery_New(database._ref, language, cstr(queryString),
+                                            errorPos, gError),
                            "Couldn't create query", gError)
         self.database = database
         self.columnCount = lib.CBLQuery_ColumnCount(self._ref)
