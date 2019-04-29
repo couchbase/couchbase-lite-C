@@ -117,6 +117,25 @@ class Database (CBLObject):
         if not lib.CBLDatabase_EndBatch(self._ref, gError) and not exc_type:
             raise CBLException("Couldn't commit a batch operation", gError)
 
+    # Expiration:
+    
+    def getDocumentExpiration(self, id):
+        exp = CBLDatabase_GetDocumentExpiration(self._ref, id, gError)
+        if exp > 0:
+            return datetime.fromtimestamp(exp)
+        elif exp == 0:
+            return None
+        else:
+            raise CBLException("Couldn't get document's expiration", gError)
+            
+    def setDocumentExpiration(self, id, expDateTime):
+        timestamp = 0
+        if expDateTime != None:
+            timestamp = math.ceil(expDateTime.timestamp)
+        if not CBLDatabase_SetDocumentExpiration(self._ref, id, timestamp, gError):
+            raise CBLException("Couldn't set document's expiration", gError)
+            
+
     # Listeners:
 
     def addListener(self, listener):

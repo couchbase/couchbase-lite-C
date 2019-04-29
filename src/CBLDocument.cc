@@ -401,3 +401,18 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db _cbl_nonnull,
 {
     return c4db_purgeDoc(internal(db), slice(docID), internal(outError));
 }
+
+time_t CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+                                         const char *docID _cbl_nonnull,
+                                         CBLError* error)
+{
+    return c4doc_getExpiration(internal(db), slice(docID), internal(error));
+}
+
+bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+                                       const char *docID _cbl_nonnull,
+                                       time_t expiration,
+                                       CBLError* error)
+{
+    return c4doc_setExpiration(internal(db), slice(docID), expiration, internal(error));
+}

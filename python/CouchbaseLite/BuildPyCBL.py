@@ -25,6 +25,7 @@ ffibuilder.cdef("""
 // Careful, this supports only a subset of C syntax
 
 void free(void *);
+typedef long time_t;
 
 //////// Fleece (slices):
 typedef struct {const void *buf; size_t size;} FLSlice;
@@ -151,6 +152,8 @@ const char* CBLDatabase_Name(const CBLDatabase*);
 const char* CBLDatabase_Path(const CBLDatabase*);
 uint64_t CBLDatabase_Count(const CBLDatabase*);
 CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*);
+time_t CBLDatabase_NextDocExpiration(CBLDatabase*);
+int64_t CBLDatabase_PurgeExpiredDocuments(CBLDatabase* db, CBLError* error);
 
 typedef void (*CBLDatabaseChangeListener)(void *context,
                                      const CBLDatabase* db,
@@ -178,6 +181,13 @@ bool CBLDocument_Purge(const CBLDocument* document,
 bool CBLDatabase_PurgeDocumentByID(CBLDatabase* database,
                           const char* docID,
                           CBLError* error);
+time_t CBLDatabase_GetDocumentExpiration(CBLDatabase* db,
+                                         const char *docID,
+                                         CBLError* error);
+bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db,
+                                       const char *docID,
+                                       time_t expiration,
+                                       CBLError* error);
 CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
                                        const char* docID);
 CBLDocument* CBLDocument_New(const char *docID);

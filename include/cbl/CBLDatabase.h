@@ -143,6 +143,17 @@ bool CBLDatabase_BeginBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 /** Ends a batch operation. This **must** be called after \ref CBLDatabase_BeginBatch. */
 bool CBLDatabase_EndBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
+/** Returns the nearest future time at which a document in this database will expire,
+    or 0 if no documents will expire. */
+time_t CBLDatabase_NextDocExpiration(CBLDatabase* _cbl_nonnull) CBLAPI;
+
+/** Purges all documents whose expiration time has passed.
+    @param db  The database to purge
+    @param error  On failure, the error will be written here.
+    @return  The number of documents purged, or -1 on error. */
+int64_t CBLDatabase_PurgeExpiredDocuments(CBLDatabase* db _cbl_nonnull,
+                                          CBLError* error) CBLAPI;
+
 /** @} */
 
 
