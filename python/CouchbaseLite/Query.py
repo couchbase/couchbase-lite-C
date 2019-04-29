@@ -17,6 +17,7 @@ class Query (CBLObject):
         self.database = database
         self.columnCount = lib.CBLQuery_ColumnCount(self._ref)
         self.sourceCode = queryString
+        self.listeners = set()
 
     def __repr__(self):
         return self.__class__.__name__ + "['" + self.sourceCode + "']"
@@ -54,12 +55,24 @@ class Query (CBLObject):
         finally:
             lib.CBL_Release(results)
 
+    # Listeners:
+
+    def addListener(self, listener):
+        handle = ffi.new_handle(listener)
+        self.listeners.add(handle)
+        c_token = lib.CBLQuery_AddChangeListener(self._ref, lib.queryListenerCallback, handle)
+        return ListenerToken(self, handle, c_token)
+
+    def removeListener(self, token):
+        token.remove()
+
 
 class JSONQuery (Query):
     def __init__(self, database, jsonQuery):
         if not isinstance(jsonQuery, str):
             jsonQuery = json.dumps(jsonQuery)
         Query.__init__(self, database, jsonQuery, JSONLanguage)
+
 
 class N1QLQuery (Query):
     def __init__(self, database, n1ql):
@@ -128,3 +141,10 @@ class QueryResult (object):
             if lib.FLValue_GetType(item) != lib.kFLUndefined:
                 result[keys[i]] = decodeFleece(item)
         return result
+
+
+
+@ffi.def_extern()
+def queryListenerCallback(context, query):
+    listener = ffi.from_handle(context)
+    listener()

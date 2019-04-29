@@ -64,6 +64,9 @@ class Document (CBLObject):
     def __contains__(self, key):
         return key in self.properties
 
+    def addListener(self, listener):
+        self.database.addDocumentListener(listener)
+
 
 class MutableDocument (Document):
     def __init__(self, id):

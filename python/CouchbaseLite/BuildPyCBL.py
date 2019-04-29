@@ -189,6 +189,15 @@ FLMutableDict CBLDocument_MutableProperties(CBLDocument*);
 char* CBLDocument_PropertiesAsJSON(const CBLDocument*);
 bool CBLDocument_SetPropertiesAsJSON(CBLDocument*, const char *json, CBLError*);
 
+typedef void (*CBLDocumentChangeListener)(void *context,
+                                          const CBLDatabase* db,
+                                          const char *docID);
+CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db,
+                                                        const char* docID,
+                                                        CBLDocumentChangeListener listener,
+                                                        void *context);
+extern "Python" void documentListenerCallback(void *context, const CBLDatabase*, const char *docID);
+
 //////// CBLQuery.h
 typedef enum {
     kCBLJSONLanguage,
@@ -212,9 +221,13 @@ FLSlice CBLQuery_ColumnName(CBLQuery*,
 bool CBLResultSet_Next(CBLResultSet*);
 FLValue CBLResultSet_ValueAtIndex(CBLResultSet*, unsigned index);
 FLValue CBLResultSet_ValueForKey(CBLResultSet*, const char* key);
-//CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query,
-//                                        CBLQueryListener* listener,
-//                                        void *context);
+
+typedef void (*CBLQueryChangeListener)(void *context,
+                                       CBLQuery* query);
+extern "Python" void queryListenerCallback(void *context, const CBLQuery *query);
+CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query,
+                                        CBLQueryChangeListener listener,
+                                        void *context);
 """)
 
 if __name__ == "__main__":

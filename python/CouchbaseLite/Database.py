@@ -125,8 +125,16 @@ class Database (CBLObject):
         c_token = lib.CBLDatabase_AddChangeListener(self._ref, lib.databaseListenerCallback, handle)
         return ListenerToken(self, handle, c_token)
 
+    def addDocumentListener(self, docID, listener):
+        handle = ffi.new_handle(listener)
+        self.listeners.add(handle)
+        c_token = lib.CBLDatabase_AddDocumentChangeListener(self._ref, docID,
+                                                            lib.databaseListenerCallback, handle)
+        return ListenerToken(self, handle, c_token)
+
     def removeListener(self, token):
-        self.listeners.remove(token.handle)
+        token.remove()
+
 
 @ffi.def_extern()
 def databaseListenerCallback(context, db, numDocs, c_docIDs):
@@ -134,4 +142,9 @@ def databaseListenerCallback(context, db, numDocs, c_docIDs):
     for i in range(numDocs):
         docIDs.append(pystr(c_docIDs[i]))
     listener = ffi.from_handle(context)
-    listener(db, docIDs)
+    listener(docIDs)
+
+@ffi.def_extern()
+def documentListenerCallback(context, db, docID):
+    listener = ffi.from_handle(context)
+    listener(pystr(docID))

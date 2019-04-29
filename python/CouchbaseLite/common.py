@@ -50,6 +50,6 @@ class ListenerToken (object):
     def remove(self):
         if self.owner != None:
             lib.CBLListener_Remove(self.c_token)
-            self.owner.removeListener(self)
+            self.owner.listeners.remove(self.handle)
             self.owner = None
             self.handle = None
