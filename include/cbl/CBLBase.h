@@ -143,7 +143,7 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
 /** Sets the detail level of logging. */
 void CBL_SetLogLevel(CBLLogLevel, CBLLogDomain) CBLAPI;
 
-void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format _cbl_nonnull, ...);
+void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format _cbl_nonnull, ...) CBLAPI;
 
 /** @} */
 
@@ -151,9 +151,9 @@ void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format _cbl_nonnull, ...);
 
 /** \defgroup refcounting   Reference Counting
      @{
-    Couchbase Lite "objects" are reference-counted; these functions are the shared
-    `retain` and `release` operations. (But there are type-safe equivalents defined for each
-    class, so you can call \ref cbl_db_release() on a database, for instance, without having to
+    Couchbase Lite "objects" are reference-counted; the functions below are the shared
+    _retain_ and _release_ operations. (But there are type-safe equivalents defined for each
+    class, so you can call \ref CBLDatabase_Release() on a database, for instance, without having to
     type-cast.)
  */
 
@@ -161,12 +161,12 @@ typedef struct CBLRefCounted CBLRefCounted;
 
 /** Increments an object's reference-count.
     Usually you'll call one of the type-safe synonyms specific to the object type,
-    like \ref cbl_db_retain` */
+    like \ref CBLDatabase_Retain` */
 CBLRefCounted* CBL_Retain(CBLRefCounted*) CBLAPI;
 
 /** Decrements an object's reference-count, freeing the object if the count hits zero.
     Usually you'll call one of the type-safe synonyms specific to the object type,
-    like \ref cbl_db_release. */
+    like \ref CBLDatabase_Release. */
 void CBL_Release(CBLRefCounted*) CBLAPI;
 
 /** Returns the total number of Couchbase Lite objects. Useful for leak checking. */
@@ -214,7 +214,7 @@ typedef struct CBLResultSet  CBLResultSet;
 
 /** \defgroup replication  Replication
      @{ */
-/** A background task that syncs a CBLDatabase with a remote server or peer. */
+/** A background task that syncs a \ref CBLDatabase with a remote server or peer. */
 typedef struct CBLReplicator CBLReplicator;
 /** @} */
 

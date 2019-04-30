@@ -32,6 +32,8 @@ using namespace fleece;
 using namespace cbl_internal;
 
 
+static constexpr CBLDatabaseFlags kDefaultFlags = kC4DB_Create;
+
 // Default location for databases: the current directory
 static const char* defaultDbDir() {
     static const string kDir = cbl_getcwd(nullptr, 0);
@@ -43,16 +45,22 @@ static slice effectiveDir(const char *inDirectory) {
 }
 
 static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
-    C4DatabaseConfig2 c4Config { effectiveDir(config->directory) };
-    if (config->flags & kCBLDatabase_Create)
-        c4Config.flags |= kC4DB_Create;
-    if (config->flags & kCBLDatabase_ReadOnly)
-        c4Config.flags |= kC4DB_ReadOnly;
-    if (config->flags & kCBLDatabase_NoUpgrade)
-        c4Config.flags |= kC4DB_NoUpgrade;
-    c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(config->encryptionKey.algorithm);
-    static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes), "C4EncryptionKey and CBLEncryptionKey size do not match");
-    memcpy(c4Config.encryptionKey.bytes, config->encryptionKey.bytes, sizeof(CBLEncryptionKey::bytes));
+    C4DatabaseConfig2 c4Config = {};
+    if (config) {
+        c4Config.parentDirectory = effectiveDir(config->directory);
+        if (config->flags & kCBLDatabase_Create)
+            c4Config.flags |= kC4DB_Create;
+        if (config->flags & kCBLDatabase_ReadOnly)
+            c4Config.flags |= kC4DB_ReadOnly;
+        if (config->flags & kCBLDatabase_NoUpgrade)
+            c4Config.flags |= kC4DB_NoUpgrade;
+        c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(config->encryptionKey.algorithm);
+        static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes), "C4EncryptionKey and CBLEncryptionKey size do not match");
+        memcpy(c4Config.encryptionKey.bytes, config->encryptionKey.bytes, sizeof(CBLEncryptionKey::bytes));
+    } else {
+        c4Config.parentDirectory = effectiveDir(nullptr);
+        c4Config.flags = kDefaultFlags;
+    }
     return c4Config;
 }
 
@@ -94,7 +102,9 @@ CBLDatabase* CBLDatabase_Open(const char *name,
     C4Database *c4db = c4db_openNamed(slice(name), &c4config, internal(outError));
     if (!c4db)
         return nullptr;
-    return retain(new CBLDatabase(c4db, name, (config->directory ? config->directory : "")));
+    return retain(new CBLDatabase(c4db, name,
+                                  c4config.parentDirectory,
+                                  (config ? config->flags : kDefaultFlags)));
 }
 
 
@@ -140,7 +150,7 @@ const char* CBLDatabase_Path(const CBLDatabase* db) CBLAPI {
 
 const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) CBLAPI {
     const char *dir = db->dir.empty() ? nullptr : db->dir.c_str();
-    return {dir};
+    return {dir, db->flags};
 }
 
 uint64_t CBLDatabase_Count(const CBLDatabase* db) CBLAPI {

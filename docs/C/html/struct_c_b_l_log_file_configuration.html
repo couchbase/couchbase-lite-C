@@ -69,7 +69,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An object containing properties for file logging configuration  <a class="el" href="struct_c_b_l_log_file_configuration.html#a53e0e6ba881a590395e1249f9a1a766d">usePlaintext</a> is not recommended for production.  
+<p>An object containing properties for file logging configuration.  
  <a href="struct_c_b_l_log_file_configuration.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_c_b_l_log_8h_source.html">cbl/CBLLog.h</a>&gt;</code></p>
@@ -86,11 +86,12 @@ Data Fields</h2></td></tr>
 <tr class="memdesc:af7df99a4a12a233e9e3db5f73afd8057"><td class="mdescLeft">&#160;</td><td class="mdescRight">The max size to write to a log file before rotating (best-effort)  <a href="#af7df99a4a12a233e9e3db5f73afd8057">More...</a><br /></td></tr>
 <tr class="separator:af7df99a4a12a233e9e3db5f73afd8057"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53e0e6ba881a590395e1249f9a1a766d"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#a53e0e6ba881a590395e1249f9a1a766d">usePlaintext</a></td></tr>
-<tr class="memdesc:a53e0e6ba881a590395e1249f9a1a766d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to log in plaintext.  <a href="#a53e0e6ba881a590395e1249f9a1a766d">More...</a><br /></td></tr>
+<tr class="memdesc:a53e0e6ba881a590395e1249f9a1a766d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to log in plaintext (as opposed to binary)  <a href="#a53e0e6ba881a590395e1249f9a1a766d">More...</a><br /></td></tr>
 <tr class="separator:a53e0e6ba881a590395e1249f9a1a766d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An object containing properties for file logging configuration  <a class="el" href="struct_c_b_l_log_file_configuration.html#a53e0e6ba881a590395e1249f9a1a766d">usePlaintext</a> is not recommended for production. </p>
+<div class="textblock"><p>An object containing properties for file logging configuration. </p>
+<dl class="section warning"><dt>Warning</dt><dd><a class="el" href="struct_c_b_l_log_file_configuration.html#a53e0e6ba881a590395e1249f9a1a766d">usePlaintext</a> results in significantly larger log files; we recommend turning it off in production. </dd></dl>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="ab1729f1fffdab0563b5a35235fa36b93"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab1729f1fffdab0563b5a35235fa36b93">&#9670;&nbsp;</a></span>directory</h2>
@@ -152,7 +153,7 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Whether or not to log in plaintext. </p>
+<p>Whether or not to log in plaintext (as opposed to binary) </p>
 
 </div>
 </div>

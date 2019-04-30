@@ -77,12 +77,16 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr class="memitem:ad222d234452f7575256e423e9cf1146e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__queries.html#gac5266cfb9be1fb0441d87df7bb022356">CBLIndexType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_index_spec.html#ad222d234452f7575256e423e9cf1146e">type</a></td></tr>
+<tr class="memdesc:ad222d234452f7575256e423e9cf1146e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of index to create.  <a href="#ad222d234452f7575256e423e9cf1146e">More...</a><br /></td></tr>
 <tr class="separator:ad222d234452f7575256e423e9cf1146e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51786bcdddf1003f6c7b20e04e6dfd7d"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_index_spec.html#a51786bcdddf1003f6c7b20e04e6dfd7d">keyExpressionsJSON</a></td></tr>
+<tr class="memdesc:a51786bcdddf1003f6c7b20e04e6dfd7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">A JSON array describing each column of the index.  <a href="#a51786bcdddf1003f6c7b20e04e6dfd7d">More...</a><br /></td></tr>
 <tr class="separator:a51786bcdddf1003f6c7b20e04e6dfd7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3783fc620dc25c491f6c9e0b38a01cae"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_index_spec.html#a3783fc620dc25c491f6c9e0b38a01cae">ignoreAccents</a></td></tr>
+<tr class="memdesc:a3783fc620dc25c491f6c9e0b38a01cae"><td class="mdescLeft">&#160;</td><td class="mdescRight">In a full-text index, should diacritical marks (accents) be ignored? Defaults to false.  <a href="#a3783fc620dc25c491f6c9e0b38a01cae">More...</a><br /></td></tr>
 <tr class="separator:a3783fc620dc25c491f6c9e0b38a01cae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea8b36428d83333d235f16778be3734d"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_index_spec.html#aea8b36428d83333d235f16778be3734d">language</a></td></tr>
+<tr class="memdesc:aea8b36428d83333d235f16778be3734d"><td class="mdescLeft">&#160;</td><td class="mdescRight">In a full-text index, the dominant language.  <a href="#aea8b36428d83333d235f16778be3734d">More...</a><br /></td></tr>
 <tr class="separator:aea8b36428d83333d235f16778be3734d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -100,6 +104,9 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>In a full-text index, should diacritical marks (accents) be ignored? Defaults to false. </p>
+<p>Generally this should be left <code>false</code> for non-English text. </p>
+
 </div>
 </div>
 <a id="a51786bcdddf1003f6c7b20e04e6dfd7d"></a>
@@ -113,6 +120,8 @@ Data Fields</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>A JSON array describing each column of the index. </p>
 
 </div>
 </div>
@@ -128,6 +137,11 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>In a full-text index, the dominant language. </p>
+<p>Setting this enables word stemming, i.e. matching different cases of the same word ("big" and "bigger", for instance) and ignoring common "stop-words" ("the", "a", "of", etc.)</p>
+<p>Can be an ISO-639 language code or a lowercase (English) language name; supported languages are: da/danish, nl/dutch, en/english, fi/finnish, fr/french, de/german, hu/hungarian, it/italian, no/norwegian, pt/portuguese, ro/romanian, ru/russian, es/spanish, sv/swedish, tr/turkish.</p>
+<p>If left null, or set to an unrecognized language, no language-specific behaviors such as stemming and stop-word removal occur. </p>
+
 </div>
 </div>
 <a id="ad222d234452f7575256e423e9cf1146e"></a>
@@ -141,6 +155,8 @@ Data Fields</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The type of index to create. </p>
 
 </div>
 </div>

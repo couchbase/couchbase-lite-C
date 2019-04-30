@@ -135,7 +135,7 @@ Scheduling notifications</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Callback indicating that the database (or an object belonging to it) is ready to call one or more listeners. </p>
-<p>You should call <a class="el" href="group__listeners.html#gaa867a51411258d6c0dce9480cd8e371c">CBLDatabase_SendNotifications</a> at your earliest convenience. </p><dl class="section note"><dt>Note</dt><dd>This callback is called <em>only once</em> until the next time <a class="el" href="group__listeners.html#gaa867a51411258d6c0dce9480cd8e371c">CBLDatabase_SendNotifications</a> is called. If you don't respond by (sooner or later) calling that function, you will not be informed that any listeners are ready. </dd></dl>
+<p>You should call <a class="el" href="group__listeners.html#gaa867a51411258d6c0dce9480cd8e371c">CBLDatabase_SendNotifications</a> at your earliest convenience, in the context (thread, dispatch queue, etc.) you want them to run. </p><dl class="section note"><dt>Note</dt><dd>This callback is called <em>only once</em> until the next time <a class="el" href="group__listeners.html#gaa867a51411258d6c0dce9480cd8e371c">CBLDatabase_SendNotifications</a> is called. If you don't respond by (sooner or later) calling that function, you will not be informed that any listeners are ready. </dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>This can be called from arbitrary threads. It should do as little work as possible, just scheduling a future call to <a class="el" href="group__listeners.html#gaa867a51411258d6c0dce9480cd8e371c">CBLDatabase_SendNotifications</a>. </dd></dl>
 
 </div>

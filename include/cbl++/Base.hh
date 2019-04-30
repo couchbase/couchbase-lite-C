@@ -22,6 +22,9 @@
 #include <functional>
 #include <memory>
 
+// PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
+// It is not considered part of the official Couchbase Lite API.
+
 namespace cbl {
 
     // Artificial base class of the C++ wrapper classes; just manages ref-counting.

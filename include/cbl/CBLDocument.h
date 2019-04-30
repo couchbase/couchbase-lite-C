@@ -26,7 +26,7 @@ extern "C" {
 
 /** \defgroup documents   Documents
     @{
-    A CBLDocument is essentially a JSON object with an ID string that's unique in its database.
+    A \ref CBLDocument is essentially a JSON object with an ID string that's unique in its database.
  */
 
 /** \name  Document lifecycle
@@ -41,13 +41,13 @@ typedef CBL_ENUM(uint8_t, CBLConcurrencyControl) {
 };
 
 
-/** Reads a document from the database, creating a new (immutable) CBLDocument object.
+/** Reads a document from the database, creating a new (immutable) \ref CBLDocument object.
     Each call to this function creates a new object (which must later be released.)
     @note  If you are reading the document in order to make changes to it, call
             \ref CBLDatabase_GetMutableDocument instead.
     @param database  The database.
     @param docID  The ID of the document.
-    @return  A new CBLDocument instance, or NULL if no document with that ID exists. */
+    @return  A new \ref CBLDocument instance, or NULL if no document with that ID exists. */
 _cbl_warn_unused
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database _cbl_nonnull,
                                            const char* _cbl_nonnull docID) CBLAPI;
@@ -77,9 +77,9 @@ bool CBLDocument_Delete(const CBLDocument* document _cbl_nonnull,
                         CBLError* error) CBLAPI;
 
 /** Purges a document. This removes all traces of the document from the database.
-    Purges are not replicated. If the document is changed on a server, it will be re-created
+    Purges are _not_ replicated. If the document is changed on a server, it will be re-created
     when pulled.
-    @warning  You are still responsible for releasing the CBLDocument reference.
+    @warning  You are still responsible for releasing the \ref CBLDocument reference.
     @note If you don't have the document in memory already, \ref CBLDatabase_PurgeDocumentByID is a
           simpler shortcut.
     @param document  The document to delete.
@@ -88,7 +88,7 @@ bool CBLDocument_Delete(const CBLDocument* document _cbl_nonnull,
 bool CBLDocument_Purge(const CBLDocument* document _cbl_nonnull,
                        CBLError* error) CBLAPI;
 
-/** Purges a document given only its ID.
+/** Purges a document, given only its ID.
     @note  If no document with that ID exists, this function will return false but the error
             code will be zero.
     @param database  The database.
@@ -126,7 +126,7 @@ CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database _cbl_nonnull,
     @return  The mutable document instance. */
 CBLDocument* CBLDocument_New(const char *docID) CBLAPI _cbl_warn_unused _cbl_returns_nonnull;
 
-/** Creates a new CBLDocument instance that refers to the same document as the original.
+/** Creates a new mutable CBLDocument instance that refers to the same document as the original.
     If the original document has unsaved changes, the new one will also start out with the same
     changes; but mutating one document thereafter will not affect the other.
     @note  You must release the new reference when you're done with it. */
@@ -177,7 +177,7 @@ void CBLDocument_SetProperties(CBLDocument* _cbl_nonnull,
 FLDoc CBLDocument_CreateFleeceDoc(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Returns a document's properties as a null-terminated JSON string.
-    @note You are responsible for calling free() on the returned string. */
+    @note You are responsible for calling `free()` on the returned string. */
 char* CBLDocument_PropertiesAsJSON(const CBLDocument* _cbl_nonnull) CBLAPI _cbl_returns_nonnull; 
 
 /** Sets a mutable document's properties from a JSON string. */
@@ -185,7 +185,9 @@ bool CBLDocument_SetPropertiesAsJSON(CBLDocument* _cbl_nonnull,
                                      const char *json _cbl_nonnull,
                                      CBLError*) CBLAPI;
 
-/** Returns the time at which a given document will expire and be purged.
+/** Returns the time, if any, at which a given document will expire and be purged.
+    Documents don't normally expire; you have to call \ref CBLDatabase_SetDocumentExpiration
+    to set a document's expiration time.
     @param db  The database.
     @param docID  The ID of the document.
     @param error  On failure, an error is written here.
@@ -194,19 +196,21 @@ bool CBLDocument_SetPropertiesAsJSON(CBLDocument* _cbl_nonnull,
              or -1 if the call failed. */
 time_t CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
                                          const char *docID _cbl_nonnull,
-                                         CBLError* error);
+                                         CBLError* error) CBLAPI;
 
 /** Sets or clears the expiration time of a document.
+    @note  The purging of expired documents is not yet automatic; you will need to call
+            \ref CBLDatabase_PurgeExpiredDocuments when the time comes, to make it happen.
     @param db  The database.
     @param docID  The ID of the document.
-    @param expiration  The expiration time as a standard timestamp  (seconds since Unix epoch),
+    @param expiration  The expiration time as a standard timestamp (seconds since Unix epoch),
                         or 0 if the document should never expire.
     @param error  On failure, an error is written here.
     @return  True on success, false on failure. */
 bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
                                        const char *docID _cbl_nonnull,
                                        time_t expiration,
-                                       CBLError* error);
+                                       CBLError* error) CBLAPI;
 
 /** @} */
 
@@ -221,6 +225,9 @@ bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
  */
 
 /** A document change listener callback, invoked after a specific document is changed on disk.
+    @warning  By default, this listener may be called on arbitrary threads. If your code isn't
+                    prepared for that, you may want to use \ref CBLDatabase_BufferNotifications
+                    so that listeners will be called in a safe context.
     @param context  An arbitrary value given when the callback was registered.
     @param db  The database containing the document.
     @param docID  The document's ID. */

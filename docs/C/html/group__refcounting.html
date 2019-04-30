@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Couchbase Lite "objects" are reference-counted; these functions are the shared <code>retain</code> and <code>release</code> operations.  
+<p>Couchbase Lite "objects" are reference-counted; the functions below are the shared <em>retain</em> and <em>release</em> operations.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -100,8 +100,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga7284e00a925f2e781dfb35f11e57deff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Couchbase Lite "objects" are reference-counted; these functions are the shared <code>retain</code> and <code>release</code> operations. </p>
-<p>(But there are type-safe equivalents defined for each class, so you can call cbl_db_release() on a database, for instance, without having to type-cast.) </p>
+<p>Couchbase Lite "objects" are reference-counted; the functions below are the shared <em>retain</em> and <em>release</em> operations. </p>
+<p>(But there are type-safe equivalents defined for each class, so you can call <a class="el" href="group__database.html#ga00fd93fc1805bb05e7214b7674aa605f">CBLDatabase_Release()</a> on a database, for instance, without having to type-cast.) </p>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ga125c046d22c745f92d3801047c5121d3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga125c046d22c745f92d3801047c5121d3">&#9670;&nbsp;</a></span>CBL_REFCOUNTED</h2>
@@ -210,7 +210,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Decrements an object's reference-count, freeing the object if the count hits zero. </p>
-<p>Usually you'll call one of the type-safe synonyms specific to the object type, like cbl_db_release. </p>
+<p>Usually you'll call one of the type-safe synonyms specific to the object type, like <a class="el" href="group__database.html#ga00fd93fc1805bb05e7214b7674aa605f">CBLDatabase_Release</a>. </p>
 
 </div>
 </div>
@@ -231,7 +231,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Increments an object's reference-count. </p>
-<p>Usually you'll call one of the type-safe synonyms specific to the object type, like cbl_db_retain` </p>
+<p>Usually you'll call one of the type-safe synonyms specific to the object type, like <a class="el" href="group__database.html#gadccf9101f44e5255e3c82cba237d2cda">CBLDatabase_Retain</a>` </p>
 
 </div>
 </div>

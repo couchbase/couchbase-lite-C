@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>A CBLQuery represents a compiled N1QL-like database query.  
+<p>A CBLQuery represents a compiled database query.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -99,9 +99,9 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Query objects</h2></td></tr>
-<tr class="memitem:gadda0811bda58e431a1a4b30c3c65d20f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gadda0811bda58e431a1a4b30c3c65d20f">CBLQuery_New</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__queries.html#ga5b419d879de00f45eb417c451e21ac82">CBLQueryLanguage</a> language, const char *queryString, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
-<tr class="memdesc:gadda0811bda58e431a1a4b30c3c65d20f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new query.  <a href="#gadda0811bda58e431a1a4b30c3c65d20f">More...</a><br /></td></tr>
-<tr class="separator:gadda0811bda58e431a1a4b30c3c65d20f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga108d9804e49143f5a50a87d1ccc27d3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga108d9804e49143f5a50a87d1ccc27d3c">CBLQuery_New</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__queries.html#ga5b419d879de00f45eb417c451e21ac82">CBLQueryLanguage</a> language, const char *queryString, int *outErrorPos, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
+<tr class="memdesc:ga108d9804e49143f5a50a87d1ccc27d3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new query by compiling the input string.  <a href="#ga108d9804e49143f5a50a87d1ccc27d3c">More...</a><br /></td></tr>
+<tr class="separator:ga108d9804e49143f5a50a87d1ccc27d3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5851da5f9dcd02be5ce0c54073c22d7d"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga5851da5f9dcd02be5ce0c54073c22d7d">CBLQuery_Retain</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *t)</td></tr>
 <tr class="separator:ga5851da5f9dcd02be5ce0c54073c22d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9e9d4b09cb767cdaa820996ea9992f43"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga9e9d4b09cb767cdaa820996ea9992f43">CBLQuery_Release</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *t)</td></tr>
@@ -119,7 +119,7 @@ Query objects</h2></td></tr>
 <tr class="memdesc:gacf4a560b717dc9dd929cf4816a6e46d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the query, returning the results.  <a href="#gacf4a560b717dc9dd929cf4816a6e46d5">More...</a><br /></td></tr>
 <tr class="separator:gacf4a560b717dc9dd929cf4816a6e46d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2ce033701d68ef4a20bba8a162a8f069"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga2ce033701d68ef4a20bba8a162a8f069">CBLQuery_Explain</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
-<tr class="memdesc:ga2ce033701d68ef4a20bba8a162a8f069"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns information about the query, including the translated SQL form, and the search strategy.  <a href="#ga2ce033701d68ef4a20bba8a162a8f069">More...</a><br /></td></tr>
+<tr class="memdesc:ga2ce033701d68ef4a20bba8a162a8f069"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns information about the query, including the translated SQLite form, and the search strategy.  <a href="#ga2ce033701d68ef4a20bba8a162a8f069">More...</a><br /></td></tr>
 <tr class="separator:ga2ce033701d68ef4a20bba8a162a8f069"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf173d3368558a02792319a0044b83c63"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaf173d3368558a02792319a0044b83c63">CBLQuery_ColumnCount</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
 <tr class="memdesc:gaf173d3368558a02792319a0044b83c63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of columns in each result.  <a href="#gaf173d3368558a02792319a0044b83c63">More...</a><br /></td></tr>
@@ -131,7 +131,8 @@ Query objects</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Result sets</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p><a class="anchor" id="amgrp927e39946158e696a616aeda4abc9749"></a>A <code>CBLResultSet</code> is an iterator over the results returned by a query.</p>
-<p>It exposes one result at a time &ndash; as a collection of values indexed either by position or by name &ndash; and can be stepped from one result to the next. </p>
+<p>It exposes one result at a time &ndash; as a collection of values indexed either by position or by name &ndash; and can be stepped from one result to the next.</p>
+<p>It's important to note that the initial position of the iterator is <em>before</em> the first result, so <a class="el" href="group__queries.html#gaba853a70756d12151e7c34df2c8fb1ad">CBLResultSet_Next</a> must be called <em>first</em>. </p>
 </td></tr>
 <tr class="memitem:gaba853a70756d12151e7c34df2c8fb1ad"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaba853a70756d12151e7c34df2c8fb1ad">CBLResultSet_Next</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *)</td></tr>
 <tr class="memdesc:gaba853a70756d12151e7c34df2c8fb1ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Moves the result-set iterator to the next result.  <a href="#gaba853a70756d12151e7c34df2c8fb1ad">More...</a><br /></td></tr>
@@ -153,15 +154,24 @@ Change listener</h2></td></tr>
 <p>When changes are made to documents, the query will periodically re-run and compare its results with the prior results; if the new results are different, the listener callback will be called.</p>
 <dl class="section note"><dt>Note</dt><dd>The result set passed to the listener is the <em>entire new result set</em>, not just the rows that changed. </dd></dl>
 </td></tr>
-<tr class="memitem:gab5bd0136638986b4be7b451e811e4c37"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gab5bd0136638986b4be7b451e811e4c37">CBLQueryChangeListener</a>) (void *context, <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *newResults, const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
-<tr class="memdesc:gab5bd0136638986b4be7b451e811e4c37"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback to be invoked after the query's results have changed.  <a href="#gab5bd0136638986b4be7b451e811e4c37">More...</a><br /></td></tr>
-<tr class="separator:gab5bd0136638986b4be7b451e811e4c37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga51a9d26025d35ea429a830d3093ed120"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga51a9d26025d35ea429a830d3093ed120">CBLQuery_AddChangeListener</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__queries.html#gab5bd0136638986b4be7b451e811e4c37">CBLQueryChangeListener</a> *listener, void *context)</td></tr>
-<tr class="memdesc:ga51a9d26025d35ea429a830d3093ed120"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a change listener callback with a query, turning it into a "live query" until the listener is removed (via <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>).  <a href="#ga51a9d26025d35ea429a830d3093ed120">More...</a><br /></td></tr>
-<tr class="separator:ga51a9d26025d35ea429a830d3093ed120"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaeb35554f81b1d8e9702708940966c869"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaeb35554f81b1d8e9702708940966c869">CBLQueryChangeListener</a>) (void *context, <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query)</td></tr>
+<tr class="memdesc:gaeb35554f81b1d8e9702708940966c869"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback to be invoked after the query's results have changed.  <a href="#gaeb35554f81b1d8e9702708940966c869">More...</a><br /></td></tr>
+<tr class="separator:gaeb35554f81b1d8e9702708940966c869"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0577b29f49f70a1d579beb40ded2cf97"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga0577b29f49f70a1d579beb40ded2cf97">CBLQuery_AddChangeListener</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__queries.html#gaeb35554f81b1d8e9702708940966c869">CBLQueryChangeListener</a> listener, void *context)</td></tr>
+<tr class="memdesc:ga0577b29f49f70a1d579beb40ded2cf97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a change listener callback with a query, turning it into a "live query" until the listener is removed (via <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>).  <a href="#ga0577b29f49f70a1d579beb40ded2cf97">More...</a><br /></td></tr>
+<tr class="separator:ga0577b29f49f70a1d579beb40ded2cf97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5ff23d5a5138f74ac0efafbe3b23f521"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga5ff23d5a5138f74ac0efafbe3b23f521">CBLQuery_CurrentResults</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *listener, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
+<tr class="memdesc:ga5ff23d5a5138f74ac0efafbe3b23f521"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the query's <em>entire</em> current result set, after it's been announced via a call to the listener's callback.  <a href="#ga5ff23d5a5138f74ac0efafbe3b23f521">More...</a><br /></td></tr>
+<tr class="separator:ga5ff23d5a5138f74ac0efafbe3b23f521"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Database Indexes</h2></td></tr>
+<tr><td class="ititle" colspan="2"><p><a class="anchor" id="amgrp011ca9e3de1157373498f3c9e7d7f41b"></a>Indexes are used to speed up queries by allowing fast &ndash; O(log n) &ndash; lookup of documents that have specific values or ranges of values.</p>
+<p>The values may be properties, or expressions based on properties.</p>
+<p>An index will speed up queries that use the expression it indexes, but it takes up space in the database file, and it slows down document saves slightly because it needs to be kept up to date when documents change.</p>
+<p>Tuning a database with indexes can be a tricky task. Fortunately, a lot has been written about it in the relational-database (SQL) realm, and much of that advice holds for Couchbase Lite. You may find SQLite's documentation particularly helpful since Couchbase Lite's querying is based on SQLite.</p>
+<p>Two types of indexes are currently supported: Value indexes speed up queries by making it possible to look up property (or expression) values without scanning every document. They're just like regular indexes in SQL or N1QL. Multiple expressions are supported; the first is the primary key, second is secondary. Expressions must evaluate to scalar types (boolean, number, string). Full-Text Search (FTS) indexes enable fast search of natural-language words or phrases by using the <code>MATCH</code> operator in a query. A FTS index is <b>required</b> for full-text search: a query with a <code>MATCH</code> operator will fail to compile unless there is already a FTS index for the property/expression being matched. Only a single expression is currently allowed, and it must evaluate to a string. </p>
+</td></tr>
 <tr class="memitem:gac5266cfb9be1fb0441d87df7bb022356"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gac5266cfb9be1fb0441d87df7bb022356">CBLIndexType</a> : uint32_t { <a class="el" href="group__queries.html#ggac5266cfb9be1fb0441d87df7bb022356a3b0da6ae4a2575692a23677fbd26205b">kCBLValueIndex</a>, 
 <a class="el" href="group__queries.html#ggac5266cfb9be1fb0441d87df7bb022356ac5432e0a103a264be9eaddb01070b1ff">kCBLFullTextIndex</a>
  }</td></tr>
@@ -178,8 +188,9 @@ Database Indexes</h2></td></tr>
 <tr class="separator:gaff42f742e1571e29975ca2c619602893"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>A CBLQuery represents a compiled N1QL-like database query. </p>
-<p>The C API does not have the complex class structure that provides the "fluent" query builder API in object-oriented languages; instead, queries are described using the raw <a href="https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema">JSON schema</a> understood by the core query engine. </p>
+<p>A CBLQuery represents a compiled database query. </p>
+<p>The query language is a large subset of the <a href="https://www.couchbase.com/products/n1ql">N1QL</a> language from Couchbase Server, which you can think of as "SQL for JSON" or "SQL++".</p>
+<p>Queries may be given either in <a href="https://docs.couchbase.com/server/6.0/n1ql/n1ql-language-reference/index.html">N1QL syntax</a>, or in JSON using a <a href="https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema">schema</a> that resembles a parse tree of N1QL. The JSON syntax is harder for humans, but much more amenable to machine generation, if you need to create queries programmatically or translate them from some other form. </p>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="ga9c80e113b863821f9f82778dc0650f22"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga9c80e113b863821f9f82778dc0650f22">&#9670;&nbsp;</a></span>CBLQuery</h2>
@@ -197,25 +208,24 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="gab5bd0136638986b4be7b451e811e4c37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gab5bd0136638986b4be7b451e811e4c37">&#9670;&nbsp;</a></span>CBLQueryChangeListener</h2>
+<a id="gaeb35554f81b1d8e9702708940966c869"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaeb35554f81b1d8e9702708940966c869">&#9670;&nbsp;</a></span>CBLQueryChangeListener</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef void(* CBLQueryChangeListener) (void *context, <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *newResults, const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td>
+          <td class="memname">typedef void(* CBLQueryChangeListener) (void *context, <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>A callback to be invoked after the query's results have changed. </p>
+<p>The actual result set can be obtained by calling <a class="el" href="group__queries.html#ga5ff23d5a5138f74ac0efafbe3b23f521">CBLQuery_CurrentResults</a>, either during the callback or at any time thereafter. </p><dl class="section warning"><dt>Warning</dt><dd>By default, this listener may be called on arbitrary threads. If your code isn't prepared for that, you may want to use <a class="el" href="group__listeners.html#gafe601a68e9e6a7f18904929aa04bce2b">CBLDatabase_BufferNotifications</a> so that listeners will be called in a safe context. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">context</td><td>The same <code>context</code> value that you passed when adding the listener. </td></tr>
     <tr><td class="paramname">query</td><td>The query that triggered the listener. </td></tr>
-    <tr><td class="paramname">newResults</td><td>The entire new result set, or NULL if there was an error. </td></tr>
-    <tr><td class="paramname">error</td><td>The error that occurred, or NULL if the query ran successfully. </td></tr>
   </table>
   </dd>
 </dl>
@@ -253,8 +263,10 @@ Database Indexes</h2></td></tr>
 
 <p>Types of database indexes. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggac5266cfb9be1fb0441d87df7bb022356a3b0da6ae4a2575692a23677fbd26205b"></a>kCBLValueIndex&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ggac5266cfb9be1fb0441d87df7bb022356ac5432e0a103a264be9eaddb01070b1ff"></a>kCBLFullTextIndex&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggac5266cfb9be1fb0441d87df7bb022356a3b0da6ae4a2575692a23677fbd26205b"></a>kCBLValueIndex&#160;</td><td class="fielddoc"><p>An index that stores property or expression values. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggac5266cfb9be1fb0441d87df7bb022356ac5432e0a103a264be9eaddb01070b1ff"></a>kCBLFullTextIndex&#160;</td><td class="fielddoc"><p>An index of strings, that enables searching for words with <code>MATCH</code> </p>
+</td></tr>
 </table>
 
 </div>
@@ -273,8 +285,10 @@ Database Indexes</h2></td></tr>
 
 <p>Query languages. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga5b419d879de00f45eb417c451e21ac82aa86d4532291fc8f17284dcb61e198d76"></a>kCBLJSONLanguage&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="gga5b419d879de00f45eb417c451e21ac82a25fd238b9aa83867526649ef2769446e"></a>kCBLN1QLLanguage&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga5b419d879de00f45eb417c451e21ac82aa86d4532291fc8f17284dcb61e198d76"></a>kCBLJSONLanguage&#160;</td><td class="fielddoc"><p><a href="https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema">JSON query schema</a> </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga5b419d879de00f45eb417c451e21ac82a25fd238b9aa83867526649ef2769446e"></a>kCBLN1QLLanguage&#160;</td><td class="fielddoc"><p><a href="https://docs.couchbase.com/server/6.0/n1ql/n1ql-language-reference/index.html">N1QL syntax</a> </p>
+</td></tr>
 </table>
 
 </div>
@@ -319,7 +333,7 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Creates a database index. </p>
-<p>If an identical index with that name already exists, nothing happens (and no error is returned.) If a non-identical index with that name already exists, it is deleted and re-created. </p>
+<p>Indexes are persistent. If an identical index with that name already exists, nothing happens (and no error is returned.) If a non-identical index with that name already exists, it is deleted and re-created. </p>
 
 </div>
 </div>
@@ -380,8 +394,8 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga51a9d26025d35ea429a830d3093ed120"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga51a9d26025d35ea429a830d3093ed120">&#9670;&nbsp;</a></span>CBLQuery_AddChangeListener()</h2>
+<a id="ga0577b29f49f70a1d579beb40ded2cf97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0577b29f49f70a1d579beb40ded2cf97">&#9670;&nbsp;</a></span>CBLQuery_AddChangeListener()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -395,7 +409,7 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group__queries.html#gab5bd0136638986b4be7b451e811e4c37">CBLQueryChangeListener</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="group__queries.html#gaeb35554f81b1d8e9702708940966c869">CBLQueryChangeListener</a>&#160;</td>
           <td class="paramname"><em>listener</em>, </td>
         </tr>
         <tr>
@@ -413,7 +427,7 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Registers a change listener callback with a query, turning it into a "live query" until the listener is removed (via <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>). </p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>When the first change listener is added, the query will run (in the background) and notify the listener(s) of the results when ready. After that, it will run in the background after the database changes, and only notify the listeners when the result set changes. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>The query to observe. </td></tr>
     <tr><td class="paramname">listener</td><td>The callback to be invoked. </td></tr>
@@ -472,6 +486,52 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the name of a column in the result. </p>
+<p>The column name is based on its expression in the <code>SELECT...</code> or <code>WHAT:</code> section of the query. A column that returns a property or property path will be named after that property. A column that returns an expression will have an automatically-generated name like <code>$1</code>. To give a column a custom name, use the <code>AS</code> syntax in the query. </p>
+
+</div>
+</div>
+<a id="ga5ff23d5a5138f74ac0efafbe3b23f521"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5ff23d5a5138f74ac0efafbe3b23f521">&#9670;&nbsp;</a></span>CBLQuery_CurrentResults()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a>* CBLQuery_CurrentResults </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
+          <td class="paramname"><em>query</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td>
+          <td class="paramname"><em>listener</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="struct_c_b_l_error.html">CBLError</a> *&#160;</td>
+          <td class="paramname"><em>error</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the query's <em>entire</em> current result set, after it's been announced via a call to the listener's callback. </p>
+<p>The returned object is valid until the next call to <a class="el" href="group__queries.html#ga5ff23d5a5138f74ac0efafbe3b23f521">CBLQuery_CurrentResults</a> (with the same query and listener) or until you free the listener. If you need to keep it alive longer, retain it yourself. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">query</td><td>The query being listened to. </td></tr>
+    <tr><td class="paramname">listener</td><td>The query listener that was notified. </td></tr>
+    <tr><td class="paramname">error</td><td>If the query failed to run, the error will be stored here. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The query's current result set, or NULL if the query failed to run. </dd></dl>
 
 </div>
 </div>
@@ -502,7 +562,7 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Runs the query, returning the results. </p>
-<dl class="section note"><dt>Note</dt><dd>You must release the result set when you're finished with it. </dd></dl>
+<p>To obtain the results you'll typically call <a class="el" href="group__queries.html#gaba853a70756d12151e7c34df2c8fb1ad">CBLResultSet_Next</a> in a <code>while</code> loop, examining the values in the <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> each time around. </p><dl class="section note"><dt>Note</dt><dd>You must release the result set when you're finished with it. </dd></dl>
 
 </div>
 </div>
@@ -522,13 +582,13 @@ Database Indexes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns information about the query, including the translated SQL form, and the search strategy. </p>
-<p>You can use this to help optimize the query. </p>
+<p>Returns information about the query, including the translated SQLite form, and the search strategy. </p>
+<p>You can use this to help optimize the query: the word <code>SCAN</code> in the strategy indicates a linear scan of the entire database, which should be avoided by adding an index. The strategy will also show which index(es), if any, are used. </p>
 
 </div>
 </div>
-<a id="gadda0811bda58e431a1a4b30c3c65d20f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gadda0811bda58e431a1a4b30c3c65d20f">&#9670;&nbsp;</a></span>CBLQuery_New()</h2>
+<a id="ga108d9804e49143f5a50a87d1ccc27d3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga108d9804e49143f5a50a87d1ccc27d3c">&#9670;&nbsp;</a></span>CBLQuery_New()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -554,6 +614,12 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>outErrorPos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="struct_c_b_l_error.html">CBLError</a> *&#160;</td>
           <td class="paramname"><em>error</em>&#160;</td>
         </tr>
@@ -565,13 +631,14 @@ Database Indexes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Creates a new query. </p>
-<dl class="section note"><dt>Note</dt><dd>You must release the query when you're finished with it. </dd></dl>
+<p>Creates a new query by compiling the input string. </p>
+<p>This is fast, but not instantaneous. If you need to run the same query many times, keep the <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> around instead of compiling it each time. If you need to run related queries with only some values different, create one query with placeholder parameter(s), and substitute the desired value(s) with <a class="el" href="group__queries.html#ga3423414402261bfc1a8d66080b09ec96">CBLQuery_SetParameters</a> each time you run the query. </p><dl class="section note"><dt>Note</dt><dd>You must release the <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> when you're finished with it. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">db</td><td>The database to query. </td></tr>
-    <tr><td class="paramname">language</td><td>The query language (<a href="https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema">JSON</a> or <a href="https://docs.couchbase.com/server/4.0/n1ql/n1ql-language-reference/index.html">N1QL</a>.) </td></tr>
+    <tr><td class="paramname">language</td><td>The query language, <a href="https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema">JSON</a> or <a href="https://docs.couchbase.com/server/4.0/n1ql/n1ql-language-reference/index.html">N1QL</a>. </td></tr>
     <tr><td class="paramname">queryString</td><td>The query string. </td></tr>
+    <tr><td class="paramname">outErrorPos</td><td>If non-NULL, then on a parse error the approximate byte offset in the input expression will be stored here (or -1 if not known/applicable.) </td></tr>
     <tr><td class="paramname">error</td><td>On failure, the error will be written here. </td></tr>
   </table>
   </dd>
@@ -679,7 +746,8 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Assigns values to the query's parameters. </p>
-<p>These values will be substited for those parameters the next time the query is executed. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>These values will be substited for those parameters whenever the query is executed, until they are next assigned.</p>
+<p>Parameters are specified in the query source as e.g. <code>$PARAM</code> (N1QL) or <code>["$PARAM"]</code> (JSON). In this example, the <code>parameters</code> dictionary to this call should have a key <code>PARAM</code> that maps to the value of the parameter. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>The query. </td></tr>
     <tr><td class="paramname">parameters</td><td>The parameters in the form of a Fleece <a class="el" href="group___f_l_dict.html">dictionary</a> whose keys are the parameter names. (It's easiest to construct this by using the mutable API, i.e. calling <a class="el" href="group___f_l_dict.html#ga2b3ffe66e178801e40c9e84de6aff857">FLMutableDict_New</a> and adding keys/values.) </td></tr>
@@ -716,7 +784,7 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Assigns values to the query's parameters, from JSON data. </p>
-<p>These values will be substited for those parameters the next time the query is executed. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>See <a class="el" href="group__queries.html#ga3423414402261bfc1a8d66080b09ec96">CBLQuery_SetParameters</a> for details. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>The query. </td></tr>
     <tr><td class="paramname">json</td><td>The parameters in the form of a JSON-encoded object whose keys are the parameter names. (You may use JSON5 syntax.) </td></tr>
@@ -826,6 +894,7 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the value of a column of the current result, given its (zero-based) numeric index. </p>
+<p>This may return a NULL pointer, indicating <code>MISSING</code>, if the value doesn't exist, e.g. if the column is a property that doesn't exist in the document. </p>
 
 </div>
 </div>
@@ -856,6 +925,7 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the value of a column of the current result, given its name. </p>
+<p>This may return a NULL pointer, indicating <code>MISSING</code>, if the value doesn't exist, e.g. if the column is a property that doesn't exist in the document. (Or, of course, if the key is not a column name in this query.) </p><dl class="section note"><dt>Note</dt><dd>See <a class="el" href="group__queries.html#ga4463d6260952ab1dab155410315a0c8d">CBLQuery_ColumnName</a> for a discussion of column names. </dd></dl>
 
 </div>
 </div>

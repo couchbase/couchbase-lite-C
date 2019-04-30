@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['kcblauthdefaultcookiename',['kCBLAuthDefaultCookieName',['../_c_b_l_replicator_8h.html#ade68cfa53f5cef3ffab0d72fa52adb28',1,'CBLReplicator.h']]],
+  ['kcblauthdefaultcookiename',['kCBLAuthDefaultCookieName',['../group__replication.html#gade68cfa53f5cef3ffab0d72fa52adb28',1,'CBLReplicator.h']]],
   ['kcblblobcontenttypeproperty',['kCBLBlobContentTypeProperty',['../group__blobs.html#gaf33b1053a31640902b41ab79ce611020',1,'CBLBlob.h']]],
   ['kcblblobdigestproperty',['kCBLBlobDigestProperty',['../group__blobs.html#ga866b2a87ea3aaeb5b9a3ce27775ebf77',1,'CBLBlob.h']]],
   ['kcblbloblengthproperty',['kCBLBlobLengthProperty',['../group__blobs.html#gac920ba99c8307fcebbf8f8500064a909',1,'CBLBlob.h']]],

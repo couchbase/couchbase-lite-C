@@ -27,12 +27,13 @@ extern "C" {
     @{ */
 
 /** An object containing properties for file logging configuration 
-    @warn \ref usePlaintext is not recommended for production */
+    @warning \ref usePlaintext results in significantly larger log files; we recommend turning
+                    it off in production. */
 typedef struct {
     const char* directory;          ///< The directory to write logs to (UTF-8 encoded)
     const uint32_t maxRotateCount;  ///< The maximum number of *rotated* logs to keep (i.e. the total number of logs will be one more)
     const size_t maxSize;           ///< The max size to write to a log file before rotating (best-effort)
-    const bool usePlaintext;        ///< Whether or not to log in plaintext
+    const bool usePlaintext;        ///< Whether or not to log in plaintext (as opposed to binary)
 } CBLLogFileConfiguration;
 
 /** A callback function for handling log messages

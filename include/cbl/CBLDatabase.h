@@ -25,7 +25,7 @@ extern "C" {
 
 /** \defgroup database   Database
     @{
-    A CBLDatabase is both a filesystem object and a container for documents.
+    A \ref CBLDatabase is both a filesystem object and a container for documents.
  */
 
 #pragma mark - CONFIGURATION
@@ -39,7 +39,7 @@ typedef CBL_OPTIONS(uint32_t, CBLDatabaseFlags) {
     kCBLDatabase_NoUpgrade     = 4,  ///< Disable upgrading an older-version database
 };
 
-/** Encryption algorithms. */
+/** Encryption algorithms (available only in the Enterprise Edition). */
 typedef CBL_ENUM(uint32_t, CBLEncryptionAlgorithm) {
     kCBLEncryptionNone = 0,      ///< No encryption (default)
 #ifdef COUCHBASE_ENTERPRISE
@@ -49,20 +49,20 @@ typedef CBL_ENUM(uint32_t, CBLEncryptionAlgorithm) {
 
 /** Encryption key sizes (in bytes). */
 typedef CBL_ENUM(uint64_t, CBLEncryptionKeySize) {
-    kCBLEncryptionKeySizeAES256 = 32,
+    kCBLEncryptionKeySizeAES256 = 32,     ///< Key size for \ref kCBLEncryptionAES256
 };
 
-/** Encryption key specified in a CBLDatabaseConfiguration. */
+/** Encryption key specified in a \ref CBLDatabaseConfiguration. */
 typedef struct CBLEncryptionKey {
-    CBLEncryptionAlgorithm algorithm;
-    uint8_t bytes[32];
+    CBLEncryptionAlgorithm algorithm;       ///< Encryption algorithm
+    uint8_t bytes[32];                      ///< Raw key data
 } CBLEncryptionKey;
 
 /** Database configuration options. */
 typedef struct {
-    const char *directory;
-    CBLDatabaseFlags flags;
-    CBLEncryptionKey encryptionKey;
+    const char *directory;                  ///< The parent directory of the database
+    CBLDatabaseFlags flags;                 ///< Options for opening the database
+    CBLEncryptionKey encryptionKey;         ///< The database's encryption key (if any)
 } CBLDatabaseConfiguration;
 
 /** @} */
@@ -81,7 +81,8 @@ typedef struct {
                         absolute or relative path to the database. */
 bool CBL_DatabaseExists(const char* _cbl_nonnull name, const char *inDirectory) CBLAPI;
 
-/** Copies a database file to a new location and assigns it a new UUID.
+/** Copies a database file to a new location, and assigns it a new internal UUID to distinguish
+    it from the original database when replicating.
     @param fromPath  The full filesystem path to the original database (including extension).
     @param toName  The new database name (without the ".cblite2" extension.)
     @param config  The database configuration (directory and encryption option.) */
@@ -108,9 +109,9 @@ bool CBL_DeleteDatabase(const char _cbl_nonnull *name,
     Opening, closing, and managing open databases.
  */
 
-/** Opens a database, or creates it if it doesn't exist yet, returning a new CBLDatabase
+/** Opens a database, or creates it if it doesn't exist yet, returning a new \ref CBLDatabase
     instance.
-    It's OK to open the same database file multiple times. Each CBLDatabase instance is
+    It's OK to open the same database file multiple times. Each \ref CBLDatabase instance is
     independent of the others (and must be separately closed and released.)
     @param name  The database name (without the ".cblite2" extension.)
     @param config  The database configuration (directory and encryption option.)
@@ -126,7 +127,8 @@ bool CBLDatabase_Close(CBLDatabase*, CBLError*) CBLAPI;
 
 CBL_REFCOUNTED(CBLDatabase*, Database);
 
-/** Closes and deletes a database. */
+/** Closes and deletes a database. If there are any other connections to the database,
+    an error is returned. */
 bool CBLDatabase_Delete(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** Compacts a database file. */
@@ -173,7 +175,8 @@ const char* CBLDatabase_Path(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_return
 /** Returns the number of documents in the database. */
 uint64_t CBLDatabase_Count(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
-/** Returns the database's configuration, as given when it was opened. */
+/** Returns the database's configuration, as given when it was opened.
+    @note  The encryption key is not filled in, for security reasons. */
 const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** @} */
@@ -185,14 +188,17 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* _cbl_nonnul
     @{
     A database change listener lets you detect changes made to all documents in a database.
     (If you only want to observe specific documents, use a \ref CBLDocumentChangeListener instead.)
-    @note If there are multiple CBLDatabase instances on the same database file, each one's
+    @note If there are multiple \ref CBLDatabase instances on the same database file, each one's
     listeners will be notified of changes made by other database instances.
- */
+    @warning  Changes made to the database file by other processes will _not_ be notified. */
 
 /** A database change listener callback, invoked after one or more documents are changed on disk.
+    @warning  By default, this listener may be called on arbitrary threads. If your code isn't
+                    prepared for that, you may want to use \ref CBLDatabase_BufferNotifications
+                    so that listeners will be called in a safe context.
     @param context  An arbitrary value given when the callback was registered.
     @param db  The database that changed.
-    @param numDocs  The number of documents that changed (size of the docIDs array)
+    @param numDocs  The number of documents that changed (size of the `docIDs` array)
     @param docIDs  The IDs of the documents that changed, as a C array of `numDocs` C strings. */
     typedef void (*CBLDatabaseChangeListener)(void *context,
                                               const CBLDatabase* db _cbl_nonnull,

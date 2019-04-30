@@ -24,8 +24,6 @@
 extern "C" {
 #endif
 
-CBL_CORE_API extern const char* kCBLAuthDefaultCookieName;
-
 /** \defgroup replication   Replication
     A replicator is a background task that synchronizes changes between a local database and
     another database on a remote server (or on a peer device, or even another local database.)
@@ -34,10 +32,13 @@ CBL_CORE_API extern const char* kCBLAuthDefaultCookieName;
 /** \name  Configuration
     @{ */
 
-/** An opaque object representing a database to replicate with. */
+/** The name of the HTTP cookie used by Sync Gateway to store session keys. */
+CBL_CORE_API extern const char* kCBLAuthDefaultCookieName;
+
+/** An opaque object representing the location of a database to replicate with. */
 typedef struct CBLEndpoint CBLEndpoint;
 
-/** Creates a new endpoint representing a server at the given URL.
+/** Creates a new endpoint representing a server-based database at the given URL.
     The URL's scheme must be `ws` or `wss`, it must of course have a valid hostname,
     and its path must be the name of the database on that server.
     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
@@ -46,7 +47,7 @@ CBLEndpoint* CBLEndpoint_NewWithURL(const char *url _cbl_nonnull) CBLAPI;
 
 
 #ifdef COUCHBASE_ENTERPRISE
-/** Creates a new endpoint representing another local database. */
+/** Creates a new endpoint representing another local database. (Enterprise Edition only.) */
 CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase* _cbl_nonnull) CBLAPI;
 #endif
 
@@ -77,7 +78,10 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorType) {
     kCBLReplicatorTypePull                ///< Pulling changes from the target
 };
 
-/** A callback that can decide whether a particular document should be pushed or pulled. */
+/** A callback that can decide whether a particular document should be pushed or pulled.
+    @warning  This callback will be called on a background thread managed by the replicator.
+                It must pay attention to thread-safety. It should not take a long time to return,
+                or it will slow down the replicator. */
 typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool isDeleted);
 
 
@@ -113,13 +117,18 @@ CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* _cbl_nonnull,
 /** Returns the configuration of an existing replicator. */
 const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator* _cbl_nonnull) CBLAPI;
 
-/** Instructs the replicator to ignore existing checkpoints the next time it runs. */
+/** Instructs the replicator to ignore existing checkpoints the next time it runs.
+    This will cause it to scan through all the documents on the remote database, which takes
+    a lot longer, but it can resolve problems with missing documents if the client and
+    server have gotten out of sync somehow. */
 void CBLReplicator_ResetCheckpoint(CBLReplicator* _cbl_nonnull) CBLAPI;
 
 /** Starts a replicator, asynchronously. Does nothing if it's already started. */
 void CBLReplicator_Start(CBLReplicator* _cbl_nonnull) CBLAPI;
 
-/** Stops a running replicator. Does nothing if it's not already started. */
+/** Stops a running replicator, asynchronously. Does nothing if it's not already started.
+    The replicator will call your \ref CBLReplicatorChangeListener with an activity level of
+    \ref kCBLReplicatorStopped after it stops. Until then, consider it still active. */
 void CBLReplicator_Stop(CBLReplicator* _cbl_nonnull) CBLAPI;
 
 /** @} */
@@ -157,6 +166,9 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator* _cbl_nonnull) CBLAPI;
 
 
 /** A callback that notifies you when the replicator's status changes.
+    @warning  This callback will be called on a background thread managed by the replicator.
+                It must pay attention to thread-safety. It should not take a long time to return,
+                or it will slow down the replicator.
     @param context  The value given when the listener was added.
     @param replicator  The replicator.
     @param status  The replicator's status. */
@@ -185,31 +197,21 @@ typedef struct {
 } CBLReplicatedDocument;
 
 /** A callback that notifies you when documents are replicated.
+    @warning  This callback will be called on a background thread managed by the replicator.
+                It must pay attention to thread-safety. It should not take a long time to return,
+                or it will slow down the replicator.
     @param context  The value given when the listener was added.
     @param replicator  The replicator.
     @param isPush  True if the document(s) were pushed, false if pulled.
     @param numDocuments  The number of documents reported by this callback.
-    @param documents  An array of information about the documents. */
+    @param documents  An array with information about each document. */
 typedef void (*CBLReplicatedDocumentListener)(void *context,
                                               CBLReplicator *replicator _cbl_nonnull,
                                               bool isPush,
                                               unsigned numDocuments,
                                               const CBLReplicatedDocument* documents);
 
-/** A callback that notifies you when events occurred on a replicator.  There are
-    multiple events per callback, each represented by a \ref CBLReplicatedDocument entry.
-    @param context  The value given when the listener was added.
-    @param replicator  The replicator.
-    @param documents  The events that occurred
-    @param documentCount  The size of the \ref documents array
-    @param isPush  Whether or not this replicator is a push replicator */
-typedef void (*CBLDocumentReplicationListener)(void *context, 
-                                               CBLReplicator *replicator _cbl_nonnull,
-                                               CBLReplicatedDocument** documents _cbl_nonnull,
-                                               size_t documentCount,
-                                               bool isPush);
-
-/** Adds a listener that will be called when the replicator's status changes. */
+/** Adds a listener that will be called when documents are replicated. */
 CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* _cbl_nonnull,
                                                     CBLReplicatedDocumentListener _cbl_nonnull,
                                                     void *context) CBLAPI;

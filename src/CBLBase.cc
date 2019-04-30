@@ -37,7 +37,7 @@ void CBL_SetLogLevel(CBLLogLevel level, CBLLogDomain domain) CBLAPI {
 }
 
 
-void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_nonnull, ...) {
+void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_nonnull, ...) CBLAPI {
     char *message = nullptr;
     va_list args;
     va_start(args, format);
