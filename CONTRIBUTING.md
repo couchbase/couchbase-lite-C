@@ -20,6 +20,7 @@ We are unlikely to accept contributions that change the C API, because Couchbase
   - Not all functions in C standard library headers are standard! BSD-ancestry systems like macOS and FreeBSD have some venerable functions that didn't make it into the ANSI spec, like `strlcpy`, while other functions like `asprintf` came from GNU and aren't in Windows.
 * Use `_cbl_nonnull` to mark parameters that must be non-NULL, and `_cbl_warn_unused` to mark functions that return values that need to be released/freed.
 * Be careful when adding source files or source directories, as it can break other builds. If you use Xcode, try a CMake build and make sure it still works. If you use CMake on a Mac, try an Xcode build. Or at least note in the PR that other build systems may need to be updated.
+* Always run the unit tests before submitting or updating a PR! (Yes, they must pass too.)
 * PRs should come with unit tests that test their fixes/improvements. Extending an existing unit test is OK.
 * Unit tests use [Catch](https://github.com/catchorg/Catch2). (Although we should add some tests written in C, and won't be able to use Catch for those.)
 
