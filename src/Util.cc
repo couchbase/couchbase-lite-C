@@ -62,10 +62,13 @@ namespace cbl_internal {
     }
 
     alloc_slice convertJSON5(const char *json5, C4Error *outError) {
+        FLStringResult errMsg;
         FLError flError;
-        alloc_slice json(FLJSON5_ToJSON(slice(json5), &flError));
-        if (!json)
-            setError(outError, FleeceDomain, flError, "Invalid JSON in query"_sl);
+        alloc_slice json(FLJSON5_ToJSON(slice(json5), &errMsg, nullptr, &flError));
+        if (!json) {
+            setError(outError, FleeceDomain, flError, slice(errMsg));
+            FLSliceResult_Free(errMsg);
+        }
         return json;
     }
 
