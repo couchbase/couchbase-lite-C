@@ -49,26 +49,25 @@ This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syn
 // Open a database:
 CBLError error;
 CBLDatabaseConfiguration config = {"/tmp", kCBLDatabase_Create};
-CBLDatabase* db = cbl_db_open("my_db", &config, &error);
+CBLDatabase* db = CBLDatabase_Open("my_db", &config, &error);
 
 // Create a document:
-CBLDocument* doc = cbl_doc_new("foo");
-FLMutableDict props = cbl_doc_mutableProperties(doc);
+CBLDocument* doc = CBLDocument_New("foo");
+FLMutableDict props = CBLDocument_MutableProperties(doc);
 FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
 
 // Save the document:
-const CBLDocument *saved = cbl_db_saveDocument(db, 
-                                               doc, 
-                                               kCBLConcurrencyControlFailOnConflict, 
-                                               &error);
-cbl_doc_release(saved);
-cbl_doc_release(doc);
+const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, 
+                                         kCBLConcurrencyControlFailOnConflict, 
+                                         &error);
+CBLDocument_Release(saved);
+CBLDocument_Release(doc);
 
 // Read it back:
-const CBLDocument *readDoc = cbl_db_getDocument(db, "foo");
-FLDict readProps = cbl_doc_properties(readDoc);
+const CBLDocument *readDoc = CBLDatabase_GetDocument(db, "foo");
+FLDict readProps = CBLDocument_Properties(readDoc);
 FLSlice greeting = FLValue_AsString( FLDict_Get(readProps, "greeting"_sl) );
-cbl_doc_release(readDoc);
+CBLDocument_Release(readDoc);
 ```
 
 ### C++
