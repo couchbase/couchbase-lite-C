@@ -250,7 +250,8 @@ typedef void (*CBLNotificationsReadyCallback)(void *context,
                                               CBLDatabase* db _cbl_nonnull);
 
 /** Switches the database to buffered-notification mode. Notifications for objects belonging
-    to this database will not be called immediately.
+    to this database (documents, queries, replicators, and of course the database) will not be
+    called immediately; your \ref CBLNotificationsReadyCallback will be called instead.
     @param db  The database whose notifications are to be buffered.
     @param callback  The function to be called when a notification is available.
     @param context  An arbitrary value that will be passed to the callback. */

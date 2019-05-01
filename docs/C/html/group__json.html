@@ -83,9 +83,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga794f355e7143013751493ce45d3fd347"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___f_l_slice.html#gab08438b1f08efeefe09ece8079734fdd">FLStringResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__json.html#ga794f355e7143013751493ce45d3fd347">FLValue_ToJSONX</a> (<a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> v, bool json5, bool canonicalForm)</td></tr>
 <tr class="memdesc:ga794f355e7143013751493ce45d3fd347"><td class="mdescLeft">&#160;</td><td class="mdescRight">Most general Fleece to JSON converter.  <a href="#ga794f355e7143013751493ce45d3fd347">More...</a><br /></td></tr>
 <tr class="separator:ga794f355e7143013751493ce45d3fd347"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9e24d46b9bb5f6db3c35300f41d7a9e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___f_l_slice.html#gab08438b1f08efeefe09ece8079734fdd">FLStringResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__json.html#ga9e24d46b9bb5f6db3c35300f41d7a9e2">FLJSON5_ToJSON</a> (<a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> json5, <a class="el" href="group__types.html#ga6a3de980e42db083a0ec3081c4ae8ece">FLError</a> *error)</td></tr>
-<tr class="memdesc:ga9e24d46b9bb5f6db3c35300f41d7a9e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts valid JSON5 to JSON.  <a href="#ga9e24d46b9bb5f6db3c35300f41d7a9e2">More...</a><br /></td></tr>
-<tr class="separator:ga9e24d46b9bb5f6db3c35300f41d7a9e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga24e916803eaf8f0fceab5faf9c01b77b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___f_l_slice.html#gab08438b1f08efeefe09ece8079734fdd">FLStringResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__json.html#ga24e916803eaf8f0fceab5faf9c01b77b">FLJSON5_ToJSON</a> (<a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> json5, <a class="el" href="group___f_l_slice.html#gab08438b1f08efeefe09ece8079734fdd">FLStringResult</a> *outErrorMessage, size_t *outErrorPos, <a class="el" href="group__types.html#ga6a3de980e42db083a0ec3081c4ae8ece">FLError</a> *outError)</td></tr>
+<tr class="memdesc:ga24e916803eaf8f0fceab5faf9c01b77b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts valid JSON5 <a href="https://json5.org">https://json5.org</a> to JSON.  <a href="#ga24e916803eaf8f0fceab5faf9c01b77b">More...</a><br /></td></tr>
+<tr class="separator:ga24e916803eaf8f0fceab5faf9c01b77b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Debugging Functions</h2></td></tr>
@@ -142,8 +142,8 @@ Debugging Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga9e24d46b9bb5f6db3c35300f41d7a9e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga9e24d46b9bb5f6db3c35300f41d7a9e2">&#9670;&nbsp;</a></span>FLJSON5_ToJSON()</h2>
+<a id="ga24e916803eaf8f0fceab5faf9c01b77b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga24e916803eaf8f0fceab5faf9c01b77b">&#9670;&nbsp;</a></span>FLJSON5_ToJSON()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -157,8 +157,20 @@ Debugging Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group___f_l_slice.html#gab08438b1f08efeefe09ece8079734fdd">FLStringResult</a> *&#160;</td>
+          <td class="paramname"><em>outErrorMessage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t *&#160;</td>
+          <td class="paramname"><em>outErrorPos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="group__types.html#ga6a3de980e42db083a0ec3081c4ae8ece">FLError</a> *&#160;</td>
-          <td class="paramname"><em>error</em>&#160;</td>
+          <td class="paramname"><em>outError</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -168,8 +180,18 @@ Debugging Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Converts valid JSON5 to JSON. </p>
-<p>Among other things, it converts single quotes to double, adds missing quotes around dictionary keys, and adds missing trailing commas. If given <em>invalid</em> JSON5, it will likely return an error but may just ouput comparably invalid JSON. </p>
+<p>Converts valid JSON5 <a href="https://json5.org">https://json5.org</a> to JSON. </p>
+<p>Among other things, it converts single quotes to double, adds missing quotes around dictionary keys, removes trailing commas, and removes comments. </p><dl class="section note"><dt>Note</dt><dd>If given invalid JSON5, it will <em>usually</em> return an error, but may just ouput comparably invalid JSON, in which case the caller's subsequent JSON parsing will detect the error. The types of errors it overlooks tend to be subtleties of string or number encoding. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">json5</td><td>The JSON5 to parse </td></tr>
+    <tr><td class="paramname">outErrorMessage</td><td>On failure, the error message will be stored here (if not NULL.) As this is a <a class="el" href="group___f_l_slice.html#gab08438b1f08efeefe09ece8079734fdd">FLStringResult</a>, you will be responsible for freeing it. </td></tr>
+    <tr><td class="paramname">outErrorPos</td><td>On a parse error, the byte offset in the input where the error occurred will be stored here (if it's not NULL.) </td></tr>
+    <tr><td class="paramname">outError</td><td>On failure, the error code will be stored here (if it's not NULL.) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The converted JSON. </dd></dl>
 
 </div>
 </div>

@@ -155,6 +155,15 @@ void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format _cbl_nonnull, ...) CB
     _retain_ and _release_ operations. (But there are type-safe equivalents defined for each
     class, so you can call \ref CBLDatabase_Release() on a database, for instance, without having to
     type-cast.)
+
+    API functions that **create** a ref-counted object (typically named `..._New()` or `..._Create()`)
+    return the object with a ref-count of 1; you are responsible for releasing the reference
+    when you're done with it, or the object will be leaked.
+
+    Other functions that return an **existing** ref-counted object do not modify its ref-count.
+    You do _not_ need to release such a reference. But if you're keeping a reference to the object
+    for a while, you should retain the reference to ensure it stays alive, and then release it when
+    finished (to balance the retain.)
  */
 
 typedef struct CBLRefCounted CBLRefCounted;
@@ -176,7 +185,7 @@ unsigned CBL_InstanceCount(void) CBLAPI;
     @note  May only be functional in debug builds of Couchbase Lite. */
 void CBL_DumpInstances(void) CBLAPI;
 
-// Declares retain/release functions for TYPE
+// Declares retain/release functions for TYPE. For internal use only.
 #define CBL_REFCOUNTED(TYPE, NAME) \
     static inline const TYPE CBL##NAME##_Retain(const TYPE _cbl_nonnull t) \
                                             {return (const TYPE)CBL_Retain((CBLRefCounted*)t);} \
@@ -194,13 +203,16 @@ typedef struct CBLDatabase   CBLDatabase;
 
 /** \defgroup documents  Documents
      @{ */
-/** An in-memory copy of a document. */
+/** An in-memory copy of a document.
+    CBLDocument objects can be mutable or immutable. Immutable objects are referenced by _const_
+    pointers; mutable ones by _non-const_ pointers. This prevents you from accidentally calling
+    a mutable-document function on an immutable document. */
 typedef struct CBLDocument   CBLDocument;
 /** @} */
 
 /** \defgroup blobs Blobs
      @{ */
-/** A binary data value associated with a document. */
+/** A binary data value associated with a \ref CBLDocument. */
 typedef struct CBLBlob      CBLBlob;
 /** @} */
 
@@ -208,6 +220,7 @@ typedef struct CBLBlob      CBLBlob;
      @{ */
 /** A compiled database query. */
 typedef struct CBLQuery      CBLQuery;
+
 /** An iterator over the rows resulting from running a query. */
 typedef struct CBLResultSet  CBLResultSet;
 /** @} */
@@ -224,10 +237,34 @@ typedef struct CBLReplicator CBLReplicator;
      @{
     Every API function that registers a listener callback returns an opaque token representing
     the registered callback. To unregister any type of listener, call \ref CBLListener_Remove.
+
+    The steps to creating a listener are:
+    1. Define the type of contextual information the callback needs. This is usually one of
+        your objects, or a custom struct.
+    2. Implement the listener function:
+      - The parameters and return value must match the callback defined in the API.
+      - The first parameter is always a `void*` that points to your contextual
+          information, so cast that to the actual pointer type.
+      - **The function may be called on a background thread!** And since the CBL API is not itself
+          thread-safe, you'll need to take special precautions if you want to call the API
+          from your listener, such as protecting all of your calls (inside and outside the
+          listener) with a mutex. It's safer to use \ref CBLDatabase_BufferNotifications to
+          schedule listener callbacks to a time of your own choosing, such as your thread's
+          event loop; see that function's docs for details.
+    3. To register the listener, call the relevant `AddListener` function.
+      - The parameters will include the CBL object to observe, the address of your listener
+        function, and a pointer to the contextual information. (That pointer needs to remain
+        valid for as long as the listener is registered, so it can't be a pointer to a local
+        variable.)
+      - The return value is a \ref CBLListenerToken pointer; save that.
+    4. To unregister the listener, pass the \ref CBLListenerToken to \ref CBLListener_Remove.
+      - You **must** unregister the listener before the contextual information pointer is
+        invalidated, e.g. before freeing the object it points to.
  */
 
 /** An opaque 'cookie' representing a registered listener callback.
-    It's returned from functions that register listeners, and used to remove a listener. */
+    It's returned from functions that register listeners, and used to remove a listener by
+    calling \ref CBLListener_Remove. */
 typedef struct CBLListenerToken CBLListenerToken;
 
 /** Removes a listener callback, given the token that was returned when it was added. */

@@ -183,6 +183,7 @@ Document listeners</h2></td></tr>
 </div><div class="memdoc">
 
 <p>An in-memory copy of a document. </p>
+<p>CBLDocument objects can be mutable or immutable. Immutable objects are referenced by <em>const</em> pointers; mutable ones by <em>non-const</em> pointers. This prevents you from accidentally calling a mutable-document function on an immutable document. </p>
 
 </div>
 </div>

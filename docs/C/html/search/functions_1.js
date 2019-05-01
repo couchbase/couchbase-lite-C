@@ -95,7 +95,7 @@ var searchData=
   ['flencoder_5fwriteuint',['FLEncoder_WriteUInt',['../group___f_l_encoder.html#ga1b827735d085a8735dc2327bd29f2663',1,'Fleece.h']]],
   ['flencoder_5fwriteundefined',['FLEncoder_WriteUndefined',['../group___f_l_encoder.html#ga5ea7752719836fe0cf3228bced68e881',1,'Fleece.h']]],
   ['flencoder_5fwritevalue',['FLEncoder_WriteValue',['../group___f_l_encoder.html#ga9f3b2ee2fb101cf71787f23cb8b2086b',1,'Fleece.h']]],
-  ['fljson5_5ftojson',['FLJSON5_ToJSON',['../group__json.html#ga9e24d46b9bb5f6db3c35300f41d7a9e2',1,'Fleece.h']]],
+  ['fljson5_5ftojson',['FLJSON5_ToJSON',['../group__json.html#ga24e916803eaf8f0fceab5faf9c01b77b',1,'Fleece.h']]],
   ['flkeypath_5feval',['FLKeyPath_Eval',['../group___f_l_key_path.html#gafcad708088b3ef5ead878c0465fd60a0',1,'Fleece.h']]],
   ['flkeypath_5fevalonce',['FLKeyPath_EvalOnce',['../group___f_l_key_path.html#gad93b0de13ab553b2e291749da26e5df9',1,'Fleece.h']]],
   ['flkeypath_5ffree',['FLKeyPath_Free',['../group___f_l_key_path.html#gab5be37a1e37584d7de34201b8c2023ef',1,'Fleece.h']]],

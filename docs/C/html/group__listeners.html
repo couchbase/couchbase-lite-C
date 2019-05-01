@@ -103,7 +103,22 @@ Scheduling notifications</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Every API function that registers a listener callback returns an opaque token representing the registered callback. </p>
-<p>To unregister any type of listener, call <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>. </p>
+<p>To unregister any type of listener, call <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>.</p>
+<p>The steps to creating a listener are:</p><ol type="1">
+<li>Define the type of contextual information the callback needs. This is usually one of your objects, or a custom struct.</li>
+<li>Implement the listener function:<ul>
+<li>The parameters and return value must match the callback defined in the API.</li>
+<li>The first parameter is always a <code>void*</code> that points to your contextual information, so cast that to the actual pointer type.</li>
+<li><b>The function may be called on a background thread!</b> And since the CBL API is not itself thread-safe, you'll need to take special precautions if you want to call the API from your listener, such as protecting all of your calls (inside and outside the listener) with a mutex. It's safer to use <a class="el" href="group__listeners.html#gafe601a68e9e6a7f18904929aa04bce2b">CBLDatabase_BufferNotifications</a> to schedule listener callbacks to a time of your own choosing, such as your thread's event loop; see that function's docs for details.</li>
+</ul>
+</li>
+<li>To register the listener, call the relevant <code>AddListener</code> function.<ul>
+<li>The parameters will include the CBL object to observe, the address of your listener function, and a pointer to the contextual information.</li>
+<li>The return value is a <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> pointer; save that.</li>
+</ul>
+</li>
+<li>To unregister the listener, pass the <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> to <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>. You <b>must</b> unregister the listener before the contextual information pointer is invalidated, e.g. before freeing the object it points to. </li>
+</ol>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="gae39d1de7cc3a46004b597f5eb80620c6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gae39d1de7cc3a46004b597f5eb80620c6">&#9670;&nbsp;</a></span>CBLListenerToken</h2>
@@ -118,7 +133,7 @@ Scheduling notifications</h2></td></tr>
 </div><div class="memdoc">
 
 <p>An opaque 'cookie' representing a registered listener callback. </p>
-<p>It's returned from functions that register listeners, and used to remove a listener. </p>
+<p>It's returned from functions that register listeners, and used to remove a listener by calling <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>. </p>
 
 </div>
 </div>

@@ -111,7 +111,7 @@ var searchData=
   ['flencoderformat',['FLEncoderFormat',['../group___f_l_encoder.html#gaa70cf9f00c736474273a7e4f17a25488',1,'Fleece.h']]],
   ['flerror',['FLError',['../group__types.html#ga6a3de980e42db083a0ec3081c4ae8ece',1,'Fleece.h']]],
   ['flheapslice',['FLHeapSlice',['../group___f_l_slice.html#gabc10b138e3c1345a4396b39c11a1f0d5',1,'FLSlice.h']]],
-  ['fljson5_5ftojson',['FLJSON5_ToJSON',['../group__json.html#ga9e24d46b9bb5f6db3c35300f41d7a9e2',1,'Fleece.h']]],
+  ['fljson5_5ftojson',['FLJSON5_ToJSON',['../group__json.html#ga24e916803eaf8f0fceab5faf9c01b77b',1,'Fleece.h']]],
   ['flkeypath',['FLKeyPath',['../group___f_l_key_path.html#ga233d06088ad464981abf1cb0981dc832',1,'Fleece.h']]],
   ['flkeypath_5feval',['FLKeyPath_Eval',['../group___f_l_key_path.html#gafcad708088b3ef5ead878c0465fd60a0',1,'Fleece.h']]],
   ['flkeypath_5fevalonce',['FLKeyPath_EvalOnce',['../group___f_l_key_path.html#gad93b0de13ab553b2e291749da26e5df9',1,'Fleece.h']]],

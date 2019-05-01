@@ -112,7 +112,7 @@ CBL_REFCOUNTED(CBLReplicator*, Replicator);
 
 /** Creates a replicator with the given configuration. */
 CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* _cbl_nonnull,
-                            CBLError*) CBLAPI;
+                                 CBLError*) CBLAPI;
 
 /** Returns the configuration of an existing replicator. */
 const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator* _cbl_nonnull) CBLAPI;
@@ -136,7 +136,9 @@ void CBLReplicator_Stop(CBLReplicator* _cbl_nonnull) CBLAPI;
 
 
 /** \name  Status and Progress
-    @{ */
+    @{
+    **WARNING::** Replicator listeners/notifications are not yet implemented.
+ */
 
 /** The possible states a replicator can be in during its lifecycle. */
 typedef CBL_ENUM(uint8_t, CBLReplicatorActivityLevel) {
@@ -176,7 +178,8 @@ typedef void (*CBLReplicatorChangeListener)(void *context,
                                             CBLReplicator *replicator _cbl_nonnull,
                                             const CBLReplicatorStatus *status _cbl_nonnull);
 
-/** Adds a listener that will be called when the replicator's status changes. */
+/** Adds a listener that will be called when the replicator's status changes.
+    @warning UNIMPLEMENTED! */
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* _cbl_nonnull,
                                                   CBLReplicatorChangeListener _cbl_nonnull, 
                                                   void *context) CBLAPI;
@@ -211,7 +214,8 @@ typedef void (*CBLReplicatedDocumentListener)(void *context,
                                               unsigned numDocuments,
                                               const CBLReplicatedDocument* documents);
 
-/** Adds a listener that will be called when documents are replicated. */
+/** Adds a listener that will be called when documents are replicated.
+    @warning UNIMPLEMENTED! */
 CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* _cbl_nonnull,
                                                     CBLReplicatedDocumentListener _cbl_nonnull,
                                                     void *context) CBLAPI;
