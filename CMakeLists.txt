@@ -55,6 +55,8 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
 ### SUBMODULES:
 
 include_directories("vendor/couchbase-lite-core/C/include"
+                    "vendor/couchbase-lite-core/LiteCore/C"
+                    "vendor/couchbase-lite-core/LiteCore/Support"
                     "vendor/couchbase-lite-core/vendor/fleece/API"
                     "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support")
 
