@@ -18,6 +18,7 @@
 
 #pragma once
 #include "CBLBase.h"
+#include "time.h"
 
 #ifdef __cplusplus
 extern "C" {
