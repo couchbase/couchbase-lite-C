@@ -109,7 +109,7 @@ protected: \
         {other._token = nullptr;}
 
         ListenerToken& operator=(ListenerToken &&other) {
-            CBLListener_remove(_token);
+            CBLListener_Remove(_token);
             _token = other._token;
             _callback = other._callback;
             other._token = nullptr;
@@ -118,7 +118,7 @@ protected: \
 
         /** Unregisters the listener early, before it leaves scope. */
         void remove() {
-            CBLListener_remove(_token);
+            CBLListener_Remove(_token);
             _token = nullptr;
             _callback = nullptr;
         }
