@@ -23,23 +23,15 @@
 
 from cffi import FFI
 import shutil
+import argparse
 
-SrcLibraryDir = "../../build/CBL_C/Build/Products/Debug/" # FIX: Xcode-specific
-LibraryName = "couchbase_lite"
-LibraryFilename = "lib" + LibraryName + ".dylib"    # FIX: Mac/iOS specific
 
-ffibuilder = FFI()
-ffibuilder.set_source("_PyCBL",
-   r""" // passed to the real C compiler,
-        // contains implementation of things declared in cdef()
-        #include <cbl/CouchbaseLite.h>
-    """,
-    libraries=[LibraryName],
-    include_dirs=["../../include", "../../vendor/couchbase-lite-core/vendor/fleece/API"],
-    library_dirs=["."],
-    extra_link_args=["-rpath", "@loader_path"])         # FIX: Mac-only
+# Mac settings are defaults, but overrideable on command-line
+MAC_NAME = "couchbase_lite" # cmake uses "CouchBaseLiteC' instead
+MAC_DIR = "../../build/CBL_C/Build/Products/Debug/"
+MAC_LINK_FLAGS = "-rpath @loader_path"
 
-ffibuilder.cdef("""
+CDEF = """
 // Declarations that are shared between Python and C
 // Careful, this supports only a subset of C syntax
 
@@ -257,8 +249,25 @@ extern "Python" void queryListenerCallback(void *context, const CBLQuery *query)
 CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query,
                                         CBLQueryChangeListener listener,
                                         void *context);
-""")
+"""
 
 if __name__ == "__main__":
-    shutil.copy(SrcLibraryDir + LibraryFilename, ".")
+    parser = argparse.ArgumentParser(description="build python bindings")
+    parser.add_argument('-n', '--name', default=MAC_NAME, help="Library name")
+    parser.add_argument('-d', '--dir', default=MAC_DIR, help="Directory containing shared library file")
+    parser.add_argument('-l', '--link_flags', default=MAC_LINK_FLAGS, help="Linker flags")
+    args = parser.parse_args()
+
+    ffibuilder = FFI()
+    extra_link_args = args.link_flags.split()
+    ffibuilder.cdef(CDEF)
+    ffibuilder.set_source("_PyCBL", r""" // passed to the real C compiler,
+        // contains implementation of things declared in cdef()
+        #include <cbl/CouchbaseLite.h>
+    """,
+    libraries=[args.name],
+    include_dirs=["../../include", "../../vendor/couchbase-lite-core/vendor/fleece/API"],
+    library_dirs=[args.dir],
+    extra_link_args=extra_link_args)
+
     ffibuilder.compile(verbose=True)
