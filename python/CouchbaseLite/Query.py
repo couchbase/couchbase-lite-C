@@ -54,7 +54,7 @@ class Query (CBLObject):
 
     def setParameters(self, params):
         jsonStr = json.dumps(params)
-        lib.CBLQuery_SetParametersFromJSON(self._ref, cstr(jsonStr))
+        lib.CBLQuery_SetParametersAsJSON(self._ref, cstr(jsonStr))
 
     def execute(self):
         """Executes the query and returns a Generator of QueryResult objects."""
