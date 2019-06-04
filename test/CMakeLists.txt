@@ -9,6 +9,9 @@ include_directories(${TOP}C/include/
                     ${TOP}test/
                     ${TOP}vendor/couchbase-lite-core/vendor/fleece/API/
                     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/catch/
+                    ${TOP}include/
+                    ${TOP}include/cbl++/
+                    ${PROJECT_BINARY_DIR}/../include/cbl/
                 )
 
 aux_source_directory(.  TEST_SRC)

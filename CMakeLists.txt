@@ -40,7 +40,7 @@ elseif(ANDROID)
 elseif(APPLE)
     include("cmake/platform_apple.cmake")
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    include("cmake/platform_linux.cmake")
+    include("cmake/platform_linux_desktop.cmake")
 else()
     message(FATAL_ERROR "Unknown platform")
 endif()
@@ -55,6 +55,8 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
 ### SUBMODULES:
 
 include_directories("vendor/couchbase-lite-core/C/include"
+                    "vendor/couchbase-lite-core/LiteCore/C"
+                    "vendor/couchbase-lite-core/LiteCore/Support"
                     "vendor/couchbase-lite-core/vendor/fleece/API"
                     "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support")
 

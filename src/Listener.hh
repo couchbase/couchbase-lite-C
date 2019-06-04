@@ -23,6 +23,7 @@
 #include <atomic>
 #include <memory>
 #include <vector>
+#include <functional>
 
 
 namespace cbl_internal {
