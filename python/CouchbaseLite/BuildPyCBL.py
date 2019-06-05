@@ -24,6 +24,7 @@
 from cffi import FFI
 import shutil
 import argparse
+import os.path
 
 
 # Mac settings are defaults, but overrideable on command-line
@@ -260,6 +261,9 @@ if __name__ == "__main__":
 
     ffibuilder = FFI()
     extra_link_args = args.link_flags.split()
+    # python 3.5 distutils breaks on Linux with absolute library path,
+    # so make sure it is relative path
+    libdir = os.path.relpath(args.dir)
     ffibuilder.cdef(CDEF)
     ffibuilder.set_source("_PyCBL", r""" // passed to the real C compiler,
         // contains implementation of things declared in cdef()
@@ -267,7 +271,7 @@ if __name__ == "__main__":
     """,
     libraries=[args.name],
     include_dirs=["../../include", "../../vendor/couchbase-lite-core/vendor/fleece/API"],
-    library_dirs=[args.dir],
+    library_dirs=[libdir],
     extra_link_args=extra_link_args)
 
     ffibuilder.compile(verbose=True)
