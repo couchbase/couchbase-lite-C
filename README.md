@@ -54,7 +54,7 @@ CBLDatabase* db = CBLDatabase_Open("my_db", &config, &error);
 // Create a document:
 CBLDocument* doc = CBLDocument_New("foo");
 FLMutableDict props = CBLDocument_MutableProperties(doc);
-FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
+FLSlot_SetString(FLMutableDict_Set(dict, FLStr("greeting")), FLStr("Howdy!"));
 
 // Save the document:
 const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, 
@@ -66,7 +66,7 @@ CBLDocument_Release(doc);
 // Read it back:
 const CBLDocument *readDoc = CBLDatabase_GetDocument(db, "foo");
 FLDict readProps = CBLDocument_Properties(readDoc);
-FLSlice greeting = FLValue_AsString( FLDict_Get(readProps, "greeting"_sl) );
+FLSlice greeting = FLValue_AsString( FLDict_Get(readProps, FLStr("greeting")) );
 CBLDocument_Release(readDoc);
 ```
 
