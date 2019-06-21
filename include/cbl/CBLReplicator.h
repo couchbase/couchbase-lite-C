@@ -153,7 +153,8 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorActivityLevel) {
     (fractional) result of `completed` ÷ `total`, which will range from 0.0 to 1.0.
     Before anything happens, both `completed` and `total` will be 0. */
 typedef struct {
-    uint64_t completed, total;
+    float fractionComplete;     /// Very-approximate completion, from 0.0 to 1.0
+    uint64_t documentCount;     ///< Number of documents transferred so far
 } CBLReplicatorProgress;
 
 /** A replicator's current status. */

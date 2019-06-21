@@ -32,8 +32,18 @@ using namespace fleece;
 using namespace cbl_internal;
 
 
-static inline const CBLReplicatorStatus& external(const C4ReplicatorStatus &status) {
-    return (const CBLReplicatorStatus&)status;
+extern void RegisterC4LWSWebSocketFactory();    // Defined in libLiteCoreWebSocket
+
+
+static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
+    return {
+        CBLReplicatorActivityLevel(c4status.level),
+        {
+            c4status.progress.unitsCompleted / max(float(c4status.progress.unitsTotal), 1.0f),
+            c4status.progress.documentCount
+        },
+        external(c4status.error)
+    };
 }
 
 
@@ -49,43 +59,13 @@ public:
 
 
     void start() {
-        lock_guard<mutex> lock(_mutex);
-        _start();
-    }
-
-
-    void stop() {
-        lock_guard<mutex> lock(_mutex);
-        _stop();
-    }
-
-
-    void resetCheckpoint() {
-        lock_guard<mutex> lock(_mutex);
-        if (!_c4repl)
-            _resetCheckpoint = true;
-    }
-
-
-    CBLReplicatorStatus status() {
-        lock_guard<mutex> lock(_mutex);
-        if (!_c4repl)
-            return {kCBLReplicatorStopped, {0, 0}, {}};
-        return external(c4repl_getStatus(_c4repl));
-    }
-
-
-    void setListener(CBLReplicatorChangeListener listener, void *context) {
-        lock_guard<mutex> lock(_mutex);
-        _listener = listener;
-        _listenerContext = context;
-    }
-
-private:
-
-    void _start() {
+        unique_lock<mutex> lock(_mutex);
         if (_c4repl)
             return;
+
+        // One-time initialization of network transport:
+        once_flag once;
+        call_once(once, std::bind(&RegisterC4LWSWebSocketFactory));
 
         // Set up the LiteCore replicator parameters:
         C4ReplicatorParameters params = { };
@@ -132,20 +112,59 @@ private:
         }
         params.optionsDictFleece = properties;
 
+        C4Database *otherLocalDB = nullptr;
+        if (_conf.endpoint->otherLocalDB())
+            otherLocalDB = internal(_conf.endpoint->otherLocalDB());
+
         // Create/start the LiteCore replicator:
-        CBLError error;
+        C4Error c4error;
         _c4repl = c4repl_new(internal(_conf.database),
                              _conf.endpoint->remoteAddress(),
                              _conf.endpoint->remoteDatabaseName(),
-                             internal(_conf.endpoint->otherLocalDB()),
+                             otherLocalDB,
                              params,
-                             internal(&error));
-        if (!_c4repl)
-            throw error;
+                             &c4error);
+        if (!_c4repl) {
+            C4ReplicatorStatus status = {kC4Stopped, {}, c4error};
+            _status = status;
+
+            lock.unlock();
+            _callListener(status);
+            return;
+        }
+
+        _status = c4repl_getStatus(_c4repl);
         _stopping = false;
         retain(this);
     }
 
+
+    void stop() {
+        lock_guard<mutex> lock(_mutex);
+        _stop();
+    }
+
+
+    void resetCheckpoint() {
+        lock_guard<mutex> lock(_mutex);
+        if (!_c4repl)
+            _resetCheckpoint = true;
+    }
+
+
+    CBLReplicatorStatus status() {
+        lock_guard<mutex> lock(_mutex);
+        return external(_status);
+    }
+
+
+    void setListener(CBLReplicatorChangeListener listener, void *context) {
+        lock_guard<mutex> lock(_mutex);
+        _listener = listener;
+        _listenerContext = context;
+    }
+
+private:
 
     void _stop() {
         if (!_c4repl || _stopping)
@@ -156,23 +175,34 @@ private:
     }
 
 
-    void _statusChanged(C4Replicator* c4repl, C4ReplicatorStatus status) {
-        unique_lock<mutex> lock(_mutex);
-        if (c4repl != _c4repl)
-            return;
-
-        if (_listener) {
-            lock.unlock();
-            _listener(_listenerContext, this, &external(status));
-            if (status.level == kC4Stopped)
-                lock.lock();
+    void _statusChanged(C4Replicator* c4repl, const C4ReplicatorStatus &status) {
+        C4Log("StatusChanged: level=%d, err=%d", status.level, status.error.code);
+        {
+            lock_guard<mutex> lock(_mutex);
+            if (c4repl != _c4repl)
+                return;
+            _status = status;
         }
 
+        _callListener(status);
+
         if (status.level == kC4Stopped) {
-            c4repl_free(_c4repl);
+            lock_guard<mutex> lock(_mutex);
             _c4repl = nullptr;
             _stopping = false;
             release(this);
+        }
+    }
+
+
+    void _callListener(C4ReplicatorStatus status) {
+        if (_listener) {
+            auto cblStatus = external(status);
+            _listener(_listenerContext, this, &cblStatus);
+        } else if (status.error.code) {
+            char buf[256];
+            C4Warn("No listener to receive error from CBLReplicator %p: %s",
+                   this, c4error_getDescriptionC(status.error, buf, sizeof(buf)));
         }
     }
 
@@ -188,6 +218,7 @@ private:
     Retained<CBLDatabase> const _otherLocalDB;
     std::mutex _mutex;
     c4::ref<C4Replicator> _c4repl;
+    C4ReplicatorStatus _status {kC4Stopped};
     CBLReplicatorChangeListener _listener {nullptr};
     void* _listenerContext {nullptr};
     bool _resetCheckpoint {false};

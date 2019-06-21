@@ -35,11 +35,12 @@ namespace cbl_internal {
     static inline C4Error* internal(CBLError *error)             {return (C4Error*)error;}
     static inline const C4Error* internal(const CBLError *error) {return (const C4Error*)error;}
     static inline const CBLError* external(const C4Error *error) {return (const CBLError*)error;}
+    static inline const CBLError& external(const C4Error &error) {return (const CBLError&)error;}
 
     template <typename T>
     T* validated(T *obj, CBLError *outError) {
         if (obj->validate(outError))
-            return obj;
+            return retain(obj);
         delete obj;
         return nullptr;
     }
