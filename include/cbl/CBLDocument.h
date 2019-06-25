@@ -191,25 +191,25 @@ bool CBLDocument_SetPropertiesAsJSON(CBLDocument* _cbl_nonnull,
     @param db  The database.
     @param docID  The ID of the document.
     @param error  On failure, an error is written here.
-    @return  The expiration as a standard timestamp (seconds since Unix epoch),
+    @return  The expiration time as a CBLTimestamp (milliseconds since Unix epoch),
              or 0 if the document does not have an expiration,
              or -1 if the call failed. */
-time_t CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
-                                         const char *docID _cbl_nonnull,
-                                         CBLError* error) CBLAPI;
+CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+                                               const char *docID _cbl_nonnull,
+                                               CBLError* error) CBLAPI;
 
 /** Sets or clears the expiration time of a document.
     @note  The purging of expired documents is not yet automatic; you will need to call
             \ref CBLDatabase_PurgeExpiredDocuments when the time comes, to make it happen.
     @param db  The database.
     @param docID  The ID of the document.
-    @param expiration  The expiration time as a standard timestamp (seconds since Unix epoch),
+    @param expiration  The expiration time as a CBLTimestamp (milliseconds since Unix epoch),
                         or 0 if the document should never expire.
     @param error  On failure, an error is written here.
     @return  True on success, false on failure. */
 bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
                                        const char *docID _cbl_nonnull,
-                                       time_t expiration,
+                                       CBLTimestamp expiration,
                                        CBLError* error) CBLAPI;
 
 /** @} */

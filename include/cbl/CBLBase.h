@@ -149,6 +149,21 @@ void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format _cbl_nonnull, ...) CB
 
 
 
+/** \defgroup types   Other Types
+     @{ */
+
+/** A date/time representation used for document expiration (and in date/time queries.)
+    Measured in milliseconds since the Unix epoch (1/1/1970, midnight UTC.) */
+typedef int64_t CBLTimestamp;
+
+
+/** Returns the current time, in milliseconds since 1/1/1970. */
+CBLTimestamp CBL_now(void) CBLAPI;
+
+/** @} */
+
+
+
 /** \defgroup refcounting   Reference Counting
      @{
     Couchbase Lite "objects" are reference-counted; the functions below are the shared

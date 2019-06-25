@@ -128,7 +128,7 @@ bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
     return c4db_delete(internal(db), internal(outError));
 }
 
-time_t CBLDatabase_NextDocExpiration(CBLDatabase* db) CBLAPI {
+CBLTimestamp CBLDatabase_NextDocExpiration(CBLDatabase* db) CBLAPI {
     return c4db_nextDocExpiration(internal(db));
 }
 

@@ -18,7 +18,6 @@
 
 #pragma once
 #include "CBLBase.h"
-#include "time.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -148,7 +147,7 @@ bool CBLDatabase_EndBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** Returns the nearest future time at which a document in this database will expire,
     or 0 if no documents will expire. */
-time_t CBLDatabase_NextDocExpiration(CBLDatabase* _cbl_nonnull) CBLAPI;
+CBLTimestamp CBLDatabase_NextDocExpiration(CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Purges all documents whose expiration time has passed.
     @param db  The database to purge
