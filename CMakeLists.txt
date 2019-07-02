@@ -120,10 +120,11 @@ set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
                             FleeceStatic
                            ${NO_WHOLE_LIBRARY_FLAG}
                             LiteCoreStatic
+                            LiteCoreWebSocket
                             Support
                             SQLite3_UnicodeSN
                             BLIPStatic
-                            CivetWeb
+                            websockets
                             mbedcrypto)
 
 target_link_libraries(CouchbaseLiteC PRIVATE ${CBL_LIBRARIES_PRIVATE})
