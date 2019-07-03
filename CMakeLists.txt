@@ -18,6 +18,11 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 option(BUILD_ENTERPRISE "Set whether or not to build enterprise edition" OFF)
 
+if(CMAKE_COMPILER_IS_GNUCC)
+    # Suppress an annoying note about GCC 7 ABI changes
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
+endif()
+
 if(BUILD_ENTERPRISE)
     add_definitions(-DCOUCHBASE_ENTERPRISE)         # Tells CBL it's an EE build
 endif()
@@ -126,6 +131,12 @@ set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
                             BLIPStatic
                             websockets
                             mbedcrypto)
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
+    # C/C++ atomic operations on ARM6/7 emit calls to functions in libatomic
+    set(CBL_LIBRARIES_PRIVATE ${CBL_LIBRARIES_PRIVATE} 
+                              atomic)
+endif()
 
 target_link_libraries(CouchbaseLiteC PRIVATE ${CBL_LIBRARIES_PRIVATE})
 
