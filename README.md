@@ -2,7 +2,7 @@
 
 This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syncable database, with a plain C API. The API can be used directly, or as the substrate for binding to other languages like Python, JavaScript or Rust.
 
-**As of May 2019, this project is roughly at alpha status.** The API is nearly complete and most of the functionality is implemented, but there are missing pieces and there's been little testing yet.
+**As of July 2019, this project is approaching beta status.** The API is nearly complete and most of the functionality is implemented, but there are missing pieces and only limited testing.
 
 ## Goals
 
@@ -26,15 +26,16 @@ This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syn
       - [x] Transfers document deltas for minimal bandwidth
       - [ ] Replicator event listeners
       - [ ] Replicator online/offline support and retry behavior
-      - [ ] Replicator TLS/SSL support
+      - [ ] Replicator TLS/SSL support _(in progress)_
       - [ ] Peer-to-peer replication
-- [x] Minimal platform dependencies: C++ standard library, filesystem, TCP/IP, TLS
+- [x] Minimal platform dependencies: C++ standard library, filesystem, TCP/IP
 - [ ] Broad OS support
   - [x] macOS, for ease of development
   - [x] Common Linux distros, esp. Ubuntu, Fedora, Raspbian (q.v.)
   - [x] Windows
-  - [ ] iOS, Android (although we already have [those][IOS] [covered][ANDROID])
-- [ ] Runs on Raspberry-Pi-level embedded platforms with…
+  - [x] iOS
+  - [ ] Android (but we have a [Couchbase Lite For Android][ANDROID] already, with a Java API)
+- [x] Runs on Raspberry-Pi-level embedded platforms with…
   - 32-bit or 64-bit CPU
   - ARM or x86
   - Hundreds of MB RAM, hundreds of MHz CPU, tens of MB storage
@@ -114,9 +115,12 @@ greeting = readProps["greeting"]
 
 ## Building It
 
-### With CMake on Unix
+### With CMake on Unix (now including Raspberry Pi!)
 
-Before building, please see the Couchbase Lite Core document [Build And Deploy On Linux][BUILD_LINUX] and install the dependencies, including CMake, clang and libc++.
+Dependencies: 
+* GCC 7+ or Clang
+* CMake 3.9+
+* ICU libraries (`apt-get install icu-dev`)
 
 1. Clone the repo
 2. Check out submodules (recursively)
