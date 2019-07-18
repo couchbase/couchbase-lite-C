@@ -53,7 +53,7 @@ class Query (CBLObject):
         return self._columns
 
     def setParameters(self, params):
-        jsonStr = json.dumps(params)
+        jsonStr = encodeJSON(params)
         lib.CBLQuery_SetParametersAsJSON(self._ref, cstr(jsonStr))
 
     def execute(self):
@@ -86,7 +86,7 @@ class Query (CBLObject):
 class JSONQuery (Query):
     def __init__(self, database, jsonQuery):
         if not isinstance(jsonQuery, str):
-            jsonQuery = json.dumps(jsonQuery)
+            jsonQuery = encodeJSON(jsonQuery)
         Query.__init__(self, database, jsonQuery, JSONLanguage)
 
 
@@ -106,7 +106,7 @@ class QueryResult (object):
     def __repr__(self):
         if self._ref == None:
             return "QueryResult[invalidated]"
-        return "QueryResult" + json.dumps(self.asDictionary())
+        return "QueryResult" + encodeJSON(self.asDictionary())
 
     def invalidate(self):
         self._ref = None

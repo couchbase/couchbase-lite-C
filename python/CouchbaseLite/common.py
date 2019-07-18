@@ -29,6 +29,18 @@ def sliceToString(s):
         return None
     return str(ffi.string(ffi.cast("const char*", s.buf), s.size), "utf-8")
 
+def sliceResultToBytes(sr):
+    if sr.buf == None:
+        return None
+    return bytes( ffi.buffer(s.buf, s.size) )
+
+def asSlice(data):
+    buffer = ffi.from_buffer(data)
+    s = ffi.new("Slice")
+    s.buf = buffer
+    s.size = len(buffer)
+    return s
+
 
 # A global CBLError object to use in API calls, so each call doesn't have to
 # allocate a new one. (This is fine as long as we're single-threaded.)
@@ -55,6 +67,7 @@ class CBLObject (object):
     def __del__(self):
         if lib != None and "_ref" in self.__dict__ and self._ref != None:
             lib.CBL_Release(self._ref)
+
 
 class ListenerToken (object):
     def __init__(self, owner, handle, c_token):

@@ -2,21 +2,38 @@ from ._PyCBL import ffi, lib
 from .common import *
 
 class Blob (object):
-    def __init__(self, data =None, *, db =None, dict =None):
-        if dict != None:
-            self._db = db
-            self._dict = dict
-            self.contentType = dict.get("content_type")
-            self.digest = dict.get("digest")
-            self.length =  dict.get("length")
+    def __init__(self, data, *, contentType =None, fdict =None):
+        if fdict != None:
+            super.__init__(lib.CBLBlob_Get(fdict), "Dict is not a Blob")
         else:
-            self._dict = {}
-            self.contentType = None
-            self.digest = None
-            self.length = 0
-        if data != None:
-            self._data = data
+            super.__init__(lib.CBLBlob_CreateWithData(contentType, asSlice(data)),
+                           "Failed to create Blob")
+
+    @property
+    def digest(self):
+        return pystr(lib.CBLBlob_Digest(self._ref))
+
+    @property
+    def length(self):
+        return lib.CBLBlob_Length(self._ref)
+
+    @property
+    def contentType(self):
+        return pystr(lib.CBLBlob_ContentType(self._ref))
     
+    @property
+    def data(self):
+        if "_data" in self.__dict__:
+            return self._data
+        elif self.digest != None:
+            sliceResult = lib.CBLBlob_LoadContent(self._ref, gError)
+            # OPT: This copies the bytes
+            result = sliceResultToBytes(sliceResult)
+            lib.FLSliceResult_Release(sliceResult)
+            return result
+        else:
+            return None
+
     def __repr__(self):
         r = "Blob["
         if self.contentType != None:
@@ -26,12 +43,6 @@ class Blob (object):
                 r += ", "
                 r += self.length + " bytes"
         return r + "]"
-    
-    @property
-    def data(self):
-        if "_data" in self.__dict__:
-            return self._data
-        if self.digest != None:
-            lib.cbl_blob
-    
-    def _asDict(self):
+
+    def _jsonEncodable(self):
+        return decodeFleeceDict( lib.CBLBlob_Properties(_ref), depth=99 )

@@ -35,7 +35,7 @@ assert(db.name == "db")
 assert(db.path == "/tmp/db.cblite2/")
 assert(db.count == 0)
 
-def dbListener(db, docIDs):
+def dbListener(docIDs):
     print ("######## DB changed!", docIDs)
 dbListenerToken = db.addListener(dbListener)
 

@@ -18,23 +18,53 @@
 #
 
 
-# Run this to build the PyCBL native glue library
-# See https://cffi.readthedocs.io/en/latest/index.html
+# Run this to build the PyCBL native glue library, in the current directory
+# (Argument handling is at the end of the script)
 
-from cffi import FFI
-import shutil
 import argparse
 import os.path
+from cffi import FFI
 
 
-# Mac settings are defaults, but overrideable on command-line
-MAC_NAME = "couchbase_lite" # cmake uses "CouchBaseLiteC' instead
-MAC_DIR = "../../build/CBL_C/Build/Products/Debug/"
-MAC_LINK_FLAGS = "-rpath @loader_path"
+# Paths relative to the source root (--srcdir)
+CBL_INCLUDE_DIR    = "/include"
+FLEECE_INCLUDE_DIR = "/vendor/couchbase-lite-core/vendor/fleece/API"
 
-CDEF = """
+# Mac+Xcode settings are defaults, but overrideable on command-line
+DEFAULT_LIBRARIES = "CouchbaseLiteC-static LiteCore-static LiteCoreWebSocket z"
+DEFAULT_LIBRARY_DIR  = "../../build/CBL_C/Build/Products/Debug/"
+
+def BuildLibrary(sourceDir, libdir, libraries, extra_link_args):
+    # python 3.5 distutils breaks on Linux with absolute library path,
+    # so make sure it is relative path
+    libdir = os.path.relpath(libdir)
+
+    # CFFI stuff -- see https://cffi.readthedocs.io/en/latest/index.html
+
+    # This is passed to the real C compiler and should include the declarations of
+    # the symbols declared in cdef()
+    cHeaderSource = r"""#include <cbl/CouchbaseLite.h>"""
+
+    ffibuilder = FFI()
+    ffibuilder.cdef(CDeclarations())
+    ffibuilder.set_source(
+        "_PyCBL",       # Module name
+        cHeaderSource,
+        libraries=libraries,
+        include_dirs=[sourceDir+CBL_INCLUDE_DIR, sourceDir+FLEECE_INCLUDE_DIR],
+        library_dirs=[libdir],
+        extra_link_args=extra_link_args)
+    ffibuilder.compile(verbose=True)
+
+    os.remove("_PyCBL.c")
+    os.remove("_PyCBL.o")
+
+
+def CDeclarations():
+    return r"""
 // Declarations that are shared between Python and C
-// Careful, this supports only a subset of C syntax
+// (Careful, this supports only a subset of C syntax)
+// Needs to be updated whenever public C API changes!
 
 void free(void *);
 typedef long time_t;
@@ -122,6 +152,7 @@ typedef ... CBLRefCounted;
 CBLRefCounted* CBL_Retain(void*);
 void CBL_Release(void*);
 
+typedef ... CBLBlob;
 typedef ... CBLDatabase;
 typedef ... CBLDocument;
 typedef ... CBLQuery;
@@ -142,6 +173,31 @@ typedef struct {
 } CBLDatabaseConfiguration;
 
 void CBLListener_Remove(CBLListenerToken*);
+
+//////// CBLBlob.h
+bool CBL_IsBlob(FLDict);
+const CBLBlob* CBLBlob_Get(FLDict blobDict);
+uint64_t CBLBlob_Length(const CBLBlob*);
+const char* CBLBlob_Digest(const CBLBlob*);
+const char* CBLBlob_ContentType(const CBLBlob*);
+FLDict CBLBlob_Properties(const CBLBlob*);
+FLSliceResult CBLBlob_LoadContent(const CBLBlob*, CBLError *outError);
+
+typedef ... CBLBlobReadStream;
+CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob*, CBLError *outError);
+int CBLBlobReader_Read(CBLBlobReadStream* stream, void *dst, size_t maxLength, CBLError *outError);
+void CBLBlobReader_Close(CBLBlobReadStream*);
+
+CBLBlob* CBLBlob_CreateWithData(const char *contentType, FLSlice contents);
+
+typedef ... CBLBlobWriteStream;
+CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError);
+void CBLBlobWriter_Close(CBLBlobWriteStream*);
+bool CBLBlobWriter_Write(CBLBlobWriteStream* writer, const void *data, size_t length, CBLError *outError);
+CBLBlob* CBLBlob_CreateWithStream(const char *contentType, CBLBlobWriteStream* writer);
+
+void FLMutableArray_SetBlob(FLMutableArray array, uint32_t index, CBLBlob* blob);
+void FLMutableDict_SetBlob(FLMutableDict dict, FLString key, CBLBlob* blob);
 
 //////// CBLDatabase.h
 bool CBL_DatabaseExists(const char* name, const char *inDirectory);
@@ -252,26 +308,21 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query,
                                         void *context);
 """
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="build python bindings")
-    parser.add_argument('-n', '--name', default=MAC_NAME, help="Library name")
-    parser.add_argument('-d', '--dir', default=MAC_DIR, help="Directory containing shared library file")
-    parser.add_argument('-l', '--link_flags', default=MAC_LINK_FLAGS, help="Linker flags")
+    parser = argparse.ArgumentParser(description="build Couchbase Lite Python bindings")
+    parser.add_argument('--srcdir',
+                        help="Source root directory")
+    parser.add_argument('--libdir', default=DEFAULT_LIBRARY_DIR,
+                        help="Directory containing CBL libraries")
+    parser.add_argument('--libs', default=DEFAULT_LIBRARIES,
+                        help="Library names")
+    parser.add_argument('--link_flags',
+                        help="Linker flags")
     args = parser.parse_args()
 
-    ffibuilder = FFI()
-    extra_link_args = args.link_flags.split()
-    # python 3.5 distutils breaks on Linux with absolute library path,
-    # so make sure it is relative path
-    libdir = os.path.relpath(args.dir)
-    ffibuilder.cdef(CDEF)
-    ffibuilder.set_source("_PyCBL", r""" // passed to the real C compiler,
-        // contains implementation of things declared in cdef()
-        #include <cbl/CouchbaseLite.h>
-    """,
-    libraries=[args.name],
-    include_dirs=["../../include", "../../vendor/couchbase-lite-core/vendor/fleece/API"],
-    library_dirs=[libdir],
-    extra_link_args=extra_link_args)
+    linkFlags = None
+    if args.link_flags != None:
+        linkFlags = args.link_flags.split()
 
-    ffibuilder.compile(verbose=True)
+    BuildLibrary(args.srcdir, args.libdir, args.libs.split(), linkFlags)
