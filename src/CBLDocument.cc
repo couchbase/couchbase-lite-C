@@ -20,6 +20,7 @@
 #include "CBLPrivate.h"
 #include "CBLDocument_Internal.hh"
 #include "CBLBlob_Internal.hh"
+#include "c4Private.h"
 #include "Util.hh"
 #include <mutex>
 
@@ -123,10 +124,14 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
     // Encode properties:
     alloc_slice body;
     if (!deleting) {
-        Encoder enc(c4db_getSharedFleeceEncoder(internal(db)));
+        SharedEncoder enc(c4db_getSharedFleeceEncoder(internal(db)));
         enc.writeValue(properties());
-        body = enc.finish();
-        enc.detach();
+        FLError flErr;
+        body = enc.finish(&flErr);
+        if (!body) {
+            c4error_return(FleeceDomain, flErr, nullslice, outError);
+            return nullptr;
+        }
     }
 
     // Save:

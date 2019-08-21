@@ -240,3 +240,22 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Add new key") {
     doc = db.getMutableDocument("foo");
     CHECK(doc["new"].asInt() == 10);
 }
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "Data disappears") {
+    // Regression test for <https://github.com/couchbaselabs/couchbase-lite-C/issues/19>
+    MutableDocument doc = MutableDocument("foo");
+    doc["var1"]= 1;
+    Document saved = db.saveDocument(doc);
+    CHECK(saved.properties().toJSONString() == "{\"var1\":1}");
+
+    doc = db.getMutableDocument("foo");
+    doc["var2"]= 2;
+    saved = db.saveDocument(doc);
+    CHECK(saved.properties().toJSONString() == "{\"var1\":1,\"var2\":2}");
+
+    doc = db.getMutableDocument("foo");
+    doc["var3"]= 3;
+    saved = db.saveDocument(doc);
+    CHECK(saved.properties().toJSONString() == "{\"var1\":1,\"var2\":2,\"var3\":3}");
+}
