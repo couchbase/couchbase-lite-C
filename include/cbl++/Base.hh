@@ -68,6 +68,8 @@ namespace cbl {
         }
 
         CBLRefCounted* _ref;
+
+        friend class Batch;
     };
 
 // Internal use only: Copy/move ctors and assignment ops that have to be declared in subclasses

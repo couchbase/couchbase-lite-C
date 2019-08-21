@@ -178,4 +178,45 @@ namespace cbl {
         CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)
     };
 
+
+    /** A helper object used to begin and end batch operations on a Database.
+        Multiple writes in a batch are more efficient than if done separately.
+        A Batch object should be declared as a local (auto) variable; the batch will end
+        when the object goes out of scope. */
+    class Batch {
+    public:
+        /** Begins a batch operation on the database that will end when the Batch instance
+            goes out of scope. */
+        explicit Batch(Database db) {
+            CBLError error;
+            RefCounted::check(CBLDatabase_BeginBatch(db.ref(), &error), error);
+            _db = db;
+        }
+
+        /** Ends a batch immediately. The Batch object's destructor will then do nothing. */
+        void end() {
+            Database db = std::move(_db);  // clears _db
+            if (db) {
+                CBLError error;
+                if (!CBLDatabase_EndBatch(db.ref(), &error)) {
+                    // If an exception is thrown while a Batch is in scope, its destructor will
+                    // call end(). If I'm in this situation I cannot throw another exception or
+                    // the C++ runtime will abort the process. Detect this and just warn instead.
+                    if (std::current_exception())
+                        CBL_Log(kCBLLogDomainDatabase, CBLLogWarning,
+                                "Batch::end failed, while handling an exception");
+                    else
+                        RefCounted::check(false, error);
+                }
+            }
+        }
+
+        ~Batch() {
+            end();
+        }
+
+    private:
+        Database _db;
+    };
+
 }

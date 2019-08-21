@@ -19,8 +19,24 @@
 #pragma once
 #include "CouchbaseLite.h"
 #include "CouchbaseLite.hh"
-#include "catch.hpp"
+#include <iostream>
 #include <string>
+
+// Has to be declared before including catch.hpp, so Catch macros can use it
+namespace fleece {
+    static inline std::ostream& operator << (std::ostream &out, slice s) {
+        if (s) {
+            out << "slice(\"";
+            out.write((const char*)s.buf, s.size);
+            out << "\")";
+        } else {
+            out << "nullslice";
+        }
+        return out;
+    }
+}
+
+#include "catch.hpp"
 
 
 class CBLTest {

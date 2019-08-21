@@ -84,6 +84,53 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
 }
 
 
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch") {
+    Batch b(db);
+
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    Document newDoc = db.saveDocument(doc);
+    doc = newDoc.mutableCopy();
+    doc["meeting"] = 23;
+    db.saveDocument(doc);
+
+    b.end();
+
+    Document checkDoc = db.getDocument("foo");
+    REQUIRE(checkDoc);
+    CHECK(checkDoc.properties().get("greeting").asString() == "Howdy!"_sl);
+    CHECK(checkDoc.properties().get("meeting").asInt() == 23);
+}
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch With Exception") {
+    bool threw = false;
+    try {
+        Batch b(db);
+
+        MutableDocument doc("foo");
+        doc["greeting"] = "Howdy!";
+        Document newDoc = db.saveDocument(doc);
+
+        if (sqrt(2) > 1.0)
+            throw runtime_error("intentional");
+
+        doc = newDoc.mutableCopy();
+        doc["meeting"] = 23;
+        db.saveDocument(doc);
+
+    } catch (runtime_error &x) {
+        threw = true;
+        CHECK(string(x.what()) == "intentional");
+    }
+    CHECK(threw);
+
+    Document doc = db.getDocument("foo");
+    CHECK(doc["greeting"].asString() == "Howdy!"_sl);
+    CHECK(doc["meeting"] == nullptr);
+}
+
+
 static void createDocument(Database db, const char *docID,
                            const char *property, const char *value)
 {
