@@ -217,3 +217,26 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
     CHECK(fooListenerCalls == 1);
     CHECK(barListenerCalls == 1);
 }
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "Add new key") {
+    // Regression test for <https://github.com/couchbaselabs/couchbase-lite-C/issues/18>
+    // Add doc to db:
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+
+    // Get existing doc:
+    doc = db.getMutableDocument("foo");
+    // Add a new, shareable key:
+    doc.set("new", 10);
+    db.saveDocument(doc);
+
+    CHECK(doc["new"].asInt() == 10);
+    doc["new"] = 999;
+    CHECK(doc["new"].asInt() == 999);
+    CHECK(doc.properties().count() == 2);
+
+    doc = db.getMutableDocument("foo");
+    CHECK(doc["new"].asInt() == 10);
+}
