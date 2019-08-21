@@ -60,7 +60,8 @@ namespace cbl {
                                    const char *inDirectory)
         {
             CBLError error;
-            check( CBL_DeleteDatabase(name, inDirectory, &error), error);
+            if (!CBL_DeleteDatabase(name, inDirectory, &error) && error.code != 0)
+                check(false, error);
         }
 
         // Lifecycle:
