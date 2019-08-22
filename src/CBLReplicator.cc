@@ -32,8 +32,9 @@ using namespace fleece;
 using namespace cbl_internal;
 
 
-extern void RegisterC4LWSWebSocketFactory();    // Defined in libLiteCoreWebSocket
-
+extern "C" {
+    void C4RegisterXWebSocket();
+}
 
 static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
     return {
@@ -64,8 +65,8 @@ public:
             return;
 
         // One-time initialization of network transport:
-        once_flag once;
-        call_once(once, std::bind(&RegisterC4LWSWebSocketFactory));
+        static once_flag once;
+        call_once(once, std::bind(&C4RegisterXWebSocket));
 
         // Set up the LiteCore replicator parameters:
         C4ReplicatorParameters params = { };

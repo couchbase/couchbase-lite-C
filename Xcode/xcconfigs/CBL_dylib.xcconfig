@@ -8,5 +8,7 @@
 
 #include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib.xcconfig"
 
+OTHER_LDFLAGS           = -lmbedtls -lmbedcrypto -lmbedx509
+
 PRODUCT_NAME            = CouchbaseLiteC
 EXPORTED_SYMBOLS_FILE   = src/CBL.exp
