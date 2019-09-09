@@ -259,3 +259,31 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Data disappears") {
     saved = db.saveDocument(doc);
     CHECK(saved.properties().toJSONString() == "{\"var1\":1,\"var2\":2,\"var3\":3}");
 }
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Conflict") {
+    MutableDocument doc("foo");
+    doc["n"] = 10;
+    REQUIRE(db.saveDocument(doc));
+
+    MutableDocument shadowDoc = db.getMutableDocument("foo");
+    shadowDoc["n"] = 7;
+    REQUIRE(db.saveDocument(shadowDoc));
+
+    doc["n"] = 11;
+    REQUIRE(!db.saveDocument(doc, kCBLConcurrencyControlFailOnConflict));
+    REQUIRE(db.saveDocument(doc, kCBLConcurrencyControlLastWriteWins));
+
+    shadowDoc["n"] = 8;
+    Document result = db.saveDocument(shadowDoc, [&](MutableDocument myDoc,
+                                                            Document otherDoc) {
+        CHECK(myDoc["n"].asInt() == 8);
+        CHECK(otherDoc["n"].asInt() == 11);
+        myDoc["n"] = 19;
+        return true;
+    });
+    CHECK(result);
+    CHECK(result["n"].asInt() == 19);
+}
+
+

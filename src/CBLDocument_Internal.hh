@@ -69,13 +69,21 @@ public:
     char* propertiesAsJSON() const;
     bool setPropertiesAsJSON(const char *json, C4Error* outError);
 
+    struct SaveOptions {
+        SaveOptions(CBLConcurrencyControl c)             :concurrency(c) { }
+        SaveOptions(CBLSaveConflictHandler h, void *ctx) :conflictHandler(h), context(ctx) { }
+
+        CBLConcurrencyControl concurrency;
+        CBLSaveConflictHandler conflictHandler = nullptr;
+        void *context;
+        bool deleting = false;
+    };
+
     RetainedConst<CBLDocument> save(CBLDatabase* db _cbl_nonnull,
-                                    bool deleting,
-                                    CBLConcurrencyControl concurrency,
+                                    const SaveOptions&,
                                     C4Error* outError);
 
-    bool deleteDoc(CBLConcurrencyControl concurrency,
-                   C4Error* outError);
+    bool deleteDoc(CBLConcurrencyControl, C4Error* outError);
 
     static bool deleteDoc(CBLDatabase* db _cbl_nonnull,
                           const char* docID _cbl_nonnull,
@@ -97,7 +105,8 @@ private:
 
     static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
     bool saveBlobs(CBLDatabase *db, C4Error *outError);
-
+    alloc_slice encodeBody(CBLDatabase* db _cbl_nonnull, C4Error *outError);
+    
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
     using UnretainedValueToBlobMap = std::unordered_map<FLDict, CBLNewBlob*>;
 
