@@ -81,8 +81,35 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorType) {
 /** A callback that can decide whether a particular document should be pushed or pulled.
     @warning  This callback will be called on a background thread managed by the replicator.
                 It must pay attention to thread-safety. It should not take a long time to return,
-                or it will slow down the replicator. */
+                or it will slow down the replicator.
+    @param context  The `context` field of the \ref CBLReplicatorConfiguration.
+    @param document  The document in question.
+    @param isDeleted True if the document has been deleted.
+    @return  True if the document should be replicated, false to skip it. */
 typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool isDeleted);
+
+/** Conflict-resolution callback for use in replications. This callback will be invoked
+    when the replicator finds a newer server-side revision of a document that also has local
+    changes. The local and remote changes must be resolved before the document can be pushed
+    to the server.
+    @warning  This callback will be called on a background thread managed by the replicator.
+                It must pay attention to thread-safety. However, unlike a filter callback,
+                it does not need to return quickly. If it needs to prompt for user input,
+                that's OK.
+    @param context  The `context` field of the \ref CBLReplicatorConfiguration.
+    @param documentID  The ID of the conflicted document.
+    @param localDocument  The current revision of the document in the local database,
+                or NULL if the local document has been deleted.
+    @param remoteDocument  The revision of the document found on the server,
+                or NULL if the document has been deleted on the server.
+    @return  The resolved document to save locally (and push, if the replicator is pushing.)
+        This can be the same as \ref localDocument or \ref remoteDocument, or you can create
+        a mutable copy of either one and modify it appropriately.
+        Or return NULL if the resolution is to delete the document. */
+typedef CBLDocument* (*CBLConflictResolver)(void *context,
+                                            const char *documentID,
+                                            CBLDocument *localDocument,
+                                            CBLDocument *remoteDocument);
 
 
 /** The configuration of a replicator. */
@@ -98,7 +125,8 @@ typedef struct {
     FLArray documentIDs;                ///< Optional set of document IDs to replicate
     CBLReplicationFilter pushFilter;    ///< Optional callback to filter which docs are pushed
     CBLReplicationFilter pullFilter;    ///< Optional callback to validate incoming docs
-    void* filterContext;                ///< Arbitrary value passed to filter callbacks
+    CBLConflictResolver conflictResolver;///< Optional conflict-resolver callback
+    void* context;                      ///< Arbitrary value that will be passed to callbacks
 } CBLReplicatorConfiguration;
 
 /** @} */
