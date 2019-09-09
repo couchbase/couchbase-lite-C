@@ -33,7 +33,7 @@ using namespace cbl_internal;
 
 
 extern "C" {
-    void C4RegisterXWebSocket();
+    void C4RegisterBuiltInWebSocket();
 }
 
 static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
@@ -66,7 +66,7 @@ public:
 
         // One-time initialization of network transport:
         static once_flag once;
-        call_once(once, std::bind(&C4RegisterXWebSocket));
+        call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
 
         // Set up the LiteCore replicator parameters:
         C4ReplicatorParameters params = { };
