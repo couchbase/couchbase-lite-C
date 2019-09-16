@@ -99,7 +99,8 @@ public:
             };
         }
 
-        alloc_slice properties;
+        // Encode replicator options dict:
+        alloc_slice options;
         {
             Encoder enc;
             enc.beginDict();
@@ -109,20 +110,16 @@ public:
                 _resetCheckpoint = false;
             }
             enc.endDict();
-            properties = enc.finish();
+            options = enc.finish();
         }
-        params.optionsDictFleece = properties;
-
-        C4Database *otherLocalDB = nullptr;
-        if (_conf.endpoint->otherLocalDB())
-            otherLocalDB = internal(_conf.endpoint->otherLocalDB());
+        params.optionsDictFleece = options;
 
         // Create/start the LiteCore replicator:
         C4Error c4error;
         _c4repl = c4repl_new(internal(_conf.database),
                              _conf.endpoint->remoteAddress(),
                              _conf.endpoint->remoteDatabaseName(),
-                             otherLocalDB,
+                             _conf.endpoint->otherLocalDB(),
                              params,
                              &c4error);
         if (!_c4repl) {
@@ -216,7 +213,6 @@ private:
 
 
     ReplicatorConfiguration const _conf;
-    Retained<CBLDatabase> const _otherLocalDB;
     std::mutex _mutex;
     c4::ref<C4Replicator> _c4repl;
     C4ReplicatorStatus _status {kC4Stopped};
@@ -233,6 +229,12 @@ private:
 CBLEndpoint* CBLEndpoint_NewWithURL(const char *url _cbl_nonnull) CBLAPI {
     return new CBLURLEndpoint(url);
 }
+
+#ifdef COUCHBASE_ENTERPRISE
+CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase* db) CBLAPI {
+    return new CBLLocalEndpoint(db);
+}
+#endif
 
 void CBLEndpoint_Free(CBLEndpoint *endpoint) CBLAPI {
     delete endpoint;

@@ -19,6 +19,7 @@
 #pragma once
 
 #include "CBLReplicator.h"
+#include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
 #include "c4.hh"
 #include "c4Replicator.h"
@@ -38,8 +39,8 @@ struct CBLEndpoint {
     virtual ~CBLEndpoint()                                      { }
     virtual bool valid() const =0;
     const C4Address& remoteAddress() const                      {return _address;}
-    virtual C4String remoteDatabaseName() const =0;
-    virtual CBLDatabase* otherLocalDB() const =0;
+    virtual C4String remoteDatabaseName() const                 {return nullslice;}
+    virtual C4Database* otherLocalDB() const                    {return nullptr;}
 
 protected:
     C4Address _address = { };
@@ -58,11 +59,26 @@ namespace cbl_internal {
 
         bool valid() const override                             {return _dbName != nullslice;}
         C4String remoteDatabaseName() const override            {return _dbName;}
-        virtual CBLDatabase* otherLocalDB() const override      {return nullptr;}
 
+    private:
         alloc_slice _url;
         C4String _dbName = { };
     };
+
+#ifdef COUCHBASE_ENTERPRISE
+    // Concrete Endpoint for local databases
+    struct CBLLocalEndpoint : public CBLEndpoint {
+        CBLLocalEndpoint(CBLDatabase *db _cbl_nonnull)
+        :_db(db)
+        { }
+
+        bool valid() const override                             {return true;}
+        virtual C4Database* otherLocalDB() const override       {return internal(_db);}
+
+    private:
+        Retained<CBLDatabase> _db;
+    };
+#endif
 }
 
 
@@ -114,6 +130,7 @@ namespace cbl_internal {
     };
 }
 
+
 #pragma mark - CONFIGURATION:
 
 
@@ -133,6 +150,7 @@ namespace cbl_internal {
             FLDict_Release(headers);
             FLArray_Release(channels);
             FLArray_Release(documentIDs);
+            delete endpoint;
         }
 
         bool validate(CBLError *outError) const {
