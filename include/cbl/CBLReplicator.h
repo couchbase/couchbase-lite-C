@@ -81,8 +81,35 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorType) {
 /** A callback that can decide whether a particular document should be pushed or pulled.
     @warning  This callback will be called on a background thread managed by the replicator.
                 It must pay attention to thread-safety. It should not take a long time to return,
-                or it will slow down the replicator. */
+                or it will slow down the replicator.
+    @param context  The `context` field of the \ref CBLReplicatorConfiguration.
+    @param document  The document in question.
+    @param isDeleted True if the document has been deleted.
+    @return  True if the document should be replicated, false to skip it. */
 typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool isDeleted);
+
+/** Conflict-resolution callback for use in replications. This callback will be invoked
+    when the replicator finds a newer server-side revision of a document that also has local
+    changes. The local and remote changes must be resolved before the document can be pushed
+    to the server.
+    @warning  This callback will be called on a background thread managed by the replicator.
+                It must pay attention to thread-safety. However, unlike a filter callback,
+                it does not need to return quickly. If it needs to prompt for user input,
+                that's OK.
+    @param context  The `context` field of the \ref CBLReplicatorConfiguration.
+    @param documentID  The ID of the conflicted document.
+    @param localDocument  The current revision of the document in the local database,
+                or NULL if the local document has been deleted.
+    @param remoteDocument  The revision of the document found on the server,
+                or NULL if the document has been deleted on the server.
+    @return  The resolved document to save locally (and push, if the replicator is pushing.)
+        This can be the same as \ref localDocument or \ref remoteDocument, or you can create
+        a mutable copy of either one and modify it appropriately.
+        Or return NULL if the resolution is to delete the document. */
+typedef CBLDocument* (*CBLConflictResolver)(void *context,
+                                            const char *documentID,
+                                            CBLDocument *localDocument,
+                                            CBLDocument *remoteDocument);
 
 
 /** The configuration of a replicator. */
@@ -98,7 +125,8 @@ typedef struct {
     FLArray documentIDs;                ///< Optional set of document IDs to replicate
     CBLReplicationFilter pushFilter;    ///< Optional callback to filter which docs are pushed
     CBLReplicationFilter pullFilter;    ///< Optional callback to validate incoming docs
-    void* filterContext;                ///< Arbitrary value passed to filter callbacks
+    CBLConflictResolver conflictResolver;///< Optional conflict-resolver callback
+    void* context;                      ///< Arbitrary value that will be passed to callbacks
 } CBLReplicatorConfiguration;
 
 /** @} */
@@ -130,6 +158,20 @@ void CBLReplicator_Start(CBLReplicator* _cbl_nonnull) CBLAPI;
     The replicator will call your \ref CBLReplicatorChangeListener with an activity level of
     \ref kCBLReplicatorStopped after it stops. Until then, consider it still active. */
 void CBLReplicator_Stop(CBLReplicator* _cbl_nonnull) CBLAPI;
+
+/** Informs the replicator whether it's considered possible to reach the remote host with
+    the current network configuration. The default value is true. This only affects the
+    replicator's behavior while it's in the Offline state:
+    * Setting it to false will cancel any pending retry and prevent future automatic retries.
+    * Setting it back to true will initiate an immediate retry.*/
+void CBLReplicator_SetHostReachable(CBLReplicator* _cbl_nonnull, bool reachable) CBLAPI;
+
+/** Puts the replicator in or out of "suspended" state. The default is false.
+    * Setting suspended=true causes the replicator to disconnect and enter Offline state;
+      it will not attempt to reconnect while it's suspended.
+    * Setting suspended=false causes the replicator to attempt to reconnect, _if_ it was
+      connected when suspended, and is still in Offline state. */
+void CBLReplicator_SetSuspended(CBLReplicator* repl, bool suspended) CBLAPI;
 
 /** @} */
 
@@ -179,15 +221,14 @@ typedef void (*CBLReplicatorChangeListener)(void *context,
                                             CBLReplicator *replicator _cbl_nonnull,
                                             const CBLReplicatorStatus *status _cbl_nonnull);
 
-/** Adds a listener that will be called when the replicator's status changes.
-    @warning UNIMPLEMENTED! */
+/** Adds a listener that will be called when the replicator's status changes. */
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* _cbl_nonnull,
                                                   CBLReplicatorChangeListener _cbl_nonnull, 
                                                   void *context) CBLAPI;
 
 
 /** Flags describing a replicated document. */
-typedef CBL_ENUM(unsigned, CBLDocumentFlags) {
+typedef CBL_OPTIONS(unsigned, CBLDocumentFlags) {
     kCBLDocumentFlagsDeleted        = 1 << 0,   ///< The document has been deleted.
     kCBLDocumentFlagsAccessRemoved  = 1 << 1    ///< Lost access to the document on the server.
 };
@@ -215,8 +256,7 @@ typedef void (*CBLReplicatedDocumentListener)(void *context,
                                               unsigned numDocuments,
                                               const CBLReplicatedDocument* documents);
 
-/** Adds a listener that will be called when documents are replicated.
-    @warning UNIMPLEMENTED! */
+/** Adds a listener that will be called when documents are replicated. */
 CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* _cbl_nonnull,
                                                     CBLReplicatedDocumentListener _cbl_nonnull,
                                                     void *context) CBLAPI;

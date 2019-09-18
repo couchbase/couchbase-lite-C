@@ -31,6 +31,10 @@ namespace cbl {
     class MutableDocument;
 
 
+    using SaveConflictHandler = std::function<bool(MutableDocument documentBeingSaved,
+                                                   Document conflictingDocument)>;
+
+
     class Database : private RefCounted {
     public:
         // Static database-file operations:
@@ -109,6 +113,8 @@ namespace cbl {
 
         inline Document saveDocument(MutableDocument &doc,
                                      CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);
+
+        inline Document saveDocument(MutableDocument &doc, SaveConflictHandler conflictandler);
 
         time_t getDocumentExpiration(const char *docID) const {
             CBLError error;

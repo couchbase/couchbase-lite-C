@@ -75,6 +75,15 @@ namespace cbl {
             return doc;
         }
 
+        static Document checkSave(const CBLDocument *savedDoc, CBLError &error) {
+            if (savedDoc)
+                return Document::adopt(savedDoc);
+            else if (error.code == CBLErrorConflict && error.domain == CBLDomain)
+                return nullptr;
+            else
+                throw error;
+        }
+
         friend class Database;
         friend class Replicator;
 
@@ -120,9 +129,21 @@ namespace cbl {
 
     inline Document Database::saveDocument(MutableDocument &doc, CBLConcurrencyControl c) {
         CBLError error;
-        auto saved = CBLDatabase_SaveDocument(ref(), doc.ref(), c, &error);
-        check(saved, error);
-        return Document::adopt(saved);
+        return Document::checkSave(CBLDatabase_SaveDocument(ref(), doc.ref(), c, &error), error);
+    }
+
+
+    inline Document Database::saveDocument(MutableDocument &doc,
+                                           SaveConflictHandler conflictHandler)
+    {
+        CBLSaveConflictHandler cHandler = [](void *context, CBLDocument *myDoc,
+                                             const CBLDocument *otherDoc) -> bool {
+            return (*(SaveConflictHandler*)context)(MutableDocument(myDoc),
+                                                    Document(otherDoc));
+        };
+        CBLError error;
+        return Document::checkSave(CBLDatabase_SaveDocumentResolving(ref(), doc.ref(), cHandler,
+                                                             &conflictHandler, &error), error);
     }
 
 

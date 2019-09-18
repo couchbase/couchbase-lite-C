@@ -41,6 +41,24 @@ typedef CBL_ENUM(uint8_t, CBLConcurrencyControl) {
 };
 
 
+/** Custom conflict handler for use when saving or deleting a document. This handler is called
+    if the save would cause a conflict, i.e. if the document in the database has been updated
+    (probably by a pull replicator, or by application code on another thread)
+    since it was loaded into the CBLDocument being saved.
+    @param context  The value of the \ref context parameter you passed to
+                    \ref CBLDatabase_SaveDocumentCustom.
+    @param documentBeingSaved  The document being saved (same as the parameter you passed to
+                    \ref CBLDatabase_SaveDocumentCustom.) The callback may modify
+                    this document's properties as necessary to resolve the conflict.
+    @param conflictingDocument  The revision of the document currently in the database,
+                    which has been changed since \ref documentBeingSaved was loaded.
+                    May be NULL, meaning that the document has been deleted.
+    @return  True to save the document, false to abort the save. */
+typedef bool (*CBLSaveConflictHandler)(void *context,
+                                       CBLDocument *documentBeingSaved,
+                                       const CBLDocument *conflictingDocument);
+
+
 /** Reads a document from the database, creating a new (immutable) \ref CBLDocument object.
     Each call to this function creates a new object (which must later be released.)
     @note  If you are reading the document in order to make changes to it, call
@@ -55,9 +73,13 @@ const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database _cbl_nonn
 CBL_REFCOUNTED(CBLDocument*, Document);
 
 /** Saves a (mutable) document to the database.
+    If a conflicting revision has been saved since \ref doc was loaded, the \ref concurrency
+    parameter specifies whether the save should fail, or the conflicting revision should
+    be overwritten with the revision being saved.
+    If you need finer-grained control, call \ref CBLDatabase_SaveDocumentResolving instead.
     @param db  The database to save to.
     @param doc  The mutable document to save.
-    @param concurrency  Conflict-handling strategy.
+    @param concurrency  Conflict-handling strategy (fail or overwrite).
     @param error  On failure, the error will be written here.
     @return  An updated document reflecting the saved changes, or NULL on failure. */
 _cbl_warn_unused
@@ -65,6 +87,22 @@ const CBLDocument* CBLDatabase_SaveDocument(CBLDatabase* db _cbl_nonnull,
                                             CBLDocument* doc _cbl_nonnull,
                                             CBLConcurrencyControl concurrency,
                                             CBLError* error) CBLAPI;
+
+/** Saves a (mutable) document to the database. This function is the same as \ref
+    CBLDatabase_SaveDocument, except that it allows for custom conflict handling in the event
+    that the document has been updated since \ref doc was loaded.
+    @param db  The database to save to.
+    @param doc  The mutable document to save.
+    @param conflictHandler  The callback to be invoked if there is a conflict.
+    @param context  An arbitrary value to be passed to the \ref conflictHandler.
+    @param error  On failure, the error will be written here.
+    @return  An updated document reflecting the saved changes, or NULL on failure. */
+_cbl_warn_unused
+const CBLDocument* CBLDatabase_SaveDocumentResolving(CBLDatabase* db _cbl_nonnull,
+                                                     CBLDocument* doc _cbl_nonnull,
+                                                     CBLSaveConflictHandler conflictHandler,
+                                                     void *context,
+                                                     CBLError* error) CBLAPI;
 
 /** Deletes a document from the database. Deletions are replicated.
     @warning  You are still responsible for releasing the CBLDocument.
