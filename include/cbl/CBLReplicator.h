@@ -179,7 +179,6 @@ void CBLReplicator_SetSuspended(CBLReplicator* repl, bool suspended) CBLAPI;
 
 /** \name  Status and Progress
     @{
-    **WARNING::** Replicator listeners/notifications are not yet implemented.
  */
 
 /** The possible states a replicator can be in during its lifecycle. */
@@ -191,9 +190,10 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorActivityLevel) {
     kCBLReplicatorBusy        ///< The replicator is actively transferring data.
 };
 
-/** A fractional progress value. The units are undefined; the only meaningful number is the
-    (fractional) result of `completed` ÷ `total`, which will range from 0.0 to 1.0.
-    Before anything happens, both `completed` and `total` will be 0. */
+/** A fractional progress value, ranging from 0.0 to 1.0 as replication progresses.
+    The value is very approximate and may bounce around during replication; making it more
+    accurate would require slowing down the replicator and incurring more load on the server.
+    It's fine to use in a progress bar, though. */
 typedef struct {
     float fractionComplete;     /// Very-approximate completion, from 0.0 to 1.0
     uint64_t documentCount;     ///< Number of documents transferred so far
