@@ -91,16 +91,8 @@ public:
         }
 
         // Encode replicator options dict:
-        Encoder enc;
-        enc.beginDict();
-        _conf.writeOptions(enc);
-        if (_resetCheckpoint) {
-            enc[slice(kC4ReplicatorResetCheckpoint)] = true;
-            _resetCheckpoint = false;
-        }
-        enc.endDict();
-        _options = enc.finish();
-        params.optionsDictFleece = _options;
+        alloc_slice options = encodeOptions();
+        params.optionsDictFleece = options;
 
         // Create the LiteCore replicator:
         if (_conf.endpoint->otherLocalDB()) {
@@ -133,34 +125,23 @@ public:
     // because CBLReplicator_New will detect a replicator that fails validate() and return NULL.
 
 
-    const ReplicatorConfiguration* configuration() const        {return &_conf;}
+    const ReplicatorConfiguration* configuration() const    {return &_conf;}
+    void setHostReachable(bool reachable)           {c4repl_setHostReachable(_c4repl, reachable);}
+    void setSuspended(bool suspended)               {c4repl_setSuspended(_c4repl, suspended);}
+    void resetCheckpoint()                          {_resetCheckpoint = true;}
+    void stop()                                     {c4repl_stop(_c4repl);}
 
 
     void start() {
         lock_guard<mutex> lock(_mutex);
         _retainSelf = this;     // keep myself from being freed until the replicator stops
         if (_resetCheckpoint) {
-            // FIXME: This doesn't do anything anymore. Need to add C4 API to change options?
+            alloc_slice options = encodeOptions();
+            c4repl_setOptions(_c4repl, options);
             _resetCheckpoint = false;
         }
         c4repl_start(_c4repl);
         _status = c4repl_getStatus(_c4repl);
-    }
-
-
-    void stop() {
-        c4repl_stop(_c4repl);
-    }
-
-
-    void setHostReachable(bool reachable) {
-        c4repl_setHostReachable(_c4repl, reachable);
-    }
-
-
-    void resetCheckpoint() {
-        lock_guard<mutex> lock(_mutex);
-        _resetCheckpoint = true;
     }
 
 
@@ -178,6 +159,17 @@ public:
 
 private:
 
+    alloc_slice encodeOptions() {
+        Encoder enc;
+        enc.beginDict();
+        _conf.writeOptions(enc);
+        if (_resetCheckpoint)
+            enc[slice(kC4ReplicatorResetCheckpoint)] = true;
+        enc.endDict();
+        return enc.finish();
+    }
+
+    
     void _statusChanged(C4Replicator* c4repl, const C4ReplicatorStatus &status) {
         C4Log("StatusChanged: level=%d, err=%d", status.level, status.error.code);
         {
@@ -215,12 +207,11 @@ private:
 
     std::mutex _mutex;
     ReplicatorConfiguration const _conf;
-    alloc_slice _options;
     c4::ref<C4Replicator> _c4repl;
     C4ReplicatorStatus _status {kC4Stopped};
     CBLReplicatorChangeListener _listener {nullptr};
     void* _listenerContext {nullptr};
-    bool _resetCheckpoint {false};
+    std::atomic<bool> _resetCheckpoint {false};
     Retained<CBLReplicator> _retainSelf;
 };
 
@@ -270,3 +261,4 @@ void CBLReplicator_Start(CBLReplicator* repl) CBLAPI            {repl->start();}
 void CBLReplicator_Stop(CBLReplicator* repl) CBLAPI             {repl->stop();}
 void CBLReplicator_ResetCheckpoint(CBLReplicator* repl) CBLAPI  {repl->resetCheckpoint();}
 void CBLReplicator_SetHostReachable(CBLReplicator* repl, bool r) CBLAPI {repl->setHostReachable(r);}
+void CBLReplicator_SetSuspended(CBLReplicator* repl, bool sus) CBLAPI   {repl->setSuspended(sus);}

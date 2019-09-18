@@ -166,6 +166,13 @@ void CBLReplicator_Stop(CBLReplicator* _cbl_nonnull) CBLAPI;
     * Setting it back to true will initiate an immediate retry.*/
 void CBLReplicator_SetHostReachable(CBLReplicator* _cbl_nonnull, bool reachable) CBLAPI;
 
+/** Puts the replicator in or out of "suspended" state. The default is false.
+    * Setting suspended=true causes the replicator to disconnect and enter Offline state;
+      it will not attempt to reconnect while it's suspended.
+    * Setting suspended=false causes the replicator to attempt to reconnect, _if_ it was
+      connected when suspended, and is still in Offline state. */
+void CBLReplicator_SetSuspended(CBLReplicator* repl, bool suspended) CBLAPI;
+
 /** @} */
 
 

@@ -127,6 +127,8 @@ _CBLReplicator_Config
 _CBLReplicator_ResetCheckpoint
 _CBLReplicator_Start
 _CBLReplicator_Stop
+_CBLReplicator_SetHostReachable
+_CBLReplicator_SetSuspended
 _CBLReplicator_Status
 #_CBLReplicator_AddChangeListener
 #_CBLReplicator_AddDocumentListener
