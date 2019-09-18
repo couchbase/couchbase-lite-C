@@ -52,23 +52,14 @@ class CBLReplicator : public CBLRefCounted {
 public:
     CBLReplicator(const CBLReplicatorConfiguration *conf _cbl_nonnull)
     :_conf(*conf)
-    { }
-
-
-    const ReplicatorConfiguration* configuration() const        {return &_conf;}
-    bool validate(CBLError *err) const                          {return _conf.validate(err);}
-
-
-    void start() {
-        unique_lock<mutex> lock(_mutex);
-        if (_c4repl)
-            return;
-
+    {
         // One-time initialization of network transport:
         static once_flag once;
         call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
 
         // Set up the LiteCore replicator parameters:
+        if (!_conf.validate(external(&_status.error)))
+            return;
         C4ReplicatorParameters params = { };
         auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
         if (_conf.replicatorType != kCBLReplicatorTypePull)
@@ -100,53 +91,76 @@ public:
         }
 
         // Encode replicator options dict:
-        alloc_slice options;
-        {
-            Encoder enc;
-            enc.beginDict();
-            _conf.writeOptions(enc);
-            if (_resetCheckpoint) {
-                enc[slice(kC4ReplicatorResetCheckpoint)] = true;
-                _resetCheckpoint = false;
-            }
-            enc.endDict();
-            options = enc.finish();
+        Encoder enc;
+        enc.beginDict();
+        _conf.writeOptions(enc);
+        if (_resetCheckpoint) {
+            enc[slice(kC4ReplicatorResetCheckpoint)] = true;
+            _resetCheckpoint = false;
         }
-        params.optionsDictFleece = options;
+        enc.endDict();
+        _options = enc.finish();
+        params.optionsDictFleece = _options;
 
-        // Create/start the LiteCore replicator:
-        C4Error c4error;
-        _c4repl = c4repl_new(internal(_conf.database),
-                             _conf.endpoint->remoteAddress(),
-                             _conf.endpoint->remoteDatabaseName(),
-                             _conf.endpoint->otherLocalDB(),
-                             params,
-                             &c4error);
+        // Create the LiteCore replicator:
+        if (_conf.endpoint->otherLocalDB()) {
+            _c4repl = c4repl_newLocal(internal(_conf.database),
+                                      _conf.endpoint->otherLocalDB(),
+                                      params,
+                                      &_status.error);
+        } else {
+            _c4repl = c4repl_new(internal(_conf.database),
+                                 _conf.endpoint->remoteAddress(),
+                                 _conf.endpoint->remoteDatabaseName(),
+                                 params,
+                                 &_status.error);
+        }
+        if (_c4repl)
+            _status = c4repl_getStatus(_c4repl);
+    }
+
+
+    bool validate(CBLError *err) const {
         if (!_c4repl) {
-            C4ReplicatorStatus status = {kC4Stopped, {}, c4error};
-            _status = status;
-
-            lock.unlock();
-            _callListener(status);
-            return;
+            if (err) *err = external(_status.error);
+            return false;
         }
+        return true;
+    }
 
+
+    // The rest of the implementation can assume that _c4repl is non-null, and fixed,
+    // because CBLReplicator_New will detect a replicator that fails validate() and return NULL.
+
+
+    const ReplicatorConfiguration* configuration() const        {return &_conf;}
+
+
+    void start() {
+        lock_guard<mutex> lock(_mutex);
+        _retainSelf = this;     // keep myself from being freed until the replicator stops
+        if (_resetCheckpoint) {
+            // FIXME: This doesn't do anything anymore. Need to add C4 API to change options?
+            _resetCheckpoint = false;
+        }
+        c4repl_start(_c4repl);
         _status = c4repl_getStatus(_c4repl);
-        _stopping = false;
-        retain(this);
     }
 
 
     void stop() {
-        lock_guard<mutex> lock(_mutex);
-        _stop();
+        c4repl_stop(_c4repl);
+    }
+
+
+    void setHostReachable(bool reachable) {
+        c4repl_setHostReachable(_c4repl, reachable);
     }
 
 
     void resetCheckpoint() {
         lock_guard<mutex> lock(_mutex);
-        if (!_c4repl)
-            _resetCheckpoint = true;
+        _resetCheckpoint = true;
     }
 
 
@@ -164,21 +178,10 @@ public:
 
 private:
 
-    void _stop() {
-        if (!_c4repl || _stopping)
-            return;
-
-        _stopping = true;
-        c4repl_stop(_c4repl);
-    }
-
-
     void _statusChanged(C4Replicator* c4repl, const C4ReplicatorStatus &status) {
         C4Log("StatusChanged: level=%d, err=%d", status.level, status.error.code);
         {
             lock_guard<mutex> lock(_mutex);
-            if (c4repl != _c4repl)
-                return;
             _status = status;
         }
 
@@ -186,9 +189,7 @@ private:
 
         if (status.level == kC4Stopped) {
             lock_guard<mutex> lock(_mutex);
-            _c4repl = nullptr;
-            _stopping = false;
-            release(this);
+            _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
         }
     }
 
@@ -212,14 +213,15 @@ private:
     }
 
 
-    ReplicatorConfiguration const _conf;
     std::mutex _mutex;
+    ReplicatorConfiguration const _conf;
+    alloc_slice _options;
     c4::ref<C4Replicator> _c4repl;
     C4ReplicatorStatus _status {kC4Stopped};
     CBLReplicatorChangeListener _listener {nullptr};
     void* _listenerContext {nullptr};
     bool _resetCheckpoint {false};
-    bool _stopping {false};
+    Retained<CBLReplicator> _retainSelf;
 };
 
 
@@ -267,3 +269,4 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator* repl) CBLAPI {
 void CBLReplicator_Start(CBLReplicator* repl) CBLAPI            {repl->start();}
 void CBLReplicator_Stop(CBLReplicator* repl) CBLAPI             {repl->stop();}
 void CBLReplicator_ResetCheckpoint(CBLReplicator* repl) CBLAPI  {repl->resetCheckpoint();}
+void CBLReplicator_SetHostReachable(CBLReplicator* repl, bool r) CBLAPI {repl->setHostReachable(r);}

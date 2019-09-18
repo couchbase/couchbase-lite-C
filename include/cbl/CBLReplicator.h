@@ -159,6 +159,13 @@ void CBLReplicator_Start(CBLReplicator* _cbl_nonnull) CBLAPI;
     \ref kCBLReplicatorStopped after it stops. Until then, consider it still active. */
 void CBLReplicator_Stop(CBLReplicator* _cbl_nonnull) CBLAPI;
 
+/** Informs the replicator whether it's considered possible to reach the remote host with
+    the current network configuration. The default value is true. This only affects the
+    replicator's behavior while it's in the Offline state:
+    * Setting it to false will cancel any pending retry and prevent future automatic retries.
+    * Setting it back to true will initiate an immediate retry.*/
+void CBLReplicator_SetHostReachable(CBLReplicator* _cbl_nonnull, bool reachable) CBLAPI;
+
 /** @} */
 
 

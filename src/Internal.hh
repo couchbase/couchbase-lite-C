@@ -36,6 +36,8 @@ namespace cbl_internal {
     static inline const C4Error* internal(const CBLError *error) {return (const C4Error*)error;}
     static inline const CBLError* external(const C4Error *error) {return (const CBLError*)error;}
     static inline const CBLError& external(const C4Error &error) {return (const CBLError&)error;}
+    static inline CBLError* external(C4Error *error) {return (CBLError*)error;}
+    static inline CBLError& external(C4Error &error) {return (CBLError&)error;}
 
     template <typename T>
     T* validated(T *obj, CBLError *outError) {

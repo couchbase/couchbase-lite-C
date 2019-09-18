@@ -150,7 +150,6 @@ namespace cbl_internal {
             FLDict_Release(headers);
             FLArray_Release(channels);
             FLArray_Release(documentIDs);
-            delete endpoint;
         }
 
         bool validate(CBLError *outError) const {
