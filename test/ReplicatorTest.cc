@@ -31,6 +31,10 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Fake Replicate") {
     config.endpoint.setURL("wss://couchbase.com/bogus");
 
     Replicator repl(config);
+    auto token = repl.addListener([&](Replicator r, const CBLReplicatorStatus &status) {
+        CHECK(r == repl);
+        cerr << "--- PROGRESS: status=" << status.activity << ", fraction=" << status.progress.fractionComplete << ", err=" << status.error.domain << "/" << status.error.code << "\n";
+    });
     repl.start();
 
     cerr << "Waiting...\n";

@@ -221,15 +221,14 @@ typedef void (*CBLReplicatorChangeListener)(void *context,
                                             CBLReplicator *replicator _cbl_nonnull,
                                             const CBLReplicatorStatus *status _cbl_nonnull);
 
-/** Adds a listener that will be called when the replicator's status changes.
-    @warning UNIMPLEMENTED! */
+/** Adds a listener that will be called when the replicator's status changes. */
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* _cbl_nonnull,
                                                   CBLReplicatorChangeListener _cbl_nonnull, 
                                                   void *context) CBLAPI;
 
 
 /** Flags describing a replicated document. */
-typedef CBL_ENUM(unsigned, CBLDocumentFlags) {
+typedef CBL_OPTIONS(unsigned, CBLDocumentFlags) {
     kCBLDocumentFlagsDeleted        = 1 << 0,   ///< The document has been deleted.
     kCBLDocumentFlagsAccessRemoved  = 1 << 1    ///< Lost access to the document on the server.
 };
@@ -257,8 +256,7 @@ typedef void (*CBLReplicatedDocumentListener)(void *context,
                                               unsigned numDocuments,
                                               const CBLReplicatedDocument* documents);
 
-/** Adds a listener that will be called when documents are replicated.
-    @warning UNIMPLEMENTED! */
+/** Adds a listener that will be called when documents are replicated. */
 CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* _cbl_nonnull,
                                                     CBLReplicatedDocumentListener _cbl_nonnull,
                                                     void *context) CBLAPI;

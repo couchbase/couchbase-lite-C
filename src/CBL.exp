@@ -130,8 +130,8 @@ _CBLReplicator_Stop
 _CBLReplicator_SetHostReachable
 _CBLReplicator_SetSuspended
 _CBLReplicator_Status
-#_CBLReplicator_AddChangeListener
-#_CBLReplicator_AddDocumentListener
+_CBLReplicator_AddChangeListener
+_CBLReplicator_AddDocumentListener
 
 
 

@@ -25,12 +25,15 @@
 #include "c4Private.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <atomic>
 #include <mutex>
 
 using namespace std;
 using namespace fleece;
 using namespace cbl_internal;
 
+
+#define LOCK(MUTEX)  lock_guard<recursive_mutex> _lock(MUTEX)
 
 extern "C" {
     void C4RegisterBuiltInWebSocket();
@@ -55,7 +58,7 @@ public:
     {
         // One-time initialization of network transport:
         static once_flag once;
-        call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
+        call_once(once, bind(&C4RegisterBuiltInWebSocket));
 
         // Set up the LiteCore replicator parameters:
         if (!_conf.validate(external(&_status.error)))
@@ -68,7 +71,14 @@ public:
             params.pull = type;
         params.callbackContext = this;
         params.onStatusChanged = [](C4Replicator* c4repl, C4ReplicatorStatus status, void *ctx) {
-            ((CBLReplicator*)ctx)->_statusChanged(c4repl, status);
+            ((CBLReplicator*)ctx)->_statusChanged(status);
+        };
+        params.onDocumentsEnded = [](C4Replicator* c4repl,
+                                     bool pushing,
+                                     size_t numDocs,
+                                     const C4DocumentEnded* docs[],
+                                     void *ctx) {
+            ((CBLReplicator*)ctx)->_documentsEnded(pushing, numDocs, docs);
         };
 
         if (_conf.pushFilter) {
@@ -133,7 +143,7 @@ public:
 
 
     void start() {
-        lock_guard<mutex> lock(_mutex);
+        LOCK(_mutex);
         _retainSelf = this;     // keep myself from being freed until the replicator stops
         if (_resetCheckpoint) {
             alloc_slice options = encodeOptions();
@@ -146,15 +156,19 @@ public:
 
 
     CBLReplicatorStatus status() {
-        lock_guard<mutex> lock(_mutex);
-        return external(_status);
+        return external(c4repl_getStatus(_c4repl));
     }
 
 
-    void setListener(CBLReplicatorChangeListener listener, void *context) {
-        lock_guard<mutex> lock(_mutex);
-        _listener = listener;
-        _listenerContext = context;
+    CBLListenerToken* addChangeListener(CBLReplicatorChangeListener listener, void *context) {
+        LOCK(_mutex);
+        return _changeListeners.add(listener, context);
+    }
+
+
+    CBLListenerToken* addDocumentListener(CBLReplicatedDocumentListener listener, void *context) {
+        LOCK(_mutex);
+        return _docListeners.add(listener, context);
     }
 
 private:
@@ -169,32 +183,42 @@ private:
         return enc.finish();
     }
 
-    
-    void _statusChanged(C4Replicator* c4repl, const C4ReplicatorStatus &status) {
+
+    void _statusChanged(const C4ReplicatorStatus &status) {
+        LOCK(_mutex);
         C4Log("StatusChanged: level=%d, err=%d", status.level, status.error.code);
-        {
-            lock_guard<mutex> lock(_mutex);
-            _status = status;
-        }
+        _status = status;
 
-        _callListener(status);
-
-        if (status.level == kC4Stopped) {
-            lock_guard<mutex> lock(_mutex);
-            _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
-        }
-    }
-
-
-    void _callListener(C4ReplicatorStatus status) {
-        if (_listener) {
+        if (!_changeListeners.empty()) {
             auto cblStatus = external(status);
-            _listener(_listenerContext, this, &cblStatus);
+            _changeListeners.call(this, &cblStatus);
         } else if (status.error.code) {
             char buf[256];
             C4Warn("No listener to receive error from CBLReplicator %p: %s",
                    this, c4error_getDescriptionC(status.error, buf, sizeof(buf)));
         }
+
+        if (status.level == kC4Stopped)
+            _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
+    }
+
+
+    void _documentsEnded(bool pushing, size_t numDocs, const C4DocumentEnded* c4Docs[]) {
+        LOCK(_mutex);
+        if (_docListeners.empty())
+            return;
+        vector<CBLReplicatedDocument> docs(numDocs);
+        auto src = &c4Docs[0];
+        for (auto dst = docs.begin(); dst != docs.end(); ++dst, ++src) {
+            dst->ID = (const char*)(*src)->docID.buf;
+            dst->flags = 0;
+            if ((*src)->flags & kRevDeleted)
+                dst->flags |= kCBLDocumentFlagsDeleted;
+            if ((*src)->flags & kRevPurged)
+                dst->flags |= kCBLDocumentFlagsAccessRemoved;
+            dst->error = external((*src)->error);
+        }
+        _docListeners.call(this, pushing, unsigned(numDocs), docs.data());
     }
 
 
@@ -205,14 +229,15 @@ private:
     }
 
 
-    std::mutex _mutex;
+    recursive_mutex _mutex;
     ReplicatorConfiguration const _conf;
     c4::ref<C4Replicator> _c4repl;
     C4ReplicatorStatus _status {kC4Stopped};
-    CBLReplicatorChangeListener _listener {nullptr};
-    void* _listenerContext {nullptr};
-    std::atomic<bool> _resetCheckpoint {false};
+    atomic<bool> _resetCheckpoint {false};
     Retained<CBLReplicator> _retainSelf;
+
+    cbl_internal::Listeners<CBLReplicatorChangeListener> _changeListeners;
+    cbl_internal::Listeners<CBLReplicatedDocumentListener> _docListeners;
 };
 
 
@@ -262,3 +287,17 @@ void CBLReplicator_Stop(CBLReplicator* repl) CBLAPI             {repl->stop();}
 void CBLReplicator_ResetCheckpoint(CBLReplicator* repl) CBLAPI  {repl->resetCheckpoint();}
 void CBLReplicator_SetHostReachable(CBLReplicator* repl, bool r) CBLAPI {repl->setHostReachable(r);}
 void CBLReplicator_SetSuspended(CBLReplicator* repl, bool sus) CBLAPI   {repl->setSuspended(sus);}
+
+CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* repl,
+                                                  CBLReplicatorChangeListener listener,
+                                                  void *context) CBLAPI
+{
+    return repl->addChangeListener(listener, context);
+}
+
+CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* repl,
+                                                    CBLReplicatedDocumentListener listener,
+                                                    void *context) CBLAPI
+{
+    return repl->addDocumentListener(listener, context);
+}
