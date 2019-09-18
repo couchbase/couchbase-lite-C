@@ -149,7 +149,7 @@ void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format _cbl_nonnull, ...) CB
 
 
 
-/** \defgroup types   Other Types
+/** \defgroup other_types   Other Types
      @{ */
 
 /** A date/time representation used for document expiration (and in date/time queries.)

@@ -103,7 +103,7 @@ typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool 
     @param remoteDocument  The revision of the document found on the server,
                 or NULL if the document has been deleted on the server.
     @return  The resolved document to save locally (and push, if the replicator is pushing.)
-        This can be the same as \ref localDocument or \ref remoteDocument, or you can create
+        This can be the same as \p localDocument or \p remoteDocument, or you can create
         a mutable copy of either one and modify it appropriately.
         Or return NULL if the resolution is to delete the document. */
 typedef CBLDocument* (*CBLConflictResolver)(void *context,

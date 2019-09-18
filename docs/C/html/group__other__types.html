@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Couchbase Lite C: CBLReplicatorProgress Struct Reference</title>
+<title>Couchbase Lite C: Other Types</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -46,6 +46,7 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,66 +61,66 @@ $(function() {
 </iframe>
 </div>
 
-</div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-attribs">Data Fields</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">CBLReplicatorProgress Struct Reference<div class="ingroups"><a class="el" href="group__replication.html">Replication</a></div></div>  </div>
+<div class="title">Other Types</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>A fractional progress value.  
- <a href="struct_c_b_l_replicator_progress.html#details">More...</a></p>
-
-<p><code>#include &lt;<a class="el" href="_c_b_l_replicator_8h_source.html">cbl/CBLReplicator.h</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Data Fields</h2></td></tr>
-<tr class="memitem:aaca11f417074e18fe9a705ad0bb26614"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_progress.html#aaca11f417074e18fe9a705ad0bb26614">fractionComplete</a></td></tr>
-<tr class="separator:aaca11f417074e18fe9a705ad0bb26614"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1de6365276a041880b0a85298c4bd4d8"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_progress.html#a1de6365276a041880b0a85298c4bd4d8">documentCount</a></td></tr>
-<tr class="memdesc:a1de6365276a041880b0a85298c4bd4d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Very-approximate completion, from 0.0 to 1.0.  <a href="#a1de6365276a041880b0a85298c4bd4d8">More...</a><br /></td></tr>
-<tr class="separator:a1de6365276a041880b0a85298c4bd4d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:ga37cb77b7ae63bbf1d30e933af074f598"><td class="memItemLeft" align="right" valign="top">typedef int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__other__types.html#ga37cb77b7ae63bbf1d30e933af074f598">CBLTimestamp</a></td></tr>
+<tr class="memdesc:ga37cb77b7ae63bbf1d30e933af074f598"><td class="mdescLeft">&#160;</td><td class="mdescRight">A date/time representation used for document expiration (and in date/time queries.) Measured in milliseconds since the Unix epoch (1/1/1970, midnight UTC.)  <a href="#ga37cb77b7ae63bbf1d30e933af074f598">More...</a><br /></td></tr>
+<tr class="separator:ga37cb77b7ae63bbf1d30e933af074f598"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:gabdda034bd34bbd4f79111798ce6841f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__other__types.html#ga37cb77b7ae63bbf1d30e933af074f598">CBLTimestamp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__other__types.html#gabdda034bd34bbd4f79111798ce6841f0">CBL_now</a> (void)</td></tr>
+<tr class="memdesc:gabdda034bd34bbd4f79111798ce6841f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current time, in milliseconds since 1/1/1970.  <a href="#gabdda034bd34bbd4f79111798ce6841f0">More...</a><br /></td></tr>
+<tr class="separator:gabdda034bd34bbd4f79111798ce6841f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A fractional progress value. </p>
-<p>The units are undefined; the only meaningful number is the (fractional) result of <code>completed</code> ÷ <code>total</code>, which will range from 0.0 to 1.0. Before anything happens, both <code>completed</code> and <code>total</code> will be 0. </p>
-</div><h2 class="groupheader">Field Documentation</h2>
-<a id="a1de6365276a041880b0a85298c4bd4d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1de6365276a041880b0a85298c4bd4d8">&#9670;&nbsp;</a></span>documentCount</h2>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="ga37cb77b7ae63bbf1d30e933af074f598"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga37cb77b7ae63bbf1d30e933af074f598">&#9670;&nbsp;</a></span>CBLTimestamp</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint64_t CBLReplicatorProgress::documentCount</td>
+          <td class="memname">typedef int64_t <a class="el" href="group__other__types.html#ga37cb77b7ae63bbf1d30e933af074f598">CBLTimestamp</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Very-approximate completion, from 0.0 to 1.0. </p>
-<p>Number of documents transferred so far </p>
+<p>A date/time representation used for document expiration (and in date/time queries.) Measured in milliseconds since the Unix epoch (1/1/1970, midnight UTC.) </p>
 
 </div>
 </div>
-<a id="aaca11f417074e18fe9a705ad0bb26614"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaca11f417074e18fe9a705ad0bb26614">&#9670;&nbsp;</a></span>fractionComplete</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gabdda034bd34bbd4f79111798ce6841f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gabdda034bd34bbd4f79111798ce6841f0">&#9670;&nbsp;</a></span>CBL_now()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float CBLReplicatorProgress::fractionComplete</td>
+          <td class="memname"><a class="el" href="group__other__types.html#ga37cb77b7ae63bbf1d30e933af074f598">CBLTimestamp</a> CBL_now </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Returns the current time, in milliseconds since 1/1/1970. </p>
+
 </div>
 </div>
-<hr/>The documentation for this struct was generated from the following file:<ul>
-<li>include/cbl/<a class="el" href="_c_b_l_replicator_8h_source.html">CBLReplicator.h</a></li>
-</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

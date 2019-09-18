@@ -2,7 +2,7 @@
 
 This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syncable database, with a plain C API. The API can be used directly, or as the substrate for binding to other languages like Python, JavaScript or Rust.
 
-**As of July 2019, this project is approaching beta status.** The API is nearly complete and most of the functionality is implemented, but there are missing pieces and only limited testing.
+**As of September 2019, this project is close to beta status.** The API is nearly complete and almost all of the functionality is implemented, but there are still missing pieces and only limited testing.
 
 ## Goals
 
@@ -24,9 +24,9 @@ This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syn
   - [x] Multi-master bidirectional replication (sync) with Couchbase Server
       - [x] Fast WebSocket-based protocol
       - [x] Transfers document deltas for minimal bandwidth
-      - [ ] Replicator event listeners
-      - [ ] Replicator online/offline support and retry behavior
-      - [ ] Replicator TLS/SSL support _(in progress)_
+      - [x] Replicator event listeners
+      - [x] Replicator online/offline support and retry behavior
+      - [x] Replicator TLS/SSL support
       - [ ] Peer-to-peer replication
 - [x] Minimal platform dependencies: C++ standard library, filesystem, TCP/IP
 - [ ] Broad OS support

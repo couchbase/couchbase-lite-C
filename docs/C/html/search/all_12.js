@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['value_20accessors',['Value Accessors',['../group___f_l_value.html',1,'']]]
+  ['useplaintext',['usePlaintext',['../struct_c_b_l_log_file_configuration.html#a53e0e6ba881a590395e1249f9a1a766d',1,'CBLLogFileConfiguration']]]
 ];

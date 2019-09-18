@@ -4,6 +4,7 @@ var searchData=
   ['cblblob',['CBLBlob',['../group__blobs.html#gabac5ffc289298f9bcbf79d88bb748f24',1,'CBLBase.h']]],
   ['cblblobreadstream',['CBLBlobReadStream',['../group__blobs.html#ga8615e054de70c47c18f3b338e5c4d4f3',1,'CBLBlob.h']]],
   ['cblblobwritestream',['CBLBlobWriteStream',['../group__blobs.html#ga9ca701f23874fa0beb7d88177070759d',1,'CBLBlob.h']]],
+  ['cblconflictresolver',['CBLConflictResolver',['../group__replication.html#gaebada5d3ac79c87b24fc90f4edfd14ae',1,'CBLReplicator.h']]],
   ['cbldatabase',['CBLDatabase',['../group__database.html#ga2eef6f33d930c0cee23013f845dc77e0',1,'CBLBase.h']]],
   ['cbldatabasechangelistener',['CBLDatabaseChangeListener',['../group__database.html#ga76f9e32b6550b93c07e163fe229f6dab',1,'CBLDatabase.h']]],
   ['cbldocument',['CBLDocument',['../group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51',1,'CBLBase.h']]],
@@ -19,5 +20,7 @@ var searchData=
   ['cblreplicationfilter',['CBLReplicationFilter',['../group__replication.html#gac38a5f7dfa7dc2ef84fa6a7735dc053e',1,'CBLReplicator.h']]],
   ['cblreplicator',['CBLReplicator',['../group__replication.html#ga5ec56f6d72b96556612650bae8d28f04',1,'CBLBase.h']]],
   ['cblreplicatorchangelistener',['CBLReplicatorChangeListener',['../group__replication.html#gaedff9e0aa256e3b0bf480c9e3c200074',1,'CBLReplicator.h']]],
-  ['cblresultset',['CBLResultSet',['../group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd',1,'CBLBase.h']]]
+  ['cblresultset',['CBLResultSet',['../group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd',1,'CBLBase.h']]],
+  ['cblsaveconflicthandler',['CBLSaveConflictHandler',['../group__documents.html#gae9552271570ce77eea3fdfc932360614',1,'CBLDocument.h']]],
+  ['cbltimestamp',['CBLTimestamp',['../group__other__types.html#ga37cb77b7ae63bbf1d30e933af074f598',1,'CBLBase.h']]]
 ];
