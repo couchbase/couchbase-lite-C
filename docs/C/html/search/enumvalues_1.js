@@ -18,6 +18,8 @@ var searchData=
   ['kcbllogdomainquery',['kCBLLogDomainQuery',['../group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39abf810c86e8bda9f4a7837319afe1d80a',1,'CBLBase.h']]],
   ['kcbllogdomainreplicator',['kCBLLogDomainReplicator',['../group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39a3172f7b059adfb363cd0bef44e116048',1,'CBLBase.h']]],
   ['kcbln1qllanguage',['kCBLN1QLLanguage',['../group__queries.html#gga5b419d879de00f45eb417c451e21ac82a25fd238b9aa83867526649ef2769446e',1,'CBLQuery.h']]],
+  ['kcblproxyhttp',['kCBLProxyHTTP',['../group__replication.html#gga056d4816e170aa3629f94c028dcd142ba7de945871ddc1fef6ec4b7cefcf23da4',1,'CBLReplicator.h']]],
+  ['kcblproxyhttps',['kCBLProxyHTTPS',['../group__replication.html#gga056d4816e170aa3629f94c028dcd142baa2b19c9c8a77205a2dfa2badf70fd2a6',1,'CBLReplicator.h']]],
   ['kcblreplicatorbusy',['kCBLReplicatorBusy',['../group__replication.html#gga9421513c63f1d16bf4740c4d2515dd22ae8da1c81ecb8dc05f76f2fc3f6e9c64a',1,'CBLReplicator.h']]],
   ['kcblreplicatorconnecting',['kCBLReplicatorConnecting',['../group__replication.html#gga9421513c63f1d16bf4740c4d2515dd22a05d0cfa131cf49f4f5cfba074f6719fe',1,'CBLReplicator.h']]],
   ['kcblreplicatoridle',['kCBLReplicatorIdle',['../group__replication.html#gga9421513c63f1d16bf4740c4d2515dd22a81dccc4a1dd815ec1e04ffbcae6f3257',1,'CBLReplicator.h']]],

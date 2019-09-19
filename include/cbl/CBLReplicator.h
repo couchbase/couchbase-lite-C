@@ -112,15 +112,37 @@ typedef CBLDocument* (*CBLConflictResolver)(void *context,
                                             CBLDocument *remoteDocument);
 
 
+/** Types of proxy servers, for CBLProxySettings. */
+typedef CBL_ENUM(uint8_t, CBLProxyType) {
+    kCBLProxyHTTP,                      ///< HTTP proxy; must support 'CONNECT' method
+    kCBLProxyHTTPS,                     ///< HTTPS proxy; must support 'CONNECT' method
+};
+
+
+/** Proxy settings for the replicator. */
+typedef struct {
+    CBLProxyType type;                  ///< Type of proxy
+    const char *hostname;               ///< Proxy server hostname or IP address
+    uint16_t port;                      ///< Proxy server port
+    const char *username;               ///< Username for proxy auth (optional)
+    const char *password;               ///< Password for proxy auth
+} CBLProxySettings;
+
+
 /** The configuration of a replicator. */
 typedef struct {
     CBLDatabase* database;              ///< The database to replicate
     CBLEndpoint* endpoint;              ///< The address of the other database to replicate with
     CBLReplicatorType replicatorType;   ///< Push, pull or both
     bool continuous;                    ///< Continuous replication?
+    //-- HTTP settings:
     CBLAuthenticator* authenticator;    ///< Authentication credentials, if needed
-    FLSlice pinnedServerCertificate;    ///< An X.509 cert to "pin" TLS connections to
+    const CBLProxySettings* proxy;      ///< HTTP client proxy settings
     FLDict headers;                     ///< Extra HTTP headers to add to the WebSocket request
+    //-- TLS settings:
+    FLSlice pinnedServerCertificate;    ///< An X.509 cert to "pin" TLS connections to (PEM or DER)
+    FLSlice trustedRootCertificates;    ///< Set of anchor certs (PEM format)
+    //-- Filtering:
     FLArray channels;                   ///< Optional set of channels to pull from
     FLArray documentIDs;                ///< Optional set of document IDs to replicate
     CBLReplicationFilter pushFilter;    ///< Optional callback to filter which docs are pushed

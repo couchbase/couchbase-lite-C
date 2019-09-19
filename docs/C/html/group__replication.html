@@ -75,6 +75,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_proxy_settings.html">CBLProxySettings</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Proxy settings for the replicator.  <a href="struct_c_b_l_proxy_settings.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html">CBLReplicatorConfiguration</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The configuration of a replicator.  <a href="struct_c_b_l_replicator_configuration.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,6 +105,11 @@ Configuration</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:gae4da222f876468553ef0c1dca113d0d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direction of replication: push, pull, or both.  <a href="group__replication.html#gae4da222f876468553ef0c1dca113d0d3">More...</a><br /></td></tr>
 <tr class="separator:gae4da222f876468553ef0c1dca113d0d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga056d4816e170aa3629f94c028dcd142b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga056d4816e170aa3629f94c028dcd142b">CBLProxyType</a> : uint8_t { <a class="el" href="group__replication.html#gga056d4816e170aa3629f94c028dcd142ba7de945871ddc1fef6ec4b7cefcf23da4">kCBLProxyHTTP</a>, 
+<a class="el" href="group__replication.html#gga056d4816e170aa3629f94c028dcd142baa2b19c9c8a77205a2dfa2badf70fd2a6">kCBLProxyHTTPS</a>
+ }</td></tr>
+<tr class="memdesc:ga056d4816e170aa3629f94c028dcd142b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Types of proxy servers, for <a class="el" href="struct_c_b_l_proxy_settings.html" title="Proxy settings for the replicator.">CBLProxySettings</a>.  <a href="group__replication.html#ga056d4816e170aa3629f94c028dcd142b">More...</a><br /></td></tr>
+<tr class="separator:ga056d4816e170aa3629f94c028dcd142b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga13b3c0a779ab66b887f77512591c7be2"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="group__replication.html#ga13b3c0a779ab66b887f77512591c7be2">CBLEndpoint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__replication.html#ga13b3c0a779ab66b887f77512591c7be2">CBLEndpoint</a></td></tr>
 <tr class="memdesc:ga13b3c0a779ab66b887f77512591c7be2"><td class="mdescLeft">&#160;</td><td class="mdescRight">An opaque object representing the location of a database to replicate with.  <a href="#ga13b3c0a779ab66b887f77512591c7be2">More...</a><br /></td></tr>
 <tr class="separator:ga13b3c0a779ab66b887f77512591c7be2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -372,6 +380,28 @@ Status and Progress</h2></td></tr>
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggab32e819862557ea3782119acb17d5801a69adb5bba21a2b0bc34b4f4d638fcc17"></a>kCBLDocumentFlagsDeleted&#160;</td><td class="fielddoc"><p>The document has been deleted. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ggab32e819862557ea3782119acb17d5801a015686b94024f35938899389d9c40869"></a>kCBLDocumentFlagsAccessRemoved&#160;</td><td class="fielddoc"><p>Lost access to the document on the server. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="ga056d4816e170aa3629f94c028dcd142b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga056d4816e170aa3629f94c028dcd142b">&#9670;&nbsp;</a></span>CBLProxyType</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group__replication.html#ga056d4816e170aa3629f94c028dcd142b">CBLProxyType</a> : uint8_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Types of proxy servers, for <a class="el" href="struct_c_b_l_proxy_settings.html" title="Proxy settings for the replicator.">CBLProxySettings</a>. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga056d4816e170aa3629f94c028dcd142ba7de945871ddc1fef6ec4b7cefcf23da4"></a>kCBLProxyHTTP&#160;</td><td class="fielddoc"><p>HTTP proxy; must support 'CONNECT' method. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga056d4816e170aa3629f94c028dcd142baa2b19c9c8a77205a2dfa2badf70fd2a6"></a>kCBLProxyHTTPS&#160;</td><td class="fielddoc"><p>HTTPS proxy; must support 'CONNECT' method. </p>
 </td></tr>
 </table>
 

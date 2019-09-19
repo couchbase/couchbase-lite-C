@@ -105,12 +105,15 @@ public:
         params.optionsDictFleece = options;
 
         // Create the LiteCore replicator:
+#ifdef COUCHBASE_ENTERPRISE
         if (_conf.endpoint->otherLocalDB()) {
             _c4repl = c4repl_newLocal(internal(_conf.database),
                                       _conf.endpoint->otherLocalDB(),
                                       params,
                                       &_status.error);
-        } else {
+        } else
+#endif
+        {
             _c4repl = c4repl_new(internal(_conf.database),
                                  _conf.endpoint->remoteAddress(),
                                  _conf.endpoint->remoteDatabaseName(),
@@ -138,16 +141,22 @@ public:
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
     void setHostReachable(bool reachable)           {c4repl_setHostReachable(_c4repl, reachable);}
     void setSuspended(bool suspended)               {c4repl_setSuspended(_c4repl, suspended);}
-    void resetCheckpoint()                          {_resetCheckpoint = true;}
     void stop()                                     {c4repl_stop(_c4repl);}
+
+
+    void resetCheckpoint() {
+        LOCK(_mutex);
+        _resetCheckpoint = true;
+        _optionsChanged = true;
+    }
 
 
     void start() {
         LOCK(_mutex);
         _retainSelf = this;     // keep myself from being freed until the replicator stops
-        if (_resetCheckpoint) {
-            alloc_slice options = encodeOptions();
-            c4repl_setOptions(_c4repl, options);
+        if (_optionsChanged) {
+            c4repl_setOptions(_c4repl, encodeOptions());
+            _optionsChanged = false;
             _resetCheckpoint = false;
         }
         c4repl_start(_c4repl);
@@ -168,6 +177,8 @@ public:
 
     CBLListenerToken* addDocumentListener(CBLReplicatedDocumentListener listener, void *context) {
         LOCK(_mutex);
+        if (_docListeners.empty())
+            _optionsChanged = true;
         return _docListeners.add(listener, context);
     }
 
@@ -179,6 +190,8 @@ private:
         _conf.writeOptions(enc);
         if (_resetCheckpoint)
             enc[slice(kC4ReplicatorResetCheckpoint)] = true;
+        if (!_docListeners.empty())
+            enc[slice(kC4ReplicatorOptionProgressLevel)] = 1;
         enc.endDict();
         return enc.finish();
     }
@@ -233,7 +246,8 @@ private:
     ReplicatorConfiguration const _conf;
     c4::ref<C4Replicator> _c4repl;
     C4ReplicatorStatus _status {kC4Stopped};
-    atomic<bool> _resetCheckpoint {false};
+    bool _optionsChanged {false};
+    bool _resetCheckpoint {false};
     Retained<CBLReplicator> _retainSelf;
 
     cbl_internal::Listeners<CBLReplicatorChangeListener> _changeListeners;

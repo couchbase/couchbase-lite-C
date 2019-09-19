@@ -178,6 +178,8 @@ var searchData=
   ['cblnotificationsreadycallback',['CBLNotificationsReadyCallback',['../group__listeners.html#ga20a2e8c2b93639e7a19294f91806369f',1,'CBLDatabase.h']]],
   ['cblnumerrorcodesplus1',['CBLNumErrorCodesPlus1',['../group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a4184bf6403e10b27517e68cd28b21c73',1,'CBLBase.h']]],
   ['cblposixdomain',['CBLPOSIXDomain',['../group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a971c5ad661670fdde5fd595acae21791',1,'CBLBase.h']]],
+  ['cblproxysettings',['CBLProxySettings',['../struct_c_b_l_proxy_settings.html',1,'']]],
+  ['cblproxytype',['CBLProxyType',['../group__replication.html#ga056d4816e170aa3629f94c028dcd142b',1,'CBLReplicator.h']]],
   ['cblquery',['CBLQuery',['../group__queries.html#ga9c80e113b863821f9f82778dc0650f22',1,'CBLBase.h']]],
   ['cblquery_2eh',['CBLQuery.h',['../_c_b_l_query_8h.html',1,'']]],
   ['cblquery_5faddchangelistener',['CBLQuery_AddChangeListener',['../group__queries.html#ga0577b29f49f70a1d579beb40ded2cf97',1,'CBLQuery.h']]],

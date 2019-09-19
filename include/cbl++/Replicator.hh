@@ -62,26 +62,37 @@ namespace cbl {
         Endpoint endpoint;
         CBLReplicatorType replicatorType    = kCBLReplicatorTypePushAndPull;
         bool continuous                     = false;
+
         Authenticator authenticator;
-        fleece::alloc_slice pinnedServerCertificate;
+        CBLProxySettings* proxy             = nullptr;
         fleece::MutableDict headers         = fleece::MutableDict::newDict();
+
+        fleece::alloc_slice pinnedServerCertificate;
+        fleece::alloc_slice trustedRootCertificates;
+
         fleece::MutableArray channels       = fleece::MutableArray::newArray();
         fleece::MutableArray documentIDs    = fleece::MutableArray::newArray();
+
         ReplicationFilter pushFilter;
         ReplicationFilter pullFilter;
 
         operator CBLReplicatorConfiguration() const {
-            return {
-                database.ref(),
-                endpoint.ref(),
-                replicatorType,
-                continuous,
-                authenticator.ref(),
-                pinnedServerCertificate,
-                headers,
-                channels,
-                documentIDs
-            };
+            CBLReplicatorConfiguration conf = {};
+            conf.database = database.ref();
+            conf.endpoint = endpoint.ref();
+            conf.replicatorType = replicatorType;
+            conf.continuous = continuous;
+            conf.authenticator = authenticator.ref();
+            conf.proxy = proxy;
+            if (!headers.empty())
+                conf.headers = headers;
+            conf.pinnedServerCertificate = pinnedServerCertificate;
+            conf.trustedRootCertificates = trustedRootCertificates;
+            if (!channels.empty())
+                conf.channels = channels;
+            if (!documentIDs.empty())
+                conf.documentIDs = documentIDs;
+            return conf;
         }
     };
 
@@ -90,44 +101,67 @@ namespace cbl {
         Replicator(const ReplicatorConfiguration &config) {
             CBLError error;
             CBLReplicatorConfiguration c_config = config;
-#if 0 // TODO
-            if (config.pushFilter) {
-                c_config.pushFilter = [](void *context, CBLDocument* doc, bool isDeleted) {
+            _pushFilter = config.pushFilter;
+            if (_pushFilter) {
+                c_config.pushFilter = [](void *context, CBLDocument* doc, bool isDeleted) -> bool {
                     return ((Replicator*)context)->_pushFilter(Document(doc), isDeleted);
                 };
             }
-            if (config.pullFilter) {
-                c_config.pullFilter = [](void *context, CBLDocument* doc, bool isDeleted) {
+            _pullFilter = config.pullFilter;
+            if (_pullFilter) {
+                c_config.pullFilter = [](void *context, CBLDocument* doc, bool isDeleted) -> bool {
                     return ((Replicator*)context)->_pullFilter(Document(doc), isDeleted);
                 };
             }
-            c_config.filterContext = this;
-#endif
+            c_config.context = this;
             _ref = (CBLRefCounted*) CBLReplicator_New(&c_config, &error);
             check(_ref, error);
         }
 
-        void start()                {CBLReplicator_Start(ref());}
-        void stop()                 {CBLReplicator_Stop(ref());}
+        void start()                        {CBLReplicator_Start(ref());}
+        void stop()                         {CBLReplicator_Stop(ref());}
 
-        void resetCheckpoint()      {CBLReplicator_ResetCheckpoint(ref());}
+        void resetCheckpoint()              {CBLReplicator_ResetCheckpoint(ref());}
+
+        void setHostReachable(bool r)       {CBLReplicator_SetHostReachable(ref(), r);}
+        void setSuspended(bool s)           {CBLReplicator_SetSuspended(ref(), s);}
 
         CBLReplicatorStatus status() const  {return CBLReplicator_Status(ref());}
 
-        using Listener = cbl::ListenerToken<Replicator, const CBLReplicatorStatus&>;
+        using ChangeListener = cbl::ListenerToken<Replicator, const CBLReplicatorStatus&>;
+        using DocumentListener = cbl::ListenerToken<Replicator, bool,
+                                                    const std::vector<CBLReplicatedDocument>>;
 
-        [[nodiscard]] Listener addListener(Listener::Callback f) {
-            auto l = Listener(f);
-            l.setToken( CBLReplicator_AddChangeListener(ref(), &_callListener, l.context()) );
+        [[nodiscard]] ChangeListener addChangeListener(ChangeListener::Callback f) {
+            auto l = ChangeListener(f);
+            l.setToken( CBLReplicator_AddChangeListener(ref(), &_callChangeListener, l.context()) );
+            return l;
+        }
+
+        [[nodiscard]] DocumentListener addDocumentListener(DocumentListener::Callback f) {
+            auto l = DocumentListener(f);
+            l.setToken( CBLReplicator_AddDocumentListener(ref(), &_callDocListener, l.context()) );
             return l;
         }
 
     private:
-        static void _callListener(void *context, CBLReplicator *repl,
+        static void _callChangeListener(void *context, CBLReplicator *repl,
                                   const CBLReplicatorStatus *status)
         {
-            Listener::call(context, Replicator(repl), *status);
+            ChangeListener::call(context, Replicator(repl), *status);
         }
+
+        static void _callDocListener(void *context, CBLReplicator *repl,
+                                     bool isPush,
+                                     unsigned numDocuments,
+                                     const CBLReplicatedDocument* documents)
+        {
+            std::vector<CBLReplicatedDocument> docs(&documents[0], &documents[numDocuments]);
+            DocumentListener::call(context, Replicator(repl), isPush, docs);
+        }
+
+        ReplicationFilter _pushFilter;
+        ReplicationFilter _pullFilter;
 
         CBL_REFCOUNTED_BOILERPLATE(Replicator, RefCounted, CBLReplicator)
     };

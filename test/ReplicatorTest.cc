@@ -28,12 +28,25 @@ using namespace cbl;
 
 TEST_CASE_METHOD(CBLTest_Cpp, "Fake Replicate") {
     ReplicatorConfiguration config(db);
+    config.replicatorType = kCBLReplicatorTypePull;
+#if 1
     config.endpoint.setURL("wss://couchbase.com/bogus");
+#else
+    config.endpoint.setURL("ws://localhost:4984/itunes");
+#endif
 
     Replicator repl(config);
-    auto token = repl.addListener([&](Replicator r, const CBLReplicatorStatus &status) {
+    auto ctoken = repl.addChangeListener([&](Replicator r, const CBLReplicatorStatus &status) {
         CHECK(r == repl);
         cerr << "--- PROGRESS: status=" << status.activity << ", fraction=" << status.progress.fractionComplete << ", err=" << status.error.domain << "/" << status.error.code << "\n";
+    });
+    auto dtoken = repl.addDocumentListener([&](Replicator r, bool isPush,
+                                               const vector<CBLReplicatedDocument> &docs) {
+        CHECK(r == repl);
+        cerr << "--- " << docs.size() << " docs " << (isPush ? "pushed" : "pulled") << ":";
+        for (auto &doc : docs)
+            cerr << " " << doc.ID;
+        cerr << "\n";
     });
     repl.start();
 
