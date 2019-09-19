@@ -129,7 +129,7 @@ set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
                             Support
                             SQLite3_UnicodeSN
                             BLIPStatic
-                            websockets
+                            mbedtls
                             mbedcrypto)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")

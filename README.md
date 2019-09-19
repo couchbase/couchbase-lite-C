@@ -123,11 +123,9 @@ Dependencies:
 * ICU libraries (`apt-get install icu-dev`)
 
 1. Clone the repo
-2. Check out submodules (recursively)
-3. `mkdir build_cmake`
-4. `cd build_cmake`
-5. `cmake .. && make -j5`
-6. `./test/CBL_C_Tests -r list`
+2. Check out submodules (recursively), i.e. `git submodule update --init --recursive`
+3. Run the shellscript `build.sh`
+6. Run the (minimal) test binary at `build_cmake/test/CBL_C_Tests -r list`
 
 The library is at `build_cmake/libCouchbaseLiteC.so`. (Or `.DLL` or `.dylib`)
 
