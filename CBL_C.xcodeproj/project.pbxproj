@@ -17,6 +17,7 @@
 		271C2A7521CC4BD60045856E /* Util.hh in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A7321CC4BD60045856E /* Util.hh */; };
 		271C2A7621CC4BD60045856E /* Util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7421CC4BD60045856E /* Util.cc */; };
 		271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7721CC750E0045856E /* CBLDocument.cc */; };
+		275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 275B3567234810C400FE9CF0 /* Foundation.framework */; };
 		275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4DD2201323700DBE7D2 /* CBLBlob.cc */; };
 		275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
 		277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
@@ -253,6 +254,7 @@
 		271C2A7421CC4BD60045856E /* Util.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Util.cc; sourceTree = "<group>"; };
 		271C2A7721CC750E0045856E /* CBLDocument.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDocument.cc; sourceTree = "<group>"; };
 		271C2A7921CC756A0045856E /* Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Internal.hh; sourceTree = "<group>"; };
+		275B3567234810C400FE9CF0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		275BC4CC22012D8700DBE7D2 /* CBLBlob.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLBlob.h; sourceTree = "<group>"; };
 		275BC4DD2201323700DBE7D2 /* CBLBlob.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBlob.cc; sourceTree = "<group>"; };
 		275BC4E22204E6A800DBE7D2 /* Blob.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Blob.hh; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 				27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */,
 				27B61DBC21D7075C0027CCDB /* libLiteCore-static.a in Frameworks */,
 				277CC9AB22BC3DF700B245CB /* libLiteCoreWebSocket.a in Frameworks */,
+				275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */,
 				277CC9C022BC4E2E00B245CB /* Security.framework in Frameworks */,
 				27B61D8221D6B8230027CCDB /* libz.tbd in Frameworks */,
 			);
@@ -467,6 +470,7 @@
 		271C2A7C21CC86EB0045856E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				275B3567234810C400FE9CF0 /* Foundation.framework */,
 				277CC9B122BC4E2E00B245CB /* Security.framework */,
 				27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */,
 				27B61D8121D6B8230027CCDB /* libz.tbd */,

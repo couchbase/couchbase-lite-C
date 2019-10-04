@@ -21,6 +21,7 @@
 #include "CBLDocument_Internal.hh"
 #include "CBLBlob_Internal.hh"
 #include "c4Private.h"
+#include "c4Transaction.hh"
 #include "Util.hh"
 #include <mutex>
 
