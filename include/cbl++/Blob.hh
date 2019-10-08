@@ -75,7 +75,7 @@ namespace cbl {
     protected:
         Blob(CBLRefCounted* r)                      :RefCounted(r) { }
 
-        CBL_REFCOUNTED_BOILERPLATE(Blob, RefCounted, const CBLBlob)
+        CBL_REFCOUNTED_BOILERPLATE(Blob, RefCounted, CBLBlob)
     };
 
 

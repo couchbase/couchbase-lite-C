@@ -24,12 +24,14 @@
 
 namespace cbl_internal {
 
+#if 0 // UNUSED
     /** Like sprintf(), but returns a std::string */
     std::string format(const char *fmt _cbl_nonnull, ...) __printflike(1, 2);
 
     /** Like vsprintf(), but returns a std::string */
     std::string vformat(const char *fmt _cbl_nonnull, va_list);
-
+#endif
+    
     char* allocCString(FLSlice);
     char* allocCString(FLSliceResult);      // frees the input
 

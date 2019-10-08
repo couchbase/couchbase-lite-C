@@ -25,6 +25,21 @@ using namespace std;
 using namespace fleece;
 
 
+static void createDocument(CBLDatabase *db, const char *docID,
+                           const char *property, const char *value)
+{
+    CBLDocument* doc = CBLDocument_New(docID);
+    MutableDict props = CBLDocument_MutableProperties(doc);
+    FLSlot_SetString(FLMutableDict_Set(props, slice(property)), slice(value));
+    CBLError error;
+    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict,
+                                                        &error);
+    CBLDocument_Release(doc);
+    REQUIRE(saved);
+    CBLDocument_Release(saved);
+}
+
+
 TEST_CASE_METHOD(CBLTest, "Database") {
     CHECK(string(CBLDatabase_Name(db)) == kDatabaseName);
     CHECK(string(CBLDatabase_Path(db)) == string(kDatabaseDir) + "/" + kDatabaseName + ".cblite2/");
@@ -34,6 +49,9 @@ TEST_CASE_METHOD(CBLTest, "Database") {
 
 
 TEST_CASE_METHOD(CBLTest, "New Document") {
+    CBL_SetLogLevel(CBLLogInfo, kCBLLogDomainAll);
+    CBL_SetLogLevel(CBLLogDebug, kCBLLogDomainDatabase);
+
     CBLDocument* doc = CBLDocument_New("foo");
     CHECK(doc != nullptr);
     CHECK(string(CBLDocument_ID(doc)) == "foo");
@@ -41,6 +59,8 @@ TEST_CASE_METHOD(CBLTest, "New Document") {
     CHECK(string(CBLDocument_PropertiesAsJSON(doc)) == "{}");
     CHECK(CBLDocument_MutableProperties(doc) == CBLDocument_Properties(doc));
     CBLDocument_Release(doc);
+
+    CBL_SetLogLevel(CBLLogInfo, kCBLLogDomainDatabase);
 }
 
 
@@ -90,19 +110,16 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
 }
 
 
-static void createDocument(CBLDatabase *db, const char *docID,
-                           const char *property, const char *value)
-{
-    CBLDocument* doc = CBLDocument_New(docID);
-    MutableDict props = CBLDocument_MutableProperties(doc);
-    FLSlot_SetString(FLMutableDict_Set(props, slice(property)), slice(value));
+TEST_CASE_METHOD(CBLTest, "Missing document") {
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict,
-                                                   &error);
-    CBLDocument_Release(doc);
-    REQUIRE(saved);
-    CBLDocument_Release(saved);
+    REQUIRE(!CBLDatabase_PurgeDocumentByID(db, "bogus", &error));
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorNotFound);
+    CHECK(string(CBLError_Message(&error)) == "not found");
 }
+
+
+#pragma mark - LISTENERS:
 
 
 static int dbListenerCalls = 0;

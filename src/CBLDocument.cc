@@ -439,7 +439,10 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db _cbl_nonnull,
                               const char* docID _cbl_nonnull,
                               CBLError* outError) CBLAPI
 {
-    return c4db_purgeDoc(internal(db), slice(docID), internal(outError));
+    c4::Transaction t(internal(db));
+    return t.begin(internal(outError))
+        && c4db_purgeDoc(internal(db), slice(docID), internal(outError))
+        && t.commit(internal(outError));
 }
 
 CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,

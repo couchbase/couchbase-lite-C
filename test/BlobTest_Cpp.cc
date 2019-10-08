@@ -41,7 +41,7 @@ static void checkBlob(Dict props) {
 }
 
 
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
     {
         MutableDocument doc("blobbo");
 
@@ -60,6 +60,8 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
         CHECK(blob.length() == kBlobContents.size);
         Dict props = blob.properties();
         checkBlob(props);
+
+        CHECK(CBLBlob_Get(props) == nullptr);
 
         // Add blob to document:
         doc["picture"] = props;
@@ -105,7 +107,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob") {
 }
 
 
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob in mutable doc") {
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob in mutable doc", "[Blob]") {
     {
         MutableDocument doc("blobbo");
         Blob blob;
@@ -122,4 +124,33 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob in mutable doc") {
     Blob blob = Blob(props);
     REQUIRE(blob);
     CHECK((FLDict)blob.properties() == (FLDict)props);
+}
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in arrays/dicts", "[Blob]") {
+    {
+        MutableDocument doc("blobbo");
+        MutableArray array = MutableArray::newArray();
+        array.insertNulls(0, 1);
+        CBLBlob *blob1 = CBLBlob_CreateWithData(kBlobContentType, kBlobContents);
+        FLMutableArray_SetBlob(array, 0, blob1);
+
+        MutableDict dict = MutableDict::newDict();
+        CBLBlob *blob2 = CBLBlob_CreateWithData(kBlobContentType, kBlobContents);
+        FLMutableDict_SetBlob(dict, "b"_sl, blob2);
+
+        doc["array"] = array;
+        doc["dict"] = dict;
+        db.saveDocument(doc);
+
+        CBLBlob_Release(blob1);
+        CBLBlob_Release(blob2);
+    }
+
+    Document doc = db.getDocument("blobbo");
+    auto array = doc["array"].asArray();
+    auto dict =  doc["dict"].asDict();
+
+    checkBlob(FLValue_AsDict(FLArray_Get(array, 0)));
+    checkBlob(FLValue_AsDict(FLDict_Get(dict, "b"_sl)));
 }
