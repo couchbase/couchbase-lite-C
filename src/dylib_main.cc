@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBLBase.h"
+#include <stdlib.h>
 
 __unused static void foo();
 
