@@ -37,16 +37,6 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "27984E112249A127000FE777"
-               BuildableName = "CouchbaseLite_CTests.xctest"
-               BlueprintName = "CouchbaseLite_CTests"
-               ReferencedContainer = "container:CBL_C.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

@@ -158,7 +158,7 @@ typedef int64_t CBLTimestamp;
 
 
 /** Returns the current time, in milliseconds since 1/1/1970. */
-CBLTimestamp CBL_now(void) CBLAPI;
+CBLTimestamp CBL_Now(void) CBLAPI;
 
 /** @} */
 

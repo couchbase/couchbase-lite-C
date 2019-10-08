@@ -53,7 +53,7 @@ char* CBLError_Message(const CBLError* error _cbl_nonnull) CBLAPI {
 }
 
 
-CBLTimestamp CBL_now(void) CBLAPI {
+CBLTimestamp CBL_Now(void) CBLAPI {
     return c4_now();
 }
 

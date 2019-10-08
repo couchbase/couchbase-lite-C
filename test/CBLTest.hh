@@ -19,6 +19,7 @@
 #pragma once
 #include "CouchbaseLite.h"
 #include "CouchbaseLite.hh"
+#include <functional>
 #include <iostream>
 #include <string>
 
@@ -64,3 +65,9 @@ public:
 
     cbl::Database db;
 };
+
+std::string GetTestFilePath(const std::string &filename);
+
+bool ReadFileByLines(std::string path, std::function<bool(FLSlice)> callback);
+
+unsigned ImportJSONLines(std::string path, CBLDatabase* database);

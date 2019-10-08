@@ -39,7 +39,7 @@ struct CBLEndpoint {
     virtual ~CBLEndpoint()                                      { }
     virtual bool valid() const =0;
     const C4Address& remoteAddress() const                      {return _address;}
-    virtual C4String remoteDatabaseName() const                 {return nullslice;}
+    virtual C4String remoteDatabaseName() const =0;
 #ifdef COUCHBASE_ENTERPRISE
     virtual C4Database* otherLocalDB() const                    {return nullptr;}
 #endif
@@ -56,7 +56,7 @@ namespace cbl_internal {
         :_url(url)
         {
             if (!c4address_fromURL(_url, &_address, &_dbName))
-                _dbName = nullslice;
+                _dbName = nullslice; // mark as invalid
         }
 
         bool valid() const override                             {return _dbName != nullslice;}
@@ -75,6 +75,7 @@ namespace cbl_internal {
         { }
 
         bool valid() const override                             {return true;}
+        virtual C4String remoteDatabaseName() const             {return nullslice;}
         virtual C4Database* otherLocalDB() const override       {return internal(_db);}
 
     private:
@@ -169,6 +170,8 @@ namespace cbl_internal {
             slice problem;
             if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull)
                 problem = "Invalid replicator config: missing endpoints or bad type"_sl;
+            else if (!endpoint->valid())
+                problem = "Invalid endpoint"_sl;
             else if (proxy && (proxy->type > kCBLProxyHTTPS || !proxy->hostname || !proxy->port))
                 problem = "Invalid replicator proxy settings"_sl;
 

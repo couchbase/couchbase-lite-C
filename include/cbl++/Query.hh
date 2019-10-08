@@ -102,6 +102,7 @@ namespace cbl {
         Result operator->() const {return Result(_rs.ref());}
 
         bool operator== (const ResultSetIterator &i) const {return _rs == i._rs;}
+        bool operator!= (const ResultSetIterator &i) const {return _rs != i._rs;}
 
         ResultSetIterator& operator++() {
             if (!CBLResultSet_Next(_rs.ref()))

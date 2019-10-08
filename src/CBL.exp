@@ -23,6 +23,8 @@ _CBL_DumpInstances
 _CBL_Log
 _CBL_SetLogLevel
 
+_CBL_Now
+
 _CBLError_Message
 
 _CBLListener_Remove
@@ -38,6 +40,7 @@ _CBLDatabase_Name
 _CBLDatabase_Path
 _CBLDatabase_Config
 _CBLDatabase_Count
+_CBLDatabase_LastSequence
 _CBLDatabase_Compact
 _CBLDatabase_Delete
 _CBLDatabase_BeginBatch
@@ -109,6 +112,7 @@ _CBLQuery_Explain
 _CBLQuery_ColumnCount
 _CBLQuery_ColumnName
 _CBLQuery_AddChangeListener
+_CBLQuery_CurrentResults
 
 _CBLResultSet_Next
 _CBLResultSet_ValueAtIndex

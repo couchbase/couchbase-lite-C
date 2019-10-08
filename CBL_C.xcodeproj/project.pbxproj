@@ -29,6 +29,9 @@
 		275B3592234BD5CD00FE9CF0 /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
 		275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */; };
 		275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */; };
+		275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
+		275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
+		275B35A1234D0ADC00FE9CF0 /* names_100.json in Resources */ = {isa = PBXBuildFile; fileRef = 275B35A0234D0A9F00FE9CF0 /* names_100.json */; };
 		275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4DD2201323700DBE7D2 /* CBLBlob.cc */; };
 		275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
 		277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
@@ -277,6 +280,8 @@
 		275B358823481C5200FE9CF0 /* XCTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = XCTests.xcconfig; sourceTree = "<group>"; };
 		275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTestsMain.cpp; sourceTree = "<group>"; };
 		275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CouchbaseLiteTests.mm; path = test/CouchbaseLiteTests.mm; sourceTree = SOURCE_ROOT; };
+		275B359D234D064600FE9CF0 /* QueryTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = QueryTest.cc; sourceTree = "<group>"; };
+		275B35A0234D0A9F00FE9CF0 /* names_100.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = names_100.json; sourceTree = "<group>"; };
 		275BC4CC22012D8700DBE7D2 /* CBLBlob.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLBlob.h; sourceTree = "<group>"; };
 		275BC4DD2201323700DBE7D2 /* CBLBlob.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBlob.cc; sourceTree = "<group>"; };
 		275BC4E22204E6A800DBE7D2 /* Blob.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Blob.hh; sourceTree = "<group>"; };
@@ -534,10 +539,12 @@
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
 				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
+				275B359D234D064600FE9CF0 /* QueryTest.cc */,
 				277CC99422BC23DE00B245CB /* ReplicatorTest.cc */,
 				27C9B5F221F7EE670040BC45 /* CBLTest.c */,
 				275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */,
 				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
+				275B35A0234D0A9F00FE9CF0 /* names_100.json */,
 			);
 			path = test;
 			sourceTree = "<group>";
@@ -940,6 +947,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				275B35A1234D0ADC00FE9CF0 /* names_100.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -993,6 +1001,7 @@
 				275B358923481D0C00FE9CF0 /* CBLTest.cc in Sources */,
 				275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */,
 				275B358C23481D0C00FE9CF0 /* BlobTest_Cpp.cc in Sources */,
+				275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */,
 				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1017,13 +1026,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */,
+				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
+				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
-				275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */,
-				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
-				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
-				277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */,
 				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,
+				275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */,
+				277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

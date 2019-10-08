@@ -105,7 +105,7 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                                              const SaveOptions &opt,
                                              C4Error* outError)
 {
-    if (!checkMutable(outError))
+    if (!opt.deleting && !checkMutable(outError))
         return nullptr;
     if (_db && _db != db) {
         setError(outError, LiteCoreDomain, kC4ErrorInvalidParameter,

@@ -199,7 +199,7 @@ namespace cbl_internal {
 
         CBLResultSet* resultSet(CBLError *error) {
             auto e = c4queryobs_getEnumerator(_c4obs, internal(error));
-            _resultSet = e ? new CBLResultSet(_query, e) : nullptr;
+            _resultSet = e ? new CBLResultSet(_query, c4queryenum_retain(e)) : nullptr;
             return _resultSet;
         }
 
