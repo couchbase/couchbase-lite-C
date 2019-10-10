@@ -46,7 +46,7 @@ public:
 };
 
 
-TEST_CASE_METHOD(QueryTest, "Invalid Query") {
+TEST_CASE_METHOD(QueryTest, "Invalid Query", "[!throws]") {
     CBLError error;
     int errPos;
     query = CBLQuery_New(db.ref(), kCBLN1QLLanguage,

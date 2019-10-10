@@ -102,6 +102,7 @@ CBLDatabase* CBLDatabase_Open(const char *name,
     C4Database *c4db = c4db_openNamed(slice(name), &c4config, internal(outError));
     if (!c4db)
         return nullptr;
+    c4db_startHousekeeping(c4db);
     return retain(new CBLDatabase(c4db, name,
                                   c4config.parentDirectory,
                                   (config ? config->flags : kDefaultFlags)));

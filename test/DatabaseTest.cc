@@ -157,10 +157,8 @@ TEST_CASE_METHOD(CBLTest, "Expiration") {
     CHECK(CBLDatabase_GetDocumentExpiration(db, "doc2", &error) == 0);
     CHECK(CBLDatabase_GetDocumentExpiration(db, "docX", &error) == 0);
 
-#if 0  // TODO: Enable once the doc-expiration task is implemented
     this_thread::sleep_for(chrono::milliseconds(1700));
     CHECK(CBLDatabase_Count(db) == 1);
-#endif
 }
 
 

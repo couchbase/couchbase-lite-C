@@ -112,7 +112,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch") {
 }
 
 
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch With Exception", "[.throws][!throws]") {
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch With Exception", "[!throws]") {
     bool threw = false;
     try {
         Batch b(db);
