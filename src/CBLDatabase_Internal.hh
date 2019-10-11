@@ -24,35 +24,39 @@
 #include "access_lock.hh"
 
 
-struct CBLDatabase : public CBLRefCounted {
+struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Database*> {
 
     CBLDatabase(C4Database* _cbl_nonnull db,
                 const std::string &name_,
                 fleece::slice dir_,
                 CBLDatabaseFlags flags_)
-    :c4db(db)
+    :access_lock(std::move(db))
     ,name(name_)
-    ,path(fleece::alloc_slice(c4db_getPath(c4db)))
+    ,path(fleece::alloc_slice(c4db_getPath(db)))
     ,dir(dir_)
     ,flags(flags_)
+    ,_blobStore(c4db_getBlobStore(db, nullptr))
     ,_notificationQueue(this)
     { }
 
     virtual ~CBLDatabase() {
-        c4dbobs_free(_observer);
-        _docListeners.clear();
-        c4db_release(c4db);
+        use([&](C4Database *c4db) {
+            c4dbobs_free(_observer);
+            _docListeners.clear();
+            c4db_release(c4db);
+        });
     }
 
-    C4Database* const c4db;
     std::string const name;         // Cached copy so API can return a C string
     std::string const path;         // Cached copy so API can return a C string
     std::string const dir;          // Cached copy so API can return a C string
     CBLDatabaseFlags const flags;
 
-    CBLListenerToken* addListener(CBLDatabaseChangeListener listener _cbl_nonnull, void *context);
+    CBLListenerToken* addListener(CBLDatabaseChangeListener listener _cbl_nonnull,
+                                  void *context);
     CBLListenerToken* addDocListener(const char *docID _cbl_nonnull,
-                                     CBLDocumentChangeListener listener _cbl_nonnull, void *context);
+                                     CBLDocumentChangeListener listener _cbl_nonnull,
+                                     void *context);
 
     void notify(Notification n) const   {const_cast<CBLDatabase*>(this)->_notificationQueue.add(n);}
     void sendNotifications()            {_notificationQueue.notifyAll();}
@@ -69,20 +73,16 @@ struct CBLDatabase : public CBLRefCounted {
         });
     }
 
-    C4BlobStore* blobStore() const                      {return c4db_getBlobStore(c4db, nullptr);}
+    C4BlobStore* blobStore() const      {return _blobStore;}
 
 private:
     void databaseChanged();
     void callDBListeners();
     void callDocListeners();
 
+    C4BlobStore* _blobStore;
     C4DatabaseObserver* _observer {nullptr};
     cbl_internal::Listeners<CBLDatabaseChangeListener> _listeners;
     cbl_internal::Listeners<CBLDocumentChangeListener> _docListeners;
     NotificationQueue _notificationQueue;
 };
-
-
-namespace cbl_internal {
-    static inline C4Database* internal(const CBLDatabase *db)    {return db->c4db;}
-}

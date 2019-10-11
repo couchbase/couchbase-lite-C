@@ -980,14 +980,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
 				271C2A7621CC4BD60045856E /* Util.cc in Sources */,
-				277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */,
-				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
+				271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */,
+				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */,
-				271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */,
+				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
+				277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -995,14 +995,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				275B358A23481D0C00FE9CF0 /* DatabaseTest.cc in Sources */,
-				275B358B23481D0C00FE9CF0 /* DatabaseTest_Cpp.cc in Sources */,
+				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
 				275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */,
 				275B358923481D0C00FE9CF0 /* CBLTest.cc in Sources */,
-				275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */,
+				275B358A23481D0C00FE9CF0 /* DatabaseTest.cc in Sources */,
+				275B358B23481D0C00FE9CF0 /* DatabaseTest_Cpp.cc in Sources */,
 				275B358C23481D0C00FE9CF0 /* BlobTest_Cpp.cc in Sources */,
 				275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */,
-				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
+				275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

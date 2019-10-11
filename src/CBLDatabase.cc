@@ -54,9 +54,12 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
             c4Config.flags |= kC4DB_ReadOnly;
         if (config->flags & kCBLDatabase_NoUpgrade)
             c4Config.flags |= kC4DB_NoUpgrade;
-        c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(config->encryptionKey.algorithm);
-        static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes), "C4EncryptionKey and CBLEncryptionKey size do not match");
-        memcpy(c4Config.encryptionKey.bytes, config->encryptionKey.bytes, sizeof(CBLEncryptionKey::bytes));
+        c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(
+                                                                config->encryptionKey.algorithm);
+        static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
+                      "C4EncryptionKey and CBLEncryptionKey size do not match");
+        memcpy(c4Config.encryptionKey.bytes, config->encryptionKey.bytes,
+               sizeof(CBLEncryptionKey::bytes));
     } else {
         c4Config.parentDirectory = effectiveDir(nullptr);
         c4Config.flags = kDefaultFlags;
@@ -110,31 +113,47 @@ CBLDatabase* CBLDatabase_Open(const char *name,
 
 
 bool CBLDatabase_Close(CBLDatabase* db, CBLError* outError) CBLAPI {
-    return !db || c4db_close(internal(db), internal(outError));
+    if (!db)
+        return true;
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_close(c4db, internal(outError));
+    });
 }
 
 bool CBLDatabase_BeginBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
-    return c4db_beginTransaction(internal(db), internal(outError));
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_beginTransaction(c4db, internal(outError));
+    });
 }
 
 bool CBLDatabase_EndBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
-    return c4db_endTransaction(internal(db), true, internal(outError));
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_endTransaction(c4db, true, internal(outError));
+    });
 }
 
 bool CBLDatabase_Compact(CBLDatabase* db, CBLError* outError) CBLAPI {
-    return c4db_compact(internal(db), internal(outError));
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_compact(c4db, internal(outError));
+    });
 }
 
 bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
-    return c4db_delete(internal(db), internal(outError));
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_delete(c4db, internal(outError));
+    });
 }
 
 CBLTimestamp CBLDatabase_NextDocExpiration(CBLDatabase* db) CBLAPI {
-    return c4db_nextDocExpiration(internal(db));
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_nextDocExpiration(c4db);
+    });
 }
 
 int64_t CBLDatabase_PurgeExpiredDocuments(CBLDatabase* db, CBLError* outError) CBLAPI {
-    return c4db_purgeExpiredDocs(internal(db), internal(outError));
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_purgeExpiredDocs(c4db, internal(outError));
+    });
 }
 
 
@@ -155,11 +174,15 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) CBLAPI 
 }
 
 uint64_t CBLDatabase_Count(const CBLDatabase* db) CBLAPI {
-    return c4db_getDocumentCount(internal(db));
+    return db->use<uint64_t>([](C4Database *c4db) {
+        return c4db_getDocumentCount(c4db);
+    });
 }
 
 uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) CBLAPI {
-    return c4db_getLastSequence(internal(db));
+    return db->use<uint64_t>([](C4Database *c4db) {
+        return c4db_getLastSequence(c4db);
+    });
 }
 
 
@@ -182,15 +205,17 @@ void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI {
 
 
 CBLListenerToken* CBLDatabase::addListener(CBLDatabaseChangeListener listener, void *context) {
-    auto token = _listeners.add(listener, context);
-    if (!_observer) {
-        _observer = c4dbobs_create(c4db,
-                                   [](C4DatabaseObserver* observer, void *context) {
-                                       ((CBLDatabase*)context)->databaseChanged();
-                                   },
-                                   this);
-    }
-    return token;
+    return use<CBLListenerToken*>([=](C4Database *c4db) {
+        auto token = _listeners.add(listener, context);
+        if (!_observer) {
+            _observer = c4dbobs_create(c4db,
+                                       [](C4DatabaseObserver* observer, void *context) {
+                                           ((CBLDatabase*)context)->databaseChanged();
+                                       },
+                                       this);
+        }
+        return token;
+    });
 }
 
 
@@ -249,18 +274,23 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         ,_db(db)
         ,_docID(docID)
-        ,_c4obs( c4docobs_create(internal(db),
-                                 slice(docID),
-                                 [](C4DocumentObserver* observer, C4String docID,
-                                    C4SequenceNumber sequence, void *context)
-                                 {
-                                     ((ListenerToken*)context)->docChanged();
-                                 },
-                                 this) )
-        { }
+        {
+            db->use([&](C4Database *c4db) {
+                _c4obs = c4docobs_create(c4db,
+                                         slice(docID),
+                                         [](C4DocumentObserver* observer, C4String docID,
+                                            C4SequenceNumber sequence, void *context)
+                                         {
+                                             ((ListenerToken*)context)->docChanged();
+                                         },
+                                         this);
+            });
+        }
 
         ~ListenerToken() {
-            c4docobs_free(_c4obs);
+            _db->use([&](C4Database *c4db) {
+                c4docobs_free(_c4obs);
+            });
         }
 
         CBLDocumentChangeListener callback() const {

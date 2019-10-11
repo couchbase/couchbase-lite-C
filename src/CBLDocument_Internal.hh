@@ -98,10 +98,7 @@ private:
     CBLDocument(const string &docID, CBLDatabase *db, C4Document *d, bool isMutable);
     virtual ~CBLDocument();
 
-    void initProperties();
     bool checkMutable(C4Error *outError) const;
-
-    static string ensureDocID(const char *docID);
 
     static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
     bool saveBlobs(CBLDatabase *db, C4Error *outError);
@@ -115,7 +112,8 @@ private:
     string const                _docID;                 // Document ID (never empty)
     Retained<CBLDatabase> const _db;                    // Database (null for new doc)
     c4::ref<C4Document> const   _c4doc;                 // LiteCore doc (null for new doc)
-    RetainedValue               _properties;            // Properties, initialized lazily
-    ValueToBlobMap              _blobs;
+    mutable RetainedValue       _properties;            // Properties, initialized lazily
+    ValueToBlobMap              _blobs;                 // Maps Dicts in _properties to CBLBlobs
+    mutable recursive_mutex     _mutex;                 // For accessing _c4doc, _properties, _blobs
     bool const                  _mutable {false};       // True iff I am mutable
 };

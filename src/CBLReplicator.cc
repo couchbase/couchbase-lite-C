@@ -23,6 +23,7 @@
 #include "c4.hh"
 #include "c4Replicator.h"
 #include "c4Private.h"
+#include "StringUtil.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <atomic>
@@ -55,6 +56,7 @@ class CBLReplicator : public CBLRefCounted {
 public:
     CBLReplicator(const CBLReplicatorConfiguration *conf _cbl_nonnull)
     :_conf(*conf)
+    ,_db(conf->database)
     {
         // One-time initialization of network transport:
         static once_flag once;
@@ -105,21 +107,23 @@ public:
         params.optionsDictFleece = options;
 
         // Create the LiteCore replicator:
+        _conf.database->use([&](C4Database *c4db) {
 #ifdef COUCHBASE_ENTERPRISE
-        if (_conf.endpoint->otherLocalDB()) {
-            _c4repl = c4repl_newLocal(internal(_conf.database),
-                                      _conf.endpoint->otherLocalDB(),
-                                      params,
-                                      &_status.error);
-        } else
+            if (_conf.endpoint->otherLocalDB()) {
+                _c4repl = c4repl_newLocal(c4db,
+                                          _conf.endpoint->otherLocalDB(),
+                                          params,
+                                          &_status.error);
+            } else
 #endif
-        {
-            _c4repl = c4repl_new(internal(_conf.database),
-                                 _conf.endpoint->remoteAddress(),
-                                 _conf.endpoint->remoteDatabaseName(),
-                                 params,
-                                 &_status.error);
-        }
+            {
+                _c4repl = c4repl_new(c4db,
+                                     _conf.endpoint->remoteAddress(),
+                                     _conf.endpoint->remoteDatabaseName(),
+                                     params,
+                                     &_status.error);
+            }
+        });
         if (_c4repl)
             _status = c4repl_getStatus(_c4repl);
     }
@@ -244,6 +248,7 @@ private:
 
     recursive_mutex _mutex;
     ReplicatorConfiguration const _conf;
+    Retained<CBLDatabase> _db;
     c4::ref<C4Replicator> _c4repl;
     C4ReplicatorStatus _status {kC4Stopped};
     bool _optionsChanged {false};
