@@ -39,7 +39,7 @@ public:
     CBLDocument(const char *docID, bool isMutable);
 
     // Construct on an existing document
-    CBLDocument(CBLDatabase *db, const string &docID, bool isMutable);
+    CBLDocument(CBLDatabase *db, const string &docID, bool isMutable, bool allRevisions =false);
 
     // Mutable copy of another CBLDocument
     CBLDocument(const CBLDocument* otherDoc);
@@ -61,6 +61,8 @@ public:
     uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence : 0;}
     bool isMutable() const                      {return _mutable;}
 
+    //---- Properties:
+
     FLDoc createFleeceDoc() const               {return c4doc_createFleeceDoc(_c4doc);}
     Dict properties() const;
     MutableDict mutableProperties()             {return properties().asMutable();}
@@ -68,6 +70,8 @@ public:
 
     char* propertiesAsJSON() const;
     bool setPropertiesAsJSON(const char *json, C4Error* outError);
+
+    //---- Save/delete:
 
     struct SaveOptions {
         SaveOptions(CBLConcurrencyControl c)             :concurrency(c) { }
@@ -89,10 +93,31 @@ public:
                           const char* docID _cbl_nonnull,
                           C4Error* outError);
 
+    //---- Blobs:
+
     CBLBlob* getBlob(FLDict _cbl_nonnull);
 
     static void registerNewBlob(CBLNewBlob* _cbl_nonnull);
     static void unregisterNewBlob(CBLNewBlob* _cbl_nonnull);
+
+    //---- Conflict resolution:
+
+    C4RevisionFlags revisionFlags() const       {return _c4doc->selectedRev.flags;}
+    slice revisionID() const                    {return _c4doc->selectedRev.revID;}
+
+    // Select a specific revision. Only works if constructed with allRevisions=true.
+    bool selectRevision(slice revID);
+
+    // Select a conflicting revision. Only works if constructed with allRevisions=true.
+    bool selectNextConflictingRevision();
+
+    enum class Resolution {
+        useLocal,
+        useRemote,
+        useMerge
+    };
+
+    bool resolveConflict(Resolution, CBLDocument *mergeDoc, CBLError*);
 
 private:
     CBLDocument(const string &docID, CBLDatabase *db, C4Document *d, bool isMutable);
@@ -102,7 +127,7 @@ private:
 
     static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
     bool saveBlobs(CBLDatabase *db, C4Error *outError);
-    alloc_slice encodeBody(CBLDatabase* db _cbl_nonnull, C4Error *outError);
+    alloc_slice encodeBody(CBLDatabase* _cbl_nonnull, C4Database* _cbl_nonnull, C4Error *outError);
     
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
     using UnretainedValueToBlobMap = std::unordered_map<FLDict, CBLNewBlob*>;

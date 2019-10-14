@@ -94,7 +94,7 @@ protected:
     { }
 
     CBLDatabase* database() const                       {return _db;}
-    void setDatabase(CBLDatabase *db NONNULL)           {assert(!_db); _db = db;}
+    void setDatabase(CBLDatabase *db _cbl_nonnull)      {assert(!_db); _db = db;}
 
     C4BlobStore* store() const {
         assert(_db);

@@ -108,8 +108,8 @@ typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool 
         Or return NULL if the resolution is to delete the document. */
 typedef CBLDocument* (*CBLConflictResolver)(void *context,
                                             const char *documentID,
-                                            CBLDocument *localDocument,
-                                            CBLDocument *remoteDocument);
+                                            const CBLDocument *localDocument,
+                                            const CBLDocument *remoteDocument);
 
 
 /** Types of proxy servers, for CBLProxySettings. */

@@ -36,6 +36,22 @@ static string ensureDocID(const char *docID) {
     return string(docID);
 }
 
+static C4Document* getC4Doc(CBLDatabase *db, const string &docID, bool allRevisions) {
+    return db->use<C4Document*>([&](C4Database *c4db) {
+        C4Document *doc;
+        if (allRevisions) {
+            doc = c4doc_get(c4db, slice(docID), true, nullptr);
+        } else {
+            doc = c4doc_getSingleRevision(c4db, slice(docID), nullslice, true, nullptr);
+            if (doc->flags & kDocDeleted) {
+                c4doc_release(doc);
+                doc = nullptr;
+            }
+        }
+        return doc;
+    });
+}
+
 
 // Core constructor
 CBLDocument::CBLDocument(const string &docID,
@@ -59,12 +75,8 @@ CBLDocument::CBLDocument(const char *docID, bool isMutable)
 
 
 // Construct on an existing document
-CBLDocument::CBLDocument(CBLDatabase *db, const string &docID, bool isMutable)
-:CBLDocument(docID, db,
-             db->use<C4Document*>([&](C4Database *c4db) {
-                return c4doc_getSingleRevision(c4db, slice(docID), nullslice, true, nullptr);
-             }),
-             isMutable)
+CBLDocument::CBLDocument(CBLDatabase *db, const string &docID, bool isMutable, bool allRevisions)
+:CBLDocument(docID, db, getC4Doc(db, docID, allRevisions), isMutable)
 { }
 
 
@@ -106,6 +118,9 @@ bool CBLDocument::checkMutable(C4Error *outError) const {
 }
 
 
+#pragma mark - SAVING / DELETING:
+
+
 RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                                              const SaveOptions &opt,
                                              C4Error* outError)
@@ -126,14 +141,10 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
         if (!t.begin(outError))
             return;
 
-        // Save new blobs:
-        if (!saveBlobs(db, outError))
-            return;
-
         // Encode properties:
         alloc_slice body;
         if (!opt.deleting) {
-            body = encodeBody(db, outError);
+            body = encodeBody(db, c4db, outError);
             if (!body)
                 return;
         }
@@ -170,7 +181,7 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                         c4err = {LiteCoreDomain, kC4ErrorConflict};
                         break;
                     }
-                    body = encodeBody(db, &c4err);
+                    body = encodeBody(db, c4db, &c4err);
                     if (!body)
                         break;
                     savingDoc = conflictingDoc ? c4doc_retain(conflictingDoc->_c4doc) : nullptr;
@@ -229,6 +240,62 @@ bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError
 }
 
 
+#pragma mark - CONFLICT RESOLUTION:
+
+
+bool CBLDocument::selectRevision(slice revID) {
+    LOCK(_mutex);
+    _properties = nullptr;
+    return c4doc_selectRevision(_c4doc, revID, true, nullptr);
+}
+
+
+bool CBLDocument::selectNextConflictingRevision() {
+    LOCK(_mutex);
+    _properties = nullptr;
+    while (c4doc_selectNextLeafRevision(_c4doc, true, true, nullptr))
+        if (_c4doc->selectedRev.flags & kRevIsConflict)
+            return true;
+    return false;
+}
+
+
+bool CBLDocument::resolveConflict(Resolution resolution, CBLDocument *mergeDoc, CBLError* outError)
+{
+    LOCK(_mutex);
+    C4Error *c4err = internal(outError);
+    _properties = nullptr;
+
+    slice winner(_c4doc->selectedRev.revID), loser(_c4doc->revID);
+    if (resolution != Resolution::useRemote)
+        std::swap(winner, loser);
+
+    return _db->use<bool>([&](C4Database *c4db) {
+        c4::Transaction t(c4db);
+        if (!t.begin(c4err))
+            return false;
+
+        alloc_slice mergeBody;
+        C4RevisionFlags mergeFlags = 0;
+        if (resolution == Resolution::useMerge) {
+            if (mergeDoc) {
+                mergeBody = mergeDoc->encodeBody(_db, c4db, c4err);
+                if (!mergeBody)
+                    return false;
+            } else {
+                mergeFlags = kRevDeleted;
+            }
+        } else {
+            assert(!mergeDoc);
+        }
+
+        return c4doc_resolveConflict(_c4doc, winner, loser, mergeBody, mergeFlags, c4err)
+            && _db->use<bool>([&](C4Database*) { return c4doc_save(_c4doc, 0, c4err); })
+            && t.commit(c4err);
+    });
+}
+
+
 #pragma mark - PROPERTIES:
 
 
@@ -281,17 +348,18 @@ bool CBLDocument::setPropertiesAsJSON(const char *json, C4Error* outError) {
 }
 
 
-alloc_slice CBLDocument::encodeBody(CBLDatabase* db _cbl_nonnull, C4Error *outError) {
+alloc_slice CBLDocument::encodeBody(CBLDatabase *db _cbl_nonnull, C4Database *c4db _cbl_nonnull, C4Error *outError) {
     LOCK(_mutex);
-    return db->use<alloc_slice>([&](C4Database *c4db) {
-        SharedEncoder enc(c4db_getSharedFleeceEncoder(c4db));
-        enc.writeValue(properties());
-        FLError flErr;
-        alloc_slice body = enc.finish(&flErr);
-        if (!body)
-            c4error_return(FleeceDomain, flErr, nullslice, outError);
-        return body;
-    });
+    // Save new blobs:
+    if (!saveBlobs(db, outError))
+        return nullslice;
+    SharedEncoder enc(c4db_getSharedFleeceEncoder(c4db));
+    enc.writeValue(properties());
+    FLError flErr;
+    alloc_slice body = enc.finish(&flErr);
+    if (!body)
+        c4error_return(FleeceDomain, flErr, nullslice, outError);
+    return body;
 }
 
 

@@ -73,6 +73,8 @@
 		27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
 		27B61DBC21D7075C0027CCDB /* libLiteCore-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A4F21CAD5950045856E /* libLiteCore-static.a */; };
 		27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
+		27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27D11BED2351043B00C58A70 /* ConflictResolver.hh */; };
+		27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D11BEE2351043B00C58A70 /* ConflictResolver.cc */; };
 		6938072F22DE966B00727053 /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 /* End PBXBuildFile section */
@@ -341,6 +343,9 @@
 		27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDatabase_Internal.hh; sourceTree = "<group>"; };
 		27C9B5F121F7D74A0040BC45 /* Replicator.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Replicator.hh; sourceTree = "<group>"; };
 		27C9B5F221F7EE670040BC45 /* CBLTest.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = CBLTest.c; sourceTree = "<group>"; };
+		27D11BED2351043B00C58A70 /* ConflictResolver.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ConflictResolver.hh; sourceTree = "<group>"; };
+		27D11BEE2351043B00C58A70 /* ConflictResolver.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ConflictResolver.cc; sourceTree = "<group>"; };
+		27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLReplicator_Internal.hh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -463,7 +468,10 @@
 				277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */,
 				27B61D5521D5ABA60027CCDB /* CBLQuery.cc */,
 				277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */,
+				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
+				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
+				27D11BED2351043B00C58A70 /* ConflictResolver.hh */,
 				271C2A7921CC756A0045856E /* Internal.hh */,
 				27886C8C21F64C1400069BEA /* Listener.cc */,
 				27886C8B21F64C1400069BEA /* Listener.hh */,
@@ -609,6 +617,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */,
+				27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */,
 				271C2A3321CAC98F0045856E /* CBLDocument.h in Headers */,
 				27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */,
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
@@ -980,6 +989,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
 				271C2A7621CC4BD60045856E /* Util.cc in Sources */,
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
 				271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */,

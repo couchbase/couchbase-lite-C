@@ -22,6 +22,10 @@
 #include "c4Base.h"
 #include <string>
 
+
+#define LOCK(MUTEX)     lock_guard<decltype(MUTEX)> _lock(MUTEX)
+
+
 namespace cbl_internal {
 
 #if 0 // UNUSED
