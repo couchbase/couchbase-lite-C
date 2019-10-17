@@ -20,6 +20,7 @@
 #include "cbl++/CouchbaseLite.hh"
 #include <iostream>
 #include <thread>
+#include <set>
 
 using namespace std;
 using namespace fleece;
@@ -30,6 +31,7 @@ class ReplicatorTest : public CBLTest_Cpp {
 public:
     CBLReplicatorConfiguration config = {};
     CBLReplicator *repl = nullptr;
+    set<string> docsNotified;
 
     ReplicatorTest() {
         config.database = db.ref();
@@ -50,7 +52,7 @@ public:
         auto dtoken = CBLReplicator_AddDocumentListener(repl, [](void *context, CBLReplicator *r, bool isPush,
                                                                  unsigned numDocuments,
                                                                  const CBLReplicatedDocument* documents) {
-            ((ReplicatorTest*)context)->docsChanged(r, isPush, numDocuments, documents);
+            ((ReplicatorTest*)context)->docProgress(r, isPush, numDocuments, documents);
         }, this);
 
         CBLReplicator_Start(repl);
@@ -72,13 +74,15 @@ public:
         cerr << "--- PROGRESS: status=" << status.activity << ", fraction=" << status.progress.fractionComplete << ", err=" << status.error.domain << "/" << status.error.code << "\n";
     }
 
-    void docsChanged(CBLReplicator *r, bool isPush,
+    void docProgress(CBLReplicator *r, bool isPush,
                      unsigned numDocuments,
                      const CBLReplicatedDocument* documents) {
         CHECK(r == repl);
         cerr << "--- " << numDocuments << " docs " << (isPush ? "pushed" : "pulled") << ":";
-        for (unsigned i = 0; i < numDocuments; ++i)
+        for (unsigned i = 0; i < numDocuments; ++i) {
+            docsNotified.insert(documents[i].ID);
             cerr << " " << documents[i].ID;
+        }
         cerr << "\n";
     }
 
@@ -87,13 +91,31 @@ public:
         CBLAuth_Free(config.authenticator);
         CBLEndpoint_Free(config.endpoint);
     }
+
+#ifdef COUCHBASE_ENTERPRISE
+    /// Creates `otherDB` and configures the replication to push to it
+    void configureLocalReplication() {
+        otherDB = openEmptyDatabaseNamed("otherDB");
+        config.endpoint = CBLEndpoint_NewWithLocalDB(otherDB.ref());
+        config.replicatorType = kCBLReplicatorTypePush;
+    }
+
+    static vector<string> asVector(const set<string> strings) {
+        vector<string> out;
+        for (const string &s : strings)
+            out.push_back(s);
+        return out;
+    }
+
+    Database otherDB;
+#endif // COUCHBASE_ENTERPRISE
 };
 
 
 #pragma mark - TESTS:
 
 
-TEST_CASE_METHOD(ReplicatorTest, "Bad config") {
+TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
     CBLError error;
     config.database = nullptr;
     CHECK(!CBLReplicator_New(&config, &error));
@@ -114,7 +136,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config") {
 }
 
 
-TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate") {
+TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
     config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar");
     config.authenticator = CBLAuth_NewSession("SyncGatewaySession", "NOM_NOM_NOM");
 
@@ -130,7 +152,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate") {
 }
 
 
-TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy") {
+TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replicator]") {
     config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar");
     config.authenticator = CBLAuth_NewBasic("username", "p@ssw0RD");
 
@@ -144,3 +166,172 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy") {
 
     replicate();
 }
+
+
+#pragma mark - LOCAL-TO-LOCAL TESTS:
+
+
+#ifdef COUCHBASE_ENTERPRISE
+
+TEST_CASE_METHOD(ReplicatorTest, "Push to local db", "[Replicator]") {
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+
+    configureLocalReplication();
+    replicate();
+
+    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+
+    Document copiedDoc = otherDB.getDocument("foo");
+    REQUIRE(copiedDoc);
+    CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
+}
+
+
+TEST_CASE_METHOD(ReplicatorTest, "Pull conflict (default resolver)", "[Replicator][Conflict]") {
+    configureLocalReplication();
+    config.replicatorType = kCBLReplicatorTypePull;
+
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+
+    MutableDocument doc2("foo");
+    doc2["greeting"] = "Salaam Alaykum";
+    otherDB.saveDocument(doc2);
+
+    replicate();
+
+    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+
+    Document copiedDoc = db.getDocument("foo");
+    REQUIRE(copiedDoc);
+    CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
+}
+
+
+class ReplicatorConflictTest : public ReplicatorTest {
+public:
+
+    bool deleteLocal {false}, deleteRemote {false}, deleteMerged {false};
+    bool resolverCalled {false};
+
+    void testConflict(bool delLocal, bool delRemote, bool delMerged) {
+        deleteLocal = delLocal;
+        deleteRemote = delRemote;
+        deleteMerged = delMerged;
+
+        configureLocalReplication();
+        config.replicatorType = kCBLReplicatorTypePull;
+
+        // Save the same doc to each db (will have the same revision),
+        MutableDocument doc("foo");
+        doc["greeting"] = "Howdy!";
+        doc = db.saveDocument(doc).mutableCopy();
+        if (deleteLocal) {
+            doc.deleteDoc();
+        } else {
+            doc["expletive"] = "Shazbatt!";
+            db.saveDocument(doc);
+        }
+
+        doc = MutableDocument("foo");
+        doc["greeting"] = "Howdy!";
+        doc = otherDB.saveDocument(doc).mutableCopy();
+        if (deleteRemote) {
+            doc.deleteDoc();
+        } else {
+            doc["expletive"] = "Frak!";
+            otherDB.saveDocument(doc);
+        }
+
+        config.conflictResolver = [](void *context,
+                                     const char *documentID,
+                                     const CBLDocument *localDocument,
+                                     const CBLDocument *remoteDocument) -> const CBLDocument* {
+            cerr << "--- Entering custom conflict resolver! (local=" << localDocument <<
+                    ", remote=" << remoteDocument << ")\n";
+            auto merged = ((ReplicatorConflictTest*)context)->conflictResolver(documentID, localDocument, remoteDocument);
+            cerr << "--- Returning " << merged << " from custom conflict resolver\n";
+            return merged;
+        };
+
+        replicate();
+
+        CHECK(resolverCalled);
+        CHECK(asVector(docsNotified) == vector<string>{"foo"});
+
+        Document copiedDoc = db.getDocument("foo");
+        if (deleteMerged) {
+            REQUIRE(!copiedDoc);
+        } else {
+            REQUIRE(copiedDoc);
+            CHECK(copiedDoc["greeting"].asString() == "¡Hola!"_sl);
+        }
+    }
+
+
+    const CBLDocument* conflictResolver(const char *documentID,
+                                       const CBLDocument *localDocument,
+                                       const CBLDocument *remoteDocument)
+    {
+        CHECK(!resolverCalled);
+        resolverCalled = true;
+
+        CHECK(string(documentID) == "foo");
+        if (deleteLocal) {
+            REQUIRE(!localDocument);
+        } else {
+            REQUIRE(localDocument);
+            CHECK(string(CBLDocument_ID(localDocument)) == "foo");
+            Dict localProps(CBLDocument_Properties(localDocument));
+            CHECK(localProps["greeting"].asString() == "Howdy!"_sl);
+            CHECK(localProps["expletive"].asString() == "Shazbatt!"_sl);
+        }
+        if (deleteRemote) {
+            REQUIRE(!remoteDocument);
+        } else {
+            REQUIRE(remoteDocument);
+            CHECK(string(CBLDocument_ID(remoteDocument)) == "foo");
+            Dict remoteProps(CBLDocument_Properties(remoteDocument));
+            CHECK(remoteProps["greeting"].asString() == "Howdy!"_sl);
+            CHECK(remoteProps["expletive"].asString() == "Frak!"_sl);
+        }
+        if (deleteMerged) {
+            return nullptr;
+        } else {
+            CBLDocument *merged = CBLDocument_New(documentID);
+            MutableDict mergedProps(CBLDocument_MutableProperties(merged));
+            mergedProps.set("greeting"_sl, "¡Hola!");
+            // do not release `merged`, otherwise it would be freed before returning!
+            return merged;
+        }
+    }
+};
+
+
+TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict (custom resolver)",
+                 "[Replicator][Conflict]") {
+    testConflict(false, false, false);
+}
+
+
+TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict with remote deletion (custom resolver)",
+                 "[Replicator][Conflict]") {
+    testConflict(false, true, false);
+}
+
+
+TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict with local deletion (custom resolver)",
+                 "[Replicator][Conflict]") {
+    testConflict(true, false, false);
+}
+
+
+TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict deleting merge (custom resolver)",
+                 "[Replicator][Conflict]") {
+    testConflict(false, true, true);
+}
+
+#endif // COUCHBASE_ENTERPRISE

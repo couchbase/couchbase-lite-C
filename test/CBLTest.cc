@@ -78,11 +78,9 @@ std::string& CBLTest_Cpp::kDatabaseDir = CBLTest::kDatabaseDir;
 const char* const & CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
 
 
-CBLTest_Cpp::CBLTest_Cpp() {
-    cbl::Database::deleteDatabase(kDatabaseName, kDatabaseDir.c_str());
-    db = cbl::Database(kDatabaseName, CBLTest::kDatabaseConfiguration);
-    REQUIRE(db);
-}
+CBLTest_Cpp::CBLTest_Cpp()
+:db(openEmptyDatabaseNamed(kDatabaseName))
+{ }
 
 
 CBLTest_Cpp::~CBLTest_Cpp() {
@@ -94,6 +92,14 @@ CBLTest_Cpp::~CBLTest_Cpp() {
         CBL_DumpInstances();
     }
     CHECK(CBL_InstanceCount() == 0);
+}
+
+
+cbl::Database CBLTest_Cpp::openEmptyDatabaseNamed(const char *name) {
+    cbl::Database::deleteDatabase(name, CBLTest::kDatabaseConfiguration.directory);
+    cbl::Database emptyDB = cbl::Database(name, CBLTest::kDatabaseConfiguration);
+    REQUIRE(emptyDB);
+    return emptyDB;
 }
 
 

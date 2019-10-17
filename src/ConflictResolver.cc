@@ -23,6 +23,18 @@
 #include "c4DocEnumerator.h"
 #include "c4.hh"
 #include "StringUtil.hh"
+#include "Stopwatch.hh"
+
+
+static const CBLDocument* defaultConflictResolver(void *context,
+                                            const char *documentID,
+                                            const CBLDocument *localDocument,
+                                            const CBLDocument *remoteDocument)
+{
+    return localDocument;
+}
+
+const CBLConflictResolver CBLDefaultConflictResolver = &defaultConflictResolver;
 
 
 namespace cbl_internal {
@@ -34,11 +46,13 @@ namespace cbl_internal {
                                        alloc_slice docID,
                                        alloc_slice revID)
     :_db(db)
-    ,_docID(docID)
-    ,_revID(revID)
     ,_clientResolver(customResolver)
     ,_clientResolverContext(context)
-    { }
+    ,_docID(docID)
+    ,_revID(revID)
+    {
+        //SyncLog(Info, "ConflictResolver %p on %s", this, _docID.c_str());
+    }
 
 
     ConflictResolver::ConflictResolver(CBLDatabase *db,
@@ -49,20 +63,11 @@ namespace cbl_internal {
     { }
 
 
-    ConflictResolver::ConflictResolver(CBLReplicator *replicator,
-                                       const C4DocumentEnded &docEnded)
-    :ConflictResolver(replicator->configuration()->database,
-                      replicator->configuration()->conflictResolver,
-                      replicator->configuration()->context,
-                      docEnded)
-    { }
-
-
     void ConflictResolver::runAsync(CompletionHandler completionHandler) noexcept {
         assert(completionHandler);
         _completionHandler = completionHandler;
-        C4LogToAt(kC4SyncLog, kC4LogInfo, "Scheduling async resolution of conflict in doc '%s'",
-                  _docID.c_str());
+        SyncLog(Info, "Scheduling async resolution of conflict in doc '%s'",
+                _docID.c_str());
         c4_runAsyncTask([](void *context) { ((ConflictResolver*)context)->_runAsyncNow(); },
                         this);
     }
@@ -76,7 +81,7 @@ namespace cbl_internal {
         } catch (...) {
             errorFromException(nullptr, "Conflict resolution");
         }
-        _completionHandler(*this);
+        _completionHandler(this);       // the handler will most likely delete me
     }
 
 
@@ -88,8 +93,8 @@ namespace cbl_internal {
             // Create a CBLDocument that reflects the conflict revision:
             Retained<CBLDocument> conflict = new CBLDocument(_db, _docID.c_str(), true, true);
             if (!conflict->exists()) {
-                C4LogToAt(kC4SyncLog, kC4LogInfo, "Doc '%s' no longer exists, no conflict to resolve",
-                          _docID.c_str());
+                SyncLog(Info, "Doc '%s' no longer exists, no conflict to resolve",
+                        _docID.c_str());
                 return true;
             }
 
@@ -103,8 +108,8 @@ namespace cbl_internal {
             }
             if (!ok) {
                 // Revision is gone or not a leaf: Conflict must be resolved, so stop
-                C4LogToAt(kC4SyncLog, kC4LogInfo, "Conflict in doc '%s' already resolved, nothing to do",
-                          _docID.c_str());
+                SyncLog(Info, "Conflict in doc '%s' already resolved, nothing to do",
+                        _docID.c_str());
                 return true;
             }
 
@@ -130,6 +135,7 @@ namespace cbl_internal {
         } while (inConflict);
 
         if (ok) {
+            SyncLog(Info, "Successfully resolved and saved doc '%s'", _docID.c_str());
             _error = {};
         } else {
             SyncLog(Error, "%s conflict resolution of doc '%s' failed: %s",
@@ -142,11 +148,18 @@ namespace cbl_internal {
 
     // Performs custom conflict resolution.
     bool ConflictResolver::customResolve(CBLDocument *conflict) {
-        CBLDocument *otherDoc = (conflict->revisionFlags() & kRevDeleted) ? nullptr : conflict;
-        RetainedConst<CBLDocument> myDoc = CBLDatabase_GetDocument(_db, _docID.c_str());
+        CBLDocument *otherDoc = conflict;
+        if (otherDoc->revisionFlags() & kRevDeleted)
+            otherDoc = nullptr;
+        RetainedConst<CBLDocument> myDoc = new CBLDocument(_db, _docID.c_str(), false);
+        if (!myDoc->exists())
+            myDoc = nullptr;
 
         // Call the custom resolver (this could take a long time to return)
-        CBLDocument *resolved;
+        SyncLog(Verbose, "Calling custom conflict resolver for doc '%s' ...",
+                _docID.c_str());
+        Stopwatch st;
+        const CBLDocument *resolved;
         try {
             resolved = _clientResolver(_clientResolverContext, _docID.c_str(), myDoc, otherDoc);
         } catch (std::exception &x) {
@@ -156,6 +169,8 @@ namespace cbl_internal {
             errorFromException(nullptr, "Custom conflict resolver");
             return false;
         }
+        SyncLog(Info, "Custom conflict resolver for '%s' took %.0fms",
+                _docID.c_str(), st.elapsedMS());
 
         // Determine the resolution type:
         CBLDocument::Resolution resolution;

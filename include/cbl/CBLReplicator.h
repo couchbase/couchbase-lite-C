@@ -106,10 +106,13 @@ typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool 
         This can be the same as \p localDocument or \p remoteDocument, or you can create
         a mutable copy of either one and modify it appropriately.
         Or return NULL if the resolution is to delete the document. */
-typedef CBLDocument* (*CBLConflictResolver)(void *context,
-                                            const char *documentID,
-                                            const CBLDocument *localDocument,
-                                            const CBLDocument *remoteDocument);
+typedef const CBLDocument* (*CBLConflictResolver)(void *context,
+                                                  const char *documentID,
+                                                  const CBLDocument *localDocument,
+                                                  const CBLDocument *remoteDocument);
+
+/** Default conflict resolver. This always returns `localDocument`. */
+extern const CBLConflictResolver CBLDefaultConflictResolver;
 
 
 /** Types of proxy servers, for CBLProxySettings. */

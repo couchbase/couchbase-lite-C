@@ -17,21 +17,17 @@ namespace cbl_internal {
     class ConflictResolver {
     public:
         /// Basic constructor.
+        ConflictResolver(CBLDatabase *db _cbl_nonnull,
+                         CBLConflictResolver customResolver, void* context,
+                         alloc_slice docID,
+                         alloc_slice revID =nullslice);
+
         ConflictResolver(CBLDatabase* _cbl_nonnull,
                          CBLConflictResolver,
                          void *context,
                          const C4DocumentEnded&);
 
-        ConflictResolver(CBLDatabase *db,
-                         CBLConflictResolver customResolver, void* context,
-                         alloc_slice docID,
-                         alloc_slice revID =nullslice);
-
-        /// Convenience constructor that's given the conflict info from C4Replicator.
-        ConflictResolver(CBLReplicator* _cbl_nonnull,
-                         const C4DocumentEnded&);
-
-        using CompletionHandler = std::function<void(const ConflictResolver&)>;
+        using CompletionHandler = std::function<void(ConflictResolver*)>;
 
         /// Schedules async conflict resolution.
         /// @param handler  Completion handler to call when finished.
@@ -51,11 +47,11 @@ namespace cbl_internal {
         void errorFromException(const std::exception*, const string &what);
 
         Retained<CBLDatabase>   _db;
+        CBLConflictResolver     _clientResolver;
+        void*                   _clientResolverContext;
         std::string const       _docID;
         alloc_slice             _revID;
         C4RevisionFlags         _flags {};
-        CBLConflictResolver     _clientResolver;
-        void*                   _clientResolverContext;
         CompletionHandler       _completionHandler;
         CBLError                _error {};
     };

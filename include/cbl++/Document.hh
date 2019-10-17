@@ -39,11 +39,13 @@ namespace cbl {
 
         fleece::Dict properties() const                 {return CBLDocument_Properties(ref());}
 
-        char* _cbl_nonnull propertiesAsJSON(const CBLDocument* _cbl_nonnull);
+        std::string _cbl_nonnull propertiesAsJSON() const {
+            char *json = CBLDocument_PropertiesAsJSON(ref());
+            std::string result(json ? json : "");
+            free(json);
+            return result;
+        }
 
-        bool CBLDocument_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
-                                         const char *json _cbl_nonnull,
-                                         CBLError*);
         fleece::Value operator[] (const char *key _cbl_nonnull) const {return properties()[key];}
 
         // Operations:
@@ -102,6 +104,12 @@ namespace cbl {
 
         fleece::keyref<fleece::MutableDict,fleece::slice> operator[] (const char *key)
                                                         {return properties()[fleece::slice(key)];}
+
+        void setPropertiesAsJSON(const char *json _cbl_nonnull) {
+            CBLError error;
+            if (!CBLDocument_SetPropertiesAsJSON(ref(), json, &error))
+                throw error;
+        }
 
     protected:
         static MutableDocument adopt(CBLDocument *d) {

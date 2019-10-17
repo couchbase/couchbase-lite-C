@@ -24,6 +24,10 @@
 #include "access_lock.hh"
 
 
+namespace cbl_internal {
+    class CBLLocalEndpoint;
+}
+
 struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Database*> {
 
     CBLDatabase(C4Database* _cbl_nonnull db,
@@ -76,6 +80,9 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
     C4BlobStore* blobStore() const      {return _blobStore;}
 
 private:
+    friend class cbl_internal::CBLLocalEndpoint;
+    C4Database* _getC4Database() const;
+
     void databaseChanged();
     void callDBListeners();
     void callDocListeners();

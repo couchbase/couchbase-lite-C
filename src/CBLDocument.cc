@@ -260,7 +260,7 @@ bool CBLDocument::selectNextConflictingRevision() {
 }
 
 
-bool CBLDocument::resolveConflict(Resolution resolution, CBLDocument *mergeDoc, CBLError* outError)
+bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *mergeDoc, CBLError* outError)
 {
     LOCK(_mutex);
     C4Error *c4err = internal(outError);
@@ -283,6 +283,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, CBLDocument *mergeDoc, 
                 if (!mergeBody)
                     return false;
             } else {
+                mergeBody = alloc_slice(size_t(0));
                 mergeFlags = kRevDeleted;
             }
         } else {
@@ -348,7 +349,7 @@ bool CBLDocument::setPropertiesAsJSON(const char *json, C4Error* outError) {
 }
 
 
-alloc_slice CBLDocument::encodeBody(CBLDatabase *db _cbl_nonnull, C4Database *c4db _cbl_nonnull, C4Error *outError) {
+alloc_slice CBLDocument::encodeBody(CBLDatabase *db _cbl_nonnull, C4Database *c4db _cbl_nonnull, C4Error *outError) const {
     LOCK(_mutex);
     // Save new blobs:
     if (!saveBlobs(db, outError))
@@ -415,7 +416,7 @@ CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
 }
 
 
-bool CBLDocument::saveBlobs(CBLDatabase *db, C4Error *outError) {
+bool CBLDocument::saveBlobs(CBLDatabase *db, C4Error *outError) const {
     // Walk through the Fleece object tree, looking for mutable blob Dicts to install.
     // We can skip any immutable collections (they can't contain new blobs.)
     if (!isMutable())

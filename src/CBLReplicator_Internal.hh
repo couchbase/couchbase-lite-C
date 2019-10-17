@@ -67,7 +67,7 @@ public:
         call_once(once, bind(&C4RegisterBuiltInWebSocket));
 
         // Set up the LiteCore replicator parameters:
-        if (!_conf.validate(external(&_status.error)))
+        if (!_conf.validate(external(&_c4status.error)))
             return;
         C4ReplicatorParameters params = { };
         auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
@@ -117,7 +117,7 @@ public:
                 _c4repl = c4repl_newLocal(c4db,
                                           _conf.endpoint->otherLocalDB(),
                                           params,
-                                          &_status.error);
+                                          &_c4status.error);
             } else
 #endif
             {
@@ -125,17 +125,17 @@ public:
                                      _conf.endpoint->remoteAddress(),
                                      _conf.endpoint->remoteDatabaseName(),
                                      params,
-                                     &_status.error);
+                                     &_c4status.error);
             }
         });
         if (_c4repl)
-            _status = c4repl_getStatus(_c4repl);
+            _c4status = c4repl_getStatus(_c4repl);
     }
 
 
     bool validate(CBLError *err) const {
         if (!_c4repl) {
-            if (err) *err = external(_status.error);
+            if (err) *err = external(_c4status.error);
             return false;
         }
         return true;
@@ -168,12 +168,12 @@ public:
             _resetCheckpoint = false;
         }
         c4repl_start(_c4repl);
-        _status = c4repl_getStatus(_c4repl);
     }
 
 
+
     CBLReplicatorStatus status() {
-        return external(c4repl_getStatus(_c4repl));
+        return effectiveStatus(c4repl_getStatus(_c4repl));
     }
 
 
@@ -205,34 +205,42 @@ private:
     }
 
 
-    void _statusChanged(const C4ReplicatorStatus &status) {
+    CBLReplicatorStatus effectiveStatus(C4ReplicatorStatus c4status) {
         LOCK(_mutex);
-        _status = status;
-
-        if (!_changeListeners.empty()) {
-            auto cblStatus = external(status);
-            _changeListeners.call(this, &cblStatus);
-        } else if (status.error.code) {
-            char buf[256];
-            SyncLog(Warning, "No listener to receive error from CBLReplicator %p: %s",
-                    this, c4error_getDescriptionC(status.error, buf, sizeof(buf)));
+        auto eff = external(c4status);
+        // Bump effective status to Busy if conflict resolvers are running, but pass
+        // Offline status through.
+        if (_activeConflictResolvers > 0) {
+            if (eff.activity != kCBLReplicatorOffline)
+                eff.activity = kCBLReplicatorBusy;
         }
-
-        if (status.level == kC4Stopped)
-            _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
+        return eff;
     }
 
 
-    static CBLReplicatedDocument mkReplDoc(const C4DocumentEnded &src) {
-        CBLReplicatedDocument doc = {};
-        doc.ID = (const char*)src.docID.buf;
-        doc.error = external(src.error);
-        doc.flags = 0;
-        if (src.flags & kRevDeleted)
-            doc.flags |= kCBLDocumentFlagsDeleted;
-        if (src.flags & kRevPurged)
-            doc.flags |= kCBLDocumentFlagsAccessRemoved;
-        return doc;
+    void bumpConflictResolverCount(int delta) {
+        auto curActivity = effectiveStatus(_c4status).activity;
+        _activeConflictResolvers += delta;
+        if (effectiveStatus(_c4status).activity != curActivity)
+            _statusChanged(_c4status);
+    }
+
+
+    void _statusChanged(C4ReplicatorStatus c4status) {
+        LOCK(_mutex);
+        _c4status = c4status;
+        auto cblStatus = effectiveStatus(c4status);
+
+        if (!_changeListeners.empty()) {
+            _changeListeners.call(this, &cblStatus);
+        } else if (cblStatus.error.code) {
+            char buf[256];
+            SyncLog(Warning, "No listener to receive error from CBLReplicator %p: %s",
+                    this, c4error_getDescriptionC(c4status.error, buf, sizeof(buf)));
+        }
+
+        if (cblStatus.activity == kCBLReplicatorStopped)
+            _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
     }
 
 
@@ -246,23 +254,35 @@ private:
         for (size_t i = 0; i < numDocs; ++i) {
             auto src = *c4Docs[i];
             if (!pushing && src.flags & kRevIsConflict) {
-                auto r = new ConflictResolver(this, src);
+                // Conflict -- start an async resolver task:
+                auto r = new ConflictResolver(_db, _conf.conflictResolver, _conf.context, src);
+                bumpConflictResolverCount(1);
                 r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, _1) );
-                continue; // async conflict resolution is pending
-                // TODO: Increment a counter and remain busy
+            } else if (docs) {
+                // Otherwise add to list of changes to notify:
+                CBLReplicatedDocument doc = {};
+                doc.ID = (const char*)src.docID.buf;
+                doc.error = external(src.error);
+                doc.flags = 0;
+                if (src.flags & kRevDeleted)
+                    doc.flags |= kCBLDocumentFlagsDeleted;
+                if (src.flags & kRevPurged)
+                    doc.flags |= kCBLDocumentFlagsAccessRemoved;
+                docs->push_back(doc);
             }
-            if (docs)
-                docs->push_back(mkReplDoc(src));
         }
         if (docs)
             _docListeners.call(this, pushing, unsigned(docs->size()), docs->data());
     }
 
 
-    void _conflictResolverFinished(const ConflictResolver &resolver) {
-        CBLReplicatedDocument doc = resolver.result();
+    void _conflictResolverFinished(ConflictResolver *resolver) {
+        CBLReplicatedDocument doc = resolver->result();
         _docListeners.call(this, false, 1, &doc);
-        // TODO: Decrement counter
+        delete resolver;
+
+        LOCK(_mutex);
+        bumpConflictResolverCount(-1);
     }
 
 
@@ -277,10 +297,11 @@ private:
     ReplicatorConfiguration const   _conf;
     Retained<CBLDatabase>           _db;
     c4::ref<C4Replicator>           _c4repl;
-    C4ReplicatorStatus              _status {kC4Stopped};
+    C4ReplicatorStatus              _c4status {kC4Stopped};
     bool                            _optionsChanged {false};
     bool                            _resetCheckpoint {false};
     Retained<CBLReplicator>         _retainSelf;
+    int                             _activeConflictResolvers {0};
     Listeners<CBLReplicatorChangeListener>    _changeListeners;
     Listeners<CBLReplicatedDocumentListener>  _docListeners;
 };

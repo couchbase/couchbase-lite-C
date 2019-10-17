@@ -117,7 +117,7 @@ public:
         useMerge
     };
 
-    bool resolveConflict(Resolution, CBLDocument *mergeDoc, CBLError*);
+    bool resolveConflict(Resolution, const CBLDocument *mergeDoc, CBLError*);
 
 private:
     CBLDocument(const string &docID, CBLDatabase *db, C4Document *d, bool isMutable);
@@ -126,8 +126,8 @@ private:
     bool checkMutable(C4Error *outError) const;
 
     static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
-    bool saveBlobs(CBLDatabase *db, C4Error *outError);
-    alloc_slice encodeBody(CBLDatabase* _cbl_nonnull, C4Database* _cbl_nonnull, C4Error *outError);
+    bool saveBlobs(CBLDatabase *db, C4Error *outError) const;
+    alloc_slice encodeBody(CBLDatabase* _cbl_nonnull, C4Database* _cbl_nonnull, C4Error *outError) const;
     
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
     using UnretainedValueToBlobMap = std::unordered_map<FLDict, CBLNewBlob*>;

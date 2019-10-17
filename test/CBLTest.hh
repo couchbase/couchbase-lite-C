@@ -62,6 +62,7 @@ public:
     CBLTest_Cpp();
     ~CBLTest_Cpp();
 
+    cbl::Database openEmptyDatabaseNamed(const char *name);
 
     cbl::Database db;
 };

@@ -119,7 +119,7 @@ _CBLResultSet_ValueAtIndex
 _CBLResultSet_ValueForKey
 
 _CBLEndpoint_NewWithURL
-# CBLEndpoint_NewWithLocalDB
+_CBLEndpoint_NewWithLocalDB
 _CBLEndpoint_Free
 
 _CBLAuth_NewBasic
@@ -137,11 +137,10 @@ _CBLReplicator_Status
 _CBLReplicator_AddChangeListener
 _CBLReplicator_AddDocumentListener
 
+_CBLDefaultConflictResolver
 
 
 #  Fleece.exp
-#
-#  Copyright © 2018 Couchbase. All rights reserved.
 
 _kFLNullValue
 _kFLEmptyArray
