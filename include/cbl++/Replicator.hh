@@ -29,7 +29,7 @@ namespace cbl {
     public:
         void setURL(const char *url _cbl_nonnull)   {_ref = CBLEndpoint_NewWithURL(url);}
 #ifdef COUCHBASE_ENTERPRISE
-        void setLocalDB(Database db)                {_ref = cbl_endpoint_newWithLocalDB(db.ref());}
+        void setLocalDB(Database db)                {_ref = CBLEndpoint_NewWithLocalDB(db.ref());}
 #endif
         ~Endpoint()                                 {CBLEndpoint_Free(_ref);}
         CBLEndpoint* ref() const                    {return _ref;}

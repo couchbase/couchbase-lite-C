@@ -75,8 +75,8 @@ namespace cbl_internal {
         { }
 
         bool valid() const override                             {return true;}
-        virtual C4String remoteDatabaseName() const             {return nullslice;}
-        virtual C4Database* otherLocalDB() const override       {return internal(_db);}
+        virtual C4String remoteDatabaseName() const override    {return nullslice;}
+        virtual C4Database* otherLocalDB() const override       {return _db->_getC4Database();}
 
     private:
         Retained<CBLDatabase> _db;
