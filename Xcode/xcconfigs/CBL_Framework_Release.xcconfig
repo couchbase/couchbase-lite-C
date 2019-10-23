@@ -6,5 +6,5 @@
 //  Copyright © 2019 Couchbase. All rights reserved.
 //
 
+#include "CBL_Dylib_Release.xcconfig"
 #include "CBL_Framework.xcconfig"
-#include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib_Release.xcconfig"
