@@ -296,3 +296,20 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Conflict") {
 }
 
 
+TEST_CASE_METHOD(CBLTest_Cpp, "Retaining immutable Fleece") {
+    MutableDocument mdoc("ubiq");
+    {
+        auto fldoc = fleece::Doc::fromJSON(R"({"msg":{"FOO":18,"BAR":"Wahooma"}})"_sl);
+        REQUIRE(fldoc);
+        Dict message = fldoc["msg"].asDict();
+        REQUIRE(message);
+        mdoc.setProperties(message);
+        // Now the variable `fldoc` goes out of scope, but its data needs to remain valid,
+        // since `doc` points into it. The Doc object is retained by the MutableDict in `mdoc`,
+        // keeping it alive.
+    }
+    CHECK(mdoc["FOO"].asInt() == 18);
+    CHECK(mdoc["BAR"].asString() == "Wahooma"_sl);
+    auto doc = db.saveDocument(mdoc);
+    CHECK(doc.propertiesAsJSON() == R"({"BAR":"Wahooma","FOO":18})");
+}
