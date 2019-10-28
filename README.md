@@ -11,13 +11,13 @@ This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syn
   - [x] Clean and regular design
   - [x] Comes with a C++ wrapper API, implemented as inline calls to C
   - [x] Experimental Python binding (made using `cffi`)
-  - [x] Can be bound to other languages like JavaScript
+  - [x] Can be bound to [other languages](#other-language-bindings) like Go or JavaScript
 - [ ] Same feature set as other Couchbase Lite platforms
   - [x] Schemaless JSON data model
       - [x] Standard CRUD operations
       - [x] Efficient binary blob support
       - [x] Timed document expiration
-      - [ ] Database encryption (Enterprise Edition only)
+      - [x] Database encryption (Enterprise Edition only)
   - [x] Powerful query language based on Couchbase's [N1QL][N1QL]
       - [x] Index arbitrary JSON properties or derived expression values
       - [x] Full-text search (FTS)
@@ -184,3 +184,9 @@ If the tests immediately crash after logging a message like "`ERROR: Interceptor
 [BUILD_LINUX]:https://github.com/couchbase/couchbase-lite-core/wiki/Build-and-Deploy-On-Linux#dependencies
 [IOS]:        https://github.com/couchbase/couchbase-lite-ios
 [ANDROID]:    https://github.com/couchbase/couchbase-lite-android
+
+## Other Language Bindings
+
+* **C++**: Already included; see [`include/cbl++`](https://github.com/couchbaselabs/couchbase-lite-C/tree/master/include/cbl%2B%2B)
+* **Python**: Included but unsupported; [see above](#python-bindings-experimental)
+* **Go** (Golang): [Third-party, in progress](https://github.com/svr4/couchbase-lite-cgo).
