@@ -5,18 +5,24 @@ set(TOP ${PROJECT_SOURCE_DIR}/../)
 
 add_definitions(-DCBL_TESTS)
 
-include_directories(${TOP}C/include/
-                    ${TOP}test/
+include_directories(${TOP}test/
                     ${TOP}vendor/couchbase-lite-core/vendor/fleece/API/
                     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/catch/
                     ${TOP}include/
                     ${TOP}include/cbl++/
+                    ${TOP}/src/        # Just for CBLPrivate.h
                     ${PROJECT_BINARY_DIR}/../include/cbl/
                 )
 
-aux_source_directory(.  TEST_SRC)
-
-set(TEST_SRC ${TEST_SRC})
+set(TEST_SRC
+    BlobTest_Cpp.cc
+    CBLTest.c
+    CBLTest.cc
+    CBLTestsMain.cpp
+    DatabaseTest.cc
+    DatabaseTest_Cpp.cc
+    QueryTest.cc
+    ReplicatorTest.cc)
 
 add_executable(CBL_C_Tests ${TEST_SRC} )
 
