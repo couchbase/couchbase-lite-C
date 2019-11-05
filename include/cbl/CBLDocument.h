@@ -192,6 +192,9 @@ uint64_t CBLDocument_Sequence(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Returns a document's properties as a dictionary.
     @note  The dictionary object is owned by the document; you do not need to release it.
+    @warning  When the document is released, this reference to the properties becomes invalid.
+            If you need to use any properties after releasing the document, you must retain them
+            by calling \ref FLValue_Retain (and of course later release them.)
     @warning  This dictionary _reference_ is immutable, but if the document is mutable the
            underlying dictionary itself is mutable and could be modified through a mutable
            reference obtained via \ref CBLDocument_MutableProperties. If you need to preserve the
@@ -202,13 +205,16 @@ FLDict CBLDocument_Properties(const CBLDocument* _cbl_nonnull) CBLAPI;
     You may modify this dictionary and then call \ref CBLDatabase_SaveDocument to persist the changes.
     @note  The dictionary object is owned by the document; you do not need to release it.
     @note  Every call to this function returns the same mutable collection. This is the
-           same collection returned by \ref CBLDocument_Properties. */
+           same collection returned by \ref CBLDocument_Properties.
+    @warning  When the document is released, this reference to the properties becomes invalid.
+            If you need to use any properties after releasing the document, you must retain them
+            by calling \ref FLValue_Retain (and of course later release them.) */
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
 
 /** Sets a mutable document's properties.
     Call \ref CBLDatabase_SaveDocument to persist the changes.
     @note  The dictionary object will be retained by the document. You are responsible for
-           releasing your own reference(s) to it. */
+           releasing any retained reference(s) you have to it. */
 void CBLDocument_SetProperties(CBLDocument* _cbl_nonnull,
                                FLMutableDict properties _cbl_nonnull) CBLAPI;
 
