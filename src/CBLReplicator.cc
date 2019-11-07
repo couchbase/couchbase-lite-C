@@ -68,6 +68,14 @@ void CBLReplicator_ResetCheckpoint(CBLReplicator* repl) CBLAPI  {repl->resetChec
 void CBLReplicator_SetHostReachable(CBLReplicator* repl, bool r) CBLAPI {repl->setHostReachable(r);}
 void CBLReplicator_SetSuspended(CBLReplicator* repl, bool sus) CBLAPI   {repl->setSuspended(sus);}
 
+FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator *repl, CBLError *outError) CBLAPI {
+    return FLDict_Retain(repl->pendingDocumentIDs(outError));
+}
+
+bool CBLReplicator_IsDocumentPending(CBLReplicator *repl, FLString docID, CBLError *error) CBLAPI {
+    return repl->isDocumentPending(docID, error);
+}
+
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* repl,
                                                   CBLReplicatorChangeListener listener,
                                                   void *context) CBLAPI

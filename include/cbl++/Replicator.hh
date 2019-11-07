@@ -128,6 +128,21 @@ namespace cbl {
 
         CBLReplicatorStatus status() const  {return CBLReplicator_Status(ref());}
 
+        Dict pendingDocumentIDs() const {
+            CBLError error;
+            Dict result = CBLReplicator_PendingDocumentIDs(ref(), &error);
+            check(result, error);
+            FLDict_Release(result);  // remove the extra ref the C function returned with
+            return result;
+        }
+
+        bool isDocumentPending(slice docID) const {
+            CBLError error;
+            bool pending = CBLReplicator_IsDocumentPending(ref(), docID, &error);
+            check(pending || error.code == 0, error);
+            return pending;
+        }
+
         using ChangeListener = cbl::ListenerToken<Replicator, const CBLReplicatorStatus&>;
         using DocumentListener = cbl::ListenerToken<Replicator, bool,
                                                     const std::vector<CBLReplicatedDocument>>;
