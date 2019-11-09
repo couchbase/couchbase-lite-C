@@ -128,15 +128,15 @@ namespace cbl {
 
         CBLReplicatorStatus status() const  {return CBLReplicator_Status(ref());}
 
-        Dict pendingDocumentIDs() const {
+        fleece::Dict pendingDocumentIDs() const {
             CBLError error;
-            Dict result = CBLReplicator_PendingDocumentIDs(ref(), &error);
-            check(result, error);
+            fleece::Dict result = CBLReplicator_PendingDocumentIDs(ref(), &error);
+            check(result != nullptr, error);
             FLDict_Release(result);  // remove the extra ref the C function returned with
             return result;
         }
 
-        bool isDocumentPending(slice docID) const {
+        bool isDocumentPending(fleece::slice docID) const {
             CBLError error;
             bool pending = CBLReplicator_IsDocumentPending(ref(), docID, &error);
             check(pending || error.code == 0, error);
