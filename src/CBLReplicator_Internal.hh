@@ -177,6 +177,29 @@ public:
     }
 
 
+    MutableDict pendingDocumentIDs(CBLError *outError) {
+        C4Error c4err;
+        alloc_slice arrayData(c4repl_getPendingDocIDs(_c4repl, &c4err));
+        if (outError)
+            *outError = external(c4err);
+        if (!arrayData && c4err.code != 0)
+            return nullptr;
+
+        MutableDict result = MutableDict::newDict();
+        if (arrayData) {
+            Doc doc(arrayData, kFLTrusted);
+            for (Array::iterator i(doc.asArray()); i; ++i)
+                result.set(i->asString(), true);
+        }
+        return result;
+    }
+
+
+    bool isDocumentPending(FLSlice docID, CBLError *outError) {
+        return c4repl_isDocumentPending(_c4repl, docID, internal(outError));
+    }
+
+
     CBLListenerToken* addChangeListener(CBLReplicatorChangeListener listener, void *context) {
         LOCK(_mutex);
         return _changeListeners.add(listener, context);

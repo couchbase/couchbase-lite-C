@@ -234,6 +234,34 @@ typedef struct {
 /** Returns the replicator's current status. */
 CBLReplicatorStatus CBLReplicator_Status(CBLReplicator* _cbl_nonnull) CBLAPI;
 
+/** Indicates which documents have local changes that have not yet been pushed to the server
+    by this replicator. This is of course a snapshot, that will go out of date as the replicator
+    makes progress and/or documents are saved locally.
+
+    The result is, effectively, a set of document IDs: a dictionary whose keys are the IDs and
+    values are `true`.
+    If there are no pending documents, the dictionary is empty.
+    On error, NULL is returned.
+
+    \note  This function can be called on a stopped or un-started replicator.
+    \note  Documents that would never be pushed by this replicator, due to its configuration's
+           `pushFilter` or `docIDs`, are ignored.
+    \warning  You are responsible for releasing the returned array via \ref FLValue_Release. */
+FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator* _cbl_nonnull,
+                                        CBLError*) CBLAPI;
+
+/** Indicates whether the document with the given ID has local changes that have not yet been
+    pushed to the server by this replicator.
+
+    This is equivalent to, but faster than, calling \ref CBLReplicator_PendingDocumentIDs and
+    checking whether the result contains \p docID. See that function's documentation for details.
+
+    \note  A `false` result means the document is not pending, _or_ there was an error.
+           To tell the difference, compare the error code to zero. */
+bool CBLReplicator_IsDocumentPending(CBLReplicator *repl _cbl_nonnull,
+                                     FLString docID,
+                                     CBLError *outError) CBLAPI;
+
 
 /** A callback that notifies you when the replicator's status changes.
     @warning  This callback will be called on a background thread managed by the replicator.

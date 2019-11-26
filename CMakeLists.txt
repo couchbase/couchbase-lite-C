@@ -13,7 +13,7 @@ project (CouchbaseLite_C)
 set(COMPILE_FLAGS   "${COMPILE_FLAGS}   -Wall -Werror")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 option(BUILD_ENTERPRISE "Set whether or not to build enterprise edition" OFF)
@@ -86,6 +86,7 @@ set(
     src/CBLLog.cc
     src/CBLQuery.cc
     src/CBLReplicator.cc
+    src/ConflictResolver.cc
     src/Listener.cc
     src/Util.cc
     ${PLATFORM_SRC}
