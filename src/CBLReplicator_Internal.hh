@@ -30,6 +30,7 @@
 #include "fleece/Mutable.hh"
 #include <atomic>
 #include <mutex>
+#include <algorithm>
 
 using namespace std;
 using namespace std::placeholders;
