@@ -23,6 +23,12 @@
 #include <iostream>
 #include <string>
 
+#ifdef WIN32
+constexpr char kPathSeparator[] = "\\";
+#else
+constexpr char kPathSeparator[] = "/";
+#endif
+
 // Has to be declared before including catch.hpp, so Catch macros can use it
 namespace fleece {
     static inline std::ostream& operator << (std::ostream &out, slice s) {
@@ -69,6 +75,6 @@ public:
 
 std::string GetTestFilePath(const std::string &filename);
 
-bool ReadFileByLines(std::string path, std::function<bool(FLSlice)> callback);
+bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)> &callback);
 
-unsigned ImportJSONLines(std::string path, CBLDatabase* database);
+unsigned ImportJSONLines(std::string &&path, CBLDatabase* database);

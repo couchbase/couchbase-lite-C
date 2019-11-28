@@ -22,21 +22,26 @@ set(TEST_SRC
     DatabaseTest.cc
     DatabaseTest_Cpp.cc
     QueryTest.cc
-    ReplicatorTest.cc)
+    ReplicatorTest.cc
+    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/LibC++Debug.cc
+    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/Backtrace.cc)
 
 add_executable(CBL_C_Tests ${TEST_SRC} )
 
 target_link_libraries(CBL_C_Tests PRIVATE  CouchbaseLiteC FleeceStatic)
 
 if(MSVC)
-    set(BIN_TOP "${PROJECT_BINARY_DIR}/../..")
-    set(FilesToCopy ${BIN_TOP}/\$\(Configuration\)/LiteCore
-                    ${BIN_TOP}/\$\(Configuration\)/LiteCoreREST)
+    target_include_directories(
+        CBL_C_Tests PRIVATE
+        ${TOP}vendor/couchbase-lite-core/MSVC
+    )
+    set(BIN_TOP "${PROJECT_BINARY_DIR}/..")
+    set(FilesToCopy ${BIN_TOP}/\$\(Configuration\)/CouchbaseLiteC)
     add_custom_command(TARGET CBL_C_Tests POST_BUILD
         COMMAND ${CMAKE_COMMAND}
         -DFilesToCopy="${FilesToCopy}"
         -DDestinationDirectory=${PROJECT_BINARY_DIR}/\$\(Configuration\)
-        -P ${TOP}MSVC/copy_artifacts.cmake)
+        -P ${TOP}vendor/couchbase-lite-core/MSVC/copy_artifacts.cmake)
 elseif(ANDROID)
     target_link_libraries(CBL_C_Tests PUBLIC  "log")
 elseif(APPLE AND BUILD_ENTERPRISE)
@@ -46,3 +51,5 @@ elseif(APPLE AND BUILD_ENTERPRISE)
 elseif(UNIX)
     target_link_libraries(CBL_C_Tests PUBLIC  "pthread" "${LIBCXX_LIB}" "${LIBCXXABI_LIB}" dl)
 endif()
+
+file(COPY names_100.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test)

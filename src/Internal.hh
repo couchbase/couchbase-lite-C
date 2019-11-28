@@ -25,9 +25,23 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <mutex>
 
 
 struct CBLRefCounted : public fleece::RefCounted, fleece::InstanceCountedIn<CBLRefCounted> {
+protected:
+    using Value = fleece::Value;
+    using Dict = fleece::Dict;
+    using Array = fleece::Array;
+    using Doc = fleece::Doc;
+    using Encoder = fleece::Encoder;
+    using MutableDict = fleece::MutableDict;
+    using alloc_slice = fleece::alloc_slice;
+    using slice = fleece::slice;
+    using mutex = std::mutex;
+    using recursive_mutex = std::recursive_mutex;
+    using string = std::string;
+    using once_flag = std::once_flag;
 };
 
 
