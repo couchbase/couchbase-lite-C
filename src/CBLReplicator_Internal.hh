@@ -278,7 +278,7 @@ private:
                 // Conflict -- start an async resolver task:
                 auto r = new ConflictResolver(_db, _conf.conflictResolver, _conf.context, src);
                 bumpConflictResolverCount(1);
-                r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, std::_Ph<1>{}) );
+                r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, std::placeholders::_1) );
             } else if (docs) {
                 // Otherwise add to list of changes to notify:
                 CBLReplicatedDocument doc = {};
