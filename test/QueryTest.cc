@@ -20,7 +20,6 @@
 #include "cbl/CouchbaseLite.h"
 #include <iostream>
 #include <thread>
-#include <unistd.h>
 
 using namespace std;
 using namespace fleece;

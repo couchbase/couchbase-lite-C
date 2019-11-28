@@ -5,6 +5,7 @@
 //
 
 #pragma once
+#include "CBLUsings.hh"
 #include "CBLReplicatorConfig.hh"
 #include "c4Replicator.h"
 #include <functional>
@@ -20,14 +21,14 @@ namespace cbl_internal {
         ConflictResolver(CBLDatabase *db _cbl_nonnull,
                          CBLConflictResolver customResolver, void* context,
                          alloc_slice docID,
-                         alloc_slice revID =nullslice);
+                         alloc_slice revID = fleece::nullslice);
 
         ConflictResolver(CBLDatabase* _cbl_nonnull,
                          CBLConflictResolver,
                          void *context,
                          const C4DocumentEnded&);
 
-        using CompletionHandler = std::function<void(ConflictResolver*)>;
+        using CompletionHandler = function<void(ConflictResolver*)>;
 
         /// Schedules async conflict resolution.
         /// @param handler  Completion handler to call when finished.
@@ -49,7 +50,7 @@ namespace cbl_internal {
         Retained<CBLDatabase>   _db;
         CBLConflictResolver     _clientResolver;
         void*                   _clientResolverContext;
-        std::string const       _docID;
+        string const            _docID;
         alloc_slice             _revID;
         C4RevisionFlags         _flags {};
         CompletionHandler       _completionHandler;
@@ -69,10 +70,10 @@ namespace cbl_internal {
     private:
         alloc_slice next(C4DocumentEnded &doc, C4Error *c4err);
 
-        Retained<CBLDatabase>       _db;
-        CBLConflictResolver         _clientResolver;
-        void*                       _clientResolverContext;
-        c4::ref<C4DocEnumerator>    _enum;
+        Retained<CBLDatabase>               _db;
+        CBLConflictResolver                 _clientResolver;
+        void*                               _clientResolverContext;
+        c4::ref<C4DocEnumerator>            _enum;
     };
 
 }

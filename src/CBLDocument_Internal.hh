@@ -26,14 +26,13 @@
 #include "fleece/Mutable.hh"
 #include <unordered_map>
 
-using namespace std;
-using namespace fleece;
-
 class CBLBlob;
 class CBLNewBlob;
 
 
 class CBLDocument : public CBLRefCounted {
+    using RetainedConstDocument = fleece::RetainedConst<CBLDocument>;
+
 public:
     // Construct a new document (not in any database yet)
     CBLDocument(const char *docID, bool isMutable);
@@ -87,7 +86,7 @@ public:
         bool deleting = false;
     };
 
-    RetainedConst<CBLDocument> save(CBLDatabase* db _cbl_nonnull,
+    RetainedConstDocument save(CBLDatabase* db _cbl_nonnull,
                                     const SaveOptions&,
                                     C4Error* outError);
 
@@ -130,14 +129,17 @@ private:
     bool saveBlobs(CBLDatabase *db, C4Error *outError) const;
     alloc_slice encodeBody(CBLDatabase* _cbl_nonnull, C4Database* _cbl_nonnull, C4Error *outError) const;
     
-    using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
+    using ValueToBlobMap = std::unordered_map<FLDict, fleece::Retained<CBLBlob>>;
     using UnretainedValueToBlobMap = std::unordered_map<FLDict, CBLNewBlob*>;
+    using RetainedDatabase = fleece::Retained<CBLDatabase>;
+    using RetainedValue = fleece::RetainedValue;
+    using recursive_mutex = std::recursive_mutex;
 
     static UnretainedValueToBlobMap* sNewBlobs;
 
     string const                _docID;                 // Document ID (never empty)
     mutable string              _revID;                 // Revision ID (if no _c4doc)
-    Retained<CBLDatabase> const _db;                    // Database (null for new doc)
+    RetainedDatabase const      _db;                    // Database (null for new doc)
     c4::ref<C4Document> const   _c4doc;                 // LiteCore doc (null for new doc)
     Doc                         _fromJSON;              // Properties read from JSON
     mutable RetainedValue       _properties;            // Properties, initialized lazily

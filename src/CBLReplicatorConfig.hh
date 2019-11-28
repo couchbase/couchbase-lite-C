@@ -28,9 +28,6 @@
 #include "fleece/Mutable.hh"
 #include <mutex>
 
-using namespace std;
-using namespace fleece;
-
 
 #pragma mark - ENDPOINT
 
@@ -56,14 +53,14 @@ namespace cbl_internal {
         :_url(url)
         {
             if (!c4address_fromURL(_url, &_address, &_dbName))
-                _dbName = nullslice; // mark as invalid
+                _dbName = fleece::nullslice; // mark as invalid
         }
 
-        bool valid() const override                             {return _dbName != nullslice;}
+        bool valid() const override                             {return _dbName != fleece::nullslice;}
         C4String remoteDatabaseName() const override            {return _dbName;}
 
     private:
-        alloc_slice _url;
+        fleece::alloc_slice _url;
         C4String _dbName = { };
     };
 
@@ -75,11 +72,11 @@ namespace cbl_internal {
         { }
 
         bool valid() const override                             {return true;}
-        virtual C4String remoteDatabaseName() const override    {return nullslice;}
+        virtual C4String remoteDatabaseName() const override    {return fleece::nullslice;}
         virtual C4Database* otherLocalDB() const override       {return _db->_getC4Database();}
 
     private:
-        Retained<CBLDatabase> _db;
+        fleece::Retained<CBLDatabase> _db;
     };
 #endif
 }
@@ -89,6 +86,13 @@ namespace cbl_internal {
 
 
 struct CBLAuthenticator {
+protected:
+    using slice = fleece::slice;
+    using Encoder = fleece::Encoder;
+    using alloc_slice = fleece::alloc_slice;
+    using string = std::string;
+
+public:
     virtual ~CBLAuthenticator()                                 { }
     virtual void writeOptions(Encoder&) =0;
 };
@@ -140,7 +144,13 @@ namespace cbl_internal {
 
 namespace cbl_internal {
     // Managed config object that retains/releases its properties.
-    struct ReplicatorConfiguration : public CBLReplicatorConfiguration {
+    class ReplicatorConfiguration : public CBLReplicatorConfiguration {
+        using Encoder = fleece::Encoder;
+        using Dict = fleece::Dict;
+        using slice = fleece::slice;
+        using Array = fleece::Array;
+
+    public:
         ReplicatorConfiguration(const CBLReplicatorConfiguration &conf) {
             *(CBLReplicatorConfiguration*)this = conf;
             retain(database);
@@ -170,11 +180,11 @@ namespace cbl_internal {
         bool validate(CBLError *outError) const {
             slice problem;
             if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull)
-                problem = "Invalid replicator config: missing endpoints or bad type"_sl;
+                problem = slice("Invalid replicator config: missing endpoints or bad type");
             else if (!endpoint->valid())
-                problem = "Invalid endpoint"_sl;
+                problem = slice("Invalid endpoint");
             else if (proxy && (proxy->type > kCBLProxyHTTPS || !proxy->hostname || !proxy->port))
-                problem = "Invalid replicator proxy settings"_sl;
+                problem = slice("Invalid replicator proxy settings");
 
             if (!problem)
                 return true;
@@ -222,6 +232,9 @@ namespace cbl_internal {
         ReplicatorConfiguration& operator=(const ReplicatorConfiguration&) =delete;
 
     private:
+        using string = std::string;
+        using alloc_slice = fleece::alloc_slice;
+
         static const char* copyString(const char *cstr, string &str) {
             if (!cstr) return nullptr;
             str = cstr;

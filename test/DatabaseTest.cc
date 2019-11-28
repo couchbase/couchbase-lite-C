@@ -44,7 +44,7 @@ static void createDocument(CBLDatabase *db, const char *docID,
 
 TEST_CASE_METHOD(CBLTest, "Database") {
     CHECK(string(CBLDatabase_Name(db)) == kDatabaseName);
-    CHECK(string(CBLDatabase_Path(db)) == string(kDatabaseDir) + "/" + kDatabaseName + ".cblite2/");
+    CHECK(string(CBLDatabase_Path(db)) == string(kDatabaseDir) + kPathSeparator + kDatabaseName + ".cblite2" + kPathSeparator);
     CHECK(CBL_DatabaseExists(kDatabaseName, kDatabaseDir.c_str()));
     CHECK(CBLDatabase_Count(db) == 0);
     CHECK(CBLDatabase_LastSequence(db) == 0);       // not public API

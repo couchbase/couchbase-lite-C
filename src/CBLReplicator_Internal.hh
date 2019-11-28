@@ -30,11 +30,7 @@
 #include "fleece/Mutable.hh"
 #include <atomic>
 #include <mutex>
-
-using namespace std;
-using namespace std::placeholders;
-using namespace fleece;
-using namespace cbl_internal;
+#include <algorithm>
 
 
 #define SyncLog(LEVEL, MSG, ...) C4LogToAt(kC4SyncLog, kC4Log ## LEVEL, MSG, ##__VA_ARGS__)
@@ -48,7 +44,7 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
     return {
         CBLReplicatorActivityLevel(c4status.level),
         {
-            c4status.progress.unitsCompleted / max(float(c4status.progress.unitsTotal), 1.0f),
+            c4status.progress.unitsCompleted / std::max(float(c4status.progress.unitsTotal), 1.0f),
             c4status.progress.documentCount
         },
         external(c4status.error)
@@ -64,7 +60,7 @@ public:
     {
         // One-time initialization of network transport:
         static once_flag once;
-        call_once(once, bind(&C4RegisterBuiltInWebSocket));
+        call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
 
         // Set up the LiteCore replicator parameters:
         if (!_conf.validate(external(&_c4status.error)))
@@ -271,9 +267,9 @@ private:
 
     void _documentsEnded(bool pushing, size_t numDocs, const C4DocumentEnded* c4Docs[]) {
         LOCK(_mutex);
-        unique_ptr<vector<CBLReplicatedDocument>> docs;
+        std::unique_ptr<std::vector<CBLReplicatedDocument>> docs;
         if (!_docListeners.empty()) {
-            docs = make_unique<vector<CBLReplicatedDocument>>();
+            docs = std::make_unique<std::vector<CBLReplicatedDocument>>();
             docs->reserve(numDocs);
         }
         for (size_t i = 0; i < numDocs; ++i) {
@@ -282,7 +278,7 @@ private:
                 // Conflict -- start an async resolver task:
                 auto r = new ConflictResolver(_db, _conf.conflictResolver, _conf.context, src);
                 bumpConflictResolverCount(1);
-                r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, _1) );
+                r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, std::_Ph<1>{}) );
             } else if (docs) {
                 // Otherwise add to list of changes to notify:
                 CBLReplicatedDocument doc = {};
@@ -320,12 +316,12 @@ private:
 
     recursive_mutex                 _mutex;
     ReplicatorConfiguration const   _conf;
-    Retained<CBLDatabase>           _db;
+    fleece::Retained<CBLDatabase>           _db;
     c4::ref<C4Replicator>           _c4repl;
     C4ReplicatorStatus              _c4status {kC4Stopped};
     bool                            _optionsChanged {false};
     bool                            _resetCheckpoint {false};
-    Retained<CBLReplicator>         _retainSelf;
+    fleece::Retained<CBLReplicator>         _retainSelf;
     int                             _activeConflictResolvers {0};
     Listeners<CBLReplicatorChangeListener>    _changeListeners;
     Listeners<CBLReplicatedDocumentListener>  _docListeners;

@@ -20,7 +20,6 @@
 
 #include "CBLTest.hh"
 #include "fleece/slice.hh"
-#include <sys/stat.h>
 #include <fstream>
 
 #ifdef __APPLE__
@@ -31,10 +30,16 @@ using namespace std;
 using namespace fleece;
 
 
-static std::string databaseDir() {
-    std::string dir = "/tmp/CBL_C_tests";  // TODO // COMPAT
+static string databaseDir() {
+#ifndef WIN32
+    string dir = "/tmp/CBL_C_tests";
     if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
         FAIL("Can't create temp directory: errno " << errno);
+#else
+    string dir = "C:\\tmp\\CBL_C_tests";
+    if (_mkdir(dir.c_str()) != 0 && errno != EEXIST)
+        FAIL("Can't create temp directory: errno " << errno);
+#endif
     return dir;
 }
 
@@ -122,26 +127,30 @@ string GetTestFilePath(const std::string &filename) {
         } else
 #endif
         {
+#ifdef WIN32
+            sTestFilesPath = "..\\test\\";
+#else
             sTestFilesPath = "test/";
+#endif
         }
     }
     return sTestFilesPath + filename;
 }
 
 
-bool ReadFileByLines(string path, function<bool(FLSlice)> callback) {
+bool ReadFileByLines(const string &path, const function<bool(FLSlice)> &callback) {
     INFO("Reading lines from " << path);
     fstream fd(path.c_str(), ios_base::in);
     REQUIRE(fd);
-    char buf[1000000];  // The Wikipedia dumps have verrry long lines
+    vector<char> buf(1000000); // The Wikipedia dumps have verrry long lines
     while (fd.good()) {
-        fd.getline(buf, sizeof(buf));
+        fd.getline(buf.data(), buf.size());
         auto len = fd.gcount();
         if (len <= 0)
             break;
         REQUIRE(buf[len-1] == '\0');
         --len;
-        if (!callback({buf, (size_t)len}))
+        if (!callback({buf.data(), (size_t)len}))
             return false;
     }
     REQUIRE(fd.eof());
@@ -151,7 +160,7 @@ bool ReadFileByLines(string path, function<bool(FLSlice)> callback) {
 
 
 // Read a file that contains a JSON document per line. Every line becomes a document.
-unsigned ImportJSONLines(string path, CBLDatabase* database) {
+unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
     CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Reading %s ...  ", path.c_str());
     CBLError error;
     unsigned numDocs = 0;
@@ -173,8 +182,3 @@ unsigned ImportJSONLines(string path, CBLDatabase* database) {
     CHECK(CBLDatabase_EndBatch(database, &error));
     return numDocs;
 }
-
-
-
-#include "LibC++Debug.cc"
-#include "Backtrace.cc"

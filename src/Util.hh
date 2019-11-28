@@ -23,7 +23,7 @@
 #include <string>
 
 
-#define LOCK(MUTEX)     lock_guard<decltype(MUTEX)> _lock(MUTEX)
+#define LOCK(MUTEX)     std::lock_guard<decltype(MUTEX)> _lock(MUTEX)
 
 
 namespace cbl_internal {

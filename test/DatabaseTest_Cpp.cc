@@ -30,7 +30,7 @@ using namespace cbl;
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database") {
     CHECK(string(db.name()) == CBLTest::kDatabaseName);
-    CHECK(string(db.path()) == string(kDatabaseDir) + "/" + kDatabaseName + ".cblite2/");
+    CHECK(string(db.path()) == string(kDatabaseDir) + kPathSeparator + kDatabaseName + ".cblite2" + kPathSeparator);
     CHECK(db.count() == 0);
 //    CHECK(db.lastSequence() == 0);
 }
