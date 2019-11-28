@@ -18,7 +18,7 @@ if ! [ -x "$(command -v git)" ]; then
   exit 1
 fi
 
-git submodule update --init --recrusive
+git submodule update --init --recursive
 pushd vendor
 git clone ssh://git@github.com/couchbase/couchbase-lite-core-EE --branch $BRANCH --recursive --depth 1 couchbase-lite-core-EE
 popd
