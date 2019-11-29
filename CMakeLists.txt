@@ -59,16 +59,15 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
 
 ### SUBMODULES:
 
+add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
+
+### SOURCE FILES:
+
 include_directories("vendor/couchbase-lite-core/C/include"
                     "vendor/couchbase-lite-core/LiteCore/C"
                     "vendor/couchbase-lite-core/LiteCore/Support"
                     "vendor/couchbase-lite-core/vendor/fleece/API"
                     "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support")
-
-
-add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
-
-### SOURCE FILES:
 
 if(!MSVC)
     set_source_files_properties(${C_SRC} PROPERTIES COMPILE_FLAGS -Wno-return-type-c-linkage)
