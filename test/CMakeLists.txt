@@ -3,7 +3,10 @@ project (CBL_C_Tests)
 
 set(TOP ${PROJECT_SOURCE_DIR}/../)
 
-add_definitions(-DCBL_TESTS)
+add_definitions(
+    -DCBL_TESTS
+    -DCATCH_CONFIG_CPP11_STREAM_INSERTABLE_CHECK
+)
 
 include_directories(${TOP}test/
                     ${TOP}vendor/couchbase-lite-core/vendor/fleece/API/

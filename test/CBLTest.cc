@@ -26,6 +26,10 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
+#ifndef _MSC_VER
+#include <sys/stat.h>
+#endif
+
 using namespace std;
 using namespace fleece;
 
