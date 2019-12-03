@@ -77,5 +77,5 @@ function(init_vars)
 endfunction()
 
 function(set_dylib_properties)
-    target_link_libraries(CouchbaseLiteC PUBLIC z ${ICU4C_COMMON} ${ICU4C_I18N})
+    target_link_libraries(CouchbaseLiteC PUBLIC z ${ICU_LIBS})
 endfunction()
