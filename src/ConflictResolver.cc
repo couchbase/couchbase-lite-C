@@ -104,7 +104,7 @@ namespace cbl_internal {
                                                   (kRevLeaf|kRevIsConflict);
             } else {
                 ok = conflict->selectNextConflictingRevision();
-                _revID = conflict->revisionID();
+                _revID = slice(conflict->revisionID());
             }
             if (!ok) {
                 // Revision is gone or not a leaf: Conflict must be resolved, so stop

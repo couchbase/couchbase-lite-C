@@ -63,8 +63,10 @@ CBLDocument::CBLDocument(const string &docID,
 ,_c4doc(d)
 ,_mutable(isMutable)
 {
-    if (_c4doc)
+    if (_c4doc) {
         _c4doc->extraInfo = {this, nullptr};
+        _revID = string(slice(_c4doc->selectedRev.revID));
+    }
 }
 
 
@@ -97,16 +99,23 @@ CBLDocument::CBLDocument(const CBLDocument* otherDoc)
 
 // Document loaded from db without a C4Document (e.g. a replicator validation callback)
 CBLDocument::CBLDocument(CBLDatabase *db,
-            const string &docID,
-            C4RevisionFlags revFlags,
-            Dict body)
+                         const string &docID,
+                         slice revID,
+                         C4RevisionFlags revFlags,
+                         Dict body)
 :CBLDocument(docID, db, nullptr, false)
 {
     _properties = body;
+    _revID = string(revID);
 }
 
 
 CBLDocument::~CBLDocument() {
+}
+
+
+const char* CBLDocument::revisionID() const {
+    return _revID.empty() ? nullptr : _revID.c_str();
 }
 
 
@@ -246,7 +255,10 @@ bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError
 bool CBLDocument::selectRevision(slice revID) {
     LOCK(_mutex);
     _properties = nullptr;
-    return c4doc_selectRevision(_c4doc, revID, true, nullptr);
+    if (!c4doc_selectRevision(_c4doc, revID, true, nullptr))
+        return false;
+    _revID = string(slice(revID));
+    return true;
 }
 
 
@@ -468,6 +480,7 @@ CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
 }
 
 const char* CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->docID();}
+const char* CBLDocument_RevisionID(const CBLDocument* doc) CBLAPI      {return doc->revisionID();}
 uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
 FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}

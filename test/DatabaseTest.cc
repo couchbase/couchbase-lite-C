@@ -72,18 +72,14 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
 
 
 TEST_CASE_METHOD(CBLTest, "New Document") {
-    CBL_SetLogLevel(CBLLogInfo, kCBLLogDomainAll);
-    CBL_SetLogLevel(CBLLogDebug, kCBLLogDomainDatabase);
-
     CBLDocument* doc = CBLDocument_New("foo");
     CHECK(doc != nullptr);
     CHECK(string(CBLDocument_ID(doc)) == "foo");
+    CHECK(CBLDocument_RevisionID(doc) == nullptr);
     CHECK(CBLDocument_Sequence(doc) == 0);
     CHECK(string(CBLDocument_PropertiesAsJSON(doc)) == "{}");
     CHECK(CBLDocument_MutableProperties(doc) == CBLDocument_Properties(doc));
     CBLDocument_Release(doc);
-
-    CBL_SetLogLevel(CBLLogInfo, kCBLLogDomainDatabase);
 }
 
 
@@ -100,6 +96,7 @@ TEST_CASE_METHOD(CBLTest, "Save Empty Document") {
 
     doc = CBLDatabase_GetMutableDocument(db, "foo");
     CHECK(string(CBLDocument_ID(doc)) == "foo");
+    CHECK(string(CBLDocument_RevisionID(doc)) == "1-581ad726ee407c8376fc94aad966051d013893c4");
     CHECK(CBLDocument_Sequence(doc) == 1);
     CHECK(string(CBLDocument_PropertiesAsJSON(doc)) == "{}");
     CBLDocument_Release(doc);

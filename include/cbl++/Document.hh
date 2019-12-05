@@ -33,6 +33,8 @@ namespace cbl {
 
         const char* id() const _cbl_returns_nonnull     {return CBLDocument_ID(ref());}
 
+        const char* revisionID() const                  {return CBLDocument_RevisionID(ref());}
+
         uint64_t sequence() const                       {return CBLDocument_Sequence(ref());}
 
         // Properties:
