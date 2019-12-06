@@ -11,6 +11,6 @@
 PRODUCT_NAME                = CouchbaseLiteC-static
 
 DSTROOT                     = /tmp/couchbase_lite_C.dst
-HEADER_SEARCH_PATHS         = $(LITECORE)/C/include  $(LITECORE)/C  $(LITECORE)/LiteCore/Support  $(FLEECE)/API  $(FLEECE)/fleece/Support
+HEADER_SEARCH_PATHS         = $(LITECORE)/C/include  $(LITECORE)/C  $(LITECORE)/LiteCore/Support  $(FLEECE)/API  $(FLEECE)/Fleece/Support
 SKIP_INSTALL                = YES
 STRIP_INSTALLED_PRODUCT     = NO
