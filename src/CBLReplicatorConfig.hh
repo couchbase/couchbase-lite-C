@@ -105,6 +105,7 @@ namespace cbl_internal {
         virtual void writeOptions(Encoder &enc) override {
             enc.writeKey(slice(kC4ReplicatorOptionAuthentication));
             enc.beginDict();
+            enc[slice(kC4ReplicatorAuthType)] = kC4AuthTypeBasic;
             enc[slice(kC4ReplicatorAuthUserName)] = _username;
             enc[slice(kC4ReplicatorAuthPassword)] = _password;
             enc.endDict();
