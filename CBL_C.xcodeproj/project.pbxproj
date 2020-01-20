@@ -75,6 +75,7 @@
 		27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
 		27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27D11BED2351043B00C58A70 /* ConflictResolver.hh */; };
 		27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D11BEE2351043B00C58A70 /* ConflictResolver.cc */; };
+		27D30F9F23A2D30500392107 /* PerfTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D30F9123A2D30500392107 /* PerfTest.cc */; };
 		6938072F22DE966B00727053 /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 /* End PBXBuildFile section */
@@ -156,13 +157,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 27A924941D9B316D00086206;
 			remoteInfo = "LiteCore-iOS";
-		};
-		271C2A6A21CAD5950045856E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 93FA3F481EE21A4D00D15CF5;
-			remoteInfo = "LiteCoreServ-iOS";
 		};
 		271C2A6C21CAD5950045856E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -349,6 +343,7 @@
 		27D11BED2351043B00C58A70 /* ConflictResolver.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ConflictResolver.hh; sourceTree = "<group>"; };
 		27D11BEE2351043B00C58A70 /* ConflictResolver.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ConflictResolver.cc; sourceTree = "<group>"; };
 		27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLReplicator_Internal.hh; sourceTree = "<group>"; };
+		27D30F9123A2D30500392107 /* PerfTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PerfTest.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -506,11 +501,10 @@
 				271C2A5921CAD5950045856E /* libSupport.a */,
 				271C2A5B21CAD5950045856E /* LiteCoreCppTests */,
 				271C2A5D21CAD5950045856E /* C4Tests */,
+				271C2A6721CAD5950045856E /* LiteCoreTests.xctest */,
 				271C2A6121CAD5950045856E /* libSQLite.a */,
 				271C2A6321CAD5950045856E /* libTokenizer.a */,
-				271C2A6721CAD5950045856E /* LiteCore Tests.xctest */,
 				271C2A6921CAD5950045856E /* LiteCore-iOS.app */,
-				271C2A6B21CAD5950045856E /* LiteCoreServ-iOS.app */,
 				271C2A6D21CAD5950045856E /* LiteCore-iOS Tests.xctest */,
 			);
 			name = Products;
@@ -552,6 +546,7 @@
 				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
 				275B359D234D064600FE9CF0 /* QueryTest.cc */,
 				277CC99422BC23DE00B245CB /* ReplicatorTest.cc */,
+				27D30F9123A2D30500392107 /* PerfTest.cc */,
 				27C9B5F221F7EE670040BC45 /* CBLTest.c */,
 				275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */,
 				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
@@ -920,10 +915,10 @@
 			remoteRef = 271C2A6221CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		271C2A6721CAD5950045856E /* LiteCore Tests.xctest */ = {
+		271C2A6721CAD5950045856E /* LiteCoreTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = "LiteCore Tests.xctest";
+			path = LiteCoreTests.xctest;
 			remoteRef = 271C2A6621CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -932,13 +927,6 @@
 			fileType = wrapper.application;
 			path = "LiteCore-iOS.app";
 			remoteRef = 271C2A6821CAD5950045856E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		271C2A6B21CAD5950045856E /* LiteCoreServ-iOS.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = "LiteCoreServ-iOS.app";
-			remoteRef = 271C2A6A21CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		271C2A6D21CAD5950045856E /* LiteCore-iOS Tests.xctest */ = {
@@ -1050,6 +1038,7 @@
 				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,
 				275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */,
 				277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */,
+				27D30F9F23A2D30500392107 /* PerfTest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
