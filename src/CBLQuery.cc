@@ -236,6 +236,12 @@ namespace cbl_internal {
             c4queryobs_free(_c4obs);
         }
 
+        void setEnabled(bool enabled) {
+            _query->use([&](C4Query *c4query) {
+                c4queryobs_setEnabled(_c4obs, enabled);
+            });
+        }
+
         CBLQueryChangeListener callback() const           {return (CBLQueryChangeListener)_callback.load();}
 
         void call() {
@@ -266,6 +272,7 @@ namespace cbl_internal {
 CBLListenerToken* CBLQuery::addChangeListener(CBLQueryChangeListener listener, void *context) {
     auto token = new ListenerToken<CBLQueryChangeListener>(this, listener, context);
     _listeners.add(token);
+    token->setEnabled(true);
     return token;
 }
 
