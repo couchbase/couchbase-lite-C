@@ -255,6 +255,7 @@ bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError
 bool CBLDocument::selectRevision(slice revID) {
     LOCK(_mutex);
     _properties = nullptr;
+    _fromJSON = nullptr;
     if (!c4doc_selectRevision(_c4doc, revID, true, nullptr))
         return false;
     _revID = string(slice(revID));
@@ -265,6 +266,7 @@ bool CBLDocument::selectRevision(slice revID) {
 bool CBLDocument::selectNextConflictingRevision() {
     LOCK(_mutex);
     _properties = nullptr;
+    _fromJSON = nullptr;
     while (c4doc_selectNextLeafRevision(_c4doc, true, true, nullptr))
         if (_c4doc->selectedRev.flags & kRevIsConflict)
             return true;
@@ -277,6 +279,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
     LOCK(_mutex);
     C4Error *c4err = internal(outError);
     _properties = nullptr;
+    _fromJSON = nullptr;
 
     slice winner(_c4doc->selectedRev.revID), loser(_c4doc->revID);
     if (resolution != Resolution::useRemote)
@@ -315,8 +318,14 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
 Dict CBLDocument::properties() const {
     LOCK(_mutex);
     if (!_properties) {
-        if (_c4doc && _c4doc->selectedRev.body.buf)
-            _properties = Value::fromData(_c4doc->selectedRev.body);
+        slice storage;
+        if (_fromJSON)
+            storage = _fromJSON.data();
+        else if (_c4doc)
+            storage = _c4doc->selectedRev.body;
+        
+        if (storage)
+            _properties = Value::fromData(storage);
         if (_mutable) {
             if (_properties)
                 _properties = _properties.asDict().mutableCopy();
@@ -345,18 +354,16 @@ char* CBLDocument::propertiesAsJSON() const {
 bool CBLDocument::setPropertiesAsJSON(const char *json, C4Error* outError) {
     if (!checkMutable(outError))
         return false;
-    Doc doc = Doc::fromJSON(slice(json));
-    if (!doc) {
+    Doc fromJSON = Doc::fromJSON(slice(json));
+    if (!fromJSON) {
         setError(outError, FleeceDomain, kFLJSONError, "Invalid JSON"_sl);
         return false;
     }
-    Dict root = doc.root().asDict();
-    if (!root) {
-        setError(outError, FleeceDomain, kFLJSONError, "properties must be a JSON dictionary"_sl);
-        return false;
-    }
     LOCK(_mutex);
-    _properties = root.mutableCopy(kFLDeepCopyImmutables);
+    // Store the transcoded Fleece and clear _properties. If app accesses properties(),
+    // it'll get a mutable version of this.
+    _fromJSON = fromJSON;
+    _properties = nullptr;
     return true;
 }
 

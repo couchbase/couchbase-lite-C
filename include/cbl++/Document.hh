@@ -97,8 +97,9 @@ namespace cbl {
 
     class MutableDocument : public Document {
     public:
+        explicit MutableDocument(nullptr_t)             {_ref = (CBLRefCounted*)CBLDocument_New(nullptr);}
         explicit MutableDocument(const char *docID)     {_ref = (CBLRefCounted*)CBLDocument_New(docID);}
-        explicit MutableDocument(const std::string &docID)     :MutableDocument(docID.c_str()) { }
+        explicit MutableDocument(const std::string &id) :MutableDocument(id.c_str()) { }
 
         fleece::MutableDict properties()                {return CBLDocument_MutableProperties(ref());}
 

@@ -139,6 +139,7 @@ private:
     mutable string              _revID;                 // Revision ID (if no _c4doc)
     Retained<CBLDatabase> const _db;                    // Database (null for new doc)
     c4::ref<C4Document> const   _c4doc;                 // LiteCore doc (null for new doc)
+    Doc                         _fromJSON;              // Properties read from JSON
     mutable RetainedValue       _properties;            // Properties, initialized lazily
     ValueToBlobMap              _blobs;                 // Maps Dicts in _properties to CBLBlobs
     mutable recursive_mutex     _mutex;                 // For accessing _c4doc, _properties, _blobs
