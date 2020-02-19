@@ -1,0 +1,11 @@
+//
+//  Project_Debug_EE.xcconfig
+//  CBL_C
+//
+//  Created by Jens Alfke on 10/17/19.
+//  Copyright © 2019 Couchbase. All rights reserved.
+//
+
+#include "Project.xcconfig"
+#include "vendor/couchbase-lite-core/Xcode/xcconfigs/Project_Debug_EE.xcconfig"
+

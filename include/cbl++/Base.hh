@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <cassert>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
@@ -67,6 +68,8 @@ namespace cbl {
         }
 
         CBLRefCounted* _ref;
+
+        friend class Batch;
     };
 
 // Internal use only: Copy/move ctors and assignment ops that have to be declared in subclasses
@@ -81,6 +84,7 @@ public: \
     bool valid() const                            {return _ref != nullptr;} \
     explicit operator bool() const                {return valid();} \
     bool operator==(const CLASS &other) const     {return _ref == other._ref;} \
+    bool operator!=(const CLASS &other) const     {return _ref != other._ref;} \
     C_TYPE* ref() const                           {return (C_TYPE*)_ref;}\
 protected: \
     explicit CLASS(C_TYPE* ref)                   :SUPER((CBLRefCounted*)ref) { }
@@ -108,7 +112,7 @@ protected: \
         {other._token = nullptr;}
 
         ListenerToken& operator=(ListenerToken &&other) {
-            CBLListener_remove(_token);
+            CBLListener_Remove(_token);
             _token = other._token;
             _callback = other._callback;
             other._token = nullptr;
@@ -117,7 +121,7 @@ protected: \
 
         /** Unregisters the listener early, before it leaves scope. */
         void remove() {
-            CBLListener_remove(_token);
+            CBLListener_Remove(_token);
             _token = nullptr;
             _callback = nullptr;
         }

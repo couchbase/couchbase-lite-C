@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['shared_20keys',['Shared Keys',['../group___f_l_shared_keys.html',1,'']]],
-  ['slices',['Slices',['../group___f_l_slice.html',1,'']]],
-  ['size',['size',['../struct_f_l_slice.html#a8fb4c8187bdd5a8d645809d5d0a72c90',1,'FLSlice::size()'],['../struct_f_l_slice_result.html#a622d35e8c1031bb88d0fe89cfaca12e1',1,'FLSliceResult::size()']]]
+  ['reading_20fleece_20data',['Reading Fleece Data',['../group__reading.html',1,'']]],
+  ['reference_20counting',['Reference Counting',['../group__refcounting.html',1,'']]],
+  ['replication',['Replication',['../group__replication.html',1,'']]],
+  ['replicatortype',['replicatorType',['../struct_c_b_l_replicator_configuration.html#a40f3195389ab0578aa17e63dd832a390',1,'CBLReplicatorConfiguration']]]
 ];

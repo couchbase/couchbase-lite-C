@@ -17,23 +17,64 @@
 //
 
 #include "CBLTest.hh"
+#include "CBLPrivate.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <string>
+#include <thread>
 
 using namespace std;
 using namespace fleece;
 
 
+static void createDocument(CBLDatabase *db, const char *docID,
+                           const char *property, const char *value)
+{
+    CBLDocument* doc = CBLDocument_New(docID);
+    MutableDict props = CBLDocument_MutableProperties(doc);
+    FLSlot_SetString(FLMutableDict_Set(props, slice(property)), slice(value));
+    CBLError error;
+    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict,
+                                                        &error);
+    CBLDocument_Release(doc);
+    REQUIRE(saved);
+    CBLDocument_Release(saved);
+}
+
+
 TEST_CASE_METHOD(CBLTest, "Database") {
     CHECK(string(CBLDatabase_Name(db)) == kDatabaseName);
     CHECK(string(CBLDatabase_Path(db)) == string(kDatabaseDir) + "/" + kDatabaseName + ".cblite2/");
+    CHECK(CBL_DatabaseExists(kDatabaseName, kDatabaseDir.c_str()));
     CHECK(CBLDatabase_Count(db) == 0);
-//    CHECK(CBLDatabase_lastSequence(db) == 0);
+    CHECK(CBLDatabase_LastSequence(db) == 0);       // not public API
+}
+
+
+TEST_CASE_METHOD(CBLTest, "Database w/o config") {
+    CBLError error;
+    CBLDatabase *defaultdb = CBLDatabase_Open("unconfig", nullptr, &error);
+    REQUIRE(defaultdb);
+    const char * path = CBLDatabase_Path(defaultdb);
+    cerr << "Default database is at " << path << "\n";
+    CHECK(CBL_DatabaseExists("unconfig", nullptr));
+
+    CBLDatabaseConfiguration config = CBLDatabase_Config(defaultdb);
+    CHECK(config.directory != nullptr);     // exact value is platform-specific
+    CHECK(config.flags == kCBLDatabase_Create);
+    CHECK(config.encryptionKey.algorithm == kCBLEncryptionNone);
+
+    CHECK(CBLDatabase_Delete(defaultdb, &error));
+    CBLDatabase_Release(defaultdb);
+
+    CHECK(!CBL_DatabaseExists("unconfig", nullptr));
 }
 
 
 TEST_CASE_METHOD(CBLTest, "New Document") {
+    CBL_SetLogLevel(CBLLogInfo, kCBLLogDomainAll);
+    CBL_SetLogLevel(CBLLogDebug, kCBLLogDomainDatabase);
+
     CBLDocument* doc = CBLDocument_New("foo");
     CHECK(doc != nullptr);
     CHECK(string(CBLDocument_ID(doc)) == "foo");
@@ -41,6 +82,8 @@ TEST_CASE_METHOD(CBLTest, "New Document") {
     CHECK(string(CBLDocument_PropertiesAsJSON(doc)) == "{}");
     CHECK(CBLDocument_MutableProperties(doc) == CBLDocument_Properties(doc));
     CBLDocument_Release(doc);
+
+    CBL_SetLogLevel(CBLLogInfo, kCBLLogDomainDatabase);
 }
 
 
@@ -90,19 +133,36 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
 }
 
 
-static void createDocument(CBLDatabase *db, const char *docID,
-                           const char *property, const char *value)
-{
-    CBLDocument* doc = CBLDocument_New(docID);
-    MutableDict props = CBLDocument_MutableProperties(doc);
-    FLSlot_SetString(FLMutableDict_Set(props, slice(property)), slice(value));
+TEST_CASE_METHOD(CBLTest, "Missing document") {
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict,
-                                                   &error);
-    CBLDocument_Release(doc);
-    REQUIRE(saved);
-    CBLDocument_Release(saved);
+    REQUIRE(!CBLDatabase_PurgeDocumentByID(db, "bogus", &error));
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorNotFound);
+    CHECK(string(CBLError_Message(&error)) == "not found");
 }
+
+
+TEST_CASE_METHOD(CBLTest, "Expiration") {
+    createDocument(db, "doc1", "foo", "bar");
+    createDocument(db, "doc2", "foo", "bar");
+    createDocument(db, "doc3", "foo", "bar");
+
+    CBLError error;
+    CBLTimestamp future = CBL_Now() + 1000;
+    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc1", future, &error));
+    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc3", future, &error));
+    CHECK(CBLDatabase_Count(db) == 3);
+
+    CHECK(CBLDatabase_GetDocumentExpiration(db, "doc1", &error) == future);
+    CHECK(CBLDatabase_GetDocumentExpiration(db, "doc2", &error) == 0);
+    CHECK(CBLDatabase_GetDocumentExpiration(db, "docX", &error) == 0);
+
+    this_thread::sleep_for(chrono::milliseconds(1700));
+    CHECK(CBLDatabase_Count(db) == 1);
+}
+
+
+#pragma mark - LISTENERS:
 
 
 static int dbListenerCalls = 0;

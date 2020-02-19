@@ -41,11 +41,8 @@ public:
     // Constructor for existing blobs -- called by CBLDocument::getBlob()
     CBLBlob(CBLDocument *doc, Dict properties)
     :_db(doc->database())
-    {
-        if (_db && c4doc_dictIsBlob(properties, &_key)) {
-            _properties = properties;
-        }
-    }
+    ,_properties( (_db && c4doc_dictIsBlob(properties, &_key)) ? properties : nullptr)
+    { }
 
     bool valid() const              {return _properties != nullptr;}
     Dict properties() const         {return _properties;}
@@ -59,9 +56,10 @@ public:
     }
 
     const char* digest() const {
+        LOCK(_mutex);
         if (_digest.empty()) {
             alloc_slice digest(c4blob_keyToString(_key));
-            const_cast<CBLBlob*>(this)->_digest = string(digest);
+            _digest = string(digest);
         }
         return _digest.c_str();
     }
@@ -70,8 +68,9 @@ public:
         slice type = _properties[kCBLBlobContentTypeProperty].asString();
         if (!type)
             return nullptr;
+        LOCK(_mutex);
         if (type != slice(_contentTypeCache))
-            const_cast<CBLBlob*>(this)->_contentTypeCache = string(type);
+            _contentTypeCache = string(type);
         return _contentTypeCache.c_str();
     }
 
@@ -95,7 +94,7 @@ protected:
     { }
 
     CBLDatabase* database() const                       {return _db;}
-    void setDatabase(CBLDatabase *db)                   {_db = db;}
+    void setDatabase(CBLDatabase *db _cbl_nonnull)      {assert(!_db); _db = db;}
 
     C4BlobStore* store() const {
         assert(_db);
@@ -107,6 +106,8 @@ protected:
     const C4BlobKey& key() const                        {return _key;}
     void setKey(const C4BlobKey &key)                   {_key = key;}
 
+    mutable mutex     _mutex;
+
 private:
     bool findDatabase() {
         assert(!_db);
@@ -116,12 +117,12 @@ private:
         return (_db != nullptr);
     }
 
-    CBLDatabase*    _db {nullptr};
-    C4BlobKey       _key {};
-    string          _digest;
-    string          _contentTypeCache;
-    MutableDict     _mutableProperties;
-    Dict            _properties;
+    CBLDatabase*      _db {nullptr};
+    MutableDict const _mutableProperties;
+    C4BlobKey         _key {};
+    Dict const        _properties;
+    mutable string    _digest;
+    mutable string    _contentTypeCache;
 };
 
 
@@ -156,9 +157,11 @@ public:
     }
 
     virtual FLSliceResult getContents(C4Error *outError) const override {
-        if (database()) {
+        if (database())
             return CBLBlob::getContents(outError);
-        } else if (_contents) {
+
+        LOCK(_mutex);
+        if (_contents) {
             return FLSliceResult(const_cast<alloc_slice&>(_contents));
         } else {
             setError(outError, LiteCoreDomain, kC4ErrorNotFound,
@@ -179,6 +182,7 @@ public:
 
     virtual bool install(CBLDatabase *db _cbl_nonnull, C4Error *outError) override {
         CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%s'", digest());
+        LOCK(_mutex);
         assert(database() == nullptr || database() == db);
         const C4BlobKey &expectedKey = key();
         if (_contents) {

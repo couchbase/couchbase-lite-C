@@ -20,27 +20,31 @@
 
 
 #ifndef __has_feature
-#define __has_feature(x) 0
+    #define __has_feature(x) 0
 #endif
 #ifndef __has_attribute
-#define __has_attribute(x) 0
+    #define __has_attribute(x) 0
 #endif
 #ifndef __has_extension
-#define __has_extension(x) 0
+    #define __has_extension(x) 0
 #endif
 
 
 #ifdef _MSC_VER
-#include <sal.h>
-#define CBLINLINE           __forceinline
-#define _cbl_nonnull            _In_
-#define _cbl_returns_nonnull    _Ret_notnull_
-#define _cbl_warn_unused        _Check_return_
+    #include <sal.h>
+    #define CBLINLINE           __forceinline
+    #define _cbl_nonnull            _In_
+    #define _cbl_returns_nonnull    _Ret_notnull_
+    #define _cbl_warn_unused        _Check_return_
 #else
-#define CBLINLINE            inline
-#define _cbl_nonnull         __attribute((nonnull))
-#define _cbl_returns_nonnull __attribute__((returns_nonnull))
-#define _cbl_warn_unused     __attribute__((warn_unused_result))
+    #define CBLINLINE            inline
+    #define _cbl_returns_nonnull __attribute__((returns_nonnull))
+    #define _cbl_warn_unused     __attribute__((warn_unused_result))
+    #ifdef __clang__
+        #define _cbl_nonnull         __attribute((nonnull))
+    #else
+        #define _cbl_nonnull   /* GCC does not support the way we use nonnull */
+    #endif
 #endif
 
 // Macros for defining typed enumerations and option flags.
@@ -72,28 +76,28 @@
 
 
 #ifdef __cplusplus
-#define CBLAPI noexcept
+    #define CBLAPI noexcept
 #else
-#define CBLAPI
+    #define CBLAPI
 #endif
 
 
 // Export/import stuff:
 #ifdef _MSC_VER
-#ifdef LITECORE_EXPORTS
-#define CBL_CORE_API __declspec(dllexport)
-#else
-#define CBL_CORE_API __declspec(dllimport)
-#endif
+    #ifdef LITECORE_EXPORTS
+        #define CBL_CORE_API __declspec(dllexport)
+    #else
+        #define CBL_CORE_API __declspec(dllimport)
+    #endif
 #else // _MSC_VER
-#define CBL_CORE_API
+    #define CBL_CORE_API
 #endif
 
 // Type-checking for printf-style vararg functions:
 #ifdef _MSC_VER
-#define __printflike(A, B)
+    #define __printflike(A, B)
 #else
-#ifndef __printflike
-#define __printflike(fmtarg, firstvararg) __attribute__((__format__ (__printf__, fmtarg, firstvararg)))
-#endif
+    #ifndef __printflike
+        #define __printflike(fmtarg, firstvararg) __attribute__((__format__ (__printf__, fmtarg, firstvararg)))
+    #endif
 #endif

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1010"
+   LastUpgradeVersion = "1120"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -15,8 +15,22 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "27B61D6F21D6B64A0027CCDB"
-               BuildableName = "libcouchbase_lite.dylib"
+               BuildableName = "libCouchbaseLiteC.dylib"
                BlueprintName = "CBL_C Dylib"
+               ReferencedContainer = "container:CBL_C.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "275B357B234812C700FE9CF0"
+               BuildableName = "CouchbaseLiteTests.xctest"
+               BlueprintName = "CouchbaseLiteTests"
                ReferencedContainer = "container:CBL_C.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -26,11 +40,53 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
-      <Testables>
-      </Testables>
+      shouldUseLaunchSchemeArgsEnv = "NO"
+      enableAddressSanitizer = "YES"
+      enableASanStackUseAfterReturn = "YES"
+      enableUBSanitizer = "YES"
+      codeCoverageEnabled = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "YES">
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "--break"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "LiteCoreLog"
+            value = "verbose"
+            isEnabled = "NO">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
       <AdditionalOptions>
+         <AdditionalOption
+            key = "MallocScribble"
+            value = ""
+            isEnabled = "YES">
+         </AdditionalOption>
       </AdditionalOptions>
+      <CodeCoverageTargets>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "271C2A2221CAC8920045856E"
+            BuildableName = "libCouchbaseLiteC-static.a"
+            BlueprintName = "CBL_C"
+            ReferencedContainer = "container:CBL_C.xcodeproj">
+         </BuildableReference>
+      </CodeCoverageTargets>
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "275B357B234812C700FE9CF0"
+               BuildableName = "CouchbaseLiteTests.xctest"
+               BlueprintName = "CouchbaseLiteTests"
+               ReferencedContainer = "container:CBL_C.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -46,13 +102,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "27B61D6F21D6B64A0027CCDB"
-            BuildableName = "libcouchbase_lite.dylib"
+            BuildableName = "libCouchbaseLiteC.dylib"
             BlueprintName = "CBL_C Dylib"
             ReferencedContainer = "container:CBL_C.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -64,7 +118,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "27B61D6F21D6B64A0027CCDB"
-            BuildableName = "libcouchbase_lite.dylib"
+            BuildableName = "libCouchbaseLiteC.dylib"
             BlueprintName = "CBL_C Dylib"
             ReferencedContainer = "container:CBL_C.xcodeproj">
          </BuildableReference>

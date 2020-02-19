@@ -1,4 +1,5 @@
 #! /bin/bash -e
 
-cd CouchbaseLite
-./BuildPyCBL.py
+SCRIPT_DIR=`dirname $0`
+cd $SCRIPT_DIR/CouchbaseLite
+python3 BuildPyCBL.py $@

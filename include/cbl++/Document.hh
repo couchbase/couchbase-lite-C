@@ -39,11 +39,13 @@ namespace cbl {
 
         fleece::Dict properties() const                 {return CBLDocument_Properties(ref());}
 
-        char* _cbl_nonnull propertiesAsJSON(const CBLDocument* _cbl_nonnull);
+        std::string _cbl_nonnull propertiesAsJSON() const {
+            char *json = CBLDocument_PropertiesAsJSON(ref());
+            std::string result(json ? json : "");
+            free(json);
+            return result;
+        }
 
-        bool CBLDocument_setPropertiesAsJSON(CBLDocument* _cbl_nonnull,
-                                         const char *json _cbl_nonnull,
-                                         CBLError*);
         fleece::Value operator[] (const char *key _cbl_nonnull) const {return properties()[key];}
 
         // Operations:
@@ -75,6 +77,15 @@ namespace cbl {
             return doc;
         }
 
+        static Document checkSave(const CBLDocument *savedDoc, CBLError &error) {
+            if (savedDoc)
+                return Document::adopt(savedDoc);
+            else if (error.code == CBLErrorConflict && error.domain == CBLDomain)
+                return nullptr;
+            else
+                throw error;
+        }
+
         friend class Database;
         friend class Replicator;
 
@@ -85,14 +96,35 @@ namespace cbl {
     class MutableDocument : public Document {
     public:
         explicit MutableDocument(const char *docID)     {_ref = (CBLRefCounted*)CBLDocument_New(docID);}
+        explicit MutableDocument(const std::string &docID)     :MutableDocument(docID.c_str()) { }
 
         fleece::MutableDict properties()                {return CBLDocument_MutableProperties(ref());}
 
-        template <typename T>
-        void set(const char *key _cbl_nonnull, T val)  {properties().set(fleece::slice(key), val);}
+        template <typename V>
+        void set(const char *key, const V &val)         {properties().set(fleece::slice(key), val);}
+        template <typename K, typename V>
+        void set(const K &key, const V &val)            {properties().set(key, val);}
 
         fleece::keyref<fleece::MutableDict,fleece::slice> operator[] (const char *key)
                                                         {return properties()[fleece::slice(key)];}
+
+        void setProperties(fleece::MutableDict properties) {
+            CBLDocument_SetProperties(ref(), properties);
+        }
+
+        void setProperties(fleece::Dict properties) {
+            CBLDocument_SetProperties(ref(), properties.mutableCopy());
+        }
+
+        void setPropertiesAsJSON(const char *json _cbl_nonnull) {
+            CBLError error;
+            if (!CBLDocument_SetPropertiesAsJSON(ref(), json, &error))
+                throw error;
+        }
+
+        void setPropertiesAsJSON(const std::string &json) {
+            setPropertiesAsJSON(json.c_str());
+        }
 
     protected:
         static MutableDocument adopt(CBLDocument *d) {
@@ -109,20 +141,32 @@ namespace cbl {
 
     // Database method bodies:
 
-    inline Document Database::getDocument(const char *id _cbl_nonnull) const {
-        return Document::adopt(CBLDatabase_GetDocument(ref(), id));
+    inline Document Database::getDocument(const std::string &id) const {
+        return Document::adopt(CBLDatabase_GetDocument(ref(), id.c_str()));
     }
 
-    inline MutableDocument Database::getMutableDocument(const char *id _cbl_nonnull) const {
-        return MutableDocument::adopt(CBLDatabase_GetMutableDocument(ref(), id));
+    inline MutableDocument Database::getMutableDocument(const std::string &id) const {
+        return MutableDocument::adopt(CBLDatabase_GetMutableDocument(ref(), id.c_str()));
     }
 
 
     inline Document Database::saveDocument(MutableDocument &doc, CBLConcurrencyControl c) {
         CBLError error;
-        auto saved = CBLDatabase_SaveDocument(ref(), doc.ref(), c, &error);
-        check(saved, error);
-        return Document::adopt(saved);
+        return Document::checkSave(CBLDatabase_SaveDocument(ref(), doc.ref(), c, &error), error);
+    }
+
+
+    inline Document Database::saveDocument(MutableDocument &doc,
+                                           SaveConflictHandler conflictHandler)
+    {
+        CBLSaveConflictHandler cHandler = [](void *context, CBLDocument *myDoc,
+                                             const CBLDocument *otherDoc) -> bool {
+            return (*(SaveConflictHandler*)context)(MutableDocument(myDoc),
+                                                    Document(otherDoc));
+        };
+        CBLError error;
+        return Document::checkSave(CBLDatabase_SaveDocumentResolving(ref(), doc.ref(), cHandler,
+                                                             &conflictHandler, &error), error);
     }
 
 

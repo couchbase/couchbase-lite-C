@@ -13,10 +13,15 @@ project (CouchbaseLite_C)
 set(COMPILE_FLAGS   "${COMPILE_FLAGS}   -Wall -Werror")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 option(BUILD_ENTERPRISE "Set whether or not to build enterprise edition" OFF)
+
+if(CMAKE_COMPILER_IS_GNUCC)
+    # Suppress an annoying note about GCC 7 ABI changes
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
+endif()
 
 if(BUILD_ENTERPRISE)
     add_definitions(-DCOUCHBASE_ENTERPRISE)         # Tells CBL it's an EE build
@@ -55,6 +60,8 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
 ### SUBMODULES:
 
 include_directories("vendor/couchbase-lite-core/C/include"
+                    "vendor/couchbase-lite-core/LiteCore/C"
+                    "vendor/couchbase-lite-core/LiteCore/Support"
                     "vendor/couchbase-lite-core/vendor/fleece/API"
                     "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support")
 
@@ -79,6 +86,7 @@ set(
     src/CBLLog.cc
     src/CBLQuery.cc
     src/CBLReplicator.cc
+    src/ConflictResolver.cc
     src/Listener.cc
     src/Util.cc
     ${PLATFORM_SRC}
@@ -118,11 +126,18 @@ set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
                             FleeceStatic
                            ${NO_WHOLE_LIBRARY_FLAG}
                             LiteCoreStatic
+                            LiteCoreWebSocket
                             Support
                             SQLite3_UnicodeSN
                             BLIPStatic
-                            CivetWeb
+                            mbedtls
                             mbedcrypto)
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
+    # C/C++ atomic operations on ARM6/7 emit calls to functions in libatomic
+    set(CBL_LIBRARIES_PRIVATE ${CBL_LIBRARIES_PRIVATE} 
+                              atomic)
+endif()
 
 target_link_libraries(CouchbaseLiteC PRIVATE ${CBL_LIBRARIES_PRIVATE})
 

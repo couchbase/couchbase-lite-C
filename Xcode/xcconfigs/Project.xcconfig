@@ -10,3 +10,9 @@
 
 LITECORE    = vendor/couchbase-lite-core
 FLEECE      = $(LITECORE)/vendor/fleece
+
+IPHONEOS_DEPLOYMENT_TARGET                         = 11.0
+MACOSX_DEPLOYMENT_TARGET                           = 10.13
+TVOS_DEPLOYMENT_TARGET                             = 11.0
+SUPPORTED_PLATFORMS                                = macosx iphoneos iphonesimulator appletvos appletvsimulator
+VALID_ARCHS                                        = arm64 x86_64

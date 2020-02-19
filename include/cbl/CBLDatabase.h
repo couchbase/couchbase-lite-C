@@ -91,13 +91,16 @@ bool CBL_CopyDatabase(const char* _cbl_nonnull fromPath,
                       const CBLDatabaseConfiguration* config,
                       CBLError*) CBLAPI;
 
-/** Deletes a database file. If the database is open, an error is returned.
+/** Deletes a database file. If the database file is open, an error is returned.
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
-                        absolute or relative path to the database. */
+                        absolute or relative path to the database.
+    @param outError  On return, will be set to the error that occurred, or a 0 code if no error.
+     @return  True if the database was deleted, false if it doesn't exist or deletion failed.
+                (You can tell the last two cases apart by looking at \p outError.)*/
 bool CBL_DeleteDatabase(const char _cbl_nonnull *name, 
                         const char *inDirectory,
-                        CBLError*) CBLAPI;
+                        CBLError *outError) CBLAPI;
 
 /** @} */
 
@@ -147,7 +150,7 @@ bool CBLDatabase_EndBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
 /** Returns the nearest future time at which a document in this database will expire,
     or 0 if no documents will expire. */
-time_t CBLDatabase_NextDocExpiration(CBLDatabase* _cbl_nonnull) CBLAPI;
+CBLTimestamp CBLDatabase_NextDocExpiration(CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Purges all documents whose expiration time has passed.
     @param db  The database to purge

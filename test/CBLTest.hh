@@ -19,8 +19,25 @@
 #pragma once
 #include "CouchbaseLite.h"
 #include "CouchbaseLite.hh"
-#include "catch.hpp"
+#include <functional>
+#include <iostream>
 #include <string>
+
+// Has to be declared before including catch.hpp, so Catch macros can use it
+namespace fleece {
+    static inline std::ostream& operator << (std::ostream &out, slice s) {
+        if (s) {
+            out << "slice(\"";
+            out.write((const char*)s.buf, s.size);
+            out << "\")";
+        } else {
+            out << "nullslice";
+        }
+        return out;
+    }
+}
+
+#include "catch.hpp"
 
 
 class CBLTest {
@@ -45,6 +62,13 @@ public:
     CBLTest_Cpp();
     ~CBLTest_Cpp();
 
+    cbl::Database openEmptyDatabaseNamed(const char *name);
 
     cbl::Database db;
 };
+
+std::string GetTestFilePath(const std::string &filename);
+
+bool ReadFileByLines(std::string path, std::function<bool(FLSlice)> callback);
+
+unsigned ImportJSONLines(std::string path, CBLDatabase* database);

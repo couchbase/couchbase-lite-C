@@ -17,11 +17,18 @@
 //
 
 #define CATCH_CONFIG_CONSOLE_WIDTH 120
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
 #include "CBLTest.hh"
-#include "CaseListReporter.hh"
+#include "fleece/slice.hh"
 #include <sys/stat.h>
+#include <fstream>
+
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
+using namespace std;
+using namespace fleece;
 
 
 static std::string databaseDir() {
@@ -71,21 +78,102 @@ std::string& CBLTest_Cpp::kDatabaseDir = CBLTest::kDatabaseDir;
 const char* const & CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
 
 
-CBLTest_Cpp::CBLTest_Cpp() {
-    cbl::Database::deleteDatabase(kDatabaseName, kDatabaseDir.c_str());
-    db = cbl::Database(kDatabaseName, CBLTest::kDatabaseConfiguration);
-    REQUIRE(db);
-}
+CBLTest_Cpp::CBLTest_Cpp()
+:db(openEmptyDatabaseNamed(kDatabaseName))
+{ }
 
 
 CBLTest_Cpp::~CBLTest_Cpp() {
     db.close();
     db = nullptr;
 
-    if (CBL_InstanceCount() > 0)
+    if (CBL_InstanceCount() > 0) {
+        WARN("*** LEAKED OBJECTS: ***");
         CBL_DumpInstances();
+    }
     CHECK(CBL_InstanceCount() == 0);
 }
+
+
+cbl::Database CBLTest_Cpp::openEmptyDatabaseNamed(const char *name) {
+    cbl::Database::deleteDatabase(name, CBLTest::kDatabaseConfiguration.directory);
+    cbl::Database emptyDB = cbl::Database(name, CBLTest::kDatabaseConfiguration);
+    REQUIRE(emptyDB);
+    return emptyDB;
+}
+
+
+string GetTestFilePath(const std::string &filename) {
+    static string sTestFilesPath;
+    if (sTestFilesPath.empty()) {
+#ifdef __APPLE__
+        auto bundle = CFBundleGetBundleWithIdentifier(CFSTR("com.couchbase.CouchbaseLiteTests"));
+        if (bundle) {
+            auto url = CFBundleCopyResourcesDirectoryURL(bundle);
+            CFAutorelease(url);
+            url = CFURLCopyAbsoluteURL(url);
+            CFAutorelease(url);
+            auto path = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
+            CFAutorelease(path);
+            char pathBuf[1000];
+            CFStringGetCString(path, pathBuf, sizeof(pathBuf), kCFStringEncodingUTF8);
+            strlcat(pathBuf, "/", sizeof(pathBuf));
+            sTestFilesPath = pathBuf;
+        } else
+#endif
+        {
+            sTestFilesPath = "test/";
+        }
+    }
+    return sTestFilesPath + filename;
+}
+
+
+bool ReadFileByLines(string path, function<bool(FLSlice)> callback) {
+    INFO("Reading lines from " << path);
+    fstream fd(path.c_str(), ios_base::in);
+    REQUIRE(fd);
+    char buf[1000000];  // The Wikipedia dumps have verrry long lines
+    while (fd.good()) {
+        fd.getline(buf, sizeof(buf));
+        auto len = fd.gcount();
+        if (len <= 0)
+            break;
+        REQUIRE(buf[len-1] == '\0');
+        --len;
+        if (!callback({buf, (size_t)len}))
+            return false;
+    }
+    REQUIRE(fd.eof());
+    return true;
+}
+
+
+
+// Read a file that contains a JSON document per line. Every line becomes a document.
+unsigned ImportJSONLines(string path, CBLDatabase* database) {
+    CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Reading %s ...  ", path.c_str());
+    CBLError error;
+    unsigned numDocs = 0;
+
+    CHECK(CBLDatabase_BeginBatch(database, &error));
+    ReadFileByLines(path, [&](FLSlice line) {
+        char docID[20];
+        sprintf(docID, "%07u", numDocs+1);
+        auto doc = CBLDocument_New(docID);
+        REQUIRE(CBLDocument_SetPropertiesAsJSON(doc, slice(line).asString().c_str(), &error));
+        auto savedDoc = CBLDatabase_SaveDocument(database, doc, kCBLConcurrencyControlFailOnConflict, &error);
+        CHECK(savedDoc);
+        CBLDocument_Release(doc);
+        CBLDocument_Release(savedDoc);
+        ++numDocs;
+        return true;
+    });
+    CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Committing %u docs...", numDocs);
+    CHECK(CBLDatabase_EndBatch(database, &error));
+    return numDocs;
+}
+
 
 
 #include "LibC++Debug.cc"

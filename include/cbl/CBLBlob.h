@@ -96,7 +96,7 @@ extern "C" {
 #pragma mark - READING:
 
     /** Reads the blob's contents into memory and returns them.
-        You are responsible for calling \ref FLSliceResult_Free on the returned data when done.
+        You are responsible for calling \ref FLSliceResult_Release on the returned data when done.
         @warning  This can potentially allocate a very large heap block! */
     FLSliceResult CBLBlob_LoadContent(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
 

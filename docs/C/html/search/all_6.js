@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['filtercontext',['filterContext',['../struct_c_b_l_replicator_configuration.html#afdf4d770f7caf4292acbee4c871a0d92',1,'CBLReplicatorConfiguration']]],
   ['flags',['flags',['../struct_c_b_l_database_configuration.html#a2b14057f3354322f92b42adff979b707',1,'CBLDatabaseConfiguration::flags()'],['../struct_c_b_l_replicated_document.html#a698aef92c44acd65e16d8853ac10e696',1,'CBLReplicatedDocument::flags()']]],
   ['flapplyjsondelta',['FLApplyJSONDelta',['../group__delta.html#ga080c06c45f2553464732452ce6c44db3',1,'Fleece.h']]],
   ['flarray',['FLArray',['../group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90',1,'Fleece.h']]],
@@ -206,5 +205,6 @@ var searchData=
   ['flvalue_5ftojson5',['FLValue_ToJSON5',['../group__json.html#gaaa7905fc34de4eb5c957d4ee8a6f1dbe',1,'Fleece.h']]],
   ['flvalue_5ftojsonx',['FLValue_ToJSONX',['../group__json.html#ga794f355e7143013751493ce45d3fd347',1,'Fleece.h']]],
   ['flvalue_5ftostring',['FLValue_ToString',['../group___f_l_value.html#ga2d9f9dd804594a7a2aa9f865eee23ada',1,'Fleece.h']]],
-  ['flvaluetype',['FLValueType',['../group___f_l_value.html#ga014bcb88cbd4bdea3eea9db300bc5b2c',1,'Fleece.h']]]
+  ['flvaluetype',['FLValueType',['../group___f_l_value.html#ga014bcb88cbd4bdea3eea9db300bc5b2c',1,'Fleece.h']]],
+  ['fractioncomplete',['fractionComplete',['../struct_c_b_l_replicator_progress.html#aaca11f417074e18fe9a705ad0bb26614',1,'CBLReplicatorProgress']]]
 ];

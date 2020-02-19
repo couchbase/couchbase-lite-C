@@ -1,7 +1,9 @@
 from ._PyCBL import ffi, lib
 from .common import *
+from .Blob import Blob
 from collections.abc import Sequence, Mapping
 from functools import total_ordering
+import json
 
 
 FLArrayType = ffi.typeof("struct $$FLArray *")
@@ -58,19 +60,22 @@ def decodeFleeceArray(farray, *, depth =1):
 
 # Decodes an FLDict
 def decodeFleeceDict(fdict, *, depth =1):
-    if depth <= 0:
+    if lib.CBL_IsBlob(fdict):
+        return Blob(None, fdict=fdict)
+    elif depth <= 0:
         return Dictionary(fleece=fdict)
-    result = {}
-    i = ffi.new("FLDictIterator*")
-    lib.FLDictIterator_Begin(fdict, i)
-    while True:
-        value = lib.FLDictIterator_GetValue(i)
-        if not value:
-            break
-        key = sliceToString( lib.FLDictIterator_GetKeyString(i) )
-        result[key] = decodeFleeceValue(value, depth=depth-1)
-        lib.FLDictIterator_Next(i)
-    return result
+    else:
+        result = {}
+        i = ffi.new("FLDictIterator*")
+        lib.FLDictIterator_Begin(fdict, i)
+        while True:
+            value = lib.FLDictIterator_GetValue(i)
+            if not value:
+                break
+            key = sliceToString( lib.FLDictIterator_GetKeyString(i) )
+            result[key] = decodeFleeceValue(value, depth=depth-1)
+            lib.FLDictIterator_Next(i)
+        return result
 
 
 ### Array class
@@ -116,6 +121,9 @@ class Array (Sequence):
     def __gt__(self, other):
         return self._toList > other
 
+    def _jsonEncodable(self):
+        return self._toList
+
 
 ### Dictionary class
 
@@ -157,3 +165,19 @@ class Dictionary (Mapping):
         return self._toDict == other
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def _jsonEncodable(self):
+        return self._toDict
+
+
+### JSON Encoder
+
+
+# Custom JSON encoding for Array, Dictionary, Blob objects
+def _defaultEncodeJSON(o):
+    if not "_jsonEncodable" in o:
+        raise TypeError()
+    return o._jsonEncodable()
+
+def encodeJSON(root):
+    return json.dumps(root, default=_defaultEncodeJSON, allow_nan=False)

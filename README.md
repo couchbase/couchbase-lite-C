@@ -2,7 +2,7 @@
 
 This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syncable database, with a plain C API. The API can be used directly, or as the substrate for binding to other languages like Python, JavaScript or Rust.
 
-**As of May 2019, this project is roughly at alpha status.** The API is nearly complete and most of the functionality is implemented, but there are missing pieces and there's been little testing yet.
+**As of September 2019, this project is close to beta status.** The API is nearly complete and almost all of the functionality is implemented, but there are still missing pieces and only limited testing.
 
 ## Goals
 
@@ -11,30 +11,31 @@ This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syn
   - [x] Clean and regular design
   - [x] Comes with a C++ wrapper API, implemented as inline calls to C
   - [x] Experimental Python binding (made using `cffi`)
-  - [x] Can be bound to other languages like JavaScript
+  - [x] Can be bound to [other languages](#other-language-bindings) like Go or JavaScript
 - [ ] Same feature set as other Couchbase Lite platforms
   - [x] Schemaless JSON data model
       - [x] Standard CRUD operations
       - [x] Efficient binary blob support
       - [x] Timed document expiration
-      - [ ] Database encryption (Enterprise Edition only)
+      - [x] Database encryption (Enterprise Edition only)
   - [x] Powerful query language based on Couchbase's [N1QL][N1QL]
       - [x] Index arbitrary JSON properties or derived expression values
       - [x] Full-text search (FTS)
   - [x] Multi-master bidirectional replication (sync) with Couchbase Server
       - [x] Fast WebSocket-based protocol
       - [x] Transfers document deltas for minimal bandwidth
-      - [ ] Replicator event listeners
-      - [ ] Replicator online/offline support and retry behavior
-      - [ ] Replicator TLS/SSL support
+      - [x] Replicator event listeners
+      - [x] Replicator online/offline support and retry behavior
+      - [x] Replicator TLS/SSL support
       - [ ] Peer-to-peer replication
-- [x] Minimal platform dependencies: C++ standard library, filesystem, TCP/IP, TLS
+- [x] Minimal platform dependencies: C++ standard library, filesystem, TCP/IP
 - [ ] Broad OS support
   - [x] macOS, for ease of development
   - [x] Common Linux distros, esp. Ubuntu, Fedora, Raspbian (q.v.)
   - [x] Windows
-  - [ ] iOS, Android (although we already have [those][IOS] [covered][ANDROID])
-- [ ] Runs on Raspberry-Pi-level embedded platforms with…
+  - [x] iOS
+  - [ ] Android (but we have a [Couchbase Lite For Android][ANDROID] already, with a Java API)
+- [x] Runs on Raspberry-Pi-level embedded platforms with…
   - 32-bit or 64-bit CPU
   - ARM or x86
   - Hundreds of MB RAM, hundreds of MHz CPU, tens of MB storage
@@ -54,7 +55,7 @@ CBLDatabase* db = CBLDatabase_Open("my_db", &config, &error);
 // Create a document:
 CBLDocument* doc = CBLDocument_New("foo");
 FLMutableDict props = CBLDocument_MutableProperties(doc);
-FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
+FLSlot_SetString(FLMutableDict_Set(dict, FLStr("greeting")), FLStr("Howdy!"));
 
 // Save the document:
 const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, 
@@ -66,7 +67,7 @@ CBLDocument_Release(doc);
 // Read it back:
 const CBLDocument *readDoc = CBLDatabase_GetDocument(db, "foo");
 FLDict readProps = CBLDocument_Properties(readDoc);
-FLSlice greeting = FLValue_AsString( FLDict_Get(readProps, "greeting"_sl) );
+FLSlice greeting = FLValue_AsString( FLDict_Get(readProps, FLStr("greeting")) );
 CBLDocument_Release(readDoc);
 ```
 
@@ -114,16 +115,17 @@ greeting = readProps["greeting"]
 
 ## Building It
 
-### With CMake on Unix
+### With CMake on Unix (now including Raspberry Pi!)
 
-Before building, please see the Couchbase Lite Core document [Build And Deploy On Linux][BUILD_LINUX] and install the dependencies, including CMake, clang and libc++.
+Dependencies: 
+* GCC 7+ or Clang
+* CMake 3.9+
+* ICU libraries (`apt-get install icu-dev`)
 
 1. Clone the repo
-2. Check out submodules (recursively)
-3. `mkdir build_cmake`
-4. `cd build_cmake`
-5. `cmake .. && make -j5`
-6. `./test/CBL_C_Tests -r list`
+2. Check out submodules (recursively), i.e. `git submodule update --init --recursive`
+3. Run the shellscript `build.sh`
+6. Run the (minimal) test binary at `build_cmake/test/CBL_C_Tests -r list`
 
 The library is at `build_cmake/libCouchbaseLiteC.so`. (Or `.DLL` or `.dylib`)
 
@@ -182,3 +184,9 @@ If the tests immediately crash after logging a message like "`ERROR: Interceptor
 [BUILD_LINUX]:https://github.com/couchbase/couchbase-lite-core/wiki/Build-and-Deploy-On-Linux#dependencies
 [IOS]:        https://github.com/couchbase/couchbase-lite-ios
 [ANDROID]:    https://github.com/couchbase/couchbase-lite-android
+
+## Other Language Bindings
+
+* **C++**: Already included; see [`include/cbl++`](https://github.com/couchbaselabs/couchbase-lite-C/tree/master/include/cbl%2B%2B)
+* **Python**: Included but unsupported; [see above](#python-bindings-experimental)
+* **Go** (Golang): [Third-party, in progress](https://github.com/svr4/couchbase-lite-cgo).

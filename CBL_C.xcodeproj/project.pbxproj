@@ -17,15 +17,33 @@
 		271C2A7521CC4BD60045856E /* Util.hh in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A7321CC4BD60045856E /* Util.hh */; };
 		271C2A7621CC4BD60045856E /* Util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7421CC4BD60045856E /* Util.cc */; };
 		271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7721CC750E0045856E /* CBLDocument.cc */; };
+		275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 275B3567234810C400FE9CF0 /* Foundation.framework */; };
+		275B358723481AE700FE9CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 275B3567234810C400FE9CF0 /* Foundation.framework */; };
+		275B358923481D0C00FE9CF0 /* CBLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D6921D6B60D0027CCDB /* CBLTest.cc */; };
+		275B358A23481D0C00FE9CF0 /* DatabaseTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */; };
+		275B358B23481D0C00FE9CF0 /* DatabaseTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */; };
+		275B358C23481D0C00FE9CF0 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
+		275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
+		275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
+		275B3591234BCF7500FE9CF0 /* libCouchbaseLiteC.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */; };
+		275B3592234BD5CD00FE9CF0 /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
+		275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */; };
+		275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */; };
+		275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
+		275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
+		275B35A1234D0ADC00FE9CF0 /* names_100.json in Resources */ = {isa = PBXBuildFile; fileRef = 275B35A0234D0A9F00FE9CF0 /* names_100.json */; };
 		275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4DD2201323700DBE7D2 /* CBLBlob.cc */; };
 		275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
+		277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
+		277CC9AB22BC3DF700B245CB /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
+		277CC9C022BC4E2E00B245CB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 		277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */; };
 		277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */; };
 		277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */; };
 		27886C8D21F64C1400069BEA /* Listener.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27886C8B21F64C1400069BEA /* Listener.hh */; };
 		27886C8E21F64C1400069BEA /* Listener.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27886C8C21F64C1400069BEA /* Listener.cc */; };
 		27984E212249A189000FE777 /* dylib_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D7E21D6B6900027CCDB /* dylib_main.cc */; };
-		27984E262249A1BE000FE777 /* libcouchbase_lite_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libcouchbase_lite_static.a */; };
+		27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
 		27984E272249A1E8000FE777 /* libLiteCore-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A4F21CAD5950045856E /* libLiteCore-static.a */; };
 		27984E282249A1EE000FE777 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D8121D6B8230027CCDB /* libz.tbd */; };
 		27984E292249A240000FE777 /* CouchbaseLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B61DA321D6E40D0027CCDB /* CouchbaseLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -46,15 +64,19 @@
 		27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27984E3F2249A85E000FE777 /* CouchbaseLite_Umbrella.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery.cc */; };
 		27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61D6821D6B60D0027CCDB /* CBLTest.hh */; };
-		27B61D7D21D6B66F0027CCDB /* libcouchbase_lite_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libcouchbase_lite_static.a */; };
+		27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
 		27B61D7F21D6B6900027CCDB /* dylib_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D7E21D6B6900027CCDB /* dylib_main.cc */; };
 		27B61D8221D6B8230027CCDB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D8121D6B8230027CCDB /* libz.tbd */; };
 		27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D6921D6B60D0027CCDB /* CBLTest.cc */; };
-		27B61DB521D6EBDD0027CCDB /* libcouchbase_lite.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D7021D6B64A0027CCDB /* libcouchbase_lite.dylib */; };
+		27B61DB521D6EBDD0027CCDB /* libCouchbaseLiteC.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */; };
 		27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */; };
 		27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
 		27B61DBC21D7075C0027CCDB /* libLiteCore-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A4F21CAD5950045856E /* libLiteCore-static.a */; };
 		27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
+		27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27D11BED2351043B00C58A70 /* ConflictResolver.hh */; };
+		27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D11BEE2351043B00C58A70 /* ConflictResolver.cc */; };
+		6938072F22DE966B00727053 /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
+		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,13 +108,6 @@
 			remoteGlobalIDString = 27FC81E81EAAB0D90028E38E;
 			remoteInfo = "LiteCoreREST static";
 		};
-		271C2A5621CAD5950045856E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 279D410E1EA5558100D8DD9D;
-			remoteInfo = "LiteCoreREST dylib";
-		};
 		271C2A5821CAD5950045856E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
@@ -114,13 +129,6 @@
 			remoteGlobalIDString = 274D04081BA75E1C00FF7C35;
 			remoteInfo = C4Tests;
 		};
-		271C2A5E21CAD5950045856E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 274D03D31BA732B000FF7C35;
-			remoteInfo = LiteCoreJNI;
-		};
 		271C2A6021CAD5950045856E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
@@ -134,13 +142,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 27EF807419142C2500A327B9;
 			remoteInfo = Tokenizer;
-		};
-		271C2A6421CAD5950045856E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 279D40FE1EA54A9D00D8DD9D;
-			remoteInfo = civetweb;
 		};
 		271C2A6621CAD5950045856E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -183,6 +184,34 @@
 			proxyType = 1;
 			remoteGlobalIDString = 271C2A2221CAC8920045856E;
 			remoteInfo = CBL_C;
+		};
+		275B358F234BCF6900FE9CF0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A1B21CAC8920045856E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 27B61D6F21D6B64A0027CCDB;
+			remoteInfo = "CBL_C Dylib";
+		};
+		2779ED5522E2881B0026ACD0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A1B21CAC8920045856E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 27B61D6F21D6B64A0027CCDB;
+			remoteInfo = "CBL_C Dylib";
+		};
+		277CC9A522BC23DF00B245CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2771A098228624C000B18E0A;
+			remoteInfo = LiteCoreWebSocket;
+		};
+		277CC9AC22BC3E2800B245CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 2771A097228624C000B18E0A;
+			remoteInfo = LiteCoreWebSocket;
 		};
 		27984E222249A1A0000FE777 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -234,7 +263,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		271C2A2321CAC8920045856E /* libcouchbase_lite_static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcouchbase_lite_static.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libCouchbaseLiteC-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		271C2A2C21CAC98F0045856E /* CBLReplicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLReplicator.h; sourceTree = "<group>"; };
 		271C2A2D21CAC98F0045856E /* CBLBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLBase.h; sourceTree = "<group>"; };
 		271C2A2E21CAC98F0045856E /* CBLDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLDocument.h; sourceTree = "<group>"; };
@@ -248,12 +277,25 @@
 		271C2A7421CC4BD60045856E /* Util.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Util.cc; sourceTree = "<group>"; };
 		271C2A7721CC750E0045856E /* CBLDocument.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDocument.cc; sourceTree = "<group>"; };
 		271C2A7921CC756A0045856E /* Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Internal.hh; sourceTree = "<group>"; };
+		27310FD7235F686D0046F8C8 /* CBL_Framework_Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework_Debug.xcconfig; sourceTree = "<group>"; };
+		275B3567234810C400FE9CF0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CouchbaseLiteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		275B358823481C5200FE9CF0 /* XCTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = XCTests.xcconfig; sourceTree = "<group>"; };
+		275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTestsMain.cpp; sourceTree = "<group>"; };
+		275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CouchbaseLiteTests.mm; path = test/CouchbaseLiteTests.mm; sourceTree = SOURCE_ROOT; };
+		275B359D234D064600FE9CF0 /* QueryTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = QueryTest.cc; sourceTree = "<group>"; };
+		275B35A0234D0A9F00FE9CF0 /* names_100.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = names_100.json; sourceTree = "<group>"; };
 		275BC4CC22012D8700DBE7D2 /* CBLBlob.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLBlob.h; sourceTree = "<group>"; };
 		275BC4DD2201323700DBE7D2 /* CBLBlob.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBlob.cc; sourceTree = "<group>"; };
 		275BC4E22204E6A800DBE7D2 /* Blob.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Blob.hh; sourceTree = "<group>"; };
 		275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlobTest_Cpp.cc; sourceTree = "<group>"; };
 		275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLBlob_Internal.hh; sourceTree = "<group>"; };
 		275FA3342236E54D001C392D /* CBLPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLPrivate.h; sourceTree = "<group>"; };
+		2779ED2722DE83A60026ACD0 /* Blob.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Blob.py; sourceTree = "<group>"; };
+		2779ED3622DE83A60026ACD0 /* Collections.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Collections.py; sourceTree = "<group>"; };
+		2779ED5022E2493F0026ACD0 /* build_python.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = build_python.sh; path = Xcode/build_python.sh; sourceTree = SOURCE_ROOT; };
+		277CC99422BC23DE00B245CB /* ReplicatorTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorTest.cc; sourceTree = "<group>"; };
+		277CC9B122BC4E2E00B245CB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		277FEE3D21DEF0C700B60E3C /* Base.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Base.hh; sourceTree = "<group>"; };
 		277FEE4E21DEF54D00B60E3C /* Document.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Document.hh; sourceTree = "<group>"; };
 		277FEE4F21E6AB1100B60E3C /* Query.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Query.hh; sourceTree = "<group>"; };
@@ -274,7 +316,7 @@
 		27B61D5521D5ABA60027CCDB /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
 		27B61D6821D6B60D0027CCDB /* CBLTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTest.hh; sourceTree = "<group>"; };
 		27B61D6921D6B60D0027CCDB /* CBLTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTest.cc; sourceTree = "<group>"; };
-		27B61D7021D6B64A0027CCDB /* libcouchbase_lite.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcouchbase_lite.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCouchbaseLiteC.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		27B61D7E21D6B6900027CCDB /* dylib_main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dylib_main.cc; sourceTree = "<group>"; };
 		27B61D8021D6B7400027CCDB /* CBL.exp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.exports; path = CBL.exp; sourceTree = "<group>"; };
 		27B61D8121D6B8230027CCDB /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -293,7 +335,7 @@
 		27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		27B61DD821DEEC540027CCDB /* Database.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Database.hh; sourceTree = "<group>"; };
 		27C9B5BA21F12C970040BC45 /* test.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = test.py; sourceTree = "<group>"; };
-		27C9B5BF21F12C970040BC45 /* BuildPyCBL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = BuildPyCBL.py; sourceTree = "<group>"; };
+		27C9B5BF21F12C970040BC45 /* BuildPyCBL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; name = BuildPyCBL.py; path = ../BuildPyCBL.py; sourceTree = "<group>"; };
 		27C9B5C021F12C970040BC45 /* Database.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Database.py; sourceTree = "<group>"; };
 		27C9B5C321F12C970040BC45 /* common.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = common.py; sourceTree = "<group>"; };
 		27C9B5C421F12C970040BC45 /* Document.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Document.py; sourceTree = "<group>"; };
@@ -302,6 +344,11 @@
 		27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDatabase_Internal.hh; sourceTree = "<group>"; };
 		27C9B5F121F7D74A0040BC45 /* Replicator.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Replicator.hh; sourceTree = "<group>"; };
 		27C9B5F221F7EE670040BC45 /* CBLTest.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = CBLTest.c; sourceTree = "<group>"; };
+		27D055892358FA40009BB0A1 /* Project_Debug_EE.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project_Debug_EE.xcconfig; sourceTree = "<group>"; };
+		27D0558A2358FA67009BB0A1 /* Project_Release_EE.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project_Release_EE.xcconfig; sourceTree = "<group>"; };
+		27D11BED2351043B00C58A70 /* ConflictResolver.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ConflictResolver.hh; sourceTree = "<group>"; };
+		27D11BEE2351043B00C58A70 /* ConflictResolver.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ConflictResolver.cc; sourceTree = "<group>"; };
+		27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLReplicator_Internal.hh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -312,13 +359,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		275B3579234812C700FE9CF0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				275B3591234BCF7500FE9CF0 /* libCouchbaseLiteC.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		27984E072249A126000FE777 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27984E282249A1EE000FE777 /* libz.tbd in Frameworks */,
+				6938072F22DE966B00727053 /* libLiteCoreWebSocket.a in Frameworks */,
 				27984E272249A1E8000FE777 /* libLiteCore-static.a in Frameworks */,
-				27984E262249A1BE000FE777 /* libcouchbase_lite_static.a in Frameworks */,
+				27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */,
+				275B358723481AE700FE9CF0 /* Foundation.framework in Frameworks */,
+				6938073022DE96C200727053 /* Security.framework in Frameworks */,
+				27984E282249A1EE000FE777 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,8 +384,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27B61D7D21D6B66F0027CCDB /* libcouchbase_lite_static.a in Frameworks */,
+				275B3592234BD5CD00FE9CF0 /* libfleeceBase.a in Frameworks */,
+				27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */,
 				27B61DBC21D7075C0027CCDB /* libLiteCore-static.a in Frameworks */,
+				277CC9AB22BC3DF700B245CB /* libLiteCoreWebSocket.a in Frameworks */,
+				275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */,
+				277CC9C022BC4E2E00B245CB /* Security.framework in Frameworks */,
 				27B61D8221D6B8230027CCDB /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -337,7 +399,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */,
-				27B61DB521D6EBDD0027CCDB /* libcouchbase_lite.dylib in Frameworks */,
+				27B61DB521D6EBDD0027CCDB /* libCouchbaseLiteC.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,10 +426,11 @@
 		271C2A2421CAC8920045856E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				271C2A2321CAC8920045856E /* libcouchbase_lite_static.a */,
-				27B61D7021D6B64A0027CCDB /* libcouchbase_lite.dylib */,
+				271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */,
+				27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */,
 				27B61DA821D6E49D0027CCDB /* CBL_Tests */,
 				27984E0A2249A126000FE777 /* CouchbaseLite.framework */,
+				275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -408,7 +471,10 @@
 				277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */,
 				27B61D5521D5ABA60027CCDB /* CBLQuery.cc */,
 				277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */,
+				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
+				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
+				27D11BED2351043B00C58A70 /* ConflictResolver.hh */,
 				271C2A7921CC756A0045856E /* Internal.hh */,
 				27886C8C21F64C1400069BEA /* Listener.cc */,
 				27886C8B21F64C1400069BEA /* Listener.hh */,
@@ -436,14 +502,12 @@
 				271C2A5121CAD5950045856E /* libLiteCore.dylib */,
 				271C2A5321CAD5950045856E /* LiteCore.framework */,
 				271C2A5521CAD5950045856E /* libLiteCoreREST-static.a */,
-				271C2A5721CAD5950045856E /* libLiteCoreREST.dylib */,
+				277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */,
 				271C2A5921CAD5950045856E /* libSupport.a */,
 				271C2A5B21CAD5950045856E /* LiteCoreCppTests */,
 				271C2A5D21CAD5950045856E /* C4Tests */,
-				271C2A5F21CAD5950045856E /* libLiteCoreJNI.dylib */,
 				271C2A6121CAD5950045856E /* libSQLite.a */,
 				271C2A6321CAD5950045856E /* libTokenizer.a */,
-				271C2A6521CAD5950045856E /* libcivetweb.a */,
 				271C2A6721CAD5950045856E /* LiteCore Tests.xctest */,
 				271C2A6921CAD5950045856E /* LiteCore-iOS.app */,
 				271C2A6B21CAD5950045856E /* LiteCoreServ-iOS.app */,
@@ -455,6 +519,8 @@
 		271C2A7C21CC86EB0045856E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				275B3567234810C400FE9CF0 /* Foundation.framework */,
+				277CC9B122BC4E2E00B245CB /* Security.framework */,
 				27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */,
 				27B61D8121D6B8230027CCDB /* libz.tbd */,
 			);
@@ -480,11 +546,16 @@
 			children = (
 				27B61D6821D6B60D0027CCDB /* CBLTest.hh */,
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
+				275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
 				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
+				275B359D234D064600FE9CF0 /* QueryTest.cc */,
+				277CC99422BC23DE00B245CB /* ReplicatorTest.cc */,
 				27C9B5F221F7EE670040BC45 /* CBLTest.c */,
+				275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */,
 				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
+				275B35A0234D0A9F00FE9CF0 /* names_100.json */,
 			);
 			path = test;
 			sourceTree = "<group>";
@@ -506,12 +577,16 @@
 				27B61D8821D6BAB10027CCDB /* CBL_dylib.xcconfig */,
 				27984E482249AF44000FE777 /* CBL_Dylib_Release.xcconfig */,
 				27984E412249ACD2000FE777 /* CBL_Framework.xcconfig */,
+				27310FD7235F686D0046F8C8 /* CBL_Framework_Debug.xcconfig */,
 				27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */,
 				27B61D8621D6BAB10027CCDB /* CBL_static.xcconfig */,
 				27B61DB021D6E53D0027CCDB /* Tests.xcconfig */,
+				275B358823481C5200FE9CF0 /* XCTests.xcconfig */,
 				27B61D8521D6BA2A0027CCDB /* Project.xcconfig */,
 				27B61D8921D6BAB10027CCDB /* Project_Debug.xcconfig */,
+				27D055892358FA40009BB0A1 /* Project_Debug_EE.xcconfig */,
 				27B61D8721D6BAB10027CCDB /* Project_Release.xcconfig */,
+				27D0558A2358FA67009BB0A1 /* Project_Release_EE.xcconfig */,
 			);
 			path = xcconfigs;
 			sourceTree = "<group>";
@@ -519,6 +594,7 @@
 		27C9B5B921F12C970040BC45 /* python */ = {
 			isa = PBXGroup;
 			children = (
+				2779ED5022E2493F0026ACD0 /* build_python.sh */,
 				27C9B5BA21F12C970040BC45 /* test.py */,
 				27C9B5BB21F12C970040BC45 /* CouchbaseLite */,
 			);
@@ -530,6 +606,8 @@
 			children = (
 				27C9B5BF21F12C970040BC45 /* BuildPyCBL.py */,
 				27C9B5C321F12C970040BC45 /* common.py */,
+				2779ED2722DE83A60026ACD0 /* Blob.py */,
+				2779ED3622DE83A60026ACD0 /* Collections.py */,
 				27C9B5C021F12C970040BC45 /* Database.py */,
 				27C9B5C421F12C970040BC45 /* Document.py */,
 				27C9B5DC21F29D500040BC45 /* Query.py */,
@@ -545,6 +623,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */,
+				27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */,
 				271C2A3321CAC98F0045856E /* CBLDocument.h in Headers */,
 				27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */,
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
@@ -604,6 +683,21 @@
 			passBuildSettingsInEnvironment = 1;
 			productName = Doxygen;
 		};
+		2779ED5122E287FB0026ACD0 /* Python */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "";
+			buildConfigurationList = 2779ED5222E287FB0026ACD0 /* Build configuration list for PBXLegacyTarget "Python" */;
+			buildPhases = (
+			);
+			buildToolPath = Xcode/build_python.sh;
+			buildWorkingDirectory = "$(SRCROOT)";
+			dependencies = (
+				2779ED5622E2881B0026ACD0 /* PBXTargetDependency */,
+			);
+			name = Python;
+			passBuildSettingsInEnvironment = 1;
+			productName = Python;
+		};
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
@@ -622,8 +716,26 @@
 			);
 			name = CBL_C;
 			productName = CBL_C;
-			productReference = 271C2A2321CAC8920045856E /* libcouchbase_lite_static.a */;
+			productReference = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */;
 			productType = "com.apple.product-type.library.static";
+		};
+		275B357B234812C700FE9CF0 /* CouchbaseLiteTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 275B3584234812C800FE9CF0 /* Build configuration list for PBXNativeTarget "CouchbaseLiteTests" */;
+			buildPhases = (
+				275B3578234812C700FE9CF0 /* Sources */,
+				275B3579234812C700FE9CF0 /* Frameworks */,
+				275B357A234812C700FE9CF0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				275B3590234BCF6900FE9CF0 /* PBXTargetDependency */,
+			);
+			name = CouchbaseLiteTests;
+			productName = CouchbaseLiteTests;
+			productReference = 275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		27984E092249A126000FE777 /* CBL_C Framework */ = {
 			isa = PBXNativeTarget;
@@ -656,12 +768,13 @@
 			buildRules = (
 			);
 			dependencies = (
+				277CC9AD22BC3E2800B245CB /* PBXTargetDependency */,
 				27B61D7C21D6B6680027CCDB /* PBXTargetDependency */,
 				27B61DBE21D707910027CCDB /* PBXTargetDependency */,
 			);
 			name = "CBL_C Dylib";
 			productName = "CBL_C Dylib";
-			productReference = 27B61D7021D6B64A0027CCDB /* libcouchbase_lite.dylib */;
+			productReference = 27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		27B61DA721D6E49D0027CCDB /* CBL_Tests */ = {
@@ -688,7 +801,7 @@
 		271C2A1B21CAC8920045856E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1120;
 				ORGANIZATIONNAME = Couchbase;
 				TargetAttributes = {
 					271C2A2221CAC8920045856E = {
@@ -696,6 +809,12 @@
 					};
 					272F012A2279037600E62F72 = {
 						CreatedOnToolsVersion = 10.2.1;
+					};
+					275B357B234812C700FE9CF0 = {
+						CreatedOnToolsVersion = 11.1;
+					};
+					2779ED5122E287FB0026ACD0 = {
+						CreatedOnToolsVersion = 11.0;
 					};
 					27984E092249A126000FE777 = {
 						CreatedOnToolsVersion = 10.2;
@@ -730,7 +849,9 @@
 				27B61D6F21D6B64A0027CCDB /* CBL_C Dylib */,
 				27984E092249A126000FE777 /* CBL_C Framework */,
 				27B61DA721D6E49D0027CCDB /* CBL_Tests */,
+				275B357B234812C700FE9CF0 /* CouchbaseLiteTests */,
 				272F012A2279037600E62F72 /* Doxygen */,
+				2779ED5122E287FB0026ACD0 /* Python */,
 			);
 		};
 /* End PBXProject section */
@@ -764,13 +885,6 @@
 			remoteRef = 271C2A5421CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		271C2A5721CAD5950045856E /* libLiteCoreREST.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libLiteCoreREST.dylib;
-			remoteRef = 271C2A5621CAD5950045856E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		271C2A5921CAD5950045856E /* libSupport.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -792,13 +906,6 @@
 			remoteRef = 271C2A5C21CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		271C2A5F21CAD5950045856E /* libLiteCoreJNI.dylib */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.dylib";
-			path = libLiteCoreJNI.dylib;
-			remoteRef = 271C2A5E21CAD5950045856E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		271C2A6121CAD5950045856E /* libSQLite.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -811,13 +918,6 @@
 			fileType = archive.ar;
 			path = libTokenizer.a;
 			remoteRef = 271C2A6221CAD5950045856E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		271C2A6521CAD5950045856E /* libcivetweb.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libcivetweb.a;
-			remoteRef = 271C2A6421CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		271C2A6721CAD5950045856E /* LiteCore Tests.xctest */ = {
@@ -848,7 +948,25 @@
 			remoteRef = 271C2A6C21CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libLiteCoreWebSocket.a;
+			remoteRef = 277CC9A522BC23DF00B245CB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		275B357A234812C700FE9CF0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				275B35A1234D0ADC00FE9CF0 /* names_100.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		27984E382249A36A000FE777 /* Copy Fleece Headers */ = {
@@ -877,14 +995,30 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
+				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
 				271C2A7621CC4BD60045856E /* Util.cc in Sources */,
-				277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */,
-				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
+				271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */,
+				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */,
-				271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */,
+				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
+				277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		275B3578234812C700FE9CF0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
+				275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */,
+				275B358923481D0C00FE9CF0 /* CBLTest.cc in Sources */,
+				275B358A23481D0C00FE9CF0 /* DatabaseTest.cc in Sources */,
+				275B358B23481D0C00FE9CF0 /* DatabaseTest_Cpp.cc in Sources */,
+				275B358C23481D0C00FE9CF0 /* BlobTest_Cpp.cc in Sources */,
+				275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */,
+				275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -908,11 +1042,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */,
+				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
+				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
-				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
-				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
 				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,
+				275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */,
+				277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -928,6 +1065,21 @@
 			isa = PBXTargetDependency;
 			target = 271C2A2221CAC8920045856E /* CBL_C */;
 			targetProxy = 272F012E2279038600E62F72 /* PBXContainerItemProxy */;
+		};
+		275B3590234BCF6900FE9CF0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 27B61D6F21D6B64A0027CCDB /* CBL_C Dylib */;
+			targetProxy = 275B358F234BCF6900FE9CF0 /* PBXContainerItemProxy */;
+		};
+		2779ED5622E2881B0026ACD0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 27B61D6F21D6B64A0027CCDB /* CBL_C Dylib */;
+			targetProxy = 2779ED5522E2881B0026ACD0 /* PBXContainerItemProxy */;
+		};
+		277CC9AD22BC3E2800B245CB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LiteCoreWebSocket;
+			targetProxy = 277CC9AC22BC3E2800B245CB /* PBXContainerItemProxy */;
 		};
 		27984E232249A1A0000FE777 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1102,10 +1254,144 @@
 			};
 			name = Release;
 		};
+		275B3585234812C800FE9CF0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 275B358823481C5200FE9CF0 /* XCTests.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		275B3586234812C800FE9CF0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 275B358823481C5200FE9CF0 /* XCTests.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		2779ED5322E287FB0026ACD0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2779ED5422E287FB0026ACD0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		27984E1C2249A127000FE777 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 27984E412249ACD2000FE777 /* CBL_Framework.xcconfig */;
+			baseConfigurationReference = 27310FD7235F686D0046F8C8 /* CBL_Framework_Debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_HARDENED_RUNTIME = YES;
 			};
 			name = Debug;
 		};
@@ -1113,6 +1399,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_HARDENED_RUNTIME = YES;
 			};
 			name = Release;
 		};
@@ -1142,7 +1431,6 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1167,17 +1455,13 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = N2Q372V7W2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1200,6 +1484,155 @@
 		27B61DAE21D6E49D0027CCDB /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27B61DB021D6E53D0027CCDB /* Tests.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		27D0556B2358F9DF009BB0A1 /* Debug-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27D055892358FA40009BB0A1 /* Project_Debug_EE.xcconfig */;
+			buildSettings = {
+			};
+			name = "Debug-EE";
+		};
+		27D0556C2358F9DF009BB0A1 /* Debug-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27B61D8621D6BAB10027CCDB /* CBL_static.xcconfig */;
+			buildSettings = {
+			};
+			name = "Debug-EE";
+		};
+		27D0556D2358F9DF009BB0A1 /* Debug-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27B61D8821D6BAB10027CCDB /* CBL_dylib.xcconfig */;
+			buildSettings = {
+				MODULEMAP_FILE = CouchbaseLite.modulemap;
+				PRODUCT_MODULE_NAME = CouchbaseLite;
+			};
+			name = "Debug-EE";
+		};
+		27D0556E2358F9DF009BB0A1 /* Debug-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27310FD7235F686D0046F8C8 /* CBL_Framework_Debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_HARDENED_RUNTIME = YES;
+			};
+			name = "Debug-EE";
+		};
+		27D0556F2358F9DF009BB0A1 /* Debug-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27B61DB021D6E53D0027CCDB /* Tests.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = "Debug-EE";
+		};
+		27D055702358F9DF009BB0A1 /* Debug-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 275B358823481C5200FE9CF0 /* XCTests.xcconfig */;
+			buildSettings = {
+			};
+			name = "Debug-EE";
+		};
+		27D055712358F9DF009BB0A1 /* Debug-EE */ = {
+			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1230,11 +1663,167 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Debug-EE";
+		};
+		27D055722358F9DF009BB0A1 /* Debug-EE */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Debug-EE";
+		};
+		27D055812358F9FA009BB0A1 /* Release-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27D0558A2358FA67009BB0A1 /* Project_Release_EE.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-EE";
+		};
+		27D055822358F9FA009BB0A1 /* Release-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27B61D8621D6BAB10027CCDB /* CBL_static.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-EE";
+		};
+		27D055832358F9FA009BB0A1 /* Release-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27984E482249AF44000FE777 /* CBL_Dylib_Release.xcconfig */;
+			buildSettings = {
+				MODULEMAP_FILE = CouchbaseLite.modulemap;
+				PRODUCT_MODULE_NAME = CouchbaseLite;
+			};
+			name = "Release-EE";
+		};
+		27D055842358F9FA009BB0A1 /* Release-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_HARDENED_RUNTIME = YES;
+			};
+			name = "Release-EE";
+		};
+		27D055852358F9FA009BB0A1 /* Release-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27B61DB021D6E53D0027CCDB /* Tests.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1251,7 +1840,122 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
-			name = Release;
+			name = "Release-EE";
+		};
+		27D055862358F9FA009BB0A1 /* Release-EE */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 275B358823481C5200FE9CF0 /* XCTests.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-EE";
+		};
+		27D055872358F9FA009BB0A1 /* Release-EE */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Release-EE";
+		};
+		27D055882358F9FA009BB0A1 /* Release-EE */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Release-EE";
 		};
 /* End XCBuildConfiguration section */
 
@@ -1260,7 +1964,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				271C2A2521CAC8920045856E /* Debug */,
+				27D0556B2358F9DF009BB0A1 /* Debug-EE */,
 				271C2A2621CAC8920045856E /* Release */,
+				27D055812358F9FA009BB0A1 /* Release-EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1269,7 +1975,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				271C2A2821CAC8920045856E /* Debug */,
+				27D0556C2358F9DF009BB0A1 /* Debug-EE */,
 				271C2A2921CAC8920045856E /* Release */,
+				27D055822358F9FA009BB0A1 /* Release-EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1278,7 +1986,31 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				272F012C2279037600E62F72 /* Debug */,
+				27D055712358F9DF009BB0A1 /* Debug-EE */,
 				272F012D2279037600E62F72 /* Release */,
+				27D055872358F9FA009BB0A1 /* Release-EE */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		275B3584234812C800FE9CF0 /* Build configuration list for PBXNativeTarget "CouchbaseLiteTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				275B3585234812C800FE9CF0 /* Debug */,
+				27D055702358F9DF009BB0A1 /* Debug-EE */,
+				275B3586234812C800FE9CF0 /* Release */,
+				27D055862358F9FA009BB0A1 /* Release-EE */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2779ED5222E287FB0026ACD0 /* Build configuration list for PBXLegacyTarget "Python" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2779ED5322E287FB0026ACD0 /* Debug */,
+				27D055722358F9DF009BB0A1 /* Debug-EE */,
+				2779ED5422E287FB0026ACD0 /* Release */,
+				27D055882358F9FA009BB0A1 /* Release-EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1287,7 +2019,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27984E1C2249A127000FE777 /* Debug */,
+				27D0556E2358F9DF009BB0A1 /* Debug-EE */,
 				27984E1D2249A127000FE777 /* Release */,
+				27D055842358F9FA009BB0A1 /* Release-EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1296,7 +2030,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27B61D7921D6B64A0027CCDB /* Debug */,
+				27D0556D2358F9DF009BB0A1 /* Debug-EE */,
 				27B61D7A21D6B64A0027CCDB /* Release */,
+				27D055832358F9FA009BB0A1 /* Release-EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1305,7 +2041,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27B61DAD21D6E49D0027CCDB /* Debug */,
+				27D0556F2358F9DF009BB0A1 /* Debug-EE */,
 				27B61DAE21D6E49D0027CCDB /* Release */,
+				27D055852358F9FA009BB0A1 /* Release-EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

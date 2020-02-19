@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['total',['total',['../struct_c_b_l_replicator_progress.html#a2ec5e18c579e3a2cc768cd1cf22e9a72',1,'CBLReplicatorProgress']]],
-  ['type',['type',['../struct_c_b_l_index_spec.html#ad222d234452f7575256e423e9cf1146e',1,'CBLIndexSpec']]]
+  ['shared_20keys',['Shared Keys',['../group___f_l_shared_keys.html',1,'']]],
+  ['slices',['Slices',['../group___f_l_slice.html',1,'']]],
+  ['size',['size',['../struct_f_l_slice.html#a8fb4c8187bdd5a8d645809d5d0a72c90',1,'FLSlice::size()'],['../struct_f_l_slice_result.html#a622d35e8c1031bb88d0fe89cfaca12e1',1,'FLSliceResult::size()']]]
 ];

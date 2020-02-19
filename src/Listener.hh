@@ -23,6 +23,7 @@
 #include <atomic>
 #include <memory>
 #include <vector>
+#include <functional>
 
 
 namespace cbl_internal {
@@ -124,7 +125,8 @@ namespace cbl_internal {
 
         void add(ListenerToken<LISTENER> *token)                {ListenersBase::add(token);}
         void clear()                                            {ListenersBase::clear();}
-
+        bool empty() const                                      {return _tokens.empty();}
+        
         ListenerToken<LISTENER>* find(CBLListenerToken *token) {
             return contains(token) ? (ListenerToken<LISTENER>*) token : nullptr;
         }

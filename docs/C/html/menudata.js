@@ -66,7 +66,7 @@ var menudata={children:[
 {text:"File List",url:"files.html"},
 {text:"Globals",url:"globals.html",children:[
 {text:"All",url:"globals.html",children:[
-{text:"_",url:"globals.html#index__"},
+{text:"_",url:"globals.html#index__5F"},
 {text:"c",url:"globals_c.html#index_c"},
 {text:"f",url:"globals_f.html#index_f"},
 {text:"k",url:"globals_k.html#index_k"}]},

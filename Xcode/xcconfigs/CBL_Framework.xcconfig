@@ -6,7 +6,7 @@
 //  Copyright © 2019 Couchbase. All rights reserved.
 //
 
-#include "CBL_dylib.xcconfig"
+// NOTE: Doesn't #include a parent config ... whomever #includes this needs to do so.
 
 INSTALL_PATH            = $(LOCAL_LIBRARY_DIR)/Frameworks
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/Frameworks

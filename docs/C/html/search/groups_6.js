@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['paths',['Paths',['../group___f_l_key_path.html',1,'']]]
+  ['other_20types',['Other Types',['../group__other__types.html',1,'']]]
 ];

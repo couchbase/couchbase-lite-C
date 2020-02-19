@@ -19,6 +19,7 @@
 #pragma once
 
 #include "CBLReplicator.h"
+#include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
 #include "c4.hh"
 #include "c4Replicator.h"
@@ -39,7 +40,9 @@ struct CBLEndpoint {
     virtual bool valid() const =0;
     const C4Address& remoteAddress() const                      {return _address;}
     virtual C4String remoteDatabaseName() const =0;
-    virtual CBLDatabase* otherLocalDB() const =0;
+#ifdef COUCHBASE_ENTERPRISE
+    virtual C4Database* otherLocalDB() const                    {return nullptr;}
+#endif
 
 protected:
     C4Address _address = { };
@@ -53,16 +56,32 @@ namespace cbl_internal {
         :_url(url)
         {
             if (!c4address_fromURL(_url, &_address, &_dbName))
-                _dbName = nullslice;
+                _dbName = nullslice; // mark as invalid
         }
 
         bool valid() const override                             {return _dbName != nullslice;}
         C4String remoteDatabaseName() const override            {return _dbName;}
-        virtual CBLDatabase* otherLocalDB() const override      {return nullptr;}
 
+    private:
         alloc_slice _url;
         C4String _dbName = { };
     };
+
+#ifdef COUCHBASE_ENTERPRISE
+    // Concrete Endpoint for local databases
+    struct CBLLocalEndpoint : public CBLEndpoint {
+        CBLLocalEndpoint(CBLDatabase *db _cbl_nonnull)
+        :_db(db)
+        { }
+
+        bool valid() const override                             {return true;}
+        virtual C4String remoteDatabaseName() const override    {return nullslice;}
+        virtual C4Database* otherLocalDB() const override       {return _db->_getC4Database();}
+
+    private:
+        Retained<CBLDatabase> _db;
+    };
+#endif
 }
 
 
@@ -114,6 +133,7 @@ namespace cbl_internal {
     };
 }
 
+
 #pragma mark - CONFIGURATION:
 
 
@@ -126,7 +146,17 @@ namespace cbl_internal {
             headers = FLDict_MutableCopy(headers, kFLDeepCopyImmutables);
             channels = FLArray_MutableCopy(channels, kFLDeepCopyImmutables);
             documentIDs = FLArray_MutableCopy(documentIDs, kFLDeepCopyImmutables);
+            pinnedServerCertificate = (_pinnedServerCert = pinnedServerCertificate);
+            trustedRootCertificates = (_trustedRootCerts = trustedRootCertificates);
+            if (proxy) {
+                _proxy = *proxy;
+                proxy = &_proxy;
+                _proxy.hostname = copyString(_proxy.hostname, _proxyHostname);
+                _proxy.username = copyString(_proxy.username, _proxyUsername);
+                _proxy.password = copyString(_proxy.password, _proxyPassword);
+            }
         }
+
 
         ~ReplicatorConfiguration() {
             release(database);
@@ -135,14 +165,22 @@ namespace cbl_internal {
             FLArray_Release(documentIDs);
         }
 
+
         bool validate(CBLError *outError) const {
-            if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull) {
-                c4error_return(LiteCoreDomain, kC4ErrorInvalidParameter,
-                               "Invalid replicator config"_sl, internal(outError));
-                return false;
-            }
-            return true;
+            slice problem;
+            if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull)
+                problem = "Invalid replicator config: missing endpoints or bad type"_sl;
+            else if (!endpoint->valid())
+                problem = "Invalid endpoint"_sl;
+            else if (proxy && (proxy->type > kCBLProxyHTTPS || !proxy->hostname || !proxy->port))
+                problem = "Invalid replicator proxy settings"_sl;
+
+            if (!problem)
+                return true;
+            c4error_return(LiteCoreDomain, kC4ErrorInvalidParameter, problem, internal(outError));
+            return false;
         }
+
 
         // Writes a LiteCore replicator optionsDict
         void writeOptions(Encoder &enc) const {
@@ -153,11 +191,45 @@ namespace cbl_internal {
                 enc.writeKey(slice(kC4ReplicatorOptionPinnedServerCert));
                 enc.writeData(pinnedServerCertificate);
             }
+            if (trustedRootCertificates.buf) {
+                enc.writeKey(slice(kC4ReplicatorOptionRootCerts));
+                enc.writeData(trustedRootCertificates);
+            }
             if (authenticator)
                 authenticator->writeOptions(enc);
+            if (proxy) {
+                static constexpr const char* kProxyTypeIDs[] = {kC4ProxyTypeHTTP,
+                                                                kC4ProxyTypeHTTPS};
+                enc.writeKey(slice(kC4ReplicatorOptionProxyServer));
+                enc.beginDict();
+                enc[slice(kC4ReplicatorProxyType)] = kProxyTypeIDs[proxy->type];
+                enc[slice(kC4ReplicatorProxyHost)] = proxy->hostname;
+                enc[slice(kC4ReplicatorProxyPort)] = proxy->port;
+                if (proxy->username) {
+                    enc.writeKey(slice(kC4ReplicatorProxyAuth));
+                    enc.beginDict();
+                    enc[slice(kC4ReplicatorAuthUserName)] = proxy->username;
+                    enc[slice(kC4ReplicatorAuthPassword)] = proxy->password;
+                    enc.endDict();
+                }
+                enc.endDict();
+            }
         }
+
 
         ReplicatorConfiguration(const ReplicatorConfiguration&) =delete;
         ReplicatorConfiguration& operator=(const ReplicatorConfiguration&) =delete;
+
+    private:
+        static const char* copyString(const char *cstr, string &str) {
+            if (!cstr) return nullptr;
+            str = cstr;
+            return str.c_str();
+        }
+
+
+        alloc_slice _pinnedServerCert, _trustedRootCerts;
+        CBLProxySettings _proxy;
+        string _proxyHostname, _proxyUsername, _proxyPassword;
     };
 }

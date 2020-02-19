@@ -20,7 +20,10 @@
 #include "Base.hh"
 #include "CBLDatabase.h"
 #include "CBLDocument.h"
+#include "CBLQuery.h"
+#include "fleece/Mutable.hh"
 #include <functional>
+#include <string>
 #include <vector>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
@@ -31,51 +34,58 @@ namespace cbl {
     class MutableDocument;
 
 
+    using SaveConflictHandler = std::function<bool(MutableDocument documentBeingSaved,
+                                                   Document conflictingDocument)>;
+
+
     class Database : private RefCounted {
     public:
         // Static database-file operations:
 
-        static bool exists(const char* _cbl_nonnull name,
-                           const char *inDirectory)
+        static bool exists(const std::string &name,
+                           const std::string &inDirectory)
         {
-            return CBL_DatabaseExists(name, inDirectory);
+            return CBL_DatabaseExists(name.c_str(), inDirectory.c_str());
         }
 
-        static void copyDatabase(const char* _cbl_nonnull fromPath,
-                                 const char* _cbl_nonnull toName)
+        static void copyDatabase(const std::string &fromPath,
+                                 const std::string &toName)
         {
             CBLError error;
-            check( CBL_CopyDatabase(fromPath, toName, nullptr, &error), error );
+            check( CBL_CopyDatabase(fromPath.c_str(), toName.c_str(), nullptr, &error), error );
         }
 
-        static void copyDatabase(const char* _cbl_nonnull fromPath,
-                                 const char* _cbl_nonnull toName,
+        static void copyDatabase(const std::string &fromPath,
+                                 const std::string &toName,
                                  const CBLDatabaseConfiguration& config)
         {
             CBLError error;
-            check( CBL_CopyDatabase(fromPath, toName, &config, &error), error );
+            check( CBL_CopyDatabase(fromPath.c_str(), toName.c_str(), &config, &error), error );
         }
 
-        static void deleteDatabase(const char _cbl_nonnull *name,
-                                   const char *inDirectory)
+        static void deleteDatabase(const std::string &name,
+                                   const std::string &inDirectory)
         {
             CBLError error;
-            check( CBL_DeleteDatabase(name, inDirectory, &error), error);
+            if (!CBL_DeleteDatabase(name.c_str(),
+                                    inDirectory.empty() ? nullptr : inDirectory.c_str(),
+                                    &error) && error.code != 0)
+                check(false, error);
         }
 
         // Lifecycle:
 
-        Database(const char *name _cbl_nonnull) {
+        Database(const std::string &name) {
             CBLError error;
-            _ref = (CBLRefCounted*) CBLDatabase_Open(name, nullptr, &error);
+            _ref = (CBLRefCounted*) CBLDatabase_Open(name.c_str(), nullptr, &error);
             check(_ref != nullptr, error);
         }
 
-        Database(const char *name _cbl_nonnull,
+        Database(const std::string &name,
                  const CBLDatabaseConfiguration& config)
         {
             CBLError error;
-            _ref = (CBLRefCounted*) CBLDatabase_Open(name, &config, &error);
+            _ref = (CBLRefCounted*) CBLDatabase_Open(name.c_str(), &config, &error);
             check(_ref != nullptr, error);
         }
 
@@ -103,27 +113,48 @@ namespace cbl {
 
         // Documents:
 
-        inline Document getDocument(const char *id _cbl_nonnull) const;
-        inline MutableDocument getMutableDocument(const char *id _cbl_nonnull) const;
+        inline Document getDocument(const std::string &id) const;
+        inline MutableDocument getMutableDocument(const std::string &id) const;
 
         inline Document saveDocument(MutableDocument &doc,
                                      CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);
 
-        time_t getDocumentExpiration(const char *docID) const {
+        inline Document saveDocument(MutableDocument &doc, SaveConflictHandler conflictandler);
+
+        time_t getDocumentExpiration(const std::string &docID) const {
             CBLError error;
-            time_t exp = CBLDatabase_GetDocumentExpiration(ref(), docID, &error);
+            time_t exp = CBLDatabase_GetDocumentExpiration(ref(), docID.c_str(), &error);
             check(exp >= 0, error);
             return exp;
         }
 
-        void setDocumentExpiration(const char *docID, time_t expiration) {
+        void setDocumentExpiration(const std::string &docID, time_t expiration) {
             CBLError error;
-            check(CBLDatabase_SetDocumentExpiration(ref(), docID, expiration, &error), error);
+            check(CBLDatabase_SetDocumentExpiration(ref(), docID.c_str(), expiration, &error), error);
         }
 
-        void purgeDocumentByID(const char *docID) {
+        void purgeDocumentByID(const std::string &docID) {
             CBLError error;
-            check(CBLDatabase_PurgeDocumentByID(ref(), docID, &error), error);
+            check(CBLDatabase_PurgeDocumentByID(ref(), docID.c_str(), &error), error);
+        }
+
+        // Indexes:
+
+        void createIndxex(const char *name _cbl_nonnull, CBLIndexSpec spec) {
+            CBLError error;
+            check(CBLDatabase_CreateIndex(ref(), name, spec, &error), error);
+        }
+
+        void deleteIndex(const char *name _cbl_nonnull) {
+            CBLError error;
+            check(CBLDatabase_DeleteIndex(ref(), name, &error), error);
+        }
+
+        fleece::MutableArray indexNames() {
+            FLMutableArray flNames = CBLDatabase_IndexNames(ref());
+            fleece::MutableArray names(flNames);
+            FLMutableArray_Release(flNames);
+            return names;
         }
 
         // Listeners:
@@ -139,11 +170,11 @@ namespace cbl {
 
         using DocumentListener = cbl::ListenerToken<Database,const char*>;
 
-        [[nodiscard]] DocumentListener addDocumentListener(const char *docID,
+        [[nodiscard]] DocumentListener addDocumentListener(const std::string &docID,
                                                            DocumentListener::Callback f)
         {
             auto l = DocumentListener(f);
-            l.setToken( CBLDatabase_AddDocumentChangeListener(ref(), docID, &_callDocListener, l.context()) );
+            l.setToken( CBLDatabase_AddDocumentChangeListener(ref(), docID.c_str(), &_callDocListener, l.context()) );
             return l;
         }
 
@@ -175,6 +206,47 @@ namespace cbl {
         }
 
         CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)
+    };
+
+
+    /** A helper object used to begin and end batch operations on a Database.
+        Multiple writes in a batch are more efficient than if done separately.
+        A Batch object should be declared as a local (auto) variable; the batch will end
+        when the object goes out of scope. */
+    class Batch {
+    public:
+        /** Begins a batch operation on the database that will end when the Batch instance
+            goes out of scope. */
+        explicit Batch(Database db) {
+            CBLError error;
+            RefCounted::check(CBLDatabase_BeginBatch(db.ref(), &error), error);
+            _db = db;
+        }
+
+        /** Ends a batch immediately. The Batch object's destructor will then do nothing. */
+        void end() {
+            Database db = std::move(_db);  // clears _db
+            if (db) {
+                CBLError error;
+                if (!CBLDatabase_EndBatch(db.ref(), &error)) {
+                    // If an exception is thrown while a Batch is in scope, its destructor will
+                    // call end(). If I'm in this situation I cannot throw another exception or
+                    // the C++ runtime will abort the process. Detect this and just warn instead.
+                    if (std::current_exception())
+                        CBL_Log(kCBLLogDomainDatabase, CBLLogWarning,
+                                "Batch::end failed, while handling an exception");
+                    else
+                        RefCounted::check(false, error);
+                }
+            }
+        }
+
+        ~Batch() {
+            end();
+        }
+
+    private:
+        Database _db;
     };
 
 }

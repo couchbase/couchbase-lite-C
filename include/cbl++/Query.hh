@@ -67,7 +67,7 @@ namespace cbl {
             return CBLResultSet_ValueForKey(_ref, key);
         }
 
-        fleece::Value operator[](unsigned i)                    {return valueAtIndex(i);}
+        fleece::Value operator[](int i)                         {return valueAtIndex(i);}
         fleece::Value operator[](const char *key _cbl_nonnull)  {return valueForKey(key);}
 
     protected:
@@ -99,9 +99,11 @@ namespace cbl {
     // implementation of ResultSet::iterator
     class ResultSetIterator {
     public:
-        Result operator->() const {return Result(_rs.ref());}
+        const Result& operator*()  const {return _result;}
+        const Result& operator->() const {return _result;}
 
         bool operator== (const ResultSetIterator &i) const {return _rs == i._rs;}
+        bool operator!= (const ResultSetIterator &i) const {return _rs != i._rs;}
 
         ResultSetIterator& operator++() {
             if (!CBLResultSet_Next(_rs.ref()))
@@ -109,10 +111,11 @@ namespace cbl {
             return *this;
         }
     protected:
-        ResultSetIterator()                                 :_rs() { }
-        explicit ResultSetIterator(ResultSet rs)            :_rs(rs) { }
+        ResultSetIterator()                                 :_rs(), _result(nullptr) { }
+        explicit ResultSetIterator(ResultSet rs)            :_rs(rs), _result(_rs.ref()) { }
 
         ResultSet _rs;
+        Result _result;
         friend class ResultSet;
     };
 
@@ -145,7 +148,7 @@ namespace cbl {
         if (!_ref) throw std::logic_error("begin() can only be called once");//FIX error class
         auto i = iterator(*this);
         _ref = nullptr;
-        return i;
+        return ++i;         // CBLResultSet_Next() has to be called first
     }
 
     inline ResultSet::iterator ResultSet::end() {

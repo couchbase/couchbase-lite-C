@@ -25,6 +25,7 @@ using namespace fleece;
 
 namespace cbl_internal {
 
+#if 0 // UNUSED
     std::string vformat(const char *fmt, va_list args) {
         char *cstr = nullptr;
         vasprintf(&cstr, fmt, args);
@@ -41,6 +42,7 @@ namespace cbl_internal {
         va_end(args);
         return result;
     }
+#endif
 
 
     char* allocCString(FLSlice result) {
@@ -57,7 +59,7 @@ namespace cbl_internal {
 
     char* allocCString(FLSliceResult result) {
         char *str = allocCString(FLSlice{result.buf, result.size});
-        FLSliceResult_Free(result);
+        FLSliceResult_Release(result);
         return str;
     }
 
@@ -67,7 +69,7 @@ namespace cbl_internal {
         alloc_slice json(FLJSON5_ToJSON(slice(json5), &errMsg, nullptr, &flError));
         if (!json) {
             setError(outError, FleeceDomain, flError, slice(errMsg));
-            FLSliceResult_Free(errMsg);
+            FLSliceResult_Release(errMsg);
         }
         return json;
     }

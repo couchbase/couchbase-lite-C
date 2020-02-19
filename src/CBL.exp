@@ -23,6 +23,8 @@ _CBL_DumpInstances
 _CBL_Log
 _CBL_SetLogLevel
 
+_CBL_Now
+
 _CBLError_Message
 
 _CBLListener_Remove
@@ -38,6 +40,7 @@ _CBLDatabase_Name
 _CBLDatabase_Path
 _CBLDatabase_Config
 _CBLDatabase_Count
+_CBLDatabase_LastSequence
 _CBLDatabase_Compact
 _CBLDatabase_Delete
 _CBLDatabase_BeginBatch
@@ -50,6 +53,7 @@ _CBLDatabase_SendNotifications
 _CBLDatabase_GetDocument
 _CBLDatabase_GetMutableDocument
 _CBLDatabase_SaveDocument
+_CBLDatabase_SaveDocumentResolving
 _CBLDatabase_DeleteDocumentByID
 _CBLDatabase_PurgeDocumentByID
 _CBLDatabase_GetDocumentExpiration
@@ -108,13 +112,14 @@ _CBLQuery_Explain
 _CBLQuery_ColumnCount
 _CBLQuery_ColumnName
 _CBLQuery_AddChangeListener
+_CBLQuery_CurrentResults
 
 _CBLResultSet_Next
 _CBLResultSet_ValueAtIndex
 _CBLResultSet_ValueForKey
 
 _CBLEndpoint_NewWithURL
-# CBLEndpoint_NewWithLocalDB
+_CBLEndpoint_NewWithLocalDB
 _CBLEndpoint_Free
 
 _CBLAuth_NewBasic
@@ -126,14 +131,18 @@ _CBLReplicator_Config
 _CBLReplicator_ResetCheckpoint
 _CBLReplicator_Start
 _CBLReplicator_Stop
-#_CBLReplicator_AddChangeListener
-#_CBLReplicator_AddDocumentListener
+_CBLReplicator_SetHostReachable
+_CBLReplicator_SetSuspended
+_CBLReplicator_Status
+_CBLReplicator_PendingDocumentIDs
+_CBLReplicator_IsDocumentPending
+_CBLReplicator_AddChangeListener
+_CBLReplicator_AddDocumentListener
 
+_CBLDefaultConflictResolver
 
 
 #  Fleece.exp
-#
-#  Copyright © 2018 Couchbase. All rights reserved.
 
 _kFLNullValue
 _kFLEmptyArray
@@ -142,8 +151,9 @@ _kFLEmptyDict
 _FLSlice_Equal
 _FLSlice_Compare
 _FLSlice_Copy
-_FLSliceResult_Retain
-_FLSliceResult_Release
+_FLSliceResult_New
+__FLBuf_Retain
+__FLBuf_Release
 
 _FLDoc_FromResultData
 _FLDoc_FromJSON

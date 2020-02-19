@@ -36,10 +36,8 @@ bool CBL_IsBlob(FLDict dict) CBLAPI {
 
 const CBLBlob* CBLBlob_Get(FLDict blobDict) CBLAPI {
     auto doc = CBLDocument::containing(Dict(blobDict));
-    if (!doc) {
-        C4Warn("cbl_doc_getBlob: Dict at %p does not belong to any CBLDocument", blobDict);
+    if (!doc)
         return nullptr;
-    }
     return doc->getBlob(blobDict);
 }
 

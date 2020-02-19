@@ -107,11 +107,12 @@ class MutableDocument (Document):
     def __delitem__(self, key):
         del self.properties[key]
 
+    # Called from Database.saveDocument
     def _prepareToSave(self):
         if not self._ref:
             self._ref = lib.CBLDocument_New(cstr(self.id))
         if "_properties" in self.__dict__:
-            jsonStr = json.dumps(self._properties)
+            jsonStr = encodeJSON(self._properties)
             if not lib.CBLDocument_SetPropertiesAsJSON(self._ref, cstr(jsonStr), gError):
                 raise CBLException("Couldn't store properties", gError)
 
