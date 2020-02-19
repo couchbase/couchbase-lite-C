@@ -43,7 +43,7 @@ static C4Document* getC4Doc(CBLDatabase *db, const string &docID, bool allRevisi
             doc = c4doc_get(c4db, slice(docID), true, nullptr);
         } else {
             doc = c4doc_getSingleRevision(c4db, slice(docID), nullslice, true, nullptr);
-            if (doc->flags & kDocDeleted) {
+            if (doc && doc->flags & kDocDeleted) {
                 c4doc_release(doc);
                 doc = nullptr;
             }
