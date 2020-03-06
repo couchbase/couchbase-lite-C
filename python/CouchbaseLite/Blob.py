@@ -45,4 +45,4 @@ class Blob (object):
         return r + "]"
 
     def _jsonEncodable(self):
-        return decodeFleeceDict( lib.CBLBlob_Properties(_ref), depth=99 )
+        return decodeFleeceDict( lib.CBLBlob_Properties(self._ref), depth=99 )
