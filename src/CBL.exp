@@ -66,6 +66,7 @@ _CBLDatabase_DeleteIndex
 _CBLDatabase_IndexNames
 
 _CBLDocument_ID
+_CBLDocument_RevisionID
 _CBLDocument_Sequence
 _CBLDocument_New
 _CBLDocument_MutableCopy

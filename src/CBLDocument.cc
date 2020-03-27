@@ -63,8 +63,10 @@ CBLDocument::CBLDocument(const string &docID,
 ,_c4doc(d)
 ,_mutable(isMutable)
 {
-    if (_c4doc)
+    if (_c4doc) {
         _c4doc->extraInfo = {this, nullptr};
+        _revID = string(slice(_c4doc->selectedRev.revID));
+    }
 }
 
 
@@ -97,16 +99,23 @@ CBLDocument::CBLDocument(const CBLDocument* otherDoc)
 
 // Document loaded from db without a C4Document (e.g. a replicator validation callback)
 CBLDocument::CBLDocument(CBLDatabase *db,
-            const string &docID,
-            C4RevisionFlags revFlags,
-            Dict body)
+                         const string &docID,
+                         slice revID,
+                         C4RevisionFlags revFlags,
+                         Dict body)
 :CBLDocument(docID, db, nullptr, false)
 {
     _properties = body;
+    _revID = string(revID);
 }
 
 
 CBLDocument::~CBLDocument() {
+}
+
+
+const char* CBLDocument::revisionID() const {
+    return _revID.empty() ? nullptr : _revID.c_str();
 }
 
 
@@ -246,13 +255,18 @@ bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError
 bool CBLDocument::selectRevision(slice revID) {
     LOCK(_mutex);
     _properties = nullptr;
-    return c4doc_selectRevision(_c4doc, revID, true, nullptr);
+    _fromJSON = nullptr;
+    if (!c4doc_selectRevision(_c4doc, revID, true, nullptr))
+        return false;
+    _revID = string(slice(revID));
+    return true;
 }
 
 
 bool CBLDocument::selectNextConflictingRevision() {
     LOCK(_mutex);
     _properties = nullptr;
+    _fromJSON = nullptr;
     while (c4doc_selectNextLeafRevision(_c4doc, true, true, nullptr))
         if (_c4doc->selectedRev.flags & kRevIsConflict)
             return true;
@@ -265,6 +279,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
     LOCK(_mutex);
     C4Error *c4err = internal(outError);
     _properties = nullptr;
+    _fromJSON = nullptr;
 
     slice winner(_c4doc->selectedRev.revID), loser(_c4doc->revID);
     if (resolution != Resolution::useRemote)
@@ -303,8 +318,14 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
 Dict CBLDocument::properties() const {
     LOCK(_mutex);
     if (!_properties) {
-        if (_c4doc && _c4doc->selectedRev.body.buf)
-            _properties = Value::fromData(_c4doc->selectedRev.body);
+        slice storage;
+        if (_fromJSON)
+            storage = _fromJSON.data();
+        else if (_c4doc)
+            storage = _c4doc->selectedRev.body;
+        
+        if (storage)
+            _properties = Value::fromData(storage);
         if (_mutable) {
             if (_properties)
                 _properties = _properties.asDict().mutableCopy();
@@ -333,18 +354,16 @@ char* CBLDocument::propertiesAsJSON() const {
 bool CBLDocument::setPropertiesAsJSON(const char *json, C4Error* outError) {
     if (!checkMutable(outError))
         return false;
-    Doc doc = Doc::fromJSON(slice(json));
-    if (!doc) {
+    Doc fromJSON = Doc::fromJSON(slice(json));
+    if (!fromJSON) {
         setError(outError, FleeceDomain, kFLJSONError, "Invalid JSON"_sl);
         return false;
     }
-    Dict root = doc.root().asDict();
-    if (!root) {
-        setError(outError, FleeceDomain, kFLJSONError, "properties must be a JSON dictionary"_sl);
-        return false;
-    }
     LOCK(_mutex);
-    _properties = root.mutableCopy(kFLDeepCopyImmutables);
+    // Store the transcoded Fleece and clear _properties. If app accesses properties(),
+    // it'll get a mutable version of this.
+    _fromJSON = fromJSON;
+    _properties = nullptr;
     return true;
 }
 
@@ -468,6 +487,7 @@ CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
 }
 
 const char* CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->docID();}
+const char* CBLDocument_RevisionID(const CBLDocument* doc) CBLAPI      {return doc->revisionID();}
 uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
 FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}

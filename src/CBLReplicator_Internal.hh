@@ -89,20 +89,22 @@ public:
 
         if (_conf.pushFilter) {
             params.pushFilter = [](C4String docID,
+                                   C4String revID,
                                    C4RevisionFlags flags,
                                    FLDict body,
                                    void* ctx)
             {
-                return ((CBLReplicator*)ctx)->_filter(docID, flags, body, true);
+                return ((CBLReplicator*)ctx)->_filter(docID, revID, flags, body, true);
             };
         }
         if (_conf.pullFilter) {
             params.validationFunc = [](C4String docID,
+                                       C4String revID,
                                        C4RevisionFlags flags,
                                        FLDict body,
                                        void* ctx)
             {
-                return ((CBLReplicator*)ctx)->_filter(docID, flags, body, false);
+                return ((CBLReplicator*)ctx)->_filter(docID, revID, flags, body, false);
             };
         }
 
@@ -309,8 +311,8 @@ private:
     }
 
 
-    bool _filter(slice docID, C4RevisionFlags flags, Dict body, bool pushing) {
-        Retained<CBLDocument> doc = new CBLDocument(_conf.database, string(docID), flags, body);
+    bool _filter(slice docID, slice revID, C4RevisionFlags flags, Dict body, bool pushing) {
+        Retained<CBLDocument> doc = new CBLDocument(_conf.database, string(docID), revID, flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
         return filter(_conf.context, doc, (flags & kRevDeleted) != 0);
     }

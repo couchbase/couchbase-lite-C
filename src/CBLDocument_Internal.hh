@@ -47,6 +47,7 @@ public:
     // Document loaded from db without a C4Document (e.g. a replicator validation callback)
     CBLDocument(CBLDatabase *db,
                 const string &docID,
+                slice revID,
                 C4RevisionFlags revFlags,
                 Dict body);
 
@@ -57,9 +58,12 @@ public:
 
     CBLDatabase* database() const               {return _db;}
     const char* docID() const                   {return _docID.c_str();}
+    const char* revisionID() const;
+    C4RevisionFlags revisionFlags() const       {return _c4doc->selectedRev.flags;}
     bool exists() const                         {return _c4doc != nullptr;}
     uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence : 0;}
     bool isMutable() const                      {return _mutable;}
+
 
     //---- Properties:
 
@@ -102,9 +106,6 @@ public:
 
     //---- Conflict resolution:
 
-    C4RevisionFlags revisionFlags() const       {return _c4doc->selectedRev.flags;}
-    slice revisionID() const                    {return _c4doc->selectedRev.revID;}
-
     // Select a specific revision. Only works if constructed with allRevisions=true.
     bool selectRevision(slice revID);
 
@@ -135,8 +136,10 @@ private:
     static UnretainedValueToBlobMap* sNewBlobs;
 
     string const                _docID;                 // Document ID (never empty)
+    mutable string              _revID;                 // Revision ID (if no _c4doc)
     Retained<CBLDatabase> const _db;                    // Database (null for new doc)
     c4::ref<C4Document> const   _c4doc;                 // LiteCore doc (null for new doc)
+    Doc                         _fromJSON;              // Properties read from JSON
     mutable RetainedValue       _properties;            // Properties, initialized lazily
     ValueToBlobMap              _blobs;                 // Maps Dicts in _properties to CBLBlobs
     mutable recursive_mutex     _mutex;                 // For accessing _c4doc, _properties, _blobs

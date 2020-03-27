@@ -217,10 +217,17 @@ public:
     bool deleteLocal {false}, deleteRemote {false}, deleteMerged {false};
     bool resolverCalled {false};
 
+    string expectedLocalRevID = "??", expectedRemoteRevID = "??";
+
     void testConflict(bool delLocal, bool delRemote, bool delMerged) {
         deleteLocal = delLocal;
         deleteRemote = delRemote;
         deleteMerged = delMerged;
+
+        if (deleteLocal)
+            expectedLocalRevID = "";
+        if (delRemote)
+            expectedRemoteRevID = "";
 
         configureLocalReplication();
         config.replicatorType = kCBLReplicatorTypePull;
@@ -282,18 +289,22 @@ public:
         CHECK(string(documentID) == "foo");
         if (deleteLocal) {
             REQUIRE(!localDocument);
+            REQUIRE(expectedLocalRevID.empty());
         } else {
             REQUIRE(localDocument);
             CHECK(string(CBLDocument_ID(localDocument)) == "foo");
+            CHECK(string(CBLDocument_RevisionID(localDocument)) == expectedLocalRevID);
             Dict localProps(CBLDocument_Properties(localDocument));
             CHECK(localProps["greeting"].asString() == "Howdy!"_sl);
             CHECK(localProps["expletive"].asString() == "Shazbatt!"_sl);
         }
         if (deleteRemote) {
             REQUIRE(!remoteDocument);
+            REQUIRE(expectedRemoteRevID.empty());
         } else {
             REQUIRE(remoteDocument);
             CHECK(string(CBLDocument_ID(remoteDocument)) == "foo");
+            CHECK(string(CBLDocument_RevisionID(remoteDocument)) == expectedRemoteRevID);
             Dict remoteProps(CBLDocument_Properties(remoteDocument));
             CHECK(remoteProps["greeting"].asString() == "Howdy!"_sl);
             CHECK(remoteProps["expletive"].asString() == "Frak!"_sl);
@@ -313,24 +324,29 @@ public:
 
 TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict (custom resolver)",
                  "[Replicator][Conflict]") {
+    expectedLocalRevID = "2-5dd11e6a713b8a346b8ff8a9b04a1da97005990e";
+    expectedRemoteRevID = "2-35773cca4b1a10025b7b242709c88024fa7c3713";
     testConflict(false, false, false);
 }
 
 
 TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict with remote deletion (custom resolver)",
                  "[Replicator][Conflict]") {
+    expectedLocalRevID = "2-5dd11e6a713b8a346b8ff8a9b04a1da97005990e";
     testConflict(false, true, false);
 }
 
 
 TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict with local deletion (custom resolver)",
                  "[Replicator][Conflict]") {
+    expectedRemoteRevID = "2-35773cca4b1a10025b7b242709c88024fa7c3713";
     testConflict(true, false, false);
 }
 
 
 TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict deleting merge (custom resolver)",
                  "[Replicator][Conflict]") {
+    expectedLocalRevID = "2-5dd11e6a713b8a346b8ff8a9b04a1da97005990e";
     testConflict(false, true, true);
 }
 
