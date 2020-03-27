@@ -2,7 +2,7 @@
 
 This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syncable database, with a plain C API. The API can be used directly, or as the substrate for binding to other languages like Python, JavaScript or Rust.
 
-**As of September 2019, this project is close to beta status.** The API is nearly complete and almost all of the functionality is implemented, but there are still missing pieces and only limited testing.
+**As of March 2020, this project is close to beta status.** The API is nearly complete and almost all of the functionality is implemented, but there are still missing pieces and only limited testing.
 
 ## Goals
 
@@ -125,7 +125,7 @@ Dependencies:
 1. Clone the repo
 2. Check out submodules (recursively), i.e. `git submodule update --init --recursive`
 3. Run the shellscript `build.sh`
-6. Run the (minimal) test binary at `build_cmake/test/CBL_C_Tests -r list`
+6. Run the unit tests, with `test.sh`
 
 The library is at `build_cmake/libCouchbaseLiteC.so`. (Or `.DLL` or `.dylib`)
 
