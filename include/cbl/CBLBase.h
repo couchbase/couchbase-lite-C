@@ -96,6 +96,9 @@ typedef CBL_ENUM(int32_t,  CBLNetworkErrorCode) {
     CBLNetErrTLSClientCertRejected,     ///< Server rejected my TLS client certificate
     CBLNetErrTLSCertUnknownRoot,        ///< Self-signed cert, or unknown anchor cert
     CBLNetErrInvalidRedirect,           ///< Attempted redirect to invalid URL
+    CBLNetErrUnknown,                   ///< Unknown networking error
+    CBLNetErrTLSCertRevoked,            ///< Server's cert has been revoked
+    CBLNetErrTLSCertNameMismatch,       ///< Server cert's name does not match DNS name
 };
 
 
