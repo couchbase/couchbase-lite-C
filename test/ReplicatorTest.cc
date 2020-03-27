@@ -16,103 +16,10 @@
 // limitations under the License.
 //
 
-#include "CBLTest.hh"
-#include "cbl++/CouchbaseLite.hh"
-#include <iostream>
-#include <thread>
-#include <set>
-
-using namespace std;
-using namespace fleece;
-using namespace cbl;
+#include "ReplicatorTest.hh"
 
 
-class ReplicatorTest : public CBLTest_Cpp {
-public:
-    CBLReplicatorConfiguration config = {};
-    CBLReplicator *repl = nullptr;
-    set<string> docsNotified;
-
-    ReplicatorTest() {
-        config.database = db.ref();
-        config.replicatorType = kCBLReplicatorTypePull;
-        config.context = this;
-    }
-
-    void replicate() {
-        CBLError error;
-        repl = CBLReplicator_New(&config, &error);
-        REQUIRE(repl);
-
-        auto ctoken = CBLReplicator_AddChangeListener(repl, [](void *context, CBLReplicator *r,
-                                                 const CBLReplicatorStatus *status) {
-            ((ReplicatorTest*)context)->statusChanged(r, *status);
-        }, this);
-
-        auto dtoken = CBLReplicator_AddDocumentListener(repl, [](void *context, CBLReplicator *r, bool isPush,
-                                                                 unsigned numDocuments,
-                                                                 const CBLReplicatedDocument* documents) {
-            ((ReplicatorTest*)context)->docProgress(r, isPush, numDocuments, documents);
-        }, this);
-
-        CBLReplicator_Start(repl);
-
-        cerr << "Waiting...\n";
-        CBLReplicatorStatus status;
-        while ((status = CBLReplicator_Status(repl)).activity != kCBLReplicatorStopped) {
-            this_thread::sleep_for(chrono::milliseconds(100));
-        }
-        cerr << "Finished with activity=" << status.activity
-             << ", error=(" << status.error.domain << "/" << status.error.code << ")\n";
-
-        CBLListener_Remove(ctoken);
-        CBLListener_Remove(dtoken);
-    }
-
-    void statusChanged(CBLReplicator *r, const CBLReplicatorStatus &status) {
-        CHECK(r == repl);
-        cerr << "--- PROGRESS: status=" << status.activity << ", fraction=" << status.progress.fractionComplete << ", err=" << status.error.domain << "/" << status.error.code << "\n";
-    }
-
-    void docProgress(CBLReplicator *r, bool isPush,
-                     unsigned numDocuments,
-                     const CBLReplicatedDocument* documents) {
-        CHECK(r == repl);
-        cerr << "--- " << numDocuments << " docs " << (isPush ? "pushed" : "pulled") << ":";
-        for (unsigned i = 0; i < numDocuments; ++i) {
-            docsNotified.insert(documents[i].ID);
-            cerr << " " << documents[i].ID;
-        }
-        cerr << "\n";
-    }
-
-    ~ReplicatorTest() {
-        CBLReplicator_Release(repl);
-        CBLAuth_Free(config.authenticator);
-        CBLEndpoint_Free(config.endpoint);
-    }
-
-#ifdef COUCHBASE_ENTERPRISE
-    /// Creates `otherDB` and configures the replication to push to it
-    void configureLocalReplication() {
-        otherDB = openEmptyDatabaseNamed("otherDB");
-        config.endpoint = CBLEndpoint_NewWithLocalDB(otherDB.ref());
-        config.replicatorType = kCBLReplicatorTypePush;
-    }
-
-    static vector<string> asVector(const set<string> strings) {
-        vector<string> out;
-        for (const string &s : strings)
-            out.push_back(s);
-        return out;
-    }
-
-    Database otherDB;
-#endif // COUCHBASE_ENTERPRISE
-};
-
-
-#pragma mark - TESTS:
+#pragma mark - BASIC TESTS:
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
@@ -168,186 +75,86 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replica
 }
 
 
-#pragma mark - LOCAL-TO-LOCAL TESTS:
+#pragma mark - ACTUAL-NETWORK TESTS:
 
 
-#ifdef COUCHBASE_ENTERPRISE
+/*  The following tests require a running Sync Gateway with a specific set of databases.
+    The config files and Walrus database files can be found in the LiteCore repo, at
+    vendor/couchbase-lite-core/Replicator/tests/data/
 
-TEST_CASE_METHOD(ReplicatorTest, "Push to local db", "[Replicator]") {
-    MutableDocument doc("foo");
-    doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
+    From a shell in that directory, run `sync_gateway config.json` to start a non-TLS
+    server on port 4984, and in another shell run `sync_gateway ssl_config.json` to start
+    a TLS server on port 4994.
 
-    configureLocalReplication();
-    replicate();
+    When running these tests, set environment variables giving the URLs of the two SG
+    instances, e.g:
+        CBL_TEST_SERVER_URL=ws://localhost:4984
+        CBL_TEST_SERVER_URL_TLS=wss://localhost:4994
 
-    CHECK(asVector(docsNotified) == vector<string>{"foo"});
-
-    Document copiedDoc = otherDB.getDocument("foo");
-    REQUIRE(copiedDoc);
-    CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
-}
-
-
-TEST_CASE_METHOD(ReplicatorTest, "Pull conflict (default resolver)", "[Replicator][Conflict]") {
-    configureLocalReplication();
-    config.replicatorType = kCBLReplicatorTypePull;
-
-    MutableDocument doc("foo");
-    doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
-
-    MutableDocument doc2("foo");
-    doc2["greeting"] = "Salaam Alaykum";
-    otherDB.saveDocument(doc2);
-
-    replicate();
-
-    CHECK(asVector(docsNotified) == vector<string>{"foo"});
-
-    Document copiedDoc = db.getDocument("foo");
-    REQUIRE(copiedDoc);
-    CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
-}
+    If either variable is not set, the corresponding test(s) will be skipped with a warning.
+*/
 
 
-class ReplicatorConflictTest : public ReplicatorTest {
+class ClientServerReplicatorTest : public ReplicatorTest {
 public:
-
-    bool deleteLocal {false}, deleteRemote {false}, deleteMerged {false};
-    bool resolverCalled {false};
-
-    string expectedLocalRevID = "??", expectedRemoteRevID = "??";
-
-    void testConflict(bool delLocal, bool delRemote, bool delMerged) {
-        deleteLocal = delLocal;
-        deleteRemote = delRemote;
-        deleteMerged = delMerged;
-
-        if (deleteLocal)
-            expectedLocalRevID = "";
-        if (delRemote)
-            expectedRemoteRevID = "";
-
-        configureLocalReplication();
-        config.replicatorType = kCBLReplicatorTypePull;
-
-        // Save the same doc to each db (will have the same revision),
-        MutableDocument doc("foo");
-        doc["greeting"] = "Howdy!";
-        doc = db.saveDocument(doc).mutableCopy();
-        if (deleteLocal) {
-            doc.deleteDoc();
-        } else {
-            doc["expletive"] = "Shazbatt!";
-            db.saveDocument(doc);
-        }
-
-        doc = MutableDocument("foo");
-        doc["greeting"] = "Howdy!";
-        doc = otherDB.saveDocument(doc).mutableCopy();
-        if (deleteRemote) {
-            doc.deleteDoc();
-        } else {
-            doc["expletive"] = "Frak!";
-            otherDB.saveDocument(doc);
-        }
-
-        config.conflictResolver = [](void *context,
-                                     const char *documentID,
-                                     const CBLDocument *localDocument,
-                                     const CBLDocument *remoteDocument) -> const CBLDocument* {
-            cerr << "--- Entering custom conflict resolver! (local=" << localDocument <<
-                    ", remote=" << remoteDocument << ")\n";
-            auto merged = ((ReplicatorConflictTest*)context)->conflictResolver(documentID, localDocument, remoteDocument);
-            cerr << "--- Returning " << merged << " from custom conflict resolver\n";
-            return merged;
-        };
-
-        replicate();
-
-        CHECK(resolverCalled);
-        CHECK(asVector(docsNotified) == vector<string>{"foo"});
-
-        Document copiedDoc = db.getDocument("foo");
-        if (deleteMerged) {
-            REQUIRE(!copiedDoc);
-        } else {
-            REQUIRE(copiedDoc);
-            CHECK(copiedDoc["greeting"].asString() == "¡Hola!"_sl);
-        }
+    ClientServerReplicatorTest() {
+        const char *url = getenv("CBL_TEST_SERVER_URL");
+        if (url)
+            serverURL = url;
+        url = getenv("CBL_TEST_SERVER_URL_TLS");            // e.g. "wss://localhost:4994"
+        if (url)
+            tlsServerURL = url;
     }
 
-
-    const CBLDocument* conflictResolver(const char *documentID,
-                                       const CBLDocument *localDocument,
-                                       const CBLDocument *remoteDocument)
-    {
-        CHECK(!resolverCalled);
-        resolverCalled = true;
-
-        CHECK(string(documentID) == "foo");
-        if (deleteLocal) {
-            REQUIRE(!localDocument);
-            REQUIRE(expectedLocalRevID.empty());
-        } else {
-            REQUIRE(localDocument);
-            CHECK(string(CBLDocument_ID(localDocument)) == "foo");
-            CHECK(string(CBLDocument_RevisionID(localDocument)) == expectedLocalRevID);
-            Dict localProps(CBLDocument_Properties(localDocument));
-            CHECK(localProps["greeting"].asString() == "Howdy!"_sl);
-            CHECK(localProps["expletive"].asString() == "Shazbatt!"_sl);
+    bool setConfigRemoteDBName(const char *dbName) {
+        if (serverURL.empty()) {
+            CBL_Log(kCBLLogDomainReplicator, CBLLogWarning,
+                    "Skipping test; server URL not configured");
+            return false;
         }
-        if (deleteRemote) {
-            REQUIRE(!remoteDocument);
-            REQUIRE(expectedRemoteRevID.empty());
-        } else {
-            REQUIRE(remoteDocument);
-            CHECK(string(CBLDocument_ID(remoteDocument)) == "foo");
-            CHECK(string(CBLDocument_RevisionID(remoteDocument)) == expectedRemoteRevID);
-            Dict remoteProps(CBLDocument_Properties(remoteDocument));
-            CHECK(remoteProps["greeting"].asString() == "Howdy!"_sl);
-            CHECK(remoteProps["expletive"].asString() == "Frak!"_sl);
-        }
-        if (deleteMerged) {
-            return nullptr;
-        } else {
-            CBLDocument *merged = CBLDocument_New(documentID);
-            MutableDict mergedProps(CBLDocument_MutableProperties(merged));
-            mergedProps.set("greeting"_sl, "¡Hola!");
-            // do not release `merged`, otherwise it would be freed before returning!
-            return merged;
-        }
+        config.endpoint = CBLEndpoint_NewWithURL((serverURL + "/" + dbName).c_str());
+        return true;
     }
+
+    bool setConfigRemoteDBNameTLS(const char *dbName) {
+        if (tlsServerURL.empty()) {
+            CBL_Log(kCBLLogDomainReplicator, CBLLogWarning,
+                    "Skipping test; server URL not configured");
+            return false;
+        }
+        config.endpoint = CBLEndpoint_NewWithURL((tlsServerURL + "/" + dbName).c_str());
+        return true;
+    }
+
+    string serverURL, tlsServerURL;
 };
 
 
-TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict (custom resolver)",
-                 "[Replicator][Conflict]") {
-    expectedLocalRevID = "2-5dd11e6a713b8a346b8ff8a9b04a1da97005990e";
-    expectedRemoteRevID = "2-35773cca4b1a10025b7b242709c88024fa7c3713";
-    testConflict(false, false, false);
+TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG", "[Replicator]") {
+    if (!setConfigRemoteDBName("itunes"))
+        return;
+    logEveryDocument = false;
+    config.replicatorType = kCBLReplicatorTypePull;
+    replicate();
+    CHECK(replError.code == 0);
+    CHECK(db.count() == 12189);
 }
 
 
-TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict with remote deletion (custom resolver)",
-                 "[Replicator][Conflict]") {
-    expectedLocalRevID = "2-5dd11e6a713b8a346b8ff8a9b04a1da97005990e";
-    testConflict(false, true, false);
+TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG w/TLS", "[Replicator]") {
+    if (!setConfigRemoteDBNameTLS("itunes"))
+        return;
+    logEveryDocument = false;
+    config.replicatorType = kCBLReplicatorTypePull;
+    SECTION("Without cert pinning (fails)") {
+        replicate();
+        CHECK(replError == (CBLError{CBLNetworkDomain, CBLNetErrTLSCertUnknownRoot}));
+    }
+    SECTION("With cert pinning") {
+        alloc_slice serverCert = getServerCert();
+        config.pinnedServerCertificate = serverCert;
+        replicate();
+        CHECK(replError.code == 0);
+        CHECK(db.count() == 12189);
+    }
 }
-
-
-TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict with local deletion (custom resolver)",
-                 "[Replicator][Conflict]") {
-    expectedRemoteRevID = "2-35773cca4b1a10025b7b242709c88024fa7c3713";
-    testConflict(true, false, false);
-}
-
-
-TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict deleting merge (custom resolver)",
-                 "[Replicator][Conflict]") {
-    expectedLocalRevID = "2-5dd11e6a713b8a346b8ff8a9b04a1da97005990e";
-    testConflict(false, true, true);
-}
-
-#endif // COUCHBASE_ENTERPRISE

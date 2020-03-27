@@ -26,6 +26,13 @@
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
 
+static inline bool operator== (const CBLError &e1, const CBLError &e2) {
+    if (e1.code != 0)
+        return e1.domain == e2.domain && e1.code == e2.code;
+    else
+        return e2.code == 0;
+}
+
 namespace cbl {
 
     // Artificial base class of the C++ wrapper classes; just manages ref-counting.

@@ -37,6 +37,11 @@ namespace fleece {
     }
 }
 
+static inline std::ostream& operator<< (std::ostream &out, CBLError err) {
+    out << "{" << err.domain << ", " << err.code << "}";
+    return out;
+}
+
 #include "catch.hpp"
 
 
