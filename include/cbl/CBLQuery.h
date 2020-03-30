@@ -120,7 +120,8 @@ unsigned CBLQuery_ColumnCount(CBLQuery* _cbl_nonnull) CBLAPI;
     The column name is based on its expression in the `SELECT...` or `WHAT:` section of the
     query. A column that returns a property or property path will be named after that property.
     A column that returns an expression will have an automatically-generated name like `$1`.
-    To give a column a custom name, use the `AS` syntax in the query.*/
+    To give a column a custom name, use the `AS` syntax in the query.
+    Every column is guaranteed to have a unique name. */
 FLSlice CBLQuery_ColumnName(CBLQuery* _cbl_nonnull,
                             unsigned columnIndex) CBLAPI;
 
@@ -135,12 +136,23 @@ FLSlice CBLQuery_ColumnName(CBLQuery* _cbl_nonnull,
     and can be stepped from one result to the next.
 
     It's important to note that the initial position of the iterator is _before_ the first
-    result, so \ref CBLResultSet_Next must be called _first_.
+    result, so \ref CBLResultSet_Next must be called _first_. Example:
+
+    ```
+    CBLResultSet *rs = CBLQuery_Execute(query, &error);
+    assert(rs);
+    while (CBLResultSet_Next(rs) {
+        FLValue aValue = CBLResultSet_ValueAtIndex(rs, 0);
+        ...
+    }
+    CBLResultSet_Release(rs);
+    ```
  */
 
 /** Moves the result-set iterator to the next result.
     Returns false if there are no more results.
     @warning This must be called _before_ examining the first result. */
+_cbl_warn_unused
 bool CBLResultSet_Next(CBLResultSet* _cbl_nonnull) CBLAPI;
 
 /** Returns the value of a column of the current result, given its (zero-based) numeric index.
