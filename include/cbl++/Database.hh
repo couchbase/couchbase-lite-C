@@ -140,7 +140,7 @@ namespace cbl {
 
         // Indexes:
 
-        void createIndxex(const char *name _cbl_nonnull, CBLIndexSpec spec) {
+        void createIndex(const char *name _cbl_nonnull, CBLIndexSpec spec) {
             CBLError error;
             check(CBLDatabase_CreateIndex(ref(), name, spec, &error), error);
         }

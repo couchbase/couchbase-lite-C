@@ -32,9 +32,9 @@ static constexpr const char *kJSONFilePath = "../DataSets/travel-sample/travelSa
 TEST_CASE_METHOD(CBLTest_Cpp, "Benchmark Import JSON", "[.Perf]") {
     Stopwatch st;
 
-    db.createIndxex("types",      {kCBLValueIndex, "[[\".type\"]]"});
-    db.createIndxex("locations",  {kCBLValueIndex, "[[\".country\"], [\".city\"]]"});
-    db.createIndxex("longitudes", {kCBLValueIndex, "[[\".geo.lon\"]]"});
+    db.createIndex("types",      {kCBLValueIndex, "[[\".type\"]]"});
+    db.createIndex("locations",  {kCBLValueIndex, "[[\".country\"], [\".city\"]]"});
+    db.createIndex("longitudes", {kCBLValueIndex, "[[\".geo.lon\"]]"});
 
     ImportJSONLines(kJSONFilePath, db.ref());
 
