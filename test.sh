@@ -28,4 +28,4 @@ export CBL_TEST_SERVER_URL_TLS=wss://localhost:4994
 
 # Now run the tests:
 
-./build_cmake/test/CBL_C_Tests -r list
+./build_cmake/test/CBL_C_Tests -r list "$@"

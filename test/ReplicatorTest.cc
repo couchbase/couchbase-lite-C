@@ -130,7 +130,29 @@ public:
 };
 
 
-TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG", "[Replicator]") {
+TEST_CASE_METHOD(ClientServerReplicatorTest, "HTTP auth", "[Replicator][.Server]") {
+    if (!setConfigRemoteDBName("seekrit"))
+        return;
+    config.replicatorType = kCBLReplicatorTypePull;
+    CBLAuthenticator* auth = nullptr;
+    CBLError expectedError = CBLError{CBLWebSocketDomain, 401};
+    SECTION("No credentials") {
+        auth = nullptr;
+    }
+    SECTION("Invalid credentials") {
+        auth = CBLAuth_NewBasic("manhog", "whim");
+    }
+    SECTION("Valid credentials") {
+        auth = CBLAuth_NewBasic("pupshaw", "frank");
+        expectedError = {};
+    }
+    config.authenticator = auth;
+    replicate();
+    CHECK(replError == expectedError);
+}
+
+
+TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG", "[Replicator][.Server]") {
     if (!setConfigRemoteDBName("itunes"))
         return;
     logEveryDocument = false;
@@ -141,7 +163,7 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG", "[Replicator
 }
 
 
-TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG w/TLS", "[Replicator]") {
+TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG w/TLS", "[Replicator][.Server]") {
     if (!setConfigRemoteDBNameTLS("itunes"))
         return;
     logEveryDocument = false;
