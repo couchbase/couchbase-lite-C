@@ -250,10 +250,9 @@ namespace cbl_internal {
                 cb(_context, _query);
         }
 
-        CBLResultSet* resultSet(CBLError *error) {
-            auto e = c4queryobs_getEnumerator(_c4obs, internal(error));
-            _resultSet = e ? new CBLResultSet(_query, c4queryenum_retain(e)) : nullptr;
-            return _resultSet;
+        Retained<CBLResultSet> resultSet(CBLError *error) {
+            auto e = c4queryobs_getEnumerator(_c4obs, false, internal(error));
+            return e ? new CBLResultSet(_query, e) : nullptr;
         }
 
     private:
@@ -263,7 +262,6 @@ namespace cbl_internal {
 
         Retained<CBLQuery> _query;
         C4QueryObserver* _c4obs {nullptr};
-        Retained<CBLResultSet> _resultSet;
     };
 
 }
@@ -326,9 +324,9 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
     return query->addChangeListener(listener, context);
 }
 
-CBLResultSet* CBLQuery_CurrentResults(CBLQuery* query,
-                                      CBLListenerToken *token,
-                                      CBLError *outError) CBLAPI
+CBLResultSet* CBLQuery_CopyCurrentResults(CBLQuery* query,
+                                          CBLListenerToken *token,
+                                          CBLError *outError) CBLAPI
 {
     auto listener = query->getChangeListener(token);
     if (!listener) {
@@ -336,7 +334,7 @@ CBLResultSet* CBLQuery_CurrentResults(CBLQuery* query,
                  "Listener token is not valid for this query"_sl);
         return nullptr;
     }
-    return listener->resultSet(outError);
+    return retain(listener->resultSet(outError).get());
 }
 
 bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {

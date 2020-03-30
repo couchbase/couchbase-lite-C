@@ -133,7 +133,8 @@ protected: \
             _callback = nullptr;
         }
 
-        void* context()                             {return _callback.get();}
+        void* context() const                       {return _callback.get();}
+        CBLListenerToken* token() const             {return _token;}
         void setToken(CBLListenerToken* token)      {assert(!_token); _token = token;}
 
         static void call(void* context, Args... args) {

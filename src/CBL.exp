@@ -113,7 +113,7 @@ _CBLQuery_Explain
 _CBLQuery_ColumnCount
 _CBLQuery_ColumnName
 _CBLQuery_AddChangeListener
-_CBLQuery_CurrentResults
+_CBLQuery_CopyCurrentResults
 
 _CBLResultSet_Next
 _CBLResultSet_ValueAtIndex

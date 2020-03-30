@@ -19,6 +19,7 @@
 #pragma once
 #include "CBLDatabase.h"
 #include "Internal.hh"
+#include "InstanceCounted.hh"
 #include <access_lock.hh>
 #include <atomic>
 #include <memory>
@@ -32,7 +33,7 @@ namespace cbl_internal {
 
 
 /** Abstract base class of listener tokens. (In the public API, as an opaque typeef.) */
-struct CBLListenerToken : public fleece::RefCounted {
+struct CBLListenerToken : public fleece::RefCounted, public fleece::InstanceCounted {
 public:
     CBLListenerToken(const void *callback _cbl_nonnull, void *context)
     :_callback(callback)

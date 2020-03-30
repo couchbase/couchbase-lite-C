@@ -27,10 +27,10 @@ using namespace fleece;
 using namespace cbl;
 
 
-class QueryTest : public CBLTest_Cpp {
+class QueryTest : public CBLTest {
 public:
     QueryTest() {
-        ImportJSONLines(GetTestFilePath("names_100.json"), db.ref());
+        ImportJSONLines(GetTestFilePath("names_100.json"), db);
     }
 
     ~QueryTest() {
@@ -46,10 +46,10 @@ public:
 };
 
 
-TEST_CASE_METHOD(QueryTest, "Invalid Query", "[!throws]") {
+TEST_CASE_METHOD(QueryTest, "Invalid Query", "[Query][!throws]") {
     CBLError error;
     int errPos;
-    query = CBLQuery_New(db.ref(), kCBLN1QLLanguage,
+    query = CBLQuery_New(db, kCBLN1QLLanguage,
                          "SELECT name WHERE",
                          &errPos, &error);
     REQUIRE(!query);
@@ -59,10 +59,10 @@ TEST_CASE_METHOD(QueryTest, "Invalid Query", "[!throws]") {
 }
 
 
-TEST_CASE_METHOD(QueryTest, "Query") {
+TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     CBLError error;
     int errPos;
-    query = CBLQuery_New(db.ref(), kCBLN1QLLanguage,
+    query = CBLQuery_New(db, kCBLN1QLLanguage,
                          "SELECT name WHERE birthday like '1959-%' ORDER BY birthday",
                          &errPos, &error);
     REQUIRE(query);
@@ -96,7 +96,7 @@ TEST_CASE_METHOD(QueryTest, "Query") {
 }
 
 
-TEST_CASE_METHOD(QueryTest, "Query Parameters") {
+TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
     CBLError error;
     for (int pass = 0; pass < 2; ++pass) {
         if (pass == 1) {
@@ -104,11 +104,11 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters") {
             CBLIndexSpec index = {};
             index.type = kCBLValueIndex;
             index.keyExpressionsJSON = R"(["contact.address.zip"])";
-            CHECK(CBLDatabase_CreateIndex(db.ref(), "zips", index, &error));
+            CHECK(CBLDatabase_CreateIndex(db, "zips", index, &error));
         }
 
         int errPos;
-        query = CBLQuery_New(db.ref(), kCBLN1QLLanguage,
+        query = CBLQuery_New(db, kCBLN1QLLanguage,
                              "SELECT count(*) AS n WHERE contact.address.zip BETWEEN $zip0 AND $zip1",
                              &errPos, &error);
         REQUIRE(query);
@@ -149,9 +149,9 @@ static int countResults(CBLResultSet *results) {
 }
 
 
-TEST_CASE_METHOD(QueryTest, "Query Listener") {
+TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CBLError error;
-    query = CBLQuery_New(db.ref(), kCBLN1QLLanguage,
+    query = CBLQuery_New(db, kCBLN1QLLanguage,
                          "SELECT name WHERE birthday like '1959-%' ORDER BY birthday",
                          nullptr, &error);
     REQUIRE(query);
@@ -164,9 +164,10 @@ TEST_CASE_METHOD(QueryTest, "Query Listener") {
     listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query) {
         auto self = (QueryTest*)context;
         CBLError error;
-        auto newResults = CBLQuery_CurrentResults(query, self->listenerToken, &error);
+        auto newResults = CBLQuery_CopyCurrentResults(query, self->listenerToken, &error);
         CHECK(newResults);
         self->resultCount = countResults(newResults);
+        CBLResultSet_Release(newResults);
     }, this);
 
     cerr << "Waiting for listener...\n";
@@ -177,10 +178,93 @@ TEST_CASE_METHOD(QueryTest, "Query Listener") {
     resultCount = -1;
 
     cerr << "Deleting a doc...\n";
-    const CBLDocument *doc = CBLDatabase_GetDocument(db.ref(), "0000012");
+    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012");
     REQUIRE(doc);
     CHECK(CBLDocument_Delete(doc, kCBLConcurrencyControlLastWriteWins, &error));
     CBLDocument_Release(doc);
+
+    cerr << "Waiting for listener again...\n";
+    while (resultCount < 0)
+        this_thread::sleep_for(chrono::milliseconds(100));
+    CHECK(resultCount == 2);
+}
+
+
+#pragma mark - C++ API:
+
+
+class QueryTest_Cpp : public CBLTest_Cpp {
+public:
+    QueryTest_Cpp() {
+        ImportJSONLines(GetTestFilePath("names_100.json"), db.ref());
+    }
+};
+
+
+static int countResults(ResultSet &results) {
+    int n = 0;
+    for (auto &result : results)
+        ++n;
+    return n;
+}
+
+
+TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
+    Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
+
+    CHECK(query.columnNames() == vector<string>({"name"}));
+
+    alloc_slice explanation(query.explain());
+    cerr << string(explanation);
+
+    static const slice kExpectedFirst[3] = {"Tyesha"_sl,  "Eddie"_sl,     "Diedre"_sl};
+    static const slice kExpectedLast [3] = {"Loehrer"_sl, "Colangelo"_sl, "Clinton"_sl};
+
+    int n = 0;
+    auto results = query.execute();
+    for (auto &result : results) {
+        Value name = result[0];
+        CHECK(result["name"] == name);
+        Dict dict = name.asDict();
+        CHECK(dict);
+        slice first = dict["first"].asString();
+        slice last  = dict["last"].asString();
+        REQUIRE(n < 3);
+        cerr << "'" << first << "', '" << last << "'\n";
+        CHECK(first == kExpectedFirst[n]);
+        CHECK(last == kExpectedLast[n]);
+        ++n;
+        cerr << first << " " << last << "\n";
+    }
+    CHECK(n == 3);
+}
+
+
+TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
+    Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
+    {
+        auto rs = query.execute();
+        CHECK(countResults(rs) == 3);
+    }
+
+    cerr << "Adding listener\n";
+    int resultCount = -1;
+    Query::ChangeListener listenerToken = query.addChangeListener([&](Query q) {
+        ResultSet rs = listenerToken.results();
+        resultCount = countResults(rs);
+    });
+
+    cerr << "Waiting for listener...\n";
+    resultCount = -1;
+    while (resultCount < 0)
+        this_thread::sleep_for(chrono::milliseconds(100));
+    CHECK(resultCount == 3);
+    resultCount = -1;
+
+    cerr << "Deleting a doc...\n";
+    Document doc = db.getDocument("0000012");
+    REQUIRE(doc);
+    doc.deleteDoc();
 
     cerr << "Waiting for listener again...\n";
     while (resultCount < 0)

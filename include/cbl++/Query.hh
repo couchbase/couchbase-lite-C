@@ -27,6 +27,7 @@
 // It is not considered part of the official Couchbase Lite API.
 
 namespace cbl {
+    class Query;
     class ResultSet;
     class ResultSetIterator;
 
@@ -49,9 +50,14 @@ namespace cbl {
 
         std::string explain()   {return fleece::alloc_slice(CBLQuery_Explain(ref())).asString();}
 
-        using ChangeListener = cbl::ListenerToken<CBLQuery, CBLResultSet, CBLError*>;
-        [[nodiscard]] ChangeListener addChangeListener(ChangeListener::Callback);
+        // Change listener (live query):
 
+        class ChangeListener;
+
+        [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<Query>::Callback);
+
+    private:
+        static void _callListener(void *context, CBLQuery*);
         CBL_REFCOUNTED_BOILERPLATE(Query, RefCounted, CBLQuery)
     };
 
@@ -59,16 +65,16 @@ namespace cbl {
     /** A single query result; ResultSet::iterator iterates over these. */
     class Result {
     public:
-        fleece::Value valueAtIndex(unsigned i) {
+        fleece::Value valueAtIndex(unsigned i) const {
             return CBLResultSet_ValueAtIndex(_ref, i);
         }
 
-        fleece::Value valueForKey(const char *key _cbl_nonnull) {
+        fleece::Value valueForKey(const char *key _cbl_nonnull) const {
             return CBLResultSet_ValueForKey(_ref, key);
         }
 
-        fleece::Value operator[](int i)                         {return valueAtIndex(i);}
-        fleece::Value operator[](const char *key _cbl_nonnull)  {return valueForKey(key);}
+        fleece::Value operator[](int i) const                         {return valueAtIndex(i);}
+        fleece::Value operator[](const char *key _cbl_nonnull) const  {return valueForKey(key);}
 
     protected:
         explicit Result(CBLResultSet *ref)                      :_ref(ref) { }
@@ -112,13 +118,16 @@ namespace cbl {
         }
     protected:
         ResultSetIterator()                                 :_rs(), _result(nullptr) { }
-        explicit ResultSetIterator(ResultSet rs)            :_rs(rs), _result(_rs.ref()) { }
+        explicit ResultSetIterator(ResultSet rs)
+        :_rs(rs), _result(_rs.ref())
+        {
+            ++*this;         // CBLResultSet_Next() has to be called first
+        }
 
         ResultSet _rs;
         Result _result;
         friend class ResultSet;
     };
-
 
 
     // Method implementations:
@@ -144,11 +153,39 @@ namespace cbl {
     }
 
 
+    class Query::ChangeListener : public ListenerToken<Query> {
+    public:
+        ChangeListener(Query query, Callback cb)
+        :ListenerToken<Query>(cb)
+        ,_query(std::move(query))
+        { }
+
+        ResultSet results() {
+            CBLError error;
+            auto rs = CBLQuery_CopyCurrentResults(_query.ref(), token(), &error);
+            check(rs, error);
+            return ResultSet::adopt(rs);
+        }
+
+    private:
+        Query _query;
+    };
+
+
+    inline Query::ChangeListener Query::addChangeListener(ChangeListener::Callback f) {
+        auto l = ChangeListener(*this, f);
+        l.setToken( CBLQuery_AddChangeListener(ref(), &_callListener, l.context()) );
+        return l;
+    }
+
+
+    inline void Query::_callListener(void *context, CBLQuery *q) {
+        ChangeListener::call(context, Query(q));
+    }
+
+
     inline ResultSet::iterator ResultSet::begin()  {
-        if (!_ref) throw std::logic_error("begin() can only be called once");//FIX error class
-        auto i = iterator(*this);
-        _ref = nullptr;
-        return ++i;         // CBLResultSet_Next() has to be called first
+        return iterator(*this);
     }
 
     inline ResultSet::iterator ResultSet::end() {

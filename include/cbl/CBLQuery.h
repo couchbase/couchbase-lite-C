@@ -202,18 +202,14 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
 
 /** Returns the query's _entire_ current result set, after it's been announced via a call to the
     listener's callback.
-    \warning This does _not_ return a new reference (unlike \ref CBLQuery_Execute), and you
-    **must not release the result set!**
-    \note The result set is valid until the next call to \ref CBLQuery_CurrentResults (with the
-    same query and listener) or until you free the listener. If you need to keep it alive longer,
-    retain it yourself.
+    @note  You must release the result set when you're finished with it.
     @param query  The query being listened to.
     @param listener  The query listener that was notified.
     @param error  If the query failed to run, the error will be stored here.
-    @return  The query's current result set, or NULL if the query failed to run. */
-CBLResultSet* CBLQuery_CurrentResults(CBLQuery* query _cbl_nonnull,
-                                      CBLListenerToken *listener _cbl_nonnull,
-                                      CBLError *error) CBLAPI;
+    @return  A new object containing the query's current results, or NULL if the query failed to run. */
+    CBLResultSet* CBLQuery_CopyCurrentResults(CBLQuery* query _cbl_nonnull,
+                                              CBLListenerToken *listener _cbl_nonnull,
+                                              CBLError *error) CBLAPI;
 
 /** @} */
 
