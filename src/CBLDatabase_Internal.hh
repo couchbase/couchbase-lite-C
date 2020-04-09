@@ -80,6 +80,7 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
     C4BlobStore* blobStore() const      {return _blobStore;}
 
 private:
+    friend class CBLURLEndpointListener;
     friend class cbl_internal::CBLLocalEndpoint;
     C4Database* _getC4Database() const;
 

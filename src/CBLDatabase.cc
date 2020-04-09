@@ -68,7 +68,7 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
 }
 
 
-// For use only by CBLLocalEndpoint
+// For use only by CBLURLEndpointListener and CBLLocalEndpoint
 C4Database* CBLDatabase::_getC4Database() const {
     return use<C4Database*>([](C4Database *c4db) {
         return c4db;
