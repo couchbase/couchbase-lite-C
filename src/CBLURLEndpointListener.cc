@@ -16,6 +16,8 @@
 // limitations under the License.
 //
 
+#ifdef COUCHBASE_ENTERPRISE
+
 #include "CBLURLEndpointListener.h"
 #include "Internal.hh"
 #include "CBLDatabase_Internal.hh"
@@ -108,3 +110,5 @@ FLMutableArray CBLURLEndpointListner_GetURLs(CBLURLEndpointListener* listener _c
 CBLConnectionStatus CBLURLEndpointListener_GetStatus(CBLURLEndpointListener* listener) {
     return listener->status();
 }
+
+#endif
