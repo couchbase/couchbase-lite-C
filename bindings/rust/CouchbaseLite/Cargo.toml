@@ -1,0 +1,9 @@
+[package]
+name = "CouchbaseLite"
+version = "0.1.0"
+authors = ["Jens Alfke <jens@couchbase.com>"]
+
+[dependencies]
+
+[build-dependencies]
+bindgen = "0.53.1"

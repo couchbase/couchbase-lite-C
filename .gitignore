@@ -2,7 +2,9 @@ build_cmake
 *.pyc
 *.o
 *.so
+empty.cpp
+Cargo.lock
+.vscode
 python/CouchbaseLite/libcouchbase_lite.dylib
 python/CouchbaseLite/*.c
-.vscode
-empty.cpp
+bindings/rust/CouchbaseLite/target/
