@@ -62,7 +62,7 @@ typedef struct CBLEncryptionKey {
 typedef struct {
     const char *directory;                  ///< The parent directory of the database
     CBLDatabaseFlags flags;                 ///< Options for opening the database
-    CBLEncryptionKey encryptionKey;         ///< The database's encryption key (if any)
+    CBLEncryptionKey* encryptionKey;        ///< The database's encryption key (if any)
 } CBLDatabaseConfiguration;
 
 /** @} */

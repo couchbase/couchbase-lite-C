@@ -54,12 +54,16 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
             c4Config.flags |= kC4DB_ReadOnly;
         if (config->flags & kCBLDatabase_NoUpgrade)
             c4Config.flags |= kC4DB_NoUpgrade;
-        c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(
-                                                                config->encryptionKey.algorithm);
-        static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
-                      "C4EncryptionKey and CBLEncryptionKey size do not match");
-        memcpy(c4Config.encryptionKey.bytes, config->encryptionKey.bytes,
-               sizeof(CBLEncryptionKey::bytes));
+        if (config->encryptionKey) {
+            c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(
+                                                                config->encryptionKey->algorithm);
+            static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
+                          "C4EncryptionKey and CBLEncryptionKey size do not match");
+            memcpy(c4Config.encryptionKey.bytes, config->encryptionKey->bytes,
+                   sizeof(CBLEncryptionKey::bytes));
+        } else {
+            c4Config.encryptionKey.algorithm = kC4EncryptionNone;
+        }
     } else {
         c4Config.parentDirectory = effectiveDir(nullptr);
         c4Config.flags = kDefaultFlags;

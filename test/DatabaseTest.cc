@@ -62,7 +62,7 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
     CBLDatabaseConfiguration config = CBLDatabase_Config(defaultdb);
     CHECK(config.directory != nullptr);     // exact value is platform-specific
     CHECK(config.flags == kCBLDatabase_Create);
-    CHECK(config.encryptionKey.algorithm == kCBLEncryptionNone);
+    CHECK(config.encryptionKey == nullptr);
 
     CHECK(CBLDatabase_Delete(defaultdb, &error));
     CBLDatabase_Release(defaultdb);
