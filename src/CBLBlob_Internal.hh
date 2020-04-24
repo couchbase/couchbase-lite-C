@@ -129,7 +129,7 @@ private:
 class CBLNewBlob : public CBLBlob {
 public:
     // Constructor for new blobs, given contents or writer (but not both)
-    CBLNewBlob(const char *contentType,
+    CBLNewBlob(slice contentType,
                slice contents,
                C4WriteStream *writer)
     :CBLBlob()

@@ -31,7 +31,7 @@ namespace cbl_internal {
 struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Database*> {
 
     CBLDatabase(C4Database* _cbl_nonnull db,
-                const std::string &name_,
+                fleece::slice name_,
                 fleece::slice dir_,
                 CBLDatabaseFlags flags_)
     :access_lock(std::move(db))

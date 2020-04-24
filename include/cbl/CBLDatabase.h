@@ -18,6 +18,7 @@
 
 #pragma once
 #include "CBLBase.h"
+#include "fleece/FLSlice.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,6 +66,12 @@ typedef struct {
     CBLEncryptionKey* encryptionKey;        ///< The database's encryption key (if any)
 } CBLDatabaseConfiguration;
 
+typedef struct {
+    FLString directory;                     ///< The parent directory of the database
+    CBLDatabaseFlags flags;                 ///< Options for opening the database
+    CBLEncryptionKey* encryptionKey;        ///< The database's encryption key (if any)
+} CBLDatabaseConfiguration_s;
+
 /** @} */
 
 
@@ -81,6 +88,8 @@ typedef struct {
                         absolute or relative path to the database. */
 bool CBL_DatabaseExists(const char* _cbl_nonnull name, const char *inDirectory) CBLAPI;
 
+bool CBL_DatabaseExists_s(FLString name, FLString inDirectory) CBLAPI;
+
 /** Copies a database file to a new location, and assigns it a new internal UUID to distinguish
     it from the original database when replicating.
     @param fromPath  The full filesystem path to the original database (including extension).
@@ -91,6 +100,11 @@ bool CBL_CopyDatabase(const char* _cbl_nonnull fromPath,
                       const CBLDatabaseConfiguration* config,
                       CBLError*) CBLAPI;
 
+bool CBL_CopyDatabase_s(FLString fromPath,
+                        FLString toName,
+                        const CBLDatabaseConfiguration_s* config,
+                        CBLError*) CBLAPI;
+
 /** Deletes a database file. If the database file is open, an error is returned.
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
@@ -98,9 +112,13 @@ bool CBL_CopyDatabase(const char* _cbl_nonnull fromPath,
     @param outError  On return, will be set to the error that occurred, or a 0 code if no error.
      @return  True if the database was deleted, false if it doesn't exist or deletion failed.
                 (You can tell the last two cases apart by looking at \p outError.)*/
-bool CBL_DeleteDatabase(const char _cbl_nonnull *name, 
+bool CBL_DeleteDatabase(const char *name _cbl_nonnull,
                         const char *inDirectory,
                         CBLError *outError) CBLAPI;
+
+bool CBL_DeleteDatabase_s(FLString name,
+                          FLString inDirectory,
+                          CBLError *outError) CBLAPI;
 
 /** @} */
 
@@ -124,6 +142,11 @@ _cbl_warn_unused
 CBLDatabase* CBLDatabase_Open(const char *name _cbl_nonnull,
                               const CBLDatabaseConfiguration* config,
                               CBLError* error) CBLAPI;
+
+_cbl_warn_unused
+CBLDatabase* CBLDatabase_Open_s(FLSlice name,
+                                const CBLDatabaseConfiguration_s* config,
+                                CBLError* error) CBLAPI;
 
 /** Closes an open database. */
 bool CBLDatabase_Close(CBLDatabase*, CBLError*) CBLAPI;

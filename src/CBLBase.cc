@@ -48,6 +48,11 @@ void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_non
 }
 
 
+void CBL_Log_s(CBLLogDomain domain, CBLLogLevel level, FLSlice message) CBLAPI {
+    c4slog(kC4Domains[domain], C4LogLevel(level), message);
+}
+
+
 char* CBLError_Message(const CBLError* error _cbl_nonnull) CBLAPI {
     return allocCString(c4error_getMessage(*internal(error)));
 }

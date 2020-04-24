@@ -22,6 +22,7 @@
 #endif
 
 #include "CBL_Compat.h"
+#include "fleece/FLSlice.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -147,6 +148,8 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
 void CBL_SetLogLevel(CBLLogLevel, CBLLogDomain) CBLAPI;
 
 void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format _cbl_nonnull, ...) CBLAPI;
+
+void CBL_Log_s(CBLLogDomain, CBLLogLevel, FLSlice message) CBLAPI;
 
 /** @} */
 

@@ -40,10 +40,10 @@ public:
 
     CBLQuery(const CBLDatabase* db _cbl_nonnull,
              CBLQueryLanguage language,
-             const char *queryCString _cbl_nonnull,
+             slice queryString,
              int *outErrPos,
              C4Error* outError)
-    :shared_access_lock<C4Query*>(create(db, language, queryCString, outErrPos, outError), db)
+    :shared_access_lock<C4Query*>(create(db, language, queryString, outErrPos, outError), db)
     ,_database(db)
     { }
 
@@ -55,19 +55,16 @@ public:
 
     static C4Query* create(const CBLDatabase* db _cbl_nonnull,
                            CBLQueryLanguage language,
-                           const char *queryCString _cbl_nonnull,
+                           slice queryString,
                            int *outErrPos,
                            C4Error* outError)
     {
-        slice queryString;
         alloc_slice json;
         if (language == kCBLJSONLanguage) {
-            json = convertJSON5(queryCString, outError);
+            json = convertJSON5(queryString, outError);
             if (!json)
                 return nullptr;
             queryString = json;
-        } else {
-            queryString = slice(queryCString);
         }
         return db->use<C4Query*>([&](C4Database* c4db) {
             return c4query_new2(c4db, (C4QueryLanguage)language, queryString,
@@ -109,7 +106,7 @@ public:
         _encodeParameters(enc);
     }
 
-    bool setParametersAsJSON(const char* json5) {
+    bool setParametersAsJSON(slice json5) {
         alloc_slice json = convertJSON5(json5, nullptr);
         if (!json)
             return false;
@@ -183,8 +180,8 @@ public:
         return more;
     }
 
-    Value property(const char *prop) {
-        int col = _query->columnNamed(slice(prop));
+    Value property(slice prop) {
+        int col = _query->columnNamed(prop);
         return (col >= 0) ? column(col) : nullptr;
     }
 
@@ -284,6 +281,15 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        int *outErrorPos,
                        CBLError* outError) CBLAPI
 {
+    return CBLQuery_New_s(db, language, slice(queryString), outErrorPos, outError);
+}
+
+CBLQuery* CBLQuery_New_s(const CBLDatabase* db _cbl_nonnull,
+                         CBLQueryLanguage language,
+                         FLString queryString,
+                         int *outErrorPos,
+                         CBLError* outError) CBLAPI
+{
     auto query = retained(new CBLQuery(db, language, queryString, outErrorPos, internal(outError)));
     return query->valid() ? retain(query.get()) : nullptr;
 }
@@ -297,6 +303,10 @@ void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBL
 }
 
 bool CBLQuery_SetParametersAsJSON(CBLQuery* query, const char* json5) CBLAPI {
+    return CBLQuery_SetParametersAsJSON_s(query, slice(json5));
+}
+
+bool CBLQuery_SetParametersAsJSON_s(CBLQuery* query, FLString json5) CBLAPI {
     query->setParametersAsJSON(json5);
     return true;
 }
@@ -342,6 +352,10 @@ bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
 }
 
 FLValue CBLResultSet_ValueForKey(CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
+    return CBLResultSet_ValueForKey_s(rs, slice(property));
+}
+
+FLValue CBLResultSet_ValueForKey_s(CBLResultSet* rs, FLString property) CBLAPI {
     return rs->property(property);
 }
 
@@ -354,9 +368,9 @@ FLValue CBLResultSet_ValueAtIndex(CBLResultSet* rs _cbl_nonnull, unsigned column
 
 
 bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
-                        const char* name _cbl_nonnull,
-                        CBLIndexSpec spec,
-                        CBLError *outError) CBLAPI
+                             const char* name _cbl_nonnull,
+                             CBLIndexSpec spec,
+                             CBLError *outError) CBLAPI
 {
     C4IndexOptions options = {};
     options.language = spec.language;
@@ -369,6 +383,21 @@ bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
                                 &options,
                                 internal(outError));
     });
+}
+
+bool CBLDatabase_CreateIndex_s(CBLDatabase *db,
+                               FLString name,
+                               CBLIndexSpec_s spec_s,
+                               CBLError *outError) CBLAPI
+{
+    string json(slice(spec_s.keyExpressionsJSON));
+    CBLIndexSpec spec = {spec_s.type, json.c_str(), spec_s.ignoreAccents};
+    string language;
+    if (spec_s.language.buf) {
+        language = slice(spec.language);
+        spec.language = language.c_str();
+    }
+    return CBLDatabase_CreateIndex(db, string(slice(name)).c_str(), spec, outError);
 }
 
 bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,

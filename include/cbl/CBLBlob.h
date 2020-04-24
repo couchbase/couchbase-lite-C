@@ -132,6 +132,9 @@ extern "C" {
     CBLBlob* CBLBlob_CreateWithData(const char *contentType,
                                     FLSlice contents) CBLAPI;
 
+    CBLBlob* CBLBlob_CreateWithData_s(FLString contentType,
+                                      FLSlice contents) CBLAPI;
+
     /** A stream for writing a new blob to the database. */
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
 
@@ -167,6 +170,9 @@ extern "C" {
         @return  A new CBLBlob instance. */
     CBLBlob* CBLBlob_CreateWithStream(const char *contentType,
                                       CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
+
+    CBLBlob* CBLBlob_CreateWithStream_s(FLString contentType,
+                                        CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
 
 #pragma mark - FLEECE UTILITIES:
 

@@ -81,25 +81,36 @@ void CBLBlobReader_Close(CBLBlobReadStream* stream) CBLAPI {
 #pragma mark - CREATING BLOBS:
 
 
-static CBLBlob* createNewBlob(const char *type,
+static CBLBlob* createNewBlob(slice contentType,
                               FLSlice contents,
                               CBLBlobWriteStream *writer)
 {
-    return retain(new CBLNewBlob(type, contents, internal(writer)));
+    return retain(new CBLNewBlob(contentType, contents, internal(writer)));
 }
 
 CBLBlob* CBLBlob_CreateWithData(const char *contentType,
-                                    FLSlice contents) CBLAPI
+                                FLSlice contents) CBLAPI
+{
+    return createNewBlob(contentType, contents, nullptr);
+}
+
+CBLBlob* CBLBlob_CreateWithData_s(FLString contentType,
+                                  FLSlice contents) CBLAPI
 {
     return createNewBlob(contentType, contents, nullptr);
 }
 
 CBLBlob* CBLBlob_CreateWithStream(const char *contentType,
-                                      CBLBlobWriteStream *writer) CBLAPI
+                                  CBLBlobWriteStream *writer) CBLAPI
 {
     return createNewBlob(contentType, nullslice, writer);
 }
 
+CBLBlob* CBLBlob_CreateWithStream_s(FLString contentType,
+                                    CBLBlobWriteStream* writer) CBLAPI
+{
+    return createNewBlob(contentType, nullslice, writer);
+}
 
 CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError) CBLAPI {
     return (CBLBlobWriteStream*) c4blob_openWriteStream(db->blobStore(),

@@ -73,6 +73,12 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        int *outErrorPos,
                        CBLError* error) CBLAPI;
 
+CBLQuery* CBLQuery_New_s(const CBLDatabase* db _cbl_nonnull,
+                         CBLQueryLanguage language,
+                         FLString queryString,
+                         int *outErrorPos,
+                         CBLError* error) CBLAPI;
+
 CBL_REFCOUNTED(CBLQuery*, Query);
 
 /** Assigns values to the query's parameters.
@@ -99,6 +105,9 @@ FLDict CBLQuery_Parameters(CBLQuery* _cbl_nonnull query) CBLAPI;
             keys are the parameter names. (You may use JSON5 syntax.) */
 bool CBLQuery_SetParametersAsJSON(CBLQuery* _cbl_nonnull query,
                                   const char* _cbl_nonnull json) CBLAPI;
+
+bool CBLQuery_SetParametersAsJSON_s(CBLQuery* _cbl_nonnull query,
+                                    FLString json) CBLAPI;
 
 /** Runs the query, returning the results.
     To obtain the results you'll typically call \ref CBLResultSet_Next in a `while` loop,
@@ -168,6 +177,9 @@ FLValue CBLResultSet_ValueAtIndex(CBLResultSet* _cbl_nonnull,
     @note  See \ref CBLQuery_ColumnName for a discussion of column names. */
 FLValue CBLResultSet_ValueForKey(CBLResultSet* _cbl_nonnull,
                                  const char* key _cbl_nonnull) CBLAPI;
+
+FLValue CBLResultSet_ValueForKey_s(CBLResultSet* _cbl_nonnull,
+                                   FLString key) CBLAPI;
 
 CBL_REFCOUNTED(CBLResultSet*, ResultSet);
 
@@ -287,6 +299,13 @@ typedef struct {
     const char* language;
 } CBLIndexSpec;
 
+typedef struct {
+    CBLIndexType type;
+    FLString keyExpressionsJSON;
+    bool ignoreAccents;
+    FLString language;
+} CBLIndexSpec_s;
+
 
 /** Creates a database index.
     Indexes are persistent.
@@ -297,12 +316,17 @@ bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
                              CBLIndexSpec,
                              CBLError *outError) CBLAPI;
 
+bool CBLDatabase_CreateIndex_s(CBLDatabase *db _cbl_nonnull,
+                               FLString name,
+                               CBLIndexSpec_s,
+                               CBLError *outError) CBLAPI;
+
 /** Deletes an index given its name. */
 bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
                              const char *name _cbl_nonnull,
                              CBLError *outError) CBLAPI;
 
-/** Returns the names of the indexes on this database, as an array of strings.
+/** Returns the names of the indexes on this database, as a Fleece array of strings.
     @note  You are responsible for releasing the returned Fleece array. */
 FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) CBLAPI;
 
