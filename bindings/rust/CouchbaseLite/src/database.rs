@@ -2,6 +2,7 @@
 
 use super::*;
 use super::base::*;
+use super::error::*;
 use super::c_api::*;
 
 use std::path::*;

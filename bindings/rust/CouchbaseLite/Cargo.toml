@@ -8,3 +8,7 @@ enum_primitive = "*"
 
 [build-dependencies]
 bindgen = "0.53.1"
+
+[lib]
+bench = false
+doctest = false         # TODO: enable

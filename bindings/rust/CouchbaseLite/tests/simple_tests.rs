@@ -1,11 +1,8 @@
-pub mod cbl;
+extern crate couchbase_lite;
+use couchbase_lite::*;
 
-use cbl::*;
-
-#[macro_use] extern crate enum_primitive;
-
-
-fn main() {
+#[test]
+fn smoke_test() {
     println!("Hello, world!");
     if Database::exists("rusty", "/tmp") {
         println!("The database already exists.")

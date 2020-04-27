@@ -43,7 +43,7 @@ fn main() {
         .whitelist_var("k?CBL.*")
         .whitelist_var("k?FL.*")
         .whitelist_function("CBL.*")
-        .whitelist_function("FL.*")
+        .whitelist_function("_?FL.*")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))

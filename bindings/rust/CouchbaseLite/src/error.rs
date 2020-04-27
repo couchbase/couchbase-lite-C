@@ -1,21 +1,16 @@
-// mod base
+// mod error
 
 #![allow(non_upper_case_globals)]
 
-use cbl::c_api::*;
-
+use super::c_api::*;
 use enum_primitive::FromPrimitive;
-use std::borrow::Borrow;
-use std::borrow::Cow;
-use std::ffi::c_void;
-use std::ffi::CStr;
-use std::str;
 
 
 //////// ERROR STRUCT:
 
 
 enum_from_primitive! {
+    /** Couchbase Lite error codes. */
     #[derive(Debug, PartialEq)]
     pub enum CouchbaseLiteError {
         AssertionFailed = 1,    // Internal assertion failure
@@ -54,7 +49,25 @@ enum_from_primitive! {
 }
 
 enum_from_primitive! {
-    /** Network error codes, in the CBLNetworkDomain. */
+    /** Fleece error codes. */
+    #[derive(Debug, PartialEq)]
+    pub enum FleeceError {
+        MemoryError = 1,    // Out of memory, or allocation failed
+        OutOfRange,         // Array index or iterator out of range
+        InvalidData,        // Bad input data (NaN, non-string key, etc.)
+        EncodeError,        // Structural error encoding (missing value, too many ends, etc.)
+        JSONError,          // Error parsing JSON
+        UnknownValue,       // Unparseable data in a Value (corrupt? Or from some distant future?)
+        InternalError,      // Something that shouldn't happen
+        NotFound,           // Key not found
+        SharedKeysStateError, // Misuse of shared keys (not in transaction, etc.)
+        POSIXError,
+        Unsupported,         // Operation is unsupported
+    }
+}
+
+enum_from_primitive! {
+    /** Network error codes defined by Couchbase Lite. */
     #[derive(Debug, PartialEq)]
     pub enum NetworkError {
         DNSFailure = 1,            // DNS lookup failed
@@ -75,12 +88,13 @@ enum_from_primitive! {
     }
 }
 
+/** Error type. Wraps multiple types of errors. */
 #[derive(Debug, PartialEq)]
 pub enum Error {
     CouchbaseLite   (CouchbaseLiteError),
     POSIX           (i32),
     SQLite          (i32),
-    Fleece          (i32),
+    Fleece          (FleeceError),
     Network         (NetworkError),
     WebSocket       (i32)
 }
@@ -95,15 +109,22 @@ impl Error {
                 }
             }
             CBLNetworkDomain => {
-                if let Some(e) = NetworkError::from_i32(err.code) {
+                if let Some(e) = NetworkError::from_i32(err.code as i32) {
                     return Error::Network(e)
                 }
             }
             CBLPOSIXDomain => return Error::POSIX(err.code),
             CBLSQLiteDomain => return Error::SQLite(err.code),
-            CBLFleeceDomain => return Error::POSIX(err.code),
+            CBLFleeceDomain => return Error::from_fleece(err.code as u32),
             CBLWebSocketDomain => return Error::WebSocket(err.code),
             _ => { }
+        }
+        return Error::untranslatable()
+    }
+    
+    pub fn from_fleece(fleece_error: u32) -> Error {
+        if let Some(e) = FleeceError::from_u32(fleece_error) {
+            return Error::Fleece(e)
         }
         return Error::untranslatable()
     }
@@ -143,64 +164,3 @@ pub fn check_bool<F>(func: F) -> Result<(), Error>
 }
 
 
-//////// SLICES
-
-
-pub fn as_slice(s: &str) -> FLSlice {
-    return FLSlice{buf: s.as_ptr() as *const c_void, 
-                   size: s.len() as u64};
-}
-
-impl AsRef<[u8]> for FLSlice {
-    fn as_ref(&self) -> &[u8] {
-        unsafe {
-            std::slice::from_raw_parts(self.buf as *const u8, self.size as usize)
-        }
-    }
-}
-
-impl Borrow<str> for FLSlice {
-    fn borrow(&self) -> &str {
-        unsafe {
-            str::from_utf8(std::slice::from_raw_parts(self.buf as *const u8, self.size as usize)).unwrap()
-        }
-    }
-}
-
-//////// C STRINGS
-
-
-// Convenience to convert a raw `char*` to an unowned `&str`
-pub unsafe fn to_str<'a>(cstr: *const ::std::os::raw::c_char) -> Cow<'a, str> {
-    return CStr::from_ptr(cstr).to_string_lossy()
-}
-
-
-// Convenience to convert a raw `char*` to an owned String
-pub unsafe fn to_string(cstr: *const ::std::os::raw::c_char) -> String {
-    return to_str(cstr).to_string();
-}
-
-
-//////// REFCOUNTED
-
-
-pub unsafe fn retain<T>(cbl_ref: *mut T) -> *mut T {
-    return CBL_Retain(cbl_ref as *mut CBLRefCounted) as *mut T
-}
-
-pub unsafe fn release<T>(cbl_ref: *mut T) {
-    CBL_Release(cbl_ref as *mut CBLRefCounted)
-}
-
-
-//////// LISTENERS
-
-
-impl Drop for super::ListenerToken {
-    fn drop(&mut self) {
-        unsafe {
-            CBLListener_Remove(self._ref)
-        }
-    }
-}

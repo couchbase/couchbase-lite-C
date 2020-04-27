@@ -2,6 +2,7 @@
 
 use super::*;
 use super::base::*;
+use super::error::*;
 use super::c_api::*;
 // use super::database::*;
 
@@ -10,8 +11,6 @@ use super::c_api::*;
 
 
 pub type SaveConflictHandler = fn(&mut Document, &Document) -> bool;
-
-pub struct Timestamp(i64);
 
 pub type ChangeListener = fn(&Database, &str);
 

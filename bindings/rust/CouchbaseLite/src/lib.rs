@@ -1,10 +1,20 @@
+// mod couchbase_lite
+
+#[macro_use] extern crate enum_primitive;
+
+pub mod fleece;
 pub mod base;
 pub mod database;
 pub mod document;
+pub mod error;
 
 mod c_api;
 
 use self::c_api::*;
+
+//////// TOP-LEVEL NAMESPACE:
+
+pub struct Timestamp(i64);
 
 
 pub struct ListenerToken {
