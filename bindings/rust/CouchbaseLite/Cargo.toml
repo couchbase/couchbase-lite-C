@@ -1,9 +1,10 @@
 [package]
-name = "CouchbaseLite"
+name = "couchbase_lite"
 version = "0.1.0"
 authors = ["Jens Alfke <jens@couchbase.com>"]
 
 [dependencies]
+enum_primitive = "*"
 
 [build-dependencies]
 bindgen = "0.53.1"

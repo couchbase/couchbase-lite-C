@@ -1,35 +1,17 @@
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+pub mod cbl;
 
-use std::ffi::c_void;
-use std::ptr;
+use cbl::*;
 
-fn as_slice(s: &str) -> FLSlice {
-    return FLSlice{buf: s.as_ptr() as *const c_void, size: s.len() as u64};
-}
-
-unsafe fn open(name: &str, dir: &str) -> *mut CBLDatabase {
-    let config = CBLDatabaseConfiguration_s {
-        directory:     as_slice(dir),
-        flags:         kCBLDatabase_Create,
-        encryptionKey: ptr::null_mut()
-    };
-    let mut err = CBLError{domain: 0, code: 0, internal_info: 0};
-    return CBLDatabase_Open_s(as_slice(name), &config, &mut err);
-}
-
-unsafe fn close(db: *mut CBLDatabase) {
-    CBL_Release(db as *mut CBLRefCounted);
-}
+#[macro_use] extern crate enum_primitive;
 
 
 fn main() {
-    unsafe {
-        println!("Hello, world!");
-        let db = open("rusty", "/tmp");
-        println!("Closing database; goodbye, world!");
-        close(db);
+    println!("Hello, world!");
+    if Database::exists("rusty", "/tmp") {
+        println!("The database already exists.")
     }
+    let db = Database::open_in_dir("rusty", "/tmp").expect("open db");
+    println!("Db name is '{}', and its path is {:?} . It contains {} documents.",
+             db.name(), db.path(), db.count());
+    println!("Goodbye, world!");
 }
