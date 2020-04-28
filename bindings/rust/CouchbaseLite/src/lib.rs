@@ -12,6 +12,7 @@ mod c_api;
 
 mod fleece_tests;
 
+use self::base::*;
 use self::c_api::*;
 
 //////// TOP-LEVEL NAMESPACE:
@@ -21,6 +22,43 @@ pub struct Timestamp(i64);
 
 pub struct ListenerToken {
     _ref: *mut CBLListenerToken
+}
+
+
+//////// LOGGING
+
+pub enum LogDomain {
+    All,
+    Database,
+    Query,
+    Replicator,
+    Network
+}
+
+pub enum LogLevel {
+    Debug,
+    Verbose,
+    Info,
+    Warning,
+    Error,
+    None
+}
+
+
+pub fn set_log_level(level: LogLevel, domain: LogDomain) {
+    unsafe { CBL_SetLogLevel(level as u8, domain as u8) }
+}
+
+pub fn log(domain: LogDomain, level: LogLevel, message: &str) {
+    unsafe { CBL_Log_s(domain as u8, level as u8, as_slice(message)) }
+}
+
+
+//////// OTHER FUNCTIONS
+
+
+pub fn instance_count() -> usize {
+    unsafe { return CBL_InstanceCount() as usize }
 }
 
 

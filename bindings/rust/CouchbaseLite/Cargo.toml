@@ -5,6 +5,7 @@ authors = ["Jens Alfke <jens@couchbase.com>"]
 
 [dependencies]
 enum_primitive = "*"
+tempdir = "*"
 
 [build-dependencies]
 bindgen = "0.53.1"

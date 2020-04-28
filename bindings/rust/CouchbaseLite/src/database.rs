@@ -60,12 +60,19 @@ impl Database {
     }
     
     
-    // Deletes an unopened database file.
-    pub fn delete_file<P: AsRef<Path>>(name: &str, in_directory: P) -> Result<(), Error> {
+    // Deletes an unopened database file. Returns true on delete, false on no file, or error.
+    pub fn delete_file<P: AsRef<Path>>(name: &str, in_directory: P) -> Result<bool, Error> {
         unsafe {
-            return check_bool(|error| CBL_DeleteDatabase_s(as_slice(name), 
-                                                 as_slice(in_directory.as_ref().to_str().unwrap()),
-                                                 error));
+            let mut error = CBLError::default();
+            if CBL_DeleteDatabase_s(as_slice(name), 
+                                    as_slice(in_directory.as_ref().to_str().unwrap()),
+                                    &mut error) {
+                return Ok(true);
+            } else if !error {
+                return Ok(false);
+            } else {
+                return failure(error);
+            }
         }
     }
        

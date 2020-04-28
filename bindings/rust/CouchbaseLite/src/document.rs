@@ -4,6 +4,7 @@ use super::*;
 use super::base::*;
 use super::error::*;
 use super::c_api::*;
+use super::fleece::*;
 // use super::database::*;
 
 
@@ -18,12 +19,14 @@ pub type ChangeListener = fn(&Database, &str);
 impl Database {
     pub fn get_document(&self, id: &str) -> Document {
         unsafe {
+            // we always get a mutable CBLDocument, 
+            // since Rust doesn't let us have MutableDocument subclass.
             Document{_ref: CBLDatabase_GetMutableDocument_s(self._ref, as_slice(id))}
         }
     }
     
-    pub fn save_document(&self, doc: 
-                         &mut Document, 
+    pub fn save_document(&self, 
+                         doc: &mut Document, 
                          concurrency: ConcurrencyControl)
                          -> Result<Document, Error> 
     {
@@ -88,9 +91,7 @@ impl Database {
 impl Document {
     
     pub fn new(id: &str) -> Self {
-        unsafe {
-            return Document{_ref: CBLDocument_New_s(as_slice(id))};
-        }
+        unsafe { Document{_ref: CBLDocument_New_s(as_slice(id))} }
     }
     
     pub fn delete(self) -> Result<(), Error> {
@@ -102,30 +103,26 @@ impl Document {
     }
     
     pub fn id(&self) -> String {
-        unsafe {
-            return to_string(CBLDocument_ID(self._ref));
-        }
+        unsafe { to_string(CBLDocument_ID(self._ref)) }
     }
     
     pub fn revision_id(&self) -> String {
-        unsafe {
-            return to_string(CBLDocument_RevisionID(self._ref));
-        }
+        unsafe { to_string(CBLDocument_RevisionID(self._ref)) }
     }
     
     pub fn sequence(&self) -> u64 {
-        unsafe {
-            return CBLDocument_Sequence(self._ref);
-        }
+        unsafe { CBLDocument_Sequence(self._ref) }
+    }
+    
+    pub fn properties(&self) -> Dict {
+        unsafe { Dict{_ref: CBLDocument_Properties(self._ref)} }
     }
     
     pub fn properties_as_json(&self) -> String {
-        unsafe {
-            return to_string(CBLDocument_PropertiesAsJSON(self._ref))
-        }
+        unsafe { to_string(CBLDocument_PropertiesAsJSON(self._ref)) }
     }
     
-    pub fn set_properties_as_json(&self, json: &str) -> Result<(), Error> {
+    pub fn set_properties_as_json(&mut self, json: &str) -> Result<(), Error> {
         unsafe {
             let mut err = CBLError::default();
             let ok = CBLDocument_SetPropertiesAsJSON_s(self._ref, as_slice(json), &mut err);
@@ -137,17 +134,13 @@ impl Document {
 
 impl Drop for Document {
     fn drop(&mut self) {
-        unsafe {
-            release(self._ref);
-        }
+        unsafe { release(self._ref); }
     }
 }
 
 
 impl Clone for Document {
     fn clone(&self) -> Self {
-        unsafe {
-            return Document{_ref: retain(self._ref)}
-        }
+        unsafe { Document{_ref: retain(self._ref)} }
     }
 }

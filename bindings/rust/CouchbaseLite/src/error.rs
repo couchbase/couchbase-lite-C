@@ -135,18 +135,26 @@ impl Error {
 }
 
 
+//////// CBLERROR UTILITIES
+
+
 impl Default for CBLError {
     fn default() -> CBLError { CBLError{domain: 0, code: 0, internal_info: 0} }
 }
 
+impl std::ops::Not for CBLError {
+    type Output = bool;
+    fn not(self) -> bool {self.code == 0}
+}
+
 
 // Convenient way to return a Result from a failed CBLError
-pub fn failure<T>(err: CBLError) -> Result<T, Error> {
+pub(crate) fn failure<T>(err: CBLError) -> Result<T, Error> {
     assert!(err.code != 0);
     return Err(Error::new(&err));
 }
 
-pub fn check_failure(status: bool, err: &CBLError) -> Result<(), Error> {
+pub(crate) fn check_failure(status: bool, err: &CBLError) -> Result<(), Error> {
     if status {
         return Ok(());
     } else {
@@ -155,7 +163,7 @@ pub fn check_failure(status: bool, err: &CBLError) -> Result<(), Error> {
     }
 }
 
-pub fn check_bool<F>(func: F) -> Result<(), Error>
+pub(crate) fn check_bool<F>(func: F) -> Result<(), Error>
     where F: Fn(*mut CBLError)->bool
 {
     let mut error = CBLError::default();

@@ -20,7 +20,7 @@ pub enum Trust {
 
 /// Equivalent to FLDoc
 pub struct Fleece {
-    _ref: FLDoc,
+    pub(crate) _ref: FLDoc,
 }
 
 impl Fleece {
@@ -107,7 +107,7 @@ enum_from_primitive! {
 /** A Fleece value. It could be any type, including Undefined (empty). */
 #[derive(Clone, Copy)]
 pub struct Value {
-    _ref: FLValue
+    pub(crate) _ref: FLValue
 }
 
 
@@ -207,7 +207,7 @@ impl fmt::Display for Value {
 /** A Fleece array value. */
 #[derive(Clone, Copy)]
 pub struct Array {
-    _ref: FLArray
+    pub(crate) _ref: FLArray
 }
 
 impl Array {
@@ -308,7 +308,7 @@ impl<'a> Iterator for ArrayIterator<'a> {
 /** A Fleece dictionary (object) value. */
 #[derive(Clone, Copy)]
 pub struct Dict {
-    _ref: FLDict
+    pub(crate) _ref: FLDict
 }
 
 impl Dict {
