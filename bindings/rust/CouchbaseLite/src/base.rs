@@ -4,7 +4,6 @@
 
 use super::c_api::*;
 
-use std::borrow::Borrow;
 use std::borrow::Cow;
 use std::ffi::c_void;
 use std::ffi::CStr;
@@ -29,31 +28,32 @@ pub fn bytes_as_slice(s: &[u8]) -> FLSlice {
 }
 
 impl FLSlice {
-    pub unsafe fn as_byte_array<'a>(&self) -> &'a [u8] {
-        return std::slice::from_raw_parts(self.buf as *const u8, self.size as usize)
+    // A slice may be null, so in Rust terms it's an Option.
+    
+    pub unsafe fn as_byte_array<'a>(&self) -> Option<&'a [u8]> {
+        if !self { return None }
+        return Some(std::slice::from_raw_parts(self.buf as *const u8, self.size as usize))
     }
-    pub unsafe fn as_str<'a>(&self) -> &'a str {
-        str::from_utf8(self.as_byte_array()).unwrap()
+    pub unsafe fn as_str<'a>(&self) -> Option<&'a str> {
+        match self.as_byte_array() {
+            None    => None,
+            Some(b) => { str::from_utf8(b).ok() }
+        }
     }
-    pub unsafe fn to_string(&self) -> String {
-        return self.as_str().to_string();
+    pub unsafe fn to_string(&self) -> Option<String> {
+        return self.as_str().map(|s| s.to_string());
+    }
+    
+    pub fn map<F, T>(&self, f : F) -> Option<T> 
+        where F: Fn(&FLSlice)->T
+    {
+        if !self {None} else {Some(f(self))}
     }
 }
 
-impl AsRef<[u8]> for FLSlice {
-    fn as_ref(&self) -> &[u8] {
-        unsafe {
-            return self.as_byte_array();
-        }
-    }
-}
-
-impl Borrow<str> for FLSlice {
-    fn borrow(&self) -> &str {
-        unsafe {
-            return self.as_str();
-        }
-    }
+impl std::ops::Not for &FLSlice {
+    type Output = bool;
+    fn not(self) -> bool {self.buf.is_null()}
 }
 
 impl FLSliceResult {
@@ -61,15 +61,18 @@ impl FLSliceResult {
         return FLSlice{buf: self.buf, size: self.size};
     }
     
-    pub unsafe fn retain(&mut self) {
-        _FLBuf_Retain(self.buf);
-    }
+    // pub unsafe fn retain(&mut self) {
+    //     _FLBuf_Retain(self.buf);
+    // }
     
+    // It's not possible to implement Drop for FLSliceResult, because the generated interface
+    // makes it implement Copy. So it has to be released by hand.
     pub unsafe fn release(&mut self) {
         _FLBuf_Release(self.buf);
     }
     
-    pub unsafe fn to_string(mut self) -> String {
+    // Consumes & releases self
+    pub unsafe fn to_string(mut self) -> Option<String> {
         let str = self.as_slice().to_string();
         self.release();
         return str;

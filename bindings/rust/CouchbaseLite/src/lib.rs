@@ -3,12 +3,14 @@
 #[macro_use] extern crate enum_primitive;
 
 pub mod fleece;
-pub mod base;
 pub mod database;
 pub mod document;
 pub mod error;
 
+mod base;
 mod c_api;
+
+mod fleece_tests;
 
 use self::c_api::*;
 
