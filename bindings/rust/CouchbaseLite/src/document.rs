@@ -114,8 +114,8 @@ impl Document {
         unsafe { CBLDocument_Sequence(self._ref) }
     }
     
-    pub fn properties(&self) -> Dict {
-        unsafe { Dict{_ref: CBLDocument_Properties(self._ref)} }
+    pub fn properties<'a>(&'a self) -> Dict {
+        unsafe { Dict::wrap(CBLDocument_Properties(self._ref), self) }
     }
     
     pub fn properties_as_json(&self) -> String {

@@ -61,6 +61,10 @@ pub fn instance_count() -> usize {
     unsafe { return CBL_InstanceCount() as usize }
 }
 
+pub fn dump_instances() {
+    unsafe { CBL_DumpInstances() }
+}
+
 
 //////// DATABASE:
 

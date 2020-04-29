@@ -56,6 +56,11 @@ impl std::ops::Not for &FLSlice {
     fn not(self) -> bool {self.buf.is_null()}
 }
 
+impl std::ops::Not for FLSlice {
+    type Output = bool;
+    fn not(self) -> bool {self.buf.is_null()}
+}
+
 impl FLSliceResult {
     pub fn as_slice(&self) -> FLSlice {
         return FLSlice{buf: self.buf, size: self.size};

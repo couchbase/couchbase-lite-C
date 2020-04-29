@@ -56,3 +56,21 @@ fn basic_values() {
     assert_eq!(doc.root().to_json(), r#"{"a":[1,2],"f":12.34,"i":1234,"s":"Foo"}"#);
     assert_eq!(format!("{}", doc.root()), r#"{"a":[1,2],"f":12.34,"i":1234,"s":"Foo"}"#);
 }
+
+/*
+// This test doesn't and shouldn't compile -- it tests that the borrow-checker will correctly 
+// prevent Fleece data from being used after its document has been freed. 
+#[test]
+fn borrow_check() {
+    let v : Value;
+    let str : &str;
+    {
+        let doc = Fleece::parse_json(r#"{"i":1234,"f":12.34,"a":[1, 2],"s":"Foo"}"#).unwrap();
+        let dict = doc.as_dict();
+        v = dict.get("a");
+        str = dict.get("s").as_string().unwrap();
+    }
+    println!("v = {:?}", v);
+    println!("str = {}", str);
+}
+*/

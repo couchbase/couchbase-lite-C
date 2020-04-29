@@ -1,6 +1,7 @@
 extern crate couchbase_lite;
 extern crate tempdir;
 
+use couchbase_lite::fleece::Value;
 use couchbase_lite::*;
 use tempdir::TempDir;
 
@@ -21,7 +22,11 @@ fn db_test<F>(f: F)
     f(&mut db);
     
     drop(db);
-    assert_eq!(instance_count() as isize - start_inst_count, 0);
+    if instance_count() as isize > start_inst_count {
+        dump_instances();
+        panic!("Native object leak: {} objects, was {}", 
+            instance_count(), start_inst_count);
+    }
 }
 
 
@@ -35,11 +40,26 @@ fn db_properties() {
 
 #[test]
 fn create_document() {
-    db_test(|db| {
-        let mut doc = Document::new("foo");
+    db_test(|_db| {
+        let doc = Document::new("foo");
         assert_eq!(doc.id(), "foo");
         assert_eq!(doc.sequence(), 0);
         assert!(doc.properties());
         assert_eq!(doc.properties().count(), 0);
     });
 }
+
+/*
+// This test doesn't and shouldn't compile -- it tests that the borrow-checker will correctly 
+// prevent Fleece data from being used after its document has been freed. 
+#[test]
+fn document_borrow_check() {
+    let mut db = Database::open(DB_NAME, None).expect("open db");
+    let v : Value;
+    {
+        let doc = db.get_document("foo");
+        v = doc.properties().get("a");
+    }
+    println!("v = {:?}", v);
+}
+*/

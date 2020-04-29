@@ -88,6 +88,7 @@ fn main() {
         // Copy the CBL dylib:
         let src = root_dir.join("build_cmake/libCouchbaseLiteC.dylib");
         let dst = out_dir.join("libCouchbaseLiteC.dylib");
+        println!("cargo:rerun-if-changed={}", src.to_str().unwrap());
         fs::copy(src, dst).expect("copy dylib");
         // Tell rustc to link it:
         println!("cargo:rustc-link-search={}", out_dir.to_str().unwrap());

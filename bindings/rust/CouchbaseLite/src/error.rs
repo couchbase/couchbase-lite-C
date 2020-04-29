@@ -147,6 +147,11 @@ impl std::ops::Not for CBLError {
     fn not(self) -> bool {self.code == 0}
 }
 
+impl std::ops::Not for &CBLError {
+    type Output = bool;
+    fn not(self) -> bool {self.code == 0}
+}
+
 
 // Convenient way to return a Result from a failed CBLError
 pub(crate) fn failure<T>(err: CBLError) -> Result<T, Error> {
