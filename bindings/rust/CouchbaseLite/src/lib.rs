@@ -1,11 +1,17 @@
 // mod couchbase_lite
 
+// TODO: Re-enable these warnings once I'm further along
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
 #[macro_use] extern crate enum_primitive;
 
 pub mod fleece;
+pub mod fleece_mutable;
 pub mod database;
 pub mod document;
 pub mod error;
+pub mod logging;
 
 mod base;
 mod c_api;
@@ -15,42 +21,22 @@ mod fleece_tests;
 use self::base::*;
 use self::c_api::*;
 
+
+//////// RE-EXPORT:
+
+pub use error::*;
+pub use fleece::*;
+pub use fleece_mutable::*;
+
+
 //////// TOP-LEVEL NAMESPACE:
+
 
 pub struct Timestamp(i64);
 
 
 pub struct ListenerToken {
     _ref: *mut CBLListenerToken
-}
-
-
-//////// LOGGING
-
-pub enum LogDomain {
-    All,
-    Database,
-    Query,
-    Replicator,
-    Network
-}
-
-pub enum LogLevel {
-    Debug,
-    Verbose,
-    Info,
-    Warning,
-    Error,
-    None
-}
-
-
-pub fn set_log_level(level: LogLevel, domain: LogDomain) {
-    unsafe { CBL_SetLogLevel(level as u8, domain as u8) }
-}
-
-pub fn log(domain: LogDomain, level: LogLevel, message: &str) {
-    unsafe { CBL_Log_s(domain as u8, level as u8, as_slice(message)) }
 }
 
 

@@ -8,3 +8,4 @@ Cargo.lock
 python/CouchbaseLite/libcouchbase_lite.dylib
 python/CouchbaseLite/*.c
 bindings/rust/CouchbaseLite/target/
+*.sublime-workspace

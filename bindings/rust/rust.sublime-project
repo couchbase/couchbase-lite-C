@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "CouchbaseLite/src"
+		},
+        {
+            "path": "CouchbaseLite/tests"
+        },
+        {
+            "path": "CouchbaseLite",
+            "name": "Crate",
+            "file_include_patterns": ["*.toml", "*.h"],
+            "folder_include_patterns": ["NONE"],
+        }
+    ],
+    "settings": {
+        "tab_size": 4,
+        "translate_tabs_to_spaces": true,
+        "rulers": [100],
+        "trim_trailing_white_space_on_save": true,
+        "ensure_newline_at_eof_on_save": true,
+        "default_line_ending": "unix",
+    },
+}

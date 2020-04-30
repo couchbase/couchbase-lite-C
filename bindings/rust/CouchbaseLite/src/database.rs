@@ -17,7 +17,7 @@ impl Database {
     //////// CONSTRUCTORS:
     
     
-    pub fn open(name: &str, config: Option<DatabaseConfiguration>) -> Result<Database, Error> {
+    pub fn open(name: &str, config: Option<DatabaseConfiguration>) -> Result<Database> {
         unsafe {
             if let Some(cfg) = config {
                 let c_config = CBLDatabaseConfiguration_s {
@@ -33,13 +33,13 @@ impl Database {
     }
     
     
-    pub fn open_in_dir<P: AsRef<Path>>(name: &str, dir: P) -> Result<Database,Error> {
+    pub fn open_in_dir<P: AsRef<Path>>(name: &str, dir: P) -> Result<Database> {
         let config = DatabaseConfiguration{directory: dir.as_ref(), flags: CREATE};
         return Database::open(name, Some(config));
     }
     
     
-    unsafe fn _open(name: &str, config_ptr: *const CBLDatabaseConfiguration_s) -> Result<Database, Error> {
+    unsafe fn _open(name: &str, config_ptr: *const CBLDatabaseConfiguration_s) -> Result<Database> {
         let mut err = CBLError::default();
         let db_ref = CBLDatabase_Open_s(as_slice(name), config_ptr, &mut err);
         if db_ref.is_null() {
@@ -61,7 +61,7 @@ impl Database {
     
     
     // Deletes an unopened database file. Returns true on delete, false on no file, or error.
-    pub fn delete_file<P: AsRef<Path>>(name: &str, in_directory: P) -> Result<bool, Error> {
+    pub fn delete_file<P: AsRef<Path>>(name: &str, in_directory: P) -> Result<bool> {
         unsafe {
             let mut error = CBLError::default();
             if CBL_DeleteDatabase_s(as_slice(name), 
@@ -78,7 +78,7 @@ impl Database {
        
        
     // Closes & deletes a database. (Note it consumes `self`!)
-    pub fn delete(self) -> Result<(), Error> {
+    pub fn delete(self) -> Result<()> {
         unsafe {
             return check_bool(|error| CBLDatabase_Delete(self._ref, error));
         }
@@ -117,14 +117,14 @@ impl Database {
     //////// OTHER OPERATIONS:
     
 
-    pub fn compact(&self) -> Result<(), Error> {
+    pub fn compact(&self) -> Result<()> {
         unsafe {
             return check_bool(|error| CBLDatabase_Compact(self._ref, error));
         }
     }
     
     
-    pub fn in_batch<T>(&self, callback: fn()->T) -> Result<T, Error> {
+    pub fn in_batch<T>(&self, callback: fn()->T) -> Result<T> {
         let mut err = CBLError::default();
         unsafe {
             if ! CBLDatabase_BeginBatch(self._ref, &mut err) {

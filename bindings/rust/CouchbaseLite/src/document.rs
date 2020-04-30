@@ -5,7 +5,7 @@ use super::base::*;
 use super::error::*;
 use super::c_api::*;
 use super::fleece::*;
-// use super::database::*;
+use super::fleece_mutable::*;
 
 
 //////// DATABASE'S DOCUMENT API:
@@ -17,18 +17,22 @@ pub type ChangeListener = fn(&Database, &str);
 
 
 impl Database {
-    pub fn get_document(&self, id: &str) -> Document {
+    pub fn get_document(&self, id: &str) -> Result<Document> {
         unsafe {
             // we always get a mutable CBLDocument, 
             // since Rust doesn't let us have MutableDocument subclass.
-            Document{_ref: CBLDatabase_GetMutableDocument_s(self._ref, as_slice(id))}
+            let doc = CBLDatabase_GetMutableDocument_s(self._ref, as_slice(id));
+            if doc.is_null() {
+                return Err(Error::CouchbaseLite(CouchbaseLiteError::NotFound));
+            }
+            return Ok(Document{_ref: doc});
         }
     }
     
     pub fn save_document(&self, 
                          doc: &mut Document, 
                          concurrency: ConcurrencyControl)
-                         -> Result<Document, Error> 
+                         -> Result<Document> 
     {
         let mut error = CBLError::default();
         unsafe {
@@ -43,18 +47,18 @@ impl Database {
     pub fn save_document_resolving(&self,
                                    _doc: &mut Document, 
                                    _conflict_handler: SaveConflictHandler)
-                                   -> Result<Document, Error> 
+                                   -> Result<Document> 
     {
         todo!()
     }
     
-    pub fn purge_document_by_id(&self, id: &str) -> Result<(), Error> {
+    pub fn purge_document_by_id(&self, id: &str) -> Result<()> {
         unsafe {
             return check_bool(|error| CBLDatabase_PurgeDocumentByID_s(self._ref, as_slice(id), error));
         }
     }
 
-    pub fn document_expiration(&self, doc_id: &str) -> Result<Option<Timestamp>, Error> {
+    pub fn document_expiration(&self, doc_id: &str) -> Result<Option<Timestamp>> {
         unsafe {
             let mut error = CBLError::default();
             let exp = CBLDatabase_GetDocumentExpiration_s(self._ref, as_slice(doc_id), &mut error);
@@ -68,7 +72,7 @@ impl Database {
         }
     }
 
-    pub fn set_document_expiration(&self, doc_id: &str, when: Option<Timestamp>) -> Result<(), Error> {
+    pub fn set_document_expiration(&self, doc_id: &str, when: Option<Timestamp>) -> Result<()> {
         let exp :i64 = match when {
             Some(Timestamp(n)) => n,
             _ => 0,
@@ -94,11 +98,11 @@ impl Document {
         unsafe { Document{_ref: CBLDocument_New_s(as_slice(id))} }
     }
     
-    pub fn delete(self) -> Result<(), Error> {
+    pub fn delete(self) -> Result<()> {
         todo!()
     }
     
-    pub fn purge(self) -> Result<(), Error> {
+    pub fn purge(self) -> Result<()> {
         todo!()
     }
     
@@ -118,11 +122,15 @@ impl Document {
         unsafe { Dict::wrap(CBLDocument_Properties(self._ref), self) }
     }
     
+    pub fn mutable_properties(&mut self) -> MutableDict {
+        unsafe { MutableDict::adopt(CBLDocument_MutableProperties(self._ref)) }
+    }
+    
     pub fn properties_as_json(&self) -> String {
         unsafe { to_string(CBLDocument_PropertiesAsJSON(self._ref)) }
     }
     
-    pub fn set_properties_as_json(&mut self, json: &str) -> Result<(), Error> {
+    pub fn set_properties_as_json(&mut self, json: &str) -> Result<()> {
         unsafe {
             let mut err = CBLError::default();
             let ok = CBLDocument_SetPropertiesAsJSON_s(self._ref, as_slice(json), &mut err);

@@ -13,6 +13,9 @@ use std::ptr;
 use std::str;
 
 
+//////// CONTAINER
+
+
 pub enum Trust {
     Untrusted,
     Trusted,
@@ -24,7 +27,7 @@ pub struct Fleece {
 }
 
 impl Fleece {
-    pub fn parse(data: &[u8], trust: Trust) -> Result<Self, Error> {
+    pub fn parse(data: &[u8], trust: Trust) -> Result<Self> {
         unsafe {
             let mut copied = FLSlice_Copy(bytes_as_slice(data));
             let doc = FLDoc_FromResultData(copied, trust as u32, ptr::null_mut(), NULL_SLICE);
@@ -36,7 +39,7 @@ impl Fleece {
         }
     }
     
-    pub fn parse_json(json: &str) -> Result<Self, Error> {
+    pub fn parse_json(json: &str) -> Result<Self> {
         unsafe {
             let mut error: FLError = 0;
             let doc = FLDoc_FromJSON(as_slice(json), &mut error);
@@ -106,7 +109,7 @@ enum_from_primitive! {
 /** A Fleece value. It could be any type, including Undefined (empty). */
 #[derive(Clone, Copy)]
 pub struct Value<'f> {
-    pub(crate) _ref: FLValue,
+    pub (crate) _ref: FLValue,
     _owner : PhantomData<&'f Fleece>
 }
 
@@ -123,19 +126,19 @@ impl<'f> Value<'f> {
     }
     pub fn is_type(&self, t: ValueType) -> bool { self.get_type() == t }
     
-    pub fn is_number(&self) -> bool     {self.is_type(ValueType::Number)}
+    pub fn is_number(&self)  -> bool    {self.is_type(ValueType::Number)}
     pub fn is_integer(&self) -> bool    {unsafe { FLValue_IsInteger(self._ref) } }
                                              
-    pub fn as_i64(&self)  -> Option<i64>  {if self.is_integer() {Some(self.as_i64_or_0())} else {None} }
+    pub fn as_i64(&self) -> Option<i64>  {if self.is_integer() {Some(self.as_i64_or_0())} else {None} }
     pub fn as_u64(&self) -> Option<u64>  {if self.is_integer() {Some(self.as_u64_or_0())} else {None} }
-    pub fn as_f64(&self)   -> Option<f64>  {if self.is_number() {Some(self.as_f64_or_0())} else {None} }
-    pub fn as_f32(&self)    -> Option<f32>  {if self.is_number() {Some(self.as_f32_or_0())} else {None} }
-    pub fn as_bool(&self)     -> Option<bool> {if self.is_type(ValueType::Bool) {Some(self.as_bool_or_false())} else {None} }
+    pub fn as_f64(&self) -> Option<f64>  {if self.is_number() {Some(self.as_f64_or_0())} else {None} }
+    pub fn as_f32(&self) -> Option<f32>  {if self.is_number() {Some(self.as_f32_or_0())} else {None} }
+    pub fn as_bool(&self)-> Option<bool> {if self.is_type(ValueType::Bool) {Some(self.as_bool_or_false())} else {None} }
 
-    pub fn as_i64_or_0(&self)  -> i64    {unsafe { FLValue_AsInt(self._ref) } }
+    pub fn as_i64_or_0(&self) -> i64    {unsafe { FLValue_AsInt(self._ref) } }
     pub fn as_u64_or_0(&self) -> u64    {unsafe { FLValue_AsUnsigned(self._ref) } }
-    pub fn as_f64_or_0(&self)   -> f64    {unsafe { FLValue_AsDouble(self._ref) } }
-    pub fn as_f32_or_0(&self)    -> f32    {unsafe { FLValue_AsFloat(self._ref) } }
+    pub fn as_f64_or_0(&self) -> f64    {unsafe { FLValue_AsDouble(self._ref) } }
+    pub fn as_f32_or_0(&self) -> f32    {unsafe { FLValue_AsFloat(self._ref) } }
     pub fn as_bool_or_false(&self) -> bool   {unsafe { FLValue_AsBool(self._ref) } }
     
     pub fn as_timestamp(&self) -> Option<Timestamp> {
@@ -328,17 +331,17 @@ pub struct Dict<'f> {
 impl<'f> Dict<'f> {
     pub(crate) fn wrap<'a, T>(dict: FLDict, _owner: &'a T) -> Dict<'a> { Dict{_ref: dict, _owner: PhantomData} }
 
-    pub fn as_value(&self) -> Value { Value::wrap(self._ref as FLValue, self) }
+    pub fn as_value(&self) -> Value<'f> { Value{_ref: self._ref as FLValue, _owner: self._owner} }
 
     pub fn count(&self) -> u32 { unsafe { FLDict_Count(self._ref) }}
     pub fn empty(&self) -> bool { unsafe { FLDict_IsEmpty(self._ref) }}
     
-    pub fn get(&self, key: &str) -> Value {
-        unsafe { Value::wrap(FLDict_Get(self._ref, as_slice(key)), self) }
+    pub fn get(&self, key: &str) -> Value<'f> {
+        unsafe { Value{_ref: FLDict_Get(self._ref, as_slice(key)), _owner: self._owner} }
     }
 
-    pub fn get_key(&self, key: &mut DictKey) -> Value {
-        unsafe { Value::wrap(FLDict_GetWithKey(self._ref, &mut key._innards), self) }
+    pub fn get_key(&self, key: &mut DictKey) -> Value<'f> {
+        unsafe { Value{_ref: FLDict_GetWithKey(self._ref, &mut key._innards), _owner: self._owner} }
     }
     
     pub fn iter(&self) -> DictIterator<'f> {
@@ -388,7 +391,7 @@ impl<'a> IntoIterator for Dict<'a> {
 
 
 pub struct DictKey {
-    _innards: FLDictKey
+    pub(crate) _innards: FLDictKey
 }
 
 impl DictKey {

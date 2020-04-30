@@ -9,6 +9,22 @@ use enum_primitive::FromPrimitive;
 //////// ERROR STRUCT:
 
 
+/** Error type. Wraps multiple types of errors in an enum. */
+#[derive(Debug, PartialEq)]
+pub enum Error {
+    CouchbaseLite   (CouchbaseLiteError),
+    POSIX           (i32),
+    SQLite          (i32),
+    Fleece          (FleeceError),
+    Network         (NetworkError),
+    WebSocket       (i32)
+}
+
+
+/** Redefine `Result` to assume our `Error` type */
+pub type Result<T> = std::result::Result<T, Error>;
+
+
 enum_from_primitive! {
     /** Couchbase Lite error codes. */
     #[derive(Debug, PartialEq)]
@@ -88,20 +104,12 @@ enum_from_primitive! {
     }
 }
 
-/** Error type. Wraps multiple types of errors. */
-#[derive(Debug, PartialEq)]
-pub enum Error {
-    CouchbaseLite   (CouchbaseLiteError),
-    POSIX           (i32),
-    SQLite          (i32),
-    Fleece          (FleeceError),
-    Network         (NetworkError),
-    WebSocket       (i32)
-}
+
+//////// CBLERROR UTILITIES
 
 
 impl Error {
-    pub fn new(err: &CBLError) -> Error {
+    pub(crate) fn new(err: &CBLError) -> Error {
         match err.domain {
             CBLDomain => {
                 if let Some(e) = CouchbaseLiteError::from_i32(err.code) {
@@ -122,20 +130,17 @@ impl Error {
         return Error::untranslatable()
     }
     
-    pub fn from_fleece(fleece_error: u32) -> Error {
+    pub(crate) fn from_fleece(fleece_error: u32) -> Error {
         if let Some(e) = FleeceError::from_u32(fleece_error) {
             return Error::Fleece(e)
         }
         return Error::untranslatable()
     }
     
-    fn untranslatable() -> Error {
+    pub(crate) fn untranslatable() -> Error {
         Error::CouchbaseLite(CouchbaseLiteError::UntranslatableError)
     }
 }
-
-
-//////// CBLERROR UTILITIES
 
 
 impl Default for CBLError {
@@ -154,12 +159,12 @@ impl std::ops::Not for &CBLError {
 
 
 // Convenient way to return a Result from a failed CBLError
-pub(crate) fn failure<T>(err: CBLError) -> Result<T, Error> {
+pub(crate) fn failure<T>(err: CBLError) -> Result<T> {
     assert!(err.code != 0);
     return Err(Error::new(&err));
 }
 
-pub(crate) fn check_failure(status: bool, err: &CBLError) -> Result<(), Error> {
+pub(crate) fn check_failure(status: bool, err: &CBLError) -> Result<()> {
     if status {
         return Ok(());
     } else {
@@ -168,7 +173,7 @@ pub(crate) fn check_failure(status: bool, err: &CBLError) -> Result<(), Error> {
     }
 }
 
-pub(crate) fn check_bool<F>(func: F) -> Result<(), Error>
+pub(crate) fn check_bool<F>(func: F) -> Result<()>
     where F: Fn(*mut CBLError)->bool
 {
     let mut error = CBLError::default();
