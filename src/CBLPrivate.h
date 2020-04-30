@@ -24,6 +24,10 @@ extern "C" {
 #endif
 
 
+void CBLLog_SetConsoleLevelOfDomain(CBLLogDomain domain, CBLLogLevel level) CBLAPI;
+
+CBLLogLevel CBLLog_ConsoleLevelOfDomain(CBLLogDomain domain) CBLAPI;
+
 /** Returns the last sequence number assigned in the database.
     This starts at zero and increments every time a document is saved or deleted. */
 uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
@@ -38,8 +42,6 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
     bool CBLDatabase_DeleteDocumentByID(CBLDatabase* database _cbl_nonnull,
                                         const char* docID _cbl_nonnull,
                                         CBLError* error) CBLAPI;
-
-
 
 #ifdef __cplusplus
 }

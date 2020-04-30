@@ -40,6 +40,8 @@
 		275B35A1234D0ADC00FE9CF0 /* names_100.json in Resources */ = {isa = PBXBuildFile; fileRef = 275B35A0234D0A9F00FE9CF0 /* names_100.json */; };
 		275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4DD2201323700DBE7D2 /* CBLBlob.cc */; };
 		275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
+		277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; };
+		277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B77D4245B44E900B222D3 /* CBLLog.cc */; };
 		277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
 		277CC9AB22BC3DF700B245CB /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
 		277CC9C022BC4E2E00B245CB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
@@ -322,6 +324,8 @@
 		2779ED2722DE83A60026ACD0 /* Blob.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Blob.py; sourceTree = "<group>"; };
 		2779ED3622DE83A60026ACD0 /* Collections.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Collections.py; sourceTree = "<group>"; };
 		2779ED5022E2493F0026ACD0 /* build_python.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = build_python.sh; path = Xcode/build_python.sh; sourceTree = SOURCE_ROOT; };
+		277B77C6245B44BE00B222D3 /* CBLLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLLog.h; sourceTree = "<group>"; };
+		277B77D4245B44E900B222D3 /* CBLLog.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CBLLog.cc; sourceTree = "<group>"; };
 		277CC99422BC23DE00B245CB /* ReplicatorTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorTest.cc; sourceTree = "<group>"; };
 		277CC9B122BC4E2E00B245CB /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		277FEE3D21DEF0C700B60E3C /* Base.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Base.hh; sourceTree = "<group>"; };
@@ -486,6 +490,7 @@
 				275BC4CC22012D8700DBE7D2 /* CBLBlob.h */,
 				271C2A2F21CAC98F0045856E /* CBLDatabase.h */,
 				271C2A2E21CAC98F0045856E /* CBLDocument.h */,
+				277B77C6245B44BE00B222D3 /* CBLLog.h */,
 				271C2A3021CAC98F0045856E /* CBLQuery.h */,
 				271C2A2C21CAC98F0045856E /* CBLReplicator.h */,
 				271A988E243BF278008C032D /* CBLURLEndpointListener.h */,
@@ -504,6 +509,7 @@
 				27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */,
 				271C2A7721CC750E0045856E /* CBLDocument.cc */,
 				277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */,
+				277B77D4245B44E900B222D3 /* CBLLog.cc */,
 				27B61D5521D5ABA60027CCDB /* CBLQuery.cc */,
 				277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
@@ -664,6 +670,7 @@
 				277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */,
 				27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */,
 				271C2A3321CAC98F0045856E /* CBLDocument.h in Headers */,
+				277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */,
 				27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */,
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
 				271C2A3421CAC98F0045856E /* CBLDatabase.h in Headers */,
@@ -1038,6 +1045,7 @@
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */,
 				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
+				277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */,
 				271A989E243BFDBF008C032D /* CBLURLEndpointListener.cc in Sources */,
 				277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */,
 			);

@@ -22,7 +22,15 @@ _CBL_DumpInstances
 
 _CBL_Log
 _CBL_Log_s
-_CBL_SetLogLevel
+_CBLLog_Callback
+_CBLLog_SetCallback
+_CBLLog_ConsoleLevel
+_CBLLog_ConsoleLevelOfDomain
+_CBLLog_SetConsoleLevel
+_CBLLog_SetConsoleLevelOfDomain
+_CBLLog_WillLogToConsole
+_CBLLog_FileConfig
+_CBLLog_SetFileConfig
 
 _CBL_Now
 

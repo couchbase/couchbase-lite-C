@@ -23,8 +23,8 @@
 
 #include "CBL_Compat.h"
 #include "fleece/FLSlice.h"
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,40 +116,6 @@ typedef struct {
 /** Returns a message describing an error.
     @note  It is the caller's responsibility to free the returned C string by calling `free`. */
 char* CBLError_Message(const CBLError* _cbl_nonnull) CBLAPI;
-
-/** @} */
-
-
-
-/** \defgroup logging   Logging
-     @{
-    Managing messages that Couchbase Lite logs at runtime. */
-
-/** Subsystems that log information. */
-typedef CBL_ENUM(uint8_t, CBLLogDomain) {
-    kCBLLogDomainAll,
-    kCBLLogDomainDatabase,
-    kCBLLogDomainQuery,
-    kCBLLogDomainReplicator,
-    kCBLLogDomainNetwork,
-};
-
-/** Levels of log messages. Higher values are more important/severe. */
-typedef CBL_ENUM(uint8_t, CBLLogLevel) {
-    CBLLogDebug,
-    CBLLogVerbose,
-    CBLLogInfo,
-    CBLLogWarning,
-    CBLLogError,
-    CBLLogNone
-};
-
-/** Sets the detail level of logging. */
-void CBL_SetLogLevel(CBLLogLevel, CBLLogDomain) CBLAPI;
-
-void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format _cbl_nonnull, ...) CBLAPI;
-
-void CBL_Log_s(CBLLogDomain, CBLLogLevel, FLSlice message) CBLAPI;
 
 /** @} */
 

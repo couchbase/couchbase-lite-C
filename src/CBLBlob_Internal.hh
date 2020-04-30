@@ -17,6 +17,7 @@
 //
 
 #include "CBLBlob.h"
+#include "CBLLog.h"
 #include "CBLDatabase_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "Internal.hh"
