@@ -52,7 +52,7 @@ fn with_db<F>(f: F)
 }
 
 fn add_doc(db: &mut Database, id: &str, i: i64, s: &str) {
-    let mut doc = Document::new(id);
+    let mut doc = Document::new_with_id(id);
     let mut props = doc.mutable_properties();
     props.at("i").put_i64(i);
     props.at("s").put_string(s);
@@ -73,7 +73,7 @@ fn db_properties() {
 #[test]
 fn create_document() {
     with_db(|_db| {
-        let doc = Document::new("foo");
+        let doc = Document::new_with_id("foo");
         assert_eq!(doc.id(), "foo");
         assert_eq!(doc.sequence(), 0);
         assert!(doc.properties());
@@ -86,7 +86,7 @@ fn save_document() {
     with_db(|db| {
         {
             logging::set_level(logging::Level::Info, logging::Domain::All);
-            let mut doc = Document::new("foo");
+            let mut doc = Document::new_with_id("foo");
             let mut props = doc.mutable_properties();
             props.at("i").put_i64(1234);
             props.at("s").put_string("Hello World!");

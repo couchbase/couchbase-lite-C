@@ -4,14 +4,22 @@
 
 use super::c_api::*;
 use enum_primitive::FromPrimitive;
+use std::fmt;
 
 
 //////// ERROR STRUCT:
 
 
 /** Error type. Wraps multiple types of errors in an enum. */
+pub struct Error {
+    pub code: ErrorCode,
+    pub(crate) internal_info: Option<i32>
+}
+
+
+/** The enum that stores the error domain and code for an Error. */
 #[derive(Debug, PartialEq)]
-pub enum Error {
+pub enum ErrorCode {
     CouchbaseLite   (CouchbaseLiteError),
     POSIX           (i32),
     SQLite          (i32),
@@ -20,14 +28,13 @@ pub enum Error {
     WebSocket       (i32)
 }
 
-
-/** Redefine `Result` to assume our `Error` type */
+// Redefine `Result` to assume our `Error` type
 pub type Result<T> = std::result::Result<T, Error>;
 
 
 enum_from_primitive! {
     /** Couchbase Lite error codes. */
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
     pub enum CouchbaseLiteError {
         AssertionFailed = 1,    // Internal assertion failure
         Unimplemented,          // Oops, an unimplemented API call
@@ -59,14 +66,14 @@ enum_from_primitive! {
         DatabaseTooNew,         // Database file format is newer than what I can open
         BadDocID,               // Invalid document ID
         CantUpgradeDatabase,/*30*/ // DB can't be upgraded (might be unsupported dev version)
-        
+
         UntranslatableError = 1000,  // Can't translate native error (unknown domain or code)
     }
 }
 
 enum_from_primitive! {
     /** Fleece error codes. */
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
     pub enum FleeceError {
         MemoryError = 1,    // Out of memory, or allocation failed
         OutOfRange,         // Array index or iterator out of range
@@ -77,14 +84,14 @@ enum_from_primitive! {
         InternalError,      // Something that shouldn't happen
         NotFound,           // Key not found
         SharedKeysStateError, // Misuse of shared keys (not in transaction, etc.)
-        POSIXError,
-        Unsupported,         // Operation is unsupported
+        POSIXError,         // Something went wrong at the OS level (file I/O, etc.)
+        Unsupported,        // Operation is unsupported
     }
 }
 
 enum_from_primitive! {
     /** Network error codes defined by Couchbase Lite. */
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, Copy, Clone, PartialEq)]
     pub enum NetworkError {
         DNSFailure = 1,            // DNS lookup failed
         UnknownHost,               // DNS server doesn't know the hostname
@@ -105,42 +112,92 @@ enum_from_primitive! {
 }
 
 
-//////// CBLERROR UTILITIES
-
-
 impl Error {
     pub(crate) fn new(err: &CBLError) -> Error {
+        Error{code: ErrorCode::new(err), internal_info: Some(err.internal_info)}
+    }
+
+    pub(crate) fn cbl_error(e: CouchbaseLiteError) -> Error {
+        Error{code: ErrorCode::CouchbaseLite(e), internal_info: None}
+    }
+
+    pub(crate) fn fleece_error(e: FLError) -> Error {
+        Error{code: ErrorCode::from_fleece(e), internal_info: None}
+    }
+
+    pub(crate) fn as_cbl_error(&self) -> CBLError {
+        let domain: CBLErrorDomain;
+        let code: i32;
+        match &self.code {
+            ErrorCode::CouchbaseLite(e) => {domain = CBLDomain; code = *e as i32;},
+            ErrorCode::Fleece(e) => {domain = CBLFleeceDomain; code = *e as i32;},
+            ErrorCode::Network(e) => {domain = CBLNetworkDomain; code = *e as i32;},
+            ErrorCode::POSIX(e) => {domain = CBLPOSIXDomain; code = *e as i32;},
+            ErrorCode::SQLite(e) => {domain = CBLSQLiteDomain; code = *e as i32;}
+            ErrorCode::WebSocket(e) => {domain = CBLWebSocketDomain; code = *e as i32;}
+        }
+        return CBLError{domain: domain, code: code, internal_info: self.internal_info.unwrap_or(0)}
+    }
+
+    pub fn message(&self) -> String {
+        if let ErrorCode::CouchbaseLite(e) = self.code {
+            if e == CouchbaseLiteError::UntranslatableError {
+                return "Unknown error".to_string();
+            }
+        }
+        unsafe { CBLError_Message_s(&self.as_cbl_error()).to_string().unwrap() }
+    }
+}
+
+impl fmt::Debug for Error {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> std::result::Result<(), fmt::Error> {
+        return fmt.write_fmt(format_args!("{:?}: {})", self.code, self.message()));
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> std::result::Result<(), fmt::Error> {
+        return fmt.write_str(&self.message());
+    }
+}
+
+
+impl ErrorCode {
+    fn new(err: &CBLError) -> ErrorCode {
         match err.domain {
             CBLDomain => {
                 if let Some(e) = CouchbaseLiteError::from_i32(err.code) {
-                    return Error::CouchbaseLite(e)
+                    return ErrorCode::CouchbaseLite(e)
                 }
             }
             CBLNetworkDomain => {
                 if let Some(e) = NetworkError::from_i32(err.code as i32) {
-                    return Error::Network(e)
+                    return ErrorCode::Network(e)
                 }
             }
-            CBLPOSIXDomain => return Error::POSIX(err.code),
-            CBLSQLiteDomain => return Error::SQLite(err.code),
-            CBLFleeceDomain => return Error::from_fleece(err.code as u32),
-            CBLWebSocketDomain => return Error::WebSocket(err.code),
+            CBLPOSIXDomain     => return ErrorCode::POSIX(err.code),
+            CBLSQLiteDomain    => return ErrorCode::SQLite(err.code),
+            CBLFleeceDomain    => return ErrorCode::from_fleece(err.code as u32),
+            CBLWebSocketDomain => return ErrorCode::WebSocket(err.code),
             _ => { }
         }
-        return Error::untranslatable()
+        return ErrorCode::untranslatable();
     }
-    
-    pub(crate) fn from_fleece(fleece_error: u32) -> Error {
+
+    fn from_fleece(fleece_error: u32) -> ErrorCode {
         if let Some(e) = FleeceError::from_u32(fleece_error) {
-            return Error::Fleece(e)
+            return ErrorCode::Fleece(e)
         }
-        return Error::untranslatable()
+        return ErrorCode::untranslatable()
     }
-    
-    pub(crate) fn untranslatable() -> Error {
-        Error::CouchbaseLite(CouchbaseLiteError::UntranslatableError)
+
+    fn untranslatable() -> ErrorCode {
+        ErrorCode::CouchbaseLite(CouchbaseLiteError::UntranslatableError)
     }
 }
+
+
+//////// CBLERROR UTILITIES:
 
 
 impl Default for CBLError {

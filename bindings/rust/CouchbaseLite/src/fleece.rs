@@ -33,7 +33,7 @@ impl Fleece {
             let doc = FLDoc_FromResultData(copied, trust as u32, ptr::null_mut(), NULL_SLICE);
             if doc.is_null() {
                 copied.release();
-                return Err(Error::Fleece(FleeceError::InvalidData));
+                return Err(Error::fleece_error(FLError_kFLInvalidData));
             }
             return Ok(Fleece{_ref: doc});
         }
@@ -44,7 +44,7 @@ impl Fleece {
             let mut error: FLError = 0;
             let doc = FLDoc_FromJSON(as_slice(json), &mut error);
             if doc.is_null() {
-                return Err(Error::from_fleece(error));
+                return Err(Error::fleece_error(error));
             }
             return Ok(Fleece{_ref: doc});
         }

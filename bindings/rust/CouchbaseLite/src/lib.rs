@@ -24,6 +24,8 @@ use self::c_api::*;
 //////// RE-EXPORT:
 
 
+pub use database::*;
+pub use document::*;
 pub use error::*;
 pub use fleece::*;
 pub use fleece_mutable::*;
@@ -33,9 +35,12 @@ pub use query::*;
 //////// TOP-LEVEL TYPES:
 
 
+/// A time value for document expiration. Defined as milliseconds since the Unix epoch (1/1/1970.)
 pub struct Timestamp(i64);
 
 
+/// An opaque token representing a registered listener.
+/// When this object is dropped, the listener function will not be called again.
 pub struct ListenerToken {
     _ref: *mut CBLListenerToken
 }
@@ -51,50 +56,19 @@ impl Drop for ListenerToken {
 //////// MISC. API FUNCTIONS
 
 
+/** Returns the total number of Couchbase Lite objects. Useful for leak checking. */
 pub fn instance_count() -> usize {
     unsafe { return CBL_InstanceCount() as usize }
 }
 
+/** Logs the class and address of each Couchbase Lite object. Useful for leak checking.
+    @note  May only be functional in debug builds of Couchbase Lite. */
 pub fn dump_instances() {
     unsafe { CBL_DumpInstances() }
 }
 
 
-//////// DATABASE:
-
-
-// Database configuration flags:
-pub static CREATE     : u32 = kCBLDatabase_Create;
-pub static READ_ONLY  : u32 = kCBLDatabase_ReadOnly;
-pub static NO_UPGRADE : u32 = kCBLDatabase_NoUpgrade;
-
-
-pub struct DatabaseConfiguration<'a> {
-    pub directory:  &'a std::path::Path,
-    pub flags:      u32
-}
-
-
-pub struct Database {
-    _ref: *mut CBLDatabase
-}
-
-
-//////// DOCUMENT:
-
-
-pub enum ConcurrencyControl {
-    LastWriteWins  = kCBLConcurrencyControlLastWriteWins as isize,
-    FailOnConflict = kCBLConcurrencyControlFailOnConflict as isize
-}
-
-
-pub struct Document {
-    _ref: *mut CBLDocument
-}
-
-
-//////// REFCOUNT SUPPORT
+//////// REFCOUNT SUPPORT (INTERNAL)
 
 
 pub(crate) unsafe fn retain<T>(cbl_ref: *mut T) -> *mut T {

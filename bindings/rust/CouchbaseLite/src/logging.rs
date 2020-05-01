@@ -8,6 +8,7 @@ use std::fmt;
 
 
 enum_from_primitive! {
+    /** Logging domains: subsystems that generate log messages. */
     #[derive(Debug, Clone, Copy, PartialEq)]
     pub enum Domain {
         All,
@@ -19,6 +20,8 @@ enum_from_primitive! {
 }
 
 enum_from_primitive! {
+    /** Levels of log messages. Higher values are more important/severe.
+        Each level includes the lower ones. */
     #[derive(Debug, Clone, Copy, PartialEq)]
     pub enum Level {
         Debug,
@@ -34,10 +37,14 @@ enum_from_primitive! {
 pub type LogCallback = Option<fn(Domain,Level,&str)>;
 
 
+/** Sets the detail level of logging.
+    Only messages whose level is ≥ the given level will be logged to the console or callback. */
 pub fn set_level(level: Level, domain: Domain) {
     unsafe { CBLLog_SetConsoleLevelOfDomain(domain as u8, level as u8) }
 }
 
+/** Registers a function that will receive log messages. After this is called, messages will no
+    longer be written to stderr, but will be passed to this callback instead. */
 pub fn set_callback(callback: LogCallback) {
     unsafe {
         LOG_CALLBACK = callback;
@@ -49,6 +56,7 @@ pub fn set_callback(callback: LogCallback) {
     }
 }
 
+/** Writes a log message. */
 pub fn write(domain: Domain, level: Level, message: &str) {
     unsafe {
         CBL_Log_s(domain as u8, level as u8, as_slice(message));
@@ -62,14 +70,20 @@ pub fn write(domain: Domain, level: Level, message: &str) {
     }
 }
 
+/** Writes a log message using the given format arguments. */
 pub fn write_args(domain: Domain, level: Level, args: fmt::Arguments) {
-    write(domain, level, &format!("{:?}", args));
+    unsafe {
+        if  CBLLog_WillLogToConsole(domain as u8, level as u8) {
+            write(domain, level, &format!("{:?}", args));
+        }
+    }
 }
 
 
 //////// LOGGING MACROS:
 
 
+/// A macro that writes a formatted Error-level log message.
 #[macro_export]
 macro_rules! error {
     ($($arg:tt)*) => ($crate::logging::write_args(
@@ -77,6 +91,7 @@ macro_rules! error {
         format_args!($($arg)*)));
 }
 
+/// A macro that writes a formatted Warning-level log message.
 #[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => ($crate::logging::write_args(
@@ -84,6 +99,7 @@ macro_rules! warn {
         format_args!($($arg)*)));
 }
 
+/// A macro that writes a formatted Info-level log message.
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => ($crate::logging::write_args(
@@ -91,6 +107,7 @@ macro_rules! info {
         format_args!($($arg)*)));
 }
 
+/// A macro that writes a formatted Verbose-level log message.
 #[macro_export]
 macro_rules! verbose {
     ($($arg:tt)*) => ($crate::logging::write_args(
@@ -98,6 +115,7 @@ macro_rules! verbose {
         format_args!($($arg)*)));
 }
 
+/// A macro that writes a formatted Debug-level log message.
 #[macro_export]
 macro_rules! debug {
     ($($arg:tt)*) => ($crate::logging::write_args(
