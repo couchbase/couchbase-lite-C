@@ -50,7 +50,7 @@ pub fn set_callback(callback: LogCallback) {
 }
 
 pub fn write(domain: Domain, level: Level, message: &str) {
-    unsafe { 
+    unsafe {
         CBL_Log_s(domain as u8, level as u8, as_slice(message));
 
         // CBL_Log doesn't invoke the callback, so do it manually:
@@ -70,38 +70,38 @@ pub fn write_args(domain: Domain, level: Level, args: fmt::Arguments) {
 //////// LOGGING MACROS:
 
 
-#[macro_export] 
+#[macro_export]
 macro_rules! error {
     ($($arg:tt)*) => ($crate::logging::write_args(
-        $crate::logging::Domain::All, $crate::logging::Level::Error, 
+        $crate::logging::Domain::All, $crate::logging::Level::Error,
         format_args!($($arg)*)));
 }
 
-#[macro_export] 
+#[macro_export]
 macro_rules! warn {
     ($($arg:tt)*) => ($crate::logging::write_args(
         $crate::logging::Domain::All, $crate::logging::Level::Warning,
         format_args!($($arg)*)));
 }
 
-#[macro_export] 
+#[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => ($crate::logging::write_args(
-        $crate::logging::Domain::All, $crate::logging::Level::Info, 
+        $crate::logging::Domain::All, $crate::logging::Level::Info,
         format_args!($($arg)*)));
 }
 
-#[macro_export] 
+#[macro_export]
 macro_rules! verbose {
     ($($arg:tt)*) => ($crate::logging::write_args(
-        $crate::logging::Domain::All, $crate::logging::Level::Verbose, 
+        $crate::logging::Domain::All, $crate::logging::Level::Verbose,
         format_args!($($arg)*)));
 }
 
-#[macro_export] 
+#[macro_export]
 macro_rules! debug {
     ($($arg:tt)*) => ($crate::logging::write_args(
-        $crate::logging::Domain::All, $crate::logging::Level::Debug, 
+        $crate::logging::Domain::All, $crate::logging::Level::Debug,
         format_args!($($arg)*)));
 }
 

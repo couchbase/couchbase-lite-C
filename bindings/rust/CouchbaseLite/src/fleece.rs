@@ -38,7 +38,7 @@ impl Fleece {
             return Ok(Fleece{_ref: doc});
         }
     }
-    
+
     pub fn parse_json(json: &str) -> Result<Self> {
         unsafe {
             let mut error: FLError = 0;
@@ -49,21 +49,21 @@ impl Fleece {
             return Ok(Fleece{_ref: doc});
         }
     }
-    
+
     pub fn root(&self) -> Value {
         unsafe {
             Value::wrap(FLDoc_GetRoot(self._ref), self)
         }
     }
-    
+
     pub fn as_array(&self) -> Array {
         self.root().as_array()
     }
-    
+
     pub fn as_dict(&self) -> Dict {
         self.root().as_dict()
     }
-    
+
     pub fn data<'a>(&self) -> &'a[u8] {
         unsafe {
             return FLDoc_GetData(self._ref).as_byte_array().unwrap();
@@ -116,19 +116,19 @@ pub struct Value<'f> {
 
 impl<'f> Value<'f> {
     pub const UNDEFINED : Value<'static> = Value{_ref: ptr::null(), _owner: PhantomData};
-    
+
     pub(crate) fn wrap<'a, T>(value: FLValue, _owner: &'a T) -> Value<'a> {
-        Value{_ref: value, _owner: PhantomData} 
+        Value{_ref: value, _owner: PhantomData}
     }
 
     pub fn get_type(&self) -> ValueType {
         unsafe { return ValueType::from_i32(FLValue_GetType(self._ref)).unwrap(); }
     }
     pub fn is_type(&self, t: ValueType) -> bool { self.get_type() == t }
-    
+
     pub fn is_number(&self)  -> bool    {self.is_type(ValueType::Number)}
     pub fn is_integer(&self) -> bool    {unsafe { FLValue_IsInteger(self._ref) } }
-                                             
+
     pub fn as_i64(&self) -> Option<i64>  {if self.is_integer() {Some(self.as_i64_or_0())} else {None} }
     pub fn as_u64(&self) -> Option<u64>  {if self.is_integer() {Some(self.as_u64_or_0())} else {None} }
     pub fn as_f64(&self) -> Option<f64>  {if self.is_number() {Some(self.as_f64_or_0())} else {None} }
@@ -140,33 +140,33 @@ impl<'f> Value<'f> {
     pub fn as_f64_or_0(&self) -> f64    {unsafe { FLValue_AsDouble(self._ref) } }
     pub fn as_f32_or_0(&self) -> f32    {unsafe { FLValue_AsFloat(self._ref) } }
     pub fn as_bool_or_false(&self) -> bool   {unsafe { FLValue_AsBool(self._ref) } }
-    
+
     pub fn as_timestamp(&self) -> Option<Timestamp> {
-        unsafe { 
+        unsafe {
             let t = FLValue_AsTimestamp(self._ref);
             if t == 0 {
                 return None;
             }
-            return Some(Timestamp(t)); 
-        } 
+            return Some(Timestamp(t));
+        }
     }
-    
+
     pub fn as_string(&self) -> Option<&'f str> {
         unsafe { FLValue_AsString(self._ref).as_str() }
     }
-    
+
     pub fn as_data(&self) -> Option<&'f [u8]> {
         unsafe { FLValue_AsData(self._ref).as_byte_array() }
     }
-    
+
     pub fn as_array(&self) -> Array<'f> {
         unsafe { Array{_ref: FLValue_AsArray(self._ref), _owner: self._owner} }
     }
-    
+
     pub fn as_dict(&self) -> Dict<'f> {
         unsafe { Dict{_ref: FLValue_AsDict(self._ref), _owner: self._owner} }
     }
-    
+
     pub fn to_string(&self) -> String {
         unsafe { FLValue_ToString(self._ref).to_string().unwrap() }
     }
@@ -220,18 +220,18 @@ pub struct Array<'f> {
 
 impl<'f> Array<'f> {
     pub(crate) fn wrap<'a, T>(array: FLArray, _owner: &'a T) -> Array<'a> {
-        Array{_ref: array, _owner: PhantomData} 
+        Array{_ref: array, _owner: PhantomData}
     }
 
     pub fn as_value(&self) -> Value { Value::wrap(self._ref as FLValue, self) }
-    
+
     pub fn count(&self) -> u32 { unsafe { FLArray_Count(self._ref) }}
     pub fn empty(&self) -> bool { unsafe { FLArray_IsEmpty(self._ref) }}
-    
-    pub fn get(&self, index: usize) -> Value { 
+
+    pub fn get(&self, index: usize) -> Value {
         unsafe { Value::wrap(FLArray_Get(self._ref, index as u32), self) }
     }
-    
+
     pub fn iter(&self) -> ArrayIterator<'f> {
         unsafe {
             let mut i = MaybeUninit::<FLArrayIterator>::uninit();
@@ -293,9 +293,9 @@ impl<'a> ArrayIterator<'a> {
     pub fn count(&self) -> u32 {
         unsafe { FLArrayIterator_GetCount(&self._innards) }
     }
-    
+
     pub fn get(&self, index: usize) -> Value {
-        unsafe { 
+        unsafe {
             Value::wrap(FLArrayIterator_GetValueAt(&self._innards, index as u32), self)
         }
     }
@@ -303,7 +303,7 @@ impl<'a> ArrayIterator<'a> {
 
 impl<'f> Iterator for ArrayIterator<'f> {
     type Item = Value<'f>;
-    
+
     fn next(&mut self) -> Option<Value<'f>> {
         unsafe {
             let val = FLArrayIterator_GetValue(&self._innards);
@@ -335,7 +335,7 @@ impl<'f> Dict<'f> {
 
     pub fn count(&self) -> u32 { unsafe { FLDict_Count(self._ref) }}
     pub fn empty(&self) -> bool { unsafe { FLDict_IsEmpty(self._ref) }}
-    
+
     pub fn get(&self, key: &str) -> Value<'f> {
         unsafe { Value{_ref: FLDict_Get(self._ref, as_slice(key)), _owner: self._owner} }
     }
@@ -343,7 +343,7 @@ impl<'f> Dict<'f> {
     pub fn get_key(&self, key: &mut DictKey) -> Value<'f> {
         unsafe { Value{_ref: FLDict_GetWithKey(self._ref, &mut key._innards), _owner: self._owner} }
     }
-    
+
     pub fn iter(&self) -> DictIterator<'f> {
         unsafe {
             let mut i = MaybeUninit::<FLDictIterator>::uninit();
@@ -400,7 +400,7 @@ impl DictKey {
             return DictKey{_innards: FLDictKey_Init(as_slice(key))};
         }
     }
-    
+
     pub fn string(&self) -> &str {
         unsafe { FLDictKey_GetString(&self._innards).as_str().unwrap() }
     }
@@ -423,7 +423,7 @@ impl<'a> DictIterator<'a> {
 
 impl<'a> Iterator for DictIterator<'a> {
     type Item = (&'a str, Value<'a>);
-    
+
     fn next(&mut self) -> Option<Self::Item> {
         unsafe {
             let val = FLDictIterator_GetValue(&self._innards);

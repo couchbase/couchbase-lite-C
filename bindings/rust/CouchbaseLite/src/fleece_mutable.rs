@@ -88,9 +88,9 @@ impl MutableDict {
     pub fn from_dict(dict: &Dict) -> MutableDict {
         MutableDict::from_dict_(dict, CopyFlags::Default)
     }
-    
+
     pub(crate) fn adopt(dict: FLMutableDict) -> MutableDict {
-        unsafe { 
+        unsafe {
             FLValue_Retain(dict as FLValue);
             return MutableDict{_ref: dict};
         }

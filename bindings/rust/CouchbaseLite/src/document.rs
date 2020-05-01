@@ -19,7 +19,7 @@ pub type ChangeListener = fn(&Database, &str);
 impl Database {
     pub fn get_document(&self, id: &str) -> Result<Document> {
         unsafe {
-            // we always get a mutable CBLDocument, 
+            // we always get a mutable CBLDocument,
             // since Rust doesn't let us have MutableDocument subclass.
             let doc = CBLDatabase_GetMutableDocument_s(self._ref, as_slice(id));
             if doc.is_null() {
@@ -28,11 +28,11 @@ impl Database {
             return Ok(Document{_ref: doc});
         }
     }
-    
-    pub fn save_document(&self, 
-                         doc: &mut Document, 
+
+    pub fn save_document(&self,
+                         doc: &mut Document,
                          concurrency: ConcurrencyControl)
-                         -> Result<Document> 
+                         -> Result<Document>
     {
         let mut error = CBLError::default();
         unsafe {
@@ -43,15 +43,15 @@ impl Database {
             return Ok(Document{_ref: doc2 as *mut CBLDocument});
         }
     }
-    
+
     pub fn save_document_resolving(&self,
-                                   _doc: &mut Document, 
+                                   _doc: &mut Document,
                                    _conflict_handler: SaveConflictHandler)
-                                   -> Result<Document> 
+                                   -> Result<Document>
     {
         todo!()
     }
-    
+
     pub fn purge_document_by_id(&self, id: &str) -> Result<()> {
         unsafe {
             return check_bool(|error| CBLDatabase_PurgeDocumentByID_s(self._ref, as_slice(id), error));
@@ -81,11 +81,11 @@ impl Database {
             return check_bool(|error| CBLDatabase_SetDocumentExpiration_s(self._ref, as_slice(doc_id), exp, error));
         }
     }
-    
+
     pub fn add_document_change_listener(&self, _doc_id: &str, _listener: ChangeListener) -> ListenerToken {
         todo!()
     }
-    
+
 }
 
 
@@ -93,43 +93,43 @@ impl Database {
 
 
 impl Document {
-    
+
     pub fn new(id: &str) -> Self {
         unsafe { Document{_ref: CBLDocument_New_s(as_slice(id))} }
     }
-    
+
     pub fn delete(self) -> Result<()> {
         todo!()
     }
-    
+
     pub fn purge(self) -> Result<()> {
         todo!()
     }
-    
+
     pub fn id(&self) -> String {
         unsafe { to_string(CBLDocument_ID(self._ref)) }
     }
-    
+
     pub fn revision_id(&self) -> String {
         unsafe { to_string(CBLDocument_RevisionID(self._ref)) }
     }
-    
+
     pub fn sequence(&self) -> u64 {
         unsafe { CBLDocument_Sequence(self._ref) }
     }
-    
+
     pub fn properties<'a>(&'a self) -> Dict {
         unsafe { Dict::wrap(CBLDocument_Properties(self._ref), self) }
     }
-    
+
     pub fn mutable_properties(&mut self) -> MutableDict {
         unsafe { MutableDict::adopt(CBLDocument_MutableProperties(self._ref)) }
     }
-    
+
     pub fn properties_as_json(&self) -> String {
         unsafe { to_string(CBLDocument_PropertiesAsJSON(self._ref)) }
     }
-    
+
     pub fn set_properties_as_json(&mut self, json: &str) -> Result<()> {
         unsafe {
             let mut err = CBLError::default();

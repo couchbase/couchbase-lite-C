@@ -34,19 +34,19 @@ fn with_db<F>(f: F)
     where F: Fn(&mut Database)
 {
     init_logging();
-    
+
     let start_inst_count = instance_count() as isize;
     let tmp_dir = TempDir::new("cbl_rust").expect("create temp dir");
     let cfg = DatabaseConfiguration{directory: tmp_dir.path(), flags: CREATE};
     let mut db = Database::open(DB_NAME, Some(cfg)).expect("open db");
     assert!(Database::exists(DB_NAME, tmp_dir.path()));
-    
+
     f(&mut db);
-    
+
     drop(db);
     if LEAK_CHECKS && instance_count() as isize > start_inst_count {
         dump_instances();
-        panic!("Native object leak: {} objects, was {}", 
+        panic!("Native object leak: {} objects, was {}",
             instance_count(), start_inst_count);
     }
 }
@@ -98,8 +98,8 @@ fn save_document() {
 
 
 /*
-// This test doesn't and shouldn't compile -- it tests that the borrow-checker will correctly 
-// prevent Fleece data from being used after its document has been freed. 
+// This test doesn't and shouldn't compile -- it tests that the borrow-checker will correctly
+// prevent Fleece data from being used after its document has been freed.
 #[test]
 fn document_borrow_check() {
     let mut db = Database::open(DB_NAME, None).expect("open db");
