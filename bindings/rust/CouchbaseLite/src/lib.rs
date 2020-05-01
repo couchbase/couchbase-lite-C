@@ -1,29 +1,28 @@
 // mod couchbase_lite
 
-// TODO: Re-enable these warnings once I'm further along
-#![allow(unused_imports)]
-#![allow(dead_code)]
+//#![allow(unused_imports)]
+//#![allow(dead_code)]
 
 #[macro_use] extern crate enum_primitive;
 
-pub mod fleece;
-pub mod fleece_mutable;
 pub mod database;
 pub mod document;
 pub mod error;
+pub mod fleece;
+pub mod fleece_mutable;
 pub mod logging;
 pub mod query;
 
-mod base;
+mod slice;
 mod c_api;
 
 mod fleece_tests;
 
-use self::base::*;
 use self::c_api::*;
 
 
 //////// RE-EXPORT:
+
 
 pub use error::*;
 pub use fleece::*;
@@ -31,7 +30,7 @@ pub use fleece_mutable::*;
 pub use query::*;
 
 
-//////// TOP-LEVEL NAMESPACE:
+//////// TOP-LEVEL TYPES:
 
 
 pub struct Timestamp(i64);
@@ -42,7 +41,14 @@ pub struct ListenerToken {
 }
 
 
-//////// OTHER FUNCTIONS
+impl Drop for ListenerToken {
+    fn drop(&mut self) {
+        unsafe { CBLListener_Remove(self._ref) }
+    }
+}
+
+
+//////// MISC. API FUNCTIONS
 
 
 pub fn instance_count() -> usize {
@@ -85,4 +91,16 @@ pub enum ConcurrencyControl {
 
 pub struct Document {
     _ref: *mut CBLDocument
+}
+
+
+//////// REFCOUNT SUPPORT
+
+
+pub(crate) unsafe fn retain<T>(cbl_ref: *mut T) -> *mut T {
+    return CBL_Retain(cbl_ref as *mut CBLRefCounted) as *mut T
+}
+
+pub(crate) unsafe fn release<T>(cbl_ref: *mut T) {
+    CBL_Release(cbl_ref as *mut CBLRefCounted)
 }

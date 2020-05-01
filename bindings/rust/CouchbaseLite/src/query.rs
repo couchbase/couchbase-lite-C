@@ -1,7 +1,7 @@
 // mod query
 
 use super::*;
-use super::base::*;
+use super::slice::*;
 use super::c_api::*;
 
 use std::marker::PhantomData;
@@ -68,6 +68,10 @@ impl Query {
 
     pub fn column_name(&self, col: usize) -> Option<&str> {
         unsafe { CBLQuery_ColumnName(self._ref, col as u32).as_str() }
+    }
+
+    pub fn column_names(&self) -> Vec<&str> {
+        (0..self.column_count()).map(|i| self.column_name(i).unwrap()).collect()
     }
 }
 
@@ -143,15 +147,11 @@ impl<'r> Row<'r> {
         }
     }
 
-    pub fn columns(&self) -> Vec<Value<'r>> {
-        return (0..self.column_count()).map(|i| self.get(i)).collect();
+    pub fn as_array(&self) -> Array {
+        unsafe { Array{_ref: CBLResultSet_RowArray(self.results._ref), _owner: PhantomData} }
     }
 
-    pub fn as_dict(&self) -> MutableDict {
-        let mut dict = MutableDict::new();
-        for i in 0..self.column_count() {
-            dict.at(self.column_name(i).unwrap()).put_value(self.get(i));
-        }
-        return dict;
+    pub fn as_dict(&self) -> Dict {
+        unsafe { Dict{_ref: CBLResultSet_RowDict(self.results._ref), _owner: PhantomData} }
     }
 }

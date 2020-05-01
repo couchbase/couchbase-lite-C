@@ -1,6 +1,6 @@
 // mod logging
 
-use super::base::*;
+use super::slice::*;
 use super::c_api::*;
 
 use enum_primitive::FromPrimitive;

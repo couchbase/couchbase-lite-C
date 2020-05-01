@@ -1,7 +1,7 @@
 // mod database
 
 use super::*;
-use super::base::*;
+use super::slice::*;
 use super::error::*;
 use super::c_api::*;
 

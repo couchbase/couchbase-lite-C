@@ -1,7 +1,7 @@
 // mod document
 
 use super::*;
-use super::base::*;
+use super::slice::*;
 use super::c_api::*;
 
 

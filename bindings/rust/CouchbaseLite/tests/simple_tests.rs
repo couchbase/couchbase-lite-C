@@ -100,7 +100,7 @@ fn save_document() {
             info!("Interesting: {} = {}", 2+2, 4);
             warn!("Some warning");
             error!("Oh no, props = {}", props);
-            assert_eq!(props.as_value().to_json(), r#"{"i":1234,"s":"Hello World!"}"#);
+            assert_eq!(props.to_json(), r#"{"i":1234,"s":"Hello World!"}"#);
         }
     });
 }
@@ -112,31 +112,43 @@ fn query() {
         add_doc(db, "doc-2", 2, "two");
         add_doc(db, "doc-3", 3, "three");
 
-        let query = Query::new(db, QueryLanguage::N1QL, "select i, s where i > 1").expect("create query");
+        let query = Query::new(db, QueryLanguage::N1QL, "select i, s where i > 1 order by i").expect("create query");
         assert_eq!(query.column_count(), 2);
         assert_eq!(query.column_name(0), Some("i"));
         assert_eq!(query.column_name(1), Some("s"));
 
+        // Step through the iterator manually:
         let results = query.execute().expect("execute");
         let mut row = (&results).next().unwrap(); //FIXME: Do something about the (&results). requirement
         let mut i = row.get(0).as_i64().unwrap();
         let mut s = row.get(1).as_string().unwrap();
         assert_eq!(i, 2);
         assert_eq!(s, "two");
-        assert_eq!(row.as_dict().as_value().to_json(), r#"{"i":2,"s":"two"}"#);
+        assert_eq!(row.as_dict().to_json(), r#"{"i":2,"s":"two"}"#);
 
         row = (&results).next().unwrap();
         i = row.get(0).as_i64().unwrap();
         s = row.get(1).as_string().unwrap();
         assert_eq!(i, 3);
         assert_eq!(s, "three");
-        assert_eq!(row.as_dict().as_value().to_json(), r#"{"i":3,"s":"three"}"#);
+        assert_eq!(row.as_dict().to_json(), r#"{"i":3,"s":"three"}"#);
 
         assert!((&results).next().is_none());
 
         // Now try a for...in loop:
         let mut n = 0;
-        for _row in &query.execute().expect("execute") {
+        for row in &query.execute().expect("execute") {
+            match n {
+                0 => {
+                    assert_eq!(row.as_array().to_json(), r#"[2,"two"]"#);
+                    assert_eq!(row.as_dict().to_json(), r#"{"i":2,"s":"two"}"#);
+                },
+                1 => {
+                    assert_eq!(row.as_array().to_json(), r#"[3,"three"]"#);
+                    assert_eq!(row.as_dict().to_json(), r#"{"i":3,"s":"three"}"#);
+                },
+                _ => {panic!("Too many rows ({})", n);}
+            }
             n += 1;
 
         }

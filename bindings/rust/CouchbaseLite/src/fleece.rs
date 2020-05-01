@@ -1,7 +1,7 @@
-// mod base
+// mod fleece
 
 use super::*;
-use super::base::*;
+use super::slice::*;
 use super::error::*;
 use super::c_api::*;
 
@@ -106,6 +106,18 @@ enum_from_primitive! {
 }
 
 
+/** A trait for Value, Array and Dict. */
+pub trait FleeceReference : Default + PartialEq + Eq + std::ops::Not + fmt::Debug + fmt::Display {
+    fn _fleece_ref(&self) -> FLValue;       // not for public consumption
+
+    fn as_value(&self) -> Value  { Value{_ref: self._fleece_ref(), _owner: PhantomData} }
+
+    fn to_json(&self) -> String {
+        unsafe { FLValue_ToJSON(self._fleece_ref()).to_string().unwrap() }
+    }
+}
+
+
 /** A Fleece value. It could be any type, including Undefined (empty). */
 #[derive(Clone, Copy)]
 pub struct Value<'f> {
@@ -131,15 +143,15 @@ impl<'f> Value<'f> {
 
     pub fn as_i64(&self) -> Option<i64>  {if self.is_integer() {Some(self.as_i64_or_0())} else {None} }
     pub fn as_u64(&self) -> Option<u64>  {if self.is_integer() {Some(self.as_u64_or_0())} else {None} }
-    pub fn as_f64(&self) -> Option<f64>  {if self.is_number() {Some(self.as_f64_or_0())} else {None} }
-    pub fn as_f32(&self) -> Option<f32>  {if self.is_number() {Some(self.as_f32_or_0())} else {None} }
+    pub fn as_f64(&self) -> Option<f64>  {if self.is_number()  {Some(self.as_f64_or_0())} else {None} }
+    pub fn as_f32(&self) -> Option<f32>  {if self.is_number()  {Some(self.as_f32_or_0())} else {None} }
     pub fn as_bool(&self)-> Option<bool> {if self.is_type(ValueType::Bool) {Some(self.as_bool_or_false())} else {None} }
 
-    pub fn as_i64_or_0(&self) -> i64    {unsafe { FLValue_AsInt(self._ref) } }
-    pub fn as_u64_or_0(&self) -> u64    {unsafe { FLValue_AsUnsigned(self._ref) } }
-    pub fn as_f64_or_0(&self) -> f64    {unsafe { FLValue_AsDouble(self._ref) } }
-    pub fn as_f32_or_0(&self) -> f32    {unsafe { FLValue_AsFloat(self._ref) } }
-    pub fn as_bool_or_false(&self) -> bool   {unsafe { FLValue_AsBool(self._ref) } }
+    pub fn as_i64_or_0(&self) -> i64       {unsafe { FLValue_AsInt(self._ref) } }
+    pub fn as_u64_or_0(&self) -> u64       {unsafe { FLValue_AsUnsigned(self._ref) } }
+    pub fn as_f64_or_0(&self) -> f64       {unsafe { FLValue_AsDouble(self._ref) } }
+    pub fn as_f32_or_0(&self) -> f32       {unsafe { FLValue_AsFloat(self._ref) } }
+    pub fn as_bool_or_false(&self) -> bool {unsafe { FLValue_AsBool(self._ref) } }
 
     pub fn as_timestamp(&self) -> Option<Timestamp> {
         unsafe {
@@ -166,10 +178,10 @@ impl<'f> Value<'f> {
     pub fn as_dict(&self) -> Dict<'f> {
         unsafe { Dict{_ref: FLValue_AsDict(self._ref), _owner: self._owner} }
     }
+}
 
-    pub fn to_json(&self) -> String {
-        unsafe { FLValue_ToJSON(self._ref).to_string().unwrap() }
-    }
+impl<'f> FleeceReference for Value<'f> {
+    fn _fleece_ref(&self) -> FLValue { self._ref }
 }
 
 impl Default for Value<'_> {
@@ -182,12 +194,12 @@ impl PartialEq for Value<'_> {
     }
 }
 
+impl Eq for Value<'_> { }
+
 impl std::ops::Not for Value<'_> {
     type Output = bool;
     fn not(self) -> bool {self._ref.is_null()}
 }
-
-impl Eq for Value<'_> { }
 
 impl fmt::Debug for Value<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -219,13 +231,11 @@ impl<'f> Array<'f> {
         Array{_ref: array, _owner: PhantomData}
     }
 
-    pub fn as_value(&self) -> Value { Value::wrap(self._ref as FLValue, self) }
-
     pub fn count(&self) -> u32 { unsafe { FLArray_Count(self._ref) }}
     pub fn empty(&self) -> bool { unsafe { FLArray_IsEmpty(self._ref) }}
 
-    pub fn get(&self, index: usize) -> Value {
-        unsafe { Value::wrap(FLArray_Get(self._ref, index as u32), self) }
+    pub fn get(&self, index: u32) -> Value<'f> {
+        unsafe { Value{_ref: FLArray_Get(self._ref, index), _owner: self._owner} }
     }
 
     pub fn iter(&self) -> ArrayIterator<'f> {
@@ -237,6 +247,10 @@ impl<'f> Array<'f> {
     }
 }
 
+impl<'f> FleeceReference for Array<'f> {
+    fn _fleece_ref(&self) -> FLValue { self._ref as FLValue }
+}
+
 impl Default for Array<'_> {
     fn default() -> Array<'static> { Array{_ref: ptr::null(), _owner: PhantomData} }
 }
@@ -244,6 +258,8 @@ impl Default for Array<'_> {
 impl PartialEq for Array<'_> {
     fn eq(&self, other: &Self) -> bool { self.as_value() == other.as_value() }
 }
+
+impl Eq for Array<'_> { }
 
 impl std::ops::Not for Array<'_> {
     type Output = bool;
@@ -349,6 +365,10 @@ impl<'f> Dict<'f> {
     }
 }
 
+impl<'f> FleeceReference for Dict<'f> {
+    fn _fleece_ref(&self) -> FLValue { self._ref as FLValue }
+}
+
 impl Default for Dict<'_> {
     fn default() -> Dict<'static> { Dict{_ref: ptr::null(), _owner: PhantomData} }
 }
@@ -356,6 +376,8 @@ impl Default for Dict<'_> {
 impl PartialEq for Dict<'_> {
     fn eq(&self, other: &Self) -> bool { self.as_value() == other.as_value() }
 }
+
+impl Eq for Dict<'_> { }
 
 impl std::ops::Not for Dict<'_> {
     type Output = bool;
