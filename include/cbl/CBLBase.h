@@ -117,6 +117,8 @@ typedef struct {
     @note  It is the caller's responsibility to free the returned C string by calling `free`. */
 char* CBLError_Message(const CBLError* _cbl_nonnull) CBLAPI;
 
+FLSliceResult CBLError_Message_s(const CBLError* _cbl_nonnull) CBLAPI;
+
 /** @} */
 
 

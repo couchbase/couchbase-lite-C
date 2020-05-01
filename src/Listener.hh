@@ -128,12 +128,12 @@ namespace cbl_internal {
         void clear()                                            {ListenersBase::clear();}
         bool empty() const                                      {return _tokens.empty();}
         
-        ListenerToken<LISTENER>* find(CBLListenerToken *token) {
+        ListenerToken<LISTENER>* find(CBLListenerToken *token) const {
             return contains(token) ? (ListenerToken<LISTENER>*) token : nullptr;
         }
 
             template <class... Args>
-        void call(Args... args) {
+        void call(Args... args) const {
             for (auto &lp : _tokens)
                 ((ListenerToken<LISTENER>*)lp.get())->call(args...);
         }

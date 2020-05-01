@@ -96,7 +96,7 @@ void CBLQuery_SetParameters(CBLQuery* _cbl_nonnull query,
                             FLDict _cbl_nonnull parameters) CBLAPI;
 
 /** Returns the query's current parameter bindings, if any. */
-FLDict CBLQuery_Parameters(CBLQuery* _cbl_nonnull query) CBLAPI;
+FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI;
 
 /** Assigns values to the query's parameters, from JSON data.
     See \ref CBLQuery_SetParameters for details.
@@ -120,10 +120,10 @@ CBLResultSet* CBLQuery_Execute(CBLQuery* _cbl_nonnull, CBLError*) CBLAPI;
     strategy. You can use this to help optimize the query: the word `SCAN` in the strategy
     indicates a linear scan of the entire database, which should be avoided by adding an index.
     The strategy will also show which index(es), if any, are used. */
-FLSliceResult CBLQuery_Explain(CBLQuery* _cbl_nonnull) CBLAPI;
+FLSliceResult CBLQuery_Explain(const CBLQuery* _cbl_nonnull) CBLAPI;
 
 /** Returns the number of columns in each result. */
-unsigned CBLQuery_ColumnCount(CBLQuery* _cbl_nonnull) CBLAPI;
+unsigned CBLQuery_ColumnCount(const CBLQuery* _cbl_nonnull) CBLAPI;
 
 /** Returns the name of a column in the result.
     The column name is based on its expression in the `SELECT...` or `WHAT:` section of the
@@ -131,7 +131,7 @@ unsigned CBLQuery_ColumnCount(CBLQuery* _cbl_nonnull) CBLAPI;
     A column that returns an expression will have an automatically-generated name like `$1`.
     To give a column a custom name, use the `AS` syntax in the query.
     Every column is guaranteed to have a unique name. */
-FLSlice CBLQuery_ColumnName(CBLQuery* _cbl_nonnull,
+FLSlice CBLQuery_ColumnName(const CBLQuery* _cbl_nonnull,
                             unsigned columnIndex) CBLAPI;
 
 /** @} */
@@ -167,7 +167,7 @@ bool CBLResultSet_Next(CBLResultSet* _cbl_nonnull) CBLAPI;
 /** Returns the value of a column of the current result, given its (zero-based) numeric index.
     This may return a NULL pointer, indicating `MISSING`, if the value doesn't exist, e.g. if
     the column is a property that doesn't exist in the document. */
-FLValue CBLResultSet_ValueAtIndex(CBLResultSet* _cbl_nonnull,
+FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* _cbl_nonnull,
                                   unsigned index) CBLAPI;
 
 /** Returns the value of a column of the current result, given its name.
@@ -175,11 +175,24 @@ FLValue CBLResultSet_ValueAtIndex(CBLResultSet* _cbl_nonnull,
     the column is a property that doesn't exist in the document. (Or, of course, if the key
     is not a column name in this query.)
     @note  See \ref CBLQuery_ColumnName for a discussion of column names. */
-FLValue CBLResultSet_ValueForKey(CBLResultSet* _cbl_nonnull,
+FLValue CBLResultSet_ValueForKey(const CBLResultSet* _cbl_nonnull,
                                  const char* key _cbl_nonnull) CBLAPI;
 
-FLValue CBLResultSet_ValueForKey_s(CBLResultSet* _cbl_nonnull,
+FLValue CBLResultSet_ValueForKey_s(const CBLResultSet* _cbl_nonnull,
                                    FLString key) CBLAPI;
+
+/** Returns the current result as an array of column values.
+    @warning The array reference is only valid until the result-set is advanced or released.
+            If you want to keep it for longer, call \ref FLArray_Retain (and release it when done.) */
+FLArray CBLResultSet_RowArray(const CBLResultSet* _cbl_nonnull) CBLAPI;
+
+/** Returns the current result as a dictionary mapping column names to values.
+    @warning The dict reference is only valid until the result-set is advanced or released.
+            If you want to keep it for longer, call \ref FLDict_Retain (and release it when done.) */
+FLDict CBLResultSet_RowDict(const CBLResultSet* _cbl_nonnull) CBLAPI;
+
+/** Returns the Query that created this ResultSet. */
+CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull);
 
 CBL_REFCOUNTED(CBLResultSet*, ResultSet);
 
@@ -231,7 +244,7 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
     @param listener  The query listener that was notified.
     @param error  If the query failed to run, the error will be stored here.
     @return  A new object containing the query's current results, or NULL if the query failed to run. */
-    CBLResultSet* CBLQuery_CopyCurrentResults(CBLQuery* query _cbl_nonnull,
+    CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query _cbl_nonnull,
                                               CBLListenerToken *listener _cbl_nonnull,
                                               CBLError *error) CBLAPI;
 

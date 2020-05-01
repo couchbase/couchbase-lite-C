@@ -35,6 +35,7 @@ _CBLLog_SetFileConfig
 _CBL_Now
 
 _CBLError_Message
+_CBLError_Message_s
 
 _CBLListener_Remove
 
@@ -144,6 +145,9 @@ _CBLResultSet_Next
 _CBLResultSet_ValueAtIndex
 _CBLResultSet_ValueForKey
 _CBLResultSet_ValueForKey_s
+_CBLResultSet_RowArray
+_CBLResultSet_RowDict
+_CBLResultSet_GetQuery
 
 _CBLEndpoint_NewWithURL
 _CBLEndpoint_NewWithURL_s

@@ -100,6 +100,12 @@ public:
         });
     }
 
+    Dict parameters() const {
+        if (!_parameters)
+            return nullptr;
+        return Value::fromData(_parameters, kFLTrusted).asDict();
+    }
+
     void setParameters(Dict parameters) {
         Encoder enc;
         enc.writeValue(parameters);
@@ -117,7 +123,7 @@ public:
 
     Retained<CBLResultSet> execute(C4Error* outError);
 
-    int columnNamed(slice name) {
+    int columnNamed(slice name) const {
         call_once(_onceColumnNames, [this]{
             _columnNames.reset(new std::unordered_map<slice, uint32_t>);
             unsigned nCols = columnCount();
@@ -129,15 +135,9 @@ public:
         return (i != _columnNames->end()) ? i->second : -1;
     }
 
-    Dict parameters() {
-        if (!_parameters)
-            return nullptr;
-        return Value::fromData(_parameters, kFLTrusted).asDict();
-    }
-
     CBLListenerToken* addChangeListener(CBLQueryChangeListener listener, void *context);
 
-    ListenerToken<CBLQueryChangeListener>* getChangeListener(CBLListenerToken *token) {
+    ListenerToken<CBLQueryChangeListener>* getChangeListener(CBLListenerToken *token) const {
         return _listeners.find(token);
     }
 
@@ -155,8 +155,8 @@ private:
 
     RetainedConst<CBLDatabase> _database;
     alloc_slice _parameters;
-    unique_ptr<std::unordered_map<slice, unsigned>> _columnNames;
-    once_flag _onceColumnNames;
+    mutable unique_ptr<std::unordered_map<slice, unsigned>> _columnNames;
+    mutable once_flag _onceColumnNames;
     Listeners<CBLQueryChangeListener> _listeners;
 };
 
@@ -172,6 +172,8 @@ public:
     { }
 
     bool next() {
+        _asArray = nullptr;
+        _asDict = nullptr;
         C4Error error;
         bool more = c4queryenum_next(_enum, &error);
         if (!more && error.code != 0)
@@ -180,20 +182,51 @@ public:
         return more;
     }
 
-    Value property(slice prop) {
+    Value property(slice prop) const {
         int col = _query->columnNamed(prop);
         return (col >= 0) ? column(col) : nullptr;
     }
 
-    Value column(unsigned col) {
+    Value column(unsigned col) const {
         if (col < 64 && (_enum->missingColumns & (1ULL<<col)))
             return nullptr;
         return FLArrayIterator_GetValueAt(&_enum->columns, uint32_t(col));
     }
 
+    Array asArray() const {
+        if (!_asArray) {
+            auto array = MutableArray::newArray();
+            unsigned nCols = _query->columnCount();
+            array.resize(uint32_t(nCols));
+            for (unsigned i = 0; i < nCols; ++i)
+                array[i] = column(i);
+            _asArray = array;
+        }
+        return _asArray;
+    }
+
+    Dict asDict() const {
+        if (!_asDict) {
+            auto dict = MutableDict::newDict();
+            unsigned nCols = _query->columnCount();
+            for (unsigned i = 0; i < nCols; ++i) {
+                slice key = _query->columnName(i);
+                dict[key] = column(i);
+            }
+            _asDict = dict;
+        }
+        return _asDict;
+    }
+
+    CBLQuery* query() const {
+        return _query;
+    }
+
 private:
     Retained<CBLQuery> const _query;
     c4::ref<C4QueryEnumerator> const _enum;
+    mutable MutableArray _asArray;
+    mutable MutableDict _asDict;
 };
 
 
@@ -294,7 +327,7 @@ CBLQuery* CBLQuery_New_s(const CBLDatabase* db _cbl_nonnull,
     return query->valid() ? retain(query.get()) : nullptr;
 }
 
-FLDict CBLQuery_Parameters(CBLQuery* _cbl_nonnull query) CBLAPI {
+FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI {
     return query->parameters();
 }
 
@@ -315,15 +348,15 @@ CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError)
     return retain(query->execute(internal(outError)).get());
 }
 
-FLSliceResult CBLQuery_Explain(CBLQuery* query _cbl_nonnull) CBLAPI {
+FLSliceResult CBLQuery_Explain(const CBLQuery* query _cbl_nonnull) CBLAPI {
     return FLSliceResult(query->explain());
 }
 
-unsigned CBLQuery_ColumnCount(CBLQuery* query _cbl_nonnull) CBLAPI {
+unsigned CBLQuery_ColumnCount(const CBLQuery* query _cbl_nonnull) CBLAPI {
     return query->columnCount();
 }
 
-FLSlice CBLQuery_ColumnName(CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI {
+FLSlice CBLQuery_ColumnName(const CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI {
     return query->columnName(col);
 }
 
@@ -334,7 +367,7 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
     return query->addChangeListener(listener, context);
 }
 
-CBLResultSet* CBLQuery_CopyCurrentResults(CBLQuery* query,
+CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
                                           CBLListenerToken *token,
                                           CBLError *outError) CBLAPI
 {
@@ -351,16 +384,28 @@ bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
     return rs->next();
 }
 
-FLValue CBLResultSet_ValueForKey(CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
+FLValue CBLResultSet_ValueForKey(const CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
     return CBLResultSet_ValueForKey_s(rs, slice(property));
 }
 
-FLValue CBLResultSet_ValueForKey_s(CBLResultSet* rs, FLString property) CBLAPI {
+FLValue CBLResultSet_ValueForKey_s(const CBLResultSet* rs, FLString property) CBLAPI {
     return rs->property(property);
 }
 
-FLValue CBLResultSet_ValueAtIndex(CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
+FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
     return rs->column(column);
+}
+
+FLArray CBLResultSet_RowArray(const CBLResultSet *rs) CBLAPI {
+    return rs->asArray();
+}
+
+FLDict CBLResultSet_RowDict(const CBLResultSet *rs) CBLAPI {
+    return rs->asDict();
+}
+
+CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) {
+    return rs->query();
 }
 
 
