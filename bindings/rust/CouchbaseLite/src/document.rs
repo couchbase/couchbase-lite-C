@@ -2,10 +2,7 @@
 
 use super::*;
 use super::base::*;
-use super::error::*;
 use super::c_api::*;
-use super::fleece::*;
-use super::fleece_mutable::*;
 
 
 //////// DATABASE'S DOCUMENT API:

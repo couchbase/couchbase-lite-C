@@ -9,8 +9,8 @@
         {
             "path": "CouchbaseLite",
             "name": "Crate",
-            "file_include_patterns": ["*.toml", "*.h"],
-            "folder_include_patterns": ["NONE"],
+            "file_include_patterns": ["*.toml", "*.h", "bindings.rs"],
+            "folder_include_patterns": ["target", "debug", "build", "out", "couchbase_lite-*"]
         }
     ],
     "settings": {

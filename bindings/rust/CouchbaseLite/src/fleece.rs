@@ -109,8 +109,8 @@ enum_from_primitive! {
 /** A Fleece value. It could be any type, including Undefined (empty). */
 #[derive(Clone, Copy)]
 pub struct Value<'f> {
-    pub (crate) _ref: FLValue,
-    _owner : PhantomData<&'f Fleece>
+    pub(crate) _ref: FLValue,
+    pub(crate) _owner : PhantomData<&'f Fleece>
 }
 
 
@@ -167,10 +167,6 @@ impl<'f> Value<'f> {
         unsafe { Dict{_ref: FLValue_AsDict(self._ref), _owner: self._owner} }
     }
 
-    pub fn to_string(&self) -> String {
-        unsafe { FLValue_ToString(self._ref).to_string().unwrap() }
-    }
-    
     pub fn to_json(&self) -> String {
         unsafe { FLValue_ToJSON(self._ref).to_string().unwrap() }
     }
@@ -215,7 +211,7 @@ impl fmt::Display for Value<'_> {
 #[derive(Clone, Copy)]
 pub struct Array<'f> {
     pub(crate) _ref: FLArray,
-    _owner : PhantomData<&'f Fleece>
+    pub(crate) _owner : PhantomData<&'f Fleece>
 }
 
 impl<'f> Array<'f> {
@@ -325,7 +321,7 @@ impl<'f> Iterator for ArrayIterator<'f> {
 #[derive(Clone, Copy)]
 pub struct Dict<'f> {
     pub(crate) _ref: FLDict,
-    _owner : PhantomData<&'f Fleece>
+    pub(crate) _owner : PhantomData<&'f Fleece>
 }
 
 impl<'f> Dict<'f> {

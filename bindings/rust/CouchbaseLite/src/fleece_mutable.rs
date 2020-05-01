@@ -13,7 +13,7 @@ use std::ptr;
 
 
 pub struct MutableDict {
-    _ref: FLMutableDict,
+    pub(crate) _ref: FLMutableDict,
 }
 
 // Dict API:
@@ -133,5 +133,5 @@ impl<'s> Slot<'s> {
     pub fn put_f64(self, value: f64)      { unsafe { FLSlot_SetDouble(self._ref, value) } }
     pub fn put_string(self, value: &str)  { unsafe { FLSlot_SetString(self._ref, as_slice(value)) } }
     pub fn put_data(self, value: &[u8])   { unsafe { FLSlot_SetString(self._ref, bytes_as_slice(value)) } }
-    pub fn put_value(self, value: &Value) { unsafe { FLSlot_SetValue(self._ref, value._ref) } }
+    pub fn put_value(self, value: Value)  { unsafe { FLSlot_SetValue(self._ref, value._ref) } }
 }

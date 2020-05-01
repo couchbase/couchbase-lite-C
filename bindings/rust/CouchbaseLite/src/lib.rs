@@ -12,6 +12,7 @@ pub mod database;
 pub mod document;
 pub mod error;
 pub mod logging;
+pub mod query;
 
 mod base;
 mod c_api;
@@ -27,6 +28,7 @@ use self::c_api::*;
 pub use error::*;
 pub use fleece::*;
 pub use fleece_mutable::*;
+pub use query::*;
 
 
 //////// TOP-LEVEL NAMESPACE:
