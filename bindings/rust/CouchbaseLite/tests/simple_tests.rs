@@ -6,6 +6,11 @@ extern crate tempdir;
 use couchbase_lite::*;
 use tempdir::TempDir;
 
+// Enables check for leaks of native CBL objects after `with_db()` finishes.
+// WARNING: These checks only work if one test method runs at a time, i.e. testing is single
+//          threaded. Run as `cargo test -- --test-threads=1` or you'll get false positives.
+const LEAK_CHECKS : bool = true;
+
 const DB_NAME : &str = "test_db";
 
 const LEVEL_PREFIX : [&str;5] = ["((", "_", "", "WARNING: ", "***ERROR: "];
@@ -39,13 +44,11 @@ fn with_db<F>(f: F)
     f(&mut db);
     
     drop(db);
-    println!("DROPPED DB");
-    if instance_count() as isize > start_inst_count {
+    if LEAK_CHECKS && instance_count() as isize > start_inst_count {
         dump_instances();
         panic!("Native object leak: {} objects, was {}", 
             instance_count(), start_inst_count);
     }
-    println!("BYE");
 }
 
 
