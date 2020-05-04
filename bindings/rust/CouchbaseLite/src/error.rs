@@ -149,6 +149,9 @@ impl Error {
     }
 }
 
+impl std::error::Error for Error { }
+impl std::error::Error for &Error { }
+
 impl fmt::Debug for Error {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> std::result::Result<(), fmt::Error> {
         return fmt.write_fmt(format_args!("{:?}: {})", self.code, self.message()));
@@ -237,5 +240,32 @@ pub(crate) fn check_bool<F>(func: F) -> Result<()>
     let ok = func(&mut error);
     return check_failure(ok, &error);
 }
+
+// The first parameter is a function that returns a non-null pointer or sets the error.
+// The second parameter is a function that takes the returned pointer and returns the final result.
+pub(crate) fn check_ptr<PTR, F, MAPF, RESULT>(func: F, map: MAPF) -> Result<RESULT>
+    where F: Fn(*mut CBLError)->*mut PTR,
+          MAPF: FnOnce(*mut PTR) -> RESULT
+{
+    let mut error = CBLError::default();
+    let ptr = func(&mut error);
+    return if ptr.is_null() {failure(error)} else {Ok(map(ptr))};
+}
+
+// The first parameter is a function that returns a non-null pointer or sets the error.
+// The second parameter is a function that takes the returned pointer and returns the final result.
+pub(crate) fn check_io<F>(mut func: F) -> std::io::Result<usize>
+    where F: FnMut(*mut CBLError)->i32
+{
+    let mut error = CBLError::default();
+    let n = func(&mut error);
+    if n < 0 {
+        // TODO: Better error mapping!
+        return Err(std::io::Error::new(std::io::ErrorKind::NotFound, Error::new(&error)));
+    } else {
+        return Ok(n as usize);
+    }
+}
+
 
 

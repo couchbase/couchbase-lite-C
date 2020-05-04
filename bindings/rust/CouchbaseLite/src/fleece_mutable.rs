@@ -130,7 +130,7 @@ impl<'a> IntoIterator for &'a MutableArray {
 }
 
 
-// Mutable API for Array:
+// Mutable API additions for Array:
 impl<'d> Array<'d> {
     pub fn as_mutable(self) -> Option<MutableArray> {
         unsafe {
@@ -267,8 +267,10 @@ impl<'d> Dict<'d> {
 //////// SLOT:
 
 
+/** A reference to an element of a MutableArray or MutableDict,
+    for the sole purpose of storing a value in it. */
 pub struct Slot<'s> {
-    _ref: FLSlot,
+    pub(crate) _ref: FLSlot,
     _owner: PhantomData<&'s mut MutableDict>
 }
 

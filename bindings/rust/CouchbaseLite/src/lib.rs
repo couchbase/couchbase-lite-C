@@ -5,6 +5,7 @@
 
 #[macro_use] extern crate enum_primitive;
 
+pub mod blob;
 pub mod database;
 pub mod document;
 pub mod error;
@@ -24,6 +25,7 @@ use self::c_api::*;
 //////// RE-EXPORT:
 
 
+pub use blob::*;
 pub use database::*;
 pub use document::*;
 pub use error::*;

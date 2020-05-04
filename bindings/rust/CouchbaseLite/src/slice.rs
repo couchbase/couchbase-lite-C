@@ -42,6 +42,10 @@ impl FLSlice {
         return self.as_str().map(|s| s.to_string());
     }
 
+    pub unsafe fn to_vec(&self) -> Option<Vec<u8>> {
+        return self.as_byte_array().map(|a| a.to_owned());
+    }
+
     pub fn map<F, T>(&self, f : F) -> Option<T>
         where F: Fn(&FLSlice)->T
     {
@@ -80,6 +84,13 @@ impl FLSliceResult {
         self.release();
         return str;
     }
+
+    // Consumes & releases self
+    pub unsafe fn to_vec(mut self) -> Option<Vec<u8>> {
+        let vec = self.as_slice().to_vec();
+        self.release();
+        return vec;
+    }
 }
 
 
@@ -96,3 +107,9 @@ pub unsafe fn to_str<'a>(cstr: *const ::std::os::raw::c_char) -> Cow<'a, str> {
 pub unsafe fn to_string(cstr: *const ::std::os::raw::c_char) -> String {
     return to_str(cstr).to_string();
 }
+
+/*
+pub(crate) unsafe fn free_cstr(cstr: *const ::std::os::raw::c_char) {
+    todo!(); // Implement this by calling `free()`
+}
+*/

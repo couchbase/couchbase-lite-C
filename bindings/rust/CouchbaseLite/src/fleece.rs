@@ -115,6 +115,17 @@ pub trait FleeceReference : Default + PartialEq + Eq + std::ops::Not + fmt::Debu
     fn to_json(&self) -> String {
         unsafe { FLValue_ToJSON(self._fleece_ref()).to_string().unwrap() }
     }
+
+    // Blob accessors:
+
+    fn is_blob(&self) -> bool {
+        unsafe { CBL_IsBlob(FLValue_AsDict(self._fleece_ref())) }
+    }
+
+    fn as_blob(&self) -> Option<Blob> {
+        Blob::from_value(self)
+    }
+
 }
 
 
