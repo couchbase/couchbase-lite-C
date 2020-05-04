@@ -20,6 +20,7 @@
 #include "Internal.hh"
 #include "Listener.hh"
 #include "Util.hh"
+#include <iostream>
 
 
 char* CBLError_Message(const CBLError* error _cbl_nonnull) CBLAPI {

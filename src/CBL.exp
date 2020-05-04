@@ -217,6 +217,7 @@ _FLValue_AsDouble
 _FLValue_AsString
 _FLValue_AsArray
 _FLValue_AsDict
+_FLValue_AsTimestamp
 _FLValue_ToString
 _FLValue_ToJSON
 _FLValue_ToJSONX
