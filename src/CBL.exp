@@ -125,6 +125,7 @@ _CBLBlobWriter_New
 _CBLBlobWriter_Close
 _CBLBlobWriter_Write
 
+_FLSlot_SetBlob
 _FLMutableArray_SetBlob
 _FLMutableDict_SetBlob
 

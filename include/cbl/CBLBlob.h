@@ -190,15 +190,19 @@ extern "C" {
         return CBLBlob_Get(FLValue_AsDict(value));
     }
 
+    void FLSlot_SetBlob(FLSlot slot _cbl_nonnull,
+                        CBLBlob* blob _cbl_nonnull) CBLAPI;
+    
     /** Stores a blob in a mutable array. */
     void FLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
                                 uint32_t index,
-                                CBLBlob* blob _cbl_nonnull) CBLAPI;
+                                CBLBlob* blob _cbl_nonnull) CBLAPI _cbl_deprecated;
 
     /** Stores a blob in a mutable dictionary. */
     void FLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
                                FLString key,
-                               CBLBlob* blob _cbl_nonnull) CBLAPI;
+                               CBLBlob* blob _cbl_nonnull) CBLAPI _cbl_deprecated;
+
 
 /** @} */
 

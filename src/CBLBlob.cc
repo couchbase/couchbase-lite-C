@@ -133,25 +133,28 @@ bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
 #pragma mark - FLEECE UTILITIES:
 
 
-static MutableDict blobMutableProperties(CBLBlob *blob _cbl_nonnull) {
+void FLSlot_SetBlob(FLSlot slot _cbl_nonnull, CBLBlob* blob _cbl_nonnull) CBLAPI
+{
     Dict props = CBLBlob_Properties(blob);
     MutableDict mProps = props.asMutable();
-    return mProps ? mProps : props.mutableCopy();
+    if (!mProps)
+        mProps = props.mutableCopy();
+    FLSlot_SetValue(slot, mProps);
 }
 
 
 void FLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
                              uint32_t index,
-                             CBLBlob* blob _cbl_nonnull) CBLAPI
+                             CBLBlob* blob _cbl_nonnull) CBLAPI //deprecated
 {
-    FLSlot_SetValue(FLMutableArray_Set(array, index), blobMutableProperties(blob));
+    FLSlot_SetBlob(FLMutableArray_Set(array, index), blob);
 }
 
 
 void FLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
                                           FLString key,
-                                          CBLBlob* blob _cbl_nonnull) CBLAPI
+                                          CBLBlob* blob _cbl_nonnull) CBLAPI //deprecated
 {
-    FLSlot_SetValue(FLMutableDict_Set(dict, key), blobMutableProperties(blob));
+    FLSlot_SetBlob(FLMutableDict_Set(dict, key), blob);
 }
 

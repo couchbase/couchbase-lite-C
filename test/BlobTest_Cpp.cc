@@ -133,11 +133,11 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in arrays/dicts", "[Blob]") {
         MutableArray array = MutableArray::newArray();
         array.insertNulls(0, 1);
         CBLBlob *blob1 = CBLBlob_CreateWithData(kBlobContentType, kBlobContents);
-        FLMutableArray_SetBlob(array, 0, blob1);
+        FLSlot_SetBlob(array[0], blob1);
 
         MutableDict dict = MutableDict::newDict();
         CBLBlob *blob2 = CBLBlob_CreateWithData(kBlobContentType, kBlobContents);
-        FLMutableDict_SetBlob(dict, "b"_sl, blob2);
+        FLSlot_SetBlob(dict["b"], blob2);
 
         doc["array"] = array;
         doc["dict"] = dict;

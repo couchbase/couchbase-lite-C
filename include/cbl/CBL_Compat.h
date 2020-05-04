@@ -36,6 +36,7 @@
     #define _cbl_nonnull            _In_
     #define _cbl_returns_nonnull    _Ret_notnull_
     #define _cbl_warn_unused        _Check_return_
+    #define _cbl_deprecated(MSG,REPLACEMENT)
 #else
     #define CBLINLINE            inline
     #define _cbl_returns_nonnull __attribute__((returns_nonnull))
@@ -45,6 +46,7 @@
     #else
         #define _cbl_nonnull   /* GCC does not support the way we use nonnull */
     #endif
+    #define _cbl_deprecated    __attribute__((deprecated()))
 #endif
 
 // Macros for defining typed enumerations and option flags.
