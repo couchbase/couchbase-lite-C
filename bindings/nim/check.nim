@@ -5,9 +5,7 @@
 import CouchbaseLite
 
 proc test() =
-    var keyBytes: array[32, uint8]
-    var key = EncryptionKey(algorithm: kEncryptionNone, bytes: keyBytes)
-    var config = DatabaseConfiguration(directory: "/tmp", flags: kDatabase_Create, encryptionKey: key)
+    var config = DatabaseConfiguration(directory: "/tmp", flags: kDatabase_Create)
 
     var error : Error
     var db = openDatabase("nimtest", addr config, error)

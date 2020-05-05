@@ -5,6 +5,9 @@
 ##
 ## If you run the script again, it will generate a _new_ file `CouchbaseLite-new.nim`.
 ## You'll need to merge new/changed declarations from that file into this one, by hand.
+##
+## Status: Up-to-date as of 5 May 2020, commit 036cd9f7 "Export kCBLAuthDefaultCookieName...",
+##         except I've left out the new "_s"-suffixed alternate functions, which Nim doesn't need.
 
 
 
@@ -110,27 +113,8 @@ type
 
 ## Returns a message describing an error.
 proc message*(a1: var Error): cstring {.importc: "CBLError_Message", dynlib: "CouchbaseLite.dylib".}
+proc message_s*(a1: var Error): FLSliceResult {.importc: "CBLError_Message_s", dynlib: "CouchbaseLite.dylib".}
 
-
-## \defgroup logging   Logging
-##     Managing messages that Couchbase Lite logs at runtime.
-## Subsystems that log information.
-type
-  LogDomain* {.size: sizeof(cint).} = enum
-    kLogDomainAll, kLogDomainDatabase, kLogDomainQuery, kLogDomainReplicator, kLogDomainNetwork
-
-
-## Levels of log messages. Higher values are more important/severe.
-type
-  LogLevel* {.size: sizeof(cint).} = enum
-    LogDebug, LogVerbose, LogInfo, LogWarning, LogError, LogNone
-
-
-## Sets the detail level of logging.
-proc setLogLevel*(a1: LogLevel; a2: LogDomain) {.importc: "CBL_SetLogLevel", dynlib: "CouchbaseLite.dylib".}
-
-## Logs a message
-proc log*(a1: LogDomain; a2: LogLevel; format: cstring) {.varargs, importc: "CBL_Log", dynlib: "CouchbaseLite.dylib".}
 
 ## \defgroup other_types   Other Types
 ## A date/time representation used for document expiration (and in date/time queries.)
@@ -279,6 +263,112 @@ proc remove*(a1: ListenerToken) {.importc: "CBLListener_Remove", dynlib: "Couchb
 
 
 ##
+##  CBLLog.h
+##
+##  Copyright © 2019 Couchbase. All rights reserved.
+##
+##  Licensed under the Apache License, Version 2.0 (the "License");
+##  you may not use this file except in compliance with the License.
+##  You may obtain a copy of the License at
+##
+##  http://www.apache.org/licenses/LICENSE-2.0
+##
+##  Unless required by applicable law or agreed to in writing, software
+##  distributed under the License is distributed on an "AS IS" BASIS,
+##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+##  See the License for the specific language governing permissions and
+##  limitations under the License.
+##
+
+## * \defgroup logging   Logging
+##     Managing messages that Couchbase Lite logs at runtime.
+## * Subsystems that log information.
+
+
+
+type
+  LogDomain* {.size: sizeof(cint).} = enum
+    kLogDomainAll, kLogDomainDatabase, kLogDomainQuery, kLogDomainReplicator, kLogDomainNetwork
+
+## * Levels of log messages. Higher values are more important/severe. Each level includes the lower ones.
+type
+  LogLevel* {.size: sizeof(cint).} = enum
+    LogDebug,                 ## /< Extremely detailed messages, only written by debug builds of CBL.
+    LogVerbose,               ## /< Detailed messages about normally-unimportant stuff.
+    LogInfo,                  ## /< Messages about ordinary behavior.
+    LogWarning,               ## /< Messages warning about unlikely and possibly bad stuff.
+    LogError,                 ## /< Messages about errors
+    LogNone                   ## /< Disables logging entirely.
+
+
+## * Formats and writes a message to the log, in the given domain at the given level.
+##     \warning This function takes a `printf`-style format string, with extra parameters to match the format placeholders, and has the same security vulnerabilities as other `printf`-style functions.
+##     If you are logging a fixed string, call \ref CBL_Log_s instead, otherwise any `%` characters in the
+##     `format` string will be misinterpreted as placeholders and the dreaded Undefined Behavior will result,
+##     possibly including crashes or overwriting the stack.
+##     @param domain  The log domain to associate this message with.
+##     @param level  The severity of the message. If this is lower than the current minimum level for the domain
+##                  (as set by \ref CBL_SetLogLevel), nothing is logged.
+##     @param format  A `printf`-style format string. `%` characters in this string introduce parameters,
+##                  and corresponding arguments must follow.
+proc log*(domain: LogDomain; level: LogLevel; format: cstring) {.varargs, importc: "CBL_Log", dynlib: "CouchbaseLite.dylib".}
+
+## * Writes a pre-formatted message to the log, exactly as given.
+##     @param domain  The log domain to associate this message with.
+##     @param level  The severity of the message. If this is lower than the current minimum level for the domain
+##                  (as set by \ref CBL_SetLogLevel), nothing is logged.
+##     @param message  The exact message to write to the log.
+
+proc logString*(domain: LogDomain; level: LogLevel; message: Slice) {.importc: "CBL_Log_s", dynlib: "CouchbaseLite.dylib".}
+## * \name Console Logging and Custom Logging
+## * A logging callback that the application can register.
+##     @param domain  The domain of the message; \ref kCBLLogDomainAll if it doesn't fall into a specific domain.
+##     @param level  The severity level of the message.
+##     @param message  The actual formatted message.
+
+type
+  LogCallback* = proc (domain: LogDomain; level: LogLevel; message: cstring)
+
+## * Gets the current log level for debug console logging.
+##     Only messages at this level or higher will be logged to the console or callback.
+proc consoleLevel*(): LogLevel {.importc: "CBLLog_ConsoleLevel", dynlib: "CouchbaseLite.dylib".}
+
+## * Sets the detail level of logging.
+##     Only messages whose level is ≥ the given level will be logged to the console or callback.
+proc setConsoleLevel*(a1: LogLevel) {.importc: "CBLLog_SetConsoleLevel", dynlib: "CouchbaseLite.dylib".}
+
+## * Returns true if a message with the given domain and level would be logged to the console.
+proc willLogToConsole*(domain: LogDomain; level: LogLevel): bool {.importc: "CBLLog_WillLogToConsole", dynlib: "CouchbaseLite.dylib".}
+
+## * Gets the current log callback.
+proc callback*(): LogCallback {.importc: "CBLLog_Callback", dynlib: "CouchbaseLite.dylib".}
+
+## * Sets the callback for receiving log messages. If set to NULL, no messages are logged to the console.
+proc setCallback*(a1: LogCallback) {.importc: "CBLLog_SetCallback", dynlib: "CouchbaseLite.dylib".}
+
+## * \name Log File Configuration
+## * The properties for configuring logging to files.
+##     @warning `usePlaintext` results in significantly larger log files and higher CPU usage that may slow
+##             down your app; we recommend turning it off in production.
+type
+  LogFileConfiguration* {.bycopy.} = object
+    directory*: cstring        ## /< The directory where log files will be created.
+    maxRotateCount*: uint32    ## /< Max number of older logs to keep (i.e. total number will be one more.)
+    maxSize*: csize_t          ## /< The size in bytes at which a file will be rotated out (best effort).
+    usePlaintext*: bool        ## /< Whether or not to log in plaintext (as opposed to binary)
+
+
+## * Gets the current file logging configuration.
+proc fileConfig*(): ptr LogFileConfiguration {.importc: "CBLLog_FileConfig", dynlib: "CouchbaseLite.dylib".}
+
+## * Sets the file logging configuration.
+proc setFileConfig*(a1: LogFileConfiguration) {.importc: "CBLLog_SetFileConfig", dynlib: "CouchbaseLite.dylib".}
+
+
+
+
+
+##
 ##  CBLDatabase.h
 ##
 ##  Copyright (c) 2018 Couchbase, Inc All rights reserved.
@@ -334,7 +424,7 @@ type
   DatabaseConfiguration* = object
     directory*: cstring        ## The parent directory of the database
     flags*: DatabaseFlags      ## Options for opening the database
-    encryptionKey*: EncryptionKey ## The database's encryption key (if any)
+    encryptionKey*: ptr EncryptionKey ## The database's encryption key (if any)
 
 
 
@@ -737,6 +827,7 @@ proc write*(writer: ptr BlobWriteStream; data: pointer; length: csize_t; outErro
 ##         You should then add the blob to a mutable document as a property -- see
 ##         \ref FLMutableDict_SetBlob and \ref FLMutableArray_SetBlob.
 proc createBlobWithStream*(contentType: cstring; writer: ptr BlobWriteStream): Blob {.importc: "CBLBlob_CreateWithStream", dynlib: "CouchbaseLite.dylib".}
+proc createBlobWithStream_s*(contentType: cstring; writer: ptr BlobWriteStream): Blob {.importc: "CBLBlob_CreateWithStream", dynlib: "CouchbaseLite.dylib".}
 
 ## Returns true if a value in a document is a blob reference.
 ##         If so, you can call \ref FLValue_GetBlob to access it.
@@ -747,59 +838,9 @@ proc isBlob*(v: Value): bool {.inline.} =
 proc getBlob*(value: Value): Blob {.inline.} =
   return getBlob(asDict(value))
 
-## Stores a blob in a mutable array.
-proc setBlob*(array: MutableArray; index: uint32; blob: Blob) {.importc: "FLMutableArray_SetBlob", dynlib: "CouchbaseLite.dylib".}
+## Stores a blob in a mutable array or dictionary.
+proc setBlob*(slot: Slot; blob: Blob) {.importc: "FLSlot_SetBlob", dynlib: "CouchbaseLite.dylib".}
 
-## Stores a blob in a mutable dictionary.
-proc setBlob*(dict: MutableDict; key: FLString; blob: Blob) {.importc: "FLMutableDict_SetBlob", dynlib: "CouchbaseLite.dylib".}
-
-##
-##  CBLLog.h
-##
-##  Copyright © 2019 Couchbase. All rights reserved.
-##
-##  Licensed under the Apache License, Version 2.0 (the "License");
-##  you may not use this file except in compliance with the License.
-##  You may obtain a copy of the License at
-##
-##  http://www.apache.org/licenses/LICENSE-2.0
-##
-##  Unless required by applicable law or agreed to in writing, software
-##  distributed under the License is distributed on an "AS IS" BASIS,
-##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-##  See the License for the specific language governing permissions and
-##  limitations under the License.
-##
-## \name  Public API
-## An object containing properties for file logging configuration
-##                     it off in production.
-type
-  LogFileConfiguration* {.bycopy.} = object
-    directory*: cstring        ## The directory to write logs to (UTF-8 encoded)
-    maxRotateCount*: uint32   ## The maximum number of *rotated* logs to keep (i.e. the total number of logs will be one more)
-    maxSize*: csize_t            ## The max size to write to a log file before rotating (best-effort)
-    usePlaintext*: bool        ## Whether or not to log in plaintext (as opposed to binary)
-
-
-## A callback function for handling log messages
-type
-  LogCallback* = proc (level: LogLevel; domain: LogDomain; message: cstring)
-
-## Gets the current log level for debug console logging
-proc consoleLevel*(): LogLevel {.importc: "CBLLog_ConsoleLevel", dynlib: "CouchbaseLite.dylib".}
-
-## Sets the debug console log level
-proc setConsoleLevel*(a1: LogLevel) {.importc: "CBLLog_SetConsoleLevel", dynlib: "CouchbaseLite.dylib".}
-
-## Gets the current file logging config
-proc fileConfig*(): ptr LogFileConfiguration {.importc: "CBLLog_FileConfig", dynlib: "CouchbaseLite.dylib".}
-
-## Sets the file logging configuration
-proc setFileConfig*(a1: LogFileConfiguration) {.importc: "CBLLog_SetFileConfig", dynlib: "CouchbaseLite.dylib".}
-proc getCallback*(): LogCallback {.importc: "CBLLog_GetCallback", dynlib: "CouchbaseLite.dylib".}
-
-## Sets the callback for receiving log messages
-proc setCallback*(a1: LogCallback) {.importc: "CBLLog_SetCallback", dynlib: "CouchbaseLite.dylib".}
 
 
 
@@ -925,6 +966,19 @@ proc valueAtIndex*(a1: ResultSet; index: cuint): Value {.importc: "CBLResultSet_
 ##     the column is a property that doesn't exist in the document. (Or, of course, if the key
 ##     is not a column name in this query.)
 proc valueForKey*(a1: ResultSet; key: cstring): Value {.importc: "CBLResultSet_ValueForKey", dynlib: "CouchbaseLite.dylib".}
+
+## Returns the current result as an array of column values.
+##    @warning The array reference is only valid until the result-set is advanced or released.
+##            If you want to keep it for longer, call \ref FLArray_Retain (and release it when done.)
+proc rowArray*(rs: ResultSet): Array {.importc: "CBLResultSet_RowArray", dynlib: "CouchbaseLite.dylib".}
+
+## Returns the current result as a dictionary mapping column names to values.
+##    @warning The dict reference is only valid until the result-set is advanced or released.
+##            If you want to keep it for longer, call \ref FLDict_Retain (and release it when done.)
+proc rowDict*(rs: ResultSet): Dict {.importc: "CBLResultSet_RowDict", dynlib: "CouchbaseLite.dylib".}
+
+## Returns the Query that created this ResultSet.
+proc getQuery*(rs: ResultSet): Query {.importc: "CBLResultSet_GetQuery", dynlib: "CouchbaseLite.dylib".}
 
 ## \name  Change listener
 ##     Adding a change listener to a query turns it into a "live query". When changes are made to
