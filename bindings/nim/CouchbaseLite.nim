@@ -1,3 +1,13 @@
+## *** NOTE: DO NOT MACHINE-UPDATE THIS FILE ***
+##
+## This started out as a machine-generated file (produced by `gen-bindings.sh`),
+## but it has been hand-edited to fix issues that kept it from compiling.
+##
+## If you run the script again, it will generate a _new_ file `CouchbaseLite-new.nim`.
+## You'll need to merge new/changed declarations from that file into this one, by hand.
+
+
+
 ##
 ##  CBLBase.h
 ##
@@ -16,7 +26,7 @@
 ##  limitations under the License.
 ##
 import Fleece
-import CBL_Compat
+
 ## \defgroup errors   Errors
 ##     Types and constants for communicating errors from API calls.
 ## Error domains, serving as namespaces for numeric error codes.
@@ -100,8 +110,8 @@ type
 
 ## Returns a message describing an error.
 proc message*(a1: var Error): cstring {.importc: "CBLError_Message", dynlib: "CouchbaseLite.dylib".}
-  
-  
+
+
 ## \defgroup logging   Logging
 ##     Managing messages that Couchbase Lite logs at runtime.
 ## Subsystems that log information.
@@ -121,7 +131,7 @@ proc setLogLevel*(a1: LogLevel; a2: LogDomain) {.importc: "CBL_SetLogLevel", dyn
 
 ## Logs a message
 proc log*(a1: LogDomain; a2: LogLevel; format: cstring) {.varargs, importc: "CBL_Log", dynlib: "CouchbaseLite.dylib".}
-  
+
 ## \defgroup other_types   Other Types
 ## A date/time representation used for document expiration (and in date/time queries.)
 ##     Measured in milliseconds since the Unix epoch (1/1/1970, midnight UTC.)
@@ -130,7 +140,7 @@ type
 
 ## Returns the current time, in milliseconds since 1/1/1970.
 proc now*(): Timestamp {.importc: "CBL_Now", dynlib: "CouchbaseLite.dylib".}
-  
+
 ## \defgroup refcounting   Reference Counting
 ##     Couchbase Lite "objects" are reference-counted; the functions below are the shared
 ##     _retain_ and _release_ operations. (But there are type-safe equivalents defined for each
@@ -151,13 +161,13 @@ type
 
 proc retain(a1: RefCounted): RefCounted {.importc: "CBL_Retain", dynlib: "CouchbaseLite.dylib", discardable.}
 proc release(a1: RefCounted) {.importc: "CBL_Release", dynlib: "CouchbaseLite.dylib".}
-  
+
 ## Returns the total number of Couchbase Lite objects. Useful for leak checking.
 proc instanceCount*(): cuint {.importc: "CBL_InstanceCount", dynlib: "CouchbaseLite.dylib".}
-  
+
 ## Logs the class and address of each Couchbase Lite object. Useful for leak checking.
 proc dumpInstances*() {.importc: "CBL_DumpInstances", dynlib: "CouchbaseLite.dylib".}
-  
+
 ##  Declares retain/release functions for TYPE. For internal use only.
 ## \defgroup database  Database
 ## A connection to an open database.
@@ -169,7 +179,7 @@ proc retain*(obj: Database): Database {.inline, discardable.} =
   return obj
 proc release*(obj: Database) {.inline.} =
     release(cast[RefCounted](obj))
-  
+
 
 ## \defgroup documents  Documents
 ## An in-memory copy of a document.
@@ -565,7 +575,7 @@ proc mutableProperties*(a1: Document): MutableDict {.importc: "CBLDocument_Mutab
 ##     Call \ref CBLDatabase_SaveDocument to persist the changes.
 ##            releasing any retained reference(s) you have to it.
 proc setProperties*(a1: Document; properties: MutableDict) {.importc: "CBLDocument_SetProperties", dynlib: "CouchbaseLite.dylib".}
-  
+
 proc createDocumentFleeceDoc*(a1: Document): Doc {.importc: "CBLDocument_CreateFleeceDoc", dynlib: "CouchbaseLite.dylib".}
 
 ## Returns a document's properties as a null-terminated JSON string.

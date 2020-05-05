@@ -1,3 +1,13 @@
+## *** NOTE: DO NOT MACHINE-UPDATE THIS FILE ***
+##
+## This started out as a machine-generated file (produced by `gen-bindings.sh`),
+## but it has been hand-edited to fix issues that kept it from compiling.
+##
+## If you run the script again, it will generate a _new_ file `Fleece-new.nim`.
+## You'll need to merge new/changed declarations from that file into this one, by hand.
+
+
+
 ##
 ##   FLSlice.h
 ##   Fleece
@@ -36,7 +46,7 @@ type
 ## Slice <-> string conversion:
 proc flStr*(str: string): FLSlice =
   FLSlice(buf: cstring(str), size: csize_t(len(str)))
-  
+
 
 ## Equality test of two slices.
 proc equal*(a: FLSlice; b: FLSlice): bool {.importc: "FLSlice_Equal", dynlib: "CouchbaseLite.dylib".}
@@ -50,7 +60,7 @@ proc newSliceResult*(a1: csize_t): FLSliceResult {.importc: "FLSliceResult_New",
 
 ## Allocates an FLSliceResult, copying the given slice.
 proc copy*(a1: FLSlice): FLSliceResult {.importc: "FLSlice_Copy", dynlib: "CouchbaseLite.dylib".}
-  
+
 proc internalFLBufRetain(a1: pointer) {.importc: "_FLBuf_Retain", dynlib: "CouchbaseLite.dylib".}
 proc internalFLBufRelease(a1: pointer) {.importc: "_FLBuf_Release", dynlib: "CouchbaseLite.dylib".}
 
@@ -102,11 +112,11 @@ type
   Slot* = ptr InternalFLSlot ## A reference to a mutable array/dict item
   MutableArray* = ptr InternalFLArray ## A reference to a mutable array.
   MutableDict* = ptr InternalFLDict ## A reference to a mutable dictionary.
-  
+
 ## Error codes returned from some API calls.
 type
   FLError* {.size: sizeof(cint).} = enum
-    NoError = 0, 
+    NoError = 0,
     MemoryError,             ##  Out of memory, or allocation failed
     OutOfRange,              ##  Array index or iterator out of range
     InvalidData,             ##  Bad input data (NaN, non-string key, etc.)
@@ -216,8 +226,8 @@ proc dump*(a1: Value): cstring {.importc: "FLDump", dynlib: "CouchbaseLite.dylib
 
 ## Debugging function that returns a C string of JSON. Does not free the string's memory!
 proc dumpData*(data: FLSlice): cstring {.importc: "FLDumpData", dynlib: "CouchbaseLite.dylib".}
-  
-  
+
+
 
 ## ////// VALUE
 ##         The core Fleece data type is FLValue: a reference to a value in Fleece-encoded data.
@@ -365,8 +375,8 @@ proc setString*(a1: Slot; a2: FLString) {.importc: "FLSlot_SetString", dynlib: "
 proc setData*(a1: Slot; a2: FLSlice) {.importc: "FLSlot_SetData", dynlib: "CouchbaseLite.dylib".} ## Stores a data blob into a slot.
 
 proc setValue*(a1: Slot; a2: Value) {.importc: "FLSlot_SetValue", dynlib: "CouchbaseLite.dylib".} ## Stores an FLValue into a slot.
-  
-  
+
+
 
 ## ////// ARRAY
 ##         FLArray is a "subclass" of FLValue, representing values that are arrays. It's always OK to
@@ -427,9 +437,9 @@ proc getCount*(a1: ptr ArrayIterator): uint32 {.importc: "FLArrayIterator_GetCou
 
 ## Advances the iterator to the next value, or returns false if at the end.
 proc next*(a1: ptr ArrayIterator): bool {.importc: "FLArrayIterator_Next", dynlib: "CouchbaseLite.dylib".}
-  
-  
-  
+
+
+
 ## ////// MUTABLE ARRAY
 
 
@@ -501,9 +511,9 @@ proc getMutableArray*(a1: MutableArray; index: uint32): MutableArray {.importc: 
 ##         - If the value is an immutable array, this function makes a mutable copy, assigns the
 ##           copy as the property value, and returns the copy.
 proc getMutableDict*(a1: MutableArray; index: uint32): MutableDict {.importc: "FLMutableArray_GetMutableDict", dynlib: "CouchbaseLite.dylib".}
-  
-  
-  
+
+
+
 ## ////// DICT
 
 ## Returns the number of items in a dictionary, or 0 if the pointer is NULL.
@@ -591,9 +601,9 @@ proc getString*(a1: ptr DictKey): FLString {.importc: "FLDictKey_GetString", dyn
 ## Looks up a key in a dictionary using an FLDictKey. If the key is found, "hint" data will
 ##         be stored inside the FLDictKey that will speed up subsequent lookups.
 proc getWithKey*(a1: Dict; a2: ptr DictKey): Value {.importc: "FLDict_GetWithKey", dynlib: "CouchbaseLite.dylib".}
-  
-  
-  
+
+
+
 ## ////// MUTABLE DICT
 
 ## Creates a new mutable Dict that's a copy of the source Dict.
@@ -649,16 +659,16 @@ proc getMutableArray*(a1: MutableDict; key: FLString): MutableArray {.importc: "
 ##         - If the value is an immutable dict, this function makes a mutable copy, assigns the
 ##           copy as the property value, and returns the copy.
 proc getMutableDict*(a1: MutableDict; key: FLString): MutableDict {.importc: "FLMutableDict_GetMutableDict", dynlib: "CouchbaseLite.dylib".}
-  
-  
-  
+
+
+
 ## ////// DEEP ITERATOR
 
 ##         A deep iterator traverses every value contained in a dictionary, in depth-first order.
 ##         You can skip any nested collection by calling FLDeepIterator_SkipChildren.
 type
   DeepIterator* = ptr InternalFLDeepIterator  ## A reference to a deep iterator.
-  
+
 ## Creates a FLDeepIterator to iterate over a dictionary.
 ##         Call FLDeepIterator_GetKey and FLDeepIterator_GetValue to get the first item,
 ##         then FLDeepIterator_Next.
@@ -695,9 +705,9 @@ proc getPathString*(a1: DeepIterator): FLSliceResult {.importc: "FLDeepIterator_
 
 ## Returns the current path in JSONPointer format (RFC 6901).
 proc getJSONPointer*(a1: DeepIterator): FLSliceResult {.importc: "FLDeepIterator_GetJSONPointer", dynlib: "CouchbaseLite.dylib".}
-  
-  
-  
+
+
+
 ## ////// PATH
 
 ##      An FLKeyPath Describes a location in a Fleece object tree, as a path from the root that follows
@@ -729,9 +739,9 @@ proc eval*(a1: KeyPath; root: Value): Value {.importc: "FLKeyPath_Eval", dynlib:
 ##         If you only need to evaluate the path once, this is a bit faster than creating an
 ##         FLKeyPath object, evaluating, then freeing it.
 proc evalOnce*(specifier: FLSlice; root: Value; error: var FLError): Value {.importc: "FLKeyPath_EvalOnce", dynlib: "CouchbaseLite.dylib".}
-  
-  
-  
+
+
+
 ## ////// SHARED KEYS
 
 proc createSharedKeys*(): SharedKeys {.importc: "FLSharedKeys_Create", dynlib: "CouchbaseLite.dylib".}
@@ -742,9 +752,9 @@ proc getStateData*(a1: SharedKeys): FLSliceResult {.importc: "FLSharedKeys_GetSt
 proc encode*(a1: SharedKeys; a2: FLString; add: bool): cint {.importc: "FLSharedKeys_Encode", dynlib: "CouchbaseLite.dylib".}
 proc decode*(a1: SharedKeys; key: cint): FLString {.importc: "FLSharedKeys_Decode", dynlib: "CouchbaseLite.dylib".}
 proc count*(a1: SharedKeys): cuint {.importc: "FLSharedKeys_Count", dynlib: "CouchbaseLite.dylib".}
-  
-  
-  
+
+
+
 ## ////// ENCODER
 
 ##         An FLEncoder generates encoded Fleece or JSON data. It's sort of a structured output stream,
@@ -925,9 +935,9 @@ proc getError*(a1: Encoder): FLError {.importc: "FLEncoder_GetError", dynlib: "C
 
 ## Returns the error message of an encoder, or NULL if there's no error.
 proc getErrorMessage*(a1: Encoder): cstring {.importc: "FLEncoder_GetErrorMessage", dynlib: "CouchbaseLite.dylib".}
-  
-  
-  
+
+
+
 ## ////// JSON DELTA COMPRESSION
 
 ##         These functions implement a fairly-efficient "delta" encoding that encapsulates the changes
