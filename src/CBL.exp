@@ -176,6 +176,8 @@ _CBLReplicator_AddDocumentListener
 
 _CBLDefaultConflictResolver
 
+_kCBLAuthDefaultCookieName
+_CBLDefaultConflictResolver
 
 #  Fleece.exp
 

@@ -20,6 +20,9 @@
 #include "CBLReplicator_Internal.hh"
 
 
+const char* const kCBLAuthDefaultCookieName = "SyncGatewaySession";
+
+
 CBLEndpoint* CBLEndpoint_NewWithURL(const char *url _cbl_nonnull) CBLAPI {
     return CBLEndpoint_NewWithURL_s(slice(url));
 }

@@ -33,7 +33,7 @@ extern "C" {
     @{ */
 
 /** The name of the HTTP cookie used by Sync Gateway to store session keys. */
-CBL_CORE_API extern const char* kCBLAuthDefaultCookieName;
+CBL_CORE_API extern const char* const kCBLAuthDefaultCookieName;
 
 /** An opaque object representing the location of a database to replicate with. */
 typedef struct CBLEndpoint CBLEndpoint;
