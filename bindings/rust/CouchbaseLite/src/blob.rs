@@ -26,8 +26,8 @@ impl Blob {
         }
     }
 
-    /** Creates a new blob from data that has has been written to a \ref Writeer.
-        You should then add the blob to a document as a property, using \ref Slot::put_blob. */
+    /** Creates a new blob from data that has has been written to a [`Writer`].
+        You should then add the blob to a document as a property, using [`Slot::put_blob`]. */
     pub fn new_from_stream(mut stream: BlobWriter, content_type: &str) -> Blob {
         unsafe {
             let blob = CBLBlob_CreateWithStream_s(as_slice(content_type), stream._stream_ref);
@@ -37,7 +37,7 @@ impl Blob {
     }
 
     // called by FleeceReference::as_blob()
-    fn from_value<V: FleeceReference>(value: &V) -> Option<Blob> {
+    pub(crate) fn from_value<V: FleeceReference>(value: &V) -> Option<Blob> {
         unsafe {
             let blob = CBLBlob_Get(FLValue_AsDict(value._fleece_ref()));
             return if blob.is_null() {None} else {Some(Blob{_ref: blob})};
@@ -145,8 +145,8 @@ impl<'r> Drop for BlobReader<'r> {
 
 
 /** A stream for writing data that will become a Blob's contents.
-    After you're done writing the data, call \ref Blob::new_from_stream,
-    then add the Blob to a document property via \ref Slot::put_blob. */
+    After you're done writing the data, call [`Blob::new_from_stream`],
+    then add the Blob to a document property via [`Slot::put_blob`]. */
 pub struct BlobWriter<'d> {
     _stream_ref: *mut CBLBlobWriteStream,
     db: PhantomData<&'d mut Database>

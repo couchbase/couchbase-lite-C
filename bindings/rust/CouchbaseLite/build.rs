@@ -11,16 +11,16 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 
-static STATIC_LIB : bool = false;
+static INCLUDE_CBL_IN_LIB : bool = false;
 
 fn main() {
     let root_dir = PathBuf::from("../../..");  // The root of the couchbase-lite-c repo
     let cbl_headers = root_dir.join("include/cbl");
     let fleece_headers = root_dir.join("vendor/couchbase-lite-core/vendor/fleece/API");
-    
+
     //FIXME: Don't hardcode a path from my system!
     let default_libclang_path = PathBuf::from("/usr/local/Cellar/llvm/10.0.0_3/lib");
-    
+
     if env::var("LIBCLANG_PATH").is_err() {
         // Set LIBCLANG_PATH environment variable if it's not already set:
         let path_str = default_libclang_path.to_str().unwrap();
@@ -57,31 +57,35 @@ fn main() {
     bindings
         .write_to_file(out_dir.join("bindings.rs"))
         .expect("Couldn't write bindings!");
-    
+
     // Tell cargo to tell rustc to link the CouchbaseLiteC shared library.
     //TODO: Abort the build now if the library does not exist, and tell the user to run CMake.
     let root = root_dir.to_str().unwrap();
-    
-    if STATIC_LIB {
+
+    if INCLUDE_CBL_IN_LIB {
         println!("cargo:rustc-link-search={}/build_cmake", root);
         println!("cargo:rustc-link-search={}/build_cmake/vendor/couchbase-lite-core", root);
-        println!("cargo:rustc-link-search={}/build_cmake/vendor/couchbase-lite-core/vendor/fleece", root);
         println!("cargo:rustc-link-search={}/build_cmake/vendor/couchbase-lite-core/vendor/BLIP-Cpp", root);
+        println!("cargo:rustc-link-search={}/build_cmake/vendor/couchbase-lite-core/vendor/fleece", root);
         println!("cargo:rustc-link-search={}/build_cmake/vendor/couchbase-lite-core/vendor/mbedtls/library", root);
+        println!("cargo:rustc-link-search={}/build_cmake/vendor/couchbase-lite-core/vendor/sqlite3-unicodesn", root);
 
         println!("cargo:rustc-link-lib=static=CouchbaseLiteCStatic");
         println!("cargo:rustc-link-lib=static=FleeceStatic");
-    
+
         println!("cargo:rustc-link-lib=static=liteCoreStatic");
         println!("cargo:rustc-link-lib=static=liteCoreWebSocket");
+        println!("cargo:rustc-link-lib=static=SQLite3_UnicodeSN");
         println!("cargo:rustc-link-lib=static=BLIPStatic");
         println!("cargo:rustc-link-lib=static=mbedtls");
         println!("cargo:rustc-link-lib=static=mbedcrypto");
-    
+
         println!("cargo:rustc-link-lib=c++");
         println!("cargo:rustc-link-lib=z");
-    
+
         println!("cargo:rustc-link-lib=framework=CoreFoundation");
+        println!("cargo:rustc-link-lib=framework=Foundation");
+        println!("cargo:rustc-link-lib=framework=CFNetwork");
         println!("cargo:rustc-link-lib=framework=Security");
         println!("cargo:rustc-link-lib=framework=SystemConfiguration");
     } else {
@@ -94,7 +98,7 @@ fn main() {
         println!("cargo:rustc-link-search={}", out_dir.to_str().unwrap());
         println!("cargo:rustc-link-lib=dylib=CouchbaseLiteC");
     }
-    
+
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=wrapper.h");
 }

@@ -23,9 +23,9 @@ pub struct Query {
 impl Query {
     /** Creates a new query by compiling the input string.
         This is fast, but not instantaneous. If you need to run the same query many times, keep the
-        \ref Query around instead of compiling it each time. If you need to run related queries
+        `Query` around instead of compiling it each time. If you need to run related queries
         with only some values different, create one query with placeholder parameter(s), and substitute
-        the desired value(s) with \ref set_parameters before each time you run the query. */
+        the desired value(s) with `set_parameters` before each time you run the query. */
     pub fn new(db: &Database, language: QueryLanguage, str: &str) -> Result<Query> {
         unsafe {
             let mut pos: i32 = 0;
@@ -59,7 +59,7 @@ impl Query {
     }
 
     /** Assigns values to the query's parameters, from JSON data.
-        See \ref set_parameters for details. */
+        See `set_parameters` for details. */
     pub fn set_parameters_json(&self, json: &str) {
         unsafe { CBLQuery_SetParametersAsJSON_s(self._ref, as_slice(json)); }
     }
@@ -72,8 +72,8 @@ impl Query {
         unsafe { CBLQuery_Explain(self._ref).to_string().unwrap() }
     }
 
-    /** Runs the query, returning the results as a \ref ResultSet object, which is an iterator
-        of \ref Row objects, each of which has column values. */
+    /** Runs the query, returning the results as a `ResultSet` object, which is an iterator
+        of `Row` objects, each of which has column values. */
     pub fn execute(&self) -> Result<ResultSet> {
         unsafe {
             let mut err = CBLError::default();
@@ -169,7 +169,7 @@ impl<'r> Row<'r> {
                        _owner: PhantomData} }
     }
 
-    /** Returns the number of columns. (This is the same as \ref Query::column_count.) */
+    /** Returns the number of columns. (This is the same as `Query`::column_count.) */
     pub fn column_count(&self) -> isize {
         unsafe {
             let query = CBLResultSet_GetQuery(self.results._ref);

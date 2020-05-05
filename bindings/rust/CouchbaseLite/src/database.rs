@@ -36,9 +36,10 @@ impl Database {
     //////// CONSTRUCTORS:
 
 
-    /** Opens a database, or creates it if it doesn't exist yet, returning a new \ref CBLDatabase
+    /** Opens a database, or creates it if it doesn't exist yet, returning a new `Database`
         instance.
-        It's OK to open the same database file multiple times. Each \ref CBLDatabase instance is
+
+        It's OK to open the same database file multiple times. Each `Database` instance is
         independent of the others (and must be separately closed and released.) */
     pub fn open(name: &str, config: Option<DatabaseConfiguration>) -> Result<Database> {
         unsafe {
@@ -106,7 +107,7 @@ impl Database {
 
 
     /** Compacts a database file, freeing up unused disk space. */
-    pub fn compact(&self) -> Result<()> {
+    pub fn compact(&mut self) -> Result<()> {
         unsafe {
             return check_bool(|error| CBLDatabase_Compact(self._ref, error));
         }
@@ -115,7 +116,7 @@ impl Database {
 
      /** Invokes the callback as a batch operation, similar to a transaction.
          - Multiple writes are much faster when grouped inside a single batch.
-         - Changes will not be visible to other CBLDatabase instances on the same database until
+         - Changes will not be visible to other Database instances on the same database until
                 the batch operation ends.
          - Batch operations can nest. Changes are not committed until the outer batch ends. */
    pub fn in_batch<T>(&self, callback: fn()->T) -> Result<T> {
@@ -174,13 +175,13 @@ impl Database {
     /** Switches the database to buffered-notification mode. Notifications for objects belonging
         to this database (documents, queries, replicators, and of course the database) will not be
         called immediately; your callback function will be called instead. You can then call
-        \ref send_notifications when you're ready. */
+        `send_notifications` when you're ready. */
     pub fn buffer_notifications(&self, _callback: fn(&Database)) {
         todo!()
     }
 
     /** Immediately issues all pending notifications for this database, by calling their listener
-        callbacks. (Only useful after \ref buffer_notifications has been called.) */
+        callbacks. (Only useful after `buffer_notifications` has been called.) */
    pub fn send_notifications(&self) {
         unsafe {
             CBLDatabase_SendNotifications(self._ref);

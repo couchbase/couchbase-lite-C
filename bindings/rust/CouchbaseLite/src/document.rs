@@ -42,11 +42,11 @@ impl Database {
     }
 
     /** Saves a new or modified document to the database.
-        If a conflicting revision has been saved since \p doc was loaded, the \p concurrency
+        If a conflicting revision has been saved since `doc` was loaded, the `concurrency`
         parameter specifies whether the save should fail, or the conflicting revision should
         be overwritten with the revision being saved.
-        If you need finer-grained control, call \ref CBLDatabase_SaveDocumentResolving instead. */
-    pub fn save_document(&self,
+        If you need finer-grained control, call `save_document_resolving` instead. */
+    pub fn save_document(&mut self,
                          doc: &mut Document,
                          concurrency: ConcurrencyControl)
                          -> Result<Document>
@@ -61,10 +61,10 @@ impl Database {
         }
     }
 
-    /** Saves a new or modified document to the database. This function is the same as \ref
-        save_document, except that it allows for custom conflict handling in the event
-        that the document has been updated since \p doc was loaded. */
-    pub fn save_document_resolving(&self,
+    /** Saves a new or modified document to the database. This function is the same as
+        `save_document`, except that it allows for custom conflict handling in the event
+        that the document has been updated since `doc` was loaded. */
+    pub fn save_document_resolving(&mut self,
                                    _doc: &mut Document,
                                    _conflict_handler: SaveConflictHandler)
                                    -> Result<Document>
@@ -72,14 +72,14 @@ impl Database {
         todo!()
     }
 
-    pub fn purge_document_by_id(&self, id: &str) -> Result<()> {
+    pub fn purge_document_by_id(&mut self, id: &str) -> Result<()> {
         unsafe {
             return check_bool(|error| CBLDatabase_PurgeDocumentByID_s(self._ref, as_slice(id), error));
         }
     }
 
     /** Returns the time, if any, at which a given document will expire and be purged.
-        Documents don't normally expire; you have to call \ref set_document_expiration
+        Documents don't normally expire; you have to call `set_document_expiration`
         to set a document's expiration time. */
     pub fn document_expiration(&self, doc_id: &str) -> Result<Option<Timestamp>> {
         unsafe {
@@ -96,7 +96,7 @@ impl Database {
     }
 
     /** Sets or clears the expiration time of a document. */
-    pub fn set_document_expiration(&self, doc_id: &str, when: Option<Timestamp>) -> Result<()> {
+    pub fn set_document_expiration(&mut self, doc_id: &str, when: Option<Timestamp>) -> Result<()> {
         let exp :i64 = match when {
             Some(Timestamp(n)) => n,
             _ => 0,
@@ -168,7 +168,7 @@ impl Document {
     }
 
     /** Returns a document's properties as a dictionary.
-        This dictionary cannot be mutated; call \ref mutable_properties() if you want to make
+        This dictionary cannot be mutated; call `mutable_properties` if you want to make
         changes to the document's properties. */
     pub fn properties<'a>(&'a self) -> Dict {
         unsafe { Dict::wrap(CBLDocument_Properties(self._ref), self) }

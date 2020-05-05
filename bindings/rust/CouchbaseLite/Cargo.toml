@@ -12,4 +12,12 @@ bindgen = "0.53.1"
 
 [lib]
 bench = false
-doctest = false         # TODO: enable
+doctest = false
+crate-type = ["lib", "dylib"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+incremental = false
+# See: https://github.com/johnthagen/min-sized-rust
