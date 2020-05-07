@@ -16,3 +16,4 @@ python/CouchbaseLite/*.c
 # Rust
 Cargo.lock
 bindings/rust/CouchbaseLite/target/
+bindings/nim/bin/
