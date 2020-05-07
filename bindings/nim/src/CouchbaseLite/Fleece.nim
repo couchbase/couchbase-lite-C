@@ -48,7 +48,7 @@ type FleeceErrorCode* = enum
 type FleeceError* = ref object of CatchableError
     code*: FleeceErrorCode
 
-proc throw(flCode: fl.FLError, msg: string) =
+proc throw(flCode: fl.FLError; msg: string) =
     let code = cast[FleeceErrorCode](flCode)
     raise FleeceError(code: code, msg: (if msg != "": msg else: $code))
 
@@ -90,7 +90,7 @@ proc `=destroy`(self: var Fleece) =
 
 type Trust* = enum untrusted, trusted
 
-proc parse*(data: openarray[byte], trust: Trust =untrusted): Fleece =
+proc parse*(data: openarray[byte]; trust: Trust =untrusted): Fleece =
     let flData = asSlice(data).copy()
     let doc = fl.newDocFromResultData(flData, fl.Trust(trust), nil, FLSlice())
     if doc == nil: throw(fl.FLError.InvalidData, "Invalid Fleece data")
@@ -210,15 +210,15 @@ proc get*(d: DictObject, key: var DictKey): Value =
     assert key.initialized, "Uninitialized DictKey"
     fl.getWithKey(d.asDict, addr key.flkey)
 
-proc `[]`*(d: DictObject, key: var DictKey): Value   = d.asDict.get(key)
-proc `[]`*(v: Value, key: var DictKey): Value  = v.asDict[key]
-proc `[]`*(f: Fleece, key: var DictKey): Value = f.asDict[key]
+proc `[]`*(d: DictObject; key: var DictKey): Value   = d.asDict.get(key)
+proc `[]`*(v: Value; key: var DictKey): Value  = v.asDict[key]
+proc `[]`*(f: Fleece; key: var DictKey): Value = f.asDict[key]
 
 
 type KeyPath* = object
     handle: fl.KeyPath
 
-proc `=`(self: var KeyPath, other: KeyPath) {.error.} =
+proc `=`(self: var KeyPath; other: KeyPath) {.error.} =
     free(self.handle)
     self.handle = other.handle
 
@@ -254,7 +254,7 @@ proc `=destroy`(self: var MutableArray) =
 proc newMutableArray*(): MutableArray =
     MutableArray(mval: fl.newMutableArray())
 
-proc mutableCopy*(a: Array, flags: CopyFlags ={}): MutableArray =
+proc mutableCopy*(a: Array; flags: CopyFlags ={}): MutableArray =
     MutableArray(mval: a.mutableCopy(cast[fl.CopyFlags](flags)))
 
 proc wrap*(a: fl.MutableArray): MutableArray =
@@ -267,16 +267,16 @@ proc isChanged*(a: MutableArray): bool  = a.mval.isChanged()
 proc set(s: Slot; v: string)           = set(s, v.asSlice())
 proc set(s: Slot; v: openarray[uint8]) = setData(s, v.asSlice())
 
-proc `[]=`*(a: MutableArray, index: uint32, value: Settable)    = a.mval.set(index).set(value)
-proc insert*(a: MutableArray, value: Settable, index: uint32)   = a.mval.insert(index).set(value)
-proc add*(a: MutableArray, value: Settable)                     = a.mval.append().set(value)
-proc delete*(a: MutableArray, index: uint32)                    = a.mval.remove(index, 1)
+proc `[]=`*(a: MutableArray; index: uint32; value: Settable)    = a.mval.set(index).set(value)
+proc insert*(a: MutableArray; value: Settable; index: uint32)   = a.mval.insert(index).set(value)
+proc add*(a: MutableArray; value: Settable)                     = a.mval.append().set(value)
+proc delete*(a: MutableArray; index: uint32)                    = a.mval.remove(index, 1)
 
 
 ######## MUTABLE DICT
 
 
-proc `=`(self: var MutableDict, other: MutableDict) =
+proc `=`(self: var MutableDict; other: MutableDict) =
     if self.mval != other.mval:
         release(self.mval)
         self.mval = other.mval
@@ -288,7 +288,7 @@ proc `=destroy`(self: var MutableDict) =
 proc newMutableDict*(): MutableDict =
     MutableDict(mval: fl.newMutableDict())
 
-proc mutableCopy*(d: Dict, flags: CopyFlags ={}): MutableDict =
+proc mutableCopy*(d: Dict; flags: CopyFlags ={}): MutableDict =
     MutableDict(mval: d.mutableCopy(cast[fl.CopyFlags](flags)))
 
 proc wrap*(d: fl.MutableDict): MutableDict =
@@ -297,5 +297,5 @@ proc wrap*(d: fl.MutableDict): MutableDict =
 proc source*(d: MutableDict): Dict      = d.mval.getSource()
 proc isChanged*(d: MutableDict): bool   = d.mval.isChanged()
 
-proc `[]=`*(d: MutableDict, key: string, value: Settable)   = d.mval.set(key.asSlice()).set(value)
-proc delete*(d: MutableDict, key: string)                   = d.mval.remove(key.asSlice())
+proc `[]=`*(d: MutableDict; key: string; value: Settable)   = d.mval.set(key.asSlice()).set(value)
+proc delete*(d: MutableDict; key: string)                   = d.mval.remove(key.asSlice())

@@ -1,5 +1,8 @@
 # Smoke-test for Couchbase Lite Nim bindings
 import CouchbaseLite
+import CouchbaseLite/database
+import CouchbaseLite/document
+import CouchbaseLite/errors
 import CouchbaseLite/fleece
 
 import strformat
