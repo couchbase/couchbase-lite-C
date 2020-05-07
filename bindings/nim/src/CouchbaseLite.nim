@@ -43,20 +43,6 @@ type
         BadDocID,            ## Invalid document ID
         CantUpgradeDatabase  ## DB can't be upgraded (might be unsupported dev version)
 
-    ## Fleece error codes, in the Fleece error domain.
-    FleeceErrorCode* = enum
-        FLMemoryError = 1,
-        FLOutOfRange,
-        FLInvalidData,
-        FLEncodeError,
-        FLJSONError,
-        FLUnknownValue,
-        FLInternalError,
-        FLFLNotFound,
-        FLSharedKeysStateError,
-        FLPOSIXError,
-        FLUnsupported
-
     ## Network error codes, in the Network error domain.
     NetworkErrorCode* = enum
         DNSFailure = 1,     ## DNS lookup failed
@@ -133,11 +119,10 @@ type
 
 
 proc `=destroy`(d: var DatabaseObj) =
-    echo "(release DB)"
     release(d.handle)
 
-proc `=`(dst: var DatabaseObj, src: DatabaseObj) =
-    echo "(copy db)" #TEMP
+proc `=`(dst: var DatabaseObj, src: DatabaseObj) {.error.} =
+    echo "can't copy a db"
 
 
 type
@@ -146,36 +131,41 @@ type
         readOnly,           ## Open file read-only
         noUpgrade           ## Disable upgrading an older-version database
     DatabaseFlags* = set[DatabaseFlag]
+
     EncryptionAlgorithm* = enum
         none = 0,
         AES256
     EncryptionKey* = object
         algorithm*: EncryptionAlgorithm ## Encryption algorithm
         bytes*: array[32, uint8]        ## Raw key data
-    DatabaseConfiguration* = ref object
+
+    DatabaseConfiguration* = object
         directory*: string
         flags*: DatabaseFlags
         encryptionKey*: ref EncryptionKey
 
 
-proc openDatabase*(name: string, config: DatabaseConfiguration): Database =
-    var cblConfig: cbl.DatabaseConfiguration
-    var cblKey: cbl.EncryptionKey
-    var configP: ptr cbl.DatabaseConfiguration = nil
-    if config != nil:
-        cblConfig.directory = config.directory
-        cblConfig.flags = cast[cbl.DatabaseFlags](config.flags)
-        if config.encryptionKey != nil:
-            cblKey.algorithm = cast[cbl.EncryptionAlgorithm](config.encryptionKey.algorithm)
-            cblKey.bytes = config.encryptionKey.bytes
-            cblConfig.encryptionKey = addr cblKey
-        configP = addr cblConfig
-
+proc openDB(name: string, configP: ptr cbl.DatabaseConfiguration): Database =
     var err: cbl.Error
     let dbRef = cbl.openDatabase(name, configP, err)
     if dbRef == nil:
         throw(err)
     return Database(handle: dbRef)
+
+proc openDatabase*(name: string, config: DatabaseConfiguration): Database =
+    var cblConfig = cbl.DatabaseConfiguration(
+        directory: config.directory,
+        flags: cast[cbl.DatabaseFlags](config.flags) )
+    var cblKey: cbl.EncryptionKey
+    if config.encryptionKey != nil:
+        cblKey.algorithm = cast[cbl.EncryptionAlgorithm](config.encryptionKey.algorithm)
+        cblKey.bytes = config.encryptionKey.bytes
+        cblConfig.encryptionKey = addr cblKey
+    return openDB(name, addr cblConfig)
+
+proc openDatabase*(name: string): Database =
+    return openDB(name, nil)
+
 
 proc databaseExists*(name: string; inDirectory: string): bool =
     cbl.databaseExists(name, inDirectory)
@@ -217,19 +207,20 @@ type
         handle: cbl.Document
         db: Database
     Document* = ref DocumentObj
+
     MutableDocumentObj* = object of DocumentObj
     MutableDocument* = ref MutableDocumentObj
+
     ConcurrencyControl* {.pure.} = enum LastWriteWins =0, FailOnConflict
     SaveConflictHandler* = proc (documentBeingSaved: MutableDocument;
                                  conflictingDocument: Document): bool
     Timestamp = cbl.Timestamp
 
 proc `=destroy`(d: var DocumentObj) =
-    echo "(release Document)"
     release(d.handle)
 
-proc `=`(dst: var DocumentObj, src: DocumentObj) =
-    echo "(copy doc)" #TEMP
+proc `=`(dst: var DocumentObj, src: DocumentObj) {.error.} =
+    echo "(can't copy a Document)"
 
 #### Database's document-related methods:
 
@@ -238,16 +229,12 @@ proc getDocument*(db: Database; docID: string): Document =
     if doc == nil: return nil
     return Document(handle: doc, db: db)
 
+proc `[]`*(db: Database, docID: string): Document   = db.getDocument(docID)
+
 proc getMutableDocument*(db: Database; docID: string): MutableDocument =
     let doc = getMutableDocument(db.handle, docID)
     if doc == nil: return nil
     return MutableDocument(handle: doc, db: db)
-
-proc saveDocument*(db: Database; doc: MutableDocument; concurrency: ConcurrencyControl): MutableDocument =
-    var err: cbl.Error
-    let newDoc = db.handle.saveDocument(doc.handle, cast[cbl.ConcurrencyControl](concurrency), err)
-    if newDoc == nil: throw(err)
-    return MutableDocument(handle: newDoc, db: db)
 
 proc saveCallback(context: pointer; documentBeingSaved, conflictingDocument: cbl.Document): bool =
     let handler: SaveConflictHandler = (cast[ptr SaveConflictHandler](context))[]
@@ -256,7 +243,13 @@ proc saveCallback(context: pointer; documentBeingSaved, conflictingDocument: cbl
         conflicting = Document(handle: conflictingDocument)
     return handler(MutableDocument(handle: documentBeingSaved), conflicting)
 
-proc saveDocumentResolving*(db: Database; doc: MutableDocument; handler: SaveConflictHandler): MutableDocument =
+proc saveDocument*(db: Database; doc: MutableDocument; concurrency: ConcurrencyControl = LastWriteWins): MutableDocument =
+    var err: cbl.Error
+    let newDoc = db.handle.saveDocument(doc.handle, cast[cbl.ConcurrencyControl](concurrency), err)
+    if newDoc == nil: throw(err)
+    return MutableDocument(handle: newDoc, db: db)
+
+proc saveDocument*(db: Database; doc: MutableDocument; handler: SaveConflictHandler): MutableDocument =
     var err: cbl.Error
     let newDoc = db.handle.saveDocumentResolving(doc.handle, saveCallback, unsafeAddr(handler), err)
     if newDoc == nil: throw(err)
@@ -274,7 +267,7 @@ proc getDocumentExpiration*(db: Database; docID: string): Timestamp =
 proc setDocumentExpiration*(db: Database; docID: string, expiration: Timestamp) =
     checkBool( (err) => db.handle.setDocumentExpiration(docID, expiration, err[]) )
 
-#### Document methods:
+#### Document accessors:
 
 proc id*(doc: Document): string = $(doc.handle.id)
 
@@ -286,7 +279,7 @@ proc sequence*(doc: Document): uint64 = doc.handle.sequence
 
 proc properties*(doc: Document): Dict           = doc.handle.properties
 
-proc `[]`*(doc: Document, key: string): Value    = doc.properties[key]
+proc `[]`*(doc: Document, key: string): Value   = doc.properties[key]
 
 proc propertiesAsJSON*(doc: Document): cstring  = $(doc.handle.propertiesAsJSON)
 
@@ -304,12 +297,14 @@ proc newDocument*(docID: string): MutableDocument =
 proc mutableCopy*(doc: Document): MutableDocument =
     MutableDocument(handle: doc.handle.mutableCopy(), db: doc.db)
 
-proc delete*(doc: MutableDocument; concurrency: ConcurrencyControl) =
+proc delete*(doc: MutableDocument; concurrency: ConcurrencyControl = LastWriteWins) =
     checkBool( (err) => doc.handle.delete(cast[cbl.ConcurrencyControl](concurrency), err[]) )
 
 proc purge*(doc: MutableDocument) =
     checkBool( (err) => doc.handle.purge(err[]) )
 
-proc properties*(doc: MutableDocument): MutableDict         = wrap(doc.handle.mutableProperties)
+proc properties*(doc: MutableDocument): MutableDict =
+    wrap(doc.handle.mutableProperties)
 
-proc `[]=`*(doc: MutableDocument, key: string, value: Settable)    = doc.mutableProperties[key] = value
+proc `[]=`*(doc: MutableDocument, key: string, value: Settable) =
+    doc.mutableProperties[key] = value

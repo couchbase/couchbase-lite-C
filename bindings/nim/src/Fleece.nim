@@ -31,8 +31,26 @@ proc toByteArray(s: FLSlice): seq[uint8] =
 ######## TYPES
 
 
+type FleeceErrorCode* = enum
+    NoError = 0,
+    MemoryError,             ##  Out of memory, or allocation failed
+    OutOfRange,              ##  Array index or iterator out of range
+    InvalidData,             ##  Bad input data (NaN, non-string key, etc.)
+    EncodeError,             ##  Structural error encoding (missing value, too many ends, etc.)
+    JSONError,               ##  Error parsing JSON
+    UnknownValue,            ##  Unparseable data in a Value (corrupt? Or from some distant future?)
+    InternalError,           ##  Something that shouldn't happen
+    NotFound,                ##  Key not found
+    SharedKeysStateError,    ##  Misuse of shared keys (not in transaction, etc.)
+    POSIXError,              ##  POSIX API call failed
+    Unsupported              ##  Operation is unsupported
+
 type FleeceError* = ref object of CatchableError
-    code: fl.FLError
+    code*: FleeceErrorCode
+
+proc throw(flCode: fl.FLError, msg: string) =
+    let code = cast[FleeceErrorCode](flCode)
+    raise FleeceError(code: code, msg: (if msg != "": msg else: $code))
 
 
 type
@@ -41,13 +59,17 @@ type
     Dict*  = fl.Dict
 
     MutableArray* = object
-        array: fl.MutableArray
+        mval: fl.MutableArray
     MutableDict* = object
-        dict: fl.MutableDict
+        mval: fl.MutableDict
 
-    ArrayObject* = Array | MutableArray
-    DictObject* = Dict | MutableDict
+    ArrayObject*  = Array | MutableArray
+    DictObject*   = Dict  | MutableDict
+    ImmutableObject* = Value | Array | Dict
+    MutableObject* = MutableArray | MutableDict
     FleeceObject* = Value | ArrayObject | DictObject
+
+    Settable* = bool | int64 | uint64 | cfloat | cdouble | string | openarray[uint8] | Value
 
 
 ######## FLEECE DOCUMENT
@@ -71,13 +93,13 @@ type Trust* = enum untrusted, trusted
 proc parse*(data: openarray[byte], trust: Trust =untrusted): Fleece =
     let flData = asSlice(data).copy()
     let doc = fl.newDocFromResultData(flData, fl.Trust(trust), nil, FLSlice())
-    if doc == nil: raise FleeceError(code: fl.FLError.InvalidData, msg: "Invalid Fleece data")
+    if doc == nil: throw(fl.FLError.InvalidData, "Invalid Fleece data")
     return Fleece(doc: doc)
 
 proc parseJSON*(json: string): Fleece =
     var err: FLError
     let doc = fl.newDocFromJSON(asSlice(json), err)
-    if doc == nil: raise FleeceError(code: err, msg: "Invalid JSON")
+    if doc == nil: throw(err, "Invalid JSON")
     return Fleece(doc: doc)
 
 proc root*(self: Fleece): Value     = self.doc.getRoot()
@@ -85,25 +107,16 @@ proc asArray*(self: Fleece): Array  = self.root.asArray()
 proc asDict*(self: Fleece): Dict    = self.root.asDict()
 
 
-######## VALUE / ARRAY / DICT:
+######## VALUE
 
+
+proc asValue*(v: ImmutableObject): Value= cast[Value](v)
+proc asValue*(a: MutableArray): Value   = cast[Value](a.mval)
+proc asValue*(d: MutableDict): Value    = cast[Value](d.mval)
 
 type
     Type* = enum undefined = -1, null, bool, number, string, data, array, dict
     Timestamp* = fl.Timestamp
-    ToJSONFlag* = enum JSON5, canonical
-    ToJSONFlags* = set[ToJSONFlag]
-
-proc asValue*(v: FleeceObject): Value   = cast[Value](v)
-
-proc toJSON*(v: FleeceObject, flags: ToJSONFlags ={}): string =
-    fl.toJSONX(v.asValue, ToJSONFlag.JSON5 in flags, ToJSONFlag.canonical in flags).toString()
-
-proc `$`*(v: FleeceObject): string = toJSON(v, {})
-
-
-######## VALUE
-
 
 proc type*(v: Value): Type              = Type(fl.getType(v))
 
@@ -120,13 +133,19 @@ proc asString*(v: Value): string        = fl.asString(v).toString()
 proc asData*(v: Value): seq[uint8]      = fl.asData(v).toByteArray()
 proc asTimestamp*(v: Value): Timestamp  = fl.asTimestamp(v)
 
-proc asValue*(a: MutableArray): Value   = cast[Value](a.array)
-proc asValue*(d: MutableDict): Value    = cast[Value](d.dict)
+type
+    ToJSONFlag* = enum JSON5, canonical
+    ToJSONFlags* = set[ToJSONFlag]
+
+proc toJSON*(v: FleeceObject, flags: ToJSONFlags ={}): string =
+    fl.toJSONX(v.asValue, ToJSONFlag.JSON5 in flags, ToJSONFlag.canonical in flags).toString()
+
+proc `$`*(v: FleeceObject): string      = toJSON(v, {})
 
 ######## ARRAY
 
 proc asArray*(a: Array): Array          = a
-proc asArray*(a: MutableArray): Array   = cast[Array](a.array)
+proc asArray*(a: MutableArray): Array   = cast[Array](a.mval)
 proc asArray*(v: Value): Array          = fl.asArray(v)
 
 proc count*(a: ArrayObject): uint32     = fl.count(a.asArray)
@@ -150,7 +169,7 @@ iterator items*(a: ArrayObject): Value =
 ######## DICT
 
 proc asDict*(d: Dict): Dict                     = d
-proc asDict*(d: MutableDict): Dict              = cast[Dict](d.dict)
+proc asDict*(d: MutableDict): Dict              = cast[Dict](d.mval)
 proc asDict*(v: Value): Dict                    = fl.asDict(v)
 
 proc count*(d: DictObject): uint32              = fl.count(d.asDict)
@@ -209,10 +228,11 @@ proc `=destroy`(self: var KeyPath) =
 proc keyPath*(path: string): KeyPath =
     var err: FLError
     let h = fl.newKeyPath(path.asSlice(), err)
-    if h == nil: raise FleeceError(code: err, msg: "Invalid KeyPath")
+    if h == nil: throw(err, "Invalid KeyPath")
     return KeyPath(handle: h)
 
-proc eval*(path: KeyPath, v: Value): Value = path.handle.eval(v)
+proc eval*(path: KeyPath, v: Value): Value =
+    path.handle.eval(v)
 
 
 ######## MUTABLE ARRAY
@@ -223,61 +243,59 @@ type
     CopyFlags = set[CopyFlag]
 
 proc `=`(self: var MutableArray, other: MutableArray) =
-    if self.array != other.array:
-        release(self.array)
-        self.array = other.array
-    discard retain(self.array)
+    if self.mval != other.mval:
+        release(self.mval)
+        self.mval = other.mval
+    discard retain(self.mval)
 
 proc `=destroy`(self: var MutableArray) =
-    release(self.array)
+    release(self.mval)
 
 proc newMutableArray*(): MutableArray =
-    MutableArray(array: fl.newMutableArray())
+    MutableArray(mval: fl.newMutableArray())
 
 proc mutableCopy*(a: Array, flags: CopyFlags ={}): MutableArray =
-    MutableArray(array: a.mutableCopy(cast[fl.CopyFlags](flags)))
+    MutableArray(mval: a.mutableCopy(cast[fl.CopyFlags](flags)))
 
 proc wrap*(a: fl.MutableArray): MutableArray =
-    MutableArray(array: retain(a))
+    MutableArray(mval: retain(a))
 
-proc source*(a: MutableArray): Array    = a.array.getSource()
-proc isChanged*(a: MutableArray): bool  = a.array.isChanged()
+proc source*(a: MutableArray): Array    = a.mval.getSource()
+proc isChanged*(a: MutableArray): bool  = a.mval.isChanged()
 
 # (extra stuff for Slot to enable use of the Settable type)
 proc set(s: Slot; v: string)           = set(s, v.asSlice())
 proc set(s: Slot; v: openarray[uint8]) = setData(s, v.asSlice())
-type Settable* = bool | int64 | uint64 | cfloat | cdouble | string | openarray[uint8] | Value
 
-proc `[]=`*(a: MutableArray, index: uint32, value: Settable)    = a.array.set(index).set(value)
-proc insert*(a: MutableArray, value: Settable, index: uint32)   = a.array.insert(index).set(value)
-proc add*(a: MutableArray, value: Settable)                     = a.array.append().set(value)
-proc delete*(a: MutableArray, index: uint32)                    = a.array.remove(index, 1)
+proc `[]=`*(a: MutableArray, index: uint32, value: Settable)    = a.mval.set(index).set(value)
+proc insert*(a: MutableArray, value: Settable, index: uint32)   = a.mval.insert(index).set(value)
+proc add*(a: MutableArray, value: Settable)                     = a.mval.append().set(value)
+proc delete*(a: MutableArray, index: uint32)                    = a.mval.remove(index, 1)
 
 
 ######## MUTABLE DICT
 
 
 proc `=`(self: var MutableDict, other: MutableDict) =
-    if self.dict != other.dict:
-        release(self.dict)
-        self.dict = other.dict
-    discard retain(self.dict)
+    if self.mval != other.mval:
+        release(self.mval)
+        self.mval = other.mval
+    discard retain(self.mval)
 
 proc `=destroy`(self: var MutableDict) =
-    release(self.dict)
+    release(self.mval)
 
 proc newMutableDict*(): MutableDict =
-    MutableDict(dict: fl.newMutableDict())
+    MutableDict(mval: fl.newMutableDict())
 
 proc mutableCopy*(d: Dict, flags: CopyFlags ={}): MutableDict =
-    MutableDict(dict: d.mutableCopy(cast[fl.CopyFlags](flags)))
+    MutableDict(mval: d.mutableCopy(cast[fl.CopyFlags](flags)))
 
 proc wrap*(d: fl.MutableDict): MutableDict =
-    MutableDict(dict: retain(d))
+    MutableDict(mval: retain(d))
 
-proc source*(d: MutableDict): Dict      = d.dict.getSource()
-proc isChanged*(d: MutableDict): bool   = d.dict.isChanged()
+proc source*(d: MutableDict): Dict      = d.mval.getSource()
+proc isChanged*(d: MutableDict): bool   = d.mval.isChanged()
 
-
-proc `[]=`*(d: MutableDict, key: string, value: Settable)   = d.dict.set(key.asSlice()).set(value)
-proc delete*(d: MutableDict, key: string)                   = d.dict.remove(key.asSlice())
+proc `[]=`*(d: MutableDict, key: string, value: Settable)   = d.mval.set(key.asSlice()).set(value)
+proc delete*(d: MutableDict, key: string)                   = d.mval.remove(key.asSlice())
