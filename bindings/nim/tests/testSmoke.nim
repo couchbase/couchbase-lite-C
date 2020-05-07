@@ -1,6 +1,6 @@
 # Smoke-test for Couchbase Lite Nim bindings
-import Fleece
 import CouchbaseLite
+import CouchbaseLite/fleece
 
 import strformat
 

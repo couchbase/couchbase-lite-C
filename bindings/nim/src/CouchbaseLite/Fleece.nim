@@ -1,6 +1,6 @@
 # Fleece.nim
 
-import Fleece_raw as fl
+import CouchbaseLite/private/fl
 
 
 ######## SLICES & CONVERSIONS

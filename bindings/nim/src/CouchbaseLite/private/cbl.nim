@@ -30,7 +30,7 @@ const LibName = "libCouchbaseLiteC.dylib"
 ##  See the License for the specific language governing permissions and
 ##  limitations under the License.
 ##
-import Fleece_raw
+import fl
 
 ## \defgroup errors   Errors
 ##     Types and constants for communicating errors from API calls.

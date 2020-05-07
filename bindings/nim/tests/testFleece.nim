@@ -1,6 +1,6 @@
 # fleeceTest
 
-import fleece
+import CouchbaseLite/fleece
 import unittest
 
 

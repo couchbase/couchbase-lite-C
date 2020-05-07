@@ -1,7 +1,7 @@
 # CouchbaseLite.nim
 
-import cbl
-import fleece
+import CouchbaseLite/private/cbl
+import CouchbaseLite/fleece
 
 import strformat
 import sugar
