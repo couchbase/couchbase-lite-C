@@ -1,9 +1,7 @@
 # document.nim
 
+import CouchbaseLite/[database, errors, fleece]
 import CouchbaseLite/private/cbl
-import CouchbaseLite/database
-import CouchbaseLite/errors
-import CouchbaseLite/fleece
 
 import options
 import sugar
@@ -33,6 +31,8 @@ proc `=destroy`(d: var DocumentObj) =
 proc `=`(dst: var DocumentObj, src: DocumentObj) {.error.} =
     echo "(can't copy a Document)"
 
+proc mustBeInDatabase(doc: Document, db: Database) =
+    if doc.db != some(db): throw(ErrorCode.InvalidParameter)
 
 #%%% Database's document-related methods:
 
@@ -58,24 +58,32 @@ proc saveCallback(context: pointer; documentBeingSaved, conflictingDocument: CBL
     return ctx.handler(ctx.doc, conflicting)
 
 proc saveDocument*(db: Database; doc: MutableDocument;
-                   concurrency: ConcurrencyControl = LastWriteWins): MutableDocument =
+                   concurrency: ConcurrencyControl = LastWriteWins): Document {.discardable.} =
     var err: CBLError
     let newDoc = db.handle.saveDocument(doc.handle, cast[CBLConcurrencyControl](concurrency), err)
     if newDoc == nil:
         raise mkError(err)
     else:
-        return MutableDocument(handle: newDoc, db: some(db))
+        return Document(handle: newDoc, db: some(db))
 
-proc saveDocument*(db: Database; doc: MutableDocument; handler: SaveConflictHandler): MutableDocument =
+proc saveDocument*(db: Database; doc: MutableDocument; handler: SaveConflictHandler): Document {.discardable.} =
     var context: SaveContext = (doc, handler)
     var err: CBLError
     let newDoc = db.handle.saveDocumentResolving(doc.handle, saveCallback, addr context, err)
     if newDoc == nil:
         throw(err)
     else:
-        return MutableDocument(handle: newDoc, db: some(db))
+        return Document(handle: newDoc, db: some(db))
 
-proc purgeDocumentByID*(db: Database; docID: string) =
+proc deleteDocument*(db: Database; doc: Document; concurrency: ConcurrencyControl = LastWriteWins) {.discardable.} =
+    doc.mustBeInDatabase(db)
+    checkBool( (err) => doc.handle.delete(cast[CBLConcurrencyControl](concurrency), err[]) )
+
+proc purgeDocument*(db: Database; doc: Document) =
+    doc.mustBeInDatabase(db)
+    checkBool( (err) => doc.handle.purge(err[]) )
+
+proc purgeDocument*(db: Database; docID: string) =
     checkBool( (err) => db.handle.purgeDocumentByID(docID, err[]) )
 
 proc getDocumentExpiration*(db: Database; docID: string): Timestamp =
@@ -102,6 +110,7 @@ proc sequence*(doc: Document): uint64 = doc.handle.sequence
 proc properties*(doc: Document): Dict           = doc.handle.properties
 
 proc `[]`*(doc: Document, key: string): Value   = doc.properties[key]
+proc `[]`*(doc: Document, key: var DictKey): Value  = doc.properties[key]
 
 proc propertiesAsJSON*(doc: Document): cstring  = $(doc.handle.propertiesAsJSON)
 
@@ -115,6 +124,7 @@ proc mkDoc(doc: CBLDocument): MutableDocument =
     if doc == nil:
         throw(CBLError(domain: CBLDomain, code: int32(CBLErrorCode.ErrorMemoryError)))
     else:
+        assert doc.mutableProperties != nil # Make sure it's mutable
         return MutableDocument(handle: doc, db: none(Database))
 
 proc newDocument*(): MutableDocument =
@@ -126,14 +136,8 @@ proc newDocument*(docID: string): MutableDocument =
 proc mutableCopy*(doc: Document): MutableDocument =
     mkDoc(doc.handle.mutableCopy())
 
-proc delete*(doc: MutableDocument; concurrency: ConcurrencyControl = LastWriteWins) =
-    checkBool( (err) => doc.handle.delete(cast[CBLConcurrencyControl](concurrency), err[]) )
-
-proc purge*(doc: MutableDocument) =
-    checkBool( (err) => doc.handle.purge(err[]) )
-
 proc properties*(doc: MutableDocument): MutableDict =
     wrap(doc.handle.mutableProperties)
 
 proc `[]=`*(doc: MutableDocument, key: string, value: Settable) =
-    doc.mutableProperties[key] = value
+    doc.properties[key] = value

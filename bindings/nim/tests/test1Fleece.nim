@@ -30,12 +30,14 @@ suite "Fleece Accessors":
         check t.type == Type.bool
         check not t.isNumber
         check t.asBool == true
+        check t != 1
 
         let f = doc["false"]
         check f != nil
         check f.type == Type.bool
         check not f.isNumber
         check f.asBool == false
+        check f != 0
 
     test "Int":
         check doc.root["integer"].asInt == 1234
@@ -45,7 +47,14 @@ suite "Fleece Accessors":
         check i.isInt
         check not i.isFloat
         check i == doc.root["integer"]
+        check i.asInt == 1234
+        check i.asInt(0'i8) == 127'i8
         check i.asFloat == 1234.0
+        check i.asString == ""
+        check i.asString("nope") == "nope"
+        check i == 1234
+        check i == 1234.0f64
+        check i != 4321
 
     test "Float":
         let f = doc["float"]
@@ -57,17 +66,23 @@ suite "Fleece Accessors":
         check f.asInt == 1234
         check f.asFloat == 1234.56
         check f.asBool == true
+        check f == 1234.56
+        check f != 1234
 
     test "String":
         let s = doc["string"]
         check s != nil
         check s.type == Type.string
         check s.asString == "Hello, World!"
+        check s == "Hello, World!"
+        check s != 0
+        check s != 3.14
 
     test "Undefined":
         let m = doc["MISSING"]
         check m == nil
         check m.type == Type.undefined
+        check m != 0
 
     test "Array":
         let v = doc["array"]
@@ -75,7 +90,7 @@ suite "Fleece Accessors":
         check v.type == Type.array
         let a = v.asArray
         check a != nil
-        check a.count == 6
+        check a.len == 6
         check not a.isEmpty
         check a[0].type == Type.null
         check a[1].type == Type.bool
@@ -125,13 +140,13 @@ suite "Fleece Accessors":
 suite "Mutable Fleece":
     test "mutable array":
         var a = newMutableArray()
-        check a.count == 0
+        check a.len == 0
         check a.isEmpty
         check not a.isChanged
         a.add(17)
         a.add(true)
         a.add("howdy")
-        check a.count == 3
+        check a.len == 3
         check $a == "[17,true,\"howdy\"]"
         a[1] = false
         check $a == "[17,false,\"howdy\"]"
@@ -144,13 +159,13 @@ suite "Mutable Fleece":
 
     test "mutable dict":
         var d = newMutableDict()
-        check d.count == 0
+        check d.len == 0
         check d.isEmpty
         check not d.isChanged
         d["x"] = 17
         d["y"] = true
         d["z"] = "howdy"
-        check d.count == 3
+        check d.len == 3
         check $d == """{"x":17,"y":true,"z":"howdy"}"""
         d["y"] = false
         check $d == """{"x":17,"y":false,"z":"howdy"}"""

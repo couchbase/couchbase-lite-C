@@ -1,7 +1,7 @@
 # Errors
 
-import CouchbaseLite/private/cbl
 import CouchbaseLite/fleece
+import CouchbaseLite/private/cbl
 
 import strformat
 import sugar
@@ -103,6 +103,9 @@ proc mkError*(err: CBLError): Error =
 
 proc throw*(err: CBLError) {.noreturn.} =
     raise mkError(err)
+
+proc throw*(code: ErrorCode) =
+    throw(CBLError(domain: cbl.CBLDomain, code: int32(code)))
 
 proc checkBool*(fn: (ptr CBLError) -> bool) =
     var err: CBLError

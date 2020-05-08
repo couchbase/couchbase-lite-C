@@ -3,12 +3,12 @@
 import CouchbaseLite/database
 import CouchbaseLite/document
 import CouchbaseLite/errors
+import CouchbaseLite/fleece
 import CouchbaseLite/query
 
 
-type
-    Error* = errors.Error
-    Database* = database.Database
-    Document* = document.Document
-    MutableDocument* = document.MutableDocument
-    Query = query.Query
+export database
+export document
+export errors
+export fleece
+export query

@@ -1,11 +1,8 @@
 # Query
 
-import CouchbaseLite/database
-import CouchbaseLite/errors
-import CouchbaseLite/fleece
-
+import CouchbaseLite/[database, errors, fleece]
 import CouchbaseLite/private/cbl
-import CouchbaseLite/private/fl
+import CouchbaseLite/private/fl    # for slice utilities
 
 {.experimental: "notnil".}
 

@@ -46,7 +46,7 @@ type
     MutableObject* = MutableArray | MutableDict
     FleeceObject* = Value | ArrayObject | DictObject
 
-    Settable* = bool | int64 | uint64 | cfloat | cdouble | string | openarray[uint8] | Value
+    Settable* = bool | int64 | uint64 | cfloat | cdouble | string | openarray[uint8] | FleeceObject
 
 
 ######## FLEECE DOCUMENT
@@ -102,13 +102,35 @@ proc isInt*(v: Value): bool             = fl.isInteger(v)
 proc isFloat*(v: Value): bool           = v.isNumber and not v.isInt
 proc isString*(v: Value): bool          = v.type == Type.string
 
+proc asInt*[T](v: Value, dflt: T): T =
+    if not v.isNumber: return dflt
+    let i = fl.asInt(v)
+    try:
+        return T(i);
+    except RangeError:
+        return if i >= 0: high(T) else: low(T)
+
 proc asBool*(v: Value): bool            = fl.asBool(v)
 proc asInt64*(v: Value): int64          = fl.asInt(v)
-proc asInt*(v: Value): int              = int(fl.asInt(v))
+proc asInt*(v: Value): int              = v.asInt(0)
 proc asFloat*(v: Value): float          = fl.asDouble(v)
 proc asString*(v: Value): string        = fl.asString(v).toString()
 proc asData*(v: Value): seq[uint8]      = fl.asData(v).toByteArray()
 proc asTimestamp*(v: Value): Timestamp  = fl.asTimestamp(v)
+
+proc asBool*(v: Value, dflt: bool): bool =
+    if v.type == Type.bool: fl.asBool(v) else: dflt
+proc asFloat*(v: Value, dflt: float): float =
+    if v.isNumber: v.asFloat else: dflt
+proc asString*(v: Value, dflt: string): string =
+    if v.isString: v.asString else: dflt
+proc asTimestamp*(v: Value, dflt: Timestamp): Timestamp  =
+    let t = fl.asTimestamp(v)
+    if ord(t) > 0: t else: dflt
+
+proc `==`*(v: Value, n: int64): bool    = v.isInt and v.asInt == n
+proc `==`*(v: Value, n: float64): bool  = v.isNumber and v.asFloat == n
+proc `==`*(v: Value, str: string): bool = v.isString and v.asString == str
 
 type
     ToJSONFlag* = enum JSON5, canonical
@@ -125,7 +147,7 @@ proc asArray*(a: Array): Array          = a
 proc asArray*(a: MutableArray): Array   = cast[Array](a.mval)
 proc asArray*(v: Value): Array          = fl.asArray(v)
 
-proc count*(a: ArrayObject): uint32     = fl.count(a.asArray)
+proc len*(a: ArrayObject): uint32       = fl.count(a.asArray)
 proc isEmpty*(a: ArrayObject): bool     = fl.isEmpty(a.asArray)
 proc get*(a: ArrayObject, i: uint32): Value = fl.get(a.asArray, i)
 
@@ -149,7 +171,7 @@ proc asDict*(d: Dict): Dict                     = d
 proc asDict*(d: MutableDict): Dict              = cast[Dict](d.mval)
 proc asDict*(v: Value): Dict                    = fl.asDict(v)
 
-proc count*(d: DictObject): uint32              = fl.count(d.asDict)
+proc len*(d: DictObject): uint32                = fl.count(d.asDict)
 proc isEmpty*(d: DictObject): bool              = fl.isEmpty(d.asDict)
 proc get*(d: DictObject, key: string): Value    = fl.get(d.asDict, key.asSlice)
 
@@ -243,6 +265,7 @@ proc isChanged*(a: MutableArray): bool  = a.mval.isChanged()
 # (extra stuff for Slot to enable use of the Settable type)
 proc set(s: Slot; v: string)           = set(s, v.asSlice())
 proc set(s: Slot; v: openarray[uint8]) = setData(s, v.asSlice())
+proc set(s: Slot; v: FleeceObject)     = set(s, v.asValue())
 
 proc `[]=`*(a: MutableArray; index: uint32; value: Settable)    = a.mval.set(index).set(value)
 proc insert*(a: MutableArray; value: Settable; index: uint32)   = a.mval.insert(index).set(value)
