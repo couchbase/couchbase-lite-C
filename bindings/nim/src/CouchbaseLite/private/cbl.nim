@@ -646,21 +646,21 @@ proc sequence*(doc: Document): uint64 {.importc: "CBLDocument_Sequence".}
 ##            underlying dictionary itself is mutable and could be modified through a mutable
 ##            reference obtained via \ref CBLDocument_MutableProperties. If you need to preserve the
 ##            properties, call \ref FLDict_MutableCopy to make a deep copy.
-proc properties*(doc: Document): Dict {.importc: "CBLDocument_Properties".}
+proc properties*(doc: Document): FLDict {.importc: "CBLDocument_Properties".}
 
 ## Returns a mutable document's properties as a mutable dictionary.
 ##     You may modify this dictionary and then call \ref CBLDatabase_SaveDocument to persist the changes.
 ##            same collection returned by \ref CBLDocument_Properties.
 ##             If you need to use any properties after releasing the document, you must retain them
 ##             by calling \ref FLValue_Retain (and of course later release them.)
-proc mutableProperties*(doc: Document): MutableDict {.importc: "CBLDocument_MutableProperties".}
+proc mutableProperties*(doc: Document): FLMutableDict {.importc: "CBLDocument_MutableProperties".}
 
 ## Sets a mutable document's properties.
 ##     Call \ref CBLDatabase_SaveDocument to persist the changes.
 ##            releasing any retained reference(s) you have to it.
-proc setProperties*(doc: Document; properties: MutableDict) {.importc: "CBLDocument_SetProperties".}
+proc setProperties*(doc: Document; properties: FLMutableDict) {.importc: "CBLDocument_SetProperties".}
 
-proc createDocumentFleeceDoc*(doc: Document): Doc {.importc: "CBLDocument_CreateFleeceDoc".}
+proc createDocumentFleeceDoc*(doc: Document): FLDoc {.importc: "CBLDocument_CreateFleeceDoc".}
 
 ## Returns a document's properties as a null-terminated JSON string.
 proc propertiesAsJSON*(doc: Document): cstring {.importc: "CBLDocument_PropertiesAsJSON".}
@@ -761,10 +761,10 @@ var kBlobContentTypeProperty* {.importc: "kCBLBlobContentTypeProperty".}: FLSlic
 ## Returns true if a dictionary in a document is a blob reference.
 ##         If so, you can call \ref CBLBlob_Get to access it.
 ##                 whose value is `"blob"`.
-proc isBlob*(a1: Dict): bool {.importc: "CBL_IsBlob".}
+proc isBlob*(a1: FLDict): bool {.importc: "CBL_IsBlob".}
 
 ## Returns a CBLBlob object corresponding to a blob dictionary in a document.
-proc getBlob*(blobDict: Dict): Blob {.importc: "CBLBlob_Get".}
+proc getBlob*(blobDict: FLDict): Blob {.importc: "CBLBlob_Get".}
 
 ## Returns the length in bytes of a blob's content (from its `length` property).
 proc length*(a1: Blob): uint64 {.importc: "CBLBlob_Length".}
@@ -777,7 +777,7 @@ proc contentType*(a1: Blob): cstring {.importc: "CBLBlob_ContentType".}
 
 ## Returns a blob's metadata. This includes the `digest`, `length` and `content_type`
 ##         properties, as well as any custom ones that may have been added.
-proc properties*(a1: Blob): Dict {.importc: "CBLBlob_Properties".}
+proc properties*(a1: Blob): FLDict {.importc: "CBLBlob_Properties".}
 
 ## Reads the blob's contents into memory and returns them.
 ##         You are responsible for calling \ref FLFLSliceResult_Release on the returned data when done.
@@ -825,15 +825,15 @@ proc createBlobWithStream_s*(contentType: cstring; writer: ptr BlobWriteStream):
 
 ## Returns true if a value in a document is a blob reference.
 ##         If so, you can call \ref FLValue_GetBlob to access it.
-proc isBlob*(v: Value): bool {.inline.} =
+proc isBlob*(v: FLValue): bool {.inline.} =
   return isBlob(asDict(v))
 
 ## Instantiates a \ref CBLBlob object corresponding to a blob dictionary in a document.
-proc getBlob*(value: Value): Blob {.inline.} =
+proc getBlob*(value: FLValue): Blob {.inline.} =
   return getBlob(asDict(value))
 
 ## Stores a blob in a mutable array or dictionary.
-proc setBlob*(slot: Slot; blob: Blob) {.importc: "FLSlot_SetBlob".}
+proc setBlob*(slot: FLSlot; blob: Blob) {.importc: "FLSlot_SetBlob".}
 
 
 
@@ -895,10 +895,10 @@ proc newQuery*(db: Database; language: QueryLanguage; queryFLString: cstring; ou
 ##     to this call should have a key `PARAM` that maps to the value of the parameter.
 ##             keys are the parameter names. (It's easiest to construct this by using the mutable
 ##             API, i.e. calling \ref FLMutableDict_New and adding keys/values.)
-proc setParameters*(query: Query; parameters: Dict) {.importc: "CBLQuery_SetParameters".}
+proc setParameters*(query: Query; parameters: FLDict) {.importc: "CBLQuery_SetParameters".}
 
 ## Returns the query's current parameter bindings, if any.
-proc parameters*(query: Query): Dict {.importc: "CBLQuery_Parameters".}
+proc parameters*(query: Query): FLDict {.importc: "CBLQuery_Parameters".}
 
 ## Assigns values to the query's parameters, from JSON data.
 ##     See \ref CBLQuery_SetParameters for details.
@@ -952,23 +952,23 @@ proc next*(a1: ResultSet): bool {.importc: "CBLResultSet_Next".}
 ## Returns the value of a column of the current result, given its (zero-based) numeric index.
 ##     This may return a NULL pointer, indicating `MISSING`, if the value doesn't exist, e.g. if
 ##     the column is a property that doesn't exist in the document.
-proc valueAtIndex*(a1: ResultSet; index: cuint): Value {.importc: "CBLResultSet_ValueAtIndex".}
+proc valueAtIndex*(a1: ResultSet; index: cuint): FLValue {.importc: "CBLResultSet_ValueAtIndex".}
 
 ## Returns the value of a column of the current result, given its name.
 ##     This may return a NULL pointer, indicating `MISSING`, if the value doesn't exist, e.g. if
 ##     the column is a property that doesn't exist in the document. (Or, of course, if the key
 ##     is not a column name in this query.)
-proc valueForKey*(a1: ResultSet; key: cstring): Value {.importc: "CBLResultSet_ValueForKey".}
+proc valueForKey*(a1: ResultSet; key: cstring): FLValue {.importc: "CBLResultSet_ValueForKey".}
 
 ## Returns the current result as an array of column values.
 ##    @warning The array reference is only valid until the result-set is advanced or released.
 ##            If you want to keep it for longer, call \ref FLArray_Retain (and release it when done.)
-proc rowArray*(rs: ResultSet): Array {.importc: "CBLResultSet_RowArray".}
+proc rowArray*(rs: ResultSet): FLArray {.importc: "CBLResultSet_RowArray".}
 
 ## Returns the current result as a dictionary mapping column names to values.
 ##    @warning The dict reference is only valid until the result-set is advanced or released.
 ##            If you want to keep it for longer, call \ref FLDict_Retain (and release it when done.)
-proc rowDict*(rs: ResultSet): Dict {.importc: "CBLResultSet_RowDict".}
+proc rowDict*(rs: ResultSet): FLDict {.importc: "CBLResultSet_RowDict".}
 
 ## Returns the Query that created this ResultSet.
 proc getQuery*(rs: ResultSet): Query {.importc: "CBLResultSet_GetQuery".}
@@ -1016,7 +1016,7 @@ proc copyCurrentResults*(query: Query; listener: ListenerToken; err: var Error):
 ##     based on SQLite.
 ##
 ##     Two types of indexes are currently supported:
-##  Value indexes speed up queries by making it possible to look up property (or expression)
+##  FLValue indexes speed up queries by making it possible to look up property (or expression)
 ##           values without scanning every document. They're just like regular indexes in SQL or N1QL.
 ##           Multiple expressions are supported; the first is the primary key, second is secondary.
 ##           Expressions must evaluate to scalar types (boolean, number, string).
@@ -1063,7 +1063,7 @@ proc createDatabaseIndex*(db: Database; name: cstring; a3: IndexSpec; err: var E
 proc deleteIndex*(db: Database; name: cstring; err: var Error): bool {.importc: "CBLDatabase_DeleteIndex".}
 
 ## Returns the names of the indexes on this database, as an array of strings.
-proc indexNames*(db: Database): MutableArray {.importc: "CBLDatabase_IndexNames".}
+proc indexNames*(db: Database): FLMutableArray {.importc: "CBLDatabase_IndexNames".}
 
 
 
@@ -1176,13 +1176,13 @@ type
                     ## -- HTTP settings:
     authenticator*: Authenticator ## Authentication credentials, if needed
     proxy*: ptr ProxySettings   ## HTTP client proxy settings
-    headers*: Dict             ## Extra HTTP headers to add to the WebSocket request
+    headers*: FLDict             ## Extra HTTP headers to add to the WebSocket request
                  ## -- TLS settings:
     pinnedServerCertificate*: FLSlice ## An X.509 cert to "pin" TLS connections to (PEM or DER)
     trustedRootCertificates*: FLSlice ## Set of anchor certs (PEM format)
                                   ## -- Filtering:
-    channels*: Array           ## Optional set of channels to pull from
-    documentIDs*: Array        ## Optional set of document IDs to replicate
+    channels*: FLArray           ## Optional set of channels to pull from
+    documentIDs*: FLArray        ## Optional set of document IDs to replicate
     pushFilter*: ReplicationFilter ## Optional callback to filter which docs are pushed
     pullFilter*: ReplicationFilter ## Optional callback to validate incoming docs
     conflictResolver*: ConflictResolver ## Optional conflict-resolver callback
@@ -1270,7 +1270,7 @@ proc getStatus*(a1: Replicator): ReplicatorStatus {.importc: "CBLReplicator_GetS
 ##     \note  Documents that would never be pushed by this replicator, due to its configuration's
 ##            `pushFilter` or `docIDs`, are ignored.
 ##     \warning  You are responsible for releasing the returned array via \ref FLValue_Release.
-proc pendingDocumentIDs*(a1: Replicator; err: var Error): Dict {.importc: "CBLReplicator_PendingDocumentIDs".}
+proc pendingDocumentIDs*(a1: Replicator; err: var Error): FLDict {.importc: "CBLReplicator_PendingDocumentIDs".}
 
 ## Indicates whether the document with the given ID has local changes that have not yet been
 ##     pushed to the server by this replicator.

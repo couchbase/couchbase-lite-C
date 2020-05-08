@@ -23,20 +23,22 @@ type FleeceErrorCode* = enum
 type FleeceError* = ref object of CatchableError
     code*: FleeceErrorCode
 
-proc throw(flCode: fl.FLError; msg: string) =
+proc throw(flCode: FLError; msg: string) =
     let code = cast[FleeceErrorCode](flCode)
     raise FleeceError(code: code, msg: (if msg != "": msg else: $code))
 
 
 type
-    Value* = fl.Value
-    Array* = fl.Array
-    Dict*  = fl.Dict
+    Value* = FLValue
+    Array* = FLArray
+    Dict*  = FLDict
+
+    Slot*  = FLSlot
 
     MutableArray* = object
-        mval: fl.MutableArray
+        mval: FLMutableArray
     MutableDict* = object
-        mval: fl.MutableDict
+        mval: FLMutableDict
 
     ArrayObject*  = Array | MutableArray
     DictObject*   = Dict  | MutableDict
@@ -51,7 +53,7 @@ type
 
 
 type Fleece* = object
-    doc: fl.Doc
+    doc: FLDoc
 
 proc `=`(self: var Fleece, other: Fleece) =
     if self.doc != other.doc:
@@ -67,8 +69,8 @@ type Trust* = enum untrusted, trusted
 
 proc parse*(data: openarray[byte]; trust: Trust =untrusted): Fleece =
     let flData = asSlice(data).copy()
-    let doc = fl.newDocFromResultData(flData, fl.Trust(trust), nil, FLSlice())
-    if doc == nil: throw(fl.FLError.InvalidData, "Invalid Fleece data")
+    let doc = fl.newDocFromResultData(flData, FLTrust(trust), nil, FLSlice())
+    if doc == nil: throw(FLError.InvalidData, "Invalid Fleece data")
     return Fleece(doc: doc)
 
 proc parseJSON*(json: string): Fleece =
@@ -91,7 +93,7 @@ proc asValue*(d: MutableDict): Value    = cast[Value](d.mval)
 
 type
     Type* = enum undefined = -1, null, bool, number, string, data, array, dict
-    Timestamp* = fl.Timestamp
+    Timestamp* = FLTimestamp
 
 proc type*(v: Value): Type              = Type(fl.getType(v))
 
@@ -132,7 +134,7 @@ proc `[]`*(v: Value, i: uint32): Value  = v.asArray[i]
 proc `[]`*(f: Fleece, i: uint32): Value = f.asArray[i]
 
 iterator items*(a: ArrayObject): Value =
-    var i: fl.ArrayIterator
+    var i: FLArrayIterator
     a.asArray.begin(addr i)
     while true:
         let v = getValue(addr i)
@@ -156,7 +158,7 @@ proc `[]`*(v: Value, key: string): Value        = v.asDict[key]
 proc `[]`*(f: Fleece, key: string): Value       = f.asDict[key]
 
 iterator items*(d: DictObject): tuple [key: string, value: Value] =
-    var i: fl.DictIterator
+    var i: FLDictIterator
     d.asDict.begin(addr i)
     while true:
         let v = getValue(addr i)
@@ -170,7 +172,7 @@ type DictKey* = object
     ## A DictKey is a cached dictionary key. It works just like a string, but it's faster because
     ## it can cache the internal representation of the key.
     ## DictKey instances have to be created by the ``dictKey`` function.
-    flkey: fl.DictKey
+    flkey: FLDictKey
     initialized: bool
 
 proc dictKey*(key: string): DictKey =
@@ -191,7 +193,7 @@ proc `[]`*(f: Fleece; key: var DictKey): Value = f.asDict[key]
 
 
 type KeyPath* = object
-    handle: fl.KeyPath
+    handle: FLKeyPath
 
 proc `=`(self: var KeyPath; other: KeyPath) {.error.} =
     free(self.handle)
@@ -232,7 +234,7 @@ proc newMutableArray*(): MutableArray =
 proc mutableCopy*(a: Array; flags: CopyFlags ={}): MutableArray =
     MutableArray(mval: a.mutableCopy(cast[fl.CopyFlags](flags)))
 
-proc wrap*(a: fl.MutableArray): MutableArray =
+proc wrap*(a: FLMutableArray): MutableArray =
     MutableArray(mval: retain(a))
 
 proc source*(a: MutableArray): Array    = a.mval.getSource()
@@ -266,7 +268,7 @@ proc newMutableDict*(): MutableDict =
 proc mutableCopy*(d: Dict; flags: CopyFlags ={}): MutableDict =
     MutableDict(mval: d.mutableCopy(cast[fl.CopyFlags](flags)))
 
-proc wrap*(d: fl.MutableDict): MutableDict =
+proc wrap*(d: FLMutableDict): MutableDict =
     MutableDict(mval: retain(d))
 
 proc source*(d: MutableDict): Dict      = d.mval.getSource()
