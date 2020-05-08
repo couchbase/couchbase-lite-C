@@ -10,7 +10,7 @@
 ##         except I've left out the new "_s"-suffixed alternate functions, which Nim doesn't need.
 
 
-const LibName = "libCouchbaseLiteC.dylib"
+{.push dynlib: "libCouchbaseLiteC.dylib".}
 
 
 ##
@@ -114,8 +114,8 @@ type
 
 
 ## Returns a message describing an error.
-proc message*(err: var Error): cstring {.importc: "CBLError_Message", dynlib: LibName.}
-proc message_s*(err: var Error): FLSliceResult {.importc: "CBLError_Message_s", dynlib: LibName.}
+proc message*(err: var Error): cstring {.importc: "CBLError_Message".}
+proc message_s*(err: var Error): FLSliceResult {.importc: "CBLError_Message_s".}
 
 
 ## \defgroup other_types   Other Types
@@ -125,7 +125,7 @@ type
   Timestamp* = int64
 
 ## Returns the current time, in milliseconds since 1/1/1970.
-proc now*(): Timestamp {.importc: "CBL_Now", dynlib: LibName.}
+proc now*(): Timestamp {.importc: "CBL_Now".}
 
 ## \defgroup refcounting   Reference Counting
 ##     Couchbase Lite "objects" are reference-counted; the functions below are the shared
@@ -145,14 +145,14 @@ proc now*(): Timestamp {.importc: "CBL_Now", dynlib: LibName.}
 type
   RefCounted = ptr object
 
-proc retain(a1: RefCounted): RefCounted {.importc: "CBL_Retain", dynlib: LibName, discardable.}
-proc release(a1: RefCounted) {.importc: "CBL_Release", dynlib: LibName.}
+proc retain(a1: RefCounted): RefCounted {.importc: "CBL_Retain", discardable.}
+proc release(a1: RefCounted) {.importc: "CBL_Release".}
 
 ## Returns the total number of Couchbase Lite objects. Useful for leak checking.
-proc instanceCount*(): cuint {.importc: "CBL_InstanceCount", dynlib: LibName.}
+proc instanceCount*(): cuint {.importc: "CBL_InstanceCount".}
 
 ## Logs the class and address of each Couchbase Lite object. Useful for leak checking.
-proc dumpInstances*() {.importc: "CBL_DumpInstances", dynlib: LibName.}
+proc dumpInstances*() {.importc: "CBL_DumpInstances".}
 
 ## \defgroup database  Database
 ## A connection to an open database.
@@ -257,7 +257,7 @@ type
   ListenerToken* = ptr object
 
 ## Removes a listener callback, given the token that was returned when it was added.
-proc remove*(a1: ListenerToken) {.importc: "CBLListener_Remove", dynlib: LibName.}
+proc remove*(a1: ListenerToken) {.importc: "CBLListener_Remove".}
 
 
 
@@ -311,7 +311,7 @@ type
 ##                  (as set by \ref CBL_SetLogLevel), nothing is logged.
 ##     @param format  A `printf`-style format string. `%` characters in this string introduce parameters,
 ##                  and corresponding arguments must follow.
-proc log*(domain: LogDomain; level: LogLevel; format: cstring) {.varargs, importc: "CBL_Log", dynlib: LibName.}
+proc log*(domain: LogDomain; level: LogLevel; format: cstring) {.varargs, importc: "CBL_Log".}
 
 ## * Writes a pre-formatted message to the log, exactly as given.
 ##     @param domain  The log domain to associate this message with.
@@ -319,7 +319,7 @@ proc log*(domain: LogDomain; level: LogLevel; format: cstring) {.varargs, import
 ##                  (as set by \ref CBL_SetLogLevel), nothing is logged.
 ##     @param message  The exact message to write to the log.
 
-proc logString*(domain: LogDomain; level: LogLevel; message: Slice) {.importc: "CBL_Log_s", dynlib: LibName.}
+proc logString*(domain: LogDomain; level: LogLevel; message: Slice) {.importc: "CBL_Log_s".}
 ## * \name Console Logging and Custom Logging
 ## * A logging callback that the application can register.
 ##     @param domain  The domain of the message; \ref kCBLLogDomainAll if it doesn't fall into a specific domain.
@@ -331,20 +331,20 @@ type
 
 ## * Gets the current log level for debug console logging.
 ##     Only messages at this level or higher will be logged to the console or callback.
-proc consoleLevel*(): LogLevel {.importc: "CBLLog_ConsoleLevel", dynlib: LibName.}
+proc consoleLevel*(): LogLevel {.importc: "CBLLog_ConsoleLevel".}
 
 ## * Sets the detail level of logging.
 ##     Only messages whose level is ≥ the given level will be logged to the console or callback.
-proc setConsoleLevel*(a1: LogLevel) {.importc: "CBLLog_SetConsoleLevel", dynlib: LibName.}
+proc setConsoleLevel*(a1: LogLevel) {.importc: "CBLLog_SetConsoleLevel".}
 
 ## * Returns true if a message with the given domain and level would be logged to the console.
-proc willLogToConsole*(domain: LogDomain; level: LogLevel): bool {.importc: "CBLLog_WillLogToConsole", dynlib: LibName.}
+proc willLogToConsole*(domain: LogDomain; level: LogLevel): bool {.importc: "CBLLog_WillLogToConsole".}
 
 ## * Gets the current log callback.
-proc callback*(): LogCallback {.importc: "CBLLog_Callback", dynlib: LibName.}
+proc callback*(): LogCallback {.importc: "CBLLog_Callback".}
 
 ## * Sets the callback for receiving log messages. If set to NULL, no messages are logged to the console.
-proc setCallback*(a1: LogCallback) {.importc: "CBLLog_SetCallback", dynlib: LibName.}
+proc setCallback*(a1: LogCallback) {.importc: "CBLLog_SetCallback".}
 
 ## * \name Log File Configuration
 ## * The properties for configuring logging to files.
@@ -359,10 +359,10 @@ type
 
 
 ## * Gets the current file logging configuration.
-proc fileConfig*(): ptr LogFileConfiguration {.importc: "CBLLog_FileConfig", dynlib: LibName.}
+proc fileConfig*(): ptr LogFileConfiguration {.importc: "CBLLog_FileConfig".}
 
 ## * Sets the file logging configuration.
-proc setFileConfig*(a1: LogFileConfiguration) {.importc: "CBLLog_SetFileConfig", dynlib: LibName.}
+proc setFileConfig*(a1: LogFileConfiguration) {.importc: "CBLLog_SetFileConfig".}
 
 
 
@@ -431,16 +431,16 @@ type
 ##
 ## Returns true if a database with the given name exists in the given directory.
 ##                         absolute or relative path to the database.
-proc databaseExists*(name: cstring; inDirectory: cstring): bool {.importc: "CBL_DatabaseExists", dynlib: LibName.}
+proc databaseExists*(name: cstring; inDirectory: cstring): bool {.importc: "CBL_DatabaseExists".}
 
 ## Copies a database file to a new location, and assigns it a new internal UUID to distinguish
 ##     it from the original database when replicating.
-proc copyDatabase*(fromPath: cstring; toName: cstring; config: DatabaseConfiguration; err: var Error): bool {.importc: "CBL_CopyDatabase", dynlib: LibName.}
+proc copyDatabase*(fromPath: cstring; toName: cstring; config: DatabaseConfiguration; err: var Error): bool {.importc: "CBL_CopyDatabase".}
 
 ## Deletes a database file. If the database file is open, an error is returned.
 ##                         absolute or relative path to the database.
 ##                 (You can tell the last two cases apart by looking at \p outError.)
-proc deleteDatabase*(name: cstring; inDirectory: cstring; err: var Error): bool {.importc: "CBL_DeleteDatabase", dynlib: LibName.}
+proc deleteDatabase*(name: cstring; inDirectory: cstring; err: var Error): bool {.importc: "CBL_DeleteDatabase".}
 
 ## \name  Database lifecycle
 ##     Opening, closing, and managing open databases.
@@ -449,47 +449,47 @@ proc deleteDatabase*(name: cstring; inDirectory: cstring; err: var Error): bool 
 ##     instance.
 ##     It's OK to open the same database file multiple times. Each \ref CBLDatabase instance is
 ##     independent of the others (and must be separately closed and released.)
-proc openDatabase*(name: cstring; config: ptr DatabaseConfiguration; err: var Error): Database {.importc: "CBLDatabase_Open", dynlib: LibName.}
+proc openDatabase*(name: cstring; config: ptr DatabaseConfiguration; err: var Error): Database {.importc: "CBLDatabase_Open".}
 
 ## Closes an open database.
-proc close*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_Close", dynlib: LibName.}
+proc close*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_Close".}
 
 ## Closes and deletes a database. If there are any other connections to the database,
 ##     an error is returned.
-proc delete*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_Delete", dynlib: LibName.}
+proc delete*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_Delete".}
 
 ## Compacts a database file.
-proc compact*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_Compact", dynlib: LibName.}
+proc compact*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_Compact".}
 
 ## Begins a batch operation, similar to a transaction. You **must** later call \ref
 ##     CBLDatabase_EndBatch to end (commit) the batch.
 ##             the batch operation ends.
-proc beginBatch*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_BeginBatch", dynlib: LibName.}
+proc beginBatch*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_BeginBatch".}
 
 ## Ends a batch operation. This **must** be called after \ref CBLDatabase_BeginBatch.
-proc endBatch*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_EndBatch", dynlib: LibName.}
+proc endBatch*(a1: Database; err: var Error): bool {.importc: "CBLDatabase_EndBatch".}
 
 ## Returns the nearest future time at which a document in this database will expire,
 ##     or 0 if no documents will expire.
-proc nextDocExpiration*(a1: Database): Timestamp {.importc: "CBLDatabase_NextDocExpiration", dynlib: LibName.}
+proc nextDocExpiration*(a1: Database): Timestamp {.importc: "CBLDatabase_NextDocExpiration".}
 
 ## Purges all documents whose expiration time has passed.
-proc purgeExpiredDocuments*(db: Database; err: var Error): int64 {.importc: "CBLDatabase_PurgeExpiredDocuments", dynlib: LibName.}
+proc purgeExpiredDocuments*(db: Database; err: var Error): int64 {.importc: "CBLDatabase_PurgeExpiredDocuments".}
 
 ## \name  Database accessors
 ##     Getting information about a database.
 ##
 ## Returns the database's name.
-proc name*(a1: Database): cstring {.importc: "CBLDatabase_Name", dynlib: LibName.}
+proc name*(a1: Database): cstring {.importc: "CBLDatabase_Name".}
 
 ## Returns the database's full filesystem path.
-proc path*(a1: Database): cstring {.importc: "CBLDatabase_Path", dynlib: LibName.}
+proc path*(a1: Database): cstring {.importc: "CBLDatabase_Path".}
 
 ## Returns the number of documents in the database.
-proc count*(a1: Database): uint64 {.importc: "CBLDatabase_Count", dynlib: LibName.}
+proc count*(a1: Database): uint64 {.importc: "CBLDatabase_Count".}
 
 ## Returns the database's configuration, as given when it was opened.
-proc config*(a1: Database): DatabaseConfiguration {.importc: "CBLDatabase_Config", dynlib: LibName.}
+proc config*(a1: Database): DatabaseConfiguration {.importc: "CBLDatabase_Config".}
 
 ## \name  Database listeners
 ##     A database change listener lets you detect changes made to all documents in a database.
@@ -504,7 +504,7 @@ type
 ## Registers a database change listener callback. It will be called after one or more
 ##     documents are changed on disk.
 ##             listener.
-proc addChangeListener*(db: Database; listener: DatabaseChangeListener; context: pointer): ListenerToken {.importc: "CBLDatabase_AddChangeListener", dynlib: LibName.}
+proc addChangeListener*(db: Database; listener: DatabaseChangeListener; context: pointer): ListenerToken {.importc: "CBLDatabase_AddChangeListener".}
 
 ##  end of outer \defgroup
 ## \defgroup listeners   Listeners
@@ -531,11 +531,11 @@ type
 ## Switches the database to buffered-notification mode. Notifications for objects belonging
 ##     to this database (documents, queries, replicators, and of course the database) will not be
 ##     called immediately; your \ref CBLNotificationsReadyCallback will be called instead.
-proc bufferNotifications*(db: Database; callback: NotificationsReadyCallback; context: pointer) {.importc: "CBLDatabase_BufferNotifications", dynlib: LibName.}
+proc bufferNotifications*(db: Database; callback: NotificationsReadyCallback; context: pointer) {.importc: "CBLDatabase_BufferNotifications".}
 
 ## Immediately issues all pending notifications for this database, by calling their listener
 ##     callbacks.
-proc sendNotifications*(db: Database) {.importc: "CBLDatabase_SendNotifications", dynlib: LibName.}
+proc sendNotifications*(db: Database) {.importc: "CBLDatabase_SendNotifications".}
 
 
 
@@ -577,33 +577,33 @@ type
 ## Reads a document from the database, creating a new (immutable) \ref CBLDocument object.
 ##     Each call to this function creates a new object (which must later be released.)
 ##             \ref CBLDatabase_GetMutableDocument instead.
-proc getDocument*(database: Database; docID: cstring): Document {.importc: "CBLDatabase_GetDocument", dynlib: LibName.}
+proc getDocument*(database: Database; docID: cstring): Document {.importc: "CBLDatabase_GetDocument".}
 
 ## Saves a (mutable) document to the database.
 ##     If a conflicting revision has been saved since \p doc was loaded, the \p concurrency
 ##     parameter specifies whether the save should fail, or the conflicting revision should
 ##     be overwritten with the revision being saved.
 ##     If you need finer-grained control, call \ref CBLDatabase_SaveDocumentResolving instead.
-proc saveDocument*(db: Database; doc: Document; concurrency: ConcurrencyControl; err: var Error): Document {.importc: "CBLDatabase_SaveDocument", dynlib: LibName.}
+proc saveDocument*(db: Database; doc: Document; concurrency: ConcurrencyControl; err: var Error): Document {.importc: "CBLDatabase_SaveDocument".}
 
 ## Saves a (mutable) document to the database. This function is the same as \ref
 ##     CBLDatabase_SaveDocument, except that it allows for custom conflict handling in the event
 ##     that the document has been updated since \p doc was loaded.
-proc saveDocumentResolving*(db: Database; doc: Document; conflictHandler: SaveConflictHandler; context: pointer; err: var Error): Document {.importc: "CBLDatabase_SaveDocumentResolving", dynlib: LibName.}
+proc saveDocumentResolving*(db: Database; doc: Document; conflictHandler: SaveConflictHandler; context: pointer; err: var Error): Document {.importc: "CBLDatabase_SaveDocumentResolving".}
 
 ## Deletes a document from the database. Deletions are replicated.
-proc delete*(document: Document; concurrency: ConcurrencyControl; err: var Error): bool {.importc: "CBLDocument_Delete", dynlib: LibName.}
+proc delete*(document: Document; concurrency: ConcurrencyControl; err: var Error): bool {.importc: "CBLDocument_Delete".}
 
 ## Purges a document. This removes all traces of the document from the database.
 ##     Purges are _not_ replicated. If the document is changed on a server, it will be re-created
 ##     when pulled.
 ##           simpler shortcut.
-proc purge*(document: Document; err: var Error): bool {.importc: "CBLDocument_Purge", dynlib: LibName.}
+proc purge*(document: Document; err: var Error): bool {.importc: "CBLDocument_Purge".}
 
 ## Purges a document, given only its ID.
 ##             code will be zero.
 ##
-proc purgeDocumentByID*(database: Database; docID: cstring; err: var Error): bool {.importc: "CBLDatabase_PurgeDocumentByID", dynlib: LibName.}
+proc purgeDocumentByID*(database: Database; docID: cstring; err: var Error): bool {.importc: "CBLDatabase_PurgeDocumentByID".}
 
 ## \name  Mutable documents
 ##     The type `CBLDocument*` without a `const` qualifier refers to a _mutable_ document instance.
@@ -612,33 +612,33 @@ proc purgeDocumentByID*(database: Database; docID: cstring; err: var Error): boo
 ##
 ## Reads a document from the database, in mutable form that can be updated and saved.
 ##     (This function is otherwise identical to \ref CBLDatabase_GetDocument.)
-proc getMutableDocument*(database: Database; docID: cstring): Document {.importc: "CBLDatabase_GetMutableDocument", dynlib: LibName.}
+proc getMutableDocument*(database: Database; docID: cstring): Document {.importc: "CBLDatabase_GetMutableDocument".}
 
 ## Creates a new, empty document in memory. It will not be added to a database until saved.
-proc newDocument*(docID: cstring): Document {.importc: "CBLDocument_New", dynlib: LibName.}
+proc newDocument*(docID: cstring): Document {.importc: "CBLDocument_New".}
 
 ## Creates a new mutable CBLDocument instance that refers to the same document as the original.
 ##     If the original document has unsaved changes, the new one will also start out with the same
 ##     changes; but mutating one document thereafter will not affect the other.
-proc mutableCopy*(original: Document): Document {.importc: "CBLDocument_MutableCopy", dynlib: LibName.}
+proc mutableCopy*(original: Document): Document {.importc: "CBLDocument_MutableCopy".}
 
 ## \name  Document properties and metadata
 ##     A document's body is essentially a JSON object. The properties are accessed in memory
 ##     using the Fleece API, with the body itself being a \ref FLDict "dictionary").
 ##
 ## Returns a document's ID.
-proc id*(doc: Document): cstring {.importc: "CBLDocument_ID", dynlib: LibName.}
+proc id*(doc: Document): cstring {.importc: "CBLDocument_ID".}
 
 ## Returns a document's revision ID, which is a short opaque string that's guaranteed to be
 ##     unique to every change made to the document.
 ##     If the document doesn't exist yet, this function returns NULL.
-proc revisionID*(doc: Document): cstring {.importc: "CBLDocument_RevisionID", dynlib: LibName.}
+proc revisionID*(doc: Document): cstring {.importc: "CBLDocument_RevisionID".}
 
 ## Returns a document's current sequence in the local database.
 ##     This number increases every time the document is saved, and a more recently saved document
 ##     will have a greater sequence number than one saved earlier, so sequences may be used as an
 ##     abstract 'clock' to tell relative modification times.
-proc sequence*(doc: Document): uint64 {.importc: "CBLDocument_Sequence", dynlib: LibName.}
+proc sequence*(doc: Document): uint64 {.importc: "CBLDocument_Sequence".}
 
 ## Returns a document's properties as a dictionary.
 ##             If you need to use any properties after releasing the document, you must retain them
@@ -646,39 +646,39 @@ proc sequence*(doc: Document): uint64 {.importc: "CBLDocument_Sequence", dynlib:
 ##            underlying dictionary itself is mutable and could be modified through a mutable
 ##            reference obtained via \ref CBLDocument_MutableProperties. If you need to preserve the
 ##            properties, call \ref FLDict_MutableCopy to make a deep copy.
-proc properties*(doc: Document): Dict {.importc: "CBLDocument_Properties", dynlib: LibName.}
+proc properties*(doc: Document): Dict {.importc: "CBLDocument_Properties".}
 
 ## Returns a mutable document's properties as a mutable dictionary.
 ##     You may modify this dictionary and then call \ref CBLDatabase_SaveDocument to persist the changes.
 ##            same collection returned by \ref CBLDocument_Properties.
 ##             If you need to use any properties after releasing the document, you must retain them
 ##             by calling \ref FLValue_Retain (and of course later release them.)
-proc mutableProperties*(doc: Document): MutableDict {.importc: "CBLDocument_MutableProperties", dynlib: LibName.}
+proc mutableProperties*(doc: Document): MutableDict {.importc: "CBLDocument_MutableProperties".}
 
 ## Sets a mutable document's properties.
 ##     Call \ref CBLDatabase_SaveDocument to persist the changes.
 ##            releasing any retained reference(s) you have to it.
-proc setProperties*(doc: Document; properties: MutableDict) {.importc: "CBLDocument_SetProperties", dynlib: LibName.}
+proc setProperties*(doc: Document; properties: MutableDict) {.importc: "CBLDocument_SetProperties".}
 
-proc createDocumentFleeceDoc*(doc: Document): Doc {.importc: "CBLDocument_CreateFleeceDoc", dynlib: LibName.}
+proc createDocumentFleeceDoc*(doc: Document): Doc {.importc: "CBLDocument_CreateFleeceDoc".}
 
 ## Returns a document's properties as a null-terminated JSON string.
-proc propertiesAsJSON*(doc: Document): cstring {.importc: "CBLDocument_PropertiesAsJSON", dynlib: LibName.}
+proc propertiesAsJSON*(doc: Document): cstring {.importc: "CBLDocument_PropertiesAsJSON".}
 
 ## Sets a mutable document's properties from a JSON string.
-proc setPropertiesAsJSON*(doc: Document; json: cstring; err: var Error): bool {.importc: "CBLDocument_SetPropertiesAsJSON", dynlib: LibName.}
+proc setPropertiesAsJSON*(doc: Document; json: cstring; err: var Error): bool {.importc: "CBLDocument_SetPropertiesAsJSON".}
 
 ## Returns the time, if any, at which a given document will expire and be purged.
 ##     Documents don't normally expire; you have to call \ref CBLDatabase_SetDocumentExpiration
 ##     to set a document's expiration time.
 ##              or 0 if the document does not have an expiration,
 ##              or -1 if the call failed.
-proc getDocumentExpiration*(db: Database; docID: cstring; err: var Error): Timestamp {.importc: "CBLDatabase_GetDocumentExpiration", dynlib: LibName.}
+proc getDocumentExpiration*(db: Database; docID: cstring; err: var Error): Timestamp {.importc: "CBLDatabase_GetDocumentExpiration".}
 
 ## Sets or clears the expiration time of a document.
 ##             \ref CBLDatabase_PurgeExpiredDocuments when the time comes, to make it happen.
 ##                         or 0 if the document should never expire.
-proc setDocumentExpiration*(db: Database; docID: cstring; expiration: Timestamp; err: var Error): bool {.importc: "CBLDatabase_SetDocumentExpiration", dynlib: LibName.}
+proc setDocumentExpiration*(db: Database; docID: cstring; expiration: Timestamp; err: var Error): bool {.importc: "CBLDatabase_SetDocumentExpiration".}
 
 ## \name  Document listeners
 ##     A document change listener lets you detect changes made to a specific document after they
@@ -694,7 +694,7 @@ type
 ## Registers a document change listener callback. It will be called after a specific document
 ##     is changed on disk.
 ##             listener.
-proc addDocumentChangeListener*(db: Database; docID: cstring; listener: DocumentChangeListener; context: pointer): ListenerToken {.importc: "CBLDatabase_AddDocumentChangeListener", dynlib: LibName.}
+proc addDocumentChangeListener*(db: Database; docID: cstring; listener: DocumentChangeListener; context: pointer): ListenerToken {.importc: "CBLDatabase_AddDocumentChangeListener".}
 
 
 
@@ -743,62 +743,62 @@ proc addDocumentChangeListener*(db: Database; docID: cstring; listener: Document
 ##     To store the blob into a document, do as in the previous paragraph.
 ##
 ##
-var kTypeProperty* {.importc: "kCBLTypeProperty", dynlib: LibName.}: FLSlice
+var kTypeProperty* {.importc: "kCBLTypeProperty".}: FLSlice
 
 
-var kBlobType* {.importc: "kCBLBlobType", dynlib: LibName.}: FLSlice
+var kBlobType* {.importc: "kCBLBlobType".}: FLSlice
 
 ## `"blob"`
-var kBlobDigestProperty* {.importc: "kCBLBlobDigestProperty", dynlib: LibName.}: FLSlice
+var kBlobDigestProperty* {.importc: "kCBLBlobDigestProperty".}: FLSlice
 
 ## `"digest"`
-var kBlobLengthProperty* {.importc: "kCBLBlobLengthProperty", dynlib: LibName.}: FLSlice
+var kBlobLengthProperty* {.importc: "kCBLBlobLengthProperty".}: FLSlice
 
 ## `"length"`
-var kBlobContentTypeProperty* {.importc: "kCBLBlobContentTypeProperty", dynlib: LibName.}: FLSlice
+var kBlobContentTypeProperty* {.importc: "kCBLBlobContentTypeProperty".}: FLSlice
 
 ## `"content_type"`
 ## Returns true if a dictionary in a document is a blob reference.
 ##         If so, you can call \ref CBLBlob_Get to access it.
 ##                 whose value is `"blob"`.
-proc isBlob*(a1: Dict): bool {.importc: "CBL_IsBlob", dynlib: LibName.}
+proc isBlob*(a1: Dict): bool {.importc: "CBL_IsBlob".}
 
 ## Returns a CBLBlob object corresponding to a blob dictionary in a document.
-proc getBlob*(blobDict: Dict): Blob {.importc: "CBLBlob_Get", dynlib: LibName.}
+proc getBlob*(blobDict: Dict): Blob {.importc: "CBLBlob_Get".}
 
 ## Returns the length in bytes of a blob's content (from its `length` property).
-proc length*(a1: Blob): uint64 {.importc: "CBLBlob_Length", dynlib: LibName.}
+proc length*(a1: Blob): uint64 {.importc: "CBLBlob_Length".}
 
 ## Returns the cryptographic digest of a blob's content (from its `digest` property).
-proc digest*(a1: Blob): cstring {.importc: "CBLBlob_Digest", dynlib: LibName.}
+proc digest*(a1: Blob): cstring {.importc: "CBLBlob_Digest".}
 
 ## Returns a blob's MIME type, if its metadata has a `content_type` property.
-proc contentType*(a1: Blob): cstring {.importc: "CBLBlob_ContentType", dynlib: LibName.}
+proc contentType*(a1: Blob): cstring {.importc: "CBLBlob_ContentType".}
 
 ## Returns a blob's metadata. This includes the `digest`, `length` and `content_type`
 ##         properties, as well as any custom ones that may have been added.
-proc properties*(a1: Blob): Dict {.importc: "CBLBlob_Properties", dynlib: LibName.}
+proc properties*(a1: Blob): Dict {.importc: "CBLBlob_Properties".}
 
 ## Reads the blob's contents into memory and returns them.
 ##         You are responsible for calling \ref FLFLSliceResult_Release on the returned data when done.
-proc loadContent*(a1: Blob; err: var Error): FLSliceResult {.importc: "CBLBlob_LoadContent", dynlib: LibName.}
+proc loadContent*(a1: Blob; err: var Error): FLSliceResult {.importc: "CBLBlob_LoadContent".}
 
 ## A stream for reading a blob's content.
 type
   BlobReadStream* = ptr object
 
 ## Opens a stream for reading a blob's content.
-proc openContentStream*(a1: Blob; err: var Error): ptr BlobReadStream {.importc: "CBLBlob_OpenContentStream", dynlib: LibName.}
+proc openContentStream*(a1: Blob; err: var Error): ptr BlobReadStream {.importc: "CBLBlob_OpenContentStream".}
 
 ## Reads data from a blob.
-proc read*(stream: ptr BlobReadStream; dst: pointer; maxLength: csize_t; err: var Error): cint {.importc: "CBLBlobReader_Read", dynlib: LibName.}
+proc read*(stream: ptr BlobReadStream; dst: pointer; maxLength: csize_t; err: var Error): cint {.importc: "CBLBlobReader_Read".}
 
 ## Closes a CBLBlobReadStream.
-proc close*(a1: ptr BlobReadStream) {.importc: "CBLBlobReader_Close", dynlib: LibName.}
+proc close*(a1: ptr BlobReadStream) {.importc: "CBLBlobReader_Close".}
 
 ## Creates a new blob given its contents as a single block of data.
 ##                 has been saved.
-proc createBlobWithData*(contentType: cstring; contents: FLSlice): Blob {.importc: "CBLBlob_CreateWithData", dynlib: LibName.}
+proc createBlobWithData*(contentType: cstring; contents: FLSlice): Blob {.importc: "CBLBlob_CreateWithData".}
 
 ## A stream for writing a new blob to the database.
 type
@@ -809,19 +809,19 @@ type
 ##         then \ref CBLBlob_CreateWithStream to create the blob.
 ##
 ##         If for some reason you need to abort, just call \ref CBLBlobWriter_Close.
-proc newBlobWriter*(db: Database; err: var Error): ptr BlobWriteStream {.importc: "CBLBlobWriter_New", dynlib: LibName.}
+proc newBlobWriter*(db: Database; err: var Error): ptr BlobWriteStream {.importc: "CBLBlobWriter_New".}
 
 ## Closes a blob-writing stream, if you need to give up without creating a \ref CBLBlob.
-proc close*(a1: ptr BlobWriteStream) {.importc: "CBLBlobWriter_Close", dynlib: LibName.}
+proc close*(a1: ptr BlobWriteStream) {.importc: "CBLBlobWriter_Close".}
 
 ## Writes data to a new blob.
-proc write*(writer: ptr BlobWriteStream; data: pointer; length: csize_t; err: var Error): bool {.importc: "CBLBlobWriter_Write", dynlib: LibName.}
+proc write*(writer: ptr BlobWriteStream; data: pointer; length: csize_t; err: var Error): bool {.importc: "CBLBlobWriter_Write".}
 
 ## Creates a new blob after its data has been written to a \ref CBLBlobWriteStream.
 ##         You should then add the blob to a mutable document as a property -- see
 ##         \ref FLMutableDict_SetBlob and \ref FLMutableArray_SetBlob.
-proc createBlobWithStream*(contentType: cstring; writer: ptr BlobWriteStream): Blob {.importc: "CBLBlob_CreateWithStream", dynlib: LibName.}
-proc createBlobWithStream_s*(contentType: cstring; writer: ptr BlobWriteStream): Blob {.importc: "CBLBlob_CreateWithStream", dynlib: LibName.}
+proc createBlobWithStream*(contentType: cstring; writer: ptr BlobWriteStream): Blob {.importc: "CBLBlob_CreateWithStream".}
+proc createBlobWithStream_s*(contentType: cstring; writer: ptr BlobWriteStream): Blob {.importc: "CBLBlob_CreateWithStream".}
 
 ## Returns true if a value in a document is a blob reference.
 ##         If so, you can call \ref FLValue_GetBlob to access it.
@@ -833,7 +833,7 @@ proc getBlob*(value: Value): Blob {.inline.} =
   return getBlob(asDict(value))
 
 ## Stores a blob in a mutable array or dictionary.
-proc setBlob*(slot: Slot; blob: Blob) {.importc: "FLSlot_SetBlob", dynlib: LibName.}
+proc setBlob*(slot: Slot; blob: Blob) {.importc: "FLSlot_SetBlob".}
 
 
 
@@ -884,7 +884,7 @@ type
 ##             [JSON](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema) or
 ##             [N1QL](https://docs.couchbase.com/server/4.0/n1ql/n1ql-language-reference/index.html).
 ##                     input expression will be stored here (or -1 if not known/applicable.)
-proc newQuery*(db: Database; language: QueryLanguage; queryFLString: cstring; outErrorPos: ptr cint; err: var Error): Query {.importc: "CBLQuery_New", dynlib: LibName.}
+proc newQuery*(db: Database; language: QueryLanguage; queryFLString: cstring; outErrorPos: ptr cint; err: var Error): Query {.importc: "CBLQuery_New".}
 
 ## Assigns values to the query's parameters.
 ##     These values will be substited for those parameters whenever the query is executed,
@@ -895,29 +895,29 @@ proc newQuery*(db: Database; language: QueryLanguage; queryFLString: cstring; ou
 ##     to this call should have a key `PARAM` that maps to the value of the parameter.
 ##             keys are the parameter names. (It's easiest to construct this by using the mutable
 ##             API, i.e. calling \ref FLMutableDict_New and adding keys/values.)
-proc setParameters*(query: Query; parameters: Dict) {.importc: "CBLQuery_SetParameters", dynlib: LibName.}
+proc setParameters*(query: Query; parameters: Dict) {.importc: "CBLQuery_SetParameters".}
 
 ## Returns the query's current parameter bindings, if any.
-proc parameters*(query: Query): Dict {.importc: "CBLQuery_Parameters", dynlib: LibName.}
+proc parameters*(query: Query): Dict {.importc: "CBLQuery_Parameters".}
 
 ## Assigns values to the query's parameters, from JSON data.
 ##     See \ref CBLQuery_SetParameters for details.
 ##             keys are the parameter names. (You may use JSON5 syntax.)
-proc setParametersAsJSON*(query: Query; json: cstring): bool {.importc: "CBLQuery_SetParametersAsJSON", dynlib: LibName.}
+proc setParametersAsJSON*(query: Query; json: cstring): bool {.importc: "CBLQuery_SetParametersAsJSON".}
 
 ## Runs the query, returning the results.
 ##     To obtain the results you'll typically call \ref CBLResultSet_Next in a `while` loop,
 ##     examining the values in the \ref CBLResultSet each time around.
-proc execute*(a1: Query; err: var Error): ResultSet {.importc: "CBLQuery_Execute", dynlib: LibName.}
+proc execute*(a1: Query; err: var Error): ResultSet {.importc: "CBLQuery_Execute".}
 
 ## Returns information about the query, including the translated SQLite form, and the search
 ##     strategy. You can use this to help optimize the query: the word `SCAN` in the strategy
 ##     indicates a linear scan of the entire database, which should be avoided by adding an index.
 ##     The strategy will also show which index(es), if any, are used.
-proc explain*(a1: Query): FLSliceResult {.importc: "CBLQuery_Explain", dynlib: LibName.}
+proc explain*(a1: Query): FLSliceResult {.importc: "CBLQuery_Explain".}
 
 ## Returns the number of columns in each result.
-proc columnCount*(a1: Query): cuint {.importc: "CBLQuery_ColumnCount", dynlib: LibName.}
+proc columnCount*(a1: Query): cuint {.importc: "CBLQuery_ColumnCount".}
 
 ## Returns the name of a column in the result.
 ##     The column name is based on its expression in the `SELECT...` or `WHAT:` section of the
@@ -925,7 +925,7 @@ proc columnCount*(a1: Query): cuint {.importc: "CBLQuery_ColumnCount", dynlib: L
 ##     A column that returns an expression will have an automatically-generated name like `$1`.
 ##     To give a column a custom name, use the `AS` syntax in the query.
 ##     Every column is guaranteed to have a unique name.
-proc columnName*(a1: Query; columnIndex: cuint): FLSlice {.importc: "CBLQuery_ColumnName", dynlib: LibName.}
+proc columnName*(a1: Query; columnIndex: cuint): FLSlice {.importc: "CBLQuery_ColumnName".}
 
 ## \name  Result sets
 ##     A `CBLResultSet` is an iterator over the results returned by a query. It exposes one
@@ -947,31 +947,31 @@ proc columnName*(a1: Query; columnIndex: cuint): FLSlice {.importc: "CBLQuery_Co
 ##
 ## Moves the result-set iterator to the next result.
 ##     Returns false if there are no more results.
-proc next*(a1: ResultSet): bool {.importc: "CBLResultSet_Next", dynlib: LibName.}
+proc next*(a1: ResultSet): bool {.importc: "CBLResultSet_Next".}
 
 ## Returns the value of a column of the current result, given its (zero-based) numeric index.
 ##     This may return a NULL pointer, indicating `MISSING`, if the value doesn't exist, e.g. if
 ##     the column is a property that doesn't exist in the document.
-proc valueAtIndex*(a1: ResultSet; index: cuint): Value {.importc: "CBLResultSet_ValueAtIndex", dynlib: LibName.}
+proc valueAtIndex*(a1: ResultSet; index: cuint): Value {.importc: "CBLResultSet_ValueAtIndex".}
 
 ## Returns the value of a column of the current result, given its name.
 ##     This may return a NULL pointer, indicating `MISSING`, if the value doesn't exist, e.g. if
 ##     the column is a property that doesn't exist in the document. (Or, of course, if the key
 ##     is not a column name in this query.)
-proc valueForKey*(a1: ResultSet; key: cstring): Value {.importc: "CBLResultSet_ValueForKey", dynlib: LibName.}
+proc valueForKey*(a1: ResultSet; key: cstring): Value {.importc: "CBLResultSet_ValueForKey".}
 
 ## Returns the current result as an array of column values.
 ##    @warning The array reference is only valid until the result-set is advanced or released.
 ##            If you want to keep it for longer, call \ref FLArray_Retain (and release it when done.)
-proc rowArray*(rs: ResultSet): Array {.importc: "CBLResultSet_RowArray", dynlib: LibName.}
+proc rowArray*(rs: ResultSet): Array {.importc: "CBLResultSet_RowArray".}
 
 ## Returns the current result as a dictionary mapping column names to values.
 ##    @warning The dict reference is only valid until the result-set is advanced or released.
 ##            If you want to keep it for longer, call \ref FLDict_Retain (and release it when done.)
-proc rowDict*(rs: ResultSet): Dict {.importc: "CBLResultSet_RowDict", dynlib: LibName.}
+proc rowDict*(rs: ResultSet): Dict {.importc: "CBLResultSet_RowDict".}
 
 ## Returns the Query that created this ResultSet.
-proc getQuery*(rs: ResultSet): Query {.importc: "CBLResultSet_GetQuery", dynlib: LibName.}
+proc getQuery*(rs: ResultSet): Query {.importc: "CBLResultSet_GetQuery".}
 
 ## \name  Change listener
 ##     Adding a change listener to a query turns it into a "live query". When changes are made to
@@ -995,11 +995,11 @@ type
 ##     the listener(s) of the results when ready. After that, it will run in the background after
 ##     the database changes, and only notify the listeners when the result set changes.
 ##             listener.
-proc addChangeListener*(query: Query; listener: QueryChangeListener; context: pointer): ListenerToken {.importc: "CBLQuery_AddChangeListener", dynlib: LibName.}
+proc addChangeListener*(query: Query; listener: QueryChangeListener; context: pointer): ListenerToken {.importc: "CBLQuery_AddChangeListener".}
 
 ## Returns the query's _entire_ current result set, after it's been announced via a call to the
 ##     listener's callback.
-proc copyCurrentResults*(query: Query; listener: ListenerToken; err: var Error): ResultSet {.importc: "CBLQuery_CopyCurrentResults", dynlib: LibName.}
+proc copyCurrentResults*(query: Query; listener: ListenerToken; err: var Error): ResultSet {.importc: "CBLQuery_CopyCurrentResults".}
 
 ## \name  Database Indexes
 ##     Indexes are used to speed up queries by allowing fast -- O(log n) -- lookup of documents
@@ -1057,13 +1057,13 @@ type
 ##     Indexes are persistent.
 ##     If an identical index with that name already exists, nothing happens (and no error is returned.)
 ##     If a non-identical index with that name already exists, it is deleted and re-created.
-proc createDatabaseIndex*(db: Database; name: cstring; a3: IndexSpec; err: var Error): bool {.importc: "CBLDatabase_CreateIndex", dynlib: LibName.}
+proc createDatabaseIndex*(db: Database; name: cstring; a3: IndexSpec; err: var Error): bool {.importc: "CBLDatabase_CreateIndex".}
 
 ## Deletes an index given its name.
-proc deleteIndex*(db: Database; name: cstring; err: var Error): bool {.importc: "CBLDatabase_DeleteIndex", dynlib: LibName.}
+proc deleteIndex*(db: Database; name: cstring; err: var Error): bool {.importc: "CBLDatabase_DeleteIndex".}
 
 ## Returns the names of the indexes on this database, as an array of strings.
-proc indexNames*(db: Database): MutableArray {.importc: "CBLDatabase_IndexNames", dynlib: LibName.}
+proc indexNames*(db: Database): MutableArray {.importc: "CBLDatabase_IndexNames".}
 
 
 
@@ -1090,7 +1090,7 @@ proc indexNames*(db: Database): MutableArray {.importc: "CBLDatabase_IndexNames"
 ##     another database on a remote server (or on a peer device, or even another local database.)
 ## \name  Configuration
 ## The name of the HTTP cookie used by Sync Gateway to store session keys.
-var kAuthDefaultCookieName* {.importc: "kCBLAuthDefaultCookieName", dynlib: LibName.}: cstring
+var kAuthDefaultCookieName* {.importc: "kCBLAuthDefaultCookieName".}: cstring
 
 type
   Endpoint* = ptr object
@@ -1101,21 +1101,21 @@ type
 ##     and its path must be the name of the database on that server.
 ##     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
 ##     For example: `wss://example.org/dbname`
-proc newEndpointWithURL*(url: cstring): Endpoint {.importc: "CBLEndpoint_NewWithURL", dynlib: LibName.}
+proc newEndpointWithURL*(url: cstring): Endpoint {.importc: "CBLEndpoint_NewWithURL".}
 
 ## Frees a CBLEndpoint object.
-proc free*(a1: Endpoint) {.importc: "CBLEndpoint_Free", dynlib: LibName.}
+proc free*(a1: Endpoint) {.importc: "CBLEndpoint_Free".}
 
 
 ## Creates an authenticator for HTTP Basic (username/password) auth.
-proc newAuthBasic*(username: cstring; password: cstring): Authenticator {.importc: "CBLAuth_NewBasic", dynlib: LibName.}
+proc newAuthBasic*(username: cstring; password: cstring): Authenticator {.importc: "CBLAuth_NewBasic".}
 
 ## Creates an authenticator using a Couchbase Sync Gateway login session identifier,
 ##     and optionally a cookie name (pass NULL for the default.)
-proc newAuthSession*(sessionID: cstring; cookieName: cstring): Authenticator {.importc: "CBLAuth_NewSession", dynlib: LibName.}
+proc newAuthSession*(sessionID: cstring; cookieName: cstring): Authenticator {.importc: "CBLAuth_NewSession".}
 
 ## Frees a CBLAuthenticator object.
-proc free*(a1: Authenticator) {.importc: "CBLAuth_Free", dynlib: LibName.}
+proc free*(a1: Authenticator) {.importc: "CBLAuth_Free".}
 
 ## Direction of replication: push, pull, or both.
 type
@@ -1147,7 +1147,7 @@ type
   ConflictResolver* = proc (context: pointer; documentID: cstring; localDocument: Document; remoteDocument: Document): Document
 
 ## Default conflict resolver. This always returns `localDocument`.
-var defaultConflictResolver* {.importc: "CBLDefaultConflictResolver", dynlib: LibName.}: ConflictResolver
+var defaultConflictResolver* {.importc: "CBLDefaultConflictResolver".}: ConflictResolver
 
 ## Types of proxy servers, for CBLProxySettings.
 type
@@ -1191,38 +1191,38 @@ type
 
 ## \name  Lifecycle
 ## Creates a replicator with the given configuration.
-proc newReplicator*(a1: ptr ReplicatorConfiguration; err: var Error): Replicator {.importc: "CBLReplicator_New", dynlib: LibName.}
+proc newReplicator*(a1: ptr ReplicatorConfiguration; err: var Error): Replicator {.importc: "CBLReplicator_New".}
 
 ## Returns the configuration of an existing replicator.
-proc config*(a1: Replicator): ptr ReplicatorConfiguration {.importc: "CBLReplicator_Config", dynlib: LibName.}
+proc config*(a1: Replicator): ptr ReplicatorConfiguration {.importc: "CBLReplicator_Config".}
 
 ## Instructs the replicator to ignore existing checkpoints the next time it runs.
 ##     This will cause it to scan through all the documents on the remote database, which takes
 ##     a lot longer, but it can resolve problems with missing documents if the client and
 ##     server have gotten out of sync somehow.
-proc resetCheckpoint*(a1: Replicator) {.importc: "CBLReplicator_ResetCheckpoint", dynlib: LibName.}
+proc resetCheckpoint*(a1: Replicator) {.importc: "CBLReplicator_ResetCheckpoint".}
 
 ## Starts a replicator, asynchronously. Does nothing if it's already started.
-proc start*(a1: Replicator) {.importc: "CBLReplicator_Start", dynlib: LibName.}
+proc start*(a1: Replicator) {.importc: "CBLReplicator_Start".}
 
 ## Stops a running replicator, asynchronously. Does nothing if it's not already started.
 ##     The replicator will call your \ref CBLReplicatorChangeListener with an activity level of
 ##     \ref kCBLReplicatorStopped after it stops. Until then, consider it still active.
-proc stop*(a1: Replicator) {.importc: "CBLReplicator_Stop", dynlib: LibName.}
+proc stop*(a1: Replicator) {.importc: "CBLReplicator_Stop".}
 
 ## Informs the replicator whether it's considered possible to reach the remote host with
 ##     the current network configuration. The default value is true. This only affects the
 ##     replicator's behavior while it's in the Offline state:
 ##  Setting it to false will cancel any pending retry and prevent future automatic retries.
 ##  Setting it back to true will initiate an immediate retry.
-proc setHostReachable*(a1: Replicator; reachable: bool) {.importc: "CBLReplicator_SetHostReachable", dynlib: LibName.}
+proc setHostReachable*(a1: Replicator; reachable: bool) {.importc: "CBLReplicator_SetHostReachable".}
 
 ## Puts the replicator in or out of "suspended" state. The default is false.
 ##  Setting suspended=true causes the replicator to disconnect and enter Offline state;
 ##       it will not attempt to reconnect while it's suspended.
 ##  Setting suspended=false causes the replicator to attempt to reconnect, _if_ it was
 ##       connected when suspended, and is still in Offline state.
-proc setSuspended*(repl: Replicator; suspended: bool) {.importc: "CBLReplicator_SetSuspended", dynlib: LibName.}
+proc setSuspended*(repl: Replicator; suspended: bool) {.importc: "CBLReplicator_SetSuspended".}
 
 ## \name  Status and Progress
 ##
@@ -1255,7 +1255,7 @@ type
 
 
 ## Returns the replicator's current status.
-proc getStatus*(a1: Replicator): ReplicatorStatus {.importc: "CBLReplicator_GetStatus", dynlib: LibName.}
+proc getStatus*(a1: Replicator): ReplicatorStatus {.importc: "CBLReplicator_GetStatus".}
 
 ## Indicates which documents have local changes that have not yet been pushed to the server
 ##     by this replicator. This is of course a snapshot, that will go out of date as the replicator
@@ -1270,7 +1270,7 @@ proc getStatus*(a1: Replicator): ReplicatorStatus {.importc: "CBLReplicator_GetS
 ##     \note  Documents that would never be pushed by this replicator, due to its configuration's
 ##            `pushFilter` or `docIDs`, are ignored.
 ##     \warning  You are responsible for releasing the returned array via \ref FLValue_Release.
-proc pendingDocumentIDs*(a1: Replicator; err: var Error): Dict {.importc: "CBLReplicator_PendingDocumentIDs", dynlib: LibName.}
+proc pendingDocumentIDs*(a1: Replicator; err: var Error): Dict {.importc: "CBLReplicator_PendingDocumentIDs".}
 
 ## Indicates whether the document with the given ID has local changes that have not yet been
 ##     pushed to the server by this replicator.
@@ -1280,7 +1280,7 @@ proc pendingDocumentIDs*(a1: Replicator; err: var Error): Dict {.importc: "CBLRe
 ##
 ##     \note  A `false` result means the document is not pending, _or_ there was an error.
 ##            To tell the difference, compare the error code to zero.
-proc isDocumentPending*(repl: Replicator; docID: FLString; err: var Error): bool {.importc: "CBLReplicator_IsDocumentPending", dynlib: LibName.}
+proc isDocumentPending*(repl: Replicator; docID: FLString; err: var Error): bool {.importc: "CBLReplicator_IsDocumentPending".}
 
 ## A callback that notifies you when the replicator's status changes.
 ##                 It must pay attention to thread-safety. It should not take a long time to return,
@@ -1289,7 +1289,7 @@ type
   ReplicatorChangeListener* = proc (context: pointer; replicator: Replicator; status: ptr ReplicatorStatus)
 
 ## Adds a listener that will be called when the replicator's status changes.
-proc addChangeListener*(a1: Replicator; a2: ReplicatorChangeListener; context: pointer): ListenerToken {.importc: "CBLReplicator_AddChangeListener", dynlib: LibName.}
+proc addChangeListener*(a1: Replicator; a2: ReplicatorChangeListener; context: pointer): ListenerToken {.importc: "CBLReplicator_AddChangeListener".}
 
 ## Flags describing a replicated document.
 type
@@ -1313,4 +1313,6 @@ type
   ReplicatedDocumentListener* = proc (context: pointer; replicator: Replicator; isPush: bool; numDocuments: cuint; documents: ptr ReplicatedDocument)
 
 ## Adds a listener that will be called when documents are replicated.
-proc addDocumentListener*(a1: Replicator; a2: ReplicatedDocumentListener; context: pointer): ListenerToken {.importc: "CBLReplicator_AddDocumentListener", dynlib: LibName.}
+proc addDocumentListener*(a1: Replicator; a2: ReplicatedDocumentListener; context: pointer): ListenerToken {.importc: "CBLReplicator_AddDocumentListener".}
+
+{.pop.}

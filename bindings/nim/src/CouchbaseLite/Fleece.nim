@@ -3,31 +3,6 @@
 import CouchbaseLite/private/fl
 
 
-######## SLICES & CONVERSIONS
-
-
-proc asSlice(s: FLSliceResult): fl.FLSlice =
-    FLSlice(buf: s.buf, size: s.size)
-proc asSlice(bytes: openarray[byte]): fl.FLSlice =
-    FLSlice(buf: unsafeAddr bytes[0], size: csize_t(bytes.len))
-proc asSlice(str: string): fl.FLSlice =
-    FLSlice(buf: unsafeAddr str[0], size: csize_t(str.len))
-
-proc toString(s: FLSlice): string =
-    if s.buf == nil: return ""
-    var str = newString(s.size)
-    copyMem(addr str[0], s.buf, s.size)
-    return str
-
-proc toString(s: FLSliceResult): string =
-    toString(s.asSlice())
-
-proc toByteArray(s: FLSlice): seq[uint8] =
-    var bytes = newSeq[uint8](s.size)
-    copyMem(addr bytes[0], s.buf, s.size)
-    return bytes
-
-
 ######## TYPES
 
 

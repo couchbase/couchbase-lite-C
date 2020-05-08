@@ -4,8 +4,12 @@ import CouchbaseLite/database
 import CouchbaseLite/document
 import CouchbaseLite/errors
 import CouchbaseLite/fleece
+import CouchbaseLite/query
 
+import options
 import strformat
+
+{.experimental: "notnil".}
 
 
 proc test() =
@@ -14,14 +18,16 @@ proc test() =
     let db = openDatabase("nimtest", config)
     defer: db.close()
 
-    var doc = db.getDocument("foo")
-    if doc == nil: echo "No doc" else: echo "Found doc"
+    var maybeDoc = db.getDocument("foo")
+    if maybeDoc == nil: echo "No doc" else: echo "Found doc"
 
     var newDoc = newDocument("foo")
     newDoc.propertiesAsJSON = """{"language":"nim","rating":9.5}"""
     newDoc = db.saveDocument(newDoc, FailOnConflict)
 
-    doc = db.getDocument("foo")
+    var doc = db.getDocument("foo")
+    assert doc != nil
+    if doc == nil: return #WORKAROUND
     echo "Read doc: ", doc.propertiesAsJSON
 
     echo "Properties as JSON: ", $doc.properties

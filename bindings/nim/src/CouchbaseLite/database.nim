@@ -5,11 +5,13 @@ import CouchbaseLite/private/cbl
 
 import sugar
 
+{.experimental: "notnil".}
+
 
 type
     DatabaseObj* = object
-        handle*: cbl.Database                   # TODO: Avoid making this public
-    Database* = ref DatabaseObj
+        handle*: cbl.Database not nil                  # TODO: Avoid making this public
+    Database* = ref DatabaseObj not nil
 
 
 proc `=destroy`(d: var DatabaseObj) =
@@ -44,7 +46,8 @@ proc openDB(name: string; configP: ptr cbl.DatabaseConfiguration): Database =
     let dbRef = cbl.openDatabase(name, configP, err)
     if dbRef == nil:
         throw(err)
-    return Database(handle: dbRef)
+    else:
+        return Database(handle: dbRef)
 
 proc openDatabase*(name: string; config: DatabaseConfiguration): Database =
     var cblConfig = cbl.DatabaseConfiguration(

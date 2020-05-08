@@ -6,6 +6,8 @@ import CouchbaseLite/fleece
 import strformat
 import sugar
 
+{.experimental: "notnil".}
+
 
 type
     ## CouchbaseLiteError codes
@@ -99,7 +101,7 @@ proc mkError*(err: cbl.Error): Error =
         of WebSocketDomain: WebSocketError(cblErr: err, code: err.code)
         else:               CouchbaseLiteError(cblErr: err, code: CBLErrorCode(UnexpectedError))
 
-proc throw*(err: cbl.Error) =
+proc throw*(err: cbl.Error) {.noreturn.} =
     raise mkError(err)
 
 proc checkBool*(fn: (ptr cbl.Error) -> bool) =

@@ -5,14 +5,18 @@ import CouchbaseLite/database
 import CouchbaseLite/errors
 import CouchbaseLite/fleece
 
+import options
 import sugar
+
+{.experimental: "notnil".}
+
 
 type Database = database.Database
 
 type
     DocumentObj* = object of RootObj
-        handle: cbl.Document
-        db: Database
+        handle: cbl.Document not nil
+        db: Option[Database]
     Document* = ref DocumentObj
 
     MutableDocumentObj* = object of DocumentObj
@@ -33,36 +37,43 @@ proc `=`(dst: var DocumentObj, src: DocumentObj) {.error.} =
 #%%% Database's document-related methods:
 
 proc getDocument*(db: Database; docID: string): Document =
-    let doc = getDocument(db.handle, docID)
-    if doc == nil: return nil
-    return Document(handle: doc, db: db)
+    let doc = cbl.getDocument(db.handle, docID)
+    if doc != nil:
+        return Document(handle: doc, db: some(db))
 
 proc `[]`*(db: Database, docID: string): Document   = db.getDocument(docID)
 
 proc getMutableDocument*(db: Database; docID: string): MutableDocument =
     let doc = getMutableDocument(db.handle, docID)
-    if doc == nil: return nil
-    return MutableDocument(handle: doc, db: db)
+    if doc != nil:
+        return MutableDocument(handle: doc, db: some(db))
+
+type SaveContext = tuple [doc: MutableDocument, handler: SaveConflictHandler]
 
 proc saveCallback(context: pointer; documentBeingSaved, conflictingDocument: cbl.Document): bool =
-    let handler: SaveConflictHandler = (cast[ptr SaveConflictHandler](context))[]
+    let ctx = (cast[ptr SaveContext](context))[]
     var conflicting: Document = nil
     if conflictingDocument != nil:
-        conflicting = Document(handle: conflictingDocument)
-    return handler(MutableDocument(handle: documentBeingSaved), conflicting)
+        conflicting = Document(handle: conflictingDocument, db: ctx.doc.db)
+    return ctx.handler(ctx.doc, conflicting)
 
 proc saveDocument*(db: Database; doc: MutableDocument;
                    concurrency: ConcurrencyControl = LastWriteWins): MutableDocument =
     var err: cbl.Error
     let newDoc = db.handle.saveDocument(doc.handle, cast[cbl.ConcurrencyControl](concurrency), err)
-    if newDoc == nil: throw(err)
-    return MutableDocument(handle: newDoc, db: db)
+    if newDoc == nil:
+        raise mkError(err)
+    else:
+        return MutableDocument(handle: newDoc, db: some(db))
 
 proc saveDocument*(db: Database; doc: MutableDocument; handler: SaveConflictHandler): MutableDocument =
+    var context: SaveContext = (doc, handler)
     var err: cbl.Error
-    let newDoc = db.handle.saveDocumentResolving(doc.handle, saveCallback, unsafeAddr(handler), err)
-    if newDoc == nil: throw(err)
-    return MutableDocument(handle: newDoc, db: db)
+    let newDoc = db.handle.saveDocumentResolving(doc.handle, saveCallback, addr context, err)
+    if newDoc == nil:
+        throw(err)
+    else:
+        return MutableDocument(handle: newDoc, db: some(db))
 
 proc purgeDocumentByID*(db: Database; docID: string) =
     checkBool( (err) => db.handle.purgeDocumentByID(docID, err[]) )
@@ -100,14 +111,20 @@ proc `propertiesAsJSON=`*(doc: MutableDocument; json: string) =
 
 #%%% MutableDicument:
 
+proc mkDoc(doc: cbl.Document): MutableDocument =
+    if doc == nil:
+        throw(cbl.Error(domain: CBLDomain, code: int32(cbl.ErrorCode.ErrorMemoryError)))
+    else:
+        return MutableDocument(handle: doc, db: none(Database))
+
 proc newDocument*(): MutableDocument =
-    MutableDocument(handle: cbl.newDocument(nil))
+    mkDoc(cbl.newDocument(nil))
 
 proc newDocument*(docID: string): MutableDocument =
-    MutableDocument(handle: cbl.newDocument(docID))
+    mkDoc(cbl.newDocument(docID))
 
 proc mutableCopy*(doc: Document): MutableDocument =
-    MutableDocument(handle: doc.handle.mutableCopy(), db: doc.db)
+    mkDoc(doc.handle.mutableCopy())
 
 proc delete*(doc: MutableDocument; concurrency: ConcurrencyControl = LastWriteWins) =
     checkBool( (err) => doc.handle.delete(cast[cbl.ConcurrencyControl](concurrency), err[]) )

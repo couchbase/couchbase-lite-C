@@ -3,6 +3,7 @@
 import CouchbaseLite/database
 import CouchbaseLite/document
 import CouchbaseLite/errors
+import CouchbaseLite/query
 
 
 type
@@ -10,3 +11,4 @@ type
     Database* = database.Database
     Document* = document.Document
     MutableDocument* = document.MutableDocument
+    Query = query.Query
