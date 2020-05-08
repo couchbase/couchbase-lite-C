@@ -11,7 +11,7 @@ import sugar
 
 type
     ## CouchbaseLiteError codes
-    CBLErrorCode* = enum
+    ErrorCode* = enum
         AssertionFailed = 1, ## Internal assertion failure
         Unimplemented,       ## Oops, an unimplemented API call
         UnsupportedEncryption,## Unsupported encryption algorithm
@@ -63,9 +63,9 @@ type
 
 type
     Error* = ref object of CatchableError
-        cblErr: cbl.Error
+        cblErr: CBLError
     CouchbaseLiteError* = ref object of Error
-        code*: CBLErrorCode
+        code*: ErrorCode
     POSIXError* = ref object of Error
         errno*: int
     SQLiteError* = ref object of Error
@@ -91,20 +91,20 @@ proc `$`*(err: Error): string = &"{err.message} ({err.cblErr.domain}.{err.cblErr
 
 # TODO: Avoid making these public
 
-proc mkError*(err: cbl.Error): Error =
+proc mkError*(err: CBLError): Error =
     case err.domain:
-        of CBLDomain:       CouchbaseLiteError(cblErr: err, code: CBLErrorCode(err.code))
+        of CBLDomain:       CouchbaseLiteError(cblErr: err, code: ErrorCode(err.code))
         of POSIXDomain:     POSIXError(cblErr: err, errno: err.code)
         of SQLiteDomain:    SQLiteError(cblErr: err, code: err.code)
         of FleeceDomain:    FleeceError(cblErr: err, code: FleeceErrorCode(err.code))
         of NetworkDomain:   NetworkError(cblErr: err, code: NetworkErrorCode(err.code))
         of WebSocketDomain: WebSocketError(cblErr: err, code: err.code)
-        else:               CouchbaseLiteError(cblErr: err, code: CBLErrorCode(UnexpectedError))
+        else:               CouchbaseLiteError(cblErr: err, code: ErrorCode(UnexpectedError))
 
-proc throw*(err: cbl.Error) {.noreturn.} =
+proc throw*(err: CBLError) {.noreturn.} =
     raise mkError(err)
 
-proc checkBool*(fn: (ptr cbl.Error) -> bool) =
-    var err: cbl.Error
+proc checkBool*(fn: (ptr CBLError) -> bool) =
+    var err: CBLError
     if not fn(addr err):
         throw(err)

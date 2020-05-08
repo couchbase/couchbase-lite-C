@@ -10,7 +10,7 @@ import sugar
 
 type
     DatabaseObj* = object
-        handle*: cbl.Database not nil                  # TODO: Avoid making this public
+        handle*: CBLDatabase not nil                  # TODO: Avoid making this public
     Database* = ref DatabaseObj not nil
 
 
@@ -41,8 +41,8 @@ type
         encryptionKey*: ref EncryptionKey
 
 
-proc openDB(name: string; configP: ptr cbl.DatabaseConfiguration): Database =
-    var err: cbl.Error
+proc openDB(name: string; configP: ptr CBLDatabaseConfiguration): Database =
+    var err: CBLError
     let dbRef = cbl.openDatabase(name, configP, err)
     if dbRef == nil:
         throw(err)
@@ -50,12 +50,12 @@ proc openDB(name: string; configP: ptr cbl.DatabaseConfiguration): Database =
         return Database(handle: dbRef)
 
 proc openDatabase*(name: string; config: DatabaseConfiguration): Database =
-    var cblConfig = cbl.DatabaseConfiguration(
+    var cblConfig = CBLDatabaseConfiguration(
         directory: config.directory,
-        flags: cast[cbl.DatabaseFlags](config.flags) )
-    var cblKey: cbl.EncryptionKey
+        flags: cast[CBLDatabaseFlags](config.flags) )
+    var cblKey: CBLEncryptionKey
     if config.encryptionKey != nil:
-        cblKey.algorithm = cast[cbl.EncryptionAlgorithm](config.encryptionKey.algorithm)
+        cblKey.algorithm = cast[CBLEncryptionAlgorithm](config.encryptionKey.algorithm)
         cblKey.bytes = config.encryptionKey.bytes
         cblConfig.encryptionKey = addr cblKey
     return openDB(name, addr cblConfig)
@@ -67,8 +67,8 @@ proc openDatabase*(name: string): Database =
 proc databaseExists*(name: string; inDirectory: string): bool =
     cbl.databaseExists(name, inDirectory)
 
-proc deleteDatabase*(name: string; inDirectory: string): bool =
-    var err: cbl.Error
+proc deleteDatabase*(name: string; inDirectory: string): bool {.discardable.} =
+    var err: CBLError
     if cbl.deleteDatabase(name, inDirectory, err):
         return true
     elif err.code == 0:

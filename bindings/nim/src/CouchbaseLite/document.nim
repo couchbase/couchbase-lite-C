@@ -15,7 +15,7 @@ type Database = database.Database
 
 type
     DocumentObj* = object of RootObj
-        handle: cbl.Document not nil
+        handle: CBLDocument not nil
         db: Option[Database]
     Document* = ref DocumentObj
 
@@ -25,7 +25,7 @@ type
     ConcurrencyControl* {.pure.} = enum LastWriteWins =0, FailOnConflict
     SaveConflictHandler* = proc (documentBeingSaved: MutableDocument;
                                  conflictingDocument: Document): bool
-    Timestamp = cbl.Timestamp
+    Timestamp = CBLTimestamp
 
 proc `=destroy`(d: var DocumentObj) =
     release(d.handle)
@@ -50,7 +50,7 @@ proc getMutableDocument*(db: Database; docID: string): MutableDocument =
 
 type SaveContext = tuple [doc: MutableDocument, handler: SaveConflictHandler]
 
-proc saveCallback(context: pointer; documentBeingSaved, conflictingDocument: cbl.Document): bool =
+proc saveCallback(context: pointer; documentBeingSaved, conflictingDocument: CBLDocument): bool =
     let ctx = (cast[ptr SaveContext](context))[]
     var conflicting: Document = nil
     if conflictingDocument != nil:
@@ -59,8 +59,8 @@ proc saveCallback(context: pointer; documentBeingSaved, conflictingDocument: cbl
 
 proc saveDocument*(db: Database; doc: MutableDocument;
                    concurrency: ConcurrencyControl = LastWriteWins): MutableDocument =
-    var err: cbl.Error
-    let newDoc = db.handle.saveDocument(doc.handle, cast[cbl.ConcurrencyControl](concurrency), err)
+    var err: CBLError
+    let newDoc = db.handle.saveDocument(doc.handle, cast[CBLConcurrencyControl](concurrency), err)
     if newDoc == nil:
         raise mkError(err)
     else:
@@ -68,7 +68,7 @@ proc saveDocument*(db: Database; doc: MutableDocument;
 
 proc saveDocument*(db: Database; doc: MutableDocument; handler: SaveConflictHandler): MutableDocument =
     var context: SaveContext = (doc, handler)
-    var err: cbl.Error
+    var err: CBLError
     let newDoc = db.handle.saveDocumentResolving(doc.handle, saveCallback, addr context, err)
     if newDoc == nil:
         throw(err)
@@ -79,7 +79,7 @@ proc purgeDocumentByID*(db: Database; docID: string) =
     checkBool( (err) => db.handle.purgeDocumentByID(docID, err[]) )
 
 proc getDocumentExpiration*(db: Database; docID: string): Timestamp =
-    var err: cbl.Error
+    var err: CBLError
     let t = db.handle.getDocumentExpiration(docID, err)
     if t < 0: throw(err)
     return t
@@ -111,9 +111,9 @@ proc `propertiesAsJSON=`*(doc: MutableDocument; json: string) =
 
 #%%% MutableDicument:
 
-proc mkDoc(doc: cbl.Document): MutableDocument =
+proc mkDoc(doc: CBLDocument): MutableDocument =
     if doc == nil:
-        throw(cbl.Error(domain: CBLDomain, code: int32(cbl.ErrorCode.ErrorMemoryError)))
+        throw(CBLError(domain: CBLDomain, code: int32(CBLErrorCode.ErrorMemoryError)))
     else:
         return MutableDocument(handle: doc, db: none(Database))
 
@@ -127,7 +127,7 @@ proc mutableCopy*(doc: Document): MutableDocument =
     mkDoc(doc.handle.mutableCopy())
 
 proc delete*(doc: MutableDocument; concurrency: ConcurrencyControl = LastWriteWins) =
-    checkBool( (err) => doc.handle.delete(cast[cbl.ConcurrencyControl](concurrency), err[]) )
+    checkBool( (err) => doc.handle.delete(cast[CBLConcurrencyControl](concurrency), err[]) )
 
 proc purge*(doc: MutableDocument) =
     checkBool( (err) => doc.handle.purge(err[]) )
