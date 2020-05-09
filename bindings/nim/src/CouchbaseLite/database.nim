@@ -10,8 +10,8 @@ import sugar
 
 type
     DatabaseObj* = object
-        handle*: CBLDatabase not nil                  # TODO: Avoid making this public
-    Database* = ref DatabaseObj not nil
+        handle*: CBLDatabase not nil # TODO: Avoid making this public
+    Database* = ref DatabaseObj not nil               ## A connection to an open database.
 
 
 proc `=destroy`(d: var DatabaseObj) =
@@ -23,22 +23,25 @@ proc `=`(dst: var DatabaseObj, src: DatabaseObj) {.error.} =
 
 type
     DatabaseFlag* {.size: sizeof(cint).} = enum
-        create,             ## Create the file if it doesn't exist
-        readOnly,           ## Open file read-only
-        noUpgrade           ## Disable upgrading an older-version database
-    DatabaseFlags* = set[DatabaseFlag]
+        create,                                 ## Create the database if it doesn't exist
+        readOnly,                               ## Open database read-only
+        noUpgrade                               ## Disable upgrading an older-version database
+    DatabaseFlags* = set[DatabaseFlag]          ## Flags for how to open a database.
 
     EncryptionAlgorithm* = enum
+        ## Database encryption algorithms (available only in the Enterprise Edition).
         none = 0,
         AES256
     EncryptionKey* = object
-        algorithm*: EncryptionAlgorithm ## Encryption algorithm
-        bytes*: array[32, uint8]        ## Raw key data
+        ## Encryption key specified in a DatabaseConfiguration.
+        algorithm*: EncryptionAlgorithm         ## Encryption algorithm
+        bytes*: array[32, uint8]                ## Raw key data
 
     DatabaseConfiguration* = object
-        directory*: string
-        flags*: DatabaseFlags
-        encryptionKey*: ref EncryptionKey
+        ## Database configuration options.
+        directory*: string                      ## The parent directory of the database
+        flags*: DatabaseFlags                   ## Options for opening the database
+        encryptionKey*: ref EncryptionKey       ## The database's encryption key (if any)
 
 
 proc openDB(name: string; configP: ptr CBLDatabaseConfiguration): Database =
@@ -50,6 +53,11 @@ proc openDB(name: string; configP: ptr CBLDatabaseConfiguration): Database =
         return Database(handle: dbRef)
 
 proc openDatabase*(name: string; config: DatabaseConfiguration): Database =
+    ## Opens a database, or creates it if it doesn't exist yet, returning a new Database
+    ## instance. The database is closed when this object is garbage-collected, or when you call
+    ## ``close`` on it.
+    ## It's OK to open the same database file multiple times. Each Database instance is
+    ## independent of the others (and must be separately closed.)
     var cblConfig = CBLDatabaseConfiguration(
         directory: config.directory,
         flags: cast[CBLDatabaseFlags](config.flags) )
@@ -61,13 +69,15 @@ proc openDatabase*(name: string; config: DatabaseConfiguration): Database =
     return openDB(name, addr cblConfig)
 
 proc openDatabase*(name: string): Database =
+    ## Opens or creates a database, using the default configuration.
     return openDB(name, nil)
 
-
 proc databaseExists*(name: string; inDirectory: string): bool =
+    ## Returns true if a database with the given name exists in the given directory.
     cbl.databaseExists(name, inDirectory)
 
 proc deleteDatabase*(name: string; inDirectory: string): bool {.discardable.} =
+    ## Deletes a database file. If the database file is open, an error is returned.
     var err: CBLError
     if cbl.deleteDatabase(name, inDirectory, err):
         return true
@@ -76,19 +86,36 @@ proc deleteDatabase*(name: string; inDirectory: string): bool {.discardable.} =
     else:
         throw(err)
 
-proc name*(db: Database): string = $(db.handle.name)
+proc name*(db: Database): string =
+    ## The database's name (without the ``.cblite2`` extension.)
+    $(db.handle.name)
 
-proc path*(db: Database): string = $(db.handle.path)
+proc path*(db: Database): string =
+    ## The full path to the database file.
+    $(db.handle.path)
 
-proc count*(db: Database): uint64 = db.handle.count
+proc count*(db: Database): uint64 =
+    ## The number of documents in the database. (Deleted documents don't count.)
+    db.handle.count
 
-proc close*(db: Database) = checkBool( (err) => cbl.close(db.handle, err[]) )
+proc close*(db: Database) =
+    ## Closes the database. You must not call this object any more afterwards.
+    checkBool( (err) => cbl.close(db.handle, err[]) )
 
-proc delete*(db: Database) = checkBool( (err) => cbl.delete(db.handle, err[]) )
+proc delete*(db: Database) =
+    ## Closes and deletes a database.
+    ## If there are any other open connections to the database, an error is thrown.
+    checkBool( (err) => cbl.delete(db.handle, err[]) )
 
-proc compact*(db: Database) = checkBool( (err) => cbl.compact(db.handle, err[]) )
+proc compact*(db: Database) =
+    ## Compacts a database file, freeing up disk space.
+    checkBool( (err) => cbl.compact(db.handle, err[]) )
 
 proc inBatch*(db: Database; fn: proc()) =
+    ## Performs the callback proc within a batch operation, similar to a transaction.
+    ## Multiple writes are much faster if done inside a batch.
+    ## Changes wil not be visible to other Database instances until the batch operaton ends.
+    ## Batch operations can nest. Changes are not committed until the outer batch ends.
     checkBool( (err) => cbl.beginBatch(db.handle, err[]) )
     defer: checkBool( (err) => cbl.endBatch(db.handle, err[]) )
     fn()

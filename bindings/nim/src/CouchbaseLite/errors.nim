@@ -10,8 +10,8 @@ import sugar
 
 
 type
-    ## CouchbaseLiteError codes
-    ErrorCode* = enum
+
+    ErrorCode* = enum       ## Couchbase Lite error codes, found in ``Error`` objects.
         AssertionFailed = 1, ## Internal assertion failure
         Unimplemented,       ## Oops, an unimplemented API call
         UnsupportedEncryption,## Unsupported encryption algorithm
@@ -43,8 +43,7 @@ type
         BadDocID,            ## Invalid document ID
         CantUpgradeDatabase  ## DB can't be upgraded (might be unsupported dev version)
 
-    ## NetworkError codes
-    NetworkErrorCode* = enum
+    NetworkErrorCode* = enum ## Network error codes, found in ``NetworkError`` objects.
         DNSFailure = 1,     ## DNS lookup failed
         UnknownHost,        ## DNS server doesn't know the hostname
         Timeout,            ## No response received before timeout
@@ -63,22 +62,33 @@ type
 
 type
     Error* = ref object of CatchableError
+        ## Base class for Couchbase Lite exceptions.
         cblErr: CBLError
     CouchbaseLiteError* = ref object of Error
+        ## A Couchbase Lite-defined error. See its ``code`` for details.
         code*: ErrorCode
     POSIXError* = ref object of Error
+        ## An OS error. See the ``errno`` property for the specific error (defined in ``<errno.h>``)
         errno*: int
     SQLiteError* = ref object of Error
+        ## A SQLite database error. The ``code`` is defined in ``sqlite3.h``.
         code*: int
     FleeceError* = ref object of Error
+        ## A Fleece error.
         code*: FleeceErrorCode
     NetworkError* = ref object of Error
+        ## A Couchbase Lite network-related error; see the ``code`` for details.
         code*: NetworkErrorCode
     WebSocketError* = ref object of Error
+        ## An HTTP or WebSocket error. The ``code`` is an HTTP status if less than 1000,
+        ## else a WebSocket status.
         code*: int
 
 proc message*(err: Error): string = $(message(err.cblErr))
+    ## Gets the message associated with an error.
+
 proc codeStr*(err: Error): string =
+    ## Returns the name of the error's code.
     case err.cblErr.domain:
         of CBLDomain:     $(cast[CBLErrorCode](err.cblErr.code))
         of FleeceDomain:  $(cast[FleeceErrorCode](err.cblErr.code))
@@ -86,6 +96,7 @@ proc codeStr*(err: Error): string =
         else:             &"{err.cblErr.code}"
 
 proc `$`*(err: Error): string = &"{err.message} ({err.cblErr.domain}.{err.cblErr.code}: {err.codeStr})"
+    ## Formats an Error as a string, including the message, type and code.
 
 #%%%% Internal error handling utilities:
 
