@@ -1,5 +1,22 @@
+// Couchbase Lite C API bindings generator
+//
+// Copyright (c) 2020 Couchbase, Inc All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
 // This script runs during a Cargo build and generates the raw/unsafe Rust bindings, "bindings.rs",
-// in an internal build directory, where they can be included by code in this crate.
+// in an internal build directory, where they are included by `src/c_api.rs`.
 //
 // References:
 // - https://rust-lang.github.io/rust-bindgen/tutorial-3.html
@@ -11,6 +28,9 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 
+//TODO: This is likely not valid for your system, but I don't know how to find it automatically
+static DEFAULT_LIBCLANG_PATH : &str = "/usr/local/Cellar/llvm/10.0.0_3/lib";
+
 static INCLUDE_CBL_IN_LIB : bool = false;
 
 fn main() {
@@ -18,14 +38,10 @@ fn main() {
     let cbl_headers = root_dir.join("include/cbl");
     let fleece_headers = root_dir.join("vendor/couchbase-lite-core/vendor/fleece/API");
 
-    //FIXME: Don't hardcode a path from my system!
-    let default_libclang_path = PathBuf::from("/usr/local/Cellar/llvm/10.0.0_3/lib");
-
+    // Set LIBCLANG_PATH environment variable if it's not already set:
     if env::var("LIBCLANG_PATH").is_err() {
-        // Set LIBCLANG_PATH environment variable if it's not already set:
-        let path_str = default_libclang_path.to_str().unwrap();
-        env::set_var("LIBCLANG_PATH", path_str);
-        println!("cargo:rustc-env=LIBCLANG_PATH={}", path_str);
+        env::set_var("LIBCLANG_PATH", DEFAULT_LIBCLANG_PATH);
+        println!("cargo:rustc-env=LIBCLANG_PATH={}", DEFAULT_LIBCLANG_PATH);
     }
 
     // The bindgen::Builder is the main entry point
