@@ -28,8 +28,8 @@ import shutil
 from cffi import FFI
 
 
-# Assume we are running this from python/CouchbaseLite/
-DEFAULT_SRC_DIR    = "../.."
+# Assume we are running this from bindings/python/CouchbaseLite/
+DEFAULT_SRC_DIR    = "../../../"
 
 # Paths relative to the source root (--srcdir)
 CBL_INCLUDE_DIR    = "/include"
@@ -37,7 +37,7 @@ FLEECE_INCLUDE_DIR = "/vendor/couchbase-lite-core/vendor/fleece/API"
 
 # CMake settings are defaults, but overrideable on command-line
 DEFAULT_LIBRARIES = "CouchbaseLiteC z"
-DEFAULT_LIBRARY_DIR  = "../../build_cmake/"
+DEFAULT_LIBRARY_DIR  = DEFAULT_SRC_DIR + "build_cmake/"
 
 # Extra linker arguments -- platform-specific
 DEFAULT_LINK_ARGS = ""
