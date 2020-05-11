@@ -55,6 +55,8 @@ unsigned CBL_InstanceCount() CBLAPI {
 void CBL_DumpInstances(void) CBLAPI {
 #if INSTANCECOUNTED_TRACK
     fleece::InstanceCounted::dumpInstances();
+#else
+    std::cerr << "(CBL_DumpInstances() is not functional in non-debug builds)\n";
 #endif
 }
 
