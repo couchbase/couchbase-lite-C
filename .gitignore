@@ -4,6 +4,7 @@ build
 *.so
 *.dylib
 empty.cpp
+vendor/couchbase-lite-core-EE
 
 # Editors
 .vscode
