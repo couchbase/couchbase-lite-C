@@ -2,7 +2,15 @@
 
 This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syncable database, with a plain C API. The API can be used directly, or as the substrate for binding to other languages like Python, JavaScript or Rust.
 
-**As of March 2020, this project is close to beta status.** The API is nearly complete and almost all of the functionality is implemented, but there are still missing pieces and only limited testing.
+## What's New (May 2020)
+
+**This project is close to beta status.** The API is nearly complete and almost all of the functionality is implemented, but there are still missing pieces and only limited testing.
+
+* New Rust and Nim language bindings! They're in the new top-level `bindings` directory. The Python binding has been moved there too.
+* Added variants of many API functions, which take slices (`FLSlice`) instead of C strings. These are more efficient to call from languages whose native string type is not NUL-terminated, such as Rust.
+* Added `CBLResultSet_RowArray()`, `CBLResultSet_RowDict()`, and `CBLResultSet_GetQuery()`.
+* More of the logging API (in `CBLLog.h`) is implemented, including custom log callbacks.
+* Updated to latest Couchbase Lite Core (LiteCore).
 
 ## Goals
 
