@@ -58,8 +58,8 @@ FLMutableDict props = CBLDocument_MutableProperties(doc);
 FLSlot_SetString(FLMutableDict_Set(dict, FLStr("greeting")), FLStr("Howdy!"));
 
 // Save the document:
-const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, 
-                                         kCBLConcurrencyControlFailOnConflict, 
+const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc,
+                                         kCBLConcurrencyControlFailOnConflict,
                                          &error);
 CBLDocument_Release(saved);
 CBLDocument_Release(doc);
@@ -88,11 +88,29 @@ fleece::Dict readProps = doc->properties();
 fleece::slice greeting = readProps["greeting"].asString();
 ```
 
+### Nim
+
+```nim
+# Open a database:
+let config = DatabaseConfiguration(directory: "/tmp", flags: {DatabaseFlag.create})
+var db = openDatabase("nim_db", config)
+
+# Create a document:
+var doc = newDocument("foo")
+doc["greeting"] = "Howdy!"
+db.saveDocument(doc)
+
+# Read it back:
+let readDoc = db.getDocument("foo")
+let readProps = readDoc.properties
+let greeting = readProps["greeting"]
+```
+
 ### Python
 
 ```python
 # Open a database:
-db = Database("db", DatabaseConfiguration("/tmp"));
+db = Database("python_db", DatabaseConfiguration("/tmp"));
 
 # Create a document:
 doc = MutableDocument("foo")
@@ -103,6 +121,25 @@ db.saveDocument(doc)
 readDoc = db.getDocument("foo")
 readProps = readDoc.properties
 greeting = readProps["greeting"]
+```
+
+### Rust
+
+```rust
+// Open a database:
+let cfg = DatabaseConfiguration{directory: tmp_dir.path(), flags: CREATE};
+let mut db = Database::open("rust_db, Some(cfg)).expect("opening db");
+
+// Create a document:
+let mut doc = Document::new_with_id("foo");
+let mut props = doc.mutable_properties();
+props.at("greeting").put_string("Howdy!");
+db.save_document(&mut doc, ConcurrencyControl::FailOnConflict).expect("saving");
+
+// Read it back:
+let doc = db.get_document("foo").expect("reload document");
+let props = doc.properties();
+let greeting = props.get("greeting");
 ```
 
 ## Documentation
@@ -117,7 +154,7 @@ greeting = readProps["greeting"]
 
 ### With CMake on Unix (now including Raspberry Pi!)
 
-Dependencies: 
+Dependencies:
 * GCC 7+ or Clang
 * CMake 3.9+
 * ICU libraries (`apt-get install icu-dev`)
@@ -148,22 +185,6 @@ To run the unit tests:
 4. Select scheme `CBL_Tests`
 5. Run
 
-### Python Bindings (experimental)
-
-This only works on Mac so far. And it assumes that Xcode puts build output in a `build` subdirectory next to the project file. (Want to fix this? Edit `BuildPyCBL.py` and look at the "`# FIX`" lines.)
-
-Dependencies:
-* Python 3 (only tested with 3.7)
-* `pip` (which might be named `pip3` on your system)
-* The Python `cffi` package ... to install it, run `pip install cffi`
-
-1. Build the native library. (If using Xcode, build the "CBL_C Dylib" target.)
-2. `cd python`
-3. `./build.sh`
-4. `python3 test.py` -- some tests. Should run without throwing exceptions.
-
-If the tests immediately crash after logging a message like "`ERROR: Interceptors are not working`", this means that your Couchbase Lite library was built with the Address sanitizer enabled, probably because you built the 'CBL_Tests' scheme. Instead, select the 'CBL_C Dylib' scheme and build that; then go back to step 3.
-
 ## Using It
 
 ### Generic instructions
@@ -188,5 +209,7 @@ If the tests immediately crash after logging a message like "`ERROR: Interceptor
 ## Other Language Bindings
 
 * **C++**: Already included; see [`include/cbl++`](https://github.com/couchbaselabs/couchbase-lite-C/tree/master/include/cbl%2B%2B)
-* **Python**: Included but unsupported; [see above](#python-bindings-experimental)
+* **Python**: [Included](bindings/python/README.md) but unsupported
+* **Nim**: [Included](bindings/nim/README.md) but unsupported
+* **Rust**: [Included](bindings/rust/README.md) but unsupported
 * **Go** (Golang): [Third-party, in progress](https://github.com/svr4/couchbase-lite-cgo).

@@ -40,7 +40,7 @@ typedef CBL_OPTIONS(uint32_t, CBLDatabaseFlags) {
     kCBLDatabase_NoUpgrade     = 4,  ///< Disable upgrading an older-version database
 };
 
-/** Encryption algorithms (available only in the Enterprise Edition). */
+/** Database encryption algorithms (available only in the Enterprise Edition). */
 typedef CBL_ENUM(uint32_t, CBLEncryptionAlgorithm) {
     kCBLEncryptionNone = 0,      ///< No encryption (default)
 #ifdef COUCHBASE_ENTERPRISE

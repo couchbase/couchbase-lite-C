@@ -71,6 +71,20 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
 }
 
 
+TEST_CASE_METHOD(CBLTest, "Missing Document") {
+    const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo");
+    CHECK(doc == nullptr);
+
+    CBLDocument* mdoc = CBLDatabase_GetMutableDocument(db, "foo");
+    CHECK(mdoc == nullptr);
+
+    CBLError err;
+    CHECK(!CBLDatabase_PurgeDocumentByID(db, "foo", &err));
+    CHECK(err.domain == CBLDomain);
+    CHECK(err.code == CBLErrorNotFound);
+}
+
+
 TEST_CASE_METHOD(CBLTest, "New Document") {
     CBLDocument* doc = CBLDocument_New("foo");
     CHECK(doc != nullptr);
