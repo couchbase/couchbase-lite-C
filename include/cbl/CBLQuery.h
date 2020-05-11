@@ -192,7 +192,7 @@ FLArray CBLResultSet_RowArray(const CBLResultSet* _cbl_nonnull) CBLAPI;
 FLDict CBLResultSet_RowDict(const CBLResultSet* _cbl_nonnull) CBLAPI;
 
 /** Returns the Query that created this ResultSet. */
-CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull);
+CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) CBLAPI;
 
 CBL_REFCOUNTED(CBLResultSet*, ResultSet);
 

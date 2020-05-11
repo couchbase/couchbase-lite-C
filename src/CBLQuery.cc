@@ -404,7 +404,7 @@ FLDict CBLResultSet_RowDict(const CBLResultSet *rs) CBLAPI {
     return rs->asDict();
 }
 
-CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) {
+CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) CBLAPI {
     return rs->query();
 }
 

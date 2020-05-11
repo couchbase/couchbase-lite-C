@@ -55,7 +55,7 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
     possibly including crashes or overwriting the stack.
     @param domain  The log domain to associate this message with.
     @param level  The severity of the message. If this is lower than the current minimum level for the domain
-                 (as set by \ref CBL_SetLogLevel), nothing is logged.
+                 (as set by \ref CBLLog_SetConsoleLevel), nothing is logged.
     @param format  A `printf`-style format string. `%` characters in this string introduce parameters,
                  and corresponding arguments must follow. */
 void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_nonnull, ...) CBLAPI
@@ -64,7 +64,7 @@ void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_non
 /** Writes a pre-formatted message to the log, exactly as given.
     @param domain  The log domain to associate this message with.
     @param level  The severity of the message. If this is lower than the current minimum level for the domain
-                 (as set by \ref CBL_SetLogLevel), nothing is logged.
+                 (as set by \ref CBLLog_SetConsoleLevel), nothing is logged.
     @param message  The exact message to write to the log. */
 void CBL_Log_s(CBLLogDomain domain, CBLLogLevel level, FLSlice message) CBLAPI;
 
