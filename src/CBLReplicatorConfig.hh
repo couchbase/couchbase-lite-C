@@ -49,7 +49,7 @@ protected:
 namespace cbl_internal {
     // Concrete Endpoint for remote URLs
     struct CBLURLEndpoint : public CBLEndpoint {
-        CBLURLEndpoint(slice url)
+        CBLURLEndpoint(fleece::slice url)
         :_url(url)
         {
             if (!c4address_fromURL(_url, &_address, &_dbName))
