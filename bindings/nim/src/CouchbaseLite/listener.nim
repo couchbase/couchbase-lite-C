@@ -1,4 +1,4 @@
-# Couchbase Lite bindings for Nim; main module
+# Couchbase Lite listener token
 #
 # Copyright (c) 2020 Couchbase, Inc All rights reserved.
 #
@@ -15,19 +15,18 @@
 # limitations under the License.
 #
 
+import CouchbaseLite/private/cbl
 
-import CouchbaseLite/database
-import CouchbaseLite/document
-import CouchbaseLite/errors
-import CouchbaseLite/fleece
-import CouchbaseLite/listener
-import CouchbaseLite/query
-import CouchbaseLite/replicator
+{.experimental: "notnil".}
 
-export database
-export document
-export errors
-export fleece
-export listener
-export query
-export replicator
+
+type
+    ListenerToken* = object
+        ## A reference to a registered listener callback. When this object goes out of scope,
+        ## the listener is removed and the callback will no longer be called.
+        handle: CBLListenerToken not nil
+
+proc `=destroy`(t: var ListenerToken) =
+    remove(t.handle)
+
+proc `=`(dst: var ListenerToken, src: ListenerToken) {.error.}

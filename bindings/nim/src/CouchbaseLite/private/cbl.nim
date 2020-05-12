@@ -1103,6 +1103,9 @@ type
 ##     For example: `wss://example.org/dbname`
 proc newEndpointWithURL*(url: cstring): CBLEndpoint {.importc: "CBLEndpoint_NewWithURL".}
 
+## Creates a new endpoint representing another local database. (Enterprise Edition only.)
+proc newEndpointWithLocalDB*(db: CBLDatabase): CBLEndpoint {.importc: "CBLEndpoint_NewWithLocalDB".}
+
 ## Frees a CBLEndpoint object.
 proc free*(a1: CBLEndpoint) {.importc: "CBLEndpoint_Free".}
 

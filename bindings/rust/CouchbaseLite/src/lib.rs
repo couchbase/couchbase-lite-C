@@ -28,6 +28,7 @@ pub mod fleece;
 pub mod fleece_mutable;
 pub mod logging;
 pub mod query;
+pub mod replicator;
 
 mod slice;
 mod c_api;
@@ -47,6 +48,7 @@ pub use error::*;
 pub use fleece::*;
 pub use fleece_mutable::*;
 pub use query::*;
+pub use replicator::*;
 
 
 //////// TOP-LEVEL TYPES:
