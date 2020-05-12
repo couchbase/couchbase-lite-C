@@ -84,6 +84,7 @@
 		27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27D11BED2351043B00C58A70 /* ConflictResolver.hh */; };
 		27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D11BEE2351043B00C58A70 /* ConflictResolver.cc */; };
 		27D30F9F23A2D30500392107 /* PerfTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D30F9123A2D30500392107 /* PerfTest.cc */; };
+		27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */; };
 		6938072F22DE966B00727053 /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 /* End PBXBuildFile section */
@@ -382,6 +383,7 @@
 		27D11BEE2351043B00C58A70 /* ConflictResolver.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ConflictResolver.cc; sourceTree = "<group>"; };
 		27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLReplicator_Internal.hh; sourceTree = "<group>"; };
 		27D30F9123A2D30500392107 /* PerfTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PerfTest.cc; sourceTree = "<group>"; };
+		27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLQuery_Internal.hh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -511,6 +513,7 @@
 				277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */,
 				277B77D4245B44E900B222D3 /* CBLLog.cc */,
 				27B61D5521D5ABA60027CCDB /* CBLQuery.cc */,
+				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
 				277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
@@ -668,6 +671,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */,
+				27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */,
 				27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */,
 				271C2A3321CAC98F0045856E /* CBLDocument.h in Headers */,
 				277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */,

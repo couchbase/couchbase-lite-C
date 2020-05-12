@@ -20,6 +20,7 @@
 #include "CBLDatabase.h"
 #include "Internal.hh"
 #include "InstanceCounted.hh"
+#include "Util.hh"
 #include <access_lock.hh>
 #include <atomic>
 #include <memory>
@@ -51,15 +52,15 @@ public:
     void remove();
 
 protected:
-    std::atomic<const void*> _callback;          // Really a C fn pointer
-    void* _context;
+    std::atomic<const void*>     _callback;          // Really a C fn pointer
+    void* const                  _context;
     cbl_internal::ListenersBase* _owner {nullptr};
 };
 
 
 namespace cbl_internal {
 
-    /** Type-safe CBLListenerToken */
+    /** Type-safe CBLListenerToken. Thread-safe. */
     template <class LISTENER>
     class ListenerToken : public CBLListenerToken {
     public:
@@ -79,15 +80,17 @@ namespace cbl_internal {
 
 
 
-    /** Manages a set of CBLListenerTokens. */
+    /** Manages a set of CBLListenerTokens. Thread-safe. */
     class ListenersBase {
     public:
         void add(CBLListenerToken* t _cbl_nonnull) {
+            LOCK(_mutex);
             _tokens.emplace_back(t);
             t->addedTo(this);
         }
 
         void remove(CBLListenerToken* t _cbl_nonnull) {
+            LOCK(_mutex);
             for (auto i = _tokens.begin(); i != _tokens.end(); ++i) {
                 if (i->get() == t) {
                     _tokens.erase(i);
@@ -98,10 +101,12 @@ namespace cbl_internal {
         }
 
         void clear() {
+            LOCK(_mutex);
             _tokens.clear();
         }
 
         bool contains(CBLListenerToken *token _cbl_nonnull) const {
+            LOCK(_mutex);
             for (auto &tok : _tokens) {
                 if (tok == token)
                     return true;
@@ -109,12 +114,25 @@ namespace cbl_internal {
             return false;
         }
 
-    protected:
-        std::vector<fleece::Retained<CBLListenerToken>> _tokens;
+        bool empty() const {
+            LOCK(_mutex);
+            return _tokens.empty();
+        }
+
+        using Tokens = std::vector<fleece::Retained<CBLListenerToken>>;
+
+        Tokens tokens() const {
+            LOCK(_mutex);
+            return _tokens;
+        }
+
+    private:
+        mutable std::mutex _mutex;
+        Tokens _tokens;
     };
 
 
-    /** Manages a set of ListenerTokens. */
+    /** Manages a set of ListenerTokens. Thread-safe. */
     template <class LISTENER>
     class Listeners : private ListenersBase {
     public:
@@ -126,7 +144,7 @@ namespace cbl_internal {
 
         void add(ListenerToken<LISTENER> *token)                {ListenersBase::add(token);}
         void clear()                                            {ListenersBase::clear();}
-        bool empty() const                                      {return _tokens.empty();}
+        bool empty() const                                      {return ListenersBase::empty();}
         
         ListenerToken<LISTENER>* find(CBLListenerToken *token) const {
             return contains(token) ? (ListenerToken<LISTENER>*) token : nullptr;
@@ -134,7 +152,7 @@ namespace cbl_internal {
 
             template <class... Args>
         void call(Args... args) const {
-            for (auto &lp : _tokens)
+            for (auto &lp : tokens())
                 ((ListenerToken<LISTENER>*)lp.get())->call(args...);
         }
     };
@@ -143,7 +161,7 @@ namespace cbl_internal {
     using Notification = std::function<void()>;
 
 
-    /** Manages a queue of pending calls to listeners. Owned by CBLDatabase. */
+    /** Manages a queue of pending calls to listeners. Owned by CBLDatabase. Thread-safe. */
     class NotificationQueue {
     public:
         NotificationQueue(CBLDatabase* _cbl_nonnull);
