@@ -19,9 +19,11 @@ import CouchbaseLite
 import CouchbaseLite/[database, document, errors, listener]
 import CouchbaseLite/private/cbl
 
+import httpcore
 import options
 import sets
 import tables
+import uri
 
 {.experimental: "notnil".}
 
@@ -39,8 +41,8 @@ type
     Endpoint* = object
         ## Represents the location of a database to replicate with.
         case type*: EndpointType:
-            of WithURL:     url*: string
-            of WithLocalDB: db*: Database
+            of WithURL:     url*: Url       ## WebSocket URL ("ws:" or "wss:") of remote database
+            of WithLocalDB: db*:  Database  ## Local database (available only in Enterprise Edition)
 
     AuthenticatorType* = enum
         None,
@@ -72,7 +74,7 @@ type
 
     ReplicationFilter* = proc(document: Document; isDeleted: bool): bool
         ## A callback that can decide whether a particular document should be pushed or pulled.
-    ConflictResolver* = proc(documentID: string; localDocument, remoteDocument: Document): Document
+    ConflictResolver* = proc(documentID: string; local, remote: Document): Document
         ## Conflict-resolution callback for use in replications. This callback will be invoked
         ## when the replicator finds a newer server-side revision of a document that also has local
         ## changes. The local and remote changes must be resolved before the document can be pushed
@@ -87,7 +89,7 @@ type
 
         authenticator*:     Authenticator         ## Authentication credentials, if needed
         proxy*:             Option[ProxySettings] ## HTTP client proxy settings
-        headers*:           Table[string, string] ## Extra HTTP headers to add to the WebSocket request
+        headers*:           HttpHeaders           ## Extra HTTP headers to add to the WebSocket request
         pinnedServerCertificate*: seq[uint8]      ## An X.509 cert to "pin" TLS connections to (PEM or DER)
         trustedRootCertificates*: seq[uint8]      ## Set of anchor certs (PEM format)
 
@@ -102,7 +104,7 @@ type
 
 
 type
-    ReplicatorObj = object
+    ReplicatorObj {.requiresInit.} = object
         handle: CBLReplicator not nil
     Replicator* = ref ReplicatorObj not nil
         ## A background task that syncs a Database with a remote server or peer.

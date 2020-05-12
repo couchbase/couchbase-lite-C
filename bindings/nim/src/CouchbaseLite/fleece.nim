@@ -116,7 +116,7 @@ proc parseJSON*(json: string): Fleece =
 proc root*(self: Fleece): Value     =
     ## The root object.
     ## This reference and all children are only valid as long as this ``Fleece`` object is.
-    self.doc.getRoot()
+    if self.doc == nil: nil else: self.doc.getRoot()
 proc asArray*(self: Fleece): Array  =
     ## The root array, or an empty/undefined value if the root is not an Array.
     ## This reference and all children are only valid as long as this ``Fleece`` object is.
@@ -236,23 +236,20 @@ iterator items*(d: DictObject): tuple [key: string, value: Value] =
         if not next(addr i): break
 
 
-type DictKey* = object
+type DictKey* {.requiresInit.} = object
     ## A DictKey is a cached dictionary key. It works just like a string, but it's faster because
     ## it can cache the internal representation of the key.
     ## DictKey instances have to be created by the ``dictKey`` function.
     flkey: FLDictKey
-    initialized: bool
 
 proc dictKey*(key: string): DictKey =
     ## Creates a DictKey representing the given string.
-    DictKey(flkey: fl.init(key.asSlice()), initialized: true)
+    DictKey(flkey: fl.init(key.asSlice()))
 
 proc `$`*(key: var DictKey): string =
-    assert key.initialized, "Uninitialized DictKey"
     fl.getString(addr key.flkey).toString
 
 proc get*(d: DictObject, key: var DictKey): Value =
-    assert key.initialized, "Uninitialized DictKey"
     fl.getWithKey(d.asDict, addr key.flkey)
 
 proc `[]`*(d: DictObject; key: var DictKey): Value   = d.asDict.get(key)
@@ -260,7 +257,7 @@ proc `[]`*(v: Value; key: var DictKey): Value  = v.asDict[key]
 proc `[]`*(f: Fleece; key: var DictKey): Value = f.asDict[key]
 
 
-type KeyPath* = object
+type KeyPath* {.requiresInit.} = object
     ## KeyPath is like a multi-level DictKey: it's initialized with a path string like
     ## "coords.lat" or "contacts[2].lastName" and can then be used like a key to access the value
     ## at that path in any object. If any component in the path is missing, the result is a

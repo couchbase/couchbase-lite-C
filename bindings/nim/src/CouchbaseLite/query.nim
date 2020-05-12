@@ -23,7 +23,7 @@ import CouchbaseLite/private/fl    # for slice utilities
 
 
 type
-    QueryObj = object
+    QueryObj {.requiresInit.} = object
         handle: CBLQuery not nil
     Query* = ref QueryObj not nil
         ## A compiled database query.
@@ -38,7 +38,7 @@ type
         ## position of the error in the input string.
         byteOffset*: int
 
-    Row* = object
+    Row* {.requiresInit.} = object
         ## A result row from running a query. A collection that contains one "column" value for each
         ## item specified in the query's ``SELECT`` clause. The columns can be accessed by either
         ## position or name.
@@ -59,7 +59,7 @@ proc newQuery*(db: Database; str: string; language: QueryLanguage = N1QL): Query
     # the desired value(s) by setting the ``parameters`` property each time you run the query.
     var errPos: cint
     var err: CBLError
-    let q = newQuery(db.handle, CBLQueryLanguage(language), str, addr errPos, err)
+    let q = newQuery(db.internal_handle, CBLQueryLanguage(language), str, addr errPos, err)
     if q == nil:
         if err.domain == CBLDomain and err.code == int(CBLErrorCode.ErrorInvalidQuery):
             raise QuerySyntaxError(code: ErrorCode.InvalidQuery, msg: "Query syntax error", byteOffset: errPos)

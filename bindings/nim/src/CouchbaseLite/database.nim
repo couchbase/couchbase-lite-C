@@ -24,16 +24,15 @@ import sugar
 
 
 type
-    DatabaseObj* = object
-        handle*: CBLDatabase not nil # TODO: Avoid making this public
+    DatabaseObj* {.requiresInit.} = object
+        handle: CBLDatabase not nil
     Database* = ref DatabaseObj not nil               ## A connection to an open database.
 
 
 proc `=destroy`(d: var DatabaseObj) =
     release(d.handle)
 
-proc `=`(dst: var DatabaseObj, src: DatabaseObj) {.error.} =
-    echo "can't copy a db"
+proc `=`(dst: var DatabaseObj, src: DatabaseObj) {.error.}
 
 
 type
@@ -134,5 +133,9 @@ proc inBatch*(db: Database; fn: proc()) =
     checkBool( (err) => cbl.beginBatch(db.handle, err[]) )
     defer: checkBool( (err) => cbl.endBatch(db.handle, err[]) )
     fn()
+
+proc internal_handle*(db: Database): CBLDatabase =
+    # INTERNAL ONLY
+    db.handle
 
 #TODO: Listeners

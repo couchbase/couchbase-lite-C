@@ -27,7 +27,7 @@ import sugar
 type Database = database.Database
 
 type
-    DocumentObj* = object of RootObj
+    DocumentObj* {.requiresInit.} = object of RootObj
         handle: CBLDocument not nil
         db: Option[Database]
     Document* = ref DocumentObj
@@ -36,7 +36,7 @@ type
         ## the subclass ``MutableDocument`` does.
 
 
-    MutableDocumentObj* = object of DocumentObj
+    MutableDocumentObj* {.requiresInit.} = object of DocumentObj
     MutableDocument* = ref MutableDocumentObj
         ## An in-memory copy of a document that can be changed and then saved back to the database.
 
@@ -70,7 +70,7 @@ proc getDocument*(db: Database; docID: string): Document =
     ## Reads a document from the database, creating a new (immutable) Document object.
     ## If you are reading the document in order to make changes to it, call
     ## ``getMutableDocument`` instead.
-    let doc = cbl.getDocument(db.handle, docID)
+    let doc = cbl.getDocument(db.internal_handle, docID)
     if doc != nil:
         return Document(handle: doc, db: some(db))
 
@@ -78,7 +78,7 @@ proc `[]`*(db: Database, docID: string): Document   = db.getDocument(docID)
 
 proc getMutableDocument*(db: Database; docID: string): MutableDocument =
     ## Reads a document from the database, in mutable form that can be updated and saved.
-    let doc = getMutableDocument(db.handle, docID)
+    let doc = getMutableDocument(db.internal_handle, docID)
     if doc != nil:
         return MutableDocument(handle: doc, db: some(db))
 
@@ -100,7 +100,7 @@ proc saveDocument*(db: Database; doc: MutableDocument;
     ## If you need finer-grained control, call the version of this method that takes a
     ## ``SaveConflictHandler`` instead.
     var err: CBLError
-    let newDoc = db.handle.saveDocument(doc.handle, cast[CBLConcurrencyControl](concurrency), err)
+    let newDoc = db.internal_handle.saveDocument(doc.handle, cast[CBLConcurrencyControl](concurrency), err)
     if newDoc == nil:
         raise mkError(err)
     else:
@@ -115,7 +115,7 @@ proc saveDocument*(db: Database; doc: MutableDocument; handler: SaveConflictHand
     ## give up and return ``false``, in which case a conflict exception will be thrown.
     var context: SaveContext = (doc, handler)
     var err: CBLError
-    let newDoc = db.handle.saveDocumentResolving(doc.handle, saveCallback, addr context, err)
+    let newDoc = db.internal_handle.saveDocumentResolving(doc.handle, saveCallback, addr context, err)
     if newDoc == nil:
         throw(err)
     else:
@@ -140,7 +140,7 @@ proc purgeDocument*(db: Database; docID: string): bool =
     ## when pulled.
     ## If no document with this ID exists, returns false.
     var err: CBLError
-    if db.handle.purgeDocumentByID(docID, err):
+    if db.internal_handle.purgeDocumentByID(docID, err):
         return true
     elif err.code == 0:
         return false
@@ -152,13 +152,13 @@ proc getDocumentExpiration*(db: Database; docID: string): Timestamp =
     ## No expiration is indicated by a zero return value.
     ## Documents don't normally expire; you have to set an expiration time yourself.
     var err: CBLError
-    let t = db.handle.getDocumentExpiration(docID, err)
+    let t = db.internal_handle.getDocumentExpiration(docID, err)
     if t < 0: throw(err)
     return t
 
 proc setDocumentExpiration*(db: Database; docID: string, expiration: Timestamp) =
     ## Sets a document's expiration time, or clears it if the timestamp is zero.
-    checkBool( (err) => db.handle.setDocumentExpiration(docID, expiration, err[]) )
+    checkBool( (err) => db.internal_handle.setDocumentExpiration(docID, expiration, err[]) )
 
 
 #%%% Document accessors:
