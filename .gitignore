@@ -1,8 +1,20 @@
 build_cmake
-*.pyc
+build
 *.o
 *.so
-python/CouchbaseLite/libcouchbase_lite.dylib
-python/CouchbaseLite/*.c
-.vscode
+*.dylib
 empty.cpp
+vendor/couchbase-lite-core-EE
+
+# Editors
+.vscode
+*.sublime-workspace
+
+# Python
+python/CouchbaseLite/*.c
+*.pyc
+
+# Rust
+Cargo.lock
+bindings/rust/CouchbaseLite/target/
+bindings/nim/bin/

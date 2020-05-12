@@ -39,7 +39,7 @@ namespace cbl_internal {
     char* allocCString(FLSlice);
     char* allocCString(FLSliceResult);      // frees the input
 
-    fleece::alloc_slice convertJSON5(const char *json5, C4Error *outError);
+    fleece::alloc_slice convertJSON5(FLSlice json5, C4Error *outError);
 
     void setError(C4Error* outError, C4ErrorDomain domain, int code, C4String message);
 }

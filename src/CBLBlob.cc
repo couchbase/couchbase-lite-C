@@ -81,25 +81,36 @@ void CBLBlobReader_Close(CBLBlobReadStream* stream) CBLAPI {
 #pragma mark - CREATING BLOBS:
 
 
-static CBLBlob* createNewBlob(const char *type,
+static CBLBlob* createNewBlob(slice contentType,
                               FLSlice contents,
                               CBLBlobWriteStream *writer)
 {
-    return retain(new CBLNewBlob(type, contents, internal(writer)));
+    return retain(new CBLNewBlob(contentType, contents, internal(writer)));
 }
 
 CBLBlob* CBLBlob_CreateWithData(const char *contentType,
-                                    FLSlice contents) CBLAPI
+                                FLSlice contents) CBLAPI
+{
+    return createNewBlob(contentType, contents, nullptr);
+}
+
+CBLBlob* CBLBlob_CreateWithData_s(FLString contentType,
+                                  FLSlice contents) CBLAPI
 {
     return createNewBlob(contentType, contents, nullptr);
 }
 
 CBLBlob* CBLBlob_CreateWithStream(const char *contentType,
-                                      CBLBlobWriteStream *writer) CBLAPI
+                                  CBLBlobWriteStream *writer) CBLAPI
 {
     return createNewBlob(contentType, nullslice, writer);
 }
 
+CBLBlob* CBLBlob_CreateWithStream_s(FLString contentType,
+                                    CBLBlobWriteStream* writer) CBLAPI
+{
+    return createNewBlob(contentType, nullslice, writer);
+}
 
 CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError) CBLAPI {
     return (CBLBlobWriteStream*) c4blob_openWriteStream(db->blobStore(),
@@ -122,25 +133,28 @@ bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
 #pragma mark - FLEECE UTILITIES:
 
 
-static MutableDict blobMutableProperties(CBLBlob *blob _cbl_nonnull) {
+void FLSlot_SetBlob(FLSlot slot _cbl_nonnull, CBLBlob* blob _cbl_nonnull) CBLAPI
+{
     Dict props = CBLBlob_Properties(blob);
     MutableDict mProps = props.asMutable();
-    return mProps ? mProps : props.mutableCopy();
+    if (!mProps)
+        mProps = props.mutableCopy();
+    FLSlot_SetValue(slot, mProps);
 }
 
 
 void FLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
                              uint32_t index,
-                             CBLBlob* blob _cbl_nonnull) CBLAPI
+                             CBLBlob* blob _cbl_nonnull) CBLAPI //deprecated
 {
-    FLSlot_SetValue(FLMutableArray_Set(array, index), blobMutableProperties(blob));
+    FLSlot_SetBlob(FLMutableArray_Set(array, index), blob);
 }
 
 
 void FLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
                                           FLString key,
-                                          CBLBlob* blob _cbl_nonnull) CBLAPI
+                                          CBLBlob* blob _cbl_nonnull) CBLAPI //deprecated
 {
-    FLSlot_SetValue(FLMutableDict_Set(dict, key), blobMutableProperties(blob));
+    FLSlot_SetBlob(FLMutableDict_Set(dict, key), blob);
 }
 

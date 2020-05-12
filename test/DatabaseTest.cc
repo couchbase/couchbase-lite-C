@@ -62,12 +62,26 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
     CBLDatabaseConfiguration config = CBLDatabase_Config(defaultdb);
     CHECK(config.directory != nullptr);     // exact value is platform-specific
     CHECK(config.flags == kCBLDatabase_Create);
-    CHECK(config.encryptionKey.algorithm == kCBLEncryptionNone);
+    CHECK(config.encryptionKey == nullptr);
 
     CHECK(CBLDatabase_Delete(defaultdb, &error));
     CBLDatabase_Release(defaultdb);
 
     CHECK(!CBL_DatabaseExists("unconfig", nullptr));
+}
+
+
+TEST_CASE_METHOD(CBLTest, "Missing Document") {
+    const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo");
+    CHECK(doc == nullptr);
+
+    CBLDocument* mdoc = CBLDatabase_GetMutableDocument(db, "foo");
+    CHECK(mdoc == nullptr);
+
+    CBLError err;
+    CHECK(!CBLDatabase_PurgeDocumentByID(db, "foo", &err));
+    CHECK(err.domain == CBLDomain);
+    CHECK(err.code == CBLErrorNotFound);
 }
 
 

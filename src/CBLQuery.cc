@@ -40,10 +40,10 @@ public:
 
     CBLQuery(const CBLDatabase* db _cbl_nonnull,
              CBLQueryLanguage language,
-             const char *queryCString _cbl_nonnull,
+             slice queryString,
              int *outErrPos,
              C4Error* outError)
-    :shared_access_lock<C4Query*>(create(db, language, queryCString, outErrPos, outError), db)
+    :shared_access_lock<C4Query*>(create(db, language, queryString, outErrPos, outError), db)
     ,_database(db)
     { }
 
@@ -55,19 +55,16 @@ public:
 
     static C4Query* create(const CBLDatabase* db _cbl_nonnull,
                            CBLQueryLanguage language,
-                           const char *queryCString _cbl_nonnull,
+                           slice queryString,
                            int *outErrPos,
                            C4Error* outError)
     {
-        slice queryString;
         alloc_slice json;
         if (language == kCBLJSONLanguage) {
-            json = convertJSON5(queryCString, outError);
+            json = convertJSON5(queryString, outError);
             if (!json)
                 return nullptr;
             queryString = json;
-        } else {
-            queryString = slice(queryCString);
         }
         return db->use<C4Query*>([&](C4Database* c4db) {
             return c4query_new2(c4db, (C4QueryLanguage)language, queryString,
@@ -103,13 +100,19 @@ public:
         });
     }
 
+    Dict parameters() const {
+        if (!_parameters)
+            return nullptr;
+        return Value::fromData(_parameters, kFLTrusted).asDict();
+    }
+
     void setParameters(Dict parameters) {
         Encoder enc;
         enc.writeValue(parameters);
         _encodeParameters(enc);
     }
 
-    bool setParametersAsJSON(const char* json5) {
+    bool setParametersAsJSON(slice json5) {
         alloc_slice json = convertJSON5(json5, nullptr);
         if (!json)
             return false;
@@ -120,7 +123,7 @@ public:
 
     Retained<CBLResultSet> execute(C4Error* outError);
 
-    int columnNamed(slice name) {
+    int columnNamed(slice name) const {
         call_once(_onceColumnNames, [this]{
             _columnNames.reset(new std::unordered_map<slice, uint32_t>);
             unsigned nCols = columnCount();
@@ -132,15 +135,9 @@ public:
         return (i != _columnNames->end()) ? i->second : -1;
     }
 
-    Dict parameters() {
-        if (!_parameters)
-            return nullptr;
-        return Value::fromData(_parameters, kFLTrusted).asDict();
-    }
-
     CBLListenerToken* addChangeListener(CBLQueryChangeListener listener, void *context);
 
-    ListenerToken<CBLQueryChangeListener>* getChangeListener(CBLListenerToken *token) {
+    ListenerToken<CBLQueryChangeListener>* getChangeListener(CBLListenerToken *token) const {
         return _listeners.find(token);
     }
 
@@ -158,8 +155,8 @@ private:
 
     RetainedConst<CBLDatabase> _database;
     alloc_slice _parameters;
-    unique_ptr<std::unordered_map<slice, unsigned>> _columnNames;
-    once_flag _onceColumnNames;
+    mutable unique_ptr<std::unordered_map<slice, unsigned>> _columnNames;
+    mutable once_flag _onceColumnNames;
     Listeners<CBLQueryChangeListener> _listeners;
 };
 
@@ -175,6 +172,8 @@ public:
     { }
 
     bool next() {
+        _asArray = nullptr;
+        _asDict = nullptr;
         C4Error error;
         bool more = c4queryenum_next(_enum, &error);
         if (!more && error.code != 0)
@@ -183,20 +182,51 @@ public:
         return more;
     }
 
-    Value property(const char *prop) {
-        int col = _query->columnNamed(slice(prop));
+    Value property(slice prop) const {
+        int col = _query->columnNamed(prop);
         return (col >= 0) ? column(col) : nullptr;
     }
 
-    Value column(unsigned col) {
+    Value column(unsigned col) const {
         if (col < 64 && (_enum->missingColumns & (1ULL<<col)))
             return nullptr;
         return FLArrayIterator_GetValueAt(&_enum->columns, uint32_t(col));
     }
 
+    Array asArray() const {
+        if (!_asArray) {
+            auto array = MutableArray::newArray();
+            unsigned nCols = _query->columnCount();
+            array.resize(uint32_t(nCols));
+            for (unsigned i = 0; i < nCols; ++i)
+                array[i] = column(i);
+            _asArray = array;
+        }
+        return _asArray;
+    }
+
+    Dict asDict() const {
+        if (!_asDict) {
+            auto dict = MutableDict::newDict();
+            unsigned nCols = _query->columnCount();
+            for (unsigned i = 0; i < nCols; ++i) {
+                slice key = _query->columnName(i);
+                dict[key] = column(i);
+            }
+            _asDict = dict;
+        }
+        return _asDict;
+    }
+
+    CBLQuery* query() const {
+        return _query;
+    }
+
 private:
     Retained<CBLQuery> const _query;
     c4::ref<C4QueryEnumerator> const _enum;
+    mutable MutableArray _asArray;
+    mutable MutableDict _asDict;
 };
 
 
@@ -284,11 +314,20 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        int *outErrorPos,
                        CBLError* outError) CBLAPI
 {
+    return CBLQuery_New_s(db, language, slice(queryString), outErrorPos, outError);
+}
+
+CBLQuery* CBLQuery_New_s(const CBLDatabase* db _cbl_nonnull,
+                         CBLQueryLanguage language,
+                         FLString queryString,
+                         int *outErrorPos,
+                         CBLError* outError) CBLAPI
+{
     auto query = retained(new CBLQuery(db, language, queryString, outErrorPos, internal(outError)));
     return query->valid() ? retain(query.get()) : nullptr;
 }
 
-FLDict CBLQuery_Parameters(CBLQuery* _cbl_nonnull query) CBLAPI {
+FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI {
     return query->parameters();
 }
 
@@ -297,6 +336,10 @@ void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBL
 }
 
 bool CBLQuery_SetParametersAsJSON(CBLQuery* query, const char* json5) CBLAPI {
+    return CBLQuery_SetParametersAsJSON_s(query, slice(json5));
+}
+
+bool CBLQuery_SetParametersAsJSON_s(CBLQuery* query, FLString json5) CBLAPI {
     query->setParametersAsJSON(json5);
     return true;
 }
@@ -305,15 +348,15 @@ CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError)
     return retain(query->execute(internal(outError)).get());
 }
 
-FLSliceResult CBLQuery_Explain(CBLQuery* query _cbl_nonnull) CBLAPI {
+FLSliceResult CBLQuery_Explain(const CBLQuery* query _cbl_nonnull) CBLAPI {
     return FLSliceResult(query->explain());
 }
 
-unsigned CBLQuery_ColumnCount(CBLQuery* query _cbl_nonnull) CBLAPI {
+unsigned CBLQuery_ColumnCount(const CBLQuery* query _cbl_nonnull) CBLAPI {
     return query->columnCount();
 }
 
-FLSlice CBLQuery_ColumnName(CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI {
+FLSlice CBLQuery_ColumnName(const CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI {
     return query->columnName(col);
 }
 
@@ -324,7 +367,7 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
     return query->addChangeListener(listener, context);
 }
 
-CBLResultSet* CBLQuery_CopyCurrentResults(CBLQuery* query,
+CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
                                           CBLListenerToken *token,
                                           CBLError *outError) CBLAPI
 {
@@ -341,12 +384,28 @@ bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
     return rs->next();
 }
 
-FLValue CBLResultSet_ValueForKey(CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
+FLValue CBLResultSet_ValueForKey(const CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
+    return CBLResultSet_ValueForKey_s(rs, slice(property));
+}
+
+FLValue CBLResultSet_ValueForKey_s(const CBLResultSet* rs, FLString property) CBLAPI {
     return rs->property(property);
 }
 
-FLValue CBLResultSet_ValueAtIndex(CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
+FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
     return rs->column(column);
+}
+
+FLArray CBLResultSet_RowArray(const CBLResultSet *rs) CBLAPI {
+    return rs->asArray();
+}
+
+FLDict CBLResultSet_RowDict(const CBLResultSet *rs) CBLAPI {
+    return rs->asDict();
+}
+
+CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) CBLAPI {
+    return rs->query();
 }
 
 
@@ -354,9 +413,9 @@ FLValue CBLResultSet_ValueAtIndex(CBLResultSet* rs _cbl_nonnull, unsigned column
 
 
 bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
-                        const char* name _cbl_nonnull,
-                        CBLIndexSpec spec,
-                        CBLError *outError) CBLAPI
+                             const char* name _cbl_nonnull,
+                             CBLIndexSpec spec,
+                             CBLError *outError) CBLAPI
 {
     C4IndexOptions options = {};
     options.language = spec.language;
@@ -369,6 +428,21 @@ bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
                                 &options,
                                 internal(outError));
     });
+}
+
+bool CBLDatabase_CreateIndex_s(CBLDatabase *db,
+                               FLString name,
+                               CBLIndexSpec_s spec_s,
+                               CBLError *outError) CBLAPI
+{
+    string json(slice(spec_s.keyExpressionsJSON));
+    CBLIndexSpec spec = {spec_s.type, json.c_str(), spec_s.ignoreAccents};
+    string language;
+    if (spec_s.language.buf) {
+        language = slice(spec.language);
+        spec.language = language.c_str();
+    }
+    return CBLDatabase_CreateIndex(db, string(slice(name)).c_str(), spec, outError);
 }
 
 bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,

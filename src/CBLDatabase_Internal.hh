@@ -31,7 +31,7 @@ namespace cbl_internal {
 struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Database*> {
 
     CBLDatabase(C4Database* _cbl_nonnull db,
-                const std::string &name_,
+                fleece::slice name_,
                 fleece::slice dir_,
                 CBLDatabaseFlags flags_)
     :access_lock(std::move(db))
@@ -80,6 +80,7 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
     C4BlobStore* blobStore() const      {return _blobStore;}
 
 private:
+    friend class CBLURLEndpointListener;
     friend class cbl_internal::CBLLocalEndpoint;
     C4Database* _getC4Database() const;
 

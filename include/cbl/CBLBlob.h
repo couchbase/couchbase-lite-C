@@ -132,6 +132,9 @@ extern "C" {
     CBLBlob* CBLBlob_CreateWithData(const char *contentType,
                                     FLSlice contents) CBLAPI;
 
+    CBLBlob* CBLBlob_CreateWithData_s(FLString contentType,
+                                      FLSlice contents) CBLAPI;
+
     /** A stream for writing a new blob to the database. */
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
 
@@ -168,6 +171,9 @@ extern "C" {
     CBLBlob* CBLBlob_CreateWithStream(const char *contentType,
                                       CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
 
+    CBLBlob* CBLBlob_CreateWithStream_s(FLString contentType,
+                                        CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
+
 #pragma mark - FLEECE UTILITIES:
 
     /** Returns true if a value in a document is a blob reference.
@@ -184,15 +190,19 @@ extern "C" {
         return CBLBlob_Get(FLValue_AsDict(value));
     }
 
+    void FLSlot_SetBlob(FLSlot slot _cbl_nonnull,
+                        CBLBlob* blob _cbl_nonnull) CBLAPI;
+    
     /** Stores a blob in a mutable array. */
     void FLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
                                 uint32_t index,
-                                CBLBlob* blob _cbl_nonnull) CBLAPI;
+                                CBLBlob* blob _cbl_nonnull) CBLAPI _cbl_deprecated;
 
     /** Stores a blob in a mutable dictionary. */
     void FLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
                                FLString key,
-                               CBLBlob* blob _cbl_nonnull) CBLAPI;
+                               CBLBlob* blob _cbl_nonnull) CBLAPI _cbl_deprecated;
+
 
 /** @} */
 

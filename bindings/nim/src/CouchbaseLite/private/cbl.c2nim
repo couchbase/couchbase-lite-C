@@ -1,0 +1,55 @@
+// Definitions for c2nim to parse CouchbaseLite headers
+
+#skipinclude
+//#skipcomments
+
+#def FLPURE
+#def FLAPI
+#def FLNONNULL
+#assumendef FL_IMPL
+#assumendef DOXYGEN_PARSING
+#assumendef CMAKE
+#assumendef __OBJC__
+#assumedef FL_BINDING
+
+#def CBL_CORE_API
+#def CBLAPI
+#def CBL_ENUM(_type, _name)     enum _name _name; enum _name
+#def CBL_OPTIONS(_type, _name)  enum _name _name; enum _name
+#def CBLINLINE
+#def _cbl_nonnull
+#def _cbl_returns_nonnull
+#def _cbl_warn_unused
+#def __printflike(fmtarg, firstvararg)
+#def CBL_REFCOUNTED(TYPE,NAME)
+
+#assumedef CBL_BINDING
+#assumendef COUCHBASE_ENTERPRISE
+
+
+// Exceptions to name mangling:
+#mangle CBLDomain CBLDomain
+
+// CBL Name mangling:
+#mangle "^'CBL'{[A-Z][a-zA-Z]*}'_New'" "New$1"
+#mangle "^'CBL'{[A-Z][a-zA-Z]*}'_Create'" "Create$1"
+#mangle "^'CBL'{[A-Z][a-zA-Z]*}'_Open'$" "Open$1"
+#mangle "^'CBL'{[A-Z][a-zA-Z]*}'_Get'$" "Get$1"
+#mangle "^'CBL'[A-Z][a-zA-Z]*'_'{.*}" "$1"
+
+#mangle "^'CBL_'{[a-z]*}" "$1"
+#mangle "^'CBL'{[a-z]*}" "$1"
+#mangle "^'kCBL'{[a-z]*}" "k$1"
+
+// Fleece name mangling:
+#mangle "^'FL'{[A-Z][a-zA-Z]*}'_New'" "New$1"
+#mangle "^'FL'{[A-Z][a-zA-Z]*}'_Create'" "Create$1"
+#mangle "^'FL'{[A-Z][a-zA-Z]*}'_New'$" "Open$1"
+#mangle "^'FL'[A-Z][a-zA-Z]*'_'{.*}" "$1"
+
+#mangle "^'FL_'{[a-z]*}" "$1"
+#mangle "^'FL'{[a-z]*}" "$1"
+#mangle "^'kFL'{[a-z]*}" "k$1"
+
+# Nim does not allow leading underscores in identifiers
+#mangle "^'_'{.*}" "Internal$1"

@@ -1,0 +1,23 @@
+[package]
+name = "couchbase_lite"
+version = "0.1.0"
+authors = ["Jens Alfke <jens@couchbase.com>"]
+
+[dependencies]
+enum_primitive = "*"
+tempdir = "*"
+
+[build-dependencies]
+bindgen = "0.53.1"
+
+[lib]
+bench = false
+doctest = false
+crate-type = ["lib", "dylib"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+incremental = false
+# See: https://github.com/johnthagen/min-sized-rust

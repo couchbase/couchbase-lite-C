@@ -35,7 +35,7 @@ class CBLDocument : public CBLRefCounted {
 
 public:
     // Construct a new document (not in any database yet)
-    CBLDocument(const char *docID, bool isMutable);
+    CBLDocument(slice docID, bool isMutable);
 
     // Construct on an existing document
     CBLDocument(CBLDatabase *db, const string &docID, bool isMutable, bool allRevisions =false);
@@ -72,7 +72,7 @@ public:
     void setProperties(MutableDict d)           {if (checkMutable(nullptr)) _properties = d;}
 
     char* propertiesAsJSON() const;
-    bool setPropertiesAsJSON(const char *json, C4Error* outError);
+    bool setPropertiesAsJSON(slice json, C4Error* outError);
 
     //---- Save/delete:
 

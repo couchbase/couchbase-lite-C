@@ -23,21 +23,40 @@
 
 import argparse
 import os.path
+import platform
+import shutil
 from cffi import FFI
 
+
+# Assume we are running this from bindings/python/CouchbaseLite/
+DEFAULT_SRC_DIR    = "../../../"
 
 # Paths relative to the source root (--srcdir)
 CBL_INCLUDE_DIR    = "/include"
 FLEECE_INCLUDE_DIR = "/vendor/couchbase-lite-core/vendor/fleece/API"
 
-# Mac+Xcode settings are defaults, but overrideable on command-line
-DEFAULT_LIBRARIES = "CouchbaseLiteC-static LiteCore-static LiteCoreWebSocket z"
-DEFAULT_LIBRARY_DIR  = "../../build/CBL_C/Build/Products/Debug/"
+# CMake settings are defaults, but overrideable on command-line
+DEFAULT_LIBRARIES = "CouchbaseLiteC z"
+DEFAULT_LIBRARY_DIR  = DEFAULT_SRC_DIR + "build_cmake/"
+
+# Extra linker arguments -- platform-specific
+DEFAULT_LINK_ARGS = ""
+if platform.system() == "Darwin":
+    DEFAULT_LINK_ARGS = "-rpath @loader_path"  # Look for CBL dylib in same dir as bindings lib
+
 
 def BuildLibrary(sourceDir, libdir, libraries, extra_link_args):
     # python 3.5 distutils breaks on Linux with absolute library path,
     # so make sure it is relative path
     libdir = os.path.relpath(libdir)
+
+    # Copy the CBL library here:
+    libpath = libdir + "/libCouchbaseLiteC"
+    if platform.system() == "Darwin":
+        libpath += ".dylib"
+    else:
+        libpath += ".so"
+    shutil.copy(libpath, ".")
 
     # CFFI stuff -- see https://cffi.readthedocs.io/en/latest/index.html
 
@@ -52,7 +71,7 @@ def BuildLibrary(sourceDir, libdir, libraries, extra_link_args):
         cHeaderSource,
         libraries=libraries,
         include_dirs=[sourceDir+CBL_INCLUDE_DIR, sourceDir+FLEECE_INCLUDE_DIR],
-        library_dirs=[libdir],
+        library_dirs=["."],
         extra_link_args=extra_link_args)
     ffibuilder.compile(verbose=True)
 
@@ -67,7 +86,7 @@ def CDeclarations():
 // Needs to be updated whenever public C API changes!
 
 void free(void *);
-typedef long time_t;
+typedef int64_t CBLTimestamp;
 
 //////// Fleece (slices):
 typedef struct {const void *buf; size_t size;} FLSlice;
@@ -88,6 +107,7 @@ typedef ... * FLArray;         ///< A reference to an array value.
 typedef ... * FLDict;          ///< A reference to a dictionary (map) value.
 typedef ... * FLMutableArray;  ///< A reference to a mutable array.
 typedef ... * FLMutableDict;   ///< A reference to a mutable dictionary.
+typedef ... * FLSlot;
 typedef unsigned FLError;
 
 typedef enum {
@@ -133,6 +153,7 @@ uint32_t FLDictIterator_GetCount(const FLDictIterator* );
 bool FLDictIterator_Next(FLDictIterator*);
 void FLDictIterator_End(FLDictIterator*);
 
+
 //////// CBLBase.h
 typedef uint32_t CBLErrorDomain;
 typedef uint8_t CBLLogDomain;
@@ -144,9 +165,13 @@ typedef struct {
     int32_t internal_info;
 } CBLError;
 char* CBLError_Message(const CBLError*);
+FLSliceResult CBLError_Message_s(const CBLError*);
 
-void CBL_SetLogLevel(CBLLogLevel, CBLLogDomain);
-void CBL_Log(CBLLogDomain, CBLLogLevel, const char *format, ...);
+void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format, ...);
+void CBL_Log_s(CBLLogDomain domain, CBLLogLevel level, FLSlice message);
+CBLLogLevel CBLLog_ConsoleLevel(void);
+void CBLLog_SetConsoleLevel(CBLLogLevel);
+bool CBLLog_WillLogToConsole(CBLLogDomain domain, CBLLogLevel level);
 
 typedef ... CBLRefCounted;
 CBLRefCounted* CBL_Retain(void*);
@@ -172,7 +197,14 @@ typedef struct {
     ...;
 } CBLDatabaseConfiguration;
 
+typedef struct {
+    FLString directory;
+    CBLDatabaseFlags flags;
+    ...;
+} CBLDatabaseConfiguration_s;
+
 void CBLListener_Remove(CBLListenerToken*);
+
 
 //////// CBLBlob.h
 bool CBL_IsBlob(FLDict);
@@ -189,22 +221,31 @@ int CBLBlobReader_Read(CBLBlobReadStream* stream, void *dst, size_t maxLength, C
 void CBLBlobReader_Close(CBLBlobReadStream*);
 
 CBLBlob* CBLBlob_CreateWithData(const char *contentType, FLSlice contents);
+CBLBlob* CBLBlob_CreateWithData_s(FLString contentType, FLSlice contents);
 
 typedef ... CBLBlobWriteStream;
 CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError);
 void CBLBlobWriter_Close(CBLBlobWriteStream*);
 bool CBLBlobWriter_Write(CBLBlobWriteStream* writer, const void *data, size_t length, CBLError *outError);
 CBLBlob* CBLBlob_CreateWithStream(const char *contentType, CBLBlobWriteStream* writer);
+CBLBlob* CBLBlob_CreateWithStream_s(FLString contentType, CBLBlobWriteStream* writer);
 
 void FLMutableArray_SetBlob(FLMutableArray array, uint32_t index, CBLBlob* blob);
 void FLMutableDict_SetBlob(FLMutableDict dict, FLString key, CBLBlob* blob);
+void FLSlot_SetBlob(FLSlot slot, CBLBlob* blob);
+
 
 //////// CBLDatabase.h
 bool CBL_DatabaseExists(const char* name, const char *inDirectory);
+bool CBL_DatabaseExists_s(FLString name, FLString inDirectory);
 bool CBL_CopyDatabase(const char* fromPath,
                 const char* toName,
                 const CBLDatabaseConfiguration* config,
                 CBLError*);
+bool CBL_CopyDatabase_s(FLString fromPath,
+                        FLString toName,
+                        const CBLDatabaseConfiguration_s* config,
+                        CBLError*);
 bool CBL_DeleteDatabase(const char *name,
                   const char *inDirectory,
                   CBLError*);
@@ -220,7 +261,7 @@ const char* CBLDatabase_Name(const CBLDatabase*);
 const char* CBLDatabase_Path(const CBLDatabase*);
 uint64_t CBLDatabase_Count(const CBLDatabase*);
 CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*);
-time_t CBLDatabase_NextDocExpiration(CBLDatabase*);
+CBLTimestamp CBLDatabase_NextDocExpiration(CBLDatabase*);
 int64_t CBLDatabase_PurgeExpiredDocuments(CBLDatabase* db, CBLError* error);
 
 typedef void (*CBLDatabaseChangeListener)(void *context,
@@ -233,10 +274,13 @@ CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
                                      CBLDatabaseChangeListener listener,
                                      void *context);
 
+
 //////// CBLDocument.h
 typedef uint8_t CBLConcurrencyControl;
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database,
                                       const char* docID);
+const CBLDocument* CBLDatabase_GetDocument_s(const CBLDatabase* database,
+                                      FLString docID);
 const CBLDocument* CBLDatabase_SaveDocument(CBLDatabase* db,
                                        CBLDocument* doc,
                                        CBLConcurrencyControl concurrency,
@@ -249,16 +293,29 @@ bool CBLDocument_Purge(const CBLDocument* document,
 bool CBLDatabase_PurgeDocumentByID(CBLDatabase* database,
                           const char* docID,
                           CBLError* error);
-time_t CBLDatabase_GetDocumentExpiration(CBLDatabase* db,
+bool CBLDatabase_PurgeDocumentByID_s(CBLDatabase* database,
+                                     FLString docID,
+                                     CBLError* error);
+CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db,
                                          const char *docID,
                                          CBLError* error);
+CBLTimestamp CBLDatabase_GetDocumentExpiration_s(CBLDatabase* db,
+                                                 FLSlice docID,
+                                                 CBLError* error);
 bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db,
                                        const char *docID,
-                                       time_t expiration,
+                                       CBLTimestamp expiration,
                                        CBLError* error);
+bool CBLDatabase_SetDocumentExpiration_s(CBLDatabase* db,
+                                         FLSlice docID,
+                                         CBLTimestamp expiration,
+                                         CBLError* error);
 CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
                                        const char* docID);
+CBLDocument* CBLDatabase_GetMutableDocument_s(CBLDatabase* database,
+                                              FLString docID);
 CBLDocument* CBLDocument_New(const char *docID);
+CBLDocument* CBLDocument_New_s(FLString docID);
 CBLDocument* CBLDocument_MutableCopy(const CBLDocument* original);
 const char* CBLDocument_ID(const CBLDocument*);
 uint64_t CBLDocument_Sequence(const CBLDocument*);
@@ -266,6 +323,7 @@ FLDict CBLDocument_Properties(const CBLDocument*);
 FLMutableDict CBLDocument_MutableProperties(CBLDocument*);
 char* CBLDocument_PropertiesAsJSON(const CBLDocument*);
 bool CBLDocument_SetPropertiesAsJSON(CBLDocument*, const char *json, CBLError*);
+bool CBLDocument_SetPropertiesAsJSON_s(CBLDocument*, FLSlice json, CBLError*);
 
 typedef void (*CBLDocumentChangeListener)(void *context,
                                           const CBLDatabase* db,
@@ -286,11 +344,16 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db,
                        const char *queryString,
                        int *outErrorPos,
                        CBLError* error);
+CBLQuery* CBLQuery_New_s(const CBLDatabase* db,
+                         CBLQueryLanguage language,
+                         FLString queryString,
+                         int *outErrorPos,
+                         CBLError* error);
 FLDict CBLQuery_Parameters(CBLQuery* query);
 void CBLQuery_SetParameters(CBLQuery* query,
                              FLDict parameters);
-void CBLQuery_SetParametersAsJSON(CBLQuery* query,
-                                     const char* json);
+void CBLQuery_SetParametersAsJSON(CBLQuery* query, const char* json);
+bool CBLQuery_SetParametersAsJSON_s(CBLQuery* query, FLString json);
 CBLResultSet* CBLQuery_Execute(CBLQuery*, CBLError*);
 FLSliceResult CBLQuery_Explain(CBLQuery*);
 unsigned CBLQuery_ColumnCount(CBLQuery*);
@@ -299,6 +362,10 @@ FLSlice CBLQuery_ColumnName(CBLQuery*,
 bool CBLResultSet_Next(CBLResultSet*);
 FLValue CBLResultSet_ValueAtIndex(CBLResultSet*, unsigned index);
 FLValue CBLResultSet_ValueForKey(CBLResultSet*, const char* key);
+FLValue CBLResultSet_ValueForKey_s(const CBLResultSet*, FLString key);
+FLArray CBLResultSet_RowArray(const CBLResultSet*);
+FLDict CBLResultSet_RowDict(const CBLResultSet*);
+CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs);
 
 typedef void (*CBLQueryChangeListener)(void *context,
                                        CBLQuery* query);
@@ -306,18 +373,50 @@ extern "Python" void queryListenerCallback(void *context, const CBLQuery *query)
 CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query,
                                         CBLQueryChangeListener listener,
                                         void *context);
+
+typedef enum {
+    kCBLValueIndex,         ///< An index that stores property or expression values
+    kCBLFullTextIndex       ///< An index of strings, that enables searching for words with `MATCH`
+} CBLIndexType;
+
+typedef struct {
+    CBLIndexType type;
+    const char* keyExpressionsJSON;
+    bool ignoreAccents;
+    const char* language;
+} CBLIndexSpec;
+
+typedef struct {
+    CBLIndexType type;
+    FLString keyExpressionsJSON;
+    bool ignoreAccents;
+    FLString language;
+} CBLIndexSpec_s;
+
+bool CBLDatabase_CreateIndex(CBLDatabase *db,
+                             const char* name,
+                             CBLIndexSpec,
+                             CBLError *outError);
+bool CBLDatabase_CreateIndex_s(CBLDatabase *db,
+                               FLString name,
+                               CBLIndexSpec_s,
+                               CBLError *outError);
+bool CBLDatabase_DeleteIndex(CBLDatabase *db,
+                             const char *name,
+                             CBLError *outError);
+FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db);
 """
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="build Couchbase Lite Python bindings")
-    parser.add_argument('--srcdir',
+    parser.add_argument('--srcdir', default=DEFAULT_SRC_DIR,
                         help="Source root directory")
     parser.add_argument('--libdir', default=DEFAULT_LIBRARY_DIR,
                         help="Directory containing CBL libraries")
     parser.add_argument('--libs', default=DEFAULT_LIBRARIES,
                         help="Library names")
-    parser.add_argument('--link_flags',
+    parser.add_argument('--link_flags', default=DEFAULT_LINK_ARGS,
                         help="Linker flags")
     args = parser.parse_args()
 

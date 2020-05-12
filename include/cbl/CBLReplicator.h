@@ -33,7 +33,7 @@ extern "C" {
     @{ */
 
 /** The name of the HTTP cookie used by Sync Gateway to store session keys. */
-CBL_CORE_API extern const char* kCBLAuthDefaultCookieName;
+CBL_CORE_API extern const char* const kCBLAuthDefaultCookieName;
 
 /** An opaque object representing the location of a database to replicate with. */
 typedef struct CBLEndpoint CBLEndpoint;
@@ -45,6 +45,7 @@ typedef struct CBLEndpoint CBLEndpoint;
     For example: `wss://example.org/dbname` */
 CBLEndpoint* CBLEndpoint_NewWithURL(const char *url _cbl_nonnull) CBLAPI;
 
+CBLEndpoint* CBLEndpoint_NewWithURL_s(FLString url) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Creates a new endpoint representing another local database. (Enterprise Edition only.) */
@@ -62,10 +63,16 @@ typedef struct CBLAuthenticator CBLAuthenticator;
 CBLAuthenticator* CBLAuth_NewBasic(const char *username _cbl_nonnull,
                                    const char *password _cbl_nonnull) CBLAPI;
 
+CBLAuthenticator* CBLAuth_NewBasic_s(FLString username,
+                                     FLString password) CBLAPI;
+
 /** Creates an authenticator using a Couchbase Sync Gateway login session identifier,
     and optionally a cookie name (pass NULL for the default.) */
 CBLAuthenticator* CBLAuth_NewSession(const char *sessionID _cbl_nonnull,
                                      const char *cookieName) CBLAPI;
+
+CBLAuthenticator* CBLAuth_NewSession_s(FLString sessionID,
+                                       FLString cookieName) CBLAPI;
 
 /** Frees a CBLAuthenticator object. */
 void CBLAuth_Free(CBLAuthenticator*) CBLAPI;

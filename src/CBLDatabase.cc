@@ -40,11 +40,11 @@ static const char* defaultDbDir() {
     return kDir.c_str();
 }
 
-static slice effectiveDir(const char *inDirectory) {
+static inline slice effectiveDir(slice inDirectory) {
     return slice(inDirectory ? inDirectory : defaultDbDir());
 }
 
-static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
+static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration_s *config) {
     C4DatabaseConfig2 c4Config = {};
     if (config) {
         c4Config.parentDirectory = effectiveDir(config->directory);
@@ -54,12 +54,16 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
             c4Config.flags |= kC4DB_ReadOnly;
         if (config->flags & kCBLDatabase_NoUpgrade)
             c4Config.flags |= kC4DB_NoUpgrade;
-        c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(
-                                                                config->encryptionKey.algorithm);
-        static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
-                      "C4EncryptionKey and CBLEncryptionKey size do not match");
-        memcpy(c4Config.encryptionKey.bytes, config->encryptionKey.bytes,
-               sizeof(CBLEncryptionKey::bytes));
+        if (config->encryptionKey) {
+            c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(
+                                                                config->encryptionKey->algorithm);
+            static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
+                          "C4EncryptionKey and CBLEncryptionKey size do not match");
+            memcpy(c4Config.encryptionKey.bytes, config->encryptionKey->bytes,
+                   sizeof(CBLEncryptionKey::bytes));
+        } else {
+            c4Config.encryptionKey.algorithm = kC4EncryptionNone;
+        }
     } else {
         c4Config.parentDirectory = effectiveDir(nullptr);
         c4Config.flags = kDefaultFlags;
@@ -68,7 +72,7 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
 }
 
 
-// For use only by CBLLocalEndpoint
+// For use only by CBLURLEndpointListener and CBLLocalEndpoint
 C4Database* CBLDatabase::_getC4Database() const {
     return use<C4Database*>([](C4Database *c4db) {
         return c4db;
@@ -80,25 +84,49 @@ C4Database* CBLDatabase::_getC4Database() const {
 
 
 bool CBL_DatabaseExists(const char *name, const char *inDirectory) CBLAPI {
-    return c4db_exists(slice(name), effectiveDir(inDirectory));
+    return CBL_DatabaseExists_s(slice(name), slice(inDirectory));
+}
+
+bool CBL_DatabaseExists_s(FLString name, FLString inDirectory) CBLAPI {
+    return c4db_exists(name, effectiveDir(inDirectory));
 }
 
 
 bool CBL_CopyDatabase(const char* fromPath,
-                const char* toName,
-                const CBLDatabaseConfiguration *config,
-                CBLError* outError) CBLAPI
+                      const char* toName,
+                      const CBLDatabaseConfiguration *config,
+                      CBLError* outError) CBLAPI
+{
+    CBLDatabaseConfiguration_s config_s = {}, *configP = nullptr;
+    if (config) {
+        config_s = {slice(config->directory), config->flags, config->encryptionKey};
+        configP = &config_s;
+    }
+    return CBL_CopyDatabase_s(slice(fromPath), slice(toName), configP, outError);
+}
+
+bool CBL_CopyDatabase_s(FLString fromPath,
+                        FLString toName,
+                        const CBLDatabaseConfiguration_s* config,
+                        CBLError* outError) CBLAPI
 {
     C4DatabaseConfig2 c4config = asC4Config(config);
-    return c4db_copyNamed(slice(fromPath), slice(toName), &c4config, internal(outError));
+    return c4db_copyNamed(fromPath, toName, &c4config, internal(outError));
 }
 
 
 bool CBL_DeleteDatabase(const char *name,
-                  const char *inDirectory,
-                  CBLError* outError) CBLAPI
+                        const char *inDirectory,
+                        CBLError* outError) CBLAPI
 {
-    return c4db_deleteNamed(slice(name), effectiveDir(inDirectory), internal(outError));
+    return CBL_DeleteDatabase_s(slice(name), slice(inDirectory), outError);
+}
+
+bool CBL_DeleteDatabase_s(FLString name,
+                          FLString inDirectory,
+                          CBLError *outError) CBLAPI
+{
+    return c4db_deleteNamed(name, effectiveDir(inDirectory), internal(outError));
 }
 
 
@@ -106,8 +134,20 @@ bool CBL_DeleteDatabase(const char *name,
 
 
 CBLDatabase* CBLDatabase_Open(const char *name,
-                         const CBLDatabaseConfiguration *config,
-                         CBLError *outError) CBLAPI
+                              const CBLDatabaseConfiguration *config,
+                              CBLError *outError) CBLAPI
+{
+    CBLDatabaseConfiguration_s config_s = {}, *configP = nullptr;
+    if (config) {
+        config_s = {slice(config->directory), config->flags, config->encryptionKey};
+        configP = &config_s;
+    }
+    return CBLDatabase_Open_s(slice(name), configP, outError);
+}
+
+CBLDatabase* CBLDatabase_Open_s(FLString name,
+                                const CBLDatabaseConfiguration_s *config,
+                                CBLError *outError) CBLAPI
 {
     C4DatabaseConfig2 c4config = asC4Config(config);
     C4Database *c4db = c4db_openNamed(slice(name), &c4config, internal(outError));

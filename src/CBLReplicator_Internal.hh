@@ -153,7 +153,6 @@ public:
     void resetCheckpoint() {
         LOCK(_mutex);
         _resetCheckpoint = true;
-        _optionsChanged = true;
     }
 
 
@@ -163,9 +162,9 @@ public:
         if (_optionsChanged) {
             c4repl_setOptions(_c4repl, encodeOptions());
             _optionsChanged = false;
-            _resetCheckpoint = false;
         }
-        c4repl_start(_c4repl);
+        c4repl_start(_c4repl, _resetCheckpoint);
+        _resetCheckpoint = false;
     }
 
 
@@ -217,8 +216,6 @@ private:
         Encoder enc;
         enc.beginDict();
         _conf.writeOptions(enc);
-        if (_resetCheckpoint)
-            enc[slice(kC4ReplicatorResetCheckpoint)] = true;
         if (!_docListeners.empty())
             enc[slice(kC4ReplicatorOptionProgressLevel)] = 1;
         enc.endDict();

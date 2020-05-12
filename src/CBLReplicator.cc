@@ -20,7 +20,14 @@
 #include "CBLReplicator_Internal.hh"
 
 
+const char* const kCBLAuthDefaultCookieName = "SyncGatewaySession";
+
+
 CBLEndpoint* CBLEndpoint_NewWithURL(const char *url _cbl_nonnull) CBLAPI {
+    return CBLEndpoint_NewWithURL_s(slice(url));
+}
+
+CBLEndpoint* CBLEndpoint_NewWithURL_s(FLString url) CBLAPI {
     return new CBLURLEndpoint(url);
 }
 
@@ -39,10 +46,18 @@ void CBLEndpoint_Free(CBLEndpoint *endpoint) CBLAPI {
 }
 
 CBLAuthenticator* CBLAuth_NewBasic(const char *username, const char *password) CBLAPI {
+    return CBLAuth_NewBasic_s(slice(username), slice(password));
+}
+
+CBLAuthenticator* CBLAuth_NewBasic_s(FLString username, FLString password) CBLAPI {
     return new BasicAuthenticator(username, password);
 }
 
 CBLAuthenticator* CBLAuth_NewSession(const char *sessionID, const char *cookieName) CBLAPI {
+    return CBLAuth_NewSession_s(slice(sessionID), slice(cookieName));
+}
+
+CBLAuthenticator* CBLAuth_NewSession_s(FLString sessionID, FLString cookieName) CBLAPI {
     return new SessionAuthenticator(sessionID, cookieName);
 }
 

@@ -18,6 +18,7 @@
 
 #pragma once
 #include "CBLBlob.h"
+#include "CBLLog.h"
 #include "CBLDatabase_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "Internal.hh"
@@ -125,7 +126,7 @@ private:
 class CBLNewBlob : public CBLBlob {
 public:
     // Constructor for new blobs, given contents or writer (but not both)
-    CBLNewBlob(const char *contentType,
+    CBLNewBlob(slice contentType,
                slice contents,
                C4WriteStream *writer)
     :CBLBlob()
