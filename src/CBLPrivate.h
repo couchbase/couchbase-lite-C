@@ -43,6 +43,40 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
                                         const char* docID _cbl_nonnull,
                                         CBLError* error) CBLAPI;
 
+    /** A more detailed look at a specific database change. */
+    typedef struct {
+        FLHeapSlice docID;          ///< The document's ID
+        FLHeapSlice revID;          ///< The latest revision ID (or null if doc was purged)
+        uint64_t sequence;          ///< The latest sequence number (or 0 if doc was purged)
+        uint32_t bodySize;          ///< The size of the revision body in bytes
+    } CBLDatabaseChange;    // Note: This must remain identical in layout to C4DatabaseChange
+
+    typedef void (*CBLDatabaseChangeDetailListener)(void *context,
+                                                    const CBLDatabase* db _cbl_nonnull,
+                                                    unsigned numDocs,
+                                                    const CBLDatabaseChange docs[] _cbl_nonnull);
+
+    /** Registers a listener that gets a detailed look at each database change. */
+    CBLListenerToken* CBLDatabase_AddChangeDetailListener(const CBLDatabase* db _cbl_nonnull,
+                                            CBLDatabaseChangeDetailListener listener _cbl_nonnull,
+                                            void *context) CBLAPI;
+
+    /** Given a list of (docID, revID) pairs, finds which ones are new to this database, i.e. don't
+        currently exist and are not older than what currently exists.
+        @param db  The database.
+        @param numRevisions  The number of document revisions to check.
+        @param docIDs  An array of `numRevisions` document IDs.
+        @param revIDs  An array of `numRevisions` revision IDs, matching up with `docIDs`.
+        @param outIsNew  An array of `numRevisions` bools, which will be filled in with a `true` for
+                each revision that's new, or `false` for ones that aren't new.
+        @param outError  On failure, an error will be stored here.
+        @return  True on success, false on failure. */
+    bool CBLDatabase_FindNewRevisions(const CBLDatabase* db _cbl_nonnull,
+                                      unsigned numRevisions,
+                                      const FLSlice docIDs[],
+                                      const FLSlice revIDs[],
+                                      bool outIsNew[],
+                                      CBLError *outError);
 #ifdef __cplusplus
 }
 #endif

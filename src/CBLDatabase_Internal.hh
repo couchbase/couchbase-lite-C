@@ -19,9 +19,11 @@
 #pragma once
 #include "CBLDatabase.h"
 #include "CBLDocument.h"
+#include "CBLPrivate.h"
 #include "Internal.hh"
 #include "Listener.hh"
 #include "access_lock.hh"
+#include "function_ref.hh"
 
 
 namespace cbl_internal {
@@ -56,8 +58,9 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
     std::string const dir;          // Cached copy so API can return a C string
     CBLDatabaseFlags const flags;
 
-    CBLListenerToken* addListener(CBLDatabaseChangeListener listener _cbl_nonnull,
-                                  void *context);
+    CBLListenerToken* addListener(CBLDatabaseChangeListener listener _cbl_nonnull, void *ctx);
+    CBLListenerToken* addListener(CBLDatabaseChangeDetailListener listener _cbl_nonnull, void *ctx);
+
     CBLListenerToken* addDocListener(const char *docID _cbl_nonnull,
                                      CBLDocumentChangeListener listener _cbl_nonnull,
                                      void *context);
@@ -84,6 +87,7 @@ private:
     friend class cbl_internal::CBLLocalEndpoint;
     C4Database* _getC4Database() const;
 
+    CBLListenerToken* addListener(fleece::function_ref<CBLListenerToken*()> callback);
     void databaseChanged();
     void callDBListeners();
     void callDocListeners();
@@ -91,6 +95,7 @@ private:
     C4BlobStore* _blobStore;
     C4DatabaseObserver* _observer {nullptr};
     cbl_internal::Listeners<CBLDatabaseChangeListener> _listeners;
+    cbl_internal::Listeners<CBLDatabaseChangeDetailListener> _detailListeners;
     cbl_internal::Listeners<CBLDocumentChangeListener> _docListeners;
     NotificationQueue _notificationQueue;
 };

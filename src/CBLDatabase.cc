@@ -20,6 +20,7 @@
 #include "CBLPrivate.h"
 #include "Internal.hh"
 #include "Util.hh"
+#include "function_ref.hh"
 #include "PlatformCompat.hh"
 #include <sys/stat.h>
 
@@ -252,18 +253,28 @@ void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI {
 #pragma mark - DATABASE CHANGE LISTENERS:
 
 
-CBLListenerToken* CBLDatabase::addListener(CBLDatabaseChangeListener listener, void *context) {
+CBLListenerToken* CBLDatabase::addListener(function_ref<CBLListenerToken*()> callback) {
     return use<CBLListenerToken*>([=](C4Database *c4db) {
-        auto token = _listeners.add(listener, context);
+        auto token = callback();
         if (!_observer) {
             _observer = c4dbobs_create(c4db,
                                        [](C4DatabaseObserver* observer, void *context) {
-                                           ((CBLDatabase*)context)->databaseChanged();
-                                       },
+                ((CBLDatabase*)context)->databaseChanged();
+            },
                                        this);
         }
         return token;
     });
+}
+
+
+CBLListenerToken* CBLDatabase::addListener(CBLDatabaseChangeListener listener, void *ctx) {
+    return addListener([&]{ return _listeners.add(listener, ctx); });
+}
+
+
+CBLListenerToken* CBLDatabase::addListener(CBLDatabaseChangeDetailListener listener, void *ctx) {
+    return addListener([&]{ return _detailListeners.add(listener, ctx); });
 }
 
 
@@ -280,29 +291,43 @@ void CBLDatabase::callDBListeners() {
         uint32_t nChanges = c4dbobs_getChanges(_observer, c4changes, kMaxChanges, &external);
         if (nChanges == 0)
             break;
-        // Convert docID slices to C strings:
-        const char* docIDs[kMaxChanges];
-        size_t bufSize = 0;
-        for (uint32_t i = 0; i < nChanges; ++i)
-            bufSize += c4changes[i].docID.size + 1;
-        char *buf = new char[bufSize], *next = buf;
-        for (uint32_t i = 0; i < nChanges; ++i) {
-            docIDs[i] = next;
-            memcpy(next, (const char*)c4changes[i].docID.buf, c4changes[i].docID.size);
-            next += c4changes[i].docID.size;
-            *(next++) = '\0';
+
+        static_assert(sizeof(CBLDatabaseChange) == sizeof(C4DatabaseChange));
+        _detailListeners.call(this, nChanges, (const CBLDatabaseChange*)c4changes);
+
+        if (!_listeners.empty()) {
+            // Convert docID slices to C strings:
+            const char* docIDs[kMaxChanges];
+            size_t bufSize = 0;
+            for (uint32_t i = 0; i < nChanges; ++i)
+                bufSize += c4changes[i].docID.size + 1;
+            char *buf = new char[bufSize], *next = buf;
+            for (uint32_t i = 0; i < nChanges; ++i) {
+                docIDs[i] = next;
+                memcpy(next, (const char*)c4changes[i].docID.buf, c4changes[i].docID.size);
+                next += c4changes[i].docID.size;
+                *(next++) = '\0';
+            }
+            assert(next - buf == bufSize);
+            // Call the listener(s):
+            _listeners.call(this, nChanges, docIDs);
+            delete [] buf;
         }
-        assert(next - buf == bufSize);
-        // Call the listener(s):
-        _listeners.call(this, nChanges, docIDs);
-        delete [] buf;
     }
 }
 
 
-CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* constdb _cbl_nonnull,
-                                     CBLDatabaseChangeListener listener _cbl_nonnull,
-                                     void *context) CBLAPI
+CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* constdb,
+                                                CBLDatabaseChangeListener listener,
+                                                void *context) CBLAPI
+{
+    return const_cast<CBLDatabase*>(constdb)->addListener(listener, context);
+}
+
+
+CBLListenerToken* CBLDatabase_AddChangeDetailListener(const CBLDatabase* constdb,
+                                                      CBLDatabaseChangeDetailListener listener,
+                                                      void *context) CBLAPI
 {
     return const_cast<CBLDatabase*>(constdb)->addListener(listener, context);
 }
