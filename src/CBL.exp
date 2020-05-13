@@ -39,6 +39,9 @@ _CBLError_Message_s
 
 _CBLListener_Remove
 
+_CBLDatabaseConfiguration_Default
+_CBLDatabaseConfiguration_Default_s
+
 _CBL_DatabaseExists
 _CBL_DatabaseExists_s
 _CBL_CopyDatabase

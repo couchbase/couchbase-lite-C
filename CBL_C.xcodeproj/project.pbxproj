@@ -82,6 +82,7 @@
 		27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */; };
 		27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */; };
 		27DBD095246C9573002FD7A7 /* LibC++Debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */; };
+		27DBD098246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27DBD097246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 /* End PBXBuildFile section */
 
@@ -382,6 +383,7 @@
 		27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLQuery_Internal.hh; sourceTree = "<group>"; };
 		27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "LibC++Debug.cc"; sourceTree = "<group>"; };
 		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
+		27DBD097246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+ObjC.mm"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -494,6 +496,7 @@
 				275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */,
 				271C2A7121CADB170045856E /* CBLDatabase.cc */,
 				27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */,
+				27DBD097246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm */,
 				271C2A7721CC750E0045856E /* CBLDocument.cc */,
 				277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */,
 				277B77D4245B44E900B222D3 /* CBLLog.cc */,
@@ -1057,6 +1060,7 @@
 				271C2A7621CC4BD60045856E /* Util.cc in Sources */,
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
 				271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */,
+				27DBD098246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm in Sources */,
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */,

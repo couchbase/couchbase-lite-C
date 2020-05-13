@@ -33,51 +33,72 @@ using namespace fleece;
 using namespace cbl_internal;
 
 
+#pragma mark - CONFIGURATION:
+
+
 static constexpr CBLDatabaseFlags kDefaultFlags = kC4DB_Create;
 
-// Default location for databases: the current directory
-static const char* defaultDbDir() {
-    static const string kDir = cbl_getcwd(nullptr, 0);
-    return kDir.c_str();
+
+// Default location for databases. This is platform-dependent.
+// (The implementation for Apple platforms is in CBLDatabase+ObjC.mm)
+#ifndef __APPLE__
+std::string CBLDatabase::defaultDirectory() {
+    return cbl_getcwd(nullptr, 0);
 }
+#endif
+
 
 static inline slice effectiveDir(slice inDirectory) {
-    return slice(inDirectory ? inDirectory : defaultDbDir());
+    if (inDirectory) {
+        return inDirectory;
+    } else {
+        static const string kDir = CBLDatabase::defaultDirectory();
+        return slice(kDir);
+    }
 }
 
 static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration_s *config) {
+    CBLDatabaseConfiguration_s defaultConfig;
+    if (!config) {
+        defaultConfig = CBLDatabaseConfiguration_Default_s();
+        config = &defaultConfig;
+    }
     C4DatabaseConfig2 c4Config = {};
-    if (config) {
-        c4Config.parentDirectory = effectiveDir(config->directory);
-        if (config->flags & kCBLDatabase_Create)
-            c4Config.flags |= kC4DB_Create;
-        if (config->flags & kCBLDatabase_ReadOnly)
-            c4Config.flags |= kC4DB_ReadOnly;
-        if (config->flags & kCBLDatabase_NoUpgrade)
-            c4Config.flags |= kC4DB_NoUpgrade;
-        if (config->encryptionKey) {
-            c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(
-                                                                config->encryptionKey->algorithm);
-            static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
-                          "C4EncryptionKey and CBLEncryptionKey size do not match");
-            memcpy(c4Config.encryptionKey.bytes, config->encryptionKey->bytes,
-                   sizeof(CBLEncryptionKey::bytes));
-        } else {
-            c4Config.encryptionKey.algorithm = kC4EncryptionNone;
-        }
+    c4Config.parentDirectory = effectiveDir(config->directory);
+    if (config->flags & kCBLDatabase_Create)
+        c4Config.flags |= kC4DB_Create;
+    if (config->flags & kCBLDatabase_ReadOnly)
+        c4Config.flags |= kC4DB_ReadOnly;
+    if (config->flags & kCBLDatabase_NoUpgrade)
+        c4Config.flags |= kC4DB_NoUpgrade;
+    if (config->encryptionKey) {
+        c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(
+                                                            config->encryptionKey->algorithm);
+        static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
+                      "C4EncryptionKey and CBLEncryptionKey size do not match");
+        memcpy(c4Config.encryptionKey.bytes, config->encryptionKey->bytes,
+               sizeof(CBLEncryptionKey::bytes));
     } else {
-        c4Config.parentDirectory = effectiveDir(nullptr);
-        c4Config.flags = kDefaultFlags;
+        c4Config.encryptionKey.algorithm = kC4EncryptionNone;
     }
     return c4Config;
 }
 
 
-// For use only by CBLURLEndpointListener and CBLLocalEndpoint
-C4Database* CBLDatabase::_getC4Database() const {
-    return use<C4Database*>([](C4Database *c4db) {
-        return c4db;
-    });
+CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() {
+    static const string kDir = CBLDatabase::defaultDirectory();
+    CBLDatabaseConfiguration config = {};
+    config.directory = kDir.c_str();
+    config.flags = kDefaultFlags;
+    return config;
+}
+
+
+CBLDatabaseConfiguration_s CBLDatabaseConfiguration_Default_s() {
+    CBLDatabaseConfiguration_s config = {};
+    config.directory = effectiveDir(nullslice);
+    config.flags = kDefaultFlags;
+    return config;
 }
 
 
@@ -207,6 +228,14 @@ int64_t CBLDatabase_PurgeExpiredDocuments(CBLDatabase* db, CBLError* outError) C
 
 
 #pragma mark - ACCESSORS:
+
+
+// For use only by CBLURLEndpointListener and CBLLocalEndpoint
+C4Database* CBLDatabase::_getC4Database() const {
+    return use<C4Database*>([](C4Database *c4db) {
+        return c4db;
+    });
+}
 
 
 const char* CBLDatabase_Name(const CBLDatabase* db) CBLAPI {

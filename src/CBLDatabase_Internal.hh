@@ -53,6 +53,9 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
         });
     }
 
+    // Default location for databases. This is platform-dependent.
+    static std::string defaultDirectory();
+
     std::string const name;         // Cached copy so API can return a C string
     std::string const path;         // Cached copy so API can return a C string
     std::string const dir;          // Cached copy so API can return a C string

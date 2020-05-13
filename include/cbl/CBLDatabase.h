@@ -72,6 +72,12 @@ typedef struct {
     CBLEncryptionKey* encryptionKey;        ///< The database's encryption key (if any)
 } CBLDatabaseConfiguration_s;
 
+
+/** Returns the default database configuration. */
+CBLDatabaseConfiguration CBLDatabaseConfiguration_Default(void);
+
+CBLDatabaseConfiguration_s CBLDatabaseConfiguration_Default_s(void);
+
 /** @} */
 
 

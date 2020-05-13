@@ -7,7 +7,7 @@ function(set_platform_source_files)
 
     set(
         ${PLATFORM_RESULT}
-        src/dylib_main.cc
+        src/CBLDatabase+ObjC.mm
         PARENT_SCOPE
     )
 endfunction()
