@@ -17,7 +17,6 @@
 //
 
 #pragma once
-#include "CBLUsings.hh"
 #include "CBLReplicator.h"
 #include <functional>
 
@@ -51,7 +50,7 @@ namespace cbl {
     };
 
 
-    using ReplicationFilter = function<bool(Document, bool isDeleted)>;
+    using ReplicationFilter = std::function<bool(Document, bool isDeleted)>;
 
 
     struct ReplicatorConfiguration {
@@ -66,13 +65,13 @@ namespace cbl {
 
         Authenticator authenticator;
         CBLProxySettings* proxy             = nullptr;
-        MutableDict headers         = MutableDict::newDict();
+        fleece::MutableDict headers         = fleece::MutableDict::newDict();
 
-        alloc_slice pinnedServerCertificate;
-        alloc_slice trustedRootCertificates;
+        fleece::alloc_slice pinnedServerCertificate;
+        fleece::alloc_slice trustedRootCertificates;
 
-        MutableArray channels       = MutableArray::newArray();
-        MutableArray documentIDs    = MutableArray::newArray();
+        fleece::MutableArray channels       = fleece::MutableArray::newArray();
+        fleece::MutableArray documentIDs    = fleece::MutableArray::newArray();
 
         ReplicationFilter pushFilter;
         ReplicationFilter pullFilter;
@@ -172,7 +171,7 @@ namespace cbl {
                                      unsigned numDocuments,
                                      const CBLReplicatedDocument* documents)
         {
-            vector<CBLReplicatedDocument> docs(&documents[0], &documents[numDocuments]);
+            std::vector<CBLReplicatedDocument> docs(&documents[0], &documents[numDocuments]);
             DocumentListener::call(context, Replicator(repl), isPush, docs);
         }
 

@@ -5,7 +5,6 @@
 //
 
 #pragma once
-#include "CBLUsings.hh"
 #include "CBLReplicatorConfig.hh"
 #include "c4Replicator.h"
 #include <functional>
@@ -13,6 +12,8 @@
 struct CBLDatabase;
 
 namespace cbl_internal {
+    using namespace std;
+    using namespace fleece;
 
     /** Resolves a replication conflict in a document, synchronously or asynchronously. */
     class ConflictResolver {
@@ -21,7 +22,7 @@ namespace cbl_internal {
         ConflictResolver(CBLDatabase *db _cbl_nonnull,
                          CBLConflictResolver customResolver, void* context,
                          alloc_slice docID,
-                         alloc_slice revID = fleece::nullslice);
+                         alloc_slice revID = nullslice);
 
         ConflictResolver(CBLDatabase* _cbl_nonnull,
                          CBLConflictResolver,

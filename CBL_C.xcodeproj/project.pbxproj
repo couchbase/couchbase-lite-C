@@ -85,6 +85,7 @@
 		27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D11BEE2351043B00C58A70 /* ConflictResolver.cc */; };
 		27D30F9F23A2D30500392107 /* PerfTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D30F9123A2D30500392107 /* PerfTest.cc */; };
 		27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */; };
+		27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */; };
 		6938072F22DE966B00727053 /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 /* End PBXBuildFile section */
@@ -384,6 +385,7 @@
 		27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLReplicator_Internal.hh; sourceTree = "<group>"; };
 		27D30F9123A2D30500392107 /* PerfTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PerfTest.cc; sourceTree = "<group>"; };
 		27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLQuery_Internal.hh; sourceTree = "<group>"; };
+		27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "LibC++Debug.cc"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -602,6 +604,7 @@
 				27D30F9123A2D30500392107 /* PerfTest.cc */,
 				27C9B5F221F7EE670040BC45 /* CBLTest.c */,
 				275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */,
+				27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */,
 				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
 				275B35A0234D0A9F00FE9CF0 /* names_100.json */,
 			);
@@ -1093,6 +1096,7 @@
 			files = (
 				275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */,
 				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
+				27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */,
 				2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,

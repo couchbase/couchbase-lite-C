@@ -1,7 +1,7 @@
 //
-//  CBLUsings.hh
+// LibC++Debug.cc
 //
-// Copyright (c) 2019 Couchbase, Inc All rights reserved.
+// Copyright (c) 2017 Couchbase, Inc All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 // limitations under the License.
 //
 
-#pragma once
+#ifdef __APPLE__
+#ifdef _LIBCPP_DEBUG
 
-namespace fleece {}
+#include <__debug>
 
-namespace cbl {
-    using namespace fleece;
-    using namespace std;
+namespace std {
+    // Resolves a link error building with libc++ in debug mode. Apparently this symbol would be in
+    // the debug version of libc++.dylib, but we don't have that on Apple platforms.
+    __1::__libcpp_debug_function_type __1::__libcpp_debug_function;
 }
 
-namespace cbl_internal {
-    using namespace fleece;
-    using namespace std;
-}
+#endif
+#endif
