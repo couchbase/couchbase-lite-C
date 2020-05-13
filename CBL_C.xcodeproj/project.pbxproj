@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		271A989E243BFDBF008C032D /* CBLURLEndpointListener.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271A989D243BFDBF008C032D /* CBLURLEndpointListener.cc */; };
-		271A98A3243C0865008C032D /* libLiteCoreREST-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A5521CAD5950045856E /* libLiteCoreREST-static.a */; };
 		271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2C21CAC98F0045856E /* CBLReplicator.h */; };
 		271C2A3221CAC98F0045856E /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; };
@@ -32,7 +31,6 @@
 		275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
 		275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
 		275B3591234BCF7500FE9CF0 /* libCouchbaseLiteC.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */; };
-		275B3592234BD5CD00FE9CF0 /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
 		275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */; };
 		275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */; };
 		275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
@@ -43,7 +41,6 @@
 		277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; };
 		277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B77D4245B44E900B222D3 /* CBLLog.cc */; };
 		277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
-		277CC9AB22BC3DF700B245CB /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
 		277CC9C022BC4E2E00B245CB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 		277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */; };
 		277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */; };
@@ -52,7 +49,6 @@
 		27886C8E21F64C1400069BEA /* Listener.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27886C8C21F64C1400069BEA /* Listener.cc */; };
 		27984E212249A189000FE777 /* dylib_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D7E21D6B6900027CCDB /* dylib_main.cc */; };
 		27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
-		27984E272249A1E8000FE777 /* libLiteCore-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A4F21CAD5950045856E /* libLiteCore-static.a */; };
 		27984E282249A1EE000FE777 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D8121D6B8230027CCDB /* libz.tbd */; };
 		27984E292249A240000FE777 /* CouchbaseLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B61DA321D6E40D0027CCDB /* CouchbaseLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E2A2249A240000FE777 /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -79,14 +75,13 @@
 		27B61DB521D6EBDD0027CCDB /* libCouchbaseLiteC.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */; };
 		27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */; };
 		27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
-		27B61DBC21D7075C0027CCDB /* libLiteCore-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A4F21CAD5950045856E /* libLiteCore-static.a */; };
 		27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
 		27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27D11BED2351043B00C58A70 /* ConflictResolver.hh */; };
 		27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D11BEE2351043B00C58A70 /* ConflictResolver.cc */; };
 		27D30F9F23A2D30500392107 /* PerfTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27D30F9123A2D30500392107 /* PerfTest.cc */; };
 		27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */; };
 		27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */; };
-		6938072F22DE966B00727053 /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
+		27DBD095246C9573002FD7A7 /* LibC++Debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 /* End PBXBuildFile section */
 
@@ -386,16 +381,10 @@
 		27D30F9123A2D30500392107 /* PerfTest.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PerfTest.cc; sourceTree = "<group>"; };
 		27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLQuery_Internal.hh; sourceTree = "<group>"; };
 		27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "LibC++Debug.cc"; sourceTree = "<group>"; };
+		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		271C2A2121CAC8920045856E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		275B3579234812C700FE9CF0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -409,8 +398,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6938072F22DE966B00727053 /* libLiteCoreWebSocket.a in Frameworks */,
-				27984E272249A1E8000FE777 /* libLiteCore-static.a in Frameworks */,
 				27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */,
 				275B358723481AE700FE9CF0 /* Foundation.framework in Frameworks */,
 				6938073022DE96C200727053 /* Security.framework in Frameworks */,
@@ -422,11 +409,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				275B3592234BD5CD00FE9CF0 /* libfleeceBase.a in Frameworks */,
 				27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */,
-				27B61DBC21D7075C0027CCDB /* libLiteCore-static.a in Frameworks */,
-				277CC9AB22BC3DF700B245CB /* libLiteCoreWebSocket.a in Frameworks */,
-				271A98A3243C0865008C032D /* libLiteCoreREST-static.a in Frameworks */,
 				275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */,
 				277CC9C022BC4E2E00B245CB /* Security.framework in Frameworks */,
 				271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */,
@@ -618,6 +601,7 @@
 				27984DF422499ED4000FE777 /* CouchbaseLite.modulemap */,
 				27984E0D2249A127000FE777 /* Framework-Info.plist */,
 				27B61D8421D6BA060027CCDB /* xcconfigs */,
+				27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */,
 			);
 			path = Xcode;
 			sourceTree = "<group>";
@@ -760,7 +744,7 @@
 			buildPhases = (
 				271C2A1F21CAC8920045856E /* Headers */,
 				271C2A2021CAC8920045856E /* Sources */,
-				271C2A2121CAC8920045856E /* Frameworks */,
+				27DBD088246C94B2002FD7A7 /* Merge static libs */,
 			);
 			buildRules = (
 			);
@@ -1037,6 +1021,31 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/fleece/\"\n";
 		};
+		27DBD088246C94B2002FD7A7 /* Merge static libs */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/libFleeceBase.a",
+				"$(BUILT_PRODUCTS_DIR)/libLiteCore-static.a",
+				"$(BUILT_PRODUCTS_DIR)/libLiteCoreREST-static.a",
+				"$(BUILT_PRODUCTS_DIR)/libLiteCoreWebSocket.a",
+				"$(BUILT_PRODUCTS_DIR)/libmbedcrypto.a",
+				"$(BUILT_PRODUCTS_DIR)/libmbedtls.a",
+				"$(BUILT_PRODUCTS_DIR)/libmbedx509.a",
+			);
+			name = "Merge static libs";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/bin/bash -e";
+			shellScript = "# This script merges the input files into the static lib built by this target.\nsource $SRCROOT/Xcode/mergeIntoStaticLib.sh\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1069,6 +1078,7 @@
 				275B358A23481D0C00FE9CF0 /* DatabaseTest.cc in Sources */,
 				275B358B23481D0C00FE9CF0 /* DatabaseTest_Cpp.cc in Sources */,
 				275B358C23481D0C00FE9CF0 /* BlobTest_Cpp.cc in Sources */,
+				27DBD095246C9573002FD7A7 /* LibC++Debug.cc in Sources */,
 				275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */,
 				275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */,
 			);
