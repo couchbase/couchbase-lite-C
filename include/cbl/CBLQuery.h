@@ -93,7 +93,7 @@ CBL_REFCOUNTED(CBLQuery*, Query);
             keys are the parameter names. (It's easiest to construct this by using the mutable
             API, i.e. calling \ref FLMutableDict_New and adding keys/values.) */
 void CBLQuery_SetParameters(CBLQuery* _cbl_nonnull query,
-                            FLDict _cbl_nonnull parameters) CBLAPI;
+                            FLDict parameters) CBLAPI;
 
 /** Returns the query's current parameter bindings, if any. */
 FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI;
@@ -211,7 +211,7 @@ CBL_REFCOUNTED(CBLResultSet*, ResultSet);
  */
 
 /** A callback to be invoked after the query's results have changed.
-    The actual result set can be obtained by calling \ref CBLQuery_CurrentResults, either during
+    The actual result set can be obtained by calling \ref CBLQuery_CopyCurrentResults, either during
     the callback or at any time thereafter.
     @warning  By default, this listener may be called on arbitrary threads. If your code isn't
                     prepared for that, you may want to use \ref CBLDatabase_BufferNotifications
