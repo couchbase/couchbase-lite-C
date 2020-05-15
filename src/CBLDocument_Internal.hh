@@ -58,7 +58,7 @@ public:
     CBLDatabase* database() const               {return _db;}
     const char* docID() const                   {return _docID.c_str();}
     const char* revisionID() const;
-    C4RevisionFlags revisionFlags() const       {return _c4doc->selectedRev.flags;}
+    C4RevisionFlags revisionFlags() const;
     bool exists() const                         {return _c4doc != nullptr;}
     uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence : 0;}
     bool isMutable() const                      {return _mutable;}
@@ -66,7 +66,7 @@ public:
 
     //---- Properties:
 
-    FLDoc createFleeceDoc() const               {return c4doc_createFleeceDoc(_c4doc);}
+    FLDoc createFleeceDoc() const;
     Dict properties() const;
     MutableDict mutableProperties()             {return properties().asMutable();}
     void setProperties(MutableDict d)           {if (checkMutable(nullptr)) _properties = d;}

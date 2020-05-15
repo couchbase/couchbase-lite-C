@@ -119,6 +119,11 @@ const char* CBLDocument::revisionID() const {
 }
 
 
+C4RevisionFlags CBLDocument::revisionFlags() const {
+    return _c4doc ? _c4doc->selectedRev.flags : (kRevNew | kRevLeaf);
+}
+
+
 bool CBLDocument::checkMutable(C4Error *outError) const {
     if (_usuallyTrue(_mutable))
         return true;
@@ -254,17 +259,19 @@ bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError
 
 bool CBLDocument::selectRevision(slice revID) {
     LOCK(_mutex);
-    _properties = nullptr;
-    _fromJSON = nullptr;
-    if (!c4doc_selectRevision(_c4doc, revID, true, nullptr))
+    if (!_c4doc || !c4doc_selectRevision(_c4doc, revID, true, nullptr))
         return false;
     _revID = string(slice(revID));
+    _properties = nullptr;
+    _fromJSON = nullptr;
     return true;
 }
 
 
 bool CBLDocument::selectNextConflictingRevision() {
     LOCK(_mutex);
+    if (!_c4doc)
+        return false;
     _properties = nullptr;
     _fromJSON = nullptr;
     while (c4doc_selectNextLeafRevision(_c4doc, true, true, nullptr))
@@ -278,6 +285,13 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
 {
     LOCK(_mutex);
     C4Error *c4err = internal(outError);
+
+    if (!_c4doc) {
+        setError(c4err, LiteCoreDomain, kC4ErrorNotFound,
+                 "Document has not been saved to a database"_sl);
+        return false;
+    }
+
     _properties = nullptr;
     _fromJSON = nullptr;
 
@@ -313,6 +327,14 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
 
 
 #pragma mark - PROPERTIES:
+
+
+FLDoc CBLDocument::createFleeceDoc() const {
+    if (_c4doc)
+        return c4doc_createFleeceDoc(_c4doc);
+    else
+        return FLDoc_FromJSON("{}"_sl, nullptr);
+}
 
 
 Dict CBLDocument::properties() const {
