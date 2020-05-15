@@ -83,6 +83,8 @@
 		27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */; };
 		27DBD095246C9573002FD7A7 /* LibC++Debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */; };
 		27DBD098246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27DBD097246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm */; };
+		27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
+		27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 /* End PBXBuildFile section */
 
@@ -403,6 +405,7 @@
 				27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */,
 				275B358723481AE700FE9CF0 /* Foundation.framework in Frameworks */,
 				6938073022DE96C200727053 /* Security.framework in Frameworks */,
+				27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */,
 				27984E282249A1EE000FE777 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -693,6 +696,7 @@
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
 				27984E342249A247000FE777 /* Database.hh in Headers */,
 				27984E352249A247000FE777 /* Document.hh in Headers */,
+				27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */,
 				27984E362249A247000FE777 /* Query.hh in Headers */,
 				27984E372249A247000FE777 /* Replicator.hh in Headers */,
 			);

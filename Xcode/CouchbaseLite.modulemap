@@ -5,6 +5,7 @@ framework module CouchbaseLite {
     header "CBLBlob.h"
     header "CBLDatabase.h"
     header "CBLDocument.h"
+    header "CBLLog.h"
     header "CBLQuery.h"
     header "CBLReplicator.h"
 
@@ -14,6 +15,7 @@ framework module CouchbaseLite {
     }
 
     module Fleece {
+        header "fleece/Base.h"
         header "fleece/Fleece.h"
         header "fleece/FLSlice.h"
         header "fleece/Fleece+CoreFoundation.h"
