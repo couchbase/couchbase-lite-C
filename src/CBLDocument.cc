@@ -627,6 +627,9 @@ bool CBLDatabase_SetDocumentExpiration_s(CBLDatabase* db _cbl_nonnull,
                                          CBLError* error) CBLAPI
 {
     return db->use<bool>([&](C4Database *c4db) {
-        return c4doc_setExpiration(c4db, docID, expiration, internal(error));
+        if (!c4doc_setExpiration(c4db, docID, expiration, internal(error)))
+            return false;
+        c4db_startHousekeeping(c4db);
+        return true;
     });
 }

@@ -173,6 +173,28 @@ TEST_CASE_METHOD(CBLTest, "Expiration") {
 }
 
 
+TEST_CASE_METHOD(CBLTest, "Expiration After Reopen") {
+    createDocument(db, "doc1", "foo", "bar");
+    createDocument(db, "doc2", "foo", "bar");
+    createDocument(db, "doc3", "foo", "bar");
+
+    CBLError error;
+    CBLTimestamp future = CBL_Now() + 2000;
+    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc1", future, &error));
+    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc3", future, &error));
+    CHECK(CBLDatabase_Count(db) == 3);
+
+    // Close & reopen the database:
+    REQUIRE(CBLDatabase_Close(db, &error));
+    CBLDatabase_Release(db);
+    db = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
+
+    // Now wait for expiration:
+    this_thread::sleep_for(chrono::milliseconds(3000));
+    CHECK(CBLDatabase_Count(db) == 1);
+}
+
+
 #pragma mark - LISTENERS:
 
 
