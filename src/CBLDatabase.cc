@@ -215,18 +215,6 @@ bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
     });
 }
 
-CBLTimestamp CBLDatabase_NextDocExpiration(CBLDatabase* db) CBLAPI {
-    return db->use<bool>([=](C4Database *c4db) {
-        return c4db_nextDocExpiration(c4db);
-    });
-}
-
-int64_t CBLDatabase_PurgeExpiredDocuments(CBLDatabase* db, CBLError* outError) CBLAPI {
-    return db->use<bool>([=](C4Database *c4db) {
-        return c4db_purgeExpiredDocs(c4db, internal(outError));
-    });
-}
-
 
 #pragma mark - ACCESSORS:
 
