@@ -177,6 +177,17 @@ bool CBLDatabase_BeginBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 /** Ends a batch operation. This **must** be called after \ref CBLDatabase_BeginBatch. */
 bool CBLDatabase_EndBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
+#ifdef COUCHBASE_ENTERPRISE
+/** Encrypts or decrypts a database, or changes its encryption key.
+
+    If \p newKey is NULL, or its \p algorithm is \ref kCBLEncryptionNone, the database will be decrypted.
+    Otherwise the database will be encrypted with that key; if it was already encrypted, it will be
+    re-encrypted with the new key.*/
+bool CBLDatabase_Rekey(CBLDatabase* _cbl_nonnull,
+                       const CBLEncryptionKey *newKey,
+                       CBLError* outError) CBLAPI;
+#endif
+
 /** @} */
 
 

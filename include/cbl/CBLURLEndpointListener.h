@@ -78,7 +78,7 @@ extern "C" {
         \note  Caller is responsible for releasing the returned object.
         @param listener  The listener.
         @return  The URLs as a Fleece array of strings. */
-    FLMutableArray CBLURLEndpointListner_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull);
+    FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull);
 
     /** Returns information about how many current connections a P2P connection listener has. */
     CBLConnectionStatus CBLURLEndpointListener_GetStatus(CBLURLEndpointListener* _cbl_nonnull);

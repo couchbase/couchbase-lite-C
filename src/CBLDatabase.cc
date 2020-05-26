@@ -215,6 +215,14 @@ bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
     });
 }
 
+#ifdef COUCHBASE_ENTERPRISE
+bool CBLDatabase_Rekey(CBLDatabase* db, const CBLEncryptionKey *newKey, CBLError* outError) CBLAPI {
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_rekey(c4db, (const C4EncryptionKey*)newKey, internal(outError));
+    });
+}
+#endif
+
 
 #pragma mark - ACCESSORS:
 
