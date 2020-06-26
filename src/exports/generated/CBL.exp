@@ -183,6 +183,27 @@ _CBLDefaultConflictResolver
 
 _kCBLAuthDefaultCookieName
 _CBLDefaultConflictResolver
+
+# Private:
+
+_CBLCheckpoint_New
+_CBLCheckpoint_GetID
+_CBLCheckpoint_CompareWithRemote
+_CBLCheckpoint_LocalMinSequence
+_CBLCheckpoint_AddPendingSequence
+_CBLCheckpoint_AddSequences
+_CBLCheckpoint_PendingSequenceCount
+_CBLCheckpoint_CompletedSequence
+_CBLCheckpoint_IsSequenceCompleted
+_CBLCheckpoint_RemoteMinSequence
+_CBLCheckpoint_UpdateRemoteMinSequence
+_CBLCheckpoint_EnableSave
+_CBLCheckpoint_StopAutosave
+_CBLCheckpoint_StartSave
+_CBLCheckpoint_SaveCompleted
+_CBLCheckpoint_IsUnsaved
+_CBLDatabase_GetPeerCheckpoint
+_CBLDatabase_SetPeerCheckpoint
 #  Fleece.exp
 #
 # Copyright (c) 2019 Couchbase, Inc All rights reserved.
