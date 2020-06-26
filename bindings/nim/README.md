@@ -28,8 +28,21 @@ After that, you can use [Nimble][NIMBLE] to build and run:
 
     $ nimble test
 
-(You _should_ be able to run `nimble build`, but that just says "`Error: Nothing to build.`"" I
-don't know why; I'm a newbie at Nim.)
+When compiling on Linux system remember to set `LD_LIBRARY_PATH` to point to the
+directory where `libCouchbaseLiteC.so` exists. If you followed the above steps
+this would look like this:
+
+    $ LD_LIBRARY_PATH=. nimble test
+
+Without the symlink you can also do:
+
+    $ LD_LIBRARY_PATH=../../build_cmake nimble test
+
+The supplied `CouchbaseLite.nimble` file is used to allow Nimble to run the
+tests. If you want to try the bindings out you can create a `<filename>.nim`
+file in this directory and add `bin = @["<filename>"]` to the
+`CouchbaseLite.nimble` file. You can now run `nimble build` or `nimble run` to
+build or build and run your file with the bindings.
 
 ## Learning
 

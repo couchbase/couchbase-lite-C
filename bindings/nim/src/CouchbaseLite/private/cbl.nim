@@ -10,7 +10,12 @@
 ##         except I've left out the new "_s"-suffixed alternate functions, which Nim doesn't need.
 
 
-{.push dynlib: "libCouchbaseLiteC.dylib".}
+when defined(Linux):
+  {.push dynlib: "libCouchbaseLiteC.so".}
+elif defined(MacOS) or defined(MacOSX):
+  {.push dynlib: "libCouchbaseLiteC.dylib".}
+elif defined(Windows):
+  {.push dynlib: "libCouchbaseLiteC.dll".}
 
 
 ##
