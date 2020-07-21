@@ -83,7 +83,7 @@ void CBLLog_SetCallback(CBLLogCallback callback) CBLAPI {
 
     sCallback = callback;
     c4log_writeToCallback(c4log_callbackLevel(),
-                          callback ? c4Callback : nullptr,
+                          callback ? c4Callback : (C4LogCallback) nullptr,
                           true);
 }
 
