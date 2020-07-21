@@ -17,52 +17,7 @@
 //
 
 #include "CBLCheckpoint.h"
-#include "CBLDatabase_Internal.hh"
-#include "CBLReplicatorConfig.hh"
-#include "c4Private.h"
-#include "Checkpointer.hh"
-#include "Checkpoint.hh"
-#include "ReplicatorOptions.hh"
-#include "InstanceCounted.hh"
-#include <chrono>
-
-using namespace litecore;
-using namespace litecore::repl;
-using namespace fleece;
-
-
-class CBLCheckpoint : public CBLRefCounted,
-                      public Checkpointer,
-                      public InstanceCountedIn<CBLCheckpoint>
-{
-public:
-    CBLCheckpoint(const C4ReplicatorParameters &params, slice url)
-    :Checkpointer(repl::Options(params), url)
-    { }
-
-    void enableSave(float timeInterval,
-                    CBLCheckpointSaveCallback callback,
-                    void *context)
-    {
-        _callback = callback;
-        _callbackContext = context;
-        enableAutosave(std::chrono::milliseconds(unsigned(timeInterval * 1000)),
-                       [this](alloc_slice json) {
-            CBLCheckpointSaveCallback callback = _callback;
-            if (callback)
-                callback(_callbackContext, json);
-        });
-    }
-
-    void disableSave() {
-        _callback = nullptr;
-    }
-
-private:
-    std::atomic<CBLCheckpointSaveCallback> _callback = nullptr;
-    void* _callbackContext;
-};
-
+#include "CBLCheckpoint_Internal.hh"
 
 CBLCheckpoint* CBLCheckpoint_New(CBLDatabase *db,
                                  CBLReplicatorConfiguration *config,
@@ -88,14 +43,14 @@ CBLCheckpoint* CBLCheckpoint_New(CBLDatabase *db,
 
     alloc_slice url(c4address_toURL(conf.endpoint->remoteAddress()));
 
-    Retained<CBLCheckpoint> c = new CBLCheckpoint(params, url);
+    Retained<CBLCheckpoint> c = new CBLCheckpoint(db, params, url);
     bool ok = db->use<bool>([&](C4Database *c4db) {
         return c->read(c4db, reset, internal(outError));
     });
     if (!ok)
         return nullptr;
 
-    return retain(c.get());
+    return retain(c);
 }
 
 
@@ -105,7 +60,7 @@ FLSlice CBLCheckpoint_GetID(CBLCheckpoint* c) CBLAPI {
 
 
 bool CBLCheckpoint_CompareWithRemote(CBLCheckpoint* c,
-                                     FLString remoteJSON,
+                                     const char *remoteJSON,
                                      CBLError *outError) CBLAPI
 {
     return c->validateWith(Checkpoint(remoteJSON));
@@ -151,13 +106,13 @@ bool CBLCheckpoint_IsSequenceCompleted(CBLCheckpoint* c, CBLSequenceNumber seq) 
 
 //---- REMOTE SEQUENCES (PULL):
 
-FLSlice CBLCheckpoint_RemoteMinSequence(CBLCheckpoint* c) CBLAPI {
-    return c->remoteMinSequence();
+FLSliceResult CBLCheckpoint_RemoteMinSequence(CBLCheckpoint* c) CBLAPI {
+    return FLSliceResult(c->remoteMinSequence().toJSON());
 }
 
 
-void CBLCheckpoint_UpdateRemoteMinSequence(CBLCheckpoint* c, FLSlice sequenceID) CBLAPI {
-    c->setRemoteMinSequence(sequenceID);
+void CBLCheckpoint_UpdateRemoteMinSequence(CBLCheckpoint* c, const char *sequenceID) CBLAPI {
+    c->setRemoteMinSequence(RemoteSequence(sequenceID));
 }
 
 
@@ -165,11 +120,11 @@ void CBLCheckpoint_UpdateRemoteMinSequence(CBLCheckpoint* c, FLSlice sequenceID)
 
 
 void CBLCheckpoint_EnableSave(CBLCheckpoint* c,
-                      float timeInterval,
-                      CBLCheckpointSaveCallback callback,
-                      void *context) CBLAPI
+                              int timeIntervalSecs,
+                              CBLCheckpointSaveCallback callback,
+                              void *context) CBLAPI
 {
-    c->enableSave(timeInterval, callback, context);
+    c->enableSave(std::chrono::seconds(timeIntervalSecs), callback, context);
 }
 
 
@@ -178,12 +133,14 @@ void CBLCheckpoint_StopAutosave(CBLCheckpoint* c) CBLAPI {
 }
 
 
-bool CBLCheckpoint_Save(CBLCheckpoint* c) CBLAPI {
+bool CBLCheckpoint_StartSave(CBLCheckpoint* c) CBLAPI {
     return c->save();
 }
 
 
-void CBLCheckpoint_SaveCompleted(CBLCheckpoint* c) CBLAPI {
+void CBLCheckpoint_SaveCompleted(CBLCheckpoint* c, bool successfully) CBLAPI {
+    if (successfully)
+        c->writeLatest();
     c->saveCompleted();
 }
 
@@ -197,7 +154,7 @@ bool CBLCheckpoint_IsUnsaved(CBLCheckpoint* c) CBLAPI {
 
 
 bool CBLDatabase_GetPeerCheckpoint(CBLDatabase* db,
-                                   FLString checkpointID,
+                                   const char *checkpointID,
                                    FLSliceResult *outBody,
                                    FLSliceResult *outRevID,
                                    CBLError *outError) CBLAPI
@@ -214,9 +171,9 @@ bool CBLDatabase_GetPeerCheckpoint(CBLDatabase* db,
 
 
 bool CBLDatabase_SetPeerCheckpoint(CBLDatabase* db,
-                                   FLString checkpointID,
-                                   FLSlice body,
-                                   FLSlice revID,
+                                   const char *checkpointID,
+                                   const char *body,
+                                   const char *revID,
                                    FLSliceResult *outNewRevID,
                                    CBLError *outError) CBLAPI
 {

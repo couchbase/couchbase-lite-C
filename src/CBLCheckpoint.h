@@ -29,6 +29,8 @@ extern "C" {
 
     CBL_REFCOUNTED(CBLCheckpoint*, Checkpoint);
 
+
+    /** A sequence number in the local database. */
     typedef uint64_t CBLSequenceNumber;
     
 
@@ -46,7 +48,7 @@ extern "C" {
     /** Compares the checkpoint state with the contents of the remote checkpoint document.
         If they don't match, the local state is reset, so the replication will start from scratch. */
     bool CBLCheckpoint_CompareWithRemote(CBLCheckpoint* _cbl_nonnull,
-                                         FLString remoteJSON,
+                                         const char *remoteJSON,
                                          CBLError*) CBLAPI;
 
     //---- LOCAL SEQUENCES (PUSH):
@@ -85,23 +87,23 @@ extern "C" {
     //---- REMOTE SEQUENCES (PULL):
 
     /** The checkpoint's remote sequence, the last one up to which all is pulled. */
-    FLSlice CBLCheckpoint_RemoteMinSequence(CBLCheckpoint* _cbl_nonnull) CBLAPI;
+    FLSliceResult CBLCheckpoint_RemoteMinSequence(CBLCheckpoint* _cbl_nonnull) CBLAPI;
 
     /** Updates the checkpoint's remote sequence. */
     void CBLCheckpoint_UpdateRemoteMinSequence(CBLCheckpoint* _cbl_nonnull,
-                                               FLSlice sequenceID) CBLAPI;
+                                               const char *sequenceID) CBLAPI;
 
     //---- SAVING:
 
     /** Callback invoked when the checkpoint should be saved to the remote database.
         The callback should start an asynchronous save operation and then return ASAP.
         When the save is complete, it must call `CBLCheckpoint_saveCompleted`. */
-    typedef void (*CBLCheckpointSaveCallback)(void *context, FLSlice jsonToSave);
+    typedef void (*CBLCheckpointSaveCallback)(void *context, const char *jsonToSave);
 
     /** Enables (auto)saving the checkpoint: at about the given duration after a change is made,
         the callback will be invoked, and passed a JSON representation of the checkpoint. */
     void CBLCheckpoint_EnableSave(CBLCheckpoint* _cbl_nonnull,
-                                  float timeInterval,
+                                  int timeIntervalSecs,
                                   CBLCheckpointSaveCallback _cbl_nonnull,
                                   void *context) CBLAPI;
 
@@ -111,30 +113,37 @@ extern "C" {
         another save will have to be triggered immediately when the current one finishes. */
     void CBLCheckpoint_StopAutosave(CBLCheckpoint* _cbl_nonnull) CBLAPI;
 
-    /** Triggers an immediate save, but only if the checkpoint has changed. */
-    bool CBLCheckpoint_Save(CBLCheckpoint* _cbl_nonnull) CBLAPI;
+    /** Triggers an immediate save, if necessary, by calling the save callback.
+        If a save is already in progress the function returns false, but the Checkpoint remembers that
+        a new save is needed and will call the checkpoint as soon as the current save completes. */
+    bool CBLCheckpoint_StartSave(CBLCheckpoint* _cbl_nonnull) CBLAPI;
 
     /** The client should call this as soon as its save completes, which can be after the
-        SaveCallback returns. */
-    void CBLCheckpoint_SaveCompleted(CBLCheckpoint* _cbl_nonnull) CBLAPI;
+        SaveCallback returns.
+        @param checkpoint  The checkpoint.
+        @param successfully  True if the save was successful, false if it failed. */
+    void CBLCheckpoint_SaveCompleted(CBLCheckpoint *checkpoint _cbl_nonnull,
+                                     bool successfully) CBLAPI;
 
     /** Returns true if the checkpoint has changes that haven't been saved yet. */
     bool CBLCheckpoint_IsUnsaved(CBLCheckpoint* _cbl_nonnull) CBLAPI;
 
     //---- PEER CHECKPOINTS (PASSIVE REPLICATOR):
 
-    /** Reads a previously-stored peer replicator's checkpoint from a database. */
+    /** Reads a previously-stored peer replicator's checkpoint from a database.
+        \note You are responsible for freeing the body and revID. */
     bool CBLDatabase_GetPeerCheckpoint(CBLDatabase* _cbl_nonnull,
-                                       FLString checkpointID,
+                                       const char *checkpointID,
                                        FLSliceResult *outBody _cbl_nonnull,
                                        FLSliceResult *outRevID _cbl_nonnull,
                                        CBLError*) CBLAPI;
 
-    /** Stores a peer replicator's checkpoint in a database. */
+    /** Stores a peer replicator's checkpoint in a database.
+        \note You are responsible for freeing the newRevID.  */
     bool CBLDatabase_SetPeerCheckpoint(CBLDatabase* _cbl_nonnull,
-                                       FLString checkpointID,
-                                       FLSlice body,
-                                       FLSlice revID,
+                                       const char *checkpointID _cbl_nonnull,
+                                       const char *body _cbl_nonnull,
+                                       const char *revID,
                                        FLSliceResult *outNewRevID _cbl_nonnull,
                                        CBLError*) CBLAPI;
 

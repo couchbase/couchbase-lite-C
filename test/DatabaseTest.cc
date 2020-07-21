@@ -17,6 +17,7 @@
 //
 
 #include "CBLTest.hh"
+#include "CBLChangesFeed.h"
 #include "CBLPrivate.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
@@ -303,3 +304,54 @@ TEST_CASE_METHOD(CBLTest, "Scheduled database notifications") {
     CBLListener_Remove(fooToken);
     CBLListener_Remove(barToken);
 }
+
+
+TEST_CASE_METHOD(CBLTest, "Changes Feed") {
+    // Create 20 docs:
+    for (int i = 1; i <= 20; ++i) {
+        char docID[10];
+        sprintf(docID, "doc-%d", i);
+        createDocument(db, docID, "version", "1");
+    }
+
+    CBLChangesFeed *feed = CBLChangesFeed_NewSince(db, 0, 0);
+
+    // Get 10 changes:
+    auto changes = CBLChangesFeed_Next(feed, 10);
+    REQUIRE(changes != nullptr);
+    REQUIRE(changes->count == 10);
+    for (int i = 1; i <= 10; ++i) {
+        auto change = changes->revisions[i - 1];
+        char docID[10];
+        sprintf(docID, "doc-%d", i);
+        CHECK(slice(change->docID) == docID);
+        CHECK(slice(change->revID).hasPrefix("1-"));
+        CHECK(change->sequence == i);
+    }
+    CBLChangesFeedItems_Free(changes);
+    CHECK(CBLChangesFeed_GetLastSequenceChecked(feed) == 10);
+    CHECK(!CBLChangesFeed_CaughtUp(feed));
+
+    // Get 20 changes (there will only be 10):
+    changes = CBLChangesFeed_Next(feed, 20);
+    REQUIRE(changes != nullptr);
+    REQUIRE(changes->count == 10);
+    for (int i = 11; i <= 20; ++i) {
+        auto change = changes->revisions[i - 11];
+        char docID[10];
+        sprintf(docID, "doc-%d", i);
+        CHECK(slice(change->docID) == docID);
+        CHECK(slice(change->revID).hasPrefix("1-"));
+        CHECK(change->sequence == i);
+    }
+    CBLChangesFeedItems_Free(changes);
+    CHECK(CBLChangesFeed_GetLastSequenceChecked(feed) == 20);
+    CHECK(CBLChangesFeed_CaughtUp(feed));
+
+    changes = CBLChangesFeed_Next(feed, 20);
+    CHECK(changes == nullptr);
+
+    CBLChangesFeed_Release(feed);
+}
+
+

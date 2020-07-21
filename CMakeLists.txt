@@ -66,6 +66,7 @@ add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
 include_directories("vendor/couchbase-lite-core/C/include"
                     "vendor/couchbase-lite-core/LiteCore/C"
                     "vendor/couchbase-lite-core/LiteCore/Support"
+                    "vendor/couchbase-lite-core/Replicator"
                     "vendor/couchbase-lite-core/vendor/fleece/API"
                     "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support")
 
@@ -80,6 +81,8 @@ set(
     ALL_SRC_FILES
     src/CBLBase.cc
     src/CBLBlob.cc
+    src/CBLChangesFeed.cc
+    src/CBLCheckpoint.cc
     src/CBLDatabase.cc
     src/CBLDocument.cc
     src/CBLLog.cc
@@ -104,7 +107,10 @@ target_include_directories(
 )
 
 target_link_libraries(
-    CouchbaseLiteCStatic INTERFACE
+    CouchbaseLiteCStatic
+    PUBLIC
+    FleeceStatic
+    PRIVATE
     LiteCoreStatic
 )
 

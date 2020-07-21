@@ -288,7 +288,7 @@ CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* _cbl_nonnull,
 
 
 /** Flags describing a replicated document. */
-typedef CBL_OPTIONS(unsigned, CBLDocumentFlags) {
+typedef CBL_OPTIONS(uint8_t, CBLDocumentFlags) {
     kCBLDocumentFlagsDeleted        = 1 << 0,   ///< The document has been deleted.
     kCBLDocumentFlagsAccessRemoved  = 1 << 1    ///< Lost access to the document on the server.
 };
