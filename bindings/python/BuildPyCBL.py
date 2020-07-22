@@ -261,8 +261,6 @@ const char* CBLDatabase_Name(const CBLDatabase*);
 const char* CBLDatabase_Path(const CBLDatabase*);
 uint64_t CBLDatabase_Count(const CBLDatabase*);
 CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*);
-CBLTimestamp CBLDatabase_NextDocExpiration(CBLDatabase*);
-int64_t CBLDatabase_PurgeExpiredDocuments(CBLDatabase* db, CBLError* error);
 
 typedef void (*CBLDatabaseChangeListener)(void *context,
                                      const CBLDatabase* db,
