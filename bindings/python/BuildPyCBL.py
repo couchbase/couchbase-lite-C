@@ -45,7 +45,12 @@ if platform.system() == "Darwin":
     DEFAULT_LINK_ARGS = "-rpath @loader_path"  # Look for CBL dylib in same dir as bindings lib
 
 
-def BuildLibrary(sourceDir, libdir, libraries, extra_link_args):
+def BuildLibrary(sourceDir, python_includedir, libdir, libraries, extra_link_args):
+    # when cross-compiling, use python headers for target rather than build system
+    include_dirs = [sourceDir+CBL_INCLUDE_DIR, sourceDir+FLEECE_INCLUDE_DIR]
+    if python_includedir:
+        include_dirs.insert(0, python_includedir)
+
     # python 3.5 distutils breaks on Linux with absolute library path,
     # so make sure it is relative path
     libdir = os.path.relpath(libdir)
@@ -70,7 +75,7 @@ def BuildLibrary(sourceDir, libdir, libraries, extra_link_args):
         "_PyCBL",       # Module name
         cHeaderSource,
         libraries=libraries,
-        include_dirs=[sourceDir+CBL_INCLUDE_DIR, sourceDir+FLEECE_INCLUDE_DIR],
+        include_dirs=include_dirs,
         library_dirs=["."],
         extra_link_args=extra_link_args)
     ffibuilder.compile(verbose=True)
@@ -410,6 +415,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="build Couchbase Lite Python bindings")
     parser.add_argument('--srcdir', default=DEFAULT_SRC_DIR,
                         help="Source root directory")
+    parser.add_argument('--python_includedir', default='',
+                        help="Directory containing python headers (specify for cross-compiling)")
     parser.add_argument('--libdir', default=DEFAULT_LIBRARY_DIR,
                         help="Directory containing CBL libraries")
     parser.add_argument('--libs', default=DEFAULT_LIBRARIES,
@@ -422,4 +429,4 @@ if __name__ == "__main__":
     if args.link_flags != None:
         linkFlags = args.link_flags.split()
 
-    BuildLibrary(args.srcdir, args.libdir, args.libs.split(), linkFlags)
+    BuildLibrary(args.srcdir, args.python_includedir, args.libdir, args.libs.split(), linkFlags)
