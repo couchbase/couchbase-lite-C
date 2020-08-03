@@ -15,14 +15,12 @@
 # limitations under the License.
 #
 
-import CouchbaseLite
 import CouchbaseLite/[database, document, errors, listener]
 import CouchbaseLite/private/cbl
 
 import httpcore
 import options
 import sets
-import tables
 import uri
 
 {.experimental: "notnil".}

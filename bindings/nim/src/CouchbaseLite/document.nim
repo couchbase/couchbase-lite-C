@@ -201,7 +201,7 @@ proc propertiesAsJSON*(doc: Document): cstring =
     ## This can be useful for interoperating with other APIs that can operate on JSON,
     ## but be aware that the extra encoding and parsing will hurt performance; it's best to
     ## use the Fleece API directly.
-    $(doc.handle.propertiesAsJSON)
+    doc.handle.propertiesAsJSON
 
 
 #%%% MutableDicument:
