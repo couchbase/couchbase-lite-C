@@ -15,7 +15,7 @@ when defined(Linux):
 elif defined(MacOS) or defined(MacOSX):
   {.push dynlib: "libCouchbaseLiteC.dylib".}
 elif defined(Windows):
-  {.push dynlib: "libCouchbaseLiteC.dll".}
+  {.push dynlib: "CouchbaseLiteC.dll".}
 
 
 ##   FLSlice.h
