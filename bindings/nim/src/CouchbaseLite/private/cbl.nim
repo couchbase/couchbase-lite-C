@@ -42,69 +42,69 @@ import fl
 ## CBLError domains, serving as namespaces for numeric error codes.
 type
   CBLErrorDomain* {.size: sizeof(cint).} = enum
-    CBLDomain = 1,            ## code is a Couchbase Lite error code; see \ref CBLErrorCode
-    POSIXDomain,              ## code is a POSIX `errno`; see "errno.h"
-    SQLiteDomain,             ## code is a SQLite error; see "sqlite3.h"
-    FleeceDomain,             ## code is a Fleece error; see "FleeceException.h"
-    NetworkDomain,            ## code is a network error; see \ref CBLNetworkErrorCode
-    WebSocketDomain,          ## code is a WebSocket close code (1000...1015) or HTTP error (300..599)
+    CBLDomain = 1, ## code is a Couchbase Lite error code; see \ref CBLErrorCode
+    POSIXDomain,   ## code is a POSIX `errno`; see "errno.h"
+    SQLiteDomain,  ## code is a SQLite error; see "sqlite3.h"
+    FleeceDomain,  ## code is a Fleece error; see "FleeceException.h"
+    NetworkDomain, ## code is a network error; see \ref CBLNetworkErrorCode
+    WebSocketDomain, ## code is a WebSocket close code (1000...1015) or HTTP error (300..599)
     MaxErrorDomainPlus1
 
 
 ## Couchbase Lite error codes, in the CBLDomain.
 type
   CBLErrorCode* {.size: sizeof(cint).} = enum
-    ErrorAssertionFailed = 1, ## Internal assertion failure
-    ErrorUnimplemented,       ## Oops, an unimplemented API call
-    ErrorUnsupportedEncryption,## Unsupported encryption algorithm
-    ErrorBadRevisionID,       ## Invalid revision ID syntax
-    ErrorCorruptRevisionData, ## Revision contains corrupted/unreadable data
-    ErrorNotOpen,             ## CBLDatabase/KeyStore/index is not open
-    ErrorNotFound,            ## CBLDocument not found
-    ErrorConflict,            ## CBLDocument update conflict
-    ErrorInvalidParameter,    ## Invalid function parameter or struct value
-    ErrorUnexpectedError,     ## Internal unexpected C++ exception
-    ErrorCantOpenFile,        ## CBLDatabase file can't be opened; may not exist
-    ErrorIOError,             ## File I/O error
-    ErrorMemoryError,         ## Memory allocation failed (out of memory?)
-    ErrorNotWriteable,        ## File is not writeable
-    ErrorCorruptData,         ## Data is corrupted
-    ErrorBusy,                ## CBLDatabase is busy/locked
-    ErrorNotInTransaction,    ## Function must be called while in a transaction
-    ErrorTransactionNotClosed,## CBLDatabase can't be closed while a transaction is open
-    ErrorUnsupported,         ## Operation not supported in this database
-    ErrorNotADatabaseFile,    ## File is not a database, or encryption key is wrong
-    ErrorWrongFormat,         ## CBLDatabase exists but not in the format/storage requested
-    ErrorCrypto,              ## Encryption/decryption error
-    ErrorInvalidQuery,        ## Invalid query
-    ErrorMissingIndex,        ## No such index, or query requires a nonexistent index
-    ErrorInvalidQueryParam,   ## Unknown query param name, or param number out of range
-    ErrorRemoteError,         ## Unknown error from remote server
-    ErrorDatabaseTooOld,      ## CBLDatabase file format is older than what I can open
-    ErrorDatabaseTooNew,      ## CBLDatabase file format is newer than what I can open
-    ErrorBadDocID,            ## Invalid document ID
-    ErrorCantUpgradeDatabase, ## DB can't be upgraded (might be unsupported dev version)
+    ErrorAssertionFailed = 1,   ## Internal assertion failure
+    ErrorUnimplemented,         ## Oops, an unimplemented API call
+    ErrorUnsupportedEncryption, ## Unsupported encryption algorithm
+    ErrorBadRevisionID,         ## Invalid revision ID syntax
+    ErrorCorruptRevisionData,   ## Revision contains corrupted/unreadable data
+    ErrorNotOpen,               ## CBLDatabase/KeyStore/index is not open
+    ErrorNotFound,              ## CBLDocument not found
+    ErrorConflict,              ## CBLDocument update conflict
+    ErrorInvalidParameter,      ## Invalid function parameter or struct value
+    ErrorUnexpectedError,       ## Internal unexpected C++ exception
+    ErrorCantOpenFile,          ## CBLDatabase file can't be opened; may not exist
+    ErrorIOError,               ## File I/O error
+    ErrorMemoryError,           ## Memory allocation failed (out of memory?)
+    ErrorNotWriteable,          ## File is not writeable
+    ErrorCorruptData,           ## Data is corrupted
+    ErrorBusy,                  ## CBLDatabase is busy/locked
+    ErrorNotInTransaction,      ## Function must be called while in a transaction
+    ErrorTransactionNotClosed,  ## CBLDatabase can't be closed while a transaction is open
+    ErrorUnsupported,           ## Operation not supported in this database
+    ErrorNotADatabaseFile,      ## File is not a database, or encryption key is wrong
+    ErrorWrongFormat,           ## CBLDatabase exists but not in the format/storage requested
+    ErrorCrypto,                ## Encryption/decryption error
+    ErrorInvalidQuery,          ## Invalid query
+    ErrorMissingIndex,          ## No such index, or query requires a nonexistent index
+    ErrorInvalidQueryParam,     ## Unknown query param name, or param number out of range
+    ErrorRemoteError,           ## Unknown error from remote server
+    ErrorDatabaseTooOld,        ## CBLDatabase file format is older than what I can open
+    ErrorDatabaseTooNew,        ## CBLDatabase file format is newer than what I can open
+    ErrorBadDocID,              ## Invalid document ID
+    ErrorCantUpgradeDatabase,   ## DB can't be upgraded (might be unsupported dev version)
     NumErrorCodesPlus1
 
 
 ## Network error codes, in the CBLNetworkDomain.
 type
   NetworkErrorCode* {.size: sizeof(cint).} = enum
-    NetErrDNSFailure = 1,     ## DNS lookup failed
-    NetErrUnknownHost,        ## DNS server doesn't know the hostname
-    NetErrTimeout,            ## No response received before timeout
-    NetErrInvalidURL,         ## Invalid URL
-    NetErrTooManyRedirects,   ## HTTP redirect loop
-    NetErrTLSHandshakeFailed, ## Low-level error establishing TLS
-    NetErrTLSCertExpired,     ## Server's TLS certificate has expired
-    NetErrTLSCertUntrusted,   ## Cert isn't trusted for other reason
+    NetErrDNSFailure = 1,        ## DNS lookup failed
+    NetErrUnknownHost,           ## DNS server doesn't know the hostname
+    NetErrTimeout,               ## No response received before timeout
+    NetErrInvalidURL,            ## Invalid URL
+    NetErrTooManyRedirects,      ## HTTP redirect loop
+    NetErrTLSHandshakeFailed,    ## Low-level error establishing TLS
+    NetErrTLSCertExpired,        ## Server's TLS certificate has expired
+    NetErrTLSCertUntrusted,      ## Cert isn't trusted for other reason
     NetErrTLSClientCertRequired, ## Server requires client to have a TLS certificate
     NetErrTLSClientCertRejected, ## Server rejected my TLS client certificate
-    NetErrTLSCertUnknownRoot, ## Self-signed cert, or unknown anchor cert
-    NetErrInvalidRedirect,    ## Attempted redirect to invalid URL
-    NetErrUnknown,            ## Unknown networking error
-    NetErrTLSCertRevoked,     ## Server's cert has been revoked
-    NetErrTLSCertNameMismatch ## Server cert's name does not match DNS name
+    NetErrTLSCertUnknownRoot,    ## Self-signed cert, or unknown anchor cert
+    NetErrInvalidRedirect,       ## Attempted redirect to invalid URL
+    NetErrUnknown,               ## Unknown networking error
+    NetErrTLSCertRevoked,        ## Server's cert has been revoked
+    NetErrTLSCertNameMismatch    ## Server cert's name does not match DNS name
 
 
 ## A struct holding information about an error. It's declared on the stack by a caller, and
@@ -113,14 +113,15 @@ type
 ##     filled in with the details.
 type
   CBLError* {.byref.} = object
-    domain*: CBLErrorDomain       ## Domain of errors; a namespace for the `code`.
-    code*: int32              ## CBLError code, specific to the domain. 0 always means no error.
+    domain*: CBLErrorDomain ## Domain of errors; a namespace for the `code`.
+    code*: int32            ## CBLError code, specific to the domain. 0 always means no error.
     internalInfo: int32
 
 
 ## Returns a message describing an error.
 proc message*(err: var CBLError): cstring {.importc: "CBLError_Message".}
-proc message_s*(err: var CBLError): FLSliceResult {.importc: "CBLError_Message_s".}
+proc message_s*(err: var CBLError): FLSliceResult {.
+    importc: "CBLError_Message_s".}
 
 
 ## \defgroup other_types   Other Types
@@ -168,7 +169,7 @@ proc retain*(obj: CBLDatabase): CBLDatabase {.inline, discardable.} =
   retain(cast[CBLRefCounted](obj))
   return obj
 proc release*(obj: CBLDatabase) {.inline.} =
-    release(cast[CBLRefCounted](obj))
+  release(cast[CBLRefCounted](obj))
 
 
 ## \defgroup documents  Documents
@@ -183,7 +184,7 @@ proc retain*(obj: CBLDocument): CBLDocument {.inline, discardable.} =
   retain(cast[CBLRefCounted](obj))
   return obj
 proc release*(obj: CBLDocument) {.inline.} =
-    release(cast[CBLRefCounted](obj))
+  release(cast[CBLRefCounted](obj))
 
 ## \defgroup blobs Blobs
 ## A binary data value associated with a \ref CBLDocument.
@@ -194,7 +195,7 @@ proc retain*(obj: CBLBlob): CBLBlob {.inline, discardable.} =
   retain(cast[CBLRefCounted](obj))
   return obj
 proc release*(obj: CBLBlob) {.inline.} =
-    release(cast[CBLRefCounted](obj))
+  release(cast[CBLRefCounted](obj))
 
 ## \defgroup queries  Queries
 ## A compiled database query.
@@ -205,7 +206,7 @@ proc retain*(obj: CBLQuery): CBLQuery {.inline, discardable.} =
   retain(cast[CBLRefCounted](obj))
   return obj
 proc release*(obj: CBLQuery) {.inline.} =
-    release(cast[CBLRefCounted](obj))
+  release(cast[CBLRefCounted](obj))
 
 ## An iterator over the rows resulting from running a query.
 type
@@ -215,7 +216,7 @@ proc retain*(obj: CBLResultSet): CBLResultSet {.inline, discardable.} =
   retain(cast[CBLRefCounted](obj))
   return obj
 proc release*(obj: CBLResultSet) {.inline.} =
-    release(cast[CBLRefCounted](obj))
+  release(cast[CBLRefCounted](obj))
 
 ## \defgroup replication  Replication
 ## A background task that syncs a \ref CBLDatabase with a remote server or peer.
@@ -226,7 +227,7 @@ proc retain*(obj: CBLReplicator): CBLReplicator {.inline, discardable.} =
   retain(cast[CBLRefCounted](obj))
   return obj
 proc release*(obj: CBLReplicator) {.inline.} =
-    release(cast[CBLRefCounted](obj))
+  release(cast[CBLRefCounted](obj))
 
 ## \defgroup listeners   Listeners
 ##     Every API function that registers a listener callback returns an opaque token representing
@@ -298,12 +299,12 @@ type
 ## * Levels of log messages. Higher values are more important/severe. Each level includes the lower ones.
 type
   CBLLogLevel* {.size: sizeof(cint).} = enum
-    CBLLogDebug,                 ## /< Extremely detailed messages, only written by debug builds of CBL.
-    CBLLogVerbose,               ## /< Detailed messages about normally-unimportant stuff.
-    CBLLogInfo,                  ## /< Messages about ordinary behavior.
-    CBLLogWarning,               ## /< Messages warning about unlikely and possibly bad stuff.
-    CBLLogError,                 ## /< Messages about errors
-    CBLLogNone                   ## /< Disables logging entirely.
+    CBLLogDebug,   ## /< Extremely detailed messages, only written by debug builds of CBL.
+    CBLLogVerbose, ## /< Detailed messages about normally-unimportant stuff.
+    CBLLogInfo,    ## /< Messages about ordinary behavior.
+    CBLLogWarning, ## /< Messages warning about unlikely and possibly bad stuff.
+    CBLLogError,   ## /< Messages about errors
+    CBLLogNone     ## /< Disables logging entirely.
 
 
 ## * Formats and writes a message to the log, in the given domain at the given level.
@@ -316,7 +317,8 @@ type
 ##                  (as set by \ref CBL_SetLogLevel), nothing is logged.
 ##     @param format  A `printf`-style format string. `%` characters in this string introduce parameters,
 ##                  and corresponding arguments must follow.
-proc log*(domain: CBLLogDomain; level: CBLLogLevel; format: cstring) {.varargs, importc: "CBL_Log".}
+proc log*(domain: CBLLogDomain; level: CBLLogLevel; format: cstring) {.varargs,
+    importc: "CBL_Log".}
 
 ## * Writes a pre-formatted message to the log, exactly as given.
 ##     @param domain  The log domain to associate this message with.
@@ -324,7 +326,8 @@ proc log*(domain: CBLLogDomain; level: CBLLogLevel; format: cstring) {.varargs, 
 ##                  (as set by \ref CBL_SetLogLevel), nothing is logged.
 ##     @param message  The exact message to write to the log.
 
-proc logString*(domain: CBLLogDomain; level: CBLLogLevel; message: Slice) {.importc: "CBL_Log_s".}
+proc logString*(domain: CBLLogDomain; level: CBLLogLevel; message: Slice) {.
+    importc: "CBL_Log_s".}
 ## * \name Console Logging and Custom Logging
 ## * A logging callback that the application can register.
 ##     @param domain  The domain of the message; \ref kCBLLogDomainAll if it doesn't fall into a specific domain.
@@ -332,7 +335,8 @@ proc logString*(domain: CBLLogDomain; level: CBLLogLevel; message: Slice) {.impo
 ##     @param message  The actual formatted message.
 
 type
-  CBLLogCallback* = proc (domain: CBLLogDomain; level: CBLLogLevel; message: cstring)
+  CBLLogCallback* = proc (domain: CBLLogDomain; level: CBLLogLevel;
+      message: cstring)
 
 ## * Gets the current log level for debug console logging.
 ##     Only messages at this level or higher will be logged to the console or callback.
@@ -343,7 +347,8 @@ proc consoleLevel*(): CBLLogLevel {.importc: "CBLLog_ConsoleLevel".}
 proc setConsoleLevel*(a1: CBLLogLevel) {.importc: "CBLLog_SetConsoleLevel".}
 
 ## * Returns true if a message with the given domain and level would be logged to the console.
-proc willLogToConsole*(domain: CBLLogDomain; level: CBLLogLevel): bool {.importc: "CBLLog_WillLogToConsole".}
+proc willLogToConsole*(domain: CBLLogDomain; level: CBLLogLevel): bool {.
+    importc: "CBLLog_WillLogToConsole".}
 
 ## * Gets the current log callback.
 proc callback*(): CBLLogCallback {.importc: "CBLLog_Callback".}
@@ -357,17 +362,18 @@ proc setCallback*(a1: CBLLogCallback) {.importc: "CBLLog_SetCallback".}
 ##             down your app; we recommend turning it off in production.
 type
   CBLLogFileConfiguration* {.bycopy.} = object
-    directory*: cstring        ## /< The directory where log files will be created.
-    maxRotateCount*: uint32    ## /< Max number of older logs to keep (i.e. total number will be one more.)
-    maxSize*: csize_t          ## /< The size in bytes at which a file will be rotated out (best effort).
-    usePlaintext*: bool        ## /< Whether or not to log in plaintext (as opposed to binary)
+    directory*: cstring ## /< The directory where log files will be created.
+    maxRotateCount*: uint32 ## /< Max number of older logs to keep (i.e. total number will be one more.)
+    maxSize*: csize_t ## /< The size in bytes at which a file will be rotated out (best effort).
+    usePlaintext*: bool ## /< Whether or not to log in plaintext (as opposed to binary)
 
 
 ## * Gets the current file logging configuration.
 proc fileConfig*(): ptr CBLLogFileConfiguration {.importc: "CBLLog_FileConfig".}
 
 ## * Sets the file logging configuration.
-proc setFileConfig*(a1: CBLLogFileConfiguration) {.importc: "CBLLog_SetFileConfig".}
+proc setFileConfig*(a1: CBLLogFileConfiguration) {.
+    importc: "CBLLog_SetFileConfig".}
 
 
 
@@ -396,18 +402,18 @@ proc setFileConfig*(a1: CBLLogFileConfiguration) {.importc: "CBLLog_SetFileConfi
 ## Flags for how to open a database.
 type
   CBLDatabaseFlags* {.size: sizeof(cint).} = enum
-    kDatabaseCreate = 1,        ## Create the file if it doesn't exist
-    kDatabaseReadOnly = 2,      ## Open file read-only
-    kDatabaseNoUpgrade = 4      ## Disable upgrading an older-version database
+    kDatabaseCreate = 1,   ## Create the file if it doesn't exist
+    kDatabaseReadOnly = 2, ## Open file read-only
+    kDatabaseNoUpgrade = 4 ## Disable upgrading an older-version database
 
 
 ## Encryption algorithms (available only in the Enterprise Edition).
 type
   CBLEncryptionAlgorithm* {.size: sizeof(cint).} = enum
-    kEncryptionNone = 0,        ## No encryption (default)
-                      ## #ifdef COUCHBASE_ENTERPRISE
-    kEncryptionAES256         ## AES with 256-bit key
-                     ## #endif
+    kEncryptionNone = 0, ## No encryption (default)
+                         ## #ifdef COUCHBASE_ENTERPRISE
+    kEncryptionAES256    ## AES with 256-bit key
+                         ## #endif
 
 
 ## Encryption key sizes (in bytes).
@@ -420,14 +426,14 @@ type
 type
   CBLEncryptionKey* {.bycopy.} = object
     algorithm*: CBLEncryptionAlgorithm ## Encryption algorithm
-    bytes*: array[32, uint8]   ## Raw key data
+    bytes*: array[32, uint8]           ## Raw key data
 
 
 ## CBLDatabase configuration options.
 type
   CBLDatabaseConfiguration* = object
-    directory*: cstring        ## The parent directory of the database
-    flags*: CBLDatabaseFlags      ## Options for opening the database
+    directory*: cstring      ## The parent directory of the database
+    flags*: CBLDatabaseFlags ## Options for opening the database
     encryptionKey*: ptr CBLEncryptionKey ## The database's encryption key (if any)
 
 
@@ -436,16 +442,20 @@ type
 ##
 ## Returns true if a database with the given name exists in the given directory.
 ##                         absolute or relative path to the database.
-proc databaseExists*(name: cstring; inDirectory: cstring): bool {.importc: "CBL_DatabaseExists".}
+proc databaseExists*(name: cstring; inDirectory: cstring): bool {.
+    importc: "CBL_DatabaseExists".}
 
 ## Copies a database file to a new location, and assigns it a new internal UUID to distinguish
 ##     it from the original database when replicating.
-proc copyDatabase*(fromPath: cstring; toName: cstring; config: CBLDatabaseConfiguration; err: var CBLError): bool {.importc: "CBL_CopyDatabase".}
+proc copyDatabase*(fromPath: cstring; toName: cstring;
+    config: CBLDatabaseConfiguration; err: var CBLError): bool {.
+    importc: "CBL_CopyDatabase".}
 
 ## Deletes a database file. If the database file is open, an error is returned.
 ##                         absolute or relative path to the database.
 ##                 (You can tell the last two cases apart by looking at \p outError.)
-proc deleteDatabase*(name: cstring; inDirectory: cstring; err: var CBLError): bool {.importc: "CBL_DeleteDatabase".}
+proc deleteDatabase*(name: cstring; inDirectory: cstring;
+    err: var CBLError): bool {.importc: "CBL_DeleteDatabase".}
 
 ## \name  CBLDatabase lifecycle
 ##     Opening, closing, and managing open databases.
@@ -454,32 +464,40 @@ proc deleteDatabase*(name: cstring; inDirectory: cstring; err: var CBLError): bo
 ##     instance.
 ##     It's OK to open the same database file multiple times. Each \ref CBLDatabase instance is
 ##     independent of the others (and must be separately closed and released.)
-proc openDatabase*(name: cstring; config: ptr CBLDatabaseConfiguration; err: var CBLError): CBLDatabase {.importc: "CBLDatabase_Open".}
+proc openDatabase*(name: cstring; config: ptr CBLDatabaseConfiguration;
+    err: var CBLError): CBLDatabase {.importc: "CBLDatabase_Open".}
 
 ## Closes an open database.
-proc close*(a1: CBLDatabase; err: var CBLError): bool {.importc: "CBLDatabase_Close".}
+proc close*(a1: CBLDatabase; err: var CBLError): bool {.
+    importc: "CBLDatabase_Close".}
 
 ## Closes and deletes a database. If there are any other connections to the database,
 ##     an error is returned.
-proc delete*(a1: CBLDatabase; err: var CBLError): bool {.importc: "CBLDatabase_Delete".}
+proc delete*(a1: CBLDatabase; err: var CBLError): bool {.
+    importc: "CBLDatabase_Delete".}
 
 ## Compacts a database file.
-proc compact*(a1: CBLDatabase; err: var CBLError): bool {.importc: "CBLDatabase_Compact".}
+proc compact*(a1: CBLDatabase; err: var CBLError): bool {.
+    importc: "CBLDatabase_Compact".}
 
 ## Begins a batch operation, similar to a transaction. You **must** later call \ref
 ##     CBLDatabase_EndBatch to end (commit) the batch.
 ##             the batch operation ends.
-proc beginBatch*(a1: CBLDatabase; err: var CBLError): bool {.importc: "CBLDatabase_BeginBatch".}
+proc beginBatch*(a1: CBLDatabase; err: var CBLError): bool {.
+    importc: "CBLDatabase_BeginBatch".}
 
 ## Ends a batch operation. This **must** be called after \ref CBLDatabase_BeginBatch.
-proc endBatch*(a1: CBLDatabase; err: var CBLError): bool {.importc: "CBLDatabase_EndBatch".}
+proc endBatch*(a1: CBLDatabase; err: var CBLError): bool {.
+    importc: "CBLDatabase_EndBatch".}
 
 ## Returns the nearest future time at which a document in this database will expire,
 ##     or 0 if no documents will expire.
-proc nextDocExpiration*(a1: CBLDatabase): CBLTimestamp {.importc: "CBLDatabase_NextDocExpiration".}
+proc nextDocExpiration*(a1: CBLDatabase): CBLTimestamp {.
+    importc: "CBLDatabase_NextDocExpiration".}
 
 ## Purges all documents whose expiration time has passed.
-proc purgeExpiredDocuments*(db: CBLDatabase; err: var CBLError): int64 {.importc: "CBLDatabase_PurgeExpiredDocuments".}
+proc purgeExpiredDocuments*(db: CBLDatabase; err: var CBLError): int64 {.
+    importc: "CBLDatabase_PurgeExpiredDocuments".}
 
 ## \name  CBLDatabase accessors
 ##     Getting information about a database.
@@ -494,7 +512,8 @@ proc path*(a1: CBLDatabase): cstring {.importc: "CBLDatabase_Path".}
 proc count*(a1: CBLDatabase): uint64 {.importc: "CBLDatabase_Count".}
 
 ## Returns the database's configuration, as given when it was opened.
-proc config*(a1: CBLDatabase): CBLDatabaseConfiguration {.importc: "CBLDatabase_Config".}
+proc config*(a1: CBLDatabase): CBLDatabaseConfiguration {.
+    importc: "CBLDatabase_Config".}
 
 ## \name  CBLDatabase listeners
 ##     A database change listener lets you detect changes made to all documents in a database.
@@ -504,12 +523,15 @@ proc config*(a1: CBLDatabase): CBLDatabaseConfiguration {.importc: "CBLDatabase_
 ##                     prepared for that, you may want to use \ref CBLDatabase_BufferNotifications
 ##                     so that listeners will be called in a safe context.
 type
-  DatabaseChangeListener* = proc (context: pointer; db: CBLDatabase; numDocs: cuint; docIDs: cstringArray)
+  DatabaseChangeListener* = proc (context: pointer; db: CBLDatabase;
+      numDocs: cuint; docIDs: cstringArray)
 
 ## Registers a database change listener callback. It will be called after one or more
 ##     documents are changed on disk.
 ##             listener.
-proc addChangeListener*(db: CBLDatabase; listener: DatabaseChangeListener; context: pointer): CBLListenerToken {.importc: "CBLDatabase_AddChangeListener".}
+proc addChangeListener*(db: CBLDatabase; listener: DatabaseChangeListener;
+    context: pointer): CBLListenerToken {.
+    importc: "CBLDatabase_AddChangeListener".}
 
 ##  end of outer \defgroup
 ## \defgroup listeners   Listeners
@@ -536,11 +558,13 @@ type
 ## Switches the database to buffered-notification mode. Notifications for objects belonging
 ##     to this database (documents, queries, replicators, and of course the database) will not be
 ##     called immediately; your \ref CBLNotificationsReadyCallback will be called instead.
-proc bufferNotifications*(db: CBLDatabase; callback: NotificationsReadyCallback; context: pointer) {.importc: "CBLDatabase_BufferNotifications".}
+proc bufferNotifications*(db: CBLDatabase; callback: NotificationsReadyCallback;
+    context: pointer) {.importc: "CBLDatabase_BufferNotifications".}
 
 ## Immediately issues all pending notifications for this database, by calling their listener
 ##     callbacks.
-proc sendNotifications*(db: CBLDatabase) {.importc: "CBLDatabase_SendNotifications".}
+proc sendNotifications*(db: CBLDatabase) {.
+    importc: "CBLDatabase_SendNotifications".}
 
 
 
@@ -567,7 +591,8 @@ proc sendNotifications*(db: CBLDatabase) {.importc: "CBLDatabase_SendNotificatio
 ## \name  CBLDocument lifecycle
 ## Conflict-handling options when saving or deleting a document.
 type
-  CBLConcurrencyControl* {.size: sizeof(cint).} = enum ## The current save/delete will overwrite a conflicting revision if there is a conflict.
+  CBLConcurrencyControl* {.size: sizeof(
+      cint).} = enum ## The current save/delete will overwrite a conflicting revision if there is a conflict.
     kConcurrencyControlLastWriteWins, ## The current save/delete will fail if there is a conflict.
     kConcurrencyControlFailOnConflict
 
@@ -577,38 +602,48 @@ type
 ##     (probably by a pull replicator, or by application code on another thread)
 ##     since it was loaded into the CBLDocument being saved.
 type
-  CBLSaveConflictHandler* = proc (context: pointer; documentBeingSaved: CBLDocument; conflictingDocument: CBLDocument): bool
+  CBLSaveConflictHandler* = proc (context: pointer;
+      documentBeingSaved: CBLDocument; conflictingDocument: CBLDocument): bool
 
 ## Reads a document from the database, creating a new (immutable) \ref CBLDocument object.
 ##     Each call to this function creates a new object (which must later be released.)
 ##             \ref CBLDatabase_GetMutableDocument instead.
-proc getDocument*(database: CBLDatabase; docID: cstring): CBLDocument {.importc: "CBLDatabase_GetDocument".}
+proc getDocument*(database: CBLDatabase; docID: cstring): CBLDocument {.
+    importc: "CBLDatabase_GetDocument".}
 
 ## Saves a (mutable) document to the database.
 ##     If a conflicting revision has been saved since \p doc was loaded, the \p concurrency
 ##     parameter specifies whether the save should fail, or the conflicting revision should
 ##     be overwritten with the revision being saved.
 ##     If you need finer-grained control, call \ref CBLDatabase_SaveDocumentResolving instead.
-proc saveDocument*(db: CBLDatabase; doc: CBLDocument; concurrency: CBLConcurrencyControl; err: var CBLError): CBLDocument {.importc: "CBLDatabase_SaveDocument".}
+proc saveDocument*(db: CBLDatabase; doc: CBLDocument;
+    concurrency: CBLConcurrencyControl; err: var CBLError): CBLDocument {.
+    importc: "CBLDatabase_SaveDocument".}
 
 ## Saves a (mutable) document to the database. This function is the same as \ref
 ##     CBLDatabase_SaveDocument, except that it allows for custom conflict handling in the event
 ##     that the document has been updated since \p doc was loaded.
-proc saveDocumentResolving*(db: CBLDatabase; doc: CBLDocument; conflictHandler: CBLSaveConflictHandler; context: pointer; err: var CBLError): CBLDocument {.importc: "CBLDatabase_SaveDocumentResolving".}
+proc saveDocumentResolving*(db: CBLDatabase; doc: CBLDocument;
+    conflictHandler: CBLSaveConflictHandler; context: pointer;
+    err: var CBLError): CBLDocument {.
+    importc: "CBLDatabase_SaveDocumentResolving".}
 
 ## Deletes a document from the database. Deletions are replicated.
-proc delete*(document: CBLDocument; concurrency: CBLConcurrencyControl; err: var CBLError): bool {.importc: "CBLDocument_Delete".}
+proc delete*(document: CBLDocument; concurrency: CBLConcurrencyControl;
+    err: var CBLError): bool {.importc: "CBLDocument_Delete".}
 
 ## Purges a document. This removes all traces of the document from the database.
 ##     Purges are _not_ replicated. If the document is changed on a server, it will be re-created
 ##     when pulled.
 ##           simpler shortcut.
-proc purge*(document: CBLDocument; err: var CBLError): bool {.importc: "CBLDocument_Purge".}
+proc purge*(document: CBLDocument; err: var CBLError): bool {.
+    importc: "CBLDocument_Purge".}
 
 ## Purges a document, given only its ID.
 ##             code will be zero.
 ##
-proc purgeDocumentByID*(database: CBLDatabase; docID: cstring; err: var CBLError): bool {.importc: "CBLDatabase_PurgeDocumentByID".}
+proc purgeDocumentByID*(database: CBLDatabase; docID: cstring;
+    err: var CBLError): bool {.importc: "CBLDatabase_PurgeDocumentByID".}
 
 ## \name  Mutable documents
 ##     The type `CBLDocument*` without a `const` qualifier refers to a _mutable_ document instance.
@@ -617,7 +652,8 @@ proc purgeDocumentByID*(database: CBLDatabase; docID: cstring; err: var CBLError
 ##
 ## Reads a document from the database, in mutable form that can be updated and saved.
 ##     (This function is otherwise identical to \ref CBLDatabase_GetDocument.)
-proc getMutableDocument*(database: CBLDatabase; docID: cstring): CBLDocument {.importc: "CBLDatabase_GetMutableDocument".}
+proc getMutableDocument*(database: CBLDatabase; docID: cstring): CBLDocument {.
+    importc: "CBLDatabase_GetMutableDocument".}
 
 ## Creates a new, empty document in memory. It will not be added to a database until saved.
 proc newDocument*(docID: cstring): CBLDocument {.importc: "CBLDocument_New".}
@@ -625,7 +661,8 @@ proc newDocument*(docID: cstring): CBLDocument {.importc: "CBLDocument_New".}
 ## Creates a new mutable CBLDocument instance that refers to the same document as the original.
 ##     If the original document has unsaved changes, the new one will also start out with the same
 ##     changes; but mutating one document thereafter will not affect the other.
-proc mutableCopy*(original: CBLDocument): CBLDocument {.importc: "CBLDocument_MutableCopy".}
+proc mutableCopy*(original: CBLDocument): CBLDocument {.
+    importc: "CBLDocument_MutableCopy".}
 
 ## \name  CBLDocument properties and metadata
 ##     A document's body is essentially a JSON object. The properties are accessed in memory
@@ -637,7 +674,8 @@ proc id*(doc: CBLDocument): cstring {.importc: "CBLDocument_ID".}
 ## Returns a document's revision ID, which is a short opaque string that's guaranteed to be
 ##     unique to every change made to the document.
 ##     If the document doesn't exist yet, this function returns NULL.
-proc revisionID*(doc: CBLDocument): cstring {.importc: "CBLDocument_RevisionID".}
+proc revisionID*(doc: CBLDocument): cstring {.
+    importc: "CBLDocument_RevisionID".}
 
 ## Returns a document's current sequence in the local database.
 ##     This number increases every time the document is saved, and a more recently saved document
@@ -658,32 +696,41 @@ proc properties*(doc: CBLDocument): FLDict {.importc: "CBLDocument_Properties".}
 ##            same collection returned by \ref CBLDocument_Properties.
 ##             If you need to use any properties after releasing the document, you must retain them
 ##             by calling \ref FLValue_Retain (and of course later release them.)
-proc mutableProperties*(doc: CBLDocument): FLMutableDict {.importc: "CBLDocument_MutableProperties".}
+proc mutableProperties*(doc: CBLDocument): FLMutableDict {.
+    importc: "CBLDocument_MutableProperties".}
 
 ## Sets a mutable document's properties.
 ##     Call \ref CBLDatabase_SaveDocument to persist the changes.
 ##            releasing any retained reference(s) you have to it.
-proc setProperties*(doc: CBLDocument; properties: FLMutableDict) {.importc: "CBLDocument_SetProperties".}
+proc setProperties*(doc: CBLDocument; properties: FLMutableDict) {.
+    importc: "CBLDocument_SetProperties".}
 
-proc createDocumentFleeceDoc*(doc: CBLDocument): FLDoc {.importc: "CBLDocument_CreateFleeceDoc".}
+proc createDocumentFleeceDoc*(doc: CBLDocument): FLDoc {.
+    importc: "CBLDocument_CreateFleeceDoc".}
 
 ## Returns a document's properties as a null-terminated JSON string.
-proc propertiesAsJSON*(doc: CBLDocument): cstring {.importc: "CBLDocument_PropertiesAsJSON".}
+proc propertiesAsJSON*(doc: CBLDocument): cstring {.
+    importc: "CBLDocument_PropertiesAsJSON".}
 
 ## Sets a mutable document's properties from a JSON string.
-proc setPropertiesAsJSON*(doc: CBLDocument; json: cstring; err: var CBLError): bool {.importc: "CBLDocument_SetPropertiesAsJSON".}
+proc setPropertiesAsJSON*(doc: CBLDocument; json: cstring;
+    err: var CBLError): bool {.importc: "CBLDocument_SetPropertiesAsJSON".}
 
 ## Returns the time, if any, at which a given document will expire and be purged.
 ##     Documents don't normally expire; you have to call \ref CBLDatabase_SetDocumentExpiration
 ##     to set a document's expiration time.
 ##              or 0 if the document does not have an expiration,
 ##              or -1 if the call failed.
-proc getDocumentExpiration*(db: CBLDatabase; docID: cstring; err: var CBLError): CBLTimestamp {.importc: "CBLDatabase_GetDocumentExpiration".}
+proc getDocumentExpiration*(db: CBLDatabase; docID: cstring;
+    err: var CBLError): CBLTimestamp {.
+    importc: "CBLDatabase_GetDocumentExpiration".}
 
 ## Sets or clears the expiration time of a document.
 ##             \ref CBLDatabase_PurgeExpiredDocuments when the time comes, to make it happen.
 ##                         or 0 if the document should never expire.
-proc setDocumentExpiration*(db: CBLDatabase; docID: cstring; expiration: CBLTimestamp; err: var CBLError): bool {.importc: "CBLDatabase_SetDocumentExpiration".}
+proc setDocumentExpiration*(db: CBLDatabase; docID: cstring;
+    expiration: CBLTimestamp; err: var CBLError): bool {.
+    importc: "CBLDatabase_SetDocumentExpiration".}
 
 ## \name  CBLDocument listeners
 ##     A document change listener lets you detect changes made to a specific document after they
@@ -694,12 +741,15 @@ proc setDocumentExpiration*(db: CBLDatabase; docID: cstring; expiration: CBLTime
 ##                     prepared for that, you may want to use \ref CBLDatabase_BufferNotifications
 ##                     so that listeners will be called in a safe context.
 type
-  DocumentChangeListener* = proc (context: pointer; db: CBLDatabase; docID: cstring)
+  DocumentChangeListener* = proc (context: pointer; db: CBLDatabase;
+      docID: cstring)
 
 ## Registers a document change listener callback. It will be called after a specific document
 ##     is changed on disk.
 ##             listener.
-proc addDocumentChangeListener*(db: CBLDatabase; docID: cstring; listener: DocumentChangeListener; context: pointer): CBLListenerToken {.importc: "CBLDatabase_AddDocumentChangeListener".}
+proc addDocumentChangeListener*(db: CBLDatabase; docID: cstring;
+    listener: DocumentChangeListener; context: pointer): CBLListenerToken {.
+    importc: "CBLDatabase_AddDocumentChangeListener".}
 
 
 
@@ -786,24 +836,28 @@ proc properties*(a1: CBLBlob): FLDict {.importc: "CBLBlob_Properties".}
 
 ## Reads the blob's contents into memory and returns them.
 ##         You are responsible for calling \ref FLFLSliceResult_Release on the returned data when done.
-proc loadContent*(a1: CBLBlob; err: var CBLError): FLSliceResult {.importc: "CBLBlob_LoadContent".}
+proc loadContent*(a1: CBLBlob; err: var CBLError): FLSliceResult {.
+    importc: "CBLBlob_LoadContent".}
 
 ## A stream for reading a blob's content.
 type
   BlobReadStream* = ptr object
 
 ## Opens a stream for reading a blob's content.
-proc openContentStream*(a1: CBLBlob; err: var CBLError): ptr BlobReadStream {.importc: "CBLBlob_OpenContentStream".}
+proc openContentStream*(a1: CBLBlob; err: var CBLError): ptr BlobReadStream {.
+    importc: "CBLBlob_OpenContentStream".}
 
 ## Reads data from a blob.
-proc read*(stream: ptr BlobReadStream; dst: pointer; maxLength: csize_t; err: var CBLError): cint {.importc: "CBLBlobReader_Read".}
+proc read*(stream: ptr BlobReadStream; dst: pointer; maxLength: csize_t;
+    err: var CBLError): cint {.importc: "CBLBlobReader_Read".}
 
 ## Closes a CBLBlobReadStream.
 proc close*(a1: ptr BlobReadStream) {.importc: "CBLBlobReader_Close".}
 
 ## Creates a new blob given its contents as a single block of data.
 ##                 has been saved.
-proc createBlobWithData*(contentType: cstring; contents: FLSlice): CBLBlob {.importc: "CBLBlob_CreateWithData".}
+proc createBlobWithData*(contentType: cstring; contents: FLSlice): CBLBlob {.
+    importc: "CBLBlob_CreateWithData".}
 
 ## A stream for writing a new blob to the database.
 type
@@ -814,19 +868,25 @@ type
 ##         then \ref CBLBlob_CreateWithStream to create the blob.
 ##
 ##         If for some reason you need to abort, just call \ref CBLBlobWriter_Close.
-proc newBlobWriter*(db: CBLDatabase; err: var CBLError): ptr BlobWriteStream {.importc: "CBLBlobWriter_New".}
+proc newBlobWriter*(db: CBLDatabase; err: var CBLError): ptr BlobWriteStream {.
+    importc: "CBLBlobWriter_New".}
 
 ## Closes a blob-writing stream, if you need to give up without creating a \ref CBLBlob.
 proc close*(a1: ptr BlobWriteStream) {.importc: "CBLBlobWriter_Close".}
 
 ## Writes data to a new blob.
-proc write*(writer: ptr BlobWriteStream; data: pointer; length: csize_t; err: var CBLError): bool {.importc: "CBLBlobWriter_Write".}
+proc write*(writer: ptr BlobWriteStream; data: pointer; length: csize_t;
+    err: var CBLError): bool {.importc: "CBLBlobWriter_Write".}
 
 ## Creates a new blob after its data has been written to a \ref CBLBlobWriteStream.
 ##         You should then add the blob to a mutable document as a property -- see
 ##         \ref FLMutableDict_SetBlob and \ref FLMutableArray_SetBlob.
-proc createBlobWithStream*(contentType: cstring; writer: ptr BlobWriteStream): CBLBlob {.importc: "CBLBlob_CreateWithStream".}
-proc createBlobWithStream_s*(contentType: cstring; writer: ptr BlobWriteStream): CBLBlob {.importc: "CBLBlob_CreateWithStream".}
+proc createBlobWithStream*(contentType: cstring;
+    writer: ptr BlobWriteStream): CBLBlob {.
+    importc: "CBLBlob_CreateWithStream".}
+proc createBlobWithStream_s*(contentType: cstring;
+    writer: ptr BlobWriteStream): CBLBlob {.
+    importc: "CBLBlob_CreateWithStream".}
 
 ## Returns true if a value in a document is a blob reference.
 ##         If so, you can call \ref FLValue_GetBlob to access it.
@@ -876,8 +936,8 @@ proc setBlob*(slot: FLSlot; blob: CBLBlob) {.importc: "FLSlot_SetBlob".}
 ## CBLQuery languages
 type
   CBLQueryLanguage* {.size: sizeof(cint).} = enum
-    kJSONLanguage,            ## [JSON query schema](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-CBLQuery-Schema)
-    kN1QLLanguage             ## [N1QL syntax](https://docs.couchbase.com/server/6.0/n1ql/n1ql-language-reference/index.html)
+    kJSONLanguage, ## [JSON query schema](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-CBLQuery-Schema)
+    kN1QLLanguage ## [N1QL syntax](https://docs.couchbase.com/server/6.0/n1ql/n1ql-language-reference/index.html)
 
 
 ## \name  CBLQuery objects
@@ -889,7 +949,9 @@ type
 ##             [JSON](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-CBLQuery-Schema) or
 ##             [N1QL](https://docs.couchbase.com/server/4.0/n1ql/n1ql-language-reference/index.html).
 ##                     input expression will be stored here (or -1 if not known/applicable.)
-proc newQuery*(db: CBLDatabase; language: CBLQueryLanguage; queryFLString: cstring; outErrorPos: ptr cint; err: var CBLError): CBLQuery {.importc: "CBLQuery_New".}
+proc newQuery*(db: CBLDatabase; language: CBLQueryLanguage;
+    queryFLString: cstring; outErrorPos: ptr cint;
+    err: var CBLError): CBLQuery {.importc: "CBLQuery_New".}
 
 ## Assigns values to the query's parameters.
 ##     These values will be substited for those parameters whenever the query is executed,
@@ -900,7 +962,8 @@ proc newQuery*(db: CBLDatabase; language: CBLQueryLanguage; queryFLString: cstri
 ##     to this call should have a key `PARAM` that maps to the value of the parameter.
 ##             keys are the parameter names. (It's easiest to construct this by using the mutable
 ##             API, i.e. calling \ref FLMutableDict_New and adding keys/values.)
-proc setParameters*(query: CBLQuery; parameters: FLDict) {.importc: "CBLQuery_SetParameters".}
+proc setParameters*(query: CBLQuery; parameters: FLDict) {.
+    importc: "CBLQuery_SetParameters".}
 
 ## Returns the query's current parameter bindings, if any.
 proc parameters*(query: CBLQuery): FLDict {.importc: "CBLQuery_Parameters".}
@@ -908,12 +971,14 @@ proc parameters*(query: CBLQuery): FLDict {.importc: "CBLQuery_Parameters".}
 ## Assigns values to the query's parameters, from JSON data.
 ##     See \ref CBLQuery_SetParameters for details.
 ##             keys are the parameter names. (You may use JSON5 syntax.)
-proc setParametersAsJSON*(query: CBLQuery; json: cstring): bool {.importc: "CBLQuery_SetParametersAsJSON".}
+proc setParametersAsJSON*(query: CBLQuery; json: cstring): bool {.
+    importc: "CBLQuery_SetParametersAsJSON".}
 
 ## Runs the query, returning the results.
 ##     To obtain the results you'll typically call \ref CBLResultSet_Next in a `while` loop,
 ##     examining the values in the \ref CBLResultSet each time around.
-proc execute*(a1: CBLQuery; err: var CBLError): CBLResultSet {.importc: "CBLQuery_Execute".}
+proc execute*(a1: CBLQuery; err: var CBLError): CBLResultSet {.
+    importc: "CBLQuery_Execute".}
 
 ## Returns information about the query, including the translated SQLite form, and the search
 ##     strategy. You can use this to help optimize the query: the word `SCAN` in the strategy
@@ -930,7 +995,8 @@ proc columnCount*(a1: CBLQuery): cuint {.importc: "CBLQuery_ColumnCount".}
 ##     A column that returns an expression will have an automatically-generated name like `$1`.
 ##     To give a column a custom name, use the `AS` syntax in the query.
 ##     Every column is guaranteed to have a unique name.
-proc columnName*(a1: CBLQuery; columnIndex: cuint): FLSlice {.importc: "CBLQuery_ColumnName".}
+proc columnName*(a1: CBLQuery; columnIndex: cuint): FLSlice {.
+    importc: "CBLQuery_ColumnName".}
 
 ## \name  Result sets
 ##     A `CBLResultSet` is an iterator over the results returned by a query. It exposes one
@@ -957,13 +1023,15 @@ proc next*(a1: CBLResultSet): bool {.importc: "CBLResultSet_Next".}
 ## Returns the value of a column of the current result, given its (zero-based) numeric index.
 ##     This may return a NULL pointer, indicating `MISSING`, if the value doesn't exist, e.g. if
 ##     the column is a property that doesn't exist in the document.
-proc valueAtIndex*(a1: CBLResultSet; index: cuint): FLValue {.importc: "CBLResultSet_ValueAtIndex".}
+proc valueAtIndex*(a1: CBLResultSet; index: cuint): FLValue {.
+    importc: "CBLResultSet_ValueAtIndex".}
 
 ## Returns the value of a column of the current result, given its name.
 ##     This may return a NULL pointer, indicating `MISSING`, if the value doesn't exist, e.g. if
 ##     the column is a property that doesn't exist in the document. (Or, of course, if the key
 ##     is not a column name in this query.)
-proc valueForKey*(a1: CBLResultSet; key: cstring): FLValue {.importc: "CBLResultSet_ValueForKey".}
+proc valueForKey*(a1: CBLResultSet; key: cstring): FLValue {.
+    importc: "CBLResultSet_ValueForKey".}
 
 ## Returns the current result as an array of column values.
 ##    @warning The array reference is only valid until the result-set is advanced or released.
@@ -1000,11 +1068,14 @@ type
 ##     the listener(s) of the results when ready. After that, it will run in the background after
 ##     the database changes, and only notify the listeners when the result set changes.
 ##             listener.
-proc addChangeListener*(query: CBLQuery; listener: CBLQueryChangeListner; context: pointer): CBLListenerToken {.importc: "CBLQuery_AddChangeListener".}
+proc addChangeListener*(query: CBLQuery; listener: CBLQueryChangeListner;
+    context: pointer): CBLListenerToken {.
+    importc: "CBLQuery_AddChangeListener".}
 
 ## Returns the query's _entire_ current result set, after it's been announced via a call to the
 ##     listener's callback.
-proc copyCurrentResults*(query: CBLQuery; listener: CBLListenerToken; err: var CBLError): CBLResultSet {.importc: "CBLQuery_CopyCurrentResults".}
+proc copyCurrentResults*(query: CBLQuery; listener: CBLListenerToken;
+    err: var CBLError): CBLResultSet {.importc: "CBLQuery_CopyCurrentResults".}
 
 ## \name  CBLDatabase Indexes
 ##     Indexes are used to speed up queries by allowing fast -- O(log n) -- lookup of documents
@@ -1033,28 +1104,28 @@ proc copyCurrentResults*(query: CBLQuery; listener: CBLListenerToken; err: var C
 ## Types of database indexes.
 type
   CBLIndexType* {.size: sizeof(cint).} = enum
-    kValueIndex,              ## An index that stores property or expression values
-    kFullTextIndex            ## An index of strings, that enables searching for words with `MATCH`
+    kValueIndex, ## An index that stores property or expression values
+    kFullTextIndex ## An index of strings, that enables searching for words with `MATCH`
 
 
 ## Parameters for creating a database index.
 type
   CBLIndexSpec* {.bycopy.} = object
-    `type`*: CBLIndexType         ## The type of index to create.
-    ## A JSON array describing each column of the index.
+    `type`*: CBLIndexType ## The type of index to create.
+                          ## A JSON array describing each column of the index.
     keyExpressionsJSON*: cstring ## In a full-text index, should diacritical marks (accents) be ignored?
-                               ##         Defaults to false. Generally this should be left `false` for non-English text.
-    ignoreAccents*: bool       ## In a full-text index, the dominant language. Setting this enables word stemming, i.e.
-                       ##         matching different cases of the same word ("big" and "bigger", for instance) and ignoring
-                       ##         common "stop-words" ("the", "a", "of", etc.)
-                       ##
-                       ##         Can be an ISO-639 language code or a lowercase (English) language name; supported
-                       ##         languages are: da/danish, nl/dutch, en/english, fi/finnish, fr/french, de/german,
-                       ##         hu/hungarian, it/italian, no/norwegian, pt/portuguese, ro/romanian, ru/russian,
-                       ##         es/spanish, sv/swedish, tr/turkish.
-                       ##
-                       ##         If left null,  or set to an unrecognized language, no language-specific behaviors
-                       ##         such as stemming and stop-word removal occur.
+                          ##         Defaults to false. Generally this should be left `false` for non-English text.
+    ignoreAccents*: bool ## In a full-text index, the dominant language. Setting this enables word stemming, i.e.
+                          ##         matching different cases of the same word ("big" and "bigger", for instance) and ignoring
+                          ##         common "stop-words" ("the", "a", "of", etc.)
+                          ##
+                          ##         Can be an ISO-639 language code or a lowercase (English) language name; supported
+                          ##         languages are: da/danish, nl/dutch, en/english, fi/finnish, fr/french, de/german,
+                          ##         hu/hungarian, it/italian, no/norwegian, pt/portuguese, ro/romanian, ru/russian,
+                          ##         es/spanish, sv/swedish, tr/turkish.
+                          ##
+                          ##         If left null,  or set to an unrecognized language, no language-specific behaviors
+                          ##         such as stemming and stop-word removal occur.
     language*: cstring
 
 
@@ -1062,13 +1133,16 @@ type
 ##     Indexes are persistent.
 ##     If an identical index with that name already exists, nothing happens (and no error is returned.)
 ##     If a non-identical index with that name already exists, it is deleted and re-created.
-proc createDatabaseIndex*(db: CBLDatabase; name: cstring; a3: CBLIndexSpec; err: var CBLError): bool {.importc: "CBLDatabase_CreateIndex".}
+proc createDatabaseIndex*(db: CBLDatabase; name: cstring; a3: CBLIndexSpec;
+    err: var CBLError): bool {.importc: "CBLDatabase_CreateIndex".}
 
 ## Deletes an index given its name.
-proc deleteIndex*(db: CBLDatabase; name: cstring; err: var CBLError): bool {.importc: "CBLDatabase_DeleteIndex".}
+proc deleteIndex*(db: CBLDatabase; name: cstring; err: var CBLError): bool {.
+    importc: "CBLDatabase_DeleteIndex".}
 
 ## Returns the names of the indexes on this database, as an array of strings.
-proc indexNames*(db: CBLDatabase): FLMutableArray {.importc: "CBLDatabase_IndexNames".}
+proc indexNames*(db: CBLDatabase): FLMutableArray {.
+    importc: "CBLDatabase_IndexNames".}
 
 
 
@@ -1099,28 +1173,32 @@ var kAuthDefaultCookieName* {.importc: "kCBLAuthDefaultCookieName".}: cstring
 
 type
   CBLEndpoint* = ptr object
-  CBLAuthenticator* = ptr object  ## An opaque object representing authentication credentials for a remote server.
+  CBLAuthenticator* = ptr object ## An opaque object representing authentication credentials for a remote server.
 
 ## Creates a new endpoint representing a server-based database at the given URL.
 ##     The URL's scheme must be `ws` or `wss`, it must of course have a valid hostname,
 ##     and its path must be the name of the database on that server.
 ##     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
 ##     For example: `wss://example.org/dbname`
-proc newEndpointWithURL*(url: cstring): CBLEndpoint {.importc: "CBLEndpoint_NewWithURL".}
+proc newEndpointWithURL*(url: cstring): CBLEndpoint {.
+    importc: "CBLEndpoint_NewWithURL".}
 
 ## Creates a new endpoint representing another local database. (Enterprise Edition only.)
-proc newEndpointWithLocalDB*(db: CBLDatabase): CBLEndpoint {.importc: "CBLEndpoint_NewWithLocalDB".}
+proc newEndpointWithLocalDB*(db: CBLDatabase): CBLEndpoint {.
+    importc: "CBLEndpoint_NewWithLocalDB".}
 
 ## Frees a CBLEndpoint object.
 proc free*(a1: CBLEndpoint) {.importc: "CBLEndpoint_Free".}
 
 
 ## Creates an authenticator for HTTP Basic (username/password) auth.
-proc newAuthBasic*(username: cstring; password: cstring): CBLAuthenticator {.importc: "CBLAuth_NewBasic".}
+proc newAuthBasic*(username: cstring; password: cstring): CBLAuthenticator {.
+    importc: "CBLAuth_NewBasic".}
 
 ## Creates an authenticator using a Couchbase Sync Gateway login session identifier,
 ##     and optionally a cookie name (pass NULL for the default.)
-proc newAuthSession*(sessionID: cstring; cookieName: cstring): CBLAuthenticator {.importc: "CBLAuth_NewSession".}
+proc newAuthSession*(sessionID: cstring;
+    cookieName: cstring): CBLAuthenticator {.importc: "CBLAuth_NewSession".}
 
 ## Frees a CBLAuthenticator object.
 proc free*(a1: CBLAuthenticator) {.importc: "CBLAuth_Free".}
@@ -1129,15 +1207,16 @@ proc free*(a1: CBLAuthenticator) {.importc: "CBLAuth_Free".}
 type
   CBLReplicatorType* {.size: sizeof(cint).} = enum
     kReplicatorTypePushAndPull = 0, ## Bidirectional; both push and pull
-    kReplicatorTypePush,      ## Pushing changes to the target
-    kReplicatorTypePull       ## Pulling changes from the target
+    kReplicatorTypePush,            ## Pushing changes to the target
+    kReplicatorTypePull             ## Pulling changes from the target
 
 
 ## A callback that can decide whether a particular document should be pushed or pulled.
 ##                 It must pay attention to thread-safety. It should not take a long time to return,
 ##                 or it will slow down the replicator.
 type
-  CBLReplicationFilter* = proc (context: pointer; document: CBLDocument; isDeleted: bool): bool
+  CBLReplicationFilter* = proc (context: pointer; document: CBLDocument;
+      isDeleted: bool): bool
 
 ## Conflict-resolution callback for use in replications. This callback will be invoked
 ##     when the replicator finds a newer server-side revision of a document that also has local
@@ -1152,7 +1231,8 @@ type
 ##         a mutable copy of either one and modify it appropriately.
 ##         Or return NULL if the resolution is to delete the document.
 type
-  CBLConflictResolver* = proc (context: pointer; documentID: cstring; localDocument: CBLDocument; remoteDocument: CBLDocument): CBLDocument
+  CBLConflictResolver* = proc (context: pointer; documentID: cstring;
+      localDocument: CBLDocument; remoteDocument: CBLDocument): CBLDocument
 
 ## Default conflict resolver. This always returns `localDocument`.
 var defaultConflictResolver* {.importc: "CBLDefaultConflictResolver".}: CBLConflictResolver
@@ -1160,55 +1240,58 @@ var defaultConflictResolver* {.importc: "CBLDefaultConflictResolver".}: CBLConfl
 ## Types of proxy servers, for CBLProxySettings.
 type
   CBLProxyType* {.size: sizeof(cint).} = enum
-    kProxyHTTP,               ## HTTP proxy; must support 'CONNECT' method
-    kProxyHTTPS               ## HTTPS proxy; must support 'CONNECT' method
+    kProxyHTTP, ## HTTP proxy; must support 'CONNECT' method
+    kProxyHTTPS ## HTTPS proxy; must support 'CONNECT' method
 
 
 ## Proxy settings for the replicator.
 type
   CBLProxySettings* {.bycopy.} = object
-    `type`*: CBLProxyType         ## Type of proxy
-    hostname*: cstring         ## Proxy server hostname or IP address
-    port*: uint16             ## Proxy server port
-    username*: cstring         ## Username for proxy auth (optional)
-    password*: cstring         ## Password for proxy auth
+    `type`*: CBLProxyType ## Type of proxy
+    hostname*: cstring    ## Proxy server hostname or IP address
+    port*: uint16         ## Proxy server port
+    username*: cstring    ## Username for proxy auth (optional)
+    password*: cstring    ## Password for proxy auth
 
 
 ## The configuration of a replicator.
 type
   CBLReplicatorConfiguration* {.bycopy.} = object
-    database*: CBLDatabase     ## The database to replicate
-    endpoint*: CBLEndpoint     ## The address of the other database to replicate with
-    replicatorType*: CBLReplicatorType ## Push, pull or both
-    continuous*: bool          ## Continuous replication?
-                    ## -- HTTP settings:
-    authenticator*: CBLAuthenticator ## Authentication credentials, if needed
-    proxy*: ptr CBLProxySettings   ## HTTP client proxy settings
-    headers*: FLDict             ## Extra HTTP headers to add to the WebSocket request
-                 ## -- TLS settings:
+    database*: CBLDatabase                 ## The database to replicate
+    endpoint*: CBLEndpoint ## The address of the other database to replicate with
+    replicatorType*: CBLReplicatorType     ## Push, pull or both
+    continuous*: bool                      ## Continuous replication?
+                                           ## -- HTTP settings:
+    authenticator*: CBLAuthenticator       ## Authentication credentials, if needed
+    proxy*: ptr CBLProxySettings           ## HTTP client proxy settings
+    headers*: FLDict ## Extra HTTP headers to add to the WebSocket request
+                                           ## -- TLS settings:
     pinnedServerCertificate*: FLSlice ## An X.509 cert to "pin" TLS connections to (PEM or DER)
-    trustedRootCertificates*: FLSlice ## Set of anchor certs (PEM format)
-                                  ## -- Filtering:
-    channels*: FLArray           ## Optional set of channels to pull from
-    documentIDs*: FLArray        ## Optional set of document IDs to replicate
-    pushFilter*: CBLReplicationFilter ## Optional callback to filter which docs are pushed
-    pullFilter*: CBLReplicationFilter ## Optional callback to validate incoming docs
+    trustedRootCertificates*: FLSlice      ## Set of anchor certs (PEM format)
+                                           ## -- Filtering:
+    channels*: FLArray                     ## Optional set of channels to pull from
+    documentIDs*: FLArray                  ## Optional set of document IDs to replicate
+    pushFilter*: CBLReplicationFilter      ## Optional callback to filter which docs are pushed
+    pullFilter*: CBLReplicationFilter      ## Optional callback to validate incoming docs
     conflictResolver*: CBLConflictResolver ## Optional conflict-resolver callback
-    context*: pointer          ## Arbitrary value that will be passed to callbacks
+    context*: pointer                      ## Arbitrary value that will be passed to callbacks
 
 
 ## \name  Lifecycle
 ## Creates a replicator with the given configuration.
-proc newReplicator*(a1: ptr CBLReplicatorConfiguration; err: var CBLError): CBLReplicator {.importc: "CBLReplicator_New".}
+proc newReplicator*(a1: ptr CBLReplicatorConfiguration;
+    err: var CBLError): CBLReplicator {.importc: "CBLReplicator_New".}
 
 ## Returns the configuration of an existing replicator.
-proc config*(a1: CBLReplicator): ptr CBLReplicatorConfiguration {.importc: "CBLReplicator_Config".}
+proc config*(a1: CBLReplicator): ptr CBLReplicatorConfiguration {.
+    importc: "CBLReplicator_Config".}
 
 ## Instructs the replicator to ignore existing checkpoints the next time it runs.
 ##     This will cause it to scan through all the documents on the remote database, which takes
 ##     a lot longer, but it can resolve problems with missing documents if the client and
 ##     server have gotten out of sync somehow.
-proc resetCheckpoint*(a1: CBLReplicator) {.importc: "CBLReplicator_ResetCheckpoint".}
+proc resetCheckpoint*(a1: CBLReplicator) {.
+    importc: "CBLReplicator_ResetCheckpoint".}
 
 ## Starts a replicator, asynchronously. Does nothing if it's already started.
 proc start*(a1: CBLReplicator) {.importc: "CBLReplicator_Start".}
@@ -1223,25 +1306,27 @@ proc stop*(a1: CBLReplicator) {.importc: "CBLReplicator_Stop".}
 ##     replicator's behavior while it's in the Offline state:
 ##  Setting it to false will cancel any pending retry and prevent future automatic retries.
 ##  Setting it back to true will initiate an immediate retry.
-proc setHostReachable*(a1: CBLReplicator; reachable: bool) {.importc: "CBLReplicator_SetHostReachable".}
+proc setHostReachable*(a1: CBLReplicator; reachable: bool) {.
+    importc: "CBLReplicator_SetHostReachable".}
 
 ## Puts the replicator in or out of "suspended" state. The default is false.
 ##  Setting suspended=true causes the replicator to disconnect and enter Offline state;
 ##       it will not attempt to reconnect while it's suspended.
 ##  Setting suspended=false causes the replicator to attempt to reconnect, _if_ it was
 ##       connected when suspended, and is still in Offline state.
-proc setSuspended*(repl: CBLReplicator; suspended: bool) {.importc: "CBLReplicator_SetSuspended".}
+proc setSuspended*(repl: CBLReplicator; suspended: bool) {.
+    importc: "CBLReplicator_SetSuspended".}
 
 ## \name  Status and Progress
 ##
 ## The possible states a replicator can be in during its lifecycle.
 type
   CBLReplicatorActivityLevel* {.size: sizeof(cint).} = enum
-    kReplicatorStopped,       ## The replicator is unstarted, finished, or hit a fatal error.
-    kReplicatorOffline,       ## The replicator is offline, as the remote host is unreachable.
-    kReplicatorConnecting,    ## The replicator is connecting to the remote host.
-    kReplicatorIdle,          ## The replicator is inactive, waiting for changes to sync.
-    kReplicatorBusy           ## The replicator is actively transferring data.
+    kReplicatorStopped,    ## The replicator is unstarted, finished, or hit a fatal error.
+    kReplicatorOffline,    ## The replicator is offline, as the remote host is unreachable.
+    kReplicatorConnecting, ## The replicator is connecting to the remote host.
+    kReplicatorIdle,       ## The replicator is inactive, waiting for changes to sync.
+    kReplicatorBusy        ## The replicator is actively transferring data.
 
 
 ## A fractional progress value, ranging from 0.0 to 1.0 as replication progresses.
@@ -1250,7 +1335,7 @@ type
 ##     It's fine to use in a progress bar, though.
 type
   CBLReplicatorProgress* {.bycopy.} = object
-    fractionComplete*: cfloat  ## / Very-approximate completion, from 0.0 to 1.0
+    fractionComplete*: cfloat ## / Very-approximate completion, from 0.0 to 1.0
     documentCount*: uint64    ## Number of documents transferred so far
 
 
@@ -1258,12 +1343,13 @@ type
 type
   ReplicatorStatus* {.bycopy.} = object
     activity*: CBLReplicatorActivityLevel ## Current state
-    progress*: CBLReplicatorProgress ## Approximate fraction complete
-    error*: CBLError              ## CBLError, if any
+    progress*: CBLReplicatorProgress      ## Approximate fraction complete
+    error*: CBLError                      ## CBLError, if any
 
 
 ## Returns the replicator's current status.
-proc getStatus*(a1: CBLReplicator): ReplicatorStatus {.importc: "CBLReplicator_GetStatus".}
+proc getStatus*(a1: CBLReplicator): ReplicatorStatus {.
+    importc: "CBLReplicator_GetStatus".}
 
 ## Indicates which documents have local changes that have not yet been pushed to the server
 ##     by this replicator. This is of course a snapshot, that will go out of date as the replicator
@@ -1278,7 +1364,8 @@ proc getStatus*(a1: CBLReplicator): ReplicatorStatus {.importc: "CBLReplicator_G
 ##     \note  Documents that would never be pushed by this replicator, due to its configuration's
 ##            `pushFilter` or `docIDs`, are ignored.
 ##     \warning  You are responsible for releasing the returned array via \ref FLValue_Release.
-proc pendingDocumentIDs*(a1: CBLReplicator; err: var CBLError): FLDict {.importc: "CBLReplicator_PendingDocumentIDs".}
+proc pendingDocumentIDs*(a1: CBLReplicator; err: var CBLError): FLDict {.
+    importc: "CBLReplicator_PendingDocumentIDs".}
 
 ## Indicates whether the document with the given ID has local changes that have not yet been
 ##     pushed to the server by this replicator.
@@ -1288,16 +1375,20 @@ proc pendingDocumentIDs*(a1: CBLReplicator; err: var CBLError): FLDict {.importc
 ##
 ##     \note  A `false` result means the document is not pending, _or_ there was an error.
 ##            To tell the difference, compare the error code to zero.
-proc isDocumentPending*(repl: CBLReplicator; docID: FLString; err: var CBLError): bool {.importc: "CBLReplicator_IsDocumentPending".}
+proc isDocumentPending*(repl: CBLReplicator; docID: FLString;
+    err: var CBLError): bool {.importc: "CBLReplicator_IsDocumentPending".}
 
 ## A callback that notifies you when the replicator's status changes.
 ##                 It must pay attention to thread-safety. It should not take a long time to return,
 ##                 or it will slow down the replicator.
 type
-  CBLReplicatorChangeListener* = proc (context: pointer; replicator: CBLReplicator; status: ptr ReplicatorStatus)
+  CBLReplicatorChangeListener* = proc (context: pointer;
+      replicator: CBLReplicator; status: ptr ReplicatorStatus)
 
 ## Adds a listener that will be called when the replicator's status changes.
-proc addChangeListener*(a1: CBLReplicator; a2: CBLReplicatorChangeListener; context: pointer): CBLListenerToken {.importc: "CBLReplicator_AddChangeListener".}
+proc addChangeListener*(a1: CBLReplicator; a2: CBLReplicatorChangeListener;
+    context: pointer): CBLListenerToken {.
+    importc: "CBLReplicator_AddChangeListener".}
 
 ## Flags describing a replicated document.
 type
@@ -1309,18 +1400,22 @@ type
 ## Information about a document that's been pushed or pulled.
 type
   CBLReplicatedDocument* {.bycopy.} = object
-    id*: cstring               ## The document ID
-    flags*: CBLDocumentFlags      ## Indicates whether the document was deleted or removed
-    error*: CBLError              ## If the code is nonzero, the document failed to replicate.
+    id*: cstring     ## The document ID
+    flags*: CBLDocumentFlags ## Indicates whether the document was deleted or removed
+    error*: CBLError ## If the code is nonzero, the document failed to replicate.
 
 
 ## A callback that notifies you when documents are replicated.
 ##                 It must pay attention to thread-safety. It should not take a long time to return,
 ##                 or it will slow down the replicator.
 type
-  CBLReplicatedDocumentListener* = proc (context: pointer; replicator: CBLReplicator; isPush: bool; numDocuments: cuint; documents: ptr CBLReplicatedDocument)
+  CBLReplicatedDocumentListener* = proc (context: pointer;
+      replicator: CBLReplicator; isPush: bool; numDocuments: cuint;
+      documents: ptr CBLReplicatedDocument)
 
 ## Adds a listener that will be called when documents are replicated.
-proc addDocumentListener*(a1: CBLReplicator; a2: CBLReplicatedDocumentListener; context: pointer): CBLListenerToken {.importc: "CBLReplicator_AddDocumentListener".}
+proc addDocumentListener*(a1: CBLReplicator; a2: CBLReplicatedDocumentListener;
+    context: pointer): CBLListenerToken {.
+    importc: "CBLReplicator_AddDocumentListener".}
 
 {.pop.}
