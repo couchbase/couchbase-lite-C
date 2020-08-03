@@ -85,6 +85,8 @@ _CBLDatabase_GetDocumentExpiration
 _CBLDatabase_GetDocumentExpiration_s
 _CBLDatabase_SetDocumentExpiration
 _CBLDatabase_SetDocumentExpiration_s
+_CBLDatabase_NextDocExpiration 
+_CBLDatabase_PurgeExpiredDocuments
 
 _CBLDatabase_CreateIndex
 _CBLDatabase_CreateIndex_s
