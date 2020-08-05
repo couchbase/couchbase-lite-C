@@ -367,7 +367,7 @@
 		27B61DC321DEE1C20027CCDB /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		27B61DD821DEEC540027CCDB /* Database.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Database.hh; sourceTree = "<group>"; };
-		27C9B5BA21F12C970040BC45 /* test.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = test.py; sourceTree = "<group>"; };
+		27C9B5BA21F12C970040BC45 /* test.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; name = test.py; path = test/test.py; sourceTree = "<group>"; };
 		27C9B5BF21F12C970040BC45 /* BuildPyCBL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; name = BuildPyCBL.py; path = ../BuildPyCBL.py; sourceTree = "<group>"; };
 		27C9B5C021F12C970040BC45 /* Database.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Database.py; sourceTree = "<group>"; };
 		27C9B5C321F12C970040BC45 /* common.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = common.py; sourceTree = "<group>"; };
@@ -641,7 +641,8 @@
 				27C9B5BA21F12C970040BC45 /* test.py */,
 				27C9B5BB21F12C970040BC45 /* CouchbaseLite */,
 			);
-			path = python;
+			name = python;
+			path = bindings/python;
 			sourceTree = "<group>";
 		};
 		27C9B5BB21F12C970040BC45 /* CouchbaseLite */ = {
