@@ -328,7 +328,7 @@ TEST_CASE_METHOD(CBLTest, "Changes Feed") {
         CHECK(slice(change->revID).hasPrefix("1-"));
         CHECK(change->sequence == i);
     }
-    CBLChangesFeedItems_Free(changes);
+    CBLChangesFeedRevisions_Free(changes);
     CHECK(CBLChangesFeed_GetLastSequenceChecked(feed) == 10);
     CHECK(!CBLChangesFeed_CaughtUp(feed));
 
@@ -344,7 +344,7 @@ TEST_CASE_METHOD(CBLTest, "Changes Feed") {
         CHECK(slice(change->revID).hasPrefix("1-"));
         CHECK(change->sequence == i);
     }
-    CBLChangesFeedItems_Free(changes);
+    CBLChangesFeedRevisions_Free(changes);
     CHECK(CBLChangesFeed_GetLastSequenceChecked(feed) == 20);
     CHECK(CBLChangesFeed_CaughtUp(feed));
 
@@ -353,5 +353,3 @@ TEST_CASE_METHOD(CBLTest, "Changes Feed") {
 
     CBLChangesFeed_Release(feed);
 }
-
-

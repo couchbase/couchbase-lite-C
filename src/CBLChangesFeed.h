@@ -107,12 +107,12 @@ extern "C" {
     bool CBLChangesFeed_CaughtUp(CBLChangesFeed* _cbl_nonnull);
 
     /// Returns up to `limit` changes since the last sequence, or NULL if there are none.
-    /// \note You must call `CBLChangesFeedItems_Free` when done with the returned items.
+    /// \note You must call `CBLChangesFeedRevisions_Free` when done with the returned items.
     CBLChangesFeedRevisions* CBLChangesFeed_Next(CBLChangesFeed* _cbl_nonnull,
                                                  unsigned limit);
 
     /// Frees the memory allocated by a CBLChangesFeedRevisions.
-    void CBLChangesFeedItems_Free(CBLChangesFeedRevisions*);
+    void CBLChangesFeedRevisions_Free(CBLChangesFeedRevisions*);
 
 #ifdef __cplusplus
 }

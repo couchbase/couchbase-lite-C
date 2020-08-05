@@ -18,21 +18,22 @@
 #include <chrono>
 
 using namespace litecore;
-using namespace litecore::repl;
 using namespace fleece;
 
 
 class CBLCheckpoint : public CBLRefCounted,
-                      public Checkpointer,
+                      repl::Options,
+                      public repl::Checkpointer,
                       public InstanceCountedIn<CBLCheckpoint>
 {
 public:
     CBLCheckpoint(CBLDatabase *db, const C4ReplicatorParameters &params, slice url)
-    :Checkpointer(repl::Options(params), url)
+    :repl::Options(params)
+    ,repl::Checkpointer(*this, url)
     ,_db(db)
     { }
 
-    void enableSave(Checkpointer::duration interval,
+    void enableSave(repl::Checkpointer::duration interval,
                     CBLCheckpointSaveCallback callback,
                     void *context)
     {

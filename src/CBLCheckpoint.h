@@ -51,6 +51,10 @@ extern "C" {
                                          const char *remoteJSON,
                                          CBLError*) CBLAPI;
 
+    bool CBLCheckpoint_CompareWithRemote_s(CBLCheckpoint* _cbl_nonnull,
+                                           FLSlice remoteJSON,
+                                           CBLError*) CBLAPI;
+
     //---- LOCAL SEQUENCES (PUSH):
 
     /** The checkpoint's local sequence. All sequences up through this one are pushed. */

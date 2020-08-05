@@ -44,10 +44,13 @@ CBLCheckpoint* CBLCheckpoint_New(CBLDatabase *db,
     alloc_slice url(c4address_toURL(conf.endpoint->remoteAddress()));
 
     Retained<CBLCheckpoint> c = new CBLCheckpoint(db, params, url);
+    C4Error c4err;
     bool ok = db->use<bool>([&](C4Database *c4db) {
-        return c->read(c4db, reset, internal(outError));
+        return c->read(c4db, reset, &c4err);
     });
-    if (!ok)
+    if (outError)
+        *outError = external(c4err);
+    if (!ok && c4err.code != 0)
         return nullptr;
 
     return retain(c);
@@ -63,7 +66,15 @@ bool CBLCheckpoint_CompareWithRemote(CBLCheckpoint* c,
                                      const char *remoteJSON,
                                      CBLError *outError) CBLAPI
 {
-    return c->validateWith(Checkpoint(remoteJSON));
+    return CBLCheckpoint_CompareWithRemote_s(c, slice(remoteJSON), outError);
+}
+
+
+bool CBLCheckpoint_CompareWithRemote_s(CBLCheckpoint* c,
+                                       FLSlice remoteJSON,
+                                       CBLError *outError) CBLAPI
+{
+    return c->validateWith(repl::Checkpoint(remoteJSON));
 }
 
 
@@ -112,7 +123,7 @@ FLSliceResult CBLCheckpoint_RemoteMinSequence(CBLCheckpoint* c) CBLAPI {
 
 
 void CBLCheckpoint_UpdateRemoteMinSequence(CBLCheckpoint* c, const char *sequenceID) CBLAPI {
-    c->setRemoteMinSequence(RemoteSequence(sequenceID));
+    c->setRemoteMinSequence(repl::RemoteSequence(sequenceID));
 }
 
 
@@ -161,7 +172,8 @@ bool CBLDatabase_GetPeerCheckpoint(CBLDatabase* db,
 {
     return db->use<bool>([&](C4Database *c4db) {
         alloc_slice body, revID;
-        if (!Checkpointer::getPeerCheckpoint(c4db, checkpointID, body, revID, internal(outError)))
+        if (!repl::Checkpointer::getPeerCheckpoint(c4db, checkpointID, body, revID,
+                                                   internal(outError)))
             return false;
         *outBody = FLSliceResult(body);
         *outRevID = FLSliceResult(revID);
@@ -179,8 +191,8 @@ bool CBLDatabase_SetPeerCheckpoint(CBLDatabase* db,
 {
     return db->use<bool>([&](C4Database *c4db) {
         alloc_slice newRevID;
-        if (!Checkpointer::savePeerCheckpoint(c4db, checkpointID, body, revID, newRevID,
-                                              internal(outError)))
+        if (!repl::Checkpointer::savePeerCheckpoint(c4db, checkpointID, body, revID, newRevID,
+                                                    internal(outError)))
             return false;
         *outNewRevID = FLSliceResult(newRevID);
         return true;

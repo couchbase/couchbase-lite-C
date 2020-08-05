@@ -17,6 +17,7 @@
 //
 
 #include "ReplicatorTest.hh"
+#include "CBLCheckpoint.h"
 
 
 #pragma mark - BASIC TESTS:
@@ -179,4 +180,79 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG w/TLS", "[Repl
         CHECK(replError.code == 0);
         CHECK(db.count() == 12189);
     }
+}
+
+
+#pragma mark - CHECKPOINTS:
+
+
+TEST_CASE_METHOD(ReplicatorTest, "Checkpoint") {
+    config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar");
+    CBLError error;
+    auto chk = CBLCheckpoint_New(db.ref(), &config, false, &error);
+    REQUIRE(chk);
+    slice id = CBLCheckpoint_GetID(chk);
+    cerr << "Checkpoint ID is '" << string(id) << "'\n";
+    CHECK(id != nullslice);
+
+    alloc_slice savedJSON;
+    auto callback = [](void *context, const char *jsonToSave) {
+        *(alloc_slice*)context = jsonToSave;
+    };
+    CBLCheckpoint_EnableSave(chk, 999, callback, &savedJSON);
+
+    // got remote
+    bool match = CBLCheckpoint_CompareWithRemote(chk, nullptr, &error);
+    CHECK(match);
+
+    CHECK(CBLCheckpoint_LocalMinSequence(chk) == 0);
+    CHECK(CBLCheckpoint_RemoteMinSequence(chk) == nullslice);
+    CHECK(!CBLCheckpoint_IsUnsaved(chk));
+
+    // mark some pending sequences
+    CBLCheckpoint_AddPendingSequence(chk, 1);
+    CBLCheckpoint_AddPendingSequence(chk, 2);
+    CHECK(CBLCheckpoint_PendingSequenceCount(chk) == 2);
+    CHECK(!CBLCheckpoint_IsSequenceCompleted(chk, 1));
+    CHECK(!CBLCheckpoint_IsSequenceCompleted(chk, 2));
+    CHECK(!CBLCheckpoint_IsSequenceCompleted(chk, 666));
+    CHECK(CBLCheckpoint_IsUnsaved(chk));
+
+    const CBLSequenceNumber pending[] = {5, 7, 9};
+    CBLCheckpoint_AddSequences(chk, 3, 10, 3, pending);
+    CHECK(CBLCheckpoint_PendingSequenceCount(chk) == 5);
+    CHECK(!CBLCheckpoint_IsSequenceCompleted(chk, 1));
+    CHECK(!CBLCheckpoint_IsSequenceCompleted(chk, 2));
+    CHECK( CBLCheckpoint_IsSequenceCompleted(chk, 3));
+    for (CBLSequenceNumber seq = 4; seq <= 11; ++seq) {
+        INFO("seq = " << seq);
+        CHECK(CBLCheckpoint_IsSequenceCompleted(chk, seq) == ((seq % 2) == 0));
+    }
+    CHECK(CBLCheckpoint_LocalMinSequence(chk) == 0);
+
+    // complete some sequences
+    CBLCheckpoint_CompletedSequence(chk, 1);
+    CBLCheckpoint_CompletedSequence(chk, 2);
+    CHECK(CBLCheckpoint_LocalMinSequence(chk) == 4);
+    CBLCheckpoint_CompletedSequence(chk, 5);
+    CHECK(CBLCheckpoint_LocalMinSequence(chk) == 6);
+
+    // save checkpoint:
+    CHECK(CBLCheckpoint_IsUnsaved(chk));
+    CHECK(CBLCheckpoint_StartSave(chk));
+    CHECK(savedJSON.size > 10);
+
+    CBLCheckpoint_SaveCompleted(chk, true);
+    CHECK(!CBLCheckpoint_IsUnsaved(chk));
+
+    CBLCheckpoint_Release(chk);
+
+    // Start again:
+    chk = CBLCheckpoint_New(db.ref(), &config, false, &error);
+    REQUIRE(chk);
+    match = CBLCheckpoint_CompareWithRemote_s(chk, savedJSON, &error);
+    CHECK(match);
+
+    CBLCheckpoint_Release(chk);
+
 }

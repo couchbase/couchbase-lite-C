@@ -101,16 +101,16 @@ private:
         return _filterFunction(_filterContext, doc, (flags & kRevDeleted) != 0);
     }
 
-    Retained<CBLDatabase> _db;
-    CBLChangesFeedOptions _feedOptions;
-    Retained<CBLCheckpoint> _checkpoint;
-    optional<CBLSequenceNumber> _since;
-    RetainedValue _docIDs;
-    CBLReplicationFilter _filterFunction = nullptr;
-    void *_filterContext;
-    Listeners<CBLChangesFeedListener> _listeners;
-    Options _options;
-    std::optional<ChangesFeed> _feed;
+    Retained<CBLDatabase> const         _db;
+    CBLChangesFeedOptions const         _feedOptions;
+    Retained<CBLCheckpoint> const       _checkpoint;
+    optional<CBLSequenceNumber> const   _since;
+    RetainedValue                       _docIDs;
+    CBLReplicationFilter                _filterFunction = nullptr;
+    void *                              _filterContext;
+    Listeners<CBLChangesFeedListener>   _listeners;
+    Options                             _options;
+    std::optional<ChangesFeed>          _feed;
 };
 
 
@@ -130,8 +130,7 @@ CBLChangesFeed* CBLChangesFeed_NewSince(CBLDatabase* db,
 }
 
 
-void CBLChangesFeed_FilterToDocIDs(CBLChangesFeed* feed, FLArray docIDs)
-{
+void CBLChangesFeed_FilterToDocIDs(CBLChangesFeed* feed, FLArray docIDs) {
     feed->filterToDocIDs(docIDs);
 }
 
@@ -181,17 +180,14 @@ struct CBLChangesFeedRevisionsImpl : public ChangesFeed::Changes,
 };
 
 
-CBLChangesFeedRevisions* CBLChangesFeed_Next(CBLChangesFeed* feed,
-                                             unsigned limit)
-{
+CBLChangesFeedRevisions* CBLChangesFeed_Next(CBLChangesFeed* feed, unsigned limit) {
     auto changes = feed->feed().getMoreChanges(limit);
     auto n = changes.revs.size();
     return n ? new (n) CBLChangesFeedRevisionsImpl(move(changes)) : nullptr;
 }
 
 
-void CBLChangesFeedItems_Free(CBLChangesFeedRevisions *revs)
-{
+void CBLChangesFeedRevisions_Free(CBLChangesFeedRevisions *revs) {
     if (revs)
         delete (CBLChangesFeedRevisionsImpl*)revs;
 }
