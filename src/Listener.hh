@@ -52,6 +52,13 @@ public:
     void remove();
 
 protected:
+    friend class ListenersBase;
+
+    void removed() {
+        _owner = nullptr;
+        _callback = nullptr;
+    }
+
     std::atomic<const void*>     _callback;          // Really a C fn pointer
     void* const                  _context;
     cbl_internal::ListenersBase* _owner {nullptr};
@@ -83,6 +90,10 @@ namespace cbl_internal {
     /** Manages a set of CBLListenerTokens. Thread-safe. */
     class ListenersBase {
     public:
+        ~ListenersBase() {
+            clear();
+        }
+
         void add(CBLListenerToken* t _cbl_nonnull) {
             LOCK(_mutex);
             _tokens.emplace_back(t);
@@ -102,6 +113,8 @@ namespace cbl_internal {
 
         void clear() {
             LOCK(_mutex);
+            for (auto &tok : _tokens)
+                tok->removed();
             _tokens.clear();
         }
 
@@ -136,7 +149,7 @@ namespace cbl_internal {
     template <class LISTENER>
     class Listeners : private ListenersBase {
     public:
-        CBLListenerToken* add(LISTENER listener, void *context) {
+        fleece::Retained<CBLListenerToken> add(LISTENER listener, void *context) {
             auto t = new ListenerToken<LISTENER>(listener, context);
             add(t);
             return t;

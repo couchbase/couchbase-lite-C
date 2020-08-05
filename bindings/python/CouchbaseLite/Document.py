@@ -67,11 +67,15 @@ class Document (CBLObject):
         if not "_properties" in self.__dict__:
             if self._ref:
                 fleeceProps = lib.CBLDocument_Properties(self._ref)
-                self._properties = decodeFleeceDict(fleeceProps)
+                self._properties = decodeFleeceDict(fleeceProps, mutable=self.isMutable)
             else:
                 self._properties = {}
         return self._properties
     properties = property(getProperties)
+
+    @property
+    def JSON(self):
+        return pystr(lib.CBLDocument_PropertiesAsJSON(self._ref))
 
     def get(self, key, dflt = None):
         return self.properties.get(key, dflt)
@@ -82,6 +86,10 @@ class Document (CBLObject):
 
     def addListener(self, listener):
         self.database.addDocumentListener(listener)
+
+    @property
+    def isMutable(self):
+        return False
 
 
 class MutableDocument (Document):
@@ -97,6 +105,13 @@ class MutableDocument (Document):
         doc.database = database
         doc._ref = ref
         return doc
+
+    @property
+    def JSON(self):
+        if "_properties" in self.__dict__:
+            return encodeJSON(self._properties)
+        else:
+            return pystr(lib.CBLDocument_PropertiesAsJSON(self._ref))
 
     def setProperties(self, props):
         self._properties = props
@@ -118,3 +133,7 @@ class MutableDocument (Document):
 
     def save(self, concurrency = FailOnConflict):
         return self.database.saveDocument(self, concurrency)
+
+    @property
+    def isMutable(self):
+        return True

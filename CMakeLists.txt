@@ -103,6 +103,11 @@ target_include_directories(
     ${PLATFORM_INCLUDE}
 )
 
+target_link_libraries(
+    CouchbaseLiteCStatic INTERFACE
+    LiteCoreStatic
+)
+
 file(WRITE empty.cpp)
 add_library(CouchbaseLiteC SHARED empty.cpp)
 target_include_directories(CouchbaseLiteC PUBLIC include/cbl)
@@ -125,12 +130,7 @@ set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
                             FleeceStatic
                            ${NO_WHOLE_LIBRARY_FLAG}
                             LiteCoreStatic
-                            LiteCoreWebSocket
-                            Support
-                            SQLite3_UnicodeSN
-                            BLIPStatic
-                            mbedtls
-                            mbedcrypto)
+                            LiteCoreWebSocket)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
     # C/C++ atomic operations on ARM6/7 emit calls to functions in libatomic

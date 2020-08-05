@@ -42,10 +42,18 @@ protected:
     using recursive_mutex = std::recursive_mutex;
     using string = std::string;
     using once_flag = std::once_flag;
+
+    template <class T>
+    using Retained = fleece::Retained<T>;
 };
 
 
 namespace cbl_internal {
+    template <class RC>
+    static inline RC* retain(fleece::Retained<RC> r) { return fleece::retain(r.get()); }
+    template <class RC>
+    static inline const RC* retain(fleece::RetainedConst<RC> r) { return fleece::retain(r.get()); }
+
     static inline C4Error* internal(CBLError *error)             {return (C4Error*)error;}
     static inline const C4Error* internal(const CBLError *error) {return (const C4Error*)error;}
     static inline const C4Error& internal(const CBLError &error) {return (const C4Error&)error;}

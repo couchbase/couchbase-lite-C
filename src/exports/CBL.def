@@ -43,8 +43,6 @@ CBLDatabase_DeleteDocumentByID
 CBLDatabase_PurgeDocumentByID
 CBLDatabase_GetDocumentExpiration
 CBLDatabase_SetDocumentExpiration
-CBLDatabase_NextDocExpiration
-CBLDatabase_PurgeExpiredDocuments
 
 CBLDatabase_CreateIndex
 CBLDatabase_DeleteIndex
@@ -87,6 +85,7 @@ CBLBlobWriter_Write
 
 FLMutableArray_SetBlob
 FLMutableDict_SetBlob
+FLSlot_SetBlob
 
 CBLQuery_New
 CBLQuery_Parameters

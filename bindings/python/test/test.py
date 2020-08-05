@@ -20,6 +20,7 @@
 from CouchbaseLite.Database import Database, DatabaseConfiguration
 from CouchbaseLite.Document import Document, MutableDocument
 from CouchbaseLite.Query import JSONQuery
+import json
 
 Database.deleteFile("db", "/tmp")
 
@@ -38,6 +39,10 @@ assert(db.count == 0)
 def dbListener(docIDs):
     print ("######## DB changed!", docIDs)
 dbListenerToken = db.addListener(dbListener)
+
+def canonicalJSON(str):
+    obj = json.loads(str)
+    return json.dumps(obj, sort_keys = True)
 
 with db:
     doc = db.getDocument("foo")
@@ -76,6 +81,29 @@ with db:
     db["bar"] = doc # saves it
 
     assert(db.count == 2)
+
+    doc = MutableDocument('nested_doc')
+    doc['flat'] = 'flat'
+    doc['empty_obj'] = {}
+    doc['nested'] = {'nested': 'nested'}
+    doc['empty_array'] = []
+    doc['array'] = ['a']
+    print("doc = ", canonicalJSON(doc.JSON))
+    assert(canonicalJSON(doc.JSON) == """{"array": ["a"], "empty_array": [], "empty_obj": {}, "flat": "flat", "nested": {"nested": "nested"}}""")
+    db.saveDocument(doc)
+
+    read_doc = db.getMutableDocument('nested_doc')
+    print("read_doc = ", canonicalJSON(read_doc.JSON))
+    assert(canonicalJSON(read_doc.JSON) == """{"array": ["a"], "empty_array": [], "empty_obj": {}, "flat": "flat", "nested": {"nested": "nested"}}""")
+    db.saveDocument(read_doc)
+
+    update_doc = db.getMutableDocument('nested_doc')
+    update_doc['a'] = 'b'
+    update_doc['nested']['foo'] = 'bar'
+    print("update_doc = ", canonicalJSON(update_doc.JSON))
+    assert(canonicalJSON(update_doc.JSON) == """{"a": "b", "array": ["a"], "empty_array": [], "empty_obj": {}, "flat": "flat", "nested": {"foo": "bar", "nested": "nested"}}""")
+    db.saveDocument(update_doc)
+
 
 dbListenerToken.remove()
 

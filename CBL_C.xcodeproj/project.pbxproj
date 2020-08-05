@@ -286,6 +286,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2716F8F5247D9D6700BE21D9 /* exports */ = {isa = PBXFileReference; lastKnownFileType = folder; path = exports; sourceTree = "<group>"; };
 		271A988E243BF278008C032D /* CBLURLEndpointListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLURLEndpointListener.h; sourceTree = "<group>"; };
 		271A989C243BFCDA008C032D /* CBLCertificate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLCertificate.h; sourceTree = "<group>"; };
 		271A989D243BFDBF008C032D /* CBLURLEndpointListener.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLURLEndpointListener.cc; sourceTree = "<group>"; };
@@ -308,6 +309,7 @@
 		2736A625242E5A07002B9D65 /* ReplicatorTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ReplicatorTest.hh; sourceTree = "<group>"; };
 		2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorEETest.cc; sourceTree = "<group>"; };
 		273CE7F624534A6100D01CA2 /* platform_apple.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; name = platform_apple.cmake; path = cmake/platform_apple.cmake; sourceTree = "<group>"; };
+		274BAB9D24DA2DB900F4F810 /* generate_exports.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_exports.sh; sourceTree = "<group>"; };
 		275B3567234810C400FE9CF0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CouchbaseLiteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		275B358823481C5200FE9CF0 /* XCTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = XCTests.xcconfig; sourceTree = "<group>"; };
@@ -350,7 +352,6 @@
 		27B61D6921D6B60D0027CCDB /* CBLTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTest.cc; sourceTree = "<group>"; };
 		27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCouchbaseLiteC.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		27B61D7E21D6B6900027CCDB /* dylib_main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dylib_main.cc; sourceTree = "<group>"; };
-		27B61D8021D6B7400027CCDB /* CBL.exp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.exports; path = CBL.exp; sourceTree = "<group>"; };
 		27B61D8121D6B8230027CCDB /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		27B61D8521D6BA2A0027CCDB /* Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
 		27B61D8621D6BAB10027CCDB /* CBL_static.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_static.xcconfig; sourceTree = "<group>"; };
@@ -366,7 +367,7 @@
 		27B61DC321DEE1C20027CCDB /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		27B61DD821DEEC540027CCDB /* Database.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Database.hh; sourceTree = "<group>"; };
-		27C9B5BA21F12C970040BC45 /* test.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = test.py; sourceTree = "<group>"; };
+		27C9B5BA21F12C970040BC45 /* test.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; name = test.py; path = test/test.py; sourceTree = "<group>"; };
 		27C9B5BF21F12C970040BC45 /* BuildPyCBL.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; name = BuildPyCBL.py; path = ../BuildPyCBL.py; sourceTree = "<group>"; };
 		27C9B5C021F12C970040BC45 /* Database.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Database.py; sourceTree = "<group>"; };
 		27C9B5C321F12C970040BC45 /* common.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = common.py; sourceTree = "<group>"; };
@@ -518,7 +519,7 @@
 				271C2A7421CC4BD60045856E /* Util.cc */,
 				275FA3342236E54D001C392D /* CBLPrivate.h */,
 				27B61D7E21D6B6900027CCDB /* dylib_main.cc */,
-				27B61D8021D6B7400027CCDB /* CBL.exp */,
+				2716F8F5247D9D6700BE21D9 /* exports */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -608,6 +609,7 @@
 				27984E0D2249A127000FE777 /* Framework-Info.plist */,
 				27B61D8421D6BA060027CCDB /* xcconfigs */,
 				27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */,
+				274BAB9D24DA2DB900F4F810 /* generate_exports.sh */,
 			);
 			path = Xcode;
 			sourceTree = "<group>";
@@ -639,7 +641,8 @@
 				27C9B5BA21F12C970040BC45 /* test.py */,
 				27C9B5BB21F12C970040BC45 /* CouchbaseLite */,
 			);
-			path = python;
+			name = python;
+			path = bindings/python;
 			sourceTree = "<group>";
 		};
 		27C9B5BB21F12C970040BC45 /* CouchbaseLite */ = {
@@ -807,6 +810,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 27B61D7821D6B64A0027CCDB /* Build configuration list for PBXNativeTarget "CBL_C Dylib" */;
 			buildPhases = (
+				2716F8F4247D9C5A00BE21D9 /* Generate Export List */,
 				27B61D6C21D6B64A0027CCDB /* Headers */,
 				27B61D6D21D6B64A0027CCDB /* Sources */,
 				27B61D6E21D6B64A0027CCDB /* Frameworks */,
@@ -1009,6 +1013,29 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		2716F8F4247D9C5A00BE21D9 /* Generate Export List */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Xcode/generate_exports.sh",
+				"$(SRCROOT)/src/exports/Fleece.exp",
+				"$(SRCROOT)/src/exports/CBL.exp",
+				"$(SRCROOT)/src/exports/CBL_EE.exp",
+			);
+			name = "Generate Export List";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/CBL.exp",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/bin/bash -e";
+			shellScript = "\"$SCRIPT_INPUT_FILE_0\" \n";
+		};
 		27984E382249A36A000FE777 /* Copy Fleece Headers */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1621,30 +1648,30 @@
 			};
 			name = Release;
 		};
-		27D0556B2358F9DF009BB0A1 /* Debug-EE */ = {
+		27D0556B2358F9DF009BB0A1 /* Debug_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27D055892358FA40009BB0A1 /* Project_Debug_EE.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug-EE";
+			name = Debug_EE;
 		};
-		27D0556C2358F9DF009BB0A1 /* Debug-EE */ = {
+		27D0556C2358F9DF009BB0A1 /* Debug_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27B61D8621D6BAB10027CCDB /* CBL_static.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug-EE";
+			name = Debug_EE;
 		};
-		27D0556D2358F9DF009BB0A1 /* Debug-EE */ = {
+		27D0556D2358F9DF009BB0A1 /* Debug_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27B61D8821D6BAB10027CCDB /* CBL_dylib.xcconfig */;
 			buildSettings = {
 				MODULEMAP_FILE = CouchbaseLite.modulemap;
 				PRODUCT_MODULE_NAME = CouchbaseLite;
 			};
-			name = "Debug-EE";
+			name = Debug_EE;
 		};
-		27D0556E2358F9DF009BB0A1 /* Debug-EE */ = {
+		27D0556E2358F9DF009BB0A1 /* Debug_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27310FD7235F686D0046F8C8 /* CBL_Framework_Debug.xcconfig */;
 			buildSettings = {
@@ -1652,9 +1679,9 @@
 				DEVELOPMENT_TEAM = N2Q372V7W2;
 				ENABLE_HARDENED_RUNTIME = YES;
 			};
-			name = "Debug-EE";
+			name = Debug_EE;
 		};
-		27D0556F2358F9DF009BB0A1 /* Debug-EE */ = {
+		27D0556F2358F9DF009BB0A1 /* Debug_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27B61DB021D6E53D0027CCDB /* Tests.xcconfig */;
 			buildSettings = {
@@ -1710,16 +1737,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
-			name = "Debug-EE";
+			name = Debug_EE;
 		};
-		27D055702358F9DF009BB0A1 /* Debug-EE */ = {
+		27D055702358F9DF009BB0A1 /* Debug_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 275B358823481C5200FE9CF0 /* XCTests.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug-EE";
+			name = Debug_EE;
 		};
-		27D055712358F9DF009BB0A1 /* Debug-EE */ = {
+		27D055712358F9DF009BB0A1 /* Debug_EE */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -1780,9 +1807,9 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Debug-EE";
+			name = Debug_EE;
 		};
-		27D055722358F9DF009BB0A1 /* Debug-EE */ = {
+		27D055722358F9DF009BB0A1 /* Debug_EE */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -1843,32 +1870,32 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Debug-EE";
+			name = Debug_EE;
 		};
-		27D055812358F9FA009BB0A1 /* Release-EE */ = {
+		27D055812358F9FA009BB0A1 /* Release_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27D0558A2358FA67009BB0A1 /* Project_Release_EE.xcconfig */;
 			buildSettings = {
 			};
-			name = "Release-EE";
+			name = Release_EE;
 		};
-		27D055822358F9FA009BB0A1 /* Release-EE */ = {
+		27D055822358F9FA009BB0A1 /* Release_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27B61D8621D6BAB10027CCDB /* CBL_static.xcconfig */;
 			buildSettings = {
 			};
-			name = "Release-EE";
+			name = Release_EE;
 		};
-		27D055832358F9FA009BB0A1 /* Release-EE */ = {
+		27D055832358F9FA009BB0A1 /* Release_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27984E482249AF44000FE777 /* CBL_Dylib_Release.xcconfig */;
 			buildSettings = {
 				MODULEMAP_FILE = CouchbaseLite.modulemap;
 				PRODUCT_MODULE_NAME = CouchbaseLite;
 			};
-			name = "Release-EE";
+			name = Release_EE;
 		};
-		27D055842358F9FA009BB0A1 /* Release-EE */ = {
+		27D055842358F9FA009BB0A1 /* Release_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */;
 			buildSettings = {
@@ -1876,9 +1903,9 @@
 				DEVELOPMENT_TEAM = N2Q372V7W2;
 				ENABLE_HARDENED_RUNTIME = YES;
 			};
-			name = "Release-EE";
+			name = Release_EE;
 		};
-		27D055852358F9FA009BB0A1 /* Release-EE */ = {
+		27D055852358F9FA009BB0A1 /* Release_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27B61DB021D6E53D0027CCDB /* Tests.xcconfig */;
 			buildSettings = {
@@ -1928,16 +1955,16 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
-			name = "Release-EE";
+			name = Release_EE;
 		};
-		27D055862358F9FA009BB0A1 /* Release-EE */ = {
+		27D055862358F9FA009BB0A1 /* Release_EE */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 275B358823481C5200FE9CF0 /* XCTests.xcconfig */;
 			buildSettings = {
 			};
-			name = "Release-EE";
+			name = Release_EE;
 		};
-		27D055872358F9FA009BB0A1 /* Release-EE */ = {
+		27D055872358F9FA009BB0A1 /* Release_EE */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -1989,9 +2016,9 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Release-EE";
+			name = Release_EE;
 		};
-		27D055882358F9FA009BB0A1 /* Release-EE */ = {
+		27D055882358F9FA009BB0A1 /* Release_EE */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -2043,7 +2070,7 @@
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Release-EE";
+			name = Release_EE;
 		};
 /* End XCBuildConfiguration section */
 
@@ -2052,9 +2079,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				271C2A2521CAC8920045856E /* Debug */,
-				27D0556B2358F9DF009BB0A1 /* Debug-EE */,
+				27D0556B2358F9DF009BB0A1 /* Debug_EE */,
 				271C2A2621CAC8920045856E /* Release */,
-				27D055812358F9FA009BB0A1 /* Release-EE */,
+				27D055812358F9FA009BB0A1 /* Release_EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2063,9 +2090,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				271C2A2821CAC8920045856E /* Debug */,
-				27D0556C2358F9DF009BB0A1 /* Debug-EE */,
+				27D0556C2358F9DF009BB0A1 /* Debug_EE */,
 				271C2A2921CAC8920045856E /* Release */,
-				27D055822358F9FA009BB0A1 /* Release-EE */,
+				27D055822358F9FA009BB0A1 /* Release_EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2074,9 +2101,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				272F012C2279037600E62F72 /* Debug */,
-				27D055712358F9DF009BB0A1 /* Debug-EE */,
+				27D055712358F9DF009BB0A1 /* Debug_EE */,
 				272F012D2279037600E62F72 /* Release */,
-				27D055872358F9FA009BB0A1 /* Release-EE */,
+				27D055872358F9FA009BB0A1 /* Release_EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2085,9 +2112,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				275B3585234812C800FE9CF0 /* Debug */,
-				27D055702358F9DF009BB0A1 /* Debug-EE */,
+				27D055702358F9DF009BB0A1 /* Debug_EE */,
 				275B3586234812C800FE9CF0 /* Release */,
-				27D055862358F9FA009BB0A1 /* Release-EE */,
+				27D055862358F9FA009BB0A1 /* Release_EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2096,9 +2123,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2779ED5322E287FB0026ACD0 /* Debug */,
-				27D055722358F9DF009BB0A1 /* Debug-EE */,
+				27D055722358F9DF009BB0A1 /* Debug_EE */,
 				2779ED5422E287FB0026ACD0 /* Release */,
-				27D055882358F9FA009BB0A1 /* Release-EE */,
+				27D055882358F9FA009BB0A1 /* Release_EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2107,9 +2134,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27984E1C2249A127000FE777 /* Debug */,
-				27D0556E2358F9DF009BB0A1 /* Debug-EE */,
+				27D0556E2358F9DF009BB0A1 /* Debug_EE */,
 				27984E1D2249A127000FE777 /* Release */,
-				27D055842358F9FA009BB0A1 /* Release-EE */,
+				27D055842358F9FA009BB0A1 /* Release_EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2118,9 +2145,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27B61D7921D6B64A0027CCDB /* Debug */,
-				27D0556D2358F9DF009BB0A1 /* Debug-EE */,
+				27D0556D2358F9DF009BB0A1 /* Debug_EE */,
 				27B61D7A21D6B64A0027CCDB /* Release */,
-				27D055832358F9FA009BB0A1 /* Release-EE */,
+				27D055832358F9FA009BB0A1 /* Release_EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2129,9 +2156,9 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				27B61DAD21D6E49D0027CCDB /* Debug */,
-				27D0556F2358F9DF009BB0A1 /* Debug-EE */,
+				27D0556F2358F9DF009BB0A1 /* Debug_EE */,
 				27B61DAE21D6E49D0027CCDB /* Release */,
-				27D055852358F9FA009BB0A1 /* Release-EE */,
+				27D055852358F9FA009BB0A1 /* Release_EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

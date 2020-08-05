@@ -197,13 +197,17 @@ public:
     }
 
 
-    CBLListenerToken* addChangeListener(CBLReplicatorChangeListener listener, void *context) {
+    Retained<CBLListenerToken> addChangeListener(CBLReplicatorChangeListener listener,
+                                                 void *context)
+    {
         LOCK(_mutex);
         return _changeListeners.add(listener, context);
     }
 
 
-    CBLListenerToken* addDocumentListener(CBLReplicatedDocumentListener listener, void *context) {
+    Retained<CBLListenerToken> addDocumentListener(CBLReplicatedDocumentListener listener,
+                                                   void *context)
+    {
         LOCK(_mutex);
         if (_docListeners.empty())
             _optionsChanged = true;
@@ -313,12 +317,12 @@ private:
 
     recursive_mutex                 _mutex;
     ReplicatorConfiguration const   _conf;
-    fleece::Retained<CBLDatabase>           _db;
+    Retained<CBLDatabase>           _db;
     c4::ref<C4Replicator>           _c4repl;
     C4ReplicatorStatus              _c4status {kC4Stopped};
     bool                            _optionsChanged {false};
     bool                            _resetCheckpoint {false};
-    fleece::Retained<CBLReplicator>         _retainSelf;
+    Retained<CBLReplicator>         _retainSelf;
     int                             _activeConflictResolvers {0};
     Listeners<CBLReplicatorChangeListener>    _changeListeners;
     Listeners<CBLReplicatedDocumentListener>  _docListeners;

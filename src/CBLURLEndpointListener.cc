@@ -103,7 +103,7 @@ uint16_t CBLURLEndpointListener_GetPort(CBLURLEndpointListener* listener) {
     return listener->port();
 }
 
-FLMutableArray CBLURLEndpointListner_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull) {
+FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull) {
     return listener->URLs();
 }
 

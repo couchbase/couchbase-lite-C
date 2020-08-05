@@ -230,8 +230,6 @@ bool CBLBlobWriter_Write(CBLBlobWriteStream* writer, const void *data, size_t le
 CBLBlob* CBLBlob_CreateWithStream(const char *contentType, CBLBlobWriteStream* writer);
 CBLBlob* CBLBlob_CreateWithStream_s(FLString contentType, CBLBlobWriteStream* writer);
 
-void FLMutableArray_SetBlob(FLMutableArray array, uint32_t index, CBLBlob* blob);
-void FLMutableDict_SetBlob(FLMutableDict dict, FLString key, CBLBlob* blob);
 void FLSlot_SetBlob(FLSlot slot, CBLBlob* blob);
 
 

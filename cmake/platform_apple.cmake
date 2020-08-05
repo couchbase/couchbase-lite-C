@@ -22,7 +22,7 @@ endfunction()
 
 function(set_dylib_properties)
     set_target_properties(CouchbaseLiteC PROPERTIES LINK_FLAGS
-            "-exported_symbols_list ${PROJECT_SOURCE_DIR}/src/CBL.exp")
+            "-exported_symbols_list ${PROJECT_SOURCE_DIR}/src/exports/generated/CBL.exp")
     target_link_libraries(CouchbaseLiteC PUBLIC
             "-framework CoreFoundation"
             "-framework Foundation"

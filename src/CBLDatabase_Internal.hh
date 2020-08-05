@@ -61,12 +61,14 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
     std::string const dir;          // Cached copy so API can return a C string
     CBLDatabaseFlags const flags;
 
-    CBLListenerToken* addListener(CBLDatabaseChangeListener listener _cbl_nonnull, void *ctx);
-    CBLListenerToken* addListener(CBLDatabaseChangeDetailListener listener _cbl_nonnull, void *ctx);
+    Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener _cbl_nonnull,
+                                                   void *ctx);
+    Retained<CBLListenerToken> addListener(CBLDatabaseChangeDetailListener _cbl_nonnull,
+                                                   void *ctx);
 
-    CBLListenerToken* addDocListener(const char *docID _cbl_nonnull,
-                                     CBLDocumentChangeListener listener _cbl_nonnull,
-                                     void *context);
+    Retained<CBLListenerToken> addDocListener(const char *docID _cbl_nonnull,
+                                                      CBLDocumentChangeListener _cbl_nonnull,
+                                                      void *context);
 
     void notify(Notification n) const   {const_cast<CBLDatabase*>(this)->_notificationQueue.add(n);}
     void sendNotifications()            {_notificationQueue.notifyAll();}
@@ -77,7 +79,7 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
 
     template <class LISTENER, class... Args>
     void notify(ListenerToken<LISTENER> *listener, Args... args) const {
-        fleece::Retained<ListenerToken<LISTENER>> retained = listener;
+        Retained<ListenerToken<LISTENER>> retained = listener;
         notify([=]() {
             retained->call(args...);
         });
@@ -90,7 +92,7 @@ private:
     friend class cbl_internal::CBLLocalEndpoint;
     C4Database* _getC4Database() const;
 
-    CBLListenerToken* addListener(fleece::function_ref<CBLListenerToken*()> callback);
+    Retained<CBLListenerToken> addListener(fleece::function_ref<CBLListenerToken*()>);
     void databaseChanged();
     void callDBListeners();
     void callDocListeners();

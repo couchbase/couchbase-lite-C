@@ -35,10 +35,6 @@ CBLEndpoint* CBLEndpoint_NewWithURL_s(FLString url) CBLAPI {
 CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase* db) CBLAPI {
     return new CBLLocalEndpoint(db);
 }
-#else
-// Placeholder function for Xcode, since it has _CBLEndpoint_NewWithLocalDB in CBL.exp
-extern "C" CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase* db) CBLAPI;
-CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase* db) CBLAPI { abort(); }
 #endif
 
 void CBLEndpoint_Free(CBLEndpoint *endpoint) CBLAPI {
@@ -95,12 +91,12 @@ CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* repl,
                                                   CBLReplicatorChangeListener listener,
                                                   void *context) CBLAPI
 {
-    return repl->addChangeListener(listener, context);
+    return retain(repl->addChangeListener(listener, context));
 }
 
 CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* repl,
                                                     CBLReplicatedDocumentListener listener,
                                                     void *context) CBLAPI
 {
-    return repl->addDocumentListener(listener, context);
+    return retain(repl->addDocumentListener(listener, context));
 }

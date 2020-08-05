@@ -27,6 +27,7 @@
 
 using namespace std;
 using namespace fleece;
+using namespace cbl_internal;
 
 
 static string ensureDocID(slice docID) {
@@ -489,7 +490,7 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, C4Error *outError) const {
 
 static CBLDocument* getDocument(CBLDatabase* db, slice docID, bool isMutable) CBLAPI {
     auto doc = retained(new CBLDocument(db, string(docID), isMutable));
-    return doc->exists() ? retain(doc.get()) : nullptr;
+    return doc->exists() ? retain(doc) : nullptr;
 }
 
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, const char* docID) CBLAPI {
@@ -546,7 +547,7 @@ const CBLDocument* CBLDatabase_SaveDocument(CBLDatabase* db,
                                        CBLConcurrencyControl concurrency,
                                        CBLError* outError) CBLAPI
 {
-    return retain(doc->save(db, {concurrency}, internal(outError)).get());
+    return retain(doc->save(db, {concurrency}, internal(outError)));
 }
 
 const CBLDocument* CBLDatabase_SaveDocumentResolving(CBLDatabase* db _cbl_nonnull,
@@ -555,7 +556,7 @@ const CBLDocument* CBLDatabase_SaveDocumentResolving(CBLDatabase* db _cbl_nonnul
                                                        void *context,
                                                        CBLError* outError) CBLAPI
 {
-    return retain(doc->save(db, {conflictHandler, context}, internal(outError)).get());
+    return retain(doc->save(db, {conflictHandler, context}, internal(outError)));
 }
 
 bool CBLDocument_Delete(const CBLDocument* doc _cbl_nonnull,

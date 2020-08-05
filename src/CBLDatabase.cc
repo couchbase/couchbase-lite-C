@@ -215,6 +215,14 @@ bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
     });
 }
 
+#ifdef COUCHBASE_ENTERPRISE
+bool CBLDatabase_Rekey(CBLDatabase* db, const CBLEncryptionKey *newKey, CBLError* outError) CBLAPI {
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_rekey(c4db, (const C4EncryptionKey*)newKey, internal(outError));
+    });
+}
+#endif
+
 
 #pragma mark - ACCESSORS:
 
@@ -271,9 +279,9 @@ void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI {
 #pragma mark - DATABASE CHANGE LISTENERS:
 
 
-CBLListenerToken* CBLDatabase::addListener(function_ref<CBLListenerToken*()> callback) {
-    return use<CBLListenerToken*>([=](C4Database *c4db) {
-        auto token = callback();
+Retained<CBLListenerToken> CBLDatabase::addListener(function_ref<CBLListenerToken*()> callback) {
+    return use<Retained<CBLListenerToken>>([=](C4Database *c4db) {
+        Retained<CBLListenerToken> token = callback();
         if (!_observer) {
             _observer = c4dbobs_create(c4db,
                                        [](C4DatabaseObserver* observer, void *context) {
@@ -286,12 +294,12 @@ CBLListenerToken* CBLDatabase::addListener(function_ref<CBLListenerToken*()> cal
 }
 
 
-CBLListenerToken* CBLDatabase::addListener(CBLDatabaseChangeListener listener, void *ctx) {
+Retained<CBLListenerToken> CBLDatabase::addListener(CBLDatabaseChangeListener listener, void *ctx) {
     return addListener([&]{ return _listeners.add(listener, ctx); });
 }
 
 
-CBLListenerToken* CBLDatabase::addListener(CBLDatabaseChangeDetailListener listener, void *ctx) {
+Retained<CBLListenerToken> CBLDatabase::addListener(CBLDatabaseChangeDetailListener listener, void *ctx) {
     return addListener([&]{ return _detailListeners.add(listener, ctx); });
 }
 
@@ -339,7 +347,7 @@ CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* constdb,
                                                 CBLDatabaseChangeListener listener,
                                                 void *context) CBLAPI
 {
-    return const_cast<CBLDatabase*>(constdb)->addListener(listener, context);
+    return retain(const_cast<CBLDatabase*>(constdb)->addListener(listener, context));
 }
 
 
@@ -347,7 +355,7 @@ CBLListenerToken* CBLDatabase_AddChangeDetailListener(const CBLDatabase* constdb
                                                       CBLDatabaseChangeDetailListener listener,
                                                       void *context) CBLAPI
 {
-    return const_cast<CBLDatabase*>(constdb)->addListener(listener, context);
+    return retain(const_cast<CBLDatabase*>(constdb)->addListener(listener, context));
 }
 
 
@@ -408,8 +416,8 @@ namespace cbl_internal {
 }
 
 
-CBLListenerToken* CBLDatabase::addDocListener(const char* docID _cbl_nonnull,
-                                              CBLDocumentChangeListener listener, void *context)
+Retained<CBLListenerToken> CBLDatabase::addDocListener(const char* docID _cbl_nonnull,
+                                                       CBLDocumentChangeListener listener, void *context)
 {
     auto token = new ListenerToken<CBLDocumentChangeListener>(this, docID, listener, context);
     _docListeners.add(token);
@@ -422,6 +430,6 @@ CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db _c
                                              CBLDocumentChangeListener listener _cbl_nonnull,
                                              void *context) CBLAPI
 {
-    return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context);
+    return retain(const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context));
 
 }

@@ -14,24 +14,24 @@ FLDictType  = ffi.typeof("struct $$FLDict *")
 
 
 # Most general function, accepts params of type FLValue, FLDict or FLArray.
-def decodeFleece(f, *, depth =1):
+def decodeFleece(f, *, depth =1, mutable =False):
     ffitype = ffi.typeof(f)
     if ffitype == FLDictType:
-        return decodeFleeceDict(f, depth=depth)
+        return decodeFleeceDict(f, depth=depth, mutable=mutable)
     elif ffitype == FLArrayType:
-        return decodeFleeceArray(f, depth=depth)
+        return decodeFleeceArray(f, depth=depth, mutable=mutable)
     else:
-        return decodeFleeceValue(f, depth=depth)
+        return decodeFleeceValue(f, depth=depth, mutable=mutable)
 
 # Decodes an FLValue (which may of course turn out to be an FLArray or FLDict)
-def decodeFleeceValue(f, *, depth =1):
+def decodeFleeceValue(f, *, depth =1, mutable =False):
     typ = lib.FLValue_GetType(f)
     if typ == lib.kFLString:
         return sliceToString(lib.FLValue_AsString(f))
     elif typ == lib.kFLDict:
-        return decodeFleeceDict(ffi.cast(FLDictType, f), depth=depth)
+        return decodeFleeceDict(ffi.cast(FLDictType, f), depth=depth, mutable=mutable)
     elif typ == lib.kFLArray:
-        return decodeFleeceArray(ffi.cast(FLArrayType, f), depth=depth)
+        return decodeFleeceArray(ffi.cast(FLArrayType, f), depth=depth, mutable=mutable)
     elif typ == lib.kFLNumber:
         if lib.FLValue_IsInteger(f):
             return lib.FLValue_AsInt(f)
@@ -48,22 +48,28 @@ def decodeFleeceValue(f, *, depth =1):
         return None
 
 # Decodes an FLArray
-def decodeFleeceArray(farray, *, depth =1):
+def decodeFleeceArray(farray, *, depth =1, mutable =False):
     if depth <= 0:
-        return Array(fleece=farray)
+        if mutable:
+            return MutableArray(fleece=farray)
+        else:
+            return Array(fleece=farray)
     result = []
     n = lib.FLArray_Count(farray)
     for i in range(n):
         value = lib.FLArray_Get(farray, i)
-        result.append(decodeFleeceValue(value, depth=depth-1))
+        result.append(decodeFleeceValue(value, depth=depth-1, mutable=mutable))
     return result
 
 # Decodes an FLDict
-def decodeFleeceDict(fdict, *, depth =1):
+def decodeFleeceDict(fdict, *, depth =1, mutable =False):
     if lib.CBL_IsBlob(fdict):
         return Blob(None, fdict=fdict)
     elif depth <= 0:
-        return Dictionary(fleece=fdict)
+        if mutable:
+            return MutableDictionary(fleece=fdict)
+        else:
+            return Dictionary(fleece=fdict)
     else:
         result = {}
         i = ffi.new("FLDictIterator*")
@@ -73,7 +79,7 @@ def decodeFleeceDict(fdict, *, depth =1):
             if not value:
                 break
             key = sliceToString( lib.FLDictIterator_GetKeyString(i) )
-            result[key] = decodeFleeceValue(value, depth=depth-1)
+            result[key] = decodeFleeceValue(value, depth=depth-1, mutable=mutable)
             lib.FLDictIterator_Next(i)
         return result
 
@@ -93,13 +99,13 @@ class Array (Sequence):
             self._pyList = []
 
     def __len__(self):
-        if not "_list" in self.__dict__:
+        if not "_pyList" in self.__dict__:
             return lib.FLArray_Count(self._flArray)
         return len(self._pyList)
     
     @property
     def _toList(self):
-        if not "_list" in self.__dict__:
+        if not "_pyList" in self.__dict__:
             # Convert Fleece array to Python list:
             self._pyList = decodeFleeceArray(self._flArray, depth=1)
             del self._flArray
@@ -110,7 +116,7 @@ class Array (Sequence):
         return self._toList[i]
     
     def __repr__(self):
-        if not "_list" in self.__dict__:
+        if not "_pyList" in self.__dict__:
             # Don't convert in place; just return the converted form's representation
             return decodeFleeceArray(self._flArray, depth=999).__repr__()
         return self._pyList.__repr__()
@@ -123,6 +129,17 @@ class Array (Sequence):
 
     def _jsonEncodable(self):
         return self._toList
+
+
+class MutableArray (Array):
+    def __setitem__(self, i, value):
+        self._toList.__setitem__(i, value)
+
+    def __delitem__(self, i):
+        self._toList.__deltem__(key)
+
+    def insert(self, i, value):
+        self._toList.insert(i, value)
 
 
 ### Dictionary class
@@ -170,14 +187,22 @@ class Dictionary (Mapping):
         return self._toDict
 
 
+class MutableDictionary (Dictionary):
+    def __setitem__(self, key, value):
+        self._toDict.__setitem__(key, value)
+
+    def __delitem__(self, key):
+        self._toDict.__deltem__(key)
+
+
 ### JSON Encoder
 
 
-# Custom JSON encoding for Array, Dictionary, Blob objects
-def _defaultEncodeJSON(o):
-    if not "_jsonEncodable" in o:
-        raise TypeError()
-    return o._jsonEncodable()
-
-def encodeJSON(root):
-    return json.dumps(root, default=_defaultEncodeJSON, allow_nan=False)
+def encodeJSON(root, sortKeys =False):
+    # Custom JSON encoding for Array, Dictionary, Blob objects
+    def _defaultEncodeJSON(o):
+        try:
+            return o._jsonEncodable()
+        except AttributeError:
+            raise TypeError("Couchbase Lite documents cannot contain objects of type " + str(type(o)))
+    return json.dumps(root, default=_defaultEncodeJSON, sort_keys=sortKeys, allow_nan=False)
