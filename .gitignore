@@ -1,5 +1,6 @@
 build_cmake
 build
+bin
 *.o
 *.so
 *.dylib
@@ -17,4 +18,3 @@ python/CouchbaseLite/*.c
 # Rust
 Cargo.lock
 bindings/rust/CouchbaseLite/target/
-bindings/nim/bin/

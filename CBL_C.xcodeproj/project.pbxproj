@@ -309,6 +309,7 @@
 		2736A625242E5A07002B9D65 /* ReplicatorTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ReplicatorTest.hh; sourceTree = "<group>"; };
 		2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorEETest.cc; sourceTree = "<group>"; };
 		273CE7F624534A6100D01CA2 /* platform_apple.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; name = platform_apple.cmake; path = cmake/platform_apple.cmake; sourceTree = "<group>"; };
+		274BAB9D24DA2DB900F4F810 /* generate_exports.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_exports.sh; sourceTree = "<group>"; };
 		275B3567234810C400FE9CF0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CouchbaseLiteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		275B358823481C5200FE9CF0 /* XCTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = XCTests.xcconfig; sourceTree = "<group>"; };
@@ -608,6 +609,7 @@
 				27984E0D2249A127000FE777 /* Framework-Info.plist */,
 				27B61D8421D6BA060027CCDB /* xcconfigs */,
 				27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */,
+				274BAB9D24DA2DB900F4F810 /* generate_exports.sh */,
 			);
 			path = Xcode;
 			sourceTree = "<group>";
@@ -1018,7 +1020,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/src/exports/generate_exports.sh",
+				"$(SRCROOT)/Xcode/generate_exports.sh",
 				"$(SRCROOT)/src/exports/Fleece.exp",
 				"$(SRCROOT)/src/exports/CBL.exp",
 				"$(SRCROOT)/src/exports/CBL_EE.exp",
