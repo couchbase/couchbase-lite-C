@@ -129,9 +129,9 @@ private:
     bool saveBlobs(CBLDatabase *db, C4Error *outError) const;
     alloc_slice encodeBody(CBLDatabase* _cbl_nonnull, C4Database* _cbl_nonnull, C4Error *outError) const;
     
-    using ValueToBlobMap = std::unordered_map<FLDict, fleece::Retained<CBLBlob>>;
+    using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
     using UnretainedValueToBlobMap = std::unordered_map<FLDict, CBLNewBlob*>;
-    using RetainedDatabase = fleece::Retained<CBLDatabase>;
+    using RetainedDatabase = Retained<CBLDatabase>;
     using RetainedValue = fleece::RetainedValue;
     using recursive_mutex = std::recursive_mutex;
 

@@ -91,12 +91,12 @@ CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* repl,
                                                   CBLReplicatorChangeListener listener,
                                                   void *context) CBLAPI
 {
-    return repl->addChangeListener(listener, context);
+    return retain(repl->addChangeListener(listener, context));
 }
 
 CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* repl,
                                                     CBLReplicatedDocumentListener listener,
                                                     void *context) CBLAPI
 {
-    return repl->addDocumentListener(listener, context);
+    return retain(repl->addDocumentListener(listener, context));
 }

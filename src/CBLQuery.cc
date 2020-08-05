@@ -28,8 +28,8 @@ Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
 }
 
 
-CBLListenerToken* CBLQuery::addChangeListener(CBLQueryChangeListener listener, void *context) {
-    auto token = new ListenerToken<CBLQueryChangeListener>(this, listener, context);
+Retained<CBLListenerToken> CBLQuery::addChangeListener(CBLQueryChangeListener listener, void *context) {
+    auto token = retained(new ListenerToken<CBLQueryChangeListener>(this, listener, context));
     _listeners.add(token);
     token->setEnabled(true);
     return token;
@@ -55,7 +55,7 @@ CBLQuery* CBLQuery_New_s(const CBLDatabase* db _cbl_nonnull,
                          CBLError* outError) CBLAPI
 {
     auto query = retained(new CBLQuery(db, language, queryString, outErrorPos, internal(outError)));
-    return query->valid() ? retain(query.get()) : nullptr;
+    return query->valid() ? retain(query) : nullptr;
 }
 
 FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI {
@@ -76,7 +76,7 @@ bool CBLQuery_SetParametersAsJSON_s(CBLQuery* query, FLString json5) CBLAPI {
 }
 
 CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError) CBLAPI {
-    return retain(query->execute(internal(outError)).get());
+    return retain(query->execute(internal(outError)));
 }
 
 FLSliceResult CBLQuery_Explain(const CBLQuery* query _cbl_nonnull) CBLAPI {
@@ -95,7 +95,7 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
                                              CBLQueryChangeListener listener _cbl_nonnull,
                                              void *context) CBLAPI
 {
-    return query->addChangeListener(listener, context);
+    return retain(query->addChangeListener(listener, context));
 }
 
 CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
@@ -108,7 +108,7 @@ CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
                  "Listener token is not valid for this query"_sl);
         return nullptr;
     }
-    return retain(listener->resultSet(outError).get());
+    return retain(listener->resultSet(outError));
 }
 
 bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {

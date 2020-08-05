@@ -62,6 +62,8 @@ void CBL_DumpInstances(void) CBLAPI {
 
 
 void CBLListener_Remove(CBLListenerToken *token) CBLAPI {
-    if (token)
+    if (token) {
         token->remove();
+        release(token);
+    }
 }

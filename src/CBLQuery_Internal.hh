@@ -128,7 +128,7 @@ public:
         return (i != _columnNames->end()) ? i->second : -1;
     }
 
-    CBLListenerToken* addChangeListener(CBLQueryChangeListener listener, void *context);
+    Retained<CBLListenerToken> addChangeListener(CBLQueryChangeListener listener, void *context);
 
     ListenerToken<CBLQueryChangeListener>* getChangeListener(CBLListenerToken *token) const {
         return _listeners.find(token);

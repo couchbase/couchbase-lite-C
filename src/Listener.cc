@@ -24,10 +24,11 @@ using namespace std;
 
 void CBLListenerToken::remove() {
     auto oldOwner = _owner;
-    assert(oldOwner);
-    _callback = nullptr;
-    _owner = nullptr;
-    oldOwner->remove(this);
+    if (oldOwner) {
+        _callback = nullptr;
+        _owner = nullptr;
+        oldOwner->remove(this);
+    }
 }
 
 
