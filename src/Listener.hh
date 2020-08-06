@@ -52,7 +52,7 @@ public:
     void remove();
 
 protected:
-    friend class ListenersBase;
+    friend class cbl_internal::ListenersBase;
 
     void removed() {
         _owner = nullptr;
