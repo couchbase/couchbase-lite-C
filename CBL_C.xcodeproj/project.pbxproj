@@ -138,13 +138,6 @@
 			remoteGlobalIDString = 27FC81E81EAAB0D90028E38E;
 			remoteInfo = "LiteCoreREST static";
 		};
-		271C2A5821CAD5950045856E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 279691631ED4B29E0086565D;
-			remoteInfo = Support;
-		};
 		271C2A5A21CAD5950045856E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
@@ -235,6 +228,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 2771A097228624C000B18E0A;
 			remoteInfo = LiteCoreWebSocket;
+		};
+		279157C624E1CAC8008B56FE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 278F476724C9131000E1CA7A;
+			remoteInfo = "iOS Perf Test";
 		};
 		27984E222249A1A0000FE777 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -540,13 +540,13 @@
 				271C2A5321CAD5950045856E /* LiteCore.framework */,
 				271C2A5521CAD5950045856E /* libLiteCoreREST-static.a */,
 				277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */,
-				271C2A5921CAD5950045856E /* libSupport.a */,
 				271C2A5B21CAD5950045856E /* LiteCoreCppTests */,
 				271C2A5D21CAD5950045856E /* C4Tests */,
 				271C2A6721CAD5950045856E /* LiteCoreTests.xctest */,
 				271C2A6121CAD5950045856E /* libSQLite.a */,
 				271C2A6321CAD5950045856E /* libTokenizer.a */,
-				271C2A6921CAD5950045856E /* LiteCore-iOS.app */,
+				279157C724E1CAC8008B56FE /* iOS Perf Test.app */,
+				271C2A6921CAD5950045856E /* LiteCore-iOS shell.app */,
 				271C2A6D21CAD5950045856E /* LiteCore-iOS Tests.xctest */,
 			);
 			name = Products;
@@ -790,6 +790,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 27984E1B2249A127000FE777 /* Build configuration list for PBXNativeTarget "CBL_C Framework" */;
 			buildPhases = (
+				279157C824E1CAF2008B56FE /* Generate Export List */,
 				27984E052249A126000FE777 /* Headers */,
 				27984E062249A126000FE777 /* Sources */,
 				27984E072249A126000FE777 /* Frameworks */,
@@ -936,13 +937,6 @@
 			remoteRef = 271C2A5421CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		271C2A5921CAD5950045856E /* libSupport.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSupport.a;
-			remoteRef = 271C2A5821CAD5950045856E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		271C2A5B21CAD5950045856E /* LiteCoreCppTests */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -978,10 +972,10 @@
 			remoteRef = 271C2A6621CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		271C2A6921CAD5950045856E /* LiteCore-iOS.app */ = {
+		271C2A6921CAD5950045856E /* LiteCore-iOS shell.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
-			path = "LiteCore-iOS.app";
+			path = "LiteCore-iOS shell.app";
 			remoteRef = 271C2A6821CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -997,6 +991,13 @@
 			fileType = archive.ar;
 			path = libLiteCoreWebSocket.a;
 			remoteRef = 277CC9A522BC23DF00B245CB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		279157C724E1CAC8008B56FE /* iOS Perf Test.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = "iOS Perf Test.app";
+			remoteRef = 279157C624E1CAC8008B56FE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1034,6 +1035,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/bash -e";
+			shellScript = "\"$SCRIPT_INPUT_FILE_0\" \n";
+		};
+		279157C824E1CAF2008B56FE /* Generate Export List */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Xcode/generate_exports.sh",
+				"$(SRCROOT)/src/exports/Fleece.exp",
+				"$(SRCROOT)/src/exports/CBL.exp",
+				"$(SRCROOT)/src/exports/CBL_EE.exp",
+			);
+			name = "Generate Export List";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/CBL.exp",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
 			shellScript = "\"$SCRIPT_INPUT_FILE_0\" \n";
 		};
 		27984E382249A36A000FE777 /* Copy Fleece Headers */ = {
