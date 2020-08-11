@@ -19,8 +19,7 @@
 #include "CBLCheckpoint.h"
 #include "CBLCheckpoint_Internal.hh"
 
-CBLCheckpoint* CBLCheckpoint_New(CBLDatabase *db,
-                                 CBLReplicatorConfiguration *config,
+CBLCheckpoint* CBLCheckpoint_New(const CBLReplicatorConfiguration *config,
                                  bool reset,
                                  CBLError *outError) CBLAPI
 {
@@ -43,9 +42,9 @@ CBLCheckpoint* CBLCheckpoint_New(CBLDatabase *db,
 
     alloc_slice url(c4address_toURL(conf.endpoint->remoteAddress()));
 
-    Retained<CBLCheckpoint> c = new CBLCheckpoint(db, params, url);
+    Retained<CBLCheckpoint> c = new CBLCheckpoint(config->database, params, url);
     C4Error c4err;
-    bool ok = db->use<bool>([&](C4Database *c4db) {
+    bool ok = config->database->use<bool>([&](C4Database *c4db) {
         return c->read(c4db, reset, &c4err);
     });
     if (outError)

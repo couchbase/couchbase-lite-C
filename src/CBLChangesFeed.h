@@ -49,6 +49,8 @@ extern "C" {
 
     /// A list of document revisions, ordered by sequence, returned from CBLChangesFeed_Next.
     typedef struct CBLChangesFeedRevisions {
+        CBLSequenceNumber             firstSequence;  ///< First sequence checked
+        CBLSequenceNumber             lastSequence;   ///< Last sequence checked
         size_t                        count;          ///< Number of items in `revisions` array
         const CBLChangesFeedRevision* revisions[1];   ///< Each rev; array dimension is actually `count`
     } CBLChangesFeedRevisions;
@@ -58,13 +60,13 @@ extern "C" {
 
     /// Creates a CBLChangesFeed that will start after the sequence `since`. (I.e. at `since + 1`.)
     CBLChangesFeed* CBLChangesFeed_NewSince(CBLDatabase* _cbl_nonnull,
-                                            CBLChangesFeedOptions options,
-                                            CBLSequenceNumber since);
+                                            CBLSequenceNumber since,
+                                            CBLChangesFeedOptions options);
 
     /// Creates a CBLChangesFeed that will start after the checkpoint's LocalMinSequence.
     CBLChangesFeed* CBLChangesFeed_NewWithCheckpoint(CBLDatabase* _cbl_nonnull,
-                                                     CBLChangesFeedOptions options,
-                                                     CBLCheckpoint* _cbl_nonnull);
+                                                     CBLCheckpoint* _cbl_nonnull,
+                                                     CBLChangesFeedOptions options);
 
     /// Limits the feed to the given set of document IDs.
     void CBLChangesFeed_FilterToDocIDs(CBLChangesFeed* _cbl_nonnull,

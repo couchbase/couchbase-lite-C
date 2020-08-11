@@ -115,16 +115,16 @@ private:
 
 
 CBLChangesFeed* CBLChangesFeed_NewWithCheckpoint(CBLDatabase* db,
-                                                 CBLChangesFeedOptions options,
-                                                 CBLCheckpoint* checkpoint)
+                                                 CBLCheckpoint* checkpoint,
+                                                 CBLChangesFeedOptions options)
 {
     return retain(new CBLChangesFeed(db, options, checkpoint));
 }
 
 
 CBLChangesFeed* CBLChangesFeed_NewSince(CBLDatabase* db,
-                                        CBLChangesFeedOptions options,
-                                        CBLSequenceNumber since)
+                                        CBLSequenceNumber since,
+                                        CBLChangesFeedOptions options)
 {
     return retain(new CBLChangesFeed(db, options, nullptr, since));
 }
@@ -172,6 +172,8 @@ struct CBLChangesFeedRevisionsImpl : public ChangesFeed::Changes,
     CBLChangesFeedRevisionsImpl(ChangesFeed::Changes &&changes)
     :ChangesFeed::Changes(move(changes))
     {
+        CBLChangesFeedRevisions::firstSequence = changes.firstSequence;
+        CBLChangesFeedRevisions::lastSequence = changes.lastSequence;
         count = revs.size();
         auto *dst = &revisions[0];
         for (const auto &src : revs)

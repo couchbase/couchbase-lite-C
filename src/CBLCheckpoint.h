@@ -35,8 +35,7 @@ extern "C" {
     
 
     /** Creates a checkpoint object for this URL and replicator options. */
-    CBLCheckpoint* CBLCheckpoint_New(CBLDatabase*,
-                                     CBLReplicatorConfiguration*,
+    CBLCheckpoint* CBLCheckpoint_New(const CBLReplicatorConfiguration* _cbl_nonnull,
                                      bool reset,
                                      CBLError *outError) CBLAPI;
 
