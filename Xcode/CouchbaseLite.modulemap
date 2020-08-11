@@ -9,6 +9,10 @@ framework module CouchbaseLite {
     header "CBLQuery.h"
     header "CBLReplicator.h"
 
+    private header "CBLChangesFeed.h"
+    private header "CBLCheckpoint.h"
+    private header "CBLPrivate.h"
+
     module CBLCpp {
         requires cplusplus
         header "CouchbaseLite.hh"

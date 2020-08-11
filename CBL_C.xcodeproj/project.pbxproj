@@ -47,6 +47,9 @@
 		277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */; };
 		27886C8D21F64C1400069BEA /* Listener.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27886C8B21F64C1400069BEA /* Listener.hh */; };
 		27886C8E21F64C1400069BEA /* Listener.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27886C8C21F64C1400069BEA /* Listener.cc */; };
+		279157ED24E1D2D6008B56FE /* CBLCheckpoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 27FA565D24A5784D00B2F1F8 /* CBLCheckpoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		279157F924E1D2DD008B56FE /* CBLChangesFeed.h in Headers */ = {isa = PBXBuildFile; fileRef = 27FE0D0E24C21A9700A36EC2 /* CBLChangesFeed.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		279157FA24E1D2EA008B56FE /* CBLPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 275FA3342236E54D001C392D /* CBLPrivate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E212249A189000FE777 /* dylib_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D7E21D6B6900027CCDB /* dylib_main.cc */; };
 		27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
 		27984E282249A1EE000FE777 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D8121D6B8230027CCDB /* libz.tbd */; };
@@ -232,13 +235,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 2771A097228624C000B18E0A;
 			remoteInfo = LiteCoreWebSocket;
-		};
-		279157C624E1CAC8008B56FE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 278F476724C9131000E1CA7A;
-			remoteInfo = "iOS Perf Test";
 		};
 		27984E222249A1A0000FE777 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -559,8 +555,7 @@
 				271C2A6721CAD5950045856E /* LiteCoreTests.xctest */,
 				271C2A6121CAD5950045856E /* libSQLite.a */,
 				271C2A6321CAD5950045856E /* libTokenizer.a */,
-				279157C724E1CAC8008B56FE /* iOS Perf Test.app */,
-				271C2A6921CAD5950045856E /* LiteCore-iOS shell.app */,
+				271C2A6921CAD5950045856E /* LiteCore-iOS.app */,
 				271C2A6D21CAD5950045856E /* LiteCore-iOS Tests.xctest */,
 			);
 			name = Products;
@@ -705,11 +700,14 @@
 				27984E302249A240000FE777 /* CBL_Compat.h in Headers */,
 				27984E2A2249A240000FE777 /* CBLBase.h in Headers */,
 				27984E2B2249A240000FE777 /* CBLBlob.h in Headers */,
+				279157F924E1D2DD008B56FE /* CBLChangesFeed.h in Headers */,
+				279157ED24E1D2D6008B56FE /* CBLCheckpoint.h in Headers */,
 				27984E2D2249A240000FE777 /* CBLDocument.h in Headers */,
-				27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */,
 				27984E2C2249A240000FE777 /* CBLDatabase.h in Headers */,
 				27984E2E2249A240000FE777 /* CBLQuery.h in Headers */,
 				27984E2F2249A240000FE777 /* CBLReplicator.h in Headers */,
+				279157FA24E1D2EA008B56FE /* CBLPrivate.h in Headers */,
+				27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */,
 				27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */,
 				27984E322249A247000FE777 /* Base.hh in Headers */,
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
@@ -988,10 +986,10 @@
 			remoteRef = 271C2A6621CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		271C2A6921CAD5950045856E /* LiteCore-iOS shell.app */ = {
+		271C2A6921CAD5950045856E /* LiteCore-iOS.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
-			path = "LiteCore-iOS shell.app";
+			path = "LiteCore-iOS.app";
 			remoteRef = 271C2A6821CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -1007,13 +1005,6 @@
 			fileType = archive.ar;
 			path = libLiteCoreWebSocket.a;
 			remoteRef = 277CC9A522BC23DF00B245CB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		279157C724E1CAC8008B56FE /* iOS Perf Test.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = "iOS Perf Test.app";
-			remoteRef = 279157C624E1CAC8008B56FE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
