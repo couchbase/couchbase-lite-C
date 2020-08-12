@@ -37,8 +37,10 @@ std::string CBLDatabase::defaultDirectory() {
         if (!bundleID) {
             // For non-apps with no bundle ID, just default to the current directory:
             return NSFileManager.defaultManager.currentDirectoryPath.fileSystemRepresentation;
+        } else if (![path containsString: bundleID]) {
+            // Append bundle ID unless it's already in the path (when the app is sandboxed):
+            path = [path stringByAppendingPathComponent: bundleID];
         }
-        path = [path stringByAppendingPathComponent: bundleID];
 #endif
         // Append a "CouchbaseLite" component to the path:
         return [path stringByAppendingPathComponent: @"CouchbaseLite"].fileSystemRepresentation;
