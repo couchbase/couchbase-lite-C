@@ -36,7 +36,7 @@
     #define _cbl_nonnull            _In_
     #define _cbl_returns_nonnull    _Ret_notnull_
     #define _cbl_warn_unused        _Check_return_
-    #define _cbl_deprecated(MSG,REPLACEMENT)
+    #define _cbl_deprecated
 #else
     #define CBLINLINE            inline
     #define _cbl_returns_nonnull __attribute__((returns_nonnull))
