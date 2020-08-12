@@ -39,7 +39,10 @@ struct CBLChangesFeed : public CBLRefCounted, public ChangesFeed::Delegate {
     ,_checkpoint(checkpoint)
     ,_since(since)
     {
-        _options.push = _checkpoint ? kC4OneShot : kC4Passive;
+        if (_checkpoint)
+            _options = _checkpoint->options();
+        else
+            _options.push = kC4Passive;
     }
 
     void filterToDocIDs(Array docIDs) {
@@ -109,7 +112,7 @@ private:
     CBLReplicationFilter                _filterFunction = nullptr;
     void *                              _filterContext;
     Listeners<CBLChangesFeedListener>   _listeners;
-    Options                             _options;
+    repl::Options                       _options;
     std::optional<ChangesFeed>          _feed;
 };
 

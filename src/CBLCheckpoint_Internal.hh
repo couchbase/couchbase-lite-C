@@ -61,6 +61,10 @@ public:
         });
     }
 
+    const repl::Options& options() {
+        return *this;
+    }
+
 private:
     Retained<CBLDatabase> _db;
     std::atomic<CBLCheckpointSaveCallback> _callback = nullptr;
