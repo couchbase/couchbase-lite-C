@@ -76,7 +76,7 @@ namespace cbl_internal {
         virtual C4Database* otherLocalDB() const override       {return _db->_getC4Database();}
 
     private:
-        Retained<CBLDatabase> _db;
+        fleece::Retained<CBLDatabase> _db;
     };
 #endif
 }
