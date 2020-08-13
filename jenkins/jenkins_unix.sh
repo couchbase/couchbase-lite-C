@@ -4,8 +4,7 @@ set -e
 shopt -s extglob dotglob
 
 function build_xcode {
-    xcodebuild -project CBL_C.xcodeproj -configuration Debug-EE -derivedDataPath ios -scheme "CBL_C framework" -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO
-    popd
+    xcodebuild -project CBL_C.xcodeproj -configuration Debug-EE -derivedDataPath ios -scheme "CBL_C Framework" -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO
 }
 
 
