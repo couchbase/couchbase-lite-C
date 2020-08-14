@@ -189,7 +189,7 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG w/TLS", "[Repl
 TEST_CASE_METHOD(ReplicatorTest, "Checkpoint") {
     config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar");
     CBLError error;
-    auto chk = CBLCheckpoint_New(db.ref(), &config, false, &error);
+    auto chk = CBLCheckpoint_New(&config, false, &error);
     REQUIRE(chk);
     slice id = CBLCheckpoint_GetID(chk);
     cerr << "Checkpoint ID is '" << string(id) << "'\n";
@@ -248,7 +248,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Checkpoint") {
     CBLCheckpoint_Release(chk);
 
     // Start again:
-    chk = CBLCheckpoint_New(db.ref(), &config, false, &error);
+    chk = CBLCheckpoint_New(&config, false, &error);
     REQUIRE(chk);
     match = CBLCheckpoint_CompareWithRemote_s(chk, savedJSON, &error);
     CHECK(match);

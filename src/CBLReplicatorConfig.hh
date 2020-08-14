@@ -180,7 +180,7 @@ namespace cbl_internal {
         bool validate(CBLError *outError) const {
             slice problem;
             if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull)
-                problem = slice("Invalid replicator config: missing endpoints or bad type");
+                problem = slice("Invalid replicator config: missing db or endpoint, or bad type");
             else if (!endpoint->valid())
                 problem = slice("Invalid endpoint");
             else if (proxy && (proxy->type > kCBLProxyHTTPS || !proxy->hostname || !proxy->port))
