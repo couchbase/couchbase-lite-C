@@ -164,27 +164,15 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                 return;
         }
 
-        // Save:
         c4::ref<C4Document> savingDoc = c4doc_retain(_c4doc);
         C4Error c4err;
 
-        bool retrying;
+        // Now attempt to save, and if there's a conflict, resolve it and repeat:
+        bool retry;
         do {
-            retrying = false;
-            C4RevisionFlags flags = (opt.deleting ? kRevDeleted : 0);
-            if (savingDoc) {
-                // Update existing doc:
-                newDoc = c4doc_update(savingDoc, body, flags, &c4err);
-            } else {
-                // Create new doc:
-                C4DocPutRequest rq = {};
-                rq.allocedBody = {body.buf, body.size};
-                rq.docID = slice(_docID);
-                rq.revFlags = flags;
-                rq.save = true;
-                newDoc = c4doc_put(c4db, &rq, nullptr, &c4err);
-            }
-
+            retry = false;
+            // Attempt to save:
+            newDoc = _trySave(c4db, savingDoc, body, opt, &c4err);
             if (!newDoc && c4err == C4Error{LiteCoreDomain, kC4ErrorConflict}) {
                 // Conflict!
                 if (opt.conflictHandler) {
@@ -200,17 +188,17 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                     if (!body)
                         break;
                     savingDoc = conflictingDoc ? c4doc_retain(conflictingDoc->_c4doc) : nullptr;
-                    retrying = true;
+                    retry = true;
                 } else if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
                     // Last-write-wins; load current revision and retry:
                     savingDoc = c4doc_getSingleRevision(c4db, slice(_docID), nullslice, true,
                                                         &c4err);
                     if (!savingDoc && c4err != C4Error{LiteCoreDomain, kC4ErrorNotFound})
                         break;
-                    retrying = true;
+                    retry = true;
                 }
             }
-        } while (retrying);
+        } while (retry);
 
         if (!newDoc || !t.commit(&c4err)) {
             // Failure:
@@ -224,6 +212,37 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
         return nullptr;
     return new CBLDocument(_docID, db, c4doc_retain(newDoc), false);
 }
+
+
+// Subroutine of save() that makes one attempt to save.
+C4Document* CBLDocument::_trySave(C4Database* c4db _cbl_nonnull,
+                                  C4Document *existingDoc,
+                                  alloc_slice &body,
+                                  const SaveOptions &opt,
+                                  C4Error* c4err)
+{
+    C4RevisionFlags flags = (opt.deleting ? kRevDeleted : 0);
+
+    if (existingDoc && opt.existingRevHistory.empty()) {
+        // Normal save of an existing doc:
+        return c4doc_update(existingDoc, body, flags, c4err);
+    } else {
+        // New doc, or saving an existing (pulled) revision:
+        C4DocPutRequest rq = {};
+        rq.allocedBody = {body.buf, body.size};
+        rq.docID = slice(_docID);
+        rq.revFlags = flags;
+        rq.save = true;
+        if (!opt.existingRevHistory.empty()) {
+            // preserve existing revID (i.e. this is an existing rev pulled by a replicator):
+            rq.existingRevision = true;
+            rq.history = (const C4Slice*) opt.existingRevHistory.data();
+            rq.historyCount = opt.existingRevHistory.size();
+        }
+        return c4doc_put(c4db, &rq, nullptr, c4err);
+    }
+}
+
 
 
 bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError) {
@@ -547,7 +566,8 @@ const CBLDocument* CBLDatabase_SaveDocument(CBLDatabase* db,
                                        CBLConcurrencyControl concurrency,
                                        CBLError* outError) CBLAPI
 {
-    return retain(doc->save(db, {concurrency}, internal(outError)));
+    return retain(doc->save(db, CBLDocument::SaveOptions(concurrency),
+                            internal(outError)));
 }
 
 const CBLDocument* CBLDatabase_SaveDocumentResolving(CBLDatabase* db _cbl_nonnull,
@@ -556,7 +576,18 @@ const CBLDocument* CBLDatabase_SaveDocumentResolving(CBLDatabase* db _cbl_nonnul
                                                        void *context,
                                                        CBLError* outError) CBLAPI
 {
-    return retain(doc->save(db, {conflictHandler, context}, internal(outError)));
+    return retain(doc->save(db, CBLDocument::SaveOptions(conflictHandler, context),
+                            internal(outError)));
+}
+
+const CBLDocument* CBLDatabase_SaveDocumentAsExistingRevision(CBLDatabase* db _cbl_nonnull,
+                                                     CBLDocument* doc _cbl_nonnull,
+                                                     size_t revisionHistoryLength,
+                                                     FLSlice revisionHistory[],
+                                                     CBLError* outError) CBLAPI
+{
+    vector<slice> history(&revisionHistory[0], &revisionHistory[revisionHistoryLength]);
+    return retain(doc->save(db, CBLDocument::SaveOptions(move(history)), internal(outError)));
 }
 
 bool CBLDocument_Delete(const CBLDocument* doc _cbl_nonnull,

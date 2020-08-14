@@ -79,11 +79,13 @@ public:
     struct SaveOptions {
         SaveOptions(CBLConcurrencyControl c)             :concurrency(c) { }
         SaveOptions(CBLSaveConflictHandler h, void *ctx) :conflictHandler(h), context(ctx) { }
+        SaveOptions(std::vector<slice> history)          :existingRevHistory(move(history)) { }
 
-        CBLConcurrencyControl concurrency;
-        CBLSaveConflictHandler conflictHandler = nullptr;
-        void *context;
-        bool deleting = false;
+        CBLConcurrencyControl   concurrency;
+        CBLSaveConflictHandler  conflictHandler = nullptr;
+        void *                  context;
+        bool                    deleting = false;
+        std::vector<slice>      existingRevHistory;
     };
 
     RetainedConstDocument save(CBLDatabase* db _cbl_nonnull,
@@ -128,7 +130,13 @@ private:
     static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
     bool saveBlobs(CBLDatabase *db, C4Error *outError) const;
     alloc_slice encodeBody(CBLDatabase* _cbl_nonnull, C4Database* _cbl_nonnull, C4Error *outError) const;
-    
+
+    C4Document* _trySave(C4Database* c4db _cbl_nonnull,
+                         C4Document *existingDoc,
+                         alloc_slice &body,
+                         const SaveOptions &opt,
+                         C4Error* c4err);
+
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
     using UnretainedValueToBlobMap = std::unordered_map<FLDict, CBLNewBlob*>;
     using RetainedDatabase = Retained<CBLDatabase>;

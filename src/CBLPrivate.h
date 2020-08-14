@@ -77,6 +77,23 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
                                       const FLSlice revIDs[],
                                       bool outIsNew[],
                                       CBLError *outError);
+
+    /** Saves changes to a document, using an existing revision ID. This is used to insert a change
+        replicated from another database. The revision ID is the first element of the `revisionHistory`
+        array. Further elements of the array are prior revision IDs in between this revision and the
+        local database's current revision.
+        @param db  The database to save to.
+        @param doc  The mutable document to save.
+        @param revisionHistoryLength  The number of revisions in the `revisionHistory` array.
+        @param revisionHistory  One or more revision IDs, in reverse chronological order.
+        @param error  On failure, the error will be written here.
+        @return  An updated document reflecting the saved changes, or NULL on failure. */
+    const CBLDocument* CBLDatabase_SaveDocumentAsExistingRevision(CBLDatabase* db _cbl_nonnull,
+                                                                  CBLDocument* doc _cbl_nonnull,
+                                                                  size_t revisionHistoryLength,
+                                                                  FLSlice revisionHistory[],
+                                                                  CBLError* error) CBLAPI;
+
 #ifdef __cplusplus
 }
 #endif

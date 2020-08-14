@@ -213,5 +213,8 @@ _CBLCheckpoint_StopAutosave
 _CBLCheckpoint_StartSave
 _CBLCheckpoint_SaveCompleted
 _CBLCheckpoint_IsUnsaved
+
 _CBLDatabase_GetPeerCheckpoint
 _CBLDatabase_SetPeerCheckpoint
+
+_CBLDatabase_SaveDocumentAsExistingRevision
