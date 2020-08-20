@@ -24,8 +24,11 @@ CBLCheckpoint* CBLCheckpoint_New(const CBLReplicatorConfiguration *config,
                                  CBLError *outError) CBLAPI
 {
     cbl_internal::ReplicatorConfiguration conf(*config);
+    CBLURLEndpoint placeholderEndpoint("ws://localhost/db");
+    conf.endpoint = &placeholderEndpoint;   // Prevent conf.validate from barfing on caller's URL
     if (!conf.validate(outError))
         return nullptr;
+    
     C4ReplicatorParameters params = { };
     auto type = conf.continuous ? kC4Continuous : kC4OneShot;
     if (conf.replicatorType != kCBLReplicatorTypePull)
@@ -40,7 +43,7 @@ CBLCheckpoint* CBLCheckpoint_New(const CBLReplicatorConfiguration *config,
     alloc_slice options = enc.finish();
     params.optionsDictFleece = options;
 
-    alloc_slice url(c4address_toURL(conf.endpoint->remoteAddress()));
+    alloc_slice url(c4address_toURL(config->endpoint->remoteAddress()));
 
     Retained<CBLCheckpoint> c = new CBLCheckpoint(config->database, params, url);
     C4Error c4err;
