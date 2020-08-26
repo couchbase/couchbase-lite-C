@@ -103,13 +103,16 @@ extern "C" {
         This is intended to reflect a server-side revision ID, CAS, or MVCC token of some kind. */
     bool CBLCheckpoint_SetDocumentRemoteState(CBLCheckpoint* _cbl_nonnull,
                                               const char *docID _cbl_nonnull,
+                                              const char *revID,
                                               FLSlice state,
                                               CBLError *outError) CBLAPI;
 
     /** Returns any persistent state associated with this document ID and this replication endpoint. */
-    FLSliceResult CBLCheckpoint_GetDocumentRemoteState(CBLCheckpoint* _cbl_nonnull,
-                                                       const char *docID _cbl_nonnull,
-                                                       CBLError *outError) CBLAPI;
+    bool CBLCheckpoint_GetDocumentRemoteState(CBLCheckpoint* _cbl_nonnull,
+                                              const char *docID _cbl_nonnull,
+                                              FLSliceResult *outSstate _cbl_nonnull,
+                                              FLSliceResult *outRevID,
+                                              CBLError *outError) CBLAPI;
 
     //---- SAVING:
 

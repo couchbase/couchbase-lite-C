@@ -19,6 +19,7 @@
 #include "CBLCheckpoint.h"
 #include "CBLCheckpoint_Internal.hh"
 #include "c4Database.h"
+#include <algorithm>
 
 CBLCheckpoint* CBLCheckpoint_New(const CBLReplicatorConfiguration *config,
                                  bool reset,
@@ -132,29 +133,34 @@ void CBLCheckpoint_UpdateRemoteMinSequence(CBLCheckpoint* c, const char *sequenc
 
 //---- REMOTE DOCUMENT STATE
 
-FLSliceResult CBLCheckpoint_GetDocumentRemoteState(CBLCheckpoint *c,
-                                                   const char *docID,
-                                                   CBLError *outError) CBLAPI
+bool CBLCheckpoint_GetDocumentRemoteState(CBLCheckpoint* c,
+                                          const char *docID,
+                                          FLSliceResult *outState,
+                                          FLSliceResult *outRevID,
+                                          CBLError *outError) CBLAPI
 {
-    return c->database()->use<FLSliceResult>([&](C4Database *c4db) {
+    return c->database()->use<bool>([&](C4Database *c4db) {
         auto rawDoc = c4raw_get(c4db, c->stateStoreName(), slice(docID), internal(outError));
         if (!rawDoc)
-            return FLSliceResult{};
-        FLSliceResult result = FLSlice_Copy(rawDoc->body);
+            return false;
+        *outState = FLSlice_Copy(rawDoc->body);
+        if (outRevID)
+            *outRevID = FLSlice_Copy(rawDoc->meta);
         c4raw_free(rawDoc);
-        return result;
+        return true;
     });
 }
 
 bool CBLCheckpoint_SetDocumentRemoteState(CBLCheckpoint *c,
                                           const char *docID,
+                                          const char *revID,
                                           FLSlice state,
                                           CBLError *outError) CBLAPI
 {
     return c->database()->use<bool>([&](C4Database *c4db) {
         if (!c4db_beginTransaction(c4db, internal(outError)))
             return false;
-        bool ok = c4raw_put(c4db, c->stateStoreName(), slice(docID), nullslice, state,
+        bool ok = c4raw_put(c4db, c->stateStoreName(), slice(docID), slice(revID), state,
                             internal(outError));
         return c4db_endTransaction(c4db, ok, internal(outError)) && ok;
     });
