@@ -425,6 +425,21 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase *db _cbl_nonnull, C4Database *c4
 }
 
 
+bool CBLDocument::isMutated() const {
+    LOCK(_mutex);
+    if (!_mutable)
+        return false;
+    else if (!_properties && !_fromJSON)
+        return false;   // haven't even loaded the properties, or set JSON
+    else if (!_c4doc)
+        return true;
+    else {
+        slice originalFleece = _c4doc->selectedRev.body;
+        return !originalFleece || !properties().isEqual( Value::fromData(originalFleece) );
+    }
+}
+
+
 #pragma mark - BLOBS:
 
 
@@ -560,6 +575,8 @@ bool CBLDocument_SetPropertiesAsJSON(CBLDocument* doc, const char *json, CBLErro
 bool CBLDocument_SetPropertiesAsJSON_s(CBLDocument* doc, FLSlice json, CBLError* outError) CBLAPI {
     return doc->setPropertiesAsJSON(json, internal(outError));
 }
+
+bool CBLDocument_IsMutated(const CBLDocument* doc) CBLAPI               {return doc->isMutated();}
 
 const CBLDocument* CBLDatabase_SaveDocument(CBLDatabase* db,
                                        CBLDocument* doc,

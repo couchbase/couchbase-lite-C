@@ -74,6 +74,8 @@ public:
     char* propertiesAsJSON() const;
     bool setPropertiesAsJSON(slice json, C4Error* outError);
 
+    bool isMutated() const;
+
     //---- Save/delete:
 
     struct SaveOptions {

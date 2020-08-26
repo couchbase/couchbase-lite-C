@@ -104,6 +104,7 @@ _CBLDocument_CreateFleeceDoc
 _CBLDocument_PropertiesAsJSON
 _CBLDocument_SetPropertiesAsJSON_s
 _CBLDocument_SetPropertiesAsJSON
+_CBLDocument_IsMutated
 _CBLDocument_Delete
 _CBLDocument_Purge
 

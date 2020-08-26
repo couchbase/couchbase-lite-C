@@ -251,6 +251,8 @@ bool CBLDocument_SetPropertiesAsJSON_s(CBLDocument* _cbl_nonnull,
                                        FLSlice json,
                                        CBLError*) CBLAPI;
 
+bool CBLDocument_IsMutated(const CBLDocument* _cbl_nonnull) CBLAPI;
+
 /** Returns the time, if any, at which a given document will expire and be purged.
     Documents don't normally expire; you have to call \ref CBLDatabase_SetDocumentExpiration
     to set a document's expiration time.
