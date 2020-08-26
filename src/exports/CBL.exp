@@ -214,6 +214,8 @@ _CBLCheckpoint_StopAutosave
 _CBLCheckpoint_StartSave
 _CBLCheckpoint_SaveCompleted
 _CBLCheckpoint_IsUnsaved
+_CBLCheckpoint_SetDocumentRemoteState
+_CBLCheckpoint_GetDocumentRemoteState
 
 _CBLDatabase_GetPeerCheckpoint
 _CBLDatabase_SetPeerCheckpoint

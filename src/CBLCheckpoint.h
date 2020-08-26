@@ -96,6 +96,21 @@ extern "C" {
     void CBLCheckpoint_UpdateRemoteMinSequence(CBLCheckpoint* _cbl_nonnull,
                                                const char *sequenceID) CBLAPI;
 
+    //---- PER-DOCUMENT REMOTE STATE:
+
+    /** Stores a small amount of persistent state associated with this document ID for this replication
+        endpoint (URL or UUID).
+        This is intended to reflect a server-side revision ID, CAS, or MVCC token of some kind. */
+    bool CBLCheckpoint_SetDocumentRemoteState(CBLCheckpoint* _cbl_nonnull,
+                                              const char *docID _cbl_nonnull,
+                                              FLSlice state,
+                                              CBLError *outError) CBLAPI;
+
+    /** Returns any persistent state associated with this document ID and this replication endpoint. */
+    FLSliceResult CBLCheckpoint_GetDocumentRemoteState(CBLCheckpoint* _cbl_nonnull,
+                                                       const char *docID _cbl_nonnull,
+                                                       CBLError *outError) CBLAPI;
+
     //---- SAVING:
 
     /** Callback invoked when the checkpoint should be saved to the remote database.

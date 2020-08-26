@@ -15,6 +15,8 @@
 #include "ReplicatorOptions.hh"
 #include "InstanceCounted.hh"
 #include "Logging.hh"
+#include "SecureDigest.hh"
+#include "StringUtil.hh"
 #include <chrono>
 
 using namespace litecore;
@@ -31,7 +33,12 @@ public:
     :repl::Options(params)
     ,repl::Checkpointer(*this, url)
     ,_db(db)
+    ,_stateStoreName(computeStateStoreName())
     { }
+
+    CBLDatabase* database() const           {return _db;}
+    const repl::Options& options() const    {return *this;}
+    slice stateStoreName() const            {return _stateStoreName;}
 
     void enableSave(repl::Checkpointer::duration interval,
                     CBLCheckpointSaveCallback callback,
@@ -61,15 +68,17 @@ public:
         });
     }
 
-    const repl::Options& options() {
-        return *this;
+private:
+    string computeStateStoreName() {
+        SHA1 digest(repl::Checkpointer::remoteDBIDString());
+        return "remotestate_" + slice(digest).hexString();
     }
 
-private:
     Retained<CBLDatabase> _db;
     std::atomic<CBLCheckpointSaveCallback> _callback = nullptr;
     void* _callbackContext;
     alloc_slice _jsonBeingSaved;
+    std::string _stateStoreName;
 };
 
 
