@@ -52,6 +52,7 @@ extern "C" {
         CBLSequenceNumber             firstSequence;  ///< First sequence checked
         CBLSequenceNumber             lastSequence;   ///< Last sequence checked
         size_t                        count;          ///< Number of items in `revisions` array
+        bool                          askAgain;       ///< Should you call CBLChangesFeed_Next again?
         const CBLChangesFeedRevision* revisions[1];   ///< Each rev; array dimension is actually `count`
     } CBLChangesFeedRevisions;
 

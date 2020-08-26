@@ -169,17 +169,18 @@ struct CBLChangesFeedRevisionsImpl : public ChangesFeed::Changes,
 {
     static void* operator new(size_t size, size_t count) {
         // Account for the full size of the array when allocating heap space:
-        return ::operator new(size + (count - 1) * sizeof(CBLChangesFeedRevision));
+        size_t extra = count > 0 ? count - 1 : 0;
+        return ::operator new(size + extra * sizeof(CBLChangesFeedRevision));
     }
 
     CBLChangesFeedRevisionsImpl(ChangesFeed::Changes &&changes)
     :ChangesFeed::Changes(move(changes))
     {
         CBLChangesFeedRevisions::firstSequence = changes.firstSequence;
-        CBLChangesFeedRevisions::lastSequence = changes.lastSequence;
+        CBLChangesFeedRevisions::lastSequence  = changes.lastSequence;
+        CBLChangesFeedRevisions::askAgain      = changes.askAgain;
         count = revs.size();
         auto *dst = &revisions[0];
-        printf("Changes revs at %p\n", dst);
         for (const auto &src : revs)
             *dst++ = (const CBLChangesFeedRevision*) &src->docID;
     }
@@ -189,7 +190,7 @@ struct CBLChangesFeedRevisionsImpl : public ChangesFeed::Changes,
 CBLChangesFeedRevisions* CBLChangesFeed_Next(CBLChangesFeed* feed, unsigned limit) CBLAPI {
     auto changes = feed->feed().getMoreChanges(limit);
     auto n = changes.revs.size();
-    return n ? new (n) CBLChangesFeedRevisionsImpl(move(changes)) : nullptr;
+    return new (n) CBLChangesFeedRevisionsImpl(move(changes));
 }
 
 
