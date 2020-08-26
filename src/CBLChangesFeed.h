@@ -61,28 +61,28 @@ extern "C" {
     /// Creates a CBLChangesFeed that will start after the sequence `since`. (I.e. at `since + 1`.)
     CBLChangesFeed* CBLChangesFeed_NewSince(CBLDatabase* _cbl_nonnull,
                                             CBLSequenceNumber since,
-                                            CBLChangesFeedOptions options);
+                                            CBLChangesFeedOptions options) CBLAPI;
 
     /// Creates a CBLChangesFeed that will start after the checkpoint's LocalMinSequence.
     CBLChangesFeed* CBLChangesFeed_NewWithCheckpoint(CBLDatabase* _cbl_nonnull,
                                                      CBLCheckpoint* _cbl_nonnull,
-                                                     CBLChangesFeedOptions options);
+                                                     CBLChangesFeedOptions options) CBLAPI;
 
     /// Limits the feed to the given set of document IDs.
     void CBLChangesFeed_FilterToDocIDs(CBLChangesFeed* _cbl_nonnull,
-                                       FLArray docIDs);
+                                       FLArray docIDs) CBLAPI;
 
     /// Limits the feed to documents that pass the given filter function.
     /// \warning This may only be called before the first call to \ref CBLChangesFeed_Next.
     void CBLChangesFeed_SetFilterFunction(CBLChangesFeed* _cbl_nonnull,
                                           CBLReplicationFilter filter,
-                                          void *context);
+                                          void *context) CBLAPI;
 
     //---- Listener
 
     /// Callback notifying that \ref CBLChangesFeed_Next has new revisions to return.
     typedef void (*CBLChangesFeedListener)(void *context,
-                                           CBLChangesFeed* _cbl_nonnull);
+                                           CBLChangesFeed* _cbl_nonnull) CBLAPI;
 
     /// Adds a listener callback that will be invoked after new changes are made to the database.
     /// It will not be called until all pre-existing changes have been returned by \ref CBLChangesFeed_Next.
@@ -92,7 +92,7 @@ extern "C" {
     /// \warning This may only be called before the first call to \ref CBLChangesFeed_Next.
     CBLListenerToken* CBLChangesFeed_AddListener(CBLChangesFeed* _cbl_nonnull,
                                                  CBLChangesFeedListener listener,
-                                                 void *context);
+                                                 void *context) CBLAPI;
 
     //---- Getting Changes
 
@@ -102,19 +102,24 @@ extern "C" {
     ///
     /// This is the number you would store persistently to pass to \ref CBLChangesFeed_NewSince
     /// the next time you get changes.
-    CBLSequenceNumber CBLChangesFeed_GetLastSequenceChecked(CBLChangesFeed* _cbl_nonnull);
+    CBLSequenceNumber CBLChangesFeed_GetLastSequenceChecked(CBLChangesFeed* _cbl_nonnull) CBLAPI;
 
     /// Returns true after all pre-existing changes have been returned.
     /// This means \ref CBLChangesFeed_Next will not return any more items until the database changes.
-    bool CBLChangesFeed_CaughtUp(CBLChangesFeed* _cbl_nonnull);
+    bool CBLChangesFeed_CaughtUp(CBLChangesFeed* _cbl_nonnull) CBLAPI;
 
     /// Returns up to `limit` changes since the last sequence, or NULL if there are none.
     /// \note You must call `CBLChangesFeedRevisions_Free` when done with the returned items.
     CBLChangesFeedRevisions* CBLChangesFeed_Next(CBLChangesFeed* _cbl_nonnull,
-                                                 unsigned limit);
+                                                 unsigned limit) CBLAPI;
+
+    static inline const CBLChangesFeedRevision*
+    CBLChangesFeedRevisions_GetRevision(CBLChangesFeedRevisions* revs _cbl_nonnull, size_t i) CBLAPI {
+        return (i < revs->count) ? revs->revisions[i] : NULL;
+    }
 
     /// Frees the memory allocated by a CBLChangesFeedRevisions.
-    void CBLChangesFeedRevisions_Free(CBLChangesFeedRevisions*);
+    void CBLChangesFeedRevisions_Free(CBLChangesFeedRevisions*) CBLAPI;
 
 #ifdef __cplusplus
 }

@@ -119,7 +119,7 @@ private:
 
 CBLChangesFeed* CBLChangesFeed_NewWithCheckpoint(CBLDatabase* db,
                                                  CBLCheckpoint* checkpoint,
-                                                 CBLChangesFeedOptions options)
+                                                 CBLChangesFeedOptions options) CBLAPI
 {
     return retain(new CBLChangesFeed(db, options, checkpoint));
 }
@@ -127,20 +127,20 @@ CBLChangesFeed* CBLChangesFeed_NewWithCheckpoint(CBLDatabase* db,
 
 CBLChangesFeed* CBLChangesFeed_NewSince(CBLDatabase* db,
                                         CBLSequenceNumber since,
-                                        CBLChangesFeedOptions options)
+                                        CBLChangesFeedOptions options) CBLAPI
 {
     return retain(new CBLChangesFeed(db, options, nullptr, since));
 }
 
 
-void CBLChangesFeed_FilterToDocIDs(CBLChangesFeed* feed, FLArray docIDs) {
+void CBLChangesFeed_FilterToDocIDs(CBLChangesFeed* feed, FLArray docIDs) CBLAPI {
     feed->filterToDocIDs(docIDs);
 }
 
 
 void CBLChangesFeed_SetFilterFunction(CBLChangesFeed* feed,
                                       CBLReplicationFilter filter,
-                                      void *context)
+                                      void *context) CBLAPI
 {
     feed->setFilterFunction(filter, context);
 }
@@ -148,18 +148,18 @@ void CBLChangesFeed_SetFilterFunction(CBLChangesFeed* feed,
 
 CBLListenerToken* CBLChangesFeed_AddListener(CBLChangesFeed* feed,
                                              CBLChangesFeedListener listener,
-                                             void *context)
+                                             void *context) CBLAPI
 {
     return retain(feed->addListener(listener, context));
 }
 
 
-CBLSequenceNumber CBLChangesFeed_GetLastSequenceChecked(CBLChangesFeed* feed) {
+CBLSequenceNumber CBLChangesFeed_GetLastSequenceChecked(CBLChangesFeed* feed) CBLAPI {
     return feed->feed().lastSequence();
 }
 
 
-bool CBLChangesFeed_CaughtUp(CBLChangesFeed* feed) {
+bool CBLChangesFeed_CaughtUp(CBLChangesFeed* feed) CBLAPI {
     return feed->feed().caughtUp();
 }
 
@@ -179,20 +179,21 @@ struct CBLChangesFeedRevisionsImpl : public ChangesFeed::Changes,
         CBLChangesFeedRevisions::lastSequence = changes.lastSequence;
         count = revs.size();
         auto *dst = &revisions[0];
+        printf("Changes revs at %p\n", dst);
         for (const auto &src : revs)
             *dst++ = (const CBLChangesFeedRevision*) &src->docID;
     }
 };
 
 
-CBLChangesFeedRevisions* CBLChangesFeed_Next(CBLChangesFeed* feed, unsigned limit) {
+CBLChangesFeedRevisions* CBLChangesFeed_Next(CBLChangesFeed* feed, unsigned limit) CBLAPI {
     auto changes = feed->feed().getMoreChanges(limit);
     auto n = changes.revs.size();
     return n ? new (n) CBLChangesFeedRevisionsImpl(move(changes)) : nullptr;
 }
 
 
-void CBLChangesFeedRevisions_Free(CBLChangesFeedRevisions *revs) {
+void CBLChangesFeedRevisions_Free(CBLChangesFeedRevisions *revs) CBLAPI {
     if (revs)
         delete (CBLChangesFeedRevisionsImpl*)revs;
 }
