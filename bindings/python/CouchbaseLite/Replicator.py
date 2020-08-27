@@ -3,15 +3,17 @@ from .common import *
 
 
 class ReplicatorConfiguration:
-    def __init__(self, database, url, push_filter):
+    def __init__(self, database, url, push_filter, pull_filter, username, password, cert_path):
+        cert_as_bytes = open(cert_path, "rb").read()
+
         self.database = database
         self.endpoint = lib.CBLEndpoint_NewWithURL(cstr(url))
         self.type = 0
         self.continuous = True
-        self.authenticator = ffi.NULL
+        self.authenticator = lib.CBLAuth_NewBasic(cstr(username), cstr(password))
         self.proxy_settings = ffi.NULL
         self.headers = ffi.NULL
-        self.pinned_server_cert = []
+        self.pinned_server_cert = [asSlice(cert_as_bytes)]
         self.truested_root_cert = []
         self.channels = ffi.NULL
         self.document_ids = ffi.NULL
