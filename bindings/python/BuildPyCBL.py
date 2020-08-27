@@ -401,6 +401,64 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db,
                              const char *name,
                              CBLError *outError);
 FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db);
+
+
+//////// CBLReplicator.h
+typedef ... CBLEndpoint;
+typedef ... CBLAuthenticator;
+typedef enum {
+    kCBLReplicatorTypePushAndPull = 0,    ///< Bidirectional; both push and pull
+    kCBLReplicatorTypePush,               ///< Pushing changes to the target
+    kCBLReplicatorTypePull                ///< Pulling changes from the target
+} CBLReplicatorType;
+typedef enum {
+    kCBLProxyHTTP,                      ///< HTTP proxy; must support 'CONNECT' method
+    kCBLProxyHTTPS,                     ///< HTTPS proxy; must support 'CONNECT' method
+} CBLProxyType;
+typedef struct {
+    CBLProxyType type;                  ///< Type of proxy
+    const char *hostname;               ///< Proxy server hostname or IP address
+    uint16_t port;                      ///< Proxy server port
+    const char *username;               ///< Username for proxy auth (optional)
+    const char *password;               ///< Password for proxy auth
+} CBLProxySettings;
+typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool isDeleted);
+typedef const CBLDocument* (*CBLConflictResolver)(void *context,
+                                                  const char *documentID,
+                                                  const CBLDocument *localDocument,
+                                                  const CBLDocument *remoteDocument);
+typedef struct {
+    CBLDatabase* database;              ///< The database to replicate
+    CBLEndpoint* endpoint;              ///< The address of the other database to replicate with
+    CBLReplicatorType replicatorType;   ///< Push, pull or both
+    bool continuous;                    ///< Continuous replication?
+    //-- HTTP settings:
+    CBLAuthenticator* authenticator;    ///< Authentication credentials, if needed
+    const CBLProxySettings* proxy;      ///< HTTP client proxy settings
+    FLDict headers;                     ///< Extra HTTP headers to add to the WebSocket request
+    //-- TLS settings:
+    FLSlice pinnedServerCertificate;    ///< An X.509 cert to "pin" TLS connections to (PEM or DER)
+    FLSlice trustedRootCertificates;    ///< Set of anchor certs (PEM format)
+    //-- Filtering:
+    FLArray channels;                   ///< Optional set of channels to pull from
+    FLArray documentIDs;                ///< Optional set of document IDs to replicate
+    CBLReplicationFilter pushFilter;    ///< Optional callback to filter which docs are pushed
+    CBLReplicationFilter pullFilter;    ///< Optional callback to validate incoming docs
+    CBLConflictResolver conflictResolver;///< Optional conflict-resolver callback
+    void* context;                      ///< Arbitrary value that will be passed to callbacks
+} CBLReplicatorConfiguration;
+CBLEndpoint* CBLEndpoint_NewWithURL(const char *url);
+void CBLReplicator_Start(CBLReplicator* repl);
+void CBLReplicator_Stop(CBLReplicator* repl);
+CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration*, CBLError* error);
+CBLAuthenticator* CBLAuth_NewBasic(const char *username,
+                                   const char *password);
+CBLAuthenticator* CBLAuth_NewSession(const char *sessionID,
+                                     const char *cookieName);
+extern "Python" bool pushFilterCallback(void *context, CBLDocument* document,
+                                              bool isDeleted);
+extern "Python" bool pullFilterCallback(void *context, CBLDocument* document,
+                                              bool isDeleted);
 """
 
 
