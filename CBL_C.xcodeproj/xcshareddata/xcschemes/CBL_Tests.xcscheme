@@ -27,20 +27,7 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "27B61DA721D6E49D0027CCDB"
-            BuildableName = "CBL_Tests"
-            BlueprintName = "CBL_Tests"
-            ReferencedContainer = "container:CBL_C.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <TestPlans>
-         <TestPlanReference
-            reference = "container:Xcode/CBL_Tests.xctestplan"
-            default = "YES">
-         </TestPlanReference>
       </TestPlans>
    </TestAction>
    <LaunchAction

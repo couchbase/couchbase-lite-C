@@ -128,8 +128,8 @@ install (TARGETS CouchbaseLiteC
 set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
                             CouchbaseLiteCStatic
                             FleeceStatic
-                           ${NO_WHOLE_LIBRARY_FLAG}
                             LiteCoreStatic
+                           ${NO_WHOLE_LIBRARY_FLAG}
                             LiteCoreWebSocket)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
