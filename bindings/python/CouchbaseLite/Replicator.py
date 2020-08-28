@@ -4,7 +4,10 @@ from .common import *
 
 class ReplicatorConfiguration:
     def __init__(self, database, url, push_filter, pull_filter, username, password, cert_path):
-        cert_as_bytes = open(cert_path, "rb").read()
+        pinned_server_cert = []
+        if cert_path:
+            cert_as_bytes = open(cert_path, "rb").read()
+            pinned_server_cert = [asSlice(cert_as_bytes)]
 
         self.database = database
         self.endpoint = lib.CBLEndpoint_NewWithURL(cstr(url))
@@ -13,7 +16,7 @@ class ReplicatorConfiguration:
         self.authenticator = lib.CBLAuth_NewBasic(cstr(username), cstr(password))
         self.proxy_settings = ffi.NULL
         self.headers = ffi.NULL
-        self.pinned_server_cert = [asSlice(cert_as_bytes)]
+        self.pinned_server_cert = pinned_server_cert
         self.truested_root_cert = []
         self.channels = ffi.NULL
         self.document_ids = ffi.NULL
