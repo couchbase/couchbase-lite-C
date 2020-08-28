@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+import datetime
+import math
 
 from ._PyCBL import ffi, lib
 from .common import *
@@ -138,7 +140,7 @@ class Database (CBLObject):
     # Expiration:
     
     def getDocumentExpiration(self, id):
-        exp = CBLDatabase_GetDocumentExpiration(self._ref, id, gError)
+        exp = lib.CBLDatabase_GetDocumentExpiration(self._ref, id, gError)
         if exp > 0:
             return datetime.fromtimestamp(exp)
         elif exp == 0:
@@ -150,7 +152,7 @@ class Database (CBLObject):
         timestamp = 0
         if expDateTime != None:
             timestamp = math.ceil(expDateTime.timestamp)
-        if not CBLDatabase_SetDocumentExpiration(self._ref, id, timestamp, gError):
+        if not lib.CBLDatabase_SetDocumentExpiration(self._ref, id, timestamp, gError):
             raise CBLException("Couldn't set document's expiration", gError)
             
 
