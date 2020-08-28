@@ -1,5 +1,4 @@
 from ._PyCBL import ffi, lib
-from .Collections import *
 from .common import *
 
 
