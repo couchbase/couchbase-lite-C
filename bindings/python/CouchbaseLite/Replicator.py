@@ -18,8 +18,8 @@ class ReplicatorConfiguration:
         self.truested_root_cert = []
         self.channels = ffi.NULL
         self.document_ids = ffi.NULL
-        self.push_filter = pushFilterCallback
-        self.pull_filter = ffi.NULL
+        self.push_filter = push_filter
+        self.pull_filter = pull_filter
         self.conflict_resolver = ffi.NULL
         self.context = ffi.NULL
 
@@ -56,13 +56,3 @@ class Replicator (CBLObject):
 
     def stop(self):
         lib.CBLReplicator_Stop(self._ref)
-
-@ffi.callback("bool(void*, CBLDocument*, bool)")
-def pushFilterCallback(context, doc, isDeleted):
-
-    props = decodeFleeceDict(lib.CBLDocument_Properties(doc))
-    if "local_" in props["type"]:
-        return False
-    if isDeleted:
-        return False
-    return True
