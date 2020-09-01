@@ -83,7 +83,7 @@ extern "C" {
 
     /// Callback notifying that \ref CBLChangesFeed_Next has new revisions to return.
     typedef void (*CBLChangesFeedListener)(void *context,
-                                           CBLChangesFeed* _cbl_nonnull) CBLAPI;
+                                           CBLChangesFeed* _cbl_nonnull);
 
     /// Adds a listener callback that will be invoked after new changes are made to the database.
     /// It will not be called until all pre-existing changes have been returned by \ref CBLChangesFeed_Next.

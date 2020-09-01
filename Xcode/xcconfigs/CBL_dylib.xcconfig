@@ -9,4 +9,5 @@
 #include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib.xcconfig"
 
 PRODUCT_NAME            = CouchbaseLiteC
+OTHER_LDFLAGS           = -lmbedtls -lmbedx509 -lmbedcrypto
 EXPORTED_SYMBOLS_FILE   = $(DERIVED_FILE_DIR)/CBL.exp  // output of src/exports/generate_exports.sh

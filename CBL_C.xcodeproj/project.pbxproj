@@ -22,6 +22,14 @@
 		2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */; };
 		2736A635242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */; };
 		273CE7E22452123400D01CA2 /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
+		2747E0D824FD8BDE009DFFD5 /* libCouchbaseLiteC-unmerged.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-unmerged.a */; };
+		2747E0D924FD8BEB009DFFD5 /* libLiteCore-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A4F21CAD5950045856E /* libLiteCore-static.a */; };
+		2747E0DA24FD8BEB009DFFD5 /* libLiteCoreREST-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A5521CAD5950045856E /* libLiteCoreREST-static.a */; };
+		2747E0DB24FD8BEB009DFFD5 /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
+		2747E0DC24FD8C38009DFFD5 /* libCouchbaseLiteC-unmerged.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-unmerged.a */; };
+		2747E0DD24FD8C45009DFFD5 /* libLiteCore-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A4F21CAD5950045856E /* libLiteCore-static.a */; };
+		2747E0DE24FD8C45009DFFD5 /* libLiteCoreREST-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A5521CAD5950045856E /* libLiteCoreREST-static.a */; };
+		2747E0DF24FD8C45009DFFD5 /* libLiteCoreWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9A622BC23DF00B245CB /* libLiteCoreWebSocket.a */; };
 		275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 275B3567234810C400FE9CF0 /* Foundation.framework */; };
 		275B358723481AE700FE9CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 275B3567234810C400FE9CF0 /* Foundation.framework */; };
 		275B358923481D0C00FE9CF0 /* CBLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D6921D6B60D0027CCDB /* CBLTest.cc */; };
@@ -51,7 +59,6 @@
 		279157F924E1D2DD008B56FE /* CBLChangesFeed.h in Headers */ = {isa = PBXBuildFile; fileRef = 27FE0D0E24C21A9700A36EC2 /* CBLChangesFeed.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		279157FA24E1D2EA008B56FE /* CBLPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 275FA3342236E54D001C392D /* CBLPrivate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E212249A189000FE777 /* dylib_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D7E21D6B6900027CCDB /* dylib_main.cc */; };
-		27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
 		27984E282249A1EE000FE777 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D8121D6B8230027CCDB /* libz.tbd */; };
 		27984E292249A240000FE777 /* CouchbaseLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B61DA321D6E40D0027CCDB /* CouchbaseLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E2A2249A240000FE777 /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -71,7 +78,6 @@
 		27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27984E3F2249A85E000FE777 /* CouchbaseLite_Umbrella.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery.cc */; };
 		27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61D6821D6B60D0027CCDB /* CBLTest.hh */; };
-		27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
 		27B61D7F21D6B6900027CCDB /* dylib_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D7E21D6B6900027CCDB /* dylib_main.cc */; };
 		27B61D8221D6B8230027CCDB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D8121D6B8230027CCDB /* libz.tbd */; };
 		27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D6921D6B60D0027CCDB /* CBLTest.cc */; };
@@ -208,6 +214,27 @@
 			remoteGlobalIDString = 271C2A2221CAC8920045856E;
 			remoteInfo = CBL_C;
 		};
+		2747E0CD24FD74AF009DFFD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A1B21CAC8920045856E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 271C2A2221CAC8920045856E;
+			remoteInfo = CBL_C;
+		};
+		2747E0D124FD75F6009DFFD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 27FC81E71EAAB0D90028E38E;
+			remoteInfo = "LiteCoreREST static";
+		};
+		2747E0D324FD75F6009DFFD5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 2771A097228624C000B18E0A;
+			remoteInfo = LiteCoreWebSocket;
+		};
 		275B358F234BCF6900FE9CF0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 271C2A1B21CAC8920045856E /* Project object */;
@@ -291,7 +318,7 @@
 		271A989C243BFCDA008C032D /* CBLCertificate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLCertificate.h; sourceTree = "<group>"; };
 		271A989D243BFDBF008C032D /* CBLURLEndpointListener.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLURLEndpointListener.cc; sourceTree = "<group>"; };
 		271A98AF243FDF55008C032D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libCouchbaseLiteC-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		271C2A2321CAC8920045856E /* libCouchbaseLiteC-unmerged.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libCouchbaseLiteC-unmerged.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		271C2A2C21CAC98F0045856E /* CBLReplicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLReplicator.h; sourceTree = "<group>"; };
 		271C2A2D21CAC98F0045856E /* CBLBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLBase.h; sourceTree = "<group>"; };
 		271C2A2E21CAC98F0045856E /* CBLDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLDocument.h; sourceTree = "<group>"; };
@@ -309,6 +336,7 @@
 		2736A625242E5A07002B9D65 /* ReplicatorTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ReplicatorTest.hh; sourceTree = "<group>"; };
 		2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorEETest.cc; sourceTree = "<group>"; };
 		273CE7F624534A6100D01CA2 /* platform_apple.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; name = platform_apple.cmake; path = cmake/platform_apple.cmake; sourceTree = "<group>"; };
+		2747E0D724FD8643009DFFD5 /* mergeIntoStaticLib-Makefile.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "mergeIntoStaticLib-Makefile.txt"; sourceTree = "<group>"; };
 		274BAB9D24DA2DB900F4F810 /* generate_exports.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_exports.sh; sourceTree = "<group>"; };
 		275B3567234810C400FE9CF0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CouchbaseLiteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -408,7 +436,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */,
+				2747E0DD24FD8C45009DFFD5 /* libLiteCore-static.a in Frameworks */,
+				2747E0DE24FD8C45009DFFD5 /* libLiteCoreREST-static.a in Frameworks */,
+				2747E0DF24FD8C45009DFFD5 /* libLiteCoreWebSocket.a in Frameworks */,
+				2747E0DC24FD8C38009DFFD5 /* libCouchbaseLiteC-unmerged.a in Frameworks */,
 				275B358723481AE700FE9CF0 /* Foundation.framework in Frameworks */,
 				6938073022DE96C200727053 /* Security.framework in Frameworks */,
 				27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */,
@@ -420,7 +451,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */,
+				2747E0D924FD8BEB009DFFD5 /* libLiteCore-static.a in Frameworks */,
+				2747E0DA24FD8BEB009DFFD5 /* libLiteCoreREST-static.a in Frameworks */,
+				2747E0DB24FD8BEB009DFFD5 /* libLiteCoreWebSocket.a in Frameworks */,
+				2747E0D824FD8BDE009DFFD5 /* libCouchbaseLiteC-unmerged.a in Frameworks */,
 				275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */,
 				277CC9C022BC4E2E00B245CB /* Security.framework in Frameworks */,
 				271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */,
@@ -461,7 +495,7 @@
 		271C2A2421CAC8920045856E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */,
+				271C2A2321CAC8920045856E /* libCouchbaseLiteC-unmerged.a */,
 				27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */,
 				27B61DA821D6E49D0027CCDB /* CBL_Tests */,
 				27984E0A2249A126000FE777 /* CouchbaseLite.framework */,
@@ -618,6 +652,7 @@
 				27984E0D2249A127000FE777 /* Framework-Info.plist */,
 				27B61D8421D6BA060027CCDB /* xcconfigs */,
 				27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */,
+				2747E0D724FD8643009DFFD5 /* mergeIntoStaticLib-Makefile.txt */,
 				274BAB9D24DA2DB900F4F810 /* generate_exports.sh */,
 			);
 			path = Xcode;
@@ -744,6 +779,23 @@
 			passBuildSettingsInEnvironment = 1;
 			productName = Doxygen;
 		};
+		2747E0C724FD749F009DFFD5 /* CBL_C Static */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 2747E0C824FD749F009DFFD5 /* Build configuration list for PBXLegacyTarget "CBL_C Static" */;
+			buildPhases = (
+			);
+			buildToolPath = $SRCROOT/Xcode/mergeIntoStaticLib.sh;
+			buildWorkingDirectory = $BUILT_PRODUCTS_DIR;
+			dependencies = (
+				2747E0CE24FD74AF009DFFD5 /* PBXTargetDependency */,
+				2747E0D224FD75F6009DFFD5 /* PBXTargetDependency */,
+				2747E0D424FD75F6009DFFD5 /* PBXTargetDependency */,
+			);
+			name = "CBL_C Static";
+			passBuildSettingsInEnvironment = 1;
+			productName = "CBL_C Static";
+		};
 		2779ED5122E287FB0026ACD0 /* Python */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "";
@@ -768,7 +820,6 @@
 			buildPhases = (
 				271C2A1F21CAC8920045856E /* Headers */,
 				271C2A2021CAC8920045856E /* Sources */,
-				27DBD088246C94B2002FD7A7 /* Merge static libs */,
 			);
 			buildRules = (
 			);
@@ -779,7 +830,7 @@
 			);
 			name = CBL_C;
 			productName = CBL_C;
-			productReference = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */;
+			productReference = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-unmerged.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		275B357B234812C700FE9CF0 /* CouchbaseLiteTests */ = {
@@ -876,6 +927,9 @@
 					272F012A2279037600E62F72 = {
 						CreatedOnToolsVersion = 10.2.1;
 					};
+					2747E0C724FD749F009DFFD5 = {
+						CreatedOnToolsVersion = 12.0;
+					};
 					275B357B234812C700FE9CF0 = {
 						CreatedOnToolsVersion = 11.1;
 					};
@@ -912,6 +966,7 @@
 			projectRoot = "";
 			targets = (
 				271C2A2221CAC8920045856E /* CBL_C */,
+				2747E0C724FD749F009DFFD5 /* CBL_C Static */,
 				27B61D6F21D6B64A0027CCDB /* CBL_C Dylib */,
 				27984E092249A126000FE777 /* CBL_C Framework */,
 				27B61DA721D6E49D0027CCDB /* CBL_Tests */,
@@ -1084,32 +1139,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/fleece/\"\n";
-		};
-		27DBD088246C94B2002FD7A7 /* Merge static libs */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/libFleeceBase.a",
-				"$(BUILT_PRODUCTS_DIR)/libLiteCore-static.a",
-				"$(BUILT_PRODUCTS_DIR)/libLiteCoreREST-static.a",
-				"$(BUILT_PRODUCTS_DIR)/libLiteCoreWebSocket.a",
-				"$(BUILT_PRODUCTS_DIR)/libmbedcrypto.a",
-				"$(BUILT_PRODUCTS_DIR)/libmbedtls.a",
-				"$(BUILT_PRODUCTS_DIR)/libmbedx509.a",
-			);
-			name = "Merge static libs";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/bash -e";
-			shellScript = "# This script merges the input files into the static lib built by this target.\nsource $SRCROOT/Xcode/mergeIntoStaticLib.sh\n";
+			shellScript = "set -e\ncp -pR vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/fleece/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1213,6 +1243,21 @@
 			isa = PBXTargetDependency;
 			target = 271C2A2221CAC8920045856E /* CBL_C */;
 			targetProxy = 272F012E2279038600E62F72 /* PBXContainerItemProxy */;
+		};
+		2747E0CE24FD74AF009DFFD5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 271C2A2221CAC8920045856E /* CBL_C */;
+			targetProxy = 2747E0CD24FD74AF009DFFD5 /* PBXContainerItemProxy */;
+		};
+		2747E0D224FD75F6009DFFD5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "LiteCoreREST static";
+			targetProxy = 2747E0D124FD75F6009DFFD5 /* PBXContainerItemProxy */;
+		};
+		2747E0D424FD75F6009DFFD5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LiteCoreWebSocket;
+			targetProxy = 2747E0D324FD75F6009DFFD5 /* PBXContainerItemProxy */;
 		};
 		275B3590234BCF6900FE9CF0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1401,6 +1446,244 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
+		};
+		2747E0C924FD749F009DFFD5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2747E0CA24FD749F009DFFD5 /* Debug_EE */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug_EE;
+		};
+		2747E0CB24FD749F009DFFD5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		2747E0CC24FD749F009DFFD5 /* Release_EE */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = N2Q372V7W2;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release_EE;
 		};
 		275B3585234812C800FE9CF0 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2137,6 +2420,17 @@
 				27D055712358F9DF009BB0A1 /* Debug_EE */,
 				272F012D2279037600E62F72 /* Release */,
 				27D055872358F9FA009BB0A1 /* Release_EE */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2747E0C824FD749F009DFFD5 /* Build configuration list for PBXLegacyTarget "CBL_C Static" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2747E0C924FD749F009DFFD5 /* Debug */,
+				2747E0CA24FD749F009DFFD5 /* Debug_EE */,
+				2747E0CB24FD749F009DFFD5 /* Release */,
+				2747E0CC24FD749F009DFFD5 /* Release_EE */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

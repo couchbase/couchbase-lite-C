@@ -9,6 +9,7 @@
 // NOTE: Doesn't #include a parent config ... whomever #includes this needs to do so.
 
 INSTALL_PATH            = $(LOCAL_LIBRARY_DIR)/Frameworks
+OTHER_LDFLAGS           = -lmbedtls -lmbedx509 -lmbedcrypto
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/Frameworks
 DEFINES_MODULE          = YES
 EXECUTABLE_PREFIX       =

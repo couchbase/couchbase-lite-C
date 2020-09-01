@@ -1,0 +1,5 @@
+# Makefile for merging LiteCore static libs into libCouchbaseLiteC-unmerged.a, producing
+# libCouchbaseLiteC.a ... see mergeIntoStaticLib.sh and the "CBL_C Static" target.
+
+libCouchbaseLiteC.a: libCouchbaseLiteC-unmerged.a libLiteCore-static.a libLiteCoreREST-static.a libLiteCoreWebSocket.a libFleeceBase.a libmbedcrypto.a libmbedtls.a libmbedx509.a
+	libtool -static -o $@ - $^
