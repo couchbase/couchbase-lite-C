@@ -82,12 +82,15 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
         replicated from another database. The revision ID is the first element of the `revisionHistory`
         array. Further elements of the array are prior revision IDs in between this revision and the
         local database's current revision.
+        If a revision with this ID already exists in the database, the function returns NULL but sets
+        the error code to 0.
         @param db  The database to save to.
         @param doc  The mutable document to save.
         @param revisionHistoryLength  The number of revisions in the `revisionHistory` array.
         @param revisionHistory  One or more revision IDs, in reverse chronological order.
         @param error  On failure, the error will be written here.
-        @return  An updated document reflecting the saved changes, or NULL on failure. */
+        @return  An updated document reflecting the saved changes,
+                or NULL if the revision exists or an error occurred. */
     const CBLDocument* CBLDatabase_SaveDocumentAsExistingRevision(CBLDatabase* db _cbl_nonnull,
                                                                   CBLDocument* doc _cbl_nonnull,
                                                                   size_t revisionHistoryLength,

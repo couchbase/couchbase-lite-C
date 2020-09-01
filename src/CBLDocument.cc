@@ -175,7 +175,10 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
             newDoc = _trySave(c4db, savingDoc, body, opt, &c4err);
             if (!newDoc && c4err == C4Error{LiteCoreDomain, kC4ErrorConflict}) {
                 // Conflict!
-                if (opt.conflictHandler) {
+                if (!opt.existingRevHistory.empty()) {
+                    // no conflict handling for existing revisions; just fail
+                    // TODO: Support a conflict handler
+                } else if (opt.conflictHandler) {
                     // Custom conflict resolution:
                     Retained<CBLDocument> conflictingDoc = new CBLDocument(_db, _docID, false);
                     if (!conflictingDoc->exists())
@@ -233,13 +236,25 @@ C4Document* CBLDocument::_trySave(C4Database* c4db _cbl_nonnull,
         rq.docID = slice(_docID);
         rq.revFlags = flags;
         rq.save = true;
-        if (!opt.existingRevHistory.empty()) {
+        if (opt.existingRevHistory.empty()) {
+            // New doc:
+            return c4doc_put(c4db, &rq, nullptr, c4err);
+        } else {
             // preserve existing revID (i.e. this is an existing rev pulled by a replicator):
             rq.existingRevision = true;
             rq.history = (const C4Slice*) opt.existingRevHistory.data();
             rq.historyCount = opt.existingRevHistory.size();
+
+            size_t commonAncestorIndex;
+            C4Document *savedDoc = c4doc_put(c4db, &rq, &commonAncestorIndex, c4err);
+            if (savedDoc && commonAncestorIndex == 0) {
+                // This revision already exists; no-op
+                c4doc_release(savedDoc);
+                savedDoc = nullptr;
+                *c4err = {};
+            }
+            return savedDoc;
         }
-        return c4doc_put(c4db, &rq, nullptr, c4err);
     }
 }
 
@@ -598,10 +613,10 @@ const CBLDocument* CBLDatabase_SaveDocumentResolving(CBLDatabase* db _cbl_nonnul
 }
 
 const CBLDocument* CBLDatabase_SaveDocumentAsExistingRevision(CBLDatabase* db _cbl_nonnull,
-                                                     CBLDocument* doc _cbl_nonnull,
-                                                     size_t revisionHistoryLength,
-                                                     FLSlice revisionHistory[],
-                                                     CBLError* outError) CBLAPI
+                                                              CBLDocument* doc _cbl_nonnull,
+                                                              size_t revisionHistoryLength,
+                                                              FLSlice revisionHistory[],
+                                                              CBLError* outError) CBLAPI
 {
     vector<slice> history(&revisionHistory[0], &revisionHistory[revisionHistoryLength]);
     return retain(doc->save(db, CBLDocument::SaveOptions(move(history)), internal(outError)));
