@@ -10,7 +10,12 @@
 ##         Fleece commit 4ca3dbf1, "Mutable.hh: Allow conversion of keyRef and FLSlot to FLSlot".
 
 
-{.push dynlib: "libCouchbaseLiteC.dylib".}
+when defined(Linux):
+  {.push dynlib: "libCouchbaseLiteC.so".}
+elif defined(MacOS) or defined(MacOSX):
+  {.push dynlib: "libCouchbaseLiteC.dylib".}
+elif defined(Windows):
+  {.push dynlib: "CouchbaseLiteC.dll".}
 
 
 ##   FLSlice.h
