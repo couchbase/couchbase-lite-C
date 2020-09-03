@@ -1,0 +1,13 @@
+//
+//  Debug.xcconfig
+//  CBL_C
+//
+//  Created by Jens Alfke on 9/3/20.
+//  Copyright © 2020 Couchbase. All rights reserved.
+//
+
+GCC_DYNAMIC_NO_PIC           = NO
+GCC_OPTIMIZATION_LEVEL       = 0
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) DEBUG=1 _LIBCPP_DEBUG=0
+ENABLE_TESTABILITY           = YES
+MTL_ENABLE_DEBUG_INFO        = YES

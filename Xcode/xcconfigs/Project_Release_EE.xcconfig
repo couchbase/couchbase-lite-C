@@ -6,6 +6,6 @@
 //  Copyright © 2019 Couchbase. All rights reserved.
 //
 
-#include "Project.xcconfig"
-#include "vendor/couchbase-lite-core/Xcode/xcconfigs/Project_Release_EE.xcconfig"
+#include "Project_Release.xcconfig"
 
+GCC_PREPROCESSOR_DEFINITIONS = $(GCC_PREPROCESSOR_DEFINITIONS) COUCHBASE_ENTERPRISE SQLITE_HAS_CODEC

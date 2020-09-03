@@ -15,4 +15,11 @@ IPHONEOS_DEPLOYMENT_TARGET                         = 11.0
 MACOSX_DEPLOYMENT_TARGET                           = 10.13
 TVOS_DEPLOYMENT_TARGET                             = 11.0
 SUPPORTED_PLATFORMS                                = macosx iphoneos iphonesimulator appletvos appletvsimulator
-VALID_ARCHS                                        = arm64 x86_64
+
+// No 32-bit support anymore
+VALID_ARCHS                                        = x86_64 arm64
+VALID_ARCHS[sdk=macosx*]                           = x86_64
+VALID_ARCHS[sdk=iphonesimulator*]                  = x86_64
+VALID_ARCHS[sdk=appletvsimulator*]                 = x86_64
+VALID_ARCHS[sdk=iphoneos*]                         =        arm64
+VALID_ARCHS[sdk=appletvos*]                        =        arm64

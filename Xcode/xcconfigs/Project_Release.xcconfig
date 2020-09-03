@@ -7,5 +7,5 @@
 //
 
 #include "Project.xcconfig"
-#include "vendor/couchbase-lite-core/Xcode/xcconfigs/Project_Release.xcconfig"
+#include "Release.xcconfig"
 
