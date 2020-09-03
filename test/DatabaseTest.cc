@@ -319,6 +319,9 @@ TEST_CASE_METHOD(CBLTest, "Changes Feed") {
     // Get 10 changes:
     auto changes = CBLChangesFeed_Next(feed, 10);
     REQUIRE(changes != nullptr);
+    CHECK(changes->firstSequence == 1);
+    CHECK(changes->lastSequence == 10);
+    CHECK(changes->askAgain == true);
     REQUIRE(changes->count == 10);
     for (int i = 1; i <= 10; ++i) {
         auto change = changes->revisions[i - 1];
@@ -335,6 +338,9 @@ TEST_CASE_METHOD(CBLTest, "Changes Feed") {
     // Get 20 changes (there will only be 10):
     changes = CBLChangesFeed_Next(feed, 20);
     REQUIRE(changes != nullptr);
+    CHECK(changes->firstSequence == 11);
+    CHECK(changes->lastSequence == 20);
+    CHECK(changes->askAgain == false);
     REQUIRE(changes->count == 10);
     for (int i = 11; i <= 20; ++i) {
         auto change = changes->revisions[i - 11];
@@ -349,7 +355,12 @@ TEST_CASE_METHOD(CBLTest, "Changes Feed") {
     CHECK(CBLChangesFeed_CaughtUp(feed));
 
     changes = CBLChangesFeed_Next(feed, 20);
-    CHECK(changes == nullptr);
+    REQUIRE(changes != nullptr);
+    CHECK(changes->firstSequence > changes->lastSequence);  // i.e. it's empty
+    CHECK(changes->lastSequence == 20);
+    CHECK(changes->askAgain == false);
+    CHECK(changes->count == 0);
+    CBLChangesFeedRevisions_Free(changes);
 
     CBLChangesFeed_Release(feed);
 }
