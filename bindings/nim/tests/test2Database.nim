@@ -18,7 +18,6 @@
 
 import CouchbaseLite
 
-import strformat
 import unittest
 
 {.experimental: "notnil".}

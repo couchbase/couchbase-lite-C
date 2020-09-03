@@ -21,12 +21,13 @@ import CouchbaseLite/private/cbl
 
 
 type
-    ListenerToken* = object
-        ## A reference to a registered listener callback. When this object goes out of scope,
-        ## the listener is removed and the callback will no longer be called.
-        handle: CBLListenerToken not nil
+  ListenerToken* = object
+    ## A reference to a registered listener callback. When this object goes out
+    ## of scope, the listener is removed and the callback will no longer be
+    ## called.
+    handle: CBLListenerToken not nil
 
 proc `=destroy`(t: var ListenerToken) =
-    remove(t.handle)
+  remove(t.handle)
 
 proc `=`(dst: var ListenerToken, src: ListenerToken) {.error.}
