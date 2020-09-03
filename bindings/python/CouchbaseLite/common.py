@@ -32,11 +32,11 @@ def sliceToString(s):
 def sliceResultToBytes(sr):
     if sr.buf == None:
         return None
-    return bytes( ffi.buffer(s.buf, s.size) )
+    return bytes( ffi.buffer(sr.buf, sr.size) )
 
 def asSlice(data):
     buffer = ffi.from_buffer(data)
-    s = ffi.new("Slice")
+    s = ffi.new("FLSlice*")
     s.buf = buffer
     s.size = len(buffer)
     return s
