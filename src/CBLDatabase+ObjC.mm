@@ -43,6 +43,14 @@ std::string CBLDatabase::defaultDirectory() {
         }
 #endif
         // Append a "CouchbaseLite" component to the path:
-        return [path stringByAppendingPathComponent: @"CouchbaseLite"].fileSystemRepresentation;
-    }
+        path = [path stringByAppendingPathComponent: @"CouchbaseLite"];
+
+        // Create it if necessary:
+        [NSFileManager.defaultManager createDirectoryAtPath: path
+                                withIntermediateDirectories: YES
+                                                 attributes: nil
+                                                      error: NULL];
+
+        return path.fileSystemRepresentation;
+   }
 }
