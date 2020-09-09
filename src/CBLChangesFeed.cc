@@ -95,6 +95,8 @@ private:
             _feed->filterByDocIDs(move(_docIDs).asArray());
         if (_feedOptions & kCBLChangesFeed_SkipDeletedDocs)
             _feed->setSkipDeletedDocs(true);
+        if (_feedOptions & kCBLChangesFeed_EchoLocalChanges)
+            _feed->setEchoLocalChanges(true);
         if (_filterFunction)
             _feed->setContinuous(true);
     }

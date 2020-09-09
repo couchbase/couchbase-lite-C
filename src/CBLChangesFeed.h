@@ -36,6 +36,7 @@ extern "C" {
     /// Configuration options for a CBLChangesFeed.
     typedef CBL_OPTIONS(uint32_t, CBLChangesFeedOptions) {
         kCBLChangesFeed_SkipDeletedDocs = 1,    ///< Ignore deletion 'tombstones' until caught up
+        kCBLChangesFeed_EchoLocalChanges = 2,   ///< Include changes made via same CBLDatabase instance
     };
 
     /// Metadata of a document revision, returned from CBLChangesFeed_Next.
