@@ -136,7 +136,7 @@ class MutableArray (Array):
         self._toList.__setitem__(i, value)
 
     def __delitem__(self, i):
-        self._toList.__deltem__(key)
+        self._toList.__deltem__(i)
 
     def insert(self, i, value):
         self._toList.insert(i, value)
