@@ -67,43 +67,54 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
         doc["picture"] = props;
         db.saveDocument(doc);
     }
-
-    Document doc = db.getDocument("blobbo");
-    CHECK(doc.properties().toJSON(true,true).asString() == "{picture:{\"@type\":\"blob\","
-          "content_type:\"text/plain\",digest:\"sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=\",length:32}}");
-    CHECK(Blob::isBlob(doc["picture"].asDict()));
-    Blob blob(doc["picture"].asDict());
-    REQUIRE(blob);
-    CHECK(string(blob.contentType()) == kBlobContentType);
-    CHECK(blob.length() == kBlobContents.size);
-
     {
+        Document doc = db.getDocument("blobbo");
+        CHECK(doc.properties().toJSON(true,true).asString() == "{picture:{\"@type\":\"blob\","
+              "content_type:\"text/plain\",digest:\"sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=\",length:32}}");
+        CHECK(Blob::isBlob(doc["picture"].asDict()));
+        Blob blob(doc["picture"].asDict());
+        REQUIRE(blob);
+        CHECK(string(blob.contentType()) == kBlobContentType);
+        CHECK(blob.length() == kBlobContents.size);
+
+        {
+            CHECK(blob.loadContent() == kBlobContents);
+        }
+
+        char buf[10];
+        {
+            unique_ptr<BlobReadStream> in(blob.openContentStream());
+            size_t n = in->read(buf, 10);
+            CHECK(string(buf, n) == "This is th");
+            n = in->read(buf, 10);
+            CHECK(string(buf, n) == "e content ");
+            n = in->read(buf, 10);
+            CHECK(string(buf, n) == "of the blo");
+            n = in->read(buf, 10);
+            CHECK(string(buf, n) == "b.");
+            n = in->read(buf, 10);
+            CHECK(n == 0);
+        }
+
+        {
+            unique_ptr<BlobReadStream> in(blob.openContentStream());
+            size_t n = in->read(buf, 10);
+            CHECK(string(buf, n) == "This is th");
+        }
+
+        Blob blob2(doc["picture"].asDict());
+        CHECK(blob2 == blob);
+    }
+    {
+        // Compact the db and make sure the blob still exists: (issue #73)
+        db.compact();
+
+        Document doc = db.getDocument("blobbo");
+        CHECK(Blob::isBlob(doc["picture"].asDict()));
+        Blob blob(doc["picture"].asDict());
+        REQUIRE(blob);
         CHECK(blob.loadContent() == kBlobContents);
     }
-
-    char buf[10];
-    {
-        unique_ptr<BlobReadStream> in(blob.openContentStream());
-        size_t n = in->read(buf, 10);
-        CHECK(string(buf, n) == "This is th");
-        n = in->read(buf, 10);
-        CHECK(string(buf, n) == "e content ");
-        n = in->read(buf, 10);
-        CHECK(string(buf, n) == "of the blo");
-        n = in->read(buf, 10);
-        CHECK(string(buf, n) == "b.");
-        n = in->read(buf, 10);
-        CHECK(n == 0);
-    }
-
-    {
-        unique_ptr<BlobReadStream> in(blob.openContentStream());
-        size_t n = in->read(buf, 10);
-        CHECK(string(buf, n) == "This is th");
-    }
-
-    Blob blob2(doc["picture"].asDict());
-    CHECK(blob2 == blob);
 }
 
 

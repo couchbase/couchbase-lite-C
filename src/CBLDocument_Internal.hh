@@ -130,12 +130,14 @@ private:
     bool checkMutable(C4Error *outError) const;
 
     static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
-    bool saveBlobs(CBLDatabase *db, C4Error *outError) const;
-    alloc_slice encodeBody(CBLDatabase* _cbl_nonnull, C4Database* _cbl_nonnull, C4Error *outError) const;
+    bool saveBlobs(CBLDatabase *db, bool &outHasMutableBlobs, C4Error *outError) const;
+    alloc_slice encodeBody(CBLDatabase* _cbl_nonnull, C4Database* _cbl_nonnull,
+                           C4RevisionFlags &outRevFlags, C4Error *outError) const;
 
     C4Document* _trySave(C4Database* c4db _cbl_nonnull,
                          C4Document *existingDoc,
                          alloc_slice &body,
+                         C4RevisionFlags revFlags,
                          const SaveOptions &opt,
                          C4Error* c4err);
 
