@@ -34,14 +34,18 @@ extern "C" {
     typedef uint64_t CBLSequenceNumber;
     
 
-    /** Creates a checkpoint object for this URL and replicator options. */
+    /** Creates a checkpoint object for this replicator configuration.
+        The attributes of the configuration used are `endpoint` (URL only), `continuous`, `push`, `pull`,
+        `options`. For each combination of these, the database stores persistent checkpoint data that's
+        accessed through this object. */
     CBLCheckpoint* CBLCheckpoint_New(const CBLReplicatorConfiguration* _cbl_nonnull,
                                      bool reset,
                                      CBLError *outError) CBLAPI;
 
     //---- COMPARING WITH REMOTE CHECKPOINT:
 
-    /** Returns the doc ID to store the checkpoint in the remote database. */
+    /** Returns a string uniquely identifying this checkpoint and the local database.
+        This can be used as a key to store a matching copy of the checkpoint data in the remote database. */
     FLSlice CBLCheckpoint_GetID(CBLCheckpoint* _cbl_nonnull) CBLAPI;
 
     /** Compares the checkpoint state with the contents of the remote checkpoint document.
@@ -56,7 +60,7 @@ extern "C" {
 
     //---- LOCAL SEQUENCES (PUSH):
 
-    /** The checkpoint's local sequence. All sequences up through this one are pushed. */
+    /** The checkpoint's local sequence. All sequences up through this one have been pushed. */
     CBLSequenceNumber CBLCheckpoint_LocalMinSequence(CBLCheckpoint* _cbl_nonnull) CBLAPI;
 
     /** Marks this local sequence as existing and unpushed. */
@@ -64,8 +68,8 @@ extern "C" {
                                           CBLSequenceNumber) CBLAPI;
 
     /** Records new local sequences.
-        First all sequences in the range [first..last] (inclusive) are marked as complete.
-        Then the sequences in the `pendingSequences` array are marked as pending.
+        - First all sequences in the range [first..last] (inclusive) are marked as complete.
+        - Then the sequences in the `pendingSequences` array are marked as pending.
 
         For example: You query for sequences starting from 100, and you get 103, 105, 108.
         You decide 108 shouldn't be pushed. You then call

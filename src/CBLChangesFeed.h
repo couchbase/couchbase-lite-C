@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-    //---- Setup
+    //---- Types
 
     /// An object that lets you access the database's documents in sequence order, for purposes of
     /// custom replication/sync implementations.
