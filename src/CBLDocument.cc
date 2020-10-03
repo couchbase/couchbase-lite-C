@@ -158,10 +158,13 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
 
         // Encode properties:
         alloc_slice body;
+        C4RevisionFlags revFlags;
         if (!opt.deleting) {
-            body = encodeBody(db, c4db, outError);
+            body = encodeBody(db, c4db, revFlags, outError);
             if (!body)
                 return;
+        } else {
+            revFlags = kRevDeleted;
         }
 
         // Save:
@@ -171,16 +174,15 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
         bool retrying;
         do {
             retrying = false;
-            C4RevisionFlags flags = (opt.deleting ? kRevDeleted : 0);
             if (savingDoc) {
                 // Update existing doc:
-                newDoc = c4doc_update(savingDoc, body, flags, &c4err);
+                newDoc = c4doc_update(savingDoc, body, revFlags, &c4err);
             } else {
                 // Create new doc:
                 C4DocPutRequest rq = {};
                 rq.allocedBody = {body.buf, body.size};
                 rq.docID = slice(_docID);
-                rq.revFlags = flags;
+                rq.revFlags = revFlags;
                 rq.save = true;
                 newDoc = c4doc_put(c4db, &rq, nullptr, &c4err);
             }
@@ -196,7 +198,7 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                         c4err = {LiteCoreDomain, kC4ErrorConflict};
                         break;
                     }
-                    body = encodeBody(db, c4db, &c4err);
+                    body = encodeBody(db, c4db, revFlags, &c4err);
                     if (!body)
                         break;
                     savingDoc = conflictingDoc ? c4doc_retain(conflictingDoc->_c4doc) : nullptr;
@@ -309,7 +311,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
         C4RevisionFlags mergeFlags = 0;
         if (resolution == Resolution::useMerge) {
             if (mergeDoc) {
-                mergeBody = mergeDoc->encodeBody(_db, c4db, c4err);
+                mergeBody = mergeDoc->encodeBody(_db, c4db, mergeFlags, c4err);
                 if (!mergeBody)
                     return false;
             } else {
@@ -391,11 +393,19 @@ bool CBLDocument::setPropertiesAsJSON(slice json, C4Error* outError) {
 }
 
 
-alloc_slice CBLDocument::encodeBody(CBLDatabase *db _cbl_nonnull, C4Database *c4db _cbl_nonnull, C4Error *outError) const {
+alloc_slice CBLDocument::encodeBody(CBLDatabase *db _cbl_nonnull,
+                                    C4Database *c4db _cbl_nonnull,
+                                    C4RevisionFlags &outRevFlags,
+                                    C4Error *outError) const
+{
     LOCK(_mutex);
     // Save new blobs:
-    if (!saveBlobs(db, outError))
+    bool hasBlobs;
+    if (!saveBlobs(db, hasBlobs, outError))
         return nullslice;
+    outRevFlags = hasBlobs ? kRevHasAttachments : 0;
+
+    // Now encode the properties to Fleece:
     SharedEncoder enc(c4db_getSharedFleeceEncoder(c4db));
     enc.writeValue(properties());
     FLError flErr;
@@ -458,29 +468,40 @@ CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
 }
 
 
-bool CBLDocument::saveBlobs(CBLDatabase *db, C4Error *outError) const {
-    // Walk through the Fleece object tree, looking for mutable blob Dicts to install.
-    // We can skip any immutable collections (they can't contain new blobs.)
-    if (!isMutable())
-        return true;
+bool CBLDocument::saveBlobs(CBLDatabase *db, bool &outHasBlobs, C4Error *outError) const {
+    // Walk through the Fleece object tree, looking for new mutable blob Dicts to install,
+    // and also checking if there are any blobs at all (mutable or not.)
+    // Once we've found at least one blob, we can skip immutable collections, because
+    // they can't contain new blobs.
     LOCK(_mutex);
+    if (!isMutable()) {
+        outHasBlobs = c4doc_dictContainsBlobs(properties());
+        return true;
+    }
+    bool foundBlobs = false;
     for (DeepIterator i(properties()); i; ++i) {
         Dict dict = i.value().asDict();
         if (dict) {
             if (!dict.asMutable()) {
-                i.skipChildren();
+                if (!foundBlobs)
+                    foundBlobs = CBL_IsBlob(dict);
+                if (foundBlobs)
+                    i.skipChildren();
             } else if (CBL_IsBlob(dict)) {
-                CBLNewBlob *blob = findNewBlob(dict);
-                if (blob) {
-                    if (!blob->install(db, outError))
+                foundBlobs = true;
+                CBLNewBlob *newBlob = findNewBlob(dict);
+                if (newBlob) {
+                    if (!newBlob->install(db, outError))
                         return false;
                 }
                 i.skipChildren();
             }
         } else if (!i.value().asArray().asMutable()) {
-            i.skipChildren();
+            if (foundBlobs)
+                i.skipChildren();
         }
     }
+    outHasBlobs = foundBlobs;
     return true;
 }
 
