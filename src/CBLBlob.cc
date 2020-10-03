@@ -61,6 +61,10 @@ FLSliceResult CBLBlob_LoadContent(const CBLBlob* blob, CBLError *outError) CBLAP
     return blob->getContents(internal(outError));
 }
 
+FLStringResult CBLBlob_GetFilePath(const CBLBlob* blob, CBLError *outError) CBLAPI {
+    return blob->getFilePath(internal(outError));
+}
+
 CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* blob, CBLError *outError) CBLAPI {
     return (CBLBlobReadStream*)blob->openStream(internal(outError));
 }
@@ -157,4 +161,3 @@ void FLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
 {
     FLSlot_SetBlob(FLMutableDict_Set(dict, key), blob);
 }
-

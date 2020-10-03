@@ -75,6 +75,10 @@ public:
         return c4blob_getContents(store(), _key, outError);
     }
 
+    virtual FLStringResult getFilePath(C4Error *outError) const {
+        return c4blob_getFilePath(store(), _key, outError);
+    }
+
     virtual C4ReadStream* openStream(C4Error *outError) const {
         return c4blob_openReadStream(store(), _key, outError);
     }
@@ -165,6 +169,11 @@ public:
                      slice("Can't get streamed blob contents until doc is saved"));
             return FLSliceResult{};
         }
+    }
+
+    virtual FLStringResult getFilePath(C4Error *outError) const override {
+        setError(outError, LiteCoreDomain, kC4ErrorNotFound, slice("Can't get blob path until doc is saved"));
+        return FLStringResult{};
     }
 
     virtual c4ReadStream* openStream(C4Error *outError) const override {

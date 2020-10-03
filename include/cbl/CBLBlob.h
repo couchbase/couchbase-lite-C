@@ -100,6 +100,16 @@ extern "C" {
         @warning  This can potentially allocate a very large heap block! */
     FLSliceResult CBLBlob_LoadContent(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
 
+
+    /** Returns the path of the file that stores the blob, if possible. This call may fail with
+        error kC4ErrorWrongFormat if the blob is encrypted (in which case the file would be
+        unreadable by the caller) or with kC4ErrorUnsupported if for some implementation reason
+        the blob isn't stored as a standalone file.
+        Thus, the caller MUST use this function only as an optimization, and fall back to reading
+        the contents via the API if it fails.
+        Also, it goes without saying that the caller MUST not modify the file! */
+    FLStringResult CBLBlob_GetFilePath(const CBLBlob* blob, CBLError *outError) CBLAPI;
+
     /** A stream for reading a blob's content. */
     typedef struct CBLBlobReadStream CBLBlobReadStream;
 

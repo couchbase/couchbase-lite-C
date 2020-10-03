@@ -74,6 +74,7 @@ CBLBlob_Length
 CBLBlob_Digest
 CBLBlob_Properties
 CBLBlob_LoadContent
+CBLBlob_GetFilePath
 CBLBlob_OpenContentStream
 CBLBlob_CreateWithData
 CBLBlob_CreateWithStream
