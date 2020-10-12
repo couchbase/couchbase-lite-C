@@ -192,8 +192,10 @@ public:
             auto array = MutableArray::newArray();
             unsigned nCols = _query->columnCount();
             array.resize(uint32_t(nCols));
-            for (unsigned i = 0; i < nCols; ++i)
-                array[i] = column(i);
+            for (unsigned i = 0; i < nCols; ++i) {
+                Value val = column(i);
+                array[i] = val ? val : Value::null();
+            }
             _asArray = array;
         }
         return _asArray;
@@ -204,8 +206,10 @@ public:
             auto dict = MutableDict::newDict();
             unsigned nCols = _query->columnCount();
             for (unsigned i = 0; i < nCols; ++i) {
-                slice key = _query->columnName(i);
-                dict[key] = column(i);
+                if (Value val = column(i); val) {
+                    slice key = _query->columnName(i);
+                    dict[key] = val;
+                }
             }
             _asDict = dict;
         }
