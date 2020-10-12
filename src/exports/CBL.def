@@ -7,7 +7,6 @@ CBL_DumpInstances
 
 CBL_Log
 CBL_Log_s
-CBL_SetLogLevel
 
 CBL_Now
 
