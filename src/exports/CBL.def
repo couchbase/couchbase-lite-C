@@ -97,6 +97,7 @@ CBLQuery_Explain
 CBLQuery_ColumnCount
 CBLQuery_ColumnName
 CBLQuery_AddChangeListener
+CBLQuery_CopyCurrentResults
 
 CBLResultSet_Next
 CBLResultSet_ValueAtIndex
