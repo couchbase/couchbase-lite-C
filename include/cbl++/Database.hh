@@ -20,6 +20,7 @@
 #include "Base.hh"
 #include "CBLDatabase.h"
 #include "CBLDocument.h"
+#include "CBLLog.h"
 #include "CBLQuery.h"
 #include "fleece/Mutable.hh"
 #include <functional>

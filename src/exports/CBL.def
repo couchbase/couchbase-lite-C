@@ -8,6 +8,16 @@ CBL_DumpInstances
 CBL_Log
 CBL_Log_s
 
+CBLLog_Callback
+CBLLog_SetCallback
+CBLLog_ConsoleLevel
+CBLLog_ConsoleLevelOfDomain
+CBLLog_SetConsoleLevel
+CBLLog_SetConsoleLevelOfDomain
+CBLLog_WillLogToConsole
+CBLLog_FileConfig
+CBLLog_SetFileConfig
+
 CBL_Now
 
 CBLError_Message
