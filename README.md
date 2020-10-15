@@ -150,6 +150,30 @@ let props = doc.properties();
 let greeting = props.get("greeting");
 ```
 
+
+### Golang
+
+```go
+	// Open a database:
+	var config = &cblcgo.DatabaseConfiguration{Directory: "./", Flags: cblcgo.Database_Create}
+	db, err := cblcgo.Open("my_db", config)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	// Create a document:
+	doc := cblcgo.NewDocumentWithId("foo")
+	doc.Props["greeting"] = "Howdy!"
+	db.Save(doc, cblcgo.LastWriteWins)
+
+	// Read it back:
+	readDoc, _ := db.GetMutableDocument("foo")
+	readProps := readDoc.Props
+	greeting := readProps["greeting"]
+
+	fmt.Println("greeting:", greeting)
+```
+
 ## Documentation
 
 * [Couchbase Lite documentation](https://docs.couchbase.com/couchbase-lite/2.7/introduction.html) is a must-read to learn the architecture and the API concepts, even though the API details are different here.
@@ -176,7 +200,20 @@ The library is at `build_cmake/libCouchbaseLiteC.so`. (Or `.DLL` or `.dylib`)
 
 ### With CMake on Windows
 
-_(Much like building on Unix. Details TBD)_
+Dependencies:
+* [GCC 7+](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download)
+* [CMake 3.9+](https://github.com/Kitware/CMake/releases/download/v3.19.0-rc1/cmake-3.19.0-rc1-win64-x64.msi)
+* [Git 2.xx.x](https://git-scm.com/download/win)
+* [Visual Studio 2017 or 2019](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
+
+1. Clone the repo.
+2. Run the powershell script `./jenkins/jenkins_win.ps1`
+3. If build fails.
+    1. Make a directory build_cmake i.e. `mkdir build_cmake`
+    2. Find BuiltInWebSocket.cc file and add `#include <functional>` at line 33
+    3. Build using CMake i.e. `cmake -G "Visual Studio 16 2019" -B "D:\couchbase-lite-C\build_cmake"`
+
+[For more help](https://github.com/mateors/tutorial/blob/main/couchbase-lite-go-version.md)
 
 ### With Xcode on macOS
 
@@ -220,4 +257,4 @@ To run the unit tests:
 * **Python**: [Included](bindings/python/README.md) but unsupported
 * **Nim**: [Included](bindings/nim/README.md) but unsupported
 * **Rust**: [Included](bindings/rust/README.md) but unsupported
-* **Go** (Golang): [Third-party, in progress](https://github.com/svr4/couchbase-lite-cgo).
+* **Go** (Golang): [Third-party](https://github.com/svr4/couchbase-lite-cgo).
