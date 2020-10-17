@@ -17,7 +17,11 @@
 //
 
 #pragma once
+
 #include "CBLReplicator.h"
+
+#include "Document.hh"
+
 #include <functional>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
