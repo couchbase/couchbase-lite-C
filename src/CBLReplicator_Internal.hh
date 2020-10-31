@@ -42,7 +42,7 @@ extern "C" {
 
 static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
     return {
-        CBLReplicatorActivityLevel(min(c4status.level, kC4Busy)),   // don't expose kC4Stopping
+        CBLReplicatorActivityLevel(min(c4status.level, (C4ReplicatorActivityLevel)kC4Busy)),   // don't expose kC4Stopping
         {
             c4status.progress.unitsCompleted / std::max(float(c4status.progress.unitsTotal), 1.0f),
             c4status.progress.documentCount
