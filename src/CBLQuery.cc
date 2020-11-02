@@ -187,8 +187,12 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
 
 FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) CBLAPI {
     return db->use<FLMutableArray>([&](C4Database *c4db) {
-        Doc doc(alloc_slice(c4db_getIndexes(c4db, nullptr)));
-        MutableArray indexes = doc.root().asArray().mutableCopy(kFLDeepCopyImmutables);
+        Doc doc(alloc_slice(c4db_getIndexesInfo(c4db, nullptr)));
+        MutableArray indexes = MutableArray::newArray();
+        for (Array::iterator i(doc.root().asArray()); i; ++i) {
+            Dict info = i.value().asDict();
+            indexes.append(info["name"]);
+        }
         return FLMutableArray_Retain(indexes);
     });
 }

@@ -167,7 +167,7 @@ public:
         }
     }
 
-    virtual c4ReadStream* openStream(C4Error *outError) const override {
+    virtual C4ReadStream* openStream(C4Error *outError) const override {
         if (database()) {
             return CBLBlob::openStream(outError);
         } else {
