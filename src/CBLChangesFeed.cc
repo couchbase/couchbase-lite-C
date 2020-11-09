@@ -42,7 +42,7 @@ struct CBLChangesFeed : public CBLRefCounted, public ChangesFeed::Delegate {
         if (_checkpoint)
             _options = _checkpoint->options();
         else
-            _options.push = kC4Passive;
+            _options.push = (_feedOptions & kCBLChangesFeed_Continuous) ? kC4Continuous : kC4Passive;
     }
 
     void filterToDocIDs(Array docIDs) {
@@ -93,11 +93,9 @@ private:
             _feed->setLastSequence(*_since);
         if (_docIDs)
             _feed->filterByDocIDs(move(_docIDs).asArray());
-        if (_feedOptions & kCBLChangesFeed_SkipDeletedDocs)
-            _feed->setSkipDeletedDocs(true);
-        if (_feedOptions & kCBLChangesFeed_EchoLocalChanges)
-            _feed->setEchoLocalChanges(true);
-        if (_filterFunction)
+        _feed->setSkipDeletedDocs(!!(_feedOptions & kCBLChangesFeed_SkipDeletedDocs));
+        _feed->setEchoLocalChanges(!(_feedOptions & kCBLChangesFeed_SkipLocalChanges));
+        if ((_feedOptions & kCBLChangesFeed_Continuous) || _filterFunction)
             _feed->setContinuous(true);
     }
 

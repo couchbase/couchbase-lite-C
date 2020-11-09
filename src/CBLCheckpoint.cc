@@ -50,6 +50,8 @@ CBLCheckpoint* CBLCheckpoint_New(const CBLReplicatorConfiguration *config,
     Retained<CBLCheckpoint> c = new CBLCheckpoint(config->database, params, url);
     C4Error c4err;
     bool ok = config->database->use<bool>([&](C4Database *c4db) {
+        if (reset && !c4raw_deleteStore(c4db, c->stateStoreName(), &c4err))
+            return false;
         return c->read(c4db, reset, &c4err);
     });
     if (outError)
