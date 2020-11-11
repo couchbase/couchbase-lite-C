@@ -145,6 +145,29 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
 }
 
 
+TEST_CASE_METHOD(CBLTest, "Save Document As Existing Rev") {
+    CBLDocument* doc = CBLDocument_New("foo");
+    MutableDict props = CBLDocument_MutableProperties(doc);
+    props["greeting"_sl] = "Howdy!"_sl;
+    CBLError error;
+    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict, &error);
+    REQUIRE(saved);
+    string curRevID = CBLDocument_RevisionID(saved);
+    CBLDocument_Release(doc);
+    CBLDocument_Release(saved);
+
+    doc = CBLDatabase_GetMutableDocument(db, "foo");
+    REQUIRE(doc);
+    props["hey"_sl] = "Ho"_sl;
+    FLSlice history[2] = {"2-22222222"_sl, slice(curRevID)};
+    saved = CBLDatabase_SaveDocumentAsExistingRevision(db, doc, 2, history, &error);
+    REQUIRE(saved);
+    CHECK(string(CBLDocument_RevisionID(saved)) == "2-22222222");
+    CBLDocument_Release(doc);
+    CBLDocument_Release(saved);
+}
+
+
 TEST_CASE_METHOD(CBLTest, "Missing document") {
     CBLError error;
     REQUIRE(!CBLDatabase_PurgeDocumentByID(db, "bogus", &error));
