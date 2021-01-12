@@ -342,6 +342,7 @@ void CBLDatabase::callDBListeners() {
             _listeners.call(this, nChanges, docIDs);
             delete [] buf;
         }
+        c4dbobs_releaseChanges(c4changes, nChanges);
     }
 }
 
