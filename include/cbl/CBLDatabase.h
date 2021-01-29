@@ -163,8 +163,9 @@ CBL_REFCOUNTED(CBLDatabase*, Database);
     an error is returned. */
 bool CBLDatabase_Delete(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
-/** Compacts a database file. */
-bool CBLDatabase_Compact(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+/** Compacts a database file. Deprecated, Use performMaintenance() with kCBLMaintenanceTypeCompact
+    instead. */
+bool CBLDatabase_Compact(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI _cbl_deprecated;
 
 /** Begins a batch operation, similar to a transaction. You **must** later call \ref
     CBLDatabase_EndBatch to end (commit) the batch.
@@ -187,6 +188,18 @@ bool CBLDatabase_Rekey(CBLDatabase* _cbl_nonnull,
                        const CBLEncryptionKey *newKey,
                        CBLError* outError) CBLAPI;
 #endif
+
+/** Maintenance Type used when performing database maintenance. */
+typedef CBL_ENUM(uint32_t, CBLMaintenanceType) {
+    kCBLMaintenanceTypeCompact = 0,     ///< Compact the database file and delete unused attachments
+    kCBLMaintenanceTypeReindex,         ///< Rebuild the entire database's indexes.
+    kCBLMaintenanceTypeIntegrityCheck   ///< Check for the database’s corruption. If found, an error will be returned.
+};
+
+/**  Performs database maintenance. */
+bool CBLDatabase_PerformMaintenance(CBLDatabase* db _cbl_nonnull,
+                                    CBLMaintenanceType type,
+                                    CBLError* outError) CBLAPI;
 
 /** @} */
 

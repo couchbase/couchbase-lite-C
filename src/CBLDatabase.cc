@@ -223,6 +223,15 @@ bool CBLDatabase_Rekey(CBLDatabase* db, const CBLEncryptionKey *newKey, CBLError
 }
 #endif
 
+bool CBLDatabase_PerformMaintenance(CBLDatabase* db,
+                                    CBLMaintenanceType type,
+                                    CBLError* outError) CBLAPI
+{
+    return db->use<bool>([=](C4Database *c4db) {
+        return c4db_maintenance(c4db, (C4MaintenanceType)type, internal(outError));
+    });
+}
+
 
 #pragma mark - ACCESSORS:
 

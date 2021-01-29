@@ -45,6 +45,7 @@ CBLDatabase_Compact
 CBLDatabase_Delete
 CBLDatabase_BeginBatch
 CBLDatabase_EndBatch
+CBLDatabase_PerformMaintenance
 CBLDatabase_AddChangeListener
 CBLDatabase_AddDocumentChangeListener
 CBLDatabase_BufferNotifications
