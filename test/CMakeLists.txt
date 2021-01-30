@@ -31,7 +31,7 @@ set(TEST_SRC
 
 add_executable(CBL_C_Tests ${TEST_SRC} )
 
-target_link_libraries(CBL_C_Tests PRIVATE  CouchbaseLiteC FleeceStatic)
+target_link_libraries(CBL_C_Tests PRIVATE  CouchbaseLiteC FleeceBase)
 
 if(MSVC)
     target_include_directories(
