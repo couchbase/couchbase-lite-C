@@ -163,8 +163,7 @@ CBL_REFCOUNTED(CBLDatabase*, Database);
     an error is returned. */
 bool CBLDatabase_Delete(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
-/** Compacts a database file. Deprecated, Use performMaintenance() with kCBLMaintenanceTypeCompact
-    instead. */
+/** DEPRECATED -- Use performMaintenance() with kCBLMaintenanceTypeCompact instead. */
 bool CBLDatabase_Compact(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI _cbl_deprecated;
 
 /** Begins a batch operation, similar to a transaction. You **must** later call \ref

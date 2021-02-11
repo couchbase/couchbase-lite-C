@@ -99,12 +99,6 @@ namespace cbl {
             CBLError error;
             check(CBLDatabase_Delete(ref(), &error), error);
         }
-
-        /** Deprecated, use performMaintenance with kCBLMaintenanceTypeCompact instead. */
-        void compact()  {
-            CBLError error;
-            check(CBLDatabase_PerformMaintenance(ref(), kCBLMaintenanceTypeCompact, &error), error);
-        }
         
         void performMaintenance(CBLMaintenanceType type) {
             CBLError error;
