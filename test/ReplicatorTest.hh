@@ -10,6 +10,7 @@
 #include <iostream>
 #include <thread>
 #include <set>
+#include <vector>
 
 using namespace std;
 using namespace fleece;

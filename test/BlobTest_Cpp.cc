@@ -107,7 +107,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
     }
     {
         // Compact the db and make sure the blob still exists: (issue #73)
-        db.compact();
+        db.performMaintenance(kCBLMaintenanceTypeCompact);
 
         Document doc = db.getDocument("blobbo");
         CHECK(Blob::isBlob(doc["picture"].asDict()));

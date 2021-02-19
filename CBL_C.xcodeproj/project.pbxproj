@@ -546,7 +546,7 @@
 				271C2A6121CAD5950045856E /* libSQLite.a */,
 				271C2A6321CAD5950045856E /* libTokenizer.a */,
 				279157C724E1CAC8008B56FE /* iOS Perf Test.app */,
-				271C2A6921CAD5950045856E /* LiteCore-iOS shell.app */,
+				271C2A6921CAD5950045856E /* LiteCore-iOS.app */,
 				271C2A6D21CAD5950045856E /* LiteCore-iOS Tests.xctest */,
 			);
 			name = Products;
@@ -853,7 +853,7 @@
 		271C2A1B21CAC8920045856E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = Couchbase;
 				TargetAttributes = {
 					271C2A2221CAC8920045856E = {
@@ -972,7 +972,7 @@
 			remoteRef = 271C2A6621CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		271C2A6921CAD5950045856E /* LiteCore-iOS shell.app */ = {
+		271C2A6921CAD5950045856E /* LiteCore-iOS.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
 			path = "LiteCore-iOS shell.app";

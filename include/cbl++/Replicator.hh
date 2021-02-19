@@ -17,8 +17,13 @@
 //
 
 #pragma once
+
 #include "CBLReplicator.h"
+
+#include "Document.hh"
+
 #include <functional>
+#include <vector>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.

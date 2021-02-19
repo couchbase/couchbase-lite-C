@@ -7,7 +7,16 @@ CBL_DumpInstances
 
 CBL_Log
 CBL_Log_s
-CBL_SetLogLevel
+
+CBLLog_Callback
+CBLLog_SetCallback
+CBLLog_ConsoleLevel
+CBLLog_ConsoleLevelOfDomain
+CBLLog_SetConsoleLevel
+CBLLog_SetConsoleLevelOfDomain
+CBLLog_WillLogToConsole
+CBLLog_FileConfig
+CBLLog_SetFileConfig
 
 CBL_Now
 
@@ -32,10 +41,10 @@ CBLDatabase_Path
 CBLDatabase_Config
 CBLDatabase_Count
 CBLDatabase_LastSequence
-CBLDatabase_Compact
 CBLDatabase_Delete
 CBLDatabase_BeginBatch
 CBLDatabase_EndBatch
+CBLDatabase_PerformMaintenance
 CBLDatabase_AddChangeListener
 CBLDatabase_AddDocumentChangeListener
 CBLDatabase_BufferNotifications
