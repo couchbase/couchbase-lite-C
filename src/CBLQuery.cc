@@ -55,7 +55,7 @@ CBLQuery* CBLQuery_New_s(const CBLDatabase* db _cbl_nonnull,
                          CBLError* outError) CBLAPI
 {
     auto query = retained(new CBLQuery(db, language, queryString, outErrorPos, internal(outError)));
-    return query->valid() ? retain(query) : nullptr;
+    return query->valid() ? move(query).detach() : nullptr;
 }
 
 FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI {
@@ -76,7 +76,7 @@ bool CBLQuery_SetParametersAsJSON_s(CBLQuery* query, FLString json5) CBLAPI {
 }
 
 CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError) CBLAPI {
-    return retain(query->execute(internal(outError)));
+    return query->execute(internal(outError)).detach();
 }
 
 FLSliceResult CBLQuery_Explain(const CBLQuery* query _cbl_nonnull) CBLAPI {
@@ -95,7 +95,7 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
                                              CBLQueryChangeListener listener _cbl_nonnull,
                                              void *context) CBLAPI
 {
-    return retain(query->addChangeListener(listener, context));
+    return query->addChangeListener(listener, context).detach();
 }
 
 CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
@@ -108,7 +108,7 @@ CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
                  "Listener token is not valid for this query"_sl);
         return nullptr;
     }
-    return retain(listener->resultSet(outError));
+    return listener->resultSet(outError).detach();
 }
 
 bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {

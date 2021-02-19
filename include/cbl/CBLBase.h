@@ -36,7 +36,7 @@ extern "C" {
     Types and constants for communicating errors from API calls. */
 
 /** Error domains, serving as namespaces for numeric error codes. */
-typedef CBL_ENUM(uint32_t, CBLErrorDomain) {
+typedef CBL_ENUM(uint8_t, CBLErrorDomain) {
     CBLDomain = 1,         ///< code is a Couchbase Lite error code; see \ref CBLErrorCode
     CBLPOSIXDomain,        ///< code is a POSIX `errno`; see "errno.h"
     CBLSQLiteDomain,       ///< code is a SQLite error; see "sqlite3.h"
@@ -108,9 +108,9 @@ typedef CBL_ENUM(int32_t,  CBLNetworkErrorCode) {
     there was an error (usually by returning NULL or false), then the CBLError will have been
     filled in with the details. */
 typedef struct {
-    CBLErrorDomain domain;      ///< Domain of errors; a namespace for the `code`.
-    int32_t code;               ///< Error code, specific to the domain. 0 always means no error.
-    int32_t internal_info;
+    CBLErrorDomain domain : 8;     ///< Domain of errors; a namespace for the `code`.
+    int            code   :24;     ///< Error code, specific to the domain. 0 always means no error.
+    int32_t        internal_info;  // do not use or modify
 } CBLError;
 
 /** Returns a message describing an error.

@@ -38,6 +38,8 @@ typedef CBL_OPTIONS(uint32_t, CBLDatabaseFlags) {
     kCBLDatabase_Create        = 1,  ///< Create the file if it doesn't exist
     kCBLDatabase_ReadOnly      = 2,  ///< Open file read-only
     kCBLDatabase_NoUpgrade     = 4,  ///< Disable upgrading an older-version database
+
+    kCBLDatabase_VersionVectors = 0x8000, ///< EXPERIMENTAL: Upgrade DB to use version vectors
 };
 
 /** Database encryption algorithms (available only in the Enterprise Edition). */

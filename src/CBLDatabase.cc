@@ -71,6 +71,8 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration_s *config) {
         c4Config.flags |= kC4DB_ReadOnly;
     if (config->flags & kCBLDatabase_NoUpgrade)
         c4Config.flags |= kC4DB_NoUpgrade;
+    if (config->flags & kCBLDatabase_VersionVectors)
+        c4Config.flags |= kC4DB_VersionVectors;
     if (config->encryptionKey) {
         c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(
                                                             config->encryptionKey->algorithm);
@@ -350,7 +352,7 @@ CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* constdb,
                                                 CBLDatabaseChangeListener listener,
                                                 void *context) CBLAPI
 {
-    return retain(const_cast<CBLDatabase*>(constdb)->addListener(listener, context));
+    return const_cast<CBLDatabase*>(constdb)->addListener(listener, context).detach();
 }
 
 
@@ -358,7 +360,7 @@ CBLListenerToken* CBLDatabase_AddChangeDetailListener(const CBLDatabase* constdb
                                                       CBLDatabaseChangeDetailListener listener,
                                                       void *context) CBLAPI
 {
-    return retain(const_cast<CBLDatabase*>(constdb)->addListener(listener, context));
+    return const_cast<CBLDatabase*>(constdb)->addListener(listener, context).detach();
 }
 
 
@@ -433,6 +435,6 @@ CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db _c
                                              CBLDocumentChangeListener listener _cbl_nonnull,
                                              void *context) CBLAPI
 {
-    return retain(const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context));
+    return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context).detach();
 
 }

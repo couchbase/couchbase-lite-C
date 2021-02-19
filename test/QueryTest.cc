@@ -202,7 +202,7 @@ public:
 
 static int countResults(ResultSet &results) {
     int n = 0;
-    for (auto &result : results)
+    for (__unused auto &result : results)
         ++n;
     return n;
 }

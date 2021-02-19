@@ -23,6 +23,9 @@
 #include <iostream>
 
 
+static_assert(sizeof(CBLError) == sizeof(C4Error));
+
+
 char* CBLError_Message(const CBLError* error _cbl_nonnull) CBLAPI {
     return allocCString(CBLError_Message_s(error));
 }
