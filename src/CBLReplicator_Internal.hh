@@ -31,6 +31,7 @@
 #include <atomic>
 #include <mutex>
 #include <algorithm>
+#include <vector>
 
 
 #define SyncLog(LEVEL, MSG, ...) C4LogToAt(kC4SyncLog, kC4Log ## LEVEL, MSG, ##__VA_ARGS__)
