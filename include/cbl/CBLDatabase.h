@@ -163,9 +163,6 @@ CBL_REFCOUNTED(CBLDatabase*, Database);
     an error is returned. */
 bool CBLDatabase_Delete(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
-/** DEPRECATED -- Use performMaintenance() with kCBLMaintenanceTypeCompact instead. */
-bool CBLDatabase_Compact(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI _cbl_deprecated;
-
 /** Begins a batch operation, similar to a transaction. You **must** later call \ref
     CBLDatabase_EndBatch to end (commit) the batch.
     @note  Multiple writes are much faster when grouped inside a single batch.

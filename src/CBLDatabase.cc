@@ -203,12 +203,6 @@ bool CBLDatabase_EndBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
     });
 }
 
-bool CBLDatabase_Compact(CBLDatabase* db, CBLError* outError) CBLAPI {
-    return db->use<bool>([=](C4Database *c4db) {
-        return c4db_compact(c4db, internal(outError));
-    });
-}
-
 bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
     return db->use<bool>([=](C4Database *c4db) {
         return c4db_delete(c4db, internal(outError));
