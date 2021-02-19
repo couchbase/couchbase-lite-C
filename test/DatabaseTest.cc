@@ -195,6 +195,69 @@ TEST_CASE_METHOD(CBLTest, "Expiration After Reopen") {
 }
 
 
+TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
+    // Create a doc with blob:
+    CBLDocument* doc = CBLDocument_New("doc1");
+    FLMutableDict dict = CBLDocument_MutableProperties(doc);
+    FLSlice blobContent = FLStr("I'm Blob.");
+    CBLBlob *blob1 = CBLBlob_CreateWithData("text/plain", blobContent);
+    FLSlot_SetBlob(FLMutableDict_Set(dict, FLStr("blob")), blob1);
+    
+    // Save doc:
+    CBLError error;
+    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlLastWriteWins,
+                                                        &error);
+    REQUIRE(saved);
+    CBLBlob_Release(blob1);
+    CBLDocument_Release(doc);
+    CBLDocument_Release(saved);
+    
+    // Compact:
+    CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeCompact, &error));
+    
+    // Make sure the blob still exists after compact: (issue #73)
+    doc = CBLDatabase_GetMutableDocument(db, "doc1");
+    const CBLBlob* blob2 = FLValue_GetBlob(FLDict_Get(CBLDocument_Properties(doc), FLStr("blob")));
+    FLSliceResult content = CBLBlob_LoadContent(blob2, &error);
+    CHECK((slice)content == blobContent);
+    FLSliceResult_Release(content);
+    
+    // https://issues.couchbase.com/browse/CBL-1617
+    // CBLBlob_Release(blob2);
+    
+    // Delete doc:
+    CHECK(CBLDocument_Delete(doc, kCBLConcurrencyControlLastWriteWins, &error));
+    CBLDocument_Release(doc);
+    
+    // Compact:
+    CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeCompact, &error));
+    
+    // Integrity check:
+    CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeIntegrityCheck, &error));
+}
+
+
+TEST_CASE_METHOD(CBLTest, "Maintenance : Reindex") {
+    CBLError error;
+    CBLIndexSpec index = {};
+    index.type = kCBLValueIndex;
+    index.keyExpressionsJSON = R"(["foo"])";
+    CHECK(CBLDatabase_CreateIndex(db, "foo", index, &error));
+    
+    createDocument(db, "doc1", "foo", "bar1");
+    createDocument(db, "doc2", "foo", "bar2");
+    createDocument(db, "doc3", "foo", "bar3");
+    
+    CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeReindex, &error));
+    
+    FLMutableArray names = CBLDatabase_IndexNames(db);
+    REQUIRE(names);
+    CHECK(FLArray_Count(names) == 1);
+    CHECK(FLValue_AsString(FLArray_Get(names, 0)) == "foo"_sl);
+    FLMutableArray_Release(names);
+}
+
+
 #pragma mark - LISTENERS:
 
 

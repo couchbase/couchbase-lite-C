@@ -41,10 +41,10 @@ CBLDatabase_Path
 CBLDatabase_Config
 CBLDatabase_Count
 CBLDatabase_LastSequence
-CBLDatabase_Compact
 CBLDatabase_Delete
 CBLDatabase_BeginBatch
 CBLDatabase_EndBatch
+CBLDatabase_PerformMaintenance
 CBLDatabase_AddChangeListener
 CBLDatabase_AddDocumentChangeListener
 CBLDatabase_BufferNotifications

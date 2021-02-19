@@ -99,10 +99,10 @@ namespace cbl {
             CBLError error;
             check(CBLDatabase_Delete(ref(), &error), error);
         }
-
-        void compact()  {
+        
+        void performMaintenance(CBLMaintenanceType type) {
             CBLError error;
-            check(CBLDatabase_Compact(ref(), &error), error);
+            check(CBLDatabase_PerformMaintenance(ref(), type, &error), error);
         }
 
         // Accessors:
