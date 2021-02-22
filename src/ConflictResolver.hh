@@ -46,12 +46,12 @@ namespace cbl_internal {
     private:
         void _runAsyncNow() noexcept;
         bool customResolve(CBLDocument *conflict _cbl_nonnull);
-        void errorFromException(const std::exception*, const string &what);
+        void errorFromException(const std::exception*, const char *what);
 
         Retained<CBLDatabase>   _db;
         CBLConflictResolver     _clientResolver;
         void*                   _clientResolverContext;
-        string const            _docID;
+        alloc_slice const       _docID;
         alloc_slice             _revID;
         C4RevisionFlags         _flags {};
         CompletionHandler       _completionHandler;

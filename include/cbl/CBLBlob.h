@@ -83,10 +83,10 @@ extern "C" {
     uint64_t CBLBlob_Length(const CBLBlob* _cbl_nonnull) CBLAPI;
 
     /** Returns the cryptographic digest of a blob's content (from its `digest` property). */
-    const char* CBLBlob_Digest(const CBLBlob* _cbl_nonnull) CBLAPI;
+    FLString CBLBlob_Digest(const CBLBlob* _cbl_nonnull) CBLAPI;
 
     /** Returns a blob's MIME type, if its metadata has a `content_type` property. */
-    const char* CBLBlob_ContentType(const CBLBlob* _cbl_nonnull) CBLAPI;
+    FLString CBLBlob_ContentType(const CBLBlob* _cbl_nonnull) CBLAPI;
 
     /** Returns a blob's metadata. This includes the `digest`, `length` and `content_type`
         properties, as well as any custom ones that may have been added. */
@@ -96,8 +96,7 @@ extern "C" {
 #pragma mark - READING:
 
     /** Reads the blob's contents into memory and returns them.
-        You are responsible for calling \ref FLSliceResult_Release on the returned data when done.
-        @warning  This can potentially allocate a very large heap block! */
+        @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
     FLSliceResult CBLBlob_LoadContent(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
 
     /** A stream for reading a blob's content. */
@@ -129,11 +128,8 @@ extern "C" {
         @param contentType  The MIME type (optional).
         @param contents  The data's address and length.
         @return  A new CBLBlob instance. */
-    CBLBlob* CBLBlob_CreateWithData(const char *contentType,
+    CBLBlob* CBLBlob_CreateWithData(FLString contentType,
                                     FLSlice contents) CBLAPI;
-
-    CBLBlob* CBLBlob_CreateWithData_s(FLString contentType,
-                                      FLSlice contents) CBLAPI;
 
     /** A stream for writing a new blob to the database. */
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
@@ -156,9 +152,9 @@ extern "C" {
         @param outError  On failure, error info will be written here.
         @return  True on success, false on failure. */
     bool CBLBlobWriter_Write(CBLBlobWriteStream* writer _cbl_nonnull,
-                              const void *data _cbl_nonnull,
-                              size_t length,
-                              CBLError *outError) CBLAPI;
+                             const void *data _cbl_nonnull,
+                             size_t length,
+                             CBLError *outError) CBLAPI;
 
     /** Creates a new blob after its data has been written to a \ref CBLBlobWriteStream.
         You should then add the blob to a mutable document as a property -- see
@@ -168,11 +164,8 @@ extern "C" {
         @param contentType  The MIME type (optional).
         @param writer  The blob-writing stream the data was written to.
         @return  A new CBLBlob instance. */
-    CBLBlob* CBLBlob_CreateWithStream(const char *contentType,
+    CBLBlob* CBLBlob_CreateWithStream(FLString contentType,
                                       CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
-
-    CBLBlob* CBLBlob_CreateWithStream_s(FLString contentType,
-                                        CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
 
 #pragma mark - FLEECE UTILITIES:
 

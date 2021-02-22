@@ -18,10 +18,12 @@
 
 #pragma once
 #include "CBLBase.h"
+#include "fleece/slice.hh"
 #include <algorithm>
 #include <functional>
-#include <memory>
 #include <cassert>
+#include <memory>
+#include <utility>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
@@ -34,6 +36,9 @@ static inline bool operator== (const CBLError &e1, const CBLError &e2) {
 }
 
 namespace cbl {
+
+    using slice = fleece::slice;
+    using alloc_slice = fleece::alloc_slice;
 
     // Artificial base class of the C++ wrapper classes; just manages ref-counting.
     class RefCounted {
@@ -65,10 +70,9 @@ namespace cbl {
         static void check(bool ok, CBLError &error) {
             if (!ok) {
 #if DEBUG
-                char *message = CBLError_Message(&error);
-                CBL_Log(kCBLLogDomainAll, CBLLogError, "API returning error %d/%d: %s",
-                        error.domain, error.code, message);
-                free(message);
+                alloc_slice message = CBLError_Message(&error);
+                CBL_Log(kCBLLogDomainAll, CBLLogError, "API returning error %d/%d: %.*s",
+                        error.domain, error.code, (int)message.size, (char*)message.buf);
 #endif
                 throw error;
             }

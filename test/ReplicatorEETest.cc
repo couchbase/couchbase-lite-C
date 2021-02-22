@@ -113,7 +113,7 @@ public:
         }
 
         config.conflictResolver = [](void *context,
-                                     const char *documentID,
+                                     FLString documentID,
                                      const CBLDocument *localDocument,
                                      const CBLDocument *remoteDocument) -> const CBLDocument* {
             cerr << "--- Entering custom conflict resolver! (local=" << localDocument <<
@@ -138,9 +138,9 @@ public:
     }
 
 
-    const CBLDocument* conflictResolver(const char *documentID,
-                                       const CBLDocument *localDocument,
-                                       const CBLDocument *remoteDocument)
+    const CBLDocument* conflictResolver(slice documentID,
+                                        const CBLDocument *localDocument,
+                                        const CBLDocument *remoteDocument)
     {
         CHECK(!resolverCalled);
         resolverCalled = true;

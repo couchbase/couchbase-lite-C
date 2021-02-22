@@ -27,6 +27,7 @@
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <mutex>
+#include <string>
 
 
 #pragma mark - ENDPOINT
@@ -90,7 +91,6 @@ protected:
     using slice = fleece::slice;
     using Encoder = fleece::Encoder;
     using alloc_slice = fleece::alloc_slice;
-    using string = std::string;
 
 public:
     virtual ~CBLAuthenticator()                                 { }
@@ -134,7 +134,7 @@ namespace cbl_internal {
         }
 
     private:
-        string _sessionID, _cookieName;
+        std::string _sessionID, _cookieName;
     };
 }
 
@@ -180,11 +180,12 @@ namespace cbl_internal {
         bool validate(CBLError *outError) const {
             slice problem;
             if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull)
-                problem = slice("Invalid replicator config: missing endpoints or bad type");
+                problem = "Invalid replicator config: missing endpoints or bad type";
             else if (!endpoint->valid())
-                problem = slice("Invalid endpoint");
-            else if (proxy && (proxy->type > kCBLProxyHTTPS || !proxy->hostname || !proxy->port))
-                problem = slice("Invalid replicator proxy settings");
+                problem = "Invalid endpoint";
+            else if (proxy && (proxy->type > kCBLProxyHTTPS ||
+                                                    !proxy->hostname.buf || !proxy->port))
+                problem = "Invalid replicator proxy settings";
 
             if (!problem)
                 return true;
@@ -216,7 +217,7 @@ namespace cbl_internal {
                 enc[slice(kC4ReplicatorProxyType)] = kProxyTypeIDs[proxy->type];
                 enc[slice(kC4ReplicatorProxyHost)] = proxy->hostname;
                 enc[slice(kC4ReplicatorProxyPort)] = proxy->port;
-                if (proxy->username) {
+                if (proxy->username.size > 0) {
                     enc.writeKey(slice(kC4ReplicatorProxyAuth));
                     enc.beginDict();
                     enc[slice(kC4ReplicatorAuthUserName)] = proxy->username;
@@ -235,15 +236,14 @@ namespace cbl_internal {
         using string = std::string;
         using alloc_slice = fleece::alloc_slice;
 
-        static const char* copyString(const char *cstr, string &str) {
-            if (!cstr) return nullptr;
-            str = cstr;
-            return str.c_str();
+        static slice copyString(slice str, alloc_slice &allocated) {
+            allocated = alloc_slice(str);
+            return allocated;
         }
 
 
         alloc_slice _pinnedServerCert, _trustedRootCerts;
         CBLProxySettings _proxy;
-        string _proxyHostname, _proxyUsername, _proxyPassword;
+        alloc_slice _proxyHostname, _proxyUsername, _proxyPassword;
     };
 }

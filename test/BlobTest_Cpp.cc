@@ -28,16 +28,16 @@ using namespace fleece;
 using namespace cbl;
 
 
-static const slice kBlobContents("This is the content of the blob.");
-static const char *kBlobContentType = "text/plain";
-static const string kBlobDigest("sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=");
+static constexpr slice kBlobContents = "This is the content of the blob.";
+static constexpr slice kBlobContentType = "text/plain";
+static constexpr slice kBlobDigest = "sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=";
 
 
 static void checkBlob(Dict props) {
     CHECK(props[kCBLTypeProperty].asString() == kCBLBlobType);
-    CHECK(props[kCBLBlobDigestProperty].asString().asString() == kBlobDigest);
+    CHECK(props[kCBLBlobDigestProperty].asString() == kBlobDigest);
     CHECK(props[kCBLBlobLengthProperty].asInt() == kBlobContents.size);
-    CHECK(props[kCBLBlobContentTypeProperty].asString().asString() == kBlobContentType);
+    CHECK(props[kCBLBlobContentTypeProperty].asString() == kBlobContentType);
 }
 
 
@@ -56,7 +56,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
             blob = Blob(kBlobContentType, writer);
         }
         CHECK(blob.digest() == kBlobDigest);
-        CHECK(string(blob.contentType()) == kBlobContentType);
+        CHECK(blob.contentType() == kBlobContentType);
         CHECK(blob.length() == kBlobContents.size);
         Dict props = blob.properties();
         checkBlob(props);
@@ -74,7 +74,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
         CHECK(Blob::isBlob(doc["picture"].asDict()));
         Blob blob(doc["picture"].asDict());
         REQUIRE(blob);
-        CHECK(string(blob.contentType()) == kBlobContentType);
+        CHECK(blob.contentType() == kBlobContentType);
         CHECK(blob.length() == kBlobContents.size);
 
         {

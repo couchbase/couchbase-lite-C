@@ -30,21 +30,19 @@ using namespace fleece;
 using namespace cbl_internal;
 
 
-static string ensureDocID(slice docID) {
+static alloc_slice generateID() {
     char docIDBuf[32];
-    if (!docID)
-        docID = c4doc_generateID(docIDBuf, sizeof(docIDBuf));
-    return string(docID);
+    return alloc_slice(c4doc_generateID(docIDBuf, sizeof(docIDBuf)));
 }
 
-static C4Document* getC4Doc(CBLDatabase *db, const string &docID, bool allRevisions) {
+
+static C4Document* getC4Doc(CBLDatabase *db, slice docID, bool allRevisions) {
     return db->use<C4Document*>([&](C4Database *c4db) {
-        C4Document *doc;
-        doc = c4db_getDoc(c4db, slice(docID),
-                          true, // mustExist
-                          (allRevisions ? kDocGetAll : kDocGetCurrentRev),
-                          nullptr);
-        if (doc && doc->flags & kDocDeleted) {
+        C4Document *doc = c4db_getDoc(c4db, docID,
+                                      true, // mustExist
+                                      (allRevisions ? kDocGetAll : kDocGetCurrentRev),
+                                      nullptr);
+        if (!allRevisions && doc && doc->flags & kDocDeleted) {
             c4doc_release(doc);
             doc = nullptr;
         }
@@ -54,7 +52,7 @@ static C4Document* getC4Doc(CBLDatabase *db, const string &docID, bool allRevisi
 
 
 // Core constructor
-CBLDocument::CBLDocument(const string &docID,
+CBLDocument::CBLDocument(slice docID,
                          CBLDatabase *db,
                          C4Document *d,          // must be a +1 ref, or null
                          bool isMutable)
@@ -65,19 +63,19 @@ CBLDocument::CBLDocument(const string &docID,
 {
     if (_c4doc) {
         _c4doc->extraInfo = {this, nullptr};
-        _revID = string(slice(_c4doc->selectedRev.revID));
+        _revID = _c4doc->selectedRev.revID;
     }
 }
 
 
 // Construct a new document (not in any database yet)
 CBLDocument::CBLDocument(slice docID, bool isMutable)
-:CBLDocument(ensureDocID(docID), nullptr, nullptr, isMutable)
+:CBLDocument(docID ? docID : generateID(), nullptr, nullptr, isMutable)
 { }
 
 
 // Construct on an existing document
-CBLDocument::CBLDocument(CBLDatabase *db, const string &docID, bool isMutable, bool allRevisions)
+CBLDocument::CBLDocument(CBLDatabase *db, slice docID, bool isMutable, bool allRevisions)
 :CBLDocument(docID, db, getC4Doc(db, docID, allRevisions), isMutable)
 { }
 
@@ -99,23 +97,18 @@ CBLDocument::CBLDocument(const CBLDocument* otherDoc)
 
 // Document loaded from db without a C4Document (e.g. a replicator validation callback)
 CBLDocument::CBLDocument(CBLDatabase *db,
-                         const string &docID,
+                         slice docID,
                          slice revID,
                          C4RevisionFlags revFlags,
                          Dict body)
 :CBLDocument(docID, db, nullptr, false)
 {
     _properties = body;
-    _revID = string(revID);
+    _revID = revID;
 }
 
 
 CBLDocument::~CBLDocument() {
-}
-
-
-const char* CBLDocument::revisionID() const {
-    return _revID.empty() ? nullptr : _revID.c_str();
 }
 
 
@@ -180,7 +173,7 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                 // Create new doc:
                 C4DocPutRequest rq = {};
                 rq.allocedBody = {body.buf, body.size};
-                rq.docID = slice(_docID);
+                rq.docID = _docID;
                 rq.revFlags = revFlags;
                 rq.save = true;
                 newDoc = c4doc_put(c4db, &rq, nullptr, &c4err);
@@ -204,7 +197,7 @@ RetainedConst<CBLDocument> CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                     retrying = true;
                 } else if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
                     // Last-write-wins; load current revision and retry:
-                    savingDoc = c4db_getDoc(c4db, slice(_docID), true, kDocGetCurrentRev, &c4err);
+                    savingDoc = c4db_getDoc(c4db, _docID, true, kDocGetCurrentRev, &c4err);
                     if (!savingDoc && c4err != C4Error{LiteCoreDomain, kC4ErrorNotFound})
                         break;
                     retrying = true;
@@ -239,15 +232,14 @@ bool CBLDocument::deleteDoc(CBLConcurrencyControl concurrency, C4Error* outError
 
 
 /*static*/ bool CBLDocument::deleteDoc(CBLDatabase* db _cbl_nonnull,
-                            const char* docID _cbl_nonnull,
+                            slice docID,
                             C4Error* outError)
 {
     return db->use<bool>([&](C4Database *c4db) {
         c4::Transaction t(c4db);
         if (!t.begin(outError))
             return false;
-        c4::ref<C4Document> c4doc = c4db_getDoc(c4db, slice(docID),
-                                                false, kDocGetCurrentRev, outError);
+        c4::ref<C4Document> c4doc = c4db_getDoc(c4db, docID, false, kDocGetCurrentRev, outError);
         if (c4doc)
             c4doc = c4doc_update(c4doc, nullslice, kRevDeleted, outError);
         return c4doc && t.commit(outError);
@@ -262,7 +254,7 @@ bool CBLDocument::selectRevision(slice revID) {
     LOCK(_mutex);
     if (!_c4doc || !c4doc_selectRevision(_c4doc, revID, true, nullptr))
         return false;
-    _revID = string(slice(revID));
+    _revID = revID;
     _properties = nullptr;
     _fromJSON = nullptr;
     return true;
@@ -368,14 +360,12 @@ Dict CBLDocument::properties() const {
 }
 
 
-char* CBLDocument::propertiesAsJSON() const {
+alloc_slice CBLDocument::propertiesAsJSON() const {
     LOCK(_mutex);
-    alloc_slice json;
     if (!_mutable && _c4doc)
-        json = c4doc_bodyAsJSON(_c4doc, false, nullptr);        // fast path
+        return c4doc_bodyAsJSON(_c4doc, false, nullptr);        // fast path
     else
-        json = allocCString(properties().toJSON());
-    return allocCString(json);
+        return properties().toJSON();
 }
 
 
@@ -513,31 +503,19 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool &outHasBlobs, C4Error *outErro
 
 
 static CBLDocument* getDocument(CBLDatabase* db, slice docID, bool isMutable) CBLAPI {
-    auto doc = retained(new CBLDocument(db, string(docID), isMutable));
+    auto doc = retained(new CBLDocument(db, docID, isMutable));
     return doc->exists() ? move(doc).detach() : nullptr;
 }
 
-const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, const char* docID) CBLAPI {
+const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID) CBLAPI {
     return getDocument((CBLDatabase*)db, docID, false);
 }
 
-const CBLDocument* CBLDatabase_GetDocument_s(const CBLDatabase* db, FLString docID) CBLAPI {
-    return getDocument((CBLDatabase*)db, docID, false);
-}
-
-CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, const char* docID) CBLAPI {
+CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID) CBLAPI {
     return getDocument(db, docID, true);
 }
 
-CBLDocument* CBLDatabase_GetMutableDocument_s(CBLDatabase* db, FLString docID) CBLAPI {
-    return getDocument(db, docID, true);
-}
-
-CBLDocument* CBLDocument_New(const char *docID) CBLAPI {
-    return CBLDocument_New_s(slice(docID));
-}
-
-CBLDocument* CBLDocument_New_s(FLString docID) CBLAPI {
+CBLDocument* CBLDocument_New(FLString docID) CBLAPI {
     return retain(new CBLDocument(docID, true));
 }
 
@@ -545,24 +523,20 @@ CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
     return retain(new CBLDocument(doc));
 }
 
-const char* CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->docID();}
-const char* CBLDocument_RevisionID(const CBLDocument* doc) CBLAPI      {return doc->revisionID();}
+FLSlice CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->docID();}
+FLSlice CBLDocument_RevisionID(const CBLDocument* doc) CBLAPI      {return doc->revisionID();}
 uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
 FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}
 FLDoc CBLDocument_CreateFleeceDoc(const CBLDocument* doc) CBLAPI       {return doc->createFleeceDoc();}
 
-char* CBLDocument_PropertiesAsJSON(const CBLDocument* doc) CBLAPI      {return doc->propertiesAsJSON();}
+FLSliceResult CBLDocument_PropertiesAsJSON(const CBLDocument* doc) CBLAPI {return FLSliceResult(doc->propertiesAsJSON());}
 
 void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties _cbl_nonnull) CBLAPI {
     doc->setProperties(properties);
 }
 
-bool CBLDocument_SetPropertiesAsJSON(CBLDocument* doc, const char *json, CBLError* outError) CBLAPI {
-    return CBLDocument_SetPropertiesAsJSON_s(doc, slice(json), outError);
-}
-
-bool CBLDocument_SetPropertiesAsJSON_s(CBLDocument* doc, FLSlice json, CBLError* outError) CBLAPI {
+bool CBLDocument_SetPropertiesAsJSON(CBLDocument* doc, FLSlice json, CBLError* outError) CBLAPI {
     return doc->setPropertiesAsJSON(json, internal(outError));
 }
 
@@ -591,28 +565,21 @@ bool CBLDocument_Delete(const CBLDocument* doc _cbl_nonnull,
 }
 
 bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db _cbl_nonnull,
-                               const char* docID _cbl_nonnull,
-                               CBLError* outError) CBLAPI
+                                    FLString docID,
+                                    CBLError* outError) CBLAPI
 {
     return CBLDocument::deleteDoc(db, docID, internal(outError));
 }
 
 bool CBLDocument_Purge(const CBLDocument* doc _cbl_nonnull,
-                   CBLError* outError) CBLAPI
+                       CBLError* outError) CBLAPI
 {
     return CBLDatabase_PurgeDocumentByID(doc->database(), doc->docID(), outError);
 }
 
-bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db _cbl_nonnull,
-                              const char* docID _cbl_nonnull,
-                              CBLError* outError) CBLAPI
-{
-    return CBLDatabase_PurgeDocumentByID_s(db, slice(docID), outError);
-}
-
-bool CBLDatabase_PurgeDocumentByID_s(CBLDatabase* db,
-                                     FLString docID,
-                                     CBLError* outError) CBLAPI
+bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
+                                   FLString docID,
+                                   CBLError* outError) CBLAPI
 {
     return db->use<bool>([&](C4Database *c4db) {
         c4::Transaction t(c4db);
@@ -623,33 +590,18 @@ bool CBLDatabase_PurgeDocumentByID_s(CBLDatabase* db,
 }
 
 CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
-                                         const char *docID _cbl_nonnull,
-                                         CBLError* error) CBLAPI
-{
-    return CBLDatabase_GetDocumentExpiration_s(db, slice(docID), error);
-}
-
-bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
-                                       const char *docID _cbl_nonnull,
-                                       CBLTimestamp expiration,
-                                       CBLError* error) CBLAPI
-{
-    return CBLDatabase_SetDocumentExpiration_s(db, slice(docID), expiration, error);
-}
-
-CBLTimestamp CBLDatabase_GetDocumentExpiration_s(CBLDatabase* db _cbl_nonnull,
-                                                 FLSlice docID,
-                                                 CBLError* error) CBLAPI
+                                               FLSlice docID,
+                                               CBLError* error) CBLAPI
 {
     return db->use<CBLTimestamp>([&](C4Database *c4db) {
         return c4doc_getExpiration(c4db, docID, internal(error));
     });
 }
 
-bool CBLDatabase_SetDocumentExpiration_s(CBLDatabase* db _cbl_nonnull,
-                                         FLSlice docID,
-                                         CBLTimestamp expiration,
-                                         CBLError* error) CBLAPI
+bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+                                       FLSlice docID,
+                                       CBLTimestamp expiration,
+                                       CBLError* error) CBLAPI
 {
     return db->use<bool>([&](C4Database *c4db) {
         if (!c4doc_setExpiration(c4db, docID, expiration, internal(error)))

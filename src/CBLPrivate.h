@@ -40,7 +40,7 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
     @param error  On failure, the error will be written here.
     @return  True if the document was deleted, false if it doesn't exist or the deletion failed. */
     bool CBLDatabase_DeleteDocumentByID(CBLDatabase* database _cbl_nonnull,
-                                        const char* docID _cbl_nonnull,
+                                        FLString docID,
                                         CBLError* error) CBLAPI;
 
     /** A more detailed look at a specific database change. */

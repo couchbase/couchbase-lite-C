@@ -18,6 +18,7 @@
 
 #include "CBLQuery.h"
 #include "CBLQuery_Internal.hh"
+#include <string>
 
 
 Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
@@ -41,18 +42,9 @@ Retained<CBLListenerToken> CBLQuery::addChangeListener(CBLQueryChangeListener li
 
 CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        CBLQueryLanguage language,
-                       const char *queryString _cbl_nonnull,
+                       FLString queryString,
                        int *outErrorPos,
                        CBLError* outError) CBLAPI
-{
-    return CBLQuery_New_s(db, language, slice(queryString), outErrorPos, outError);
-}
-
-CBLQuery* CBLQuery_New_s(const CBLDatabase* db _cbl_nonnull,
-                         CBLQueryLanguage language,
-                         FLString queryString,
-                         int *outErrorPos,
-                         CBLError* outError) CBLAPI
 {
     auto query = retained(new CBLQuery(db, language, queryString, outErrorPos, internal(outError)));
     return query->valid() ? move(query).detach() : nullptr;
@@ -66,11 +58,7 @@ void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBL
     query->setParameters(parameters);
 }
 
-bool CBLQuery_SetParametersAsJSON(CBLQuery* query, const char* json5) CBLAPI {
-    return CBLQuery_SetParametersAsJSON_s(query, slice(json5));
-}
-
-bool CBLQuery_SetParametersAsJSON_s(CBLQuery* query, FLString json5) CBLAPI {
+bool CBLQuery_SetParametersAsJSON(CBLQuery* query, FLString json5) CBLAPI {
     query->setParametersAsJSON(json5);
     return true;
 }
@@ -115,11 +103,7 @@ bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
     return rs->next();
 }
 
-FLValue CBLResultSet_ValueForKey(const CBLResultSet* rs _cbl_nonnull, const char *property) CBLAPI {
-    return CBLResultSet_ValueForKey_s(rs, slice(property));
-}
-
-FLValue CBLResultSet_ValueForKey_s(const CBLResultSet* rs, FLString property) CBLAPI {
+FLValue CBLResultSet_ValueForKey(const CBLResultSet* rs, FLString property) CBLAPI {
     return rs->property(property);
 }
 
@@ -144,44 +128,33 @@ CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) CBLAPI {
 
 
 bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
-                             const char* name _cbl_nonnull,
+                             FLString name,
                              CBLIndexSpec spec,
                              CBLError *outError) CBLAPI
 {
     C4IndexOptions options = {};
-    options.language = spec.language;
     options.ignoreDiacritics = spec.ignoreAccents;
+    string languageStr;
+    if (spec.language.buf) {
+        languageStr = string(spec.language);
+        options.language = languageStr.c_str();
+    }
     return db->use<bool>([&](C4Database *c4db) {
         return c4db_createIndex(c4db,
-                                slice(name),
-                                slice(spec.keyExpressionsJSON),
+                                name,
+                                spec.keyExpressionsJSON,
                                 (C4IndexType)spec.type,
                                 &options,
                                 internal(outError));
     });
 }
 
-bool CBLDatabase_CreateIndex_s(CBLDatabase *db,
-                               FLString name,
-                               CBLIndexSpec_s spec_s,
-                               CBLError *outError) CBLAPI
-{
-    string json(slice(spec_s.keyExpressionsJSON));
-    CBLIndexSpec spec = {spec_s.type, json.c_str(), spec_s.ignoreAccents};
-    string language;
-    if (spec_s.language.buf) {
-        language = slice(spec.language);
-        spec.language = language.c_str();
-    }
-    return CBLDatabase_CreateIndex(db, string(slice(name)).c_str(), spec, outError);
-}
-
 bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
-                        const char *name _cbl_nonnull,
-                        CBLError *outError) CBLAPI
+                             FLString name,
+                             CBLError *outError) CBLAPI
 {
     return db->use<bool>([&](C4Database *c4db) {
-        return c4db_deleteIndex(c4db, slice(name), internal(outError));
+        return c4db_deleteIndex(c4db, name, internal(outError));
     });
 }
 

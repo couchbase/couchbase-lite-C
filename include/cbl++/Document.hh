@@ -20,6 +20,7 @@
 #include "Database.hh"
 #include "CBLDocument.h"
 #include "fleece/Mutable.hh"
+#include <string>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
@@ -31,9 +32,9 @@ namespace cbl {
     public:
         // Metadata:
 
-        const char* id() const _cbl_returns_nonnull     {return CBLDocument_ID(ref());}
+        slice id() const                                {return CBLDocument_ID(ref());}
 
-        const char* revisionID() const                  {return CBLDocument_RevisionID(ref());}
+        slice revisionID() const                        {return CBLDocument_RevisionID(ref());}
 
         uint64_t sequence() const                       {return CBLDocument_Sequence(ref());}
 
@@ -41,14 +42,12 @@ namespace cbl {
 
         fleece::Dict properties() const                 {return CBLDocument_Properties(ref());}
 
-        std::string _cbl_nonnull propertiesAsJSON() const {
-            char *json = CBLDocument_PropertiesAsJSON(ref());
-            std::string result(json ? json : "");
-            free(json);
-            return result;
+        std::string propertiesAsJSON() const {
+            alloc_slice json(CBLDocument_PropertiesAsJSON(ref()));
+            return std::string(json);
         }
 
-        fleece::Value operator[] (const char *key _cbl_nonnull) const {return properties()[key];}
+        fleece::Value operator[] (slice key) const {return properties()[key];}
 
         // Operations:
 
@@ -97,19 +96,18 @@ namespace cbl {
 
     class MutableDocument : public Document {
     public:
-        explicit MutableDocument(nullptr_t)             {_ref = (CBLRefCounted*)CBLDocument_New(nullptr);}
-        explicit MutableDocument(const char *docID)     {_ref = (CBLRefCounted*)CBLDocument_New(docID);}
-        explicit MutableDocument(const std::string &id) :MutableDocument(id.c_str()) { }
+        explicit MutableDocument(nullptr_t)             {_ref = (CBLRefCounted*)CBLDocument_New(fleece::nullslice);}
+        explicit MutableDocument(slice docID)     {_ref = (CBLRefCounted*)CBLDocument_New(docID);}
 
         fleece::MutableDict properties()                {return CBLDocument_MutableProperties(ref());}
 
         template <typename V>
-        void set(const char *key, const V &val)         {properties().set(fleece::slice(key), val);}
+        void set(slice key, const V &val)               {properties().set(key, val);}
         template <typename K, typename V>
         void set(const K &key, const V &val)            {properties().set(key, val);}
 
-        fleece::keyref<fleece::MutableDict,fleece::slice> operator[] (const char *key)
-                                                        {return properties()[fleece::slice(key)];}
+        fleece::keyref<fleece::MutableDict,fleece::slice> operator[] (slice key)
+                                                        {return properties()[key];}
 
         void setProperties(fleece::MutableDict properties) {
             CBLDocument_SetProperties(ref(), properties);
@@ -119,14 +117,10 @@ namespace cbl {
             CBLDocument_SetProperties(ref(), properties.mutableCopy());
         }
 
-        void setPropertiesAsJSON(const char *json _cbl_nonnull) {
+        void setPropertiesAsJSON(slice json) {
             CBLError error;
             if (!CBLDocument_SetPropertiesAsJSON(ref(), json, &error))
                 throw error;
-        }
-
-        void setPropertiesAsJSON(const std::string &json) {
-            setPropertiesAsJSON(json.c_str());
         }
 
     protected:
@@ -144,12 +138,12 @@ namespace cbl {
 
     // Database method bodies:
 
-    inline Document Database::getDocument(const std::string &id) const {
-        return Document::adopt(CBLDatabase_GetDocument(ref(), id.c_str()));
+    inline Document Database::getDocument(slice id) const {
+        return Document::adopt(CBLDatabase_GetDocument(ref(), id));
     }
 
-    inline MutableDocument Database::getMutableDocument(const std::string &id) const {
-        return MutableDocument::adopt(CBLDatabase_GetMutableDocument(ref(), id.c_str()));
+    inline MutableDocument Database::getMutableDocument(slice id) const {
+        return MutableDocument::adopt(CBLDatabase_GetMutableDocument(ref(), id));
     }
 
 

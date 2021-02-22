@@ -50,23 +50,27 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
 
 /** Formats and writes a message to the log, in the given domain at the given level.
     \warning This function takes a `printf`-style format string, with extra parameters to match the format placeholders, and has the same security vulnerabilities as other `printf`-style functions.
-    If you are logging a fixed string, call \ref CBL_Log_s instead, otherwise any `%` characters in the
-    `format` string will be misinterpreted as placeholders and the dreaded Undefined Behavior will result,
-    possibly including crashes or overwriting the stack.
+
+    If you are logging a fixed string, call \ref CBL_LogMessage instead, otherwise any `%`
+    characters in the `format` string will be misinterpreted as placeholders and the dreaded
+    Undefined Behavior will result, possibly including crashes or overwriting the stack.
     @param domain  The log domain to associate this message with.
     @param level  The severity of the message. If this is lower than the current minimum level for the domain
                  (as set by \ref CBLLog_SetConsoleLevel), nothing is logged.
     @param format  A `printf`-style format string. `%` characters in this string introduce parameters,
                  and corresponding arguments must follow. */
-void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_nonnull, ...) CBLAPI
-        __printflike(3, 4);
+void CBL_Log(CBLLogDomain domain,
+             CBLLogLevel level,
+             const char *format _cbl_nonnull, ...) CBLAPI __printflike(3, 4);
 
 /** Writes a pre-formatted message to the log, exactly as given.
     @param domain  The log domain to associate this message with.
     @param level  The severity of the message. If this is lower than the current minimum level for the domain
                  (as set by \ref CBLLog_SetConsoleLevel), nothing is logged.
     @param message  The exact message to write to the log. */
-void CBL_Log_s(CBLLogDomain domain, CBLLogLevel level, FLSlice message) CBLAPI;
+void CBL_LogMessage(CBLLogDomain domain,
+                    CBLLogLevel level,
+                    FLSlice message) CBLAPI;
 
 
 
@@ -79,7 +83,7 @@ void CBL_Log_s(CBLLogDomain domain, CBLLogLevel level, FLSlice message) CBLAPI;
     @param message  The actual formatted message. */
 typedef void (*CBLLogCallback)(CBLLogDomain domain,
                                CBLLogLevel level,
-                               const char *message _cbl_nonnull);
+                               FLString message);
 
 /** Gets the current log level for debug console logging.
     Only messages at this level or higher will be logged to the console or callback. */
@@ -109,7 +113,7 @@ void CBLLog_SetCallback(CBLLogCallback) CBLAPI;
     @warning `usePlaintext` results in significantly larger log files and higher CPU usage that may slow
             down your app; we recommend turning it off in production. */
 typedef struct {
-    const char* directory;    ///< The directory where log files will be created.
+    FLString directory;    ///< The directory where log files will be created.
     uint32_t maxRotateCount;  ///< Max number of older logs to keep (i.e. total number will be one more.)
     size_t maxSize;           ///< The size in bytes at which a file will be rotated out (best effort).
     bool usePlaintext;        ///< Whether or not to log in plaintext (as opposed to binary)

@@ -75,7 +75,7 @@ public:
         cerr << "--- " << numDocuments << " docs " << (isPush ? "pushed" : "pulled") << ":";
         if (logEveryDocument) {
             for (unsigned i = 0; i < numDocuments; ++i) {
-                docsNotified.insert(documents[i].ID);
+                docsNotified.insert(string(documents[i].ID));
                 cerr << " " << documents[i].ID;
             }
         }

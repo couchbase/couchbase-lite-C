@@ -24,6 +24,7 @@
 #include "c4Document+Fleece.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <mutex>
 #include <unordered_map>
 
 class CBLBlob;
@@ -38,14 +39,14 @@ public:
     CBLDocument(slice docID, bool isMutable);
 
     // Construct on an existing document
-    CBLDocument(CBLDatabase *db, const string &docID, bool isMutable, bool allRevisions =false);
+    CBLDocument(CBLDatabase *db, slice docID, bool isMutable, bool allRevisions =false);
 
     // Mutable copy of another CBLDocument
     CBLDocument(const CBLDocument* otherDoc);
 
     // Document loaded from db without a C4Document (e.g. a replicator validation callback)
     CBLDocument(CBLDatabase *db,
-                const string &docID,
+                slice docID,
                 slice revID,
                 C4RevisionFlags revFlags,
                 Dict body);
@@ -56,8 +57,8 @@ public:
     }
 
     CBLDatabase* database() const               {return _db;}
-    const char* docID() const                   {return _docID.c_str();}
-    const char* revisionID() const;
+    slice docID() const                         {return _docID;}
+    slice revisionID() const                    {return _revID;}
     C4RevisionFlags revisionFlags() const;
     bool exists() const                         {return _c4doc != nullptr;}
     uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence : 0;}
@@ -71,7 +72,7 @@ public:
     MutableDict mutableProperties()             {return properties().asMutable();}
     void setProperties(MutableDict d)           {if (checkMutable(nullptr)) _properties = d;}
 
-    char* propertiesAsJSON() const;
+    alloc_slice propertiesAsJSON() const;
     bool setPropertiesAsJSON(slice json, C4Error* outError);
 
     //---- Save/delete:
@@ -93,7 +94,7 @@ public:
     bool deleteDoc(CBLConcurrencyControl, C4Error* outError);
 
     static bool deleteDoc(CBLDatabase* db _cbl_nonnull,
-                          const char* docID _cbl_nonnull,
+                          slice docID,
                           C4Error* outError);
 
     //---- Blobs:
@@ -120,7 +121,7 @@ public:
     bool resolveConflict(Resolution, const CBLDocument *mergeDoc, CBLError*);
 
 private:
-    CBLDocument(const string &docID, CBLDatabase *db, C4Document *d, bool isMutable);
+    CBLDocument(slice docID, CBLDatabase *db, C4Document *d, bool isMutable);
     virtual ~CBLDocument();
 
     bool checkMutable(C4Error *outError) const;
@@ -137,8 +138,8 @@ private:
 
     static UnretainedValueToBlobMap* sNewBlobs;
 
-    string const                _docID;                 // Document ID (never empty)
-    mutable string              _revID;                 // Revision ID (if no _c4doc)
+    alloc_slice const           _docID;                 // Document ID (never empty)
+    mutable alloc_slice         _revID;                 // Revision ID (if no _c4doc)
     RetainedDatabase const      _db;                    // Database (null for new doc)
     c4::ref<C4Document> const   _c4doc;                 // LiteCore doc (null for new doc)
     Doc                         _fromJSON;              // Properties read from JSON

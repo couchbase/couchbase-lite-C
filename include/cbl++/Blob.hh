@@ -41,8 +41,8 @@ namespace cbl {
                     (it will have been written to the database.)
             @param contentType  The MIME type (optional).
             @param contents  The data's address and length. */
-        Blob(const char *contentType,
-             fleece::slice contents)
+        Blob(slice contentType,
+             slice contents)
         {
             _ref = (CBLRefCounted*) CBLBlob_CreateWithData(contentType, contents);
         }
@@ -50,7 +50,7 @@ namespace cbl {
         /** Creates a new blob from the data written to a \ref CBLBlobWriteStream.
             @param contentType  The MIME type (optional).
             @param writer  The blob-writing stream the data was written to. */
-        inline Blob(const char *contentType,
+        inline Blob(slice contentType,
                     BlobWriteStream& writer);
 
         /** Constructs a Blob instance on an existing blob reference in a document. */
@@ -59,11 +59,11 @@ namespace cbl {
         { }
 
         uint64_t length() const                     {return CBLBlob_Length(ref()); }
-        const char* contentType() const             {return CBLBlob_ContentType(ref()); }
-        const char* digest() const                  {return CBLBlob_Digest(ref()); }
+        slice contentType() const                   {return CBLBlob_ContentType(ref()); }
+        slice digest() const                        {return CBLBlob_Digest(ref()); }
         fleece::Dict properties() const             {return CBLBlob_Properties(ref()); }
 
-        fleece::alloc_slice loadContent() {
+        alloc_slice loadContent() {
             CBLError error;
             fleece::alloc_slice content = CBLBlob_LoadContent(ref(), &error);
             check(content.buf, error);
@@ -135,7 +135,7 @@ namespace cbl {
     };
 
 
-    inline Blob::Blob(const char *contentType, BlobWriteStream& writer) {
+    inline Blob::Blob(slice contentType, BlobWriteStream& writer) {
         _ref = (CBLRefCounted*) CBLBlob_CreateWithStream(contentType, writer._writer);
         writer._writer = nullptr;
     }

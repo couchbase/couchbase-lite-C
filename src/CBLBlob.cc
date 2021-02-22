@@ -45,7 +45,7 @@ FLDict CBLBlob_Properties(const CBLBlob* blob) CBLAPI {
     return blob->properties();
 }
 
-const char* CBLBlob_ContentType(const CBLBlob* blob) CBLAPI {
+FLString CBLBlob_ContentType(const CBLBlob* blob) CBLAPI {
     return blob->contentType();
 }
 
@@ -53,7 +53,7 @@ uint64_t CBLBlob_Length(const CBLBlob* blob) CBLAPI {
     return blob->contentLength();
 }
 
-const char* CBLBlob_Digest(const CBLBlob* blob) CBLAPI {
+FLString CBLBlob_Digest(const CBLBlob* blob) CBLAPI {
     return blob->digest();
 }
 
@@ -88,26 +88,14 @@ static CBLBlob* createNewBlob(slice contentType,
     return retain(new CBLNewBlob(contentType, contents, internal(writer)));
 }
 
-CBLBlob* CBLBlob_CreateWithData(const char *contentType,
+CBLBlob* CBLBlob_CreateWithData(FLString contentType,
                                 FLSlice contents) CBLAPI
 {
     return createNewBlob(contentType, contents, nullptr);
 }
 
-CBLBlob* CBLBlob_CreateWithData_s(FLString contentType,
-                                  FLSlice contents) CBLAPI
-{
-    return createNewBlob(contentType, contents, nullptr);
-}
-
-CBLBlob* CBLBlob_CreateWithStream(const char *contentType,
-                                  CBLBlobWriteStream *writer) CBLAPI
-{
-    return createNewBlob(contentType, nullslice, writer);
-}
-
-CBLBlob* CBLBlob_CreateWithStream_s(FLString contentType,
-                                    CBLBlobWriteStream* writer) CBLAPI
+CBLBlob* CBLBlob_CreateWithStream(FLString contentType,
+                                  CBLBlobWriteStream* writer) CBLAPI
 {
     return createNewBlob(contentType, nullslice, writer);
 }

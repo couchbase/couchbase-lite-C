@@ -27,6 +27,7 @@
 #include "c4Document+Fleece.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <mutex>
 
 
 static inline C4ReadStream*  internal(CBLBlobReadStream *reader)  {return (C4ReadStream*)reader;}
@@ -52,23 +53,21 @@ public:
             return c4blob_getSize(store(), _key);
     }
 
-    const char* digest() const {
+    slice digest() const {
         LOCK(_mutex);
-        if (_digest.empty()) {
-            alloc_slice digest(c4blob_keyToString(_key));
-            _digest = string(digest);
-        }
-        return _digest.c_str();
+        if (!_digest)
+            _digest = c4blob_keyToString(_key);
+        return _digest;
     }
 
-    const char* contentType() const {
+    slice contentType() const {
         slice type = _properties[kCBLBlobContentTypeProperty].asString();
         if (!type)
-            return nullptr;
+            return fleece::nullslice;
         LOCK(_mutex);
-        if (type != slice(_contentTypeCache))
-            _contentTypeCache = string(type);
-        return _contentTypeCache.c_str();
+        if (type != _contentTypeCache)
+            _contentTypeCache = type;
+        return _contentTypeCache;
     }
 
     virtual FLSliceResult getContents(C4Error *outError) const {
@@ -103,7 +102,7 @@ protected:
     const C4BlobKey& key() const                        {return _key;}
     void setKey(const C4BlobKey &key)                   {_key = key;}
 
-    mutable mutex     _mutex;
+    mutable std::mutex     _mutex;
 
 private:
     bool findDatabase() {
@@ -114,12 +113,12 @@ private:
         return (_db != nullptr);
     }
 
-    CBLDatabase*      _db {nullptr};
-    MutableDict const _mutableProperties;
-    C4BlobKey         _key {};
-    Dict const        _properties;
-    mutable string    _digest;
-    mutable string    _contentTypeCache;
+    CBLDatabase*        _db {nullptr};
+    MutableDict const   _mutableProperties;
+    C4BlobKey           _key {};
+    Dict const          _properties;
+    mutable alloc_slice _digest;
+    mutable alloc_slice _contentTypeCache;
 };
 
 
@@ -178,7 +177,7 @@ public:
     }
 
     virtual bool install(CBLDatabase *db _cbl_nonnull, C4Error *outError) override {
-        CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%s'", digest());
+        CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%.*s'", FMTSLICE(digest()));
         LOCK(_mutex);
         assert(database() == nullptr || database() == db);
         const C4BlobKey &expectedKey = key();

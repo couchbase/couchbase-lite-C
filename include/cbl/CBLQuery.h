@@ -69,15 +69,9 @@ typedef CBL_ENUM(uint32_t, CBLQueryLanguage) {
 _cbl_warn_unused
 CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        CBLQueryLanguage language,
-                       const char *queryString _cbl_nonnull,
+                       FLString queryString,
                        int *outErrorPos,
                        CBLError* error) CBLAPI;
-
-CBLQuery* CBLQuery_New_s(const CBLDatabase* db _cbl_nonnull,
-                         CBLQueryLanguage language,
-                         FLString queryString,
-                         int *outErrorPos,
-                         CBLError* error) CBLAPI;
 
 CBL_REFCOUNTED(CBLQuery*, Query);
 
@@ -104,10 +98,7 @@ FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI;
     @param json  The parameters in the form of a JSON-encoded object whose
             keys are the parameter names. (You may use JSON5 syntax.) */
 bool CBLQuery_SetParametersAsJSON(CBLQuery* _cbl_nonnull query,
-                                  const char* _cbl_nonnull json) CBLAPI;
-
-bool CBLQuery_SetParametersAsJSON_s(CBLQuery* _cbl_nonnull query,
-                                    FLString json) CBLAPI;
+                                  FLString json) CBLAPI;
 
 /** Runs the query, returning the results.
     To obtain the results you'll typically call \ref CBLResultSet_Next in a `while` loop,
@@ -119,7 +110,9 @@ CBLResultSet* CBLQuery_Execute(CBLQuery* _cbl_nonnull, CBLError*) CBLAPI;
 /** Returns information about the query, including the translated SQLite form, and the search
     strategy. You can use this to help optimize the query: the word `SCAN` in the strategy
     indicates a linear scan of the entire database, which should be avoided by adding an index.
-    The strategy will also show which index(es), if any, are used. */
+    The strategy will also show which index(es), if any, are used.
+    @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
+
 FLSliceResult CBLQuery_Explain(const CBLQuery* _cbl_nonnull) CBLAPI;
 
 /** Returns the number of columns in each result. */
@@ -176,10 +169,7 @@ FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* _cbl_nonnull,
     is not a column name in this query.)
     @note  See \ref CBLQuery_ColumnName for a discussion of column names. */
 FLValue CBLResultSet_ValueForKey(const CBLResultSet* _cbl_nonnull,
-                                 const char* key _cbl_nonnull) CBLAPI;
-
-FLValue CBLResultSet_ValueForKey_s(const CBLResultSet* _cbl_nonnull,
-                                   FLString key) CBLAPI;
+                                 FLString key) CBLAPI;
 
 /** Returns the current result as an array of column values.
     @warning The array reference is only valid until the result-set is advanced or released.
@@ -292,7 +282,7 @@ typedef struct {
     CBLIndexType type;
 
     /** A JSON array describing each column of the index. */
-    const char* keyExpressionsJSON;
+    FLString keyExpressionsJSON;
 
     /** In a full-text index, should diacritical marks (accents) be ignored?
         Defaults to false. Generally this should be left `false` for non-English text. */
@@ -309,15 +299,8 @@ typedef struct {
      
         If left null,  or set to an unrecognized language, no language-specific behaviors
         such as stemming and stop-word removal occur. */
-    const char* language;
-} CBLIndexSpec;
-
-typedef struct {
-    CBLIndexType type;
-    FLString keyExpressionsJSON;
-    bool ignoreAccents;
     FLString language;
-} CBLIndexSpec_s;
+} CBLIndexSpec;
 
 
 /** Creates a database index.
@@ -325,18 +308,13 @@ typedef struct {
     If an identical index with that name already exists, nothing happens (and no error is returned.)
     If a non-identical index with that name already exists, it is deleted and re-created. */
 bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
-                             const char* name _cbl_nonnull,
-                             CBLIndexSpec,
+                             FLString name,
+                             CBLIndexSpec spec,
                              CBLError *outError) CBLAPI;
-
-bool CBLDatabase_CreateIndex_s(CBLDatabase *db _cbl_nonnull,
-                               FLString name,
-                               CBLIndexSpec_s,
-                               CBLError *outError) CBLAPI;
 
 /** Deletes an index given its name. */
 bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
-                             const char *name _cbl_nonnull,
+                             FLString name,
                              CBLError *outError) CBLAPI;
 
 /** Returns the names of the indexes on this database, as a Fleece array of strings.

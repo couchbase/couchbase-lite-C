@@ -23,10 +23,10 @@
 #include "Util.hh"
 #include <access_lock.hh>
 #include <atomic>
-#include <memory>
-#include <vector>
 #include <functional>
-
+#include <memory>
+#include <mutex>
+#include <vector>
 
 namespace cbl_internal {
     class ListenersBase;

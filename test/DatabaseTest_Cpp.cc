@@ -29,8 +29,8 @@ using namespace cbl;
 
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database") {
-    CHECK(string(db.name()) == CBLTest::kDatabaseName);
-    CHECK(string(db.path()) == string(kDatabaseDir) + kPathSeparator + kDatabaseName + ".cblite2" + kPathSeparator);
+    CHECK(db.name() == CBLTest::kDatabaseName);
+    CHECK(string(db.path()) == string(kDatabaseDir) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
     CHECK(db.count() == 0);
 //    CHECK(db.lastSequence() == 0);
 }
@@ -66,7 +66,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Empty Document") {
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
-    CHECK(doc["greeting"].asString() == "Howdy!"_sl);
+    CHECK(doc["greeting"].asString() == "Howdy!");
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
     auto saved = db.saveDocument(doc);
@@ -74,13 +74,13 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
     CHECK(string(saved.id()) == "foo");
     CHECK(saved.sequence() == 1);
     CHECK(saved.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
-    CHECK(saved["greeting"].asString() == "Howdy!"_sl);
+    CHECK(saved["greeting"].asString() == "Howdy!");
 
     doc = db.getMutableDocument("foo");
     CHECK(string(doc.id()) == "foo");
     CHECK(doc.sequence() == 1);
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
-    CHECK(doc["greeting"].asString() == "Howdy!"_sl);
+    CHECK(doc["greeting"].asString() == "Howdy!");
 }
 
 
@@ -107,7 +107,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch") {
 
     Document checkDoc = db.getDocument("foo");
     REQUIRE(checkDoc);
-    CHECK(checkDoc.properties().get("greeting").asString() == "Howdy!"_sl);
+    CHECK(checkDoc.properties().get("greeting").asString() == "Howdy!");
     CHECK(checkDoc.properties().get("meeting").asInt() == 23);
 }
 
@@ -135,7 +135,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch With Exception", "[!throws]") {
     CHECK(threw);
 
     Document doc = db.getDocument("foo");
-    CHECK(doc["greeting"].asString() == "Howdy!"_sl);
+    CHECK(doc["greeting"].asString() == "Howdy!");
     CHECK(doc["meeting"] == nullptr);
 }
 
@@ -153,16 +153,16 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
     int dbListenerCalls = 0, fooListenerCalls = 0;
     {
         // Add a listener:
-        auto dbListener = db.addListener([&](Database callbackdb, vector<const char*> docIDs) {
+        auto dbListener = db.addListener([&](Database callbackdb, vector<slice> docIDs) {
             ++dbListenerCalls;
             CHECK(callbackdb == db);
             CHECK(docIDs.size() == 1);
-            CHECK(string(docIDs[0]) == "foo");
+            CHECK(docIDs[0] == "foo");
         });
-        auto fooListener = db.addDocumentListener("foo", [&](Database callbackdb, const char* docID) {
+        auto fooListener = db.addDocumentListener("foo", [&](Database callbackdb, slice docID) {
             ++fooListenerCalls;
             CHECK(callbackdb == db);
-            CHECK(string(docID) == "foo");
+            CHECK(docID == "foo");
         });
         // Create a doc, check that the listener was called:
         createDocument(db, "foo", "greeting", "Howdy!");
@@ -180,22 +180,22 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
     // Add a listener:
     int dbListenerCalls = 0, fooListenerCalls = 0, barListenerCalls = 0, notificationsReadyCalls = 0;
-    auto dbListener = db.addListener([&](Database callbackdb, vector<const char*> docIDs) {
+    auto dbListener = db.addListener([&](Database callbackdb, vector<slice> docIDs) {
         ++dbListenerCalls;
         CHECK(callbackdb == db);
         CHECK(docIDs.size() == 2);
-        CHECK(string(docIDs[0]) == "foo");
-        CHECK(string(docIDs[1]) == "bar");
+        CHECK(docIDs[0] == "foo");
+        CHECK(docIDs[1] == "bar");
     });
-    auto fooListener = db.addDocumentListener("foo", [&](Database callbackdb, const char* docID) {
+    auto fooListener = db.addDocumentListener("foo", [&](Database callbackdb, slice docID) {
         ++fooListenerCalls;
         CHECK(callbackdb == db);
-        CHECK(string(docID) == "foo");
+        CHECK(docID == "foo");
     });
-    auto barListener = db.addDocumentListener("bar", [&](Database callbackdb, const char* docID) {
+    auto barListener = db.addDocumentListener("bar", [&](Database callbackdb, slice docID) {
         ++barListenerCalls;
         CHECK(callbackdb == db);
-        CHECK(string(docID) == "bar");
+        CHECK(docID == "bar");
     });
 
     db.bufferNotifications([&](Database callbackdb) {
@@ -299,7 +299,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Conflict") {
 TEST_CASE_METHOD(CBLTest_Cpp, "Retaining immutable Fleece") {
     MutableDocument mdoc("ubiq");
     {
-        auto fldoc = fleece::Doc::fromJSON(R"({"msg":{"FOO":18,"BAR":"Wahooma"}})"_sl);
+        auto fldoc = fleece::Doc::fromJSON(R"({"msg":{"FOO":18,"BAR":"Wahooma"}})");
         REQUIRE(fldoc);
         Dict message = fldoc["msg"].asDict();
         REQUIRE(message);
@@ -309,7 +309,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Retaining immutable Fleece") {
         // keeping it alive.
     }
     CHECK(mdoc["FOO"].asInt() == 18);
-    CHECK(mdoc["BAR"].asString() == "Wahooma"_sl);
+    CHECK(mdoc["BAR"].asString() == "Wahooma");
     auto doc = db.saveDocument(mdoc);
     CHECK(doc.propertiesAsJSON() == R"({"BAR":"Wahooma","FOO":18})");
 }

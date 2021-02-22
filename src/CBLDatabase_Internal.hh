@@ -24,7 +24,8 @@
 #include "Listener.hh"
 #include "access_lock.hh"
 #include "function_ref.hh"
-
+#include <string>
+#include <utility>
 
 namespace cbl_internal {
     class CBLLocalEndpoint;
@@ -37,7 +38,6 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
                 fleece::slice dir_,
                 CBLDatabaseFlags flags_)
     :access_lock(std::move(db))
-    ,name(name_)
     ,path(fleece::alloc_slice(c4db_getPath(db)))
     ,dir(dir_)
     ,flags(flags_)
@@ -56,9 +56,8 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
     // Default location for databases. This is platform-dependent.
     static std::string defaultDirectory();
 
-    std::string const name;         // Cached copy so API can return a C string
-    std::string const path;         // Cached copy so API can return a C string
-    std::string const dir;          // Cached copy so API can return a C string
+    alloc_slice const dir;
+    alloc_slice const path;         // Cached copy so API can return a FLSlice
     CBLDatabaseFlags const flags;
 
     Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener _cbl_nonnull,
@@ -66,9 +65,9 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
     Retained<CBLListenerToken> addListener(CBLDatabaseChangeDetailListener _cbl_nonnull,
                                                    void *ctx);
 
-    Retained<CBLListenerToken> addDocListener(const char *docID _cbl_nonnull,
-                                                      CBLDocumentChangeListener _cbl_nonnull,
-                                                      void *context);
+    Retained<CBLListenerToken> addDocListener(slice docID,
+                                              CBLDocumentChangeListener _cbl_nonnull,
+                                              void *context);
 
     void notify(Notification n) const   {const_cast<CBLDatabase*>(this)->_notificationQueue.add(n);}
     void sendNotifications()            {_notificationQueue.notifyAll();}

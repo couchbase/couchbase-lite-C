@@ -53,8 +53,8 @@ static inline std::ostream& operator<< (std::ostream &out, CBLError err) {
 
 class CBLTest {
 public:
-    static std::string kDatabaseDir;
-    static const char* const kDatabaseName;
+    static const fleece::alloc_slice kDatabaseDir;
+    static const fleece::slice kDatabaseName;
     static const CBLDatabaseConfiguration kDatabaseConfiguration;
 
     CBLTest();
@@ -67,13 +67,13 @@ public:
 
 class CBLTest_Cpp {
 public:
-    static std::string& kDatabaseDir;
-    static const char* const &kDatabaseName;
+    static const fleece::alloc_slice kDatabaseDir;
+    static const fleece::slice kDatabaseName;
 
     CBLTest_Cpp();
     ~CBLTest_Cpp();
 
-    cbl::Database openEmptyDatabaseNamed(const char *name);
+    cbl::Database openEmptyDatabaseNamed(fleece::slice name);
 
     cbl::Database db;
 };

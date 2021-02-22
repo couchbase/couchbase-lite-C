@@ -18,52 +18,12 @@
 
 #include "Util.hh"
 #include "fleece/Fleece.h"
-#include <stdio.h>
-#include <string>
 
 using namespace fleece;
 
 namespace cbl_internal {
 
-#if 0 // UNUSED
-    std::string vformat(const char *fmt, va_list args) {
-        char *cstr = nullptr;
-        vasprintf(&cstr, fmt, args);
-        std::string result(cstr);
-        free(cstr);
-        return result;
-    }
-
-
-    std::string format(const char *fmt, ...) {
-        va_list args;
-        va_start(args, fmt);
-        std::string result = vformat(fmt, args);
-        va_end(args);
-        return result;
-    }
-#endif
-
-
-    char* allocCString(FLSlice result) {
-        if (result.buf == nullptr)
-            return nullptr;
-        char* str = (char*) malloc(result.size + 1);
-        if (!str)
-            return nullptr;
-        memcpy(str, result.buf, result.size);
-        str[result.size] = '\0';
-        return str;
-    }
-
-
-    char* allocCString(FLSliceResult result) {
-        char *str = allocCString(FLSlice{result.buf, result.size});
-        FLSliceResult_Release(result);
-        return str;
-    }
-
-    alloc_slice convertJSON5(FLSlice json5, C4Error *outError) {
+    alloc_slice convertJSON5(slice json5, C4Error *outError) {
         FLStringResult errMsg;
         FLError flError;
         alloc_slice json(FLJSON5_ToJSON(json5, &errMsg, nullptr, &flError));
@@ -74,7 +34,7 @@ namespace cbl_internal {
         return json;
     }
 
-    void setError(C4Error* outError, C4ErrorDomain domain, int code, C4String message) {
+    void setError(C4Error* outError, C4ErrorDomain domain, int code, slice message) {
         if (outError)
             *outError = c4error_make(domain, code, message);
     }

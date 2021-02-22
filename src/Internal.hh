@@ -22,9 +22,6 @@
 #include "fleece/Fleece.hh"
 #include "RefCounted.hh"
 #include "InstanceCounted.hh"
-#include <memory>
-#include <string>
-#include <mutex>
 
 
 struct CBLRefCounted : public fleece::RefCounted, fleece::InstanceCountedIn<CBLRefCounted> {
@@ -37,10 +34,6 @@ protected:
     using MutableDict = fleece::MutableDict;
     using alloc_slice = fleece::alloc_slice;
     using slice = fleece::slice;
-    using mutex = std::mutex;
-    using recursive_mutex = std::recursive_mutex;
-    using string = std::string;
-    using once_flag = std::once_flag;
 
     template <class T>
     using Retained = fleece::Retained<T>;
@@ -48,14 +41,12 @@ protected:
 
 
 namespace cbl_internal {
-    static inline C4Error* internal(CBLError *error)             {return (C4Error*)error;}
-    static inline const C4Error* internal(const CBLError *error) {return (const C4Error*)error;}
+    // Converting C4Error <--> CBLError
+    static inline       C4Error* internal(      CBLError *error) {return (C4Error*)error;}
     static inline const C4Error& internal(const CBLError &error) {return (const C4Error&)error;}
 
-    static inline const CBLError* external(const C4Error *error) {return (const CBLError*)error;}
+    static inline       CBLError* external(      C4Error *error) {return (CBLError*)error;}
     static inline const CBLError& external(const C4Error &error) {return (const CBLError&)error;}
-    static inline CBLError* external(C4Error *error) {return (CBLError*)error;}
-    static inline CBLError& external(C4Error &error) {return (CBLError&)error;}
 
     template <typename T>
     T* validated(T *obj, CBLError *outError) {

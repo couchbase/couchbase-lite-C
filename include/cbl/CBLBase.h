@@ -114,10 +114,8 @@ typedef struct {
 } CBLError;
 
 /** Returns a message describing an error.
-    @note  It is the caller's responsibility to free the returned C string by calling `free`. */
-char* CBLError_Message(const CBLError* _cbl_nonnull) CBLAPI;
-
-FLSliceResult CBLError_Message_s(const CBLError* _cbl_nonnull) CBLAPI;
+    @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
+FLSliceResult CBLError_Message(const CBLError* _cbl_nonnull) CBLAPI;
 
 /** @} */
 

@@ -34,7 +34,7 @@ namespace cbl {
     /** A database query. */
     class Query : private RefCounted {
     public:
-        Query(const Database& db, CBLQueryLanguage language, const char *queryString _cbl_nonnull) {
+        Query(const Database& db, CBLQueryLanguage language, slice queryString) {
             CBLError error;
             auto q = CBLQuery_New(db.ref(), language, queryString, nullptr, &error);
             check(q, error);
@@ -69,15 +69,15 @@ namespace cbl {
             return CBLResultSet_ValueAtIndex(_ref, i);
         }
 
-        fleece::Value valueForKey(const char *key _cbl_nonnull) const {
+        fleece::Value valueForKey(slice key) const {
             return CBLResultSet_ValueForKey(_ref, key);
         }
 
-        fleece::Value operator[](int i) const                         {return valueAtIndex(i);}
-        fleece::Value operator[](const char *key _cbl_nonnull) const  {return valueForKey(key);}
+        fleece::Value operator[](int i) const                           {return valueAtIndex(i);}
+        fleece::Value operator[](slice key) const                       {return valueForKey(key);}
 
     protected:
-        explicit Result(CBLResultSet *ref)                      :_ref(ref) { }
+        explicit Result(CBLResultSet *ref)                              :_ref(ref) { }
         CBLResultSet* _ref;
         friend class ResultSetIterator;
     };

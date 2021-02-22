@@ -57,10 +57,10 @@ static inline slice effectiveDir(slice inDirectory) {
     }
 }
 
-static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration_s *config) {
-    CBLDatabaseConfiguration_s defaultConfig;
+static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
+    CBLDatabaseConfiguration defaultConfig;
     if (!config) {
-        defaultConfig = CBLDatabaseConfiguration_Default_s();
+        defaultConfig = CBLDatabaseConfiguration_Default();
         config = &defaultConfig;
     }
     C4DatabaseConfig2 c4Config = {};
@@ -88,16 +88,7 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration_s *config) {
 
 
 CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() {
-    static const string kDir = CBLDatabase::defaultDirectory();
     CBLDatabaseConfiguration config = {};
-    config.directory = kDir.c_str();
-    config.flags = kDefaultFlags;
-    return config;
-}
-
-
-CBLDatabaseConfiguration_s CBLDatabaseConfiguration_Default_s() {
-    CBLDatabaseConfiguration_s config = {};
     config.directory = effectiveDir(nullslice);
     config.flags = kDefaultFlags;
     return config;
@@ -107,48 +98,24 @@ CBLDatabaseConfiguration_s CBLDatabaseConfiguration_Default_s() {
 #pragma mark - STATIC "METHODS":
 
 
-bool CBL_DatabaseExists(const char *name, const char *inDirectory) CBLAPI {
-    return CBL_DatabaseExists_s(slice(name), slice(inDirectory));
-}
-
-bool CBL_DatabaseExists_s(FLString name, FLString inDirectory) CBLAPI {
+bool CBL_DatabaseExists(FLString name, FLString inDirectory) CBLAPI {
     return c4db_exists(name, effectiveDir(inDirectory));
 }
 
 
-bool CBL_CopyDatabase(const char* fromPath,
-                      const char* toName,
-                      const CBLDatabaseConfiguration *config,
+bool CBL_CopyDatabase(FLString fromPath,
+                      FLString toName,
+                      const CBLDatabaseConfiguration* config,
                       CBLError* outError) CBLAPI
-{
-    CBLDatabaseConfiguration_s config_s = {}, *configP = nullptr;
-    if (config) {
-        config_s = {slice(config->directory), config->flags, config->encryptionKey};
-        configP = &config_s;
-    }
-    return CBL_CopyDatabase_s(slice(fromPath), slice(toName), configP, outError);
-}
-
-bool CBL_CopyDatabase_s(FLString fromPath,
-                        FLString toName,
-                        const CBLDatabaseConfiguration_s* config,
-                        CBLError* outError) CBLAPI
 {
     C4DatabaseConfig2 c4config = asC4Config(config);
     return c4db_copyNamed(fromPath, toName, &c4config, internal(outError));
 }
 
 
-bool CBL_DeleteDatabase(const char *name,
-                        const char *inDirectory,
-                        CBLError* outError) CBLAPI
-{
-    return CBL_DeleteDatabase_s(slice(name), slice(inDirectory), outError);
-}
-
-bool CBL_DeleteDatabase_s(FLString name,
-                          FLString inDirectory,
-                          CBLError *outError) CBLAPI
+bool CBL_DeleteDatabase(FLString name,
+                        FLString inDirectory,
+                        CBLError *outError) CBLAPI
 {
     return c4db_deleteNamed(name, effectiveDir(inDirectory), internal(outError));
 }
@@ -157,24 +124,12 @@ bool CBL_DeleteDatabase_s(FLString name,
 #pragma mark - LIFECYCLE & OPERATIONS:
 
 
-CBLDatabase* CBLDatabase_Open(const char *name,
+CBLDatabase* CBLDatabase_Open(FLString name,
                               const CBLDatabaseConfiguration *config,
                               CBLError *outError) CBLAPI
 {
-    CBLDatabaseConfiguration_s config_s = {}, *configP = nullptr;
-    if (config) {
-        config_s = {slice(config->directory), config->flags, config->encryptionKey};
-        configP = &config_s;
-    }
-    return CBLDatabase_Open_s(slice(name), configP, outError);
-}
-
-CBLDatabase* CBLDatabase_Open_s(FLString name,
-                                const CBLDatabaseConfiguration_s *config,
-                                CBLError *outError) CBLAPI
-{
     C4DatabaseConfig2 c4config = asC4Config(config);
-    C4Database *c4db = c4db_openNamed(slice(name), &c4config, internal(outError));
+    C4Database *c4db = c4db_openNamed(name, &c4config, internal(outError));
     if (!c4db)
         return nullptr;
     if (c4db_mayHaveExpiration(c4db))
@@ -240,17 +195,18 @@ C4Database* CBLDatabase::_getC4Database() const {
 }
 
 
-const char* CBLDatabase_Name(const CBLDatabase* db) CBLAPI {
-    return db->name.c_str();
+FLString CBLDatabase_Name(const CBLDatabase* db) CBLAPI {
+    return db->use<FLString>([](C4Database *c4db) {
+        return c4db_getName(c4db);
+    });
 }
 
-const char* CBLDatabase_Path(const CBLDatabase* db) CBLAPI {
-    return db->path.c_str();
+FLString CBLDatabase_Path(const CBLDatabase* db) CBLAPI {
+    return db->path;
 }
 
 const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) CBLAPI {
-    const char *dir = db->dir.empty() ? nullptr : db->dir.c_str();
-    return {dir, db->flags};
+    return {db->dir, db->flags};
 }
 
 uint64_t CBLDatabase_Count(const CBLDatabase* db) CBLAPI {
@@ -327,22 +283,10 @@ void CBLDatabase::callDBListeners() {
         _detailListeners.call(this, nChanges, (const CBLDatabaseChange*)c4changes);
 
         if (!_listeners.empty()) {
-            // Convert docID slices to C strings:
-            const char* docIDs[kMaxChanges];
-            size_t bufSize = 0;
+            FLString docIDs[kMaxChanges];
             for (uint32_t i = 0; i < nChanges; ++i)
-                bufSize += c4changes[i].docID.size + 1;
-            char *buf = new char[bufSize], *next = buf;
-            for (uint32_t i = 0; i < nChanges; ++i) {
-                docIDs[i] = next;
-                memcpy(next, (const char*)c4changes[i].docID.buf, c4changes[i].docID.size);
-                next += c4changes[i].docID.size;
-                *(next++) = '\0';
-            }
-            assert(next - buf == bufSize);
-            // Call the listener(s):
+                docIDs[i] = c4changes[i].docID;
             _listeners.call(this, nChanges, docIDs);
-            delete [] buf;
         }
     }
 }
@@ -374,14 +318,14 @@ namespace cbl_internal {
     template<>
     class ListenerToken<CBLDocumentChangeListener> : public CBLListenerToken {
     public:
-        ListenerToken(CBLDatabase *db, const char *docID, CBLDocumentChangeListener callback, void *context)
+        ListenerToken(CBLDatabase *db, slice docID, CBLDocumentChangeListener callback, void *context)
         :CBLListenerToken((const void*)callback, context)
         ,_db(db)
         ,_docID(docID)
         {
             db->use([&](C4Database *c4db) {
                 _c4obs = c4docobs_create(c4db,
-                                         slice(docID),
+                                         docID,
                                          [](C4DocumentObserver* observer, C4String docID,
                                             C4SequenceNumber sequence, void *context)
                                          {
@@ -402,27 +346,28 @@ namespace cbl_internal {
         }
 
         // this is called indirectly by CBLDatabase::sendNotifications
-        void call(const CBLDatabase*, const char*) {
+        void call(const CBLDatabase*, FLString) {
             auto cb = callback();
             if (cb)
-                cb(_context, _db, _docID.c_str());
+                cb(_context, _db, _docID);
         }
 
     private:
         void docChanged() {
-            _db->notify(this, nullptr, nullptr);
+            _db->notify(this, _db, _docID);
         }
 
         CBLDatabase* _db;
-        string _docID;
+        alloc_slice _docID;
         C4DocumentObserver* _c4obs {nullptr};
     };
 
 }
 
 
-Retained<CBLListenerToken> CBLDatabase::addDocListener(const char* docID _cbl_nonnull,
-                                                       CBLDocumentChangeListener listener, void *context)
+Retained<CBLListenerToken> CBLDatabase::addDocListener(slice docID,
+                                                       CBLDocumentChangeListener listener,
+                                                       void *context)
 {
     auto token = new ListenerToken<CBLDocumentChangeListener>(this, docID, listener, context);
     _docListeners.add(token);
@@ -431,7 +376,7 @@ Retained<CBLListenerToken> CBLDatabase::addDocListener(const char* docID _cbl_no
 
 
 CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db _cbl_nonnull,
-                                             const char* docID _cbl_nonnull,
+                                             FLString docID,
                                              CBLDocumentChangeListener listener _cbl_nonnull,
                                              void *context) CBLAPI
 {

@@ -68,11 +68,7 @@ typedef bool (*CBLSaveConflictHandler)(void *context,
     @return  A new \ref CBLDocument instance, or NULL if no document with that ID exists. */
 _cbl_warn_unused
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database _cbl_nonnull,
-                                           const char* _cbl_nonnull docID) CBLAPI;
-
-_cbl_warn_unused
-const CBLDocument* CBLDatabase_GetDocument_s(const CBLDatabase* database _cbl_nonnull,
-                                             FLString docID) CBLAPI;
+                                           FLString docID) CBLAPI;
 
 CBL_REFCOUNTED(CBLDocument*, Document);
 
@@ -139,12 +135,8 @@ bool CBLDocument_Purge(const CBLDocument* document _cbl_nonnull,
     @return  True if the document was purged, false if it doesn't exist or the purge failed.
  */
 bool CBLDatabase_PurgeDocumentByID(CBLDatabase* database _cbl_nonnull,
-                                  const char* docID _cbl_nonnull,
-                                  CBLError* error) CBLAPI;
-
-bool CBLDatabase_PurgeDocumentByID_s(CBLDatabase* database _cbl_nonnull,
-                                     FLString docID,
-                                     CBLError* error) CBLAPI;
+                                   FLString docID,
+                                   CBLError* error) CBLAPI;
 
 /** @} */
 
@@ -164,18 +156,13 @@ bool CBLDatabase_PurgeDocumentByID_s(CBLDatabase* database _cbl_nonnull,
     @param docID  The ID of the document.
     @return  A new mutable CBLDocument instance, or NULL if no document with that ID exists. */
 _cbl_warn_unused
-CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database _cbl_nonnull,
-                                            const char* docID _cbl_nonnull) CBLAPI;
-
-CBLDocument* CBLDatabase_GetMutableDocument_s(CBLDatabase* database,
-                                              FLString docID) CBLAPI;
+CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
+                                            FLString docID) CBLAPI;
 
 /** Creates a new, empty document in memory. It will not be added to a database until saved.
     @param docID  The ID of the new document, or NULL to assign a new unique ID.
     @return  The mutable document instance. */
-CBLDocument* CBLDocument_New(const char *docID) CBLAPI _cbl_warn_unused _cbl_returns_nonnull;
-
-CBLDocument* CBLDocument_New_s(FLString docID) CBLAPI _cbl_warn_unused _cbl_returns_nonnull;
+CBLDocument* CBLDocument_New(FLString docID) CBLAPI _cbl_warn_unused _cbl_returns_nonnull;
 
 /** Creates a new mutable CBLDocument instance that refers to the same document as the original.
     If the original document has unsaved changes, the new one will also start out with the same
@@ -195,12 +182,12 @@ CBLDocument* CBLDocument_MutableCopy(const CBLDocument* original _cbl_nonnull) C
  */
 
 /** Returns a document's ID. */
-const char* CBLDocument_ID(const CBLDocument* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
+FLString CBLDocument_ID(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Returns a document's revision ID, which is a short opaque string that's guaranteed to be
     unique to every change made to the document.
     If the document doesn't exist yet, this function returns NULL. */
-const char* CBLDocument_RevisionID(const CBLDocument* _cbl_nonnull) CBLAPI;
+FLString CBLDocument_RevisionID(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Returns a document's current sequence in the local database.
     This number increases every time the document is saved, and a more recently saved document
@@ -238,18 +225,14 @@ void CBLDocument_SetProperties(CBLDocument* _cbl_nonnull,
 
 FLDoc CBLDocument_CreateFleeceDoc(const CBLDocument* _cbl_nonnull) CBLAPI;
 
-/** Returns a document's properties as a null-terminated JSON string.
-    @note You are responsible for calling `free()` on the returned string. */
-char* CBLDocument_PropertiesAsJSON(const CBLDocument* _cbl_nonnull) CBLAPI _cbl_returns_nonnull; 
+/** Returns a document's properties as JSON.
+    @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
+FLSliceResult CBLDocument_PropertiesAsJSON(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Sets a mutable document's properties from a JSON string. */
 bool CBLDocument_SetPropertiesAsJSON(CBLDocument* _cbl_nonnull,
-                                     const char *json _cbl_nonnull,
+                                     FLSlice json,
                                      CBLError*) CBLAPI;
-
-bool CBLDocument_SetPropertiesAsJSON_s(CBLDocument* _cbl_nonnull,
-                                       FLSlice json,
-                                       CBLError*) CBLAPI;
 
 /** Returns the time, if any, at which a given document will expire and be purged.
     Documents don't normally expire; you have to call \ref CBLDatabase_SetDocumentExpiration
@@ -261,12 +244,8 @@ bool CBLDocument_SetPropertiesAsJSON_s(CBLDocument* _cbl_nonnull,
              or 0 if the document does not have an expiration,
              or -1 if the call failed. */
 CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
-                                               const char *docID _cbl_nonnull,
+                                               FLSlice docID,
                                                CBLError* error) CBLAPI;
-
-CBLTimestamp CBLDatabase_GetDocumentExpiration_s(CBLDatabase* db _cbl_nonnull,
-                                                 FLSlice docID,
-                                                 CBLError* error) CBLAPI;
 
 /** Sets or clears the expiration time of a document.
     @param db  The database.
@@ -276,14 +255,9 @@ CBLTimestamp CBLDatabase_GetDocumentExpiration_s(CBLDatabase* db _cbl_nonnull,
     @param error  On failure, an error is written here.
     @return  True on success, false on failure. */
 bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
-                                       const char *docID _cbl_nonnull,
+                                       FLSlice docID,
                                        CBLTimestamp expiration,
                                        CBLError* error) CBLAPI;
-
-bool CBLDatabase_SetDocumentExpiration_s(CBLDatabase* db _cbl_nonnull,
-                                         FLSlice docID,
-                                         CBLTimestamp expiration,
-                                         CBLError* error) CBLAPI;
 
 /** @} */
 
@@ -306,7 +280,7 @@ bool CBLDatabase_SetDocumentExpiration_s(CBLDatabase* db _cbl_nonnull,
     @param docID  The document's ID. */
 typedef void (*CBLDocumentChangeListener)(void *context,
                                           const CBLDatabase* db _cbl_nonnull,
-                                          const char *docID _cbl_nonnull);
+                                          FLString docID);
 
 /** Registers a document change listener callback. It will be called after a specific document
     is changed on disk.
@@ -318,7 +292,7 @@ typedef void (*CBLDocumentChangeListener)(void *context,
             listener.*/
 _cbl_warn_unused
 CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db _cbl_nonnull,
-                                                        const char* docID _cbl_nonnull,
+                                                        FLString docID,
                                                         CBLDocumentChangeListener listener _cbl_nonnull,
                                                         void *context) CBLAPI;
 

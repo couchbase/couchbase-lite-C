@@ -36,7 +36,7 @@ extern "C" {
 
     /** Authentication callback. Given a username and password, it should return true to allow the
         connection, false to reject it. */
-    typedef bool (*CBLPasswordAuthenticator)(const char *username, const char *password);
+    typedef bool (*CBLPasswordAuthenticator)(FLString username, FLString password);
 
     
     /** Describes how clients should authenticate to a CBLURLEndpointListener. */
@@ -50,7 +50,7 @@ extern "C" {
     typedef struct {
         CBLDatabase*                database;           ///< Database to share
         uint16_t                    port;               ///< Port to listen on (0 to pick one at random)
-        const char*                 networkInterface;   ///< Name or address of network interface to listen on (NULL for all interfaces)
+        FLString                    networkInterface;   ///< Name or address of network interface to listen on (NULL for all interfaces)
         CBLTLSIdentity*             tlsIdentity;        ///< TLS server certificate & private key
         CBLListenerAuthenticator*   authenticator;      ///< Authentication for client connections (NULL for no auth)
         bool                        readOnly;           ///< True to prevent peers from altering the database

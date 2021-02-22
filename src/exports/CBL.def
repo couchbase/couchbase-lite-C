@@ -6,7 +6,7 @@ CBL_InstanceCount
 CBL_DumpInstances
 
 CBL_Log
-CBL_Log_s
+CBL_LogMessage
 
 CBLLog_Callback
 CBLLog_SetCallback
@@ -26,15 +26,11 @@ CBLError_Message_s
 CBLListener_Remove
 
 CBL_DatabaseExists
-CBL_DatabaseExists_s
 CBL_CopyDatabase
-CBL_CopyDatabase_s
 CBL_DeleteDatabase
-CBL_DeleteDatabase_s
 
 CBLDatabase_Delete
 CBLDatabase_Open
-CBLDatabase_Open_s
 CBLDatabase_Close
 CBLDatabase_Name
 CBLDatabase_Path
@@ -51,21 +47,16 @@ CBLDatabase_BufferNotifications
 CBLDatabase_SendNotifications
 
 CBLDatabase_GetDocument
-CBLDatabase_GetDocument_s
 CBLDatabase_GetMutableDocument
-CBLDatabase_GetMutableDocument_s
 CBLDatabase_SaveDocument
 CBLDatabase_SaveDocumentResolving
 CBLDatabase_DeleteDocumentByID
 CBLDatabase_PurgeDocumentByID
 CBLDatabase_PurgeDocumentByID_s
 CBLDatabase_GetDocumentExpiration
-CBLDatabase_GetDocumentExpiration_s
 CBLDatabase_SetDocumentExpiration
-CBLDatabase_SetDocumentExpiration_s
 
 CBLDatabase_CreateIndex
-CBLDatabase_CreateIndex_s
 CBLDatabase_DeleteIndex
 CBLDatabase_IndexNames
 
@@ -81,7 +72,6 @@ CBLDocument_SetProperties
 CBLDocument_CreateFleeceDoc
 CBLDocument_PropertiesAsJSON
 CBLDocument_SetPropertiesAsJSON
-CBLDocument_SetPropertiesAsJSON_s
 CBLDocument_Delete
 CBLDocument_Purge
 
@@ -100,9 +90,7 @@ CBLBlob_Properties
 CBLBlob_LoadContent
 CBLBlob_OpenContentStream
 CBLBlob_CreateWithData
-CBLBlob_CreateWithData_s
 CBLBlob_CreateWithStream
-CBLBlob_CreateWithStream_s
 CBLBlobReader_Read
 CBLBlobReader_Close
 CBLBlobWriter_New
@@ -118,7 +106,6 @@ CBLQuery_New_s
 CBLQuery_Parameters
 CBLQuery_SetParameters
 CBLQuery_SetParametersAsJSON
-CBLQuery_SetParametersAsJSON_s
 CBLQuery_Execute
 CBLQuery_Explain
 CBLQuery_ColumnCount
@@ -129,19 +116,15 @@ CBLQuery_CopyCurrentResults
 CBLResultSet_Next
 CBLResultSet_ValueAtIndex
 CBLResultSet_ValueForKey
-CBLResultSet_ValueForKey_s
 CBLResultSet_RowArray
 CBLResultSet_RowDict
 CBLResultSet_GetQuery
 
 CBLEndpoint_NewWithURL
-CBLEndpoint_NewWithURL_s
 CBLEndpoint_Free
 
 CBLAuth_NewBasic
-CBLAuth_NewBasic_s
 CBLAuth_NewSession
-CBLAuth_NewSession_s
 CBLAuth_Free
 
 CBLReplicator_New

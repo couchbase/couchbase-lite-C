@@ -19,6 +19,7 @@
 #include "CBLLog.h"
 #include "CBLPrivate.h"
 #include "c4Base.h"
+#include "fleece/slice.hh"
 #include <cstdlib>
 #include "betterassert.hh"
 
@@ -78,7 +79,7 @@ void CBLLog_SetCallback(CBLLogCallback callback) CBLAPI {
                 break;
             }
         }
-        callback(cblDomain, CBLLogLevel(level), msg);
+        callback(cblDomain, CBLLogLevel(level), fleece::slice(msg));
     };
 
     sCallback = callback;
@@ -106,7 +107,7 @@ void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_non
 }
 
 
-void CBL_Log_s(CBLLogDomain domain, CBLLogLevel level, FLSlice message) CBLAPI {
+void CBL_LogMessage(CBLLogDomain domain, CBLLogLevel level, FLString message) CBLAPI {
     precondition((domain <= kCBLLogDomainNetwork));
     precondition((level <= CBLLogNone));
     c4slog(kC4Domains[domain], C4LogLevel(level), message);

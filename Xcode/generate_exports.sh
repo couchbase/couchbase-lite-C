@@ -6,6 +6,8 @@ cd "$SRCROOT/src/exports/"
 
 RESULT="$DERIVED_FILE_DIR/CBL.exp"
 
+echo "Generating $RESULT"
+
 cat CBL.exp Fleece.exp >"$RESULT"
 
 if [ "$CONFIGURATION" == "Debug_EE" ] || [ "$CONFIGURATION" == "Release_EE" ]; then

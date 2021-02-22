@@ -28,9 +28,9 @@
 #include "StringUtil.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
-#include <atomic>
-#include <mutex>
 #include <algorithm>
+#include <memory>
+#include <mutex>
 #include <vector>
 
 
@@ -284,7 +284,7 @@ private:
             } else if (docs) {
                 // Otherwise add to list of changes to notify:
                 CBLReplicatedDocument doc = {};
-                doc.ID = (const char*)src.docID.buf;
+                doc.ID = src.docID;
                 doc.error = external(src.error);
                 doc.flags = 0;
                 if (src.flags & kRevDeleted)
@@ -310,7 +310,7 @@ private:
 
 
     bool _filter(slice docID, slice revID, C4RevisionFlags flags, Dict body, bool pushing) {
-        Retained<CBLDocument> doc = new CBLDocument(_conf.database, string(docID), revID, flags, body);
+        Retained<CBLDocument> doc = new CBLDocument(_conf.database, docID, revID, flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
         return filter(_conf.context, doc, (flags & kRevDeleted) != 0);
     }

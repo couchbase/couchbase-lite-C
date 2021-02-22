@@ -49,7 +49,7 @@ TEST_CASE_METHOD(QueryTest, "Invalid Query", "[Query][!throws]") {
     CBLError error;
     int errPos;
     query = CBLQuery_New(db, kCBLN1QLLanguage,
-                         "SELECT name WHERE",
+                         "SELECT name WHERE"_sl,
                          &errPos, &error);
     REQUIRE(!query);
     CHECK(errPos == 17);
@@ -62,7 +62,7 @@ TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     CBLError error;
     int errPos;
     query = CBLQuery_New(db, kCBLN1QLLanguage,
-                         "SELECT name WHERE birthday like '1959-%' ORDER BY birthday",
+                         "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
                          &errPos, &error);
     REQUIRE(query);
 
@@ -72,15 +72,15 @@ TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     alloc_slice explanation(CBLQuery_Explain(query));
     cerr << string(explanation);
 
-    static const slice kExpectedFirst[3] = {"Tyesha"_sl,  "Eddie"_sl,     "Diedre"_sl};
-    static const slice kExpectedLast [3] = {"Loehrer"_sl, "Colangelo"_sl, "Clinton"_sl};
+    static const slice kExpectedFirst[3] = {"Tyesha",  "Eddie",     "Diedre"};
+    static const slice kExpectedLast [3] = {"Loehrer", "Colangelo", "Clinton"};
 
     int n = 0;
     results = CBLQuery_Execute(query, &error);
     REQUIRE(results);
     while (CBLResultSet_Next(results)) {
         FLValue name = CBLResultSet_ValueAtIndex(results, 0);
-        CHECK(CBLResultSet_ValueForKey(results, "name") == name);
+        CHECK(CBLResultSet_ValueForKey(results, "name"_sl) == name);
         FLDict dict = FLValue_AsDict(name);
         CHECK(dict);
         slice first  = FLValue_AsString(FLDict_Get(dict, "first"_sl));
@@ -102,24 +102,24 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
             cerr << "Creating index\n";
             CBLIndexSpec index = {};
             index.type = kCBLValueIndex;
-            index.keyExpressionsJSON = R"(["contact.address.zip"])";
-            CHECK(CBLDatabase_CreateIndex(db, "zips", index, &error));
+            index.keyExpressionsJSON = R"(["contact.address.zip"])"_sl;
+            CHECK(CBLDatabase_CreateIndex(db, "zips"_sl, index, &error));
         }
 
         int errPos;
         query = CBLQuery_New(db, kCBLN1QLLanguage,
-                             "SELECT count(*) AS n WHERE contact.address.zip BETWEEN $zip0 AND $zip1",
+                             "SELECT count(*) AS n WHERE contact.address.zip BETWEEN $zip0 AND $zip1"_sl,
                              &errPos, &error);
         REQUIRE(query);
 
         CHECK(CBLQuery_ColumnCount(query) == 1);
-        CHECK(slice(CBLQuery_ColumnName(query, 0)) == "n"_sl);
+        CHECK(CBLQuery_ColumnName(query, 0) == "n"_sl);
 
         alloc_slice explanation(CBLQuery_Explain(query));
         cerr << string(explanation);
 
         CHECK(CBLQuery_Parameters(query) == nullptr);
-        CHECK(CBLQuery_SetParametersAsJSON(query, R"({"zip0":"30000","zip1":"39999"})"));
+        CHECK(CBLQuery_SetParametersAsJSON(query, R"({"zip0":"30000","zip1":"39999"})"_sl));
 
         FLDict params = CBLQuery_Parameters(query);
         CHECK(FLValue_AsString(FLDict_Get(params, "zip0"_sl)) == "30000"_sl);
@@ -151,7 +151,7 @@ static int countResults(CBLResultSet *results) {
 TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CBLError error;
     query = CBLQuery_New(db, kCBLN1QLLanguage,
-                         "SELECT name WHERE birthday like '1959-%' ORDER BY birthday",
+                         "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
                          nullptr, &error);
     REQUIRE(query);
 
@@ -177,7 +177,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     resultCount = -1;
 
     cerr << "Deleting a doc...\n";
-    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012");
+    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl);
     REQUIRE(doc);
     CHECK(CBLDocument_Delete(doc, kCBLConcurrencyControlLastWriteWins, &error));
     CBLDocument_Release(doc);
@@ -216,8 +216,8 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
     alloc_slice explanation(query.explain());
     cerr << string(explanation);
 
-    static const slice kExpectedFirst[3] = {"Tyesha"_sl,  "Eddie"_sl,     "Diedre"_sl};
-    static const slice kExpectedLast [3] = {"Loehrer"_sl, "Colangelo"_sl, "Clinton"_sl};
+    static const slice kExpectedFirst[3] = {"Tyesha",  "Eddie",     "Diedre"};
+    static const slice kExpectedLast [3] = {"Loehrer", "Colangelo", "Clinton"};
 
     int n = 0;
     auto results = query.execute();

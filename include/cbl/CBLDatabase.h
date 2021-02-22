@@ -63,22 +63,14 @@ typedef struct CBLEncryptionKey {
 
 /** Database configuration options. */
 typedef struct {
-    const char *directory;                  ///< The parent directory of the database
+    FLString directory;                     ///< The parent directory of the database
     CBLDatabaseFlags flags;                 ///< Options for opening the database
     CBLEncryptionKey* encryptionKey;        ///< The database's encryption key (if any)
 } CBLDatabaseConfiguration;
 
-typedef struct {
-    FLString directory;                     ///< The parent directory of the database
-    CBLDatabaseFlags flags;                 ///< Options for opening the database
-    CBLEncryptionKey* encryptionKey;        ///< The database's encryption key (if any)
-} CBLDatabaseConfiguration_s;
-
 
 /** Returns the default database configuration. */
 CBLDatabaseConfiguration CBLDatabaseConfiguration_Default(void);
-
-CBLDatabaseConfiguration_s CBLDatabaseConfiguration_Default_s(void);
 
 /** @} */
 
@@ -94,24 +86,17 @@ CBLDatabaseConfiguration_s CBLDatabaseConfiguration_Default_s(void);
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
                         absolute or relative path to the database. */
-bool CBL_DatabaseExists(const char* _cbl_nonnull name, const char *inDirectory) CBLAPI;
-
-bool CBL_DatabaseExists_s(FLString name, FLString inDirectory) CBLAPI;
+bool CBL_DatabaseExists(FLString name, FLString inDirectory) CBLAPI;
 
 /** Copies a database file to a new location, and assigns it a new internal UUID to distinguish
     it from the original database when replicating.
     @param fromPath  The full filesystem path to the original database (including extension).
     @param toName  The new database name (without the ".cblite2" extension.)
     @param config  The database configuration (directory and encryption option.) */
-bool CBL_CopyDatabase(const char* _cbl_nonnull fromPath,
-                      const char* _cbl_nonnull toName,
+bool CBL_CopyDatabase(FLString fromPath,
+                      FLString toName,
                       const CBLDatabaseConfiguration* config,
                       CBLError*) CBLAPI;
-
-bool CBL_CopyDatabase_s(FLString fromPath,
-                        FLString toName,
-                        const CBLDatabaseConfiguration_s* config,
-                        CBLError*) CBLAPI;
 
 /** Deletes a database file. If the database file is open, an error is returned.
     @param name  The database name (without the ".cblite2" extension.)
@@ -120,13 +105,9 @@ bool CBL_CopyDatabase_s(FLString fromPath,
     @param outError  On return, will be set to the error that occurred, or a 0 code if no error.
      @return  True if the database was deleted, false if it doesn't exist or deletion failed.
                 (You can tell the last two cases apart by looking at \p outError.)*/
-bool CBL_DeleteDatabase(const char *name _cbl_nonnull,
-                        const char *inDirectory,
+bool CBL_DeleteDatabase(FLString name,
+                        FLString inDirectory,
                         CBLError *outError) CBLAPI;
-
-bool CBL_DeleteDatabase_s(FLString name,
-                          FLString inDirectory,
-                          CBLError *outError) CBLAPI;
 
 /** @} */
 
@@ -147,14 +128,9 @@ bool CBL_DeleteDatabase_s(FLString name,
     @param error  On failure, the error will be written here.
     @return  The new database object, or NULL on failure. */
 _cbl_warn_unused
-CBLDatabase* CBLDatabase_Open(const char *name _cbl_nonnull,
+CBLDatabase* CBLDatabase_Open(FLSlice name,
                               const CBLDatabaseConfiguration* config,
                               CBLError* error) CBLAPI;
-
-_cbl_warn_unused
-CBLDatabase* CBLDatabase_Open_s(FLSlice name,
-                                const CBLDatabaseConfiguration_s* config,
-                                CBLError* error) CBLAPI;
 
 /** Closes an open database. */
 bool CBLDatabase_Close(CBLDatabase*, CBLError*) CBLAPI;
@@ -210,10 +186,10 @@ bool CBLDatabase_PerformMaintenance(CBLDatabase* db _cbl_nonnull,
  */
 
 /** Returns the database's name. */
-const char* CBLDatabase_Name(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
+FLString CBLDatabase_Name(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Returns the database's full filesystem path. */
-const char* CBLDatabase_Path(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
+FLString CBLDatabase_Path(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Returns the number of documents in the database. */
 uint64_t CBLDatabase_Count(const CBLDatabase* _cbl_nonnull) CBLAPI;
@@ -246,7 +222,7 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* _cbl_nonnul
     typedef void (*CBLDatabaseChangeListener)(void *context,
                                               const CBLDatabase* db _cbl_nonnull,
                                               unsigned numDocs,
-                                              const char **docIDs _cbl_nonnull);
+                                              FLString docIDs[] _cbl_nonnull);
 
 /** Registers a database change listener callback. It will be called after one or more
     documents are changed on disk.

@@ -33,7 +33,7 @@ extern "C" {
     @{ */
 
 /** The name of the HTTP cookie used by Sync Gateway to store session keys. */
-CBL_CORE_API extern const char* const kCBLAuthDefaultCookieName;
+CBL_CORE_API extern const FLString kCBLAuthDefaultCookieName;
 
 /** An opaque object representing the location of a database to replicate with. */
 typedef struct CBLEndpoint CBLEndpoint;
@@ -43,9 +43,7 @@ typedef struct CBLEndpoint CBLEndpoint;
     and its path must be the name of the database on that server.
     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
     For example: `wss://example.org/dbname` */
-CBLEndpoint* CBLEndpoint_NewWithURL(const char *url _cbl_nonnull) CBLAPI;
-
-CBLEndpoint* CBLEndpoint_NewWithURL_s(FLString url) CBLAPI;
+CBLEndpoint* CBLEndpoint_NewWithURL(FLString url) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Creates a new endpoint representing another local database. (Enterprise Edition only.) */
@@ -60,19 +58,13 @@ void CBLEndpoint_Free(CBLEndpoint*) CBLAPI;
 typedef struct CBLAuthenticator CBLAuthenticator;
 
 /** Creates an authenticator for HTTP Basic (username/password) auth. */
-CBLAuthenticator* CBLAuth_NewBasic(const char *username _cbl_nonnull,
-                                   const char *password _cbl_nonnull) CBLAPI;
-
-CBLAuthenticator* CBLAuth_NewBasic_s(FLString username,
-                                     FLString password) CBLAPI;
+CBLAuthenticator* CBLAuth_NewBasic(FLString username,
+                                   FLString password) CBLAPI;
 
 /** Creates an authenticator using a Couchbase Sync Gateway login session identifier,
     and optionally a cookie name (pass NULL for the default.) */
-CBLAuthenticator* CBLAuth_NewSession(const char *sessionID _cbl_nonnull,
-                                     const char *cookieName) CBLAPI;
-
-CBLAuthenticator* CBLAuth_NewSession_s(FLString sessionID,
-                                       FLString cookieName) CBLAPI;
+CBLAuthenticator* CBLAuth_NewSession(FLString sessionID,
+                                     FLString cookieName) CBLAPI;
 
 /** Frees a CBLAuthenticator object. */
 void CBLAuth_Free(CBLAuthenticator*) CBLAPI;
@@ -114,7 +106,7 @@ typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool 
         a mutable copy of either one and modify it appropriately.
         Or return NULL if the resolution is to delete the document. */
 typedef const CBLDocument* (*CBLConflictResolver)(void *context,
-                                                  const char *documentID,
+                                                  FLString documentID,
                                                   const CBLDocument *localDocument,
                                                   const CBLDocument *remoteDocument);
 
@@ -132,10 +124,10 @@ typedef CBL_ENUM(uint8_t, CBLProxyType) {
 /** Proxy settings for the replicator. */
 typedef struct {
     CBLProxyType type;                  ///< Type of proxy
-    const char *hostname;               ///< Proxy server hostname or IP address
+    FLString hostname;               ///< Proxy server hostname or IP address
     uint16_t port;                      ///< Proxy server port
-    const char *username;               ///< Username for proxy auth (optional)
-    const char *password;               ///< Password for proxy auth
+    FLString username;               ///< Username for proxy auth (optional)
+    FLString password;               ///< Password for proxy auth
 } CBLProxySettings;
 
 
@@ -296,7 +288,7 @@ typedef CBL_OPTIONS(unsigned, CBLDocumentFlags) {
 
 /** Information about a document that's been pushed or pulled. */
 typedef struct {
-    const char *ID;             ///< The document ID
+    FLString ID;                ///< The document ID
     CBLDocumentFlags flags;     ///< Indicates whether the document was deleted or removed
     CBLError error;             ///< If the code is nonzero, the document failed to replicate.
 } CBLReplicatedDocument;

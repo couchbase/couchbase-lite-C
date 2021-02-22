@@ -26,12 +26,8 @@
 static_assert(sizeof(CBLError) == sizeof(C4Error));
 
 
-char* CBLError_Message(const CBLError* error _cbl_nonnull) CBLAPI {
-    return allocCString(CBLError_Message_s(error));
-}
-
-FLSliceResult CBLError_Message_s(const CBLError* error _cbl_nonnull) CBLAPI {
-    return c4error_getMessage(*internal(error));
+FLSliceResult CBLError_Message(const CBLError* error _cbl_nonnull) CBLAPI {
+    return c4error_getMessage(internal(*error));
 }
 
 

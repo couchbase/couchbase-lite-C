@@ -22,6 +22,7 @@ _kFLEmptyDict
 _FLSlice_Equal
 _FLSlice_Compare
 _FLSlice_Copy
+_FLSlice_ToCString
 _FLSliceResult_New
 __FLBuf_Retain
 __FLBuf_Release

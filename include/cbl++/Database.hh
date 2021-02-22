@@ -24,7 +24,6 @@
 #include "CBLQuery.h"
 #include "fleece/Mutable.hh"
 #include <functional>
-#include <string>
 #include <vector>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
@@ -43,50 +42,52 @@ namespace cbl {
     public:
         // Static database-file operations:
 
-        static bool exists(const std::string &name,
-                           const std::string &inDirectory)
+        static bool exists(slice name,
+                           slice inDirectory)
         {
-            return CBL_DatabaseExists(name.c_str(), inDirectory.c_str());
+            return CBL_DatabaseExists(name, inDirectory);
         }
 
-        static void copyDatabase(const std::string &fromPath,
-                                 const std::string &toName)
+        static void copyDatabase(slice fromPath,
+                                 slice toName)
         {
             CBLError error;
-            check( CBL_CopyDatabase(fromPath.c_str(), toName.c_str(), nullptr, &error), error );
+            check( CBL_CopyDatabase(fromPath, toName,
+                                    nullptr, &error), error );
         }
 
-        static void copyDatabase(const std::string &fromPath,
-                                 const std::string &toName,
+        static void copyDatabase(slice fromPath,
+                                 slice toName,
                                  const CBLDatabaseConfiguration& config)
         {
             CBLError error;
-            check( CBL_CopyDatabase(fromPath.c_str(), toName.c_str(), &config, &error), error );
+            check( CBL_CopyDatabase(fromPath, toName,
+                                    &config, &error), error );
         }
 
-        static void deleteDatabase(const std::string &name,
-                                   const std::string &inDirectory)
+        static void deleteDatabase(slice name,
+                                   slice inDirectory)
         {
             CBLError error;
-            if (!CBL_DeleteDatabase(name.c_str(),
-                                    inDirectory.empty() ? nullptr : inDirectory.c_str(),
+            if (!CBL_DeleteDatabase(name,
+                                    inDirectory,
                                     &error) && error.code != 0)
                 check(false, error);
         }
 
         // Lifecycle:
 
-        Database(const std::string &name) {
+        Database(slice name) {
             CBLError error;
-            _ref = (CBLRefCounted*) CBLDatabase_Open(name.c_str(), nullptr, &error);
+            _ref = (CBLRefCounted*) CBLDatabase_Open(name, nullptr, &error);
             check(_ref != nullptr, error);
         }
 
-        Database(const std::string &name,
+        Database(slice name,
                  const CBLDatabaseConfiguration& config)
         {
             CBLError error;
-            _ref = (CBLRefCounted*) CBLDatabase_Open(name.c_str(), &config, &error);
+            _ref = (CBLRefCounted*) CBLDatabase_Open(name, &config, &error);
             check(_ref != nullptr, error);
         }
 
@@ -107,46 +108,46 @@ namespace cbl {
 
         // Accessors:
 
-        const char* name() const _cbl_nonnull               {return CBLDatabase_Name(ref());}
-        const char* path() const _cbl_nonnull               {return CBLDatabase_Path(ref());}
+        slice name() const                                  {return CBLDatabase_Name(ref());}
+        slice path() const                                  {return CBLDatabase_Path(ref());}
         uint64_t count() const                              {return CBLDatabase_Count(ref());}
         CBLDatabaseConfiguration config() const             {return CBLDatabase_Config(ref());}
 
         // Documents:
 
-        inline Document getDocument(const std::string &id) const;
-        inline MutableDocument getMutableDocument(const std::string &id) const;
+        inline Document getDocument(slice id) const;
+        inline MutableDocument getMutableDocument(slice id) const;
 
         inline Document saveDocument(MutableDocument &doc,
                                      CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);
 
         inline Document saveDocument(MutableDocument &doc, SaveConflictHandler conflictandler);
 
-        time_t getDocumentExpiration(const std::string &docID) const {
+        time_t getDocumentExpiration(slice docID) const {
             CBLError error;
-            time_t exp = CBLDatabase_GetDocumentExpiration(ref(), docID.c_str(), &error);
+            time_t exp = CBLDatabase_GetDocumentExpiration(ref(), docID, &error);
             check(exp >= 0, error);
             return exp;
         }
 
-        void setDocumentExpiration(const std::string &docID, time_t expiration) {
+        void setDocumentExpiration(slice docID, time_t expiration) {
             CBLError error;
-            check(CBLDatabase_SetDocumentExpiration(ref(), docID.c_str(), expiration, &error), error);
+            check(CBLDatabase_SetDocumentExpiration(ref(), docID, expiration, &error), error);
         }
 
-        void purgeDocumentByID(const std::string &docID) {
+        void purgeDocumentByID(slice docID) {
             CBLError error;
-            check(CBLDatabase_PurgeDocumentByID(ref(), docID.c_str(), &error), error);
+            check(CBLDatabase_PurgeDocumentByID(ref(), docID, &error), error);
         }
 
         // Indexes:
 
-        void createIndex(const char *name _cbl_nonnull, CBLIndexSpec spec) {
+        void createIndex(slice name, CBLIndexSpec spec) {
             CBLError error;
             check(CBLDatabase_CreateIndex(ref(), name, spec, &error), error);
         }
 
-        void deleteIndex(const char *name _cbl_nonnull) {
+        void deleteIndex(slice name) {
             CBLError error;
             check(CBLDatabase_DeleteIndex(ref(), name, &error), error);
         }
@@ -160,7 +161,7 @@ namespace cbl {
 
         // Listeners:
 
-        using Listener = cbl::ListenerToken<Database,const std::vector<const char*>&>;
+        using Listener = cbl::ListenerToken<Database,const std::vector<slice>&>;
 
         [[nodiscard]] Listener addListener(Listener::Callback f) {
             auto l = Listener(f);
@@ -169,13 +170,13 @@ namespace cbl {
         }
 
 
-        using DocumentListener = cbl::ListenerToken<Database,const char*>;
+        using DocumentListener = cbl::ListenerToken<Database,slice>;
 
-        [[nodiscard]] DocumentListener addDocumentListener(const std::string &docID,
+        [[nodiscard]] DocumentListener addDocumentListener(slice docID,
                                                            DocumentListener::Callback f)
         {
             auto l = DocumentListener(f);
-            l.setToken( CBLDatabase_AddDocumentChangeListener(ref(), docID.c_str(), &_callDocListener, l.context()) );
+            l.setToken( CBLDatabase_AddDocumentChangeListener(ref(), docID, &_callDocListener, l.context()) );
             return l;
         }
 
@@ -196,13 +197,13 @@ namespace cbl {
 
     private:
         static void _callListener(void *context, const CBLDatabase *db,
-                                  unsigned nDocs, const char **docIDs)
+                                  unsigned nDocs, FLString *docIDs)
         {
-            std::vector<const char*> vec(&docIDs[0], &docIDs[nDocs]);
+            std::vector<slice> vec((slice*)&docIDs[0], (slice*)&docIDs[nDocs]);
             Listener::call(context, Database((CBLDatabase*)db), vec);
         }
 
-        static void _callDocListener(void *context, const CBLDatabase *db, const char *docID) {
+        static void _callDocListener(void *context, const CBLDatabase *db, FLString docID) {
             DocumentListener::call(context, Database((CBLDatabase*)db), docID);
         }
 

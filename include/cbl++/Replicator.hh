@@ -23,6 +23,7 @@
 #include "Document.hh"
 
 #include <functional>
+#include <string>
 #include <vector>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
@@ -32,7 +33,7 @@ namespace cbl {
 
     class Endpoint {
     public:
-        void setURL(const char *url _cbl_nonnull)   {_ref = CBLEndpoint_NewWithURL(url);}
+        void setURL(slice url)                      {_ref = CBLEndpoint_NewWithURL(url);}
 #ifdef COUCHBASE_ENTERPRISE
         void setLocalDB(Database db)                {_ref = CBLEndpoint_NewWithLocalDB(db.ref());}
 #endif
@@ -45,11 +46,11 @@ namespace cbl {
 
     class Authenticator {
     public:
-        void setBasic(const char *username _cbl_nonnull,
-                      const char *password _cbl_nonnull)
+        void setBasic(slice username,
+                      slice password)
                                                     {_ref = CBLAuth_NewBasic(username, password);}
 
-        void setSession(const char *sessionId, const char *cookieName) {
+        void setSession(slice sessionId, slice cookieName) {
           _ref = CBLAuth_NewSession(sessionId, cookieName);
         }
         ~Authenticator()                            {CBLAuth_Free(_ref);}
@@ -76,8 +77,8 @@ namespace cbl {
         CBLProxySettings* proxy             = nullptr;
         fleece::MutableDict headers         = fleece::MutableDict::newDict();
 
-        fleece::alloc_slice pinnedServerCertificate;
-        fleece::alloc_slice trustedRootCertificates;
+        std::string pinnedServerCertificate;
+        std::string trustedRootCertificates;
 
         fleece::MutableArray channels       = fleece::MutableArray::newArray();
         fleece::MutableArray documentIDs    = fleece::MutableArray::newArray();
@@ -95,8 +96,8 @@ namespace cbl {
             conf.proxy = proxy;
             if (!headers.empty())
                 conf.headers = headers;
-            conf.pinnedServerCertificate = pinnedServerCertificate;
-            conf.trustedRootCertificates = trustedRootCertificates;
+            conf.pinnedServerCertificate = slice(pinnedServerCertificate);
+            conf.trustedRootCertificates = slice(trustedRootCertificates);
             if (!channels.empty())
                 conf.channels = channels;
             if (!documentIDs.empty())

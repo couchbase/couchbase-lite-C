@@ -31,7 +31,7 @@ public:
     CBLURLEndpointListener(CBLURLEndpointListenerConfiguration* config _cbl_nonnull) {
         _db                 = config->database;
         _c4config.port      = config->port;
-        _c4config.networkInterface = slice(config->networkInterface);
+        _c4config.networkInterface = config->networkInterface;
         _c4config.apis      = kC4SyncAPI;
         _c4config.allowPush = !config->readOnly;
         // TODO: Fill in tlsIdentity, authenticator
@@ -68,12 +68,13 @@ public:
     }
 
     FLMutableArray URLs() {
-        return c4listener_getURLs(_listener, _db->_getC4Database());
+        return c4listener_getURLs(_listener, _db->_getC4Database(), kC4SyncAPI, nullptr);
     }
 
     CBLConnectionStatus status() {
-        unsigned count = 0; // TODO c4listener_connectionCount(_listener);
-        return {count, count};  //TODO: Get active connection count & return it
+        unsigned count = 0, activeCount = 0;
+        c4listener_getConnectionStatus(_listener, &count, &activeCount);
+        return {count, activeCount};  //TODO: Get active connection count & return it
     }
 
 private:
