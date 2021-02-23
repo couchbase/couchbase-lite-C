@@ -17,7 +17,9 @@
 
 # These are the additional exports for the Enterprise Edition (EE) dynamic library.
 
-_CBLDatabase_Rekey
+_CBLEncryptionKey_FromPassword
+
+_CBLDatabase_ChangeEncryptionKey
 
 _CBLEndpoint_NewWithLocalDB
 

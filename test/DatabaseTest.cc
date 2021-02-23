@@ -32,11 +32,9 @@ static void createDocument(CBLDatabase *db, slice docID, slice property, slice v
     MutableDict props = CBLDocument_MutableProperties(doc);
     FLSlot_SetString(FLMutableDict_Set(props, property), value);
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict,
-                                                        &error);
+    bool saved = CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlFailOnConflict, &error);
     CBLDocument_Release(doc);
     REQUIRE(saved);
-    CBLDocument_Release(saved);
 }
 
 
@@ -53,7 +51,7 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
     CBLError error;
     CBLDatabase *defaultdb = CBLDatabase_Open("unconfig"_sl, nullptr, &error);
     REQUIRE(defaultdb);
-    slice path = CBLDatabase_Path(defaultdb);
+    alloc_slice path = CBLDatabase_Path(defaultdb);
     cerr << "Default database is at " << path << "\n";
     CHECK(CBL_DatabaseExists("unconfig"_sl, nullslice));
 
@@ -98,12 +96,10 @@ TEST_CASE_METHOD(CBLTest, "New Document") {
 TEST_CASE_METHOD(CBLTest, "Save Empty Document") {
     CBLDocument* doc = CBLDocument_New("foo"_sl);
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict, &error);
-    REQUIRE(saved);
-    CHECK(CBLDocument_ID(saved) == "foo"_sl);
-    CHECK(CBLDocument_Sequence(saved) == 1);
-    CHECK(alloc_slice(CBLDocument_PropertiesAsJSON(saved)) == "{}"_sl);
-    CBLDocument_Release(saved);
+    REQUIRE(CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlFailOnConflict, &error));
+    CHECK(CBLDocument_ID(doc) == "foo"_sl);
+    CHECK(CBLDocument_Sequence(doc) == 1);
+    CHECK(alloc_slice(CBLDocument_PropertiesAsJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);
 
     doc = CBLDatabase_GetMutableDocument(db, "foo"_sl);
@@ -124,13 +120,11 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict, &error);
-    REQUIRE(saved);
-    CHECK(CBLDocument_ID(saved) == "foo"_sl);
-    CHECK(CBLDocument_Sequence(saved) == 1);
-    CHECK(alloc_slice(CBLDocument_PropertiesAsJSON(saved)) == "{\"greeting\":\"Howdy!\"}"_sl);
-    CHECK(Dict(CBLDocument_Properties(saved)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
-    CBLDocument_Release(saved);
+    REQUIRE(CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlFailOnConflict, &error));
+    CHECK(CBLDocument_ID(doc) == "foo"_sl);
+    CHECK(CBLDocument_Sequence(doc) == 1);
+    CHECK(alloc_slice(CBLDocument_PropertiesAsJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
+    CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CBLDocument_Release(doc);
 
     doc = CBLDatabase_GetMutableDocument(db, "foo"_sl);
@@ -203,12 +197,9 @@ TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
     
     // Save doc:
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlLastWriteWins,
-                                                        &error);
-    REQUIRE(saved);
+    REQUIRE(CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
     CBLBlob_Release(blob1);
     CBLDocument_Release(doc);
-    CBLDocument_Release(saved);
     
     // Compact:
     CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeCompact, &error));
@@ -224,7 +215,7 @@ TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
     // CBLBlob_Release(blob2);
     
     // Delete doc:
-    CHECK(CBLDocument_Delete(doc, kCBLConcurrencyControlLastWriteWins, &error));
+    CHECK(CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
     CBLDocument_Release(doc);
     
     // Compact:

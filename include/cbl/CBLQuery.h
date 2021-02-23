@@ -113,6 +113,7 @@ CBLResultSet* CBLQuery_Execute(CBLQuery* _cbl_nonnull, CBLError*) CBLAPI;
     The strategy will also show which index(es), if any, are used.
     @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
 
+_cbl_warn_unused
 FLSliceResult CBLQuery_Explain(const CBLQuery* _cbl_nonnull) CBLAPI;
 
 /** Returns the number of columns in each result. */
@@ -234,6 +235,7 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
     @param listener  The query listener that was notified.
     @param error  If the query failed to run, the error will be stored here.
     @return  A new object containing the query's current results, or NULL if the query failed to run. */
+    _cbl_warn_unused
     CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query _cbl_nonnull,
                                               CBLListenerToken *listener _cbl_nonnull,
                                               CBLError *error) CBLAPI;
@@ -319,6 +321,7 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
 
 /** Returns the names of the indexes on this database, as a Fleece array of strings.
     @note  You are responsible for releasing the returned Fleece array. */
+_cbl_warn_unused
 FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) CBLAPI;
 
 /** @} */

@@ -70,7 +70,17 @@ typedef struct {
 
 
 /** Returns the default database configuration. */
-CBLDatabaseConfiguration CBLDatabaseConfiguration_Default(void);
+CBLDatabaseConfiguration CBLDatabaseConfiguration_Default(void) CBLAPI;
+
+#ifdef COUCHBASE_ENTERPRISE
+/** Derives an encryption key from a password. If your UI uses passwords, call this function to
+    create the key used to encrypt the database. It is designed for security, and deliberately
+    runs slowly to make brute-force attacks impractical.
+    @param key  The derived AES key will be stored here.
+    @param password  The input password, which can be any data.
+    @return  True on success, false if there was a problem deriving the key. */
+bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key _cbl_nonnull, FLString password) CBLAPI;
+#endif
 
 /** @} */
 
@@ -158,9 +168,9 @@ bool CBLDatabase_EndBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
     If \p newKey is NULL, or its \p algorithm is \ref kCBLEncryptionNone, the database will be decrypted.
     Otherwise the database will be encrypted with that key; if it was already encrypted, it will be
     re-encrypted with the new key.*/
-bool CBLDatabase_Rekey(CBLDatabase* _cbl_nonnull,
-                       const CBLEncryptionKey *newKey,
-                       CBLError* outError) CBLAPI;
+bool CBLDatabase_ChangeEncryptionKey(CBLDatabase* _cbl_nonnull,
+                                     const CBLEncryptionKey *newKey,
+                                     CBLError* outError) CBLAPI;
 #endif
 
 /** Maintenance Type used when performing database maintenance. */
@@ -189,7 +199,8 @@ bool CBLDatabase_PerformMaintenance(CBLDatabase* db _cbl_nonnull,
 FLString CBLDatabase_Name(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Returns the database's full filesystem path. */
-FLString CBLDatabase_Path(const CBLDatabase* _cbl_nonnull) CBLAPI;
+_cbl_warn_unused
+FLStringResult CBLDatabase_Path(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Returns the number of documents in the database. */
 uint64_t CBLDatabase_Count(const CBLDatabase* _cbl_nonnull) CBLAPI;
@@ -219,10 +230,10 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* _cbl_nonnul
     @param db  The database that changed.
     @param numDocs  The number of documents that changed (size of the `docIDs` array)
     @param docIDs  The IDs of the documents that changed, as a C array of `numDocs` C strings. */
-    typedef void (*CBLDatabaseChangeListener)(void *context,
-                                              const CBLDatabase* db _cbl_nonnull,
-                                              unsigned numDocs,
-                                              FLString docIDs[] _cbl_nonnull);
+typedef void (*CBLDatabaseChangeListener)(void *context,
+                                          const CBLDatabase* db _cbl_nonnull,
+                                          unsigned numDocs,
+                                          FLString docIDs[] _cbl_nonnull);
 
 /** Registers a database change listener callback. It will be called after one or more
     documents are changed on disk.

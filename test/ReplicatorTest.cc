@@ -32,7 +32,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
     config.database = db.ref();
     CHECK(!CBLReplicator_New(&config, &error));
 
-    config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar"_sl);
+    config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg:9999/foobar"_sl);
     CBLProxySettings proxy = {};
     proxy.type = kCBLProxyHTTP;
     config.proxy = &proxy;
@@ -46,7 +46,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
-    config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar"_sl);
+    config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg/foobar"_sl);
     config.authenticator = CBLAuth_NewSession("SyncGatewaySession"_sl, "NOM_NOM_NOM"_sl);
 
     config.pullFilter = [](void *context, CBLDocument* document, bool isDeleted) -> bool {
@@ -62,12 +62,12 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replicator]") {
-    config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar"_sl);
+    config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg/foobar"_sl);
     config.authenticator = CBLAuth_NewBasic("username"_sl, "p@ssw0RD"_sl);
 
     CBLProxySettings proxy = {};
     proxy.type = kCBLProxyHTTP;
-    proxy.hostname = "localhost"_sl;
+    proxy.hostname = "jxnbgotn.dvmwk"_sl;
     proxy.port = 9998;
     proxy.username = "User Name"_sl;
     proxy.password = "123456"_sl;

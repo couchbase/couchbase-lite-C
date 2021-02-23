@@ -34,11 +34,10 @@ namespace cbl_internal {
 struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Database*> {
 
     CBLDatabase(C4Database* _cbl_nonnull db,
-                fleece::slice name_,
-                fleece::slice dir_,
+                slice name_,
+                slice dir_,
                 CBLDatabaseFlags flags_)
     :access_lock(std::move(db))
-    ,path(fleece::alloc_slice(c4db_getPath(db)))
     ,dir(dir_)
     ,flags(flags_)
     ,_blobStore(c4db_getBlobStore(db, nullptr))
@@ -57,7 +56,6 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
     static std::string defaultDirectory();
 
     alloc_slice const dir;
-    alloc_slice const path;         // Cached copy so API can return a FLSlice
     CBLDatabaseFlags const flags;
 
     Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener _cbl_nonnull,

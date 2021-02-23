@@ -97,12 +97,14 @@ extern "C" {
 
     /** Reads the blob's contents into memory and returns them.
         @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
+    _cbl_warn_unused
     FLSliceResult CBLBlob_LoadContent(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
 
     /** A stream for reading a blob's content. */
     typedef struct CBLBlobReadStream CBLBlobReadStream;
 
     /** Opens a stream for reading a blob's content. */
+    _cbl_warn_unused
     CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
 
     /** Reads data from a blob.
@@ -128,6 +130,7 @@ extern "C" {
         @param contentType  The MIME type (optional).
         @param contents  The data's address and length.
         @return  A new CBLBlob instance. */
+    _cbl_warn_unused
     CBLBlob* CBLBlob_CreateWithData(FLString contentType,
                                     FLSlice contents) CBLAPI;
 
@@ -139,6 +142,7 @@ extern "C" {
         then \ref CBLBlob_CreateWithStream to create the blob.
 
         If for some reason you need to abort, just call \ref CBLBlobWriter_Close. */
+    _cbl_warn_unused
     CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db _cbl_nonnull,
                                           CBLError *outError) CBLAPI;
 
@@ -164,6 +168,7 @@ extern "C" {
         @param contentType  The MIME type (optional).
         @param writer  The blob-writing stream the data was written to.
         @return  A new CBLBlob instance. */
+    _cbl_warn_unused
     CBLBlob* CBLBlob_CreateWithStream(FLString contentType,
                                       CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
 

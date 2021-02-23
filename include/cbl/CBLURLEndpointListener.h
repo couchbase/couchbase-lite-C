@@ -65,26 +65,28 @@ extern "C" {
     typedef struct CBLURLEndpointListener CBLURLEndpointListener;
 
     /** Creates a P2P connection listener. */
-    CBLURLEndpointListener* CBLURLEndpointListener_New(CBLURLEndpointListenerConfiguration* _cbl_nonnull);
+    _cbl_warn_unused
+    CBLURLEndpointListener* CBLURLEndpointListener_New(CBLURLEndpointListenerConfiguration* _cbl_nonnull) CBLAPI;
 
     /** Starts a P2P connection listener. */
-    bool CBLURLEndpointListener_Start(CBLURLEndpointListener* _cbl_nonnull, CBLError*);
+    bool CBLURLEndpointListener_Start(CBLURLEndpointListener* _cbl_nonnull, CBLError*) CBLAPI;
 
     /** Returns the actual port number being listened on. */
-    uint16_t CBLURLEndpointListener_GetPort(CBLURLEndpointListener* _cbl_nonnull);
+    uint16_t CBLURLEndpointListener_GetPort(CBLURLEndpointListener* _cbl_nonnull) CBLAPI;
 
     /** Returns the URL(s) at which the listener can be reached. There is one URL for each network
         address, generally in declining order of usefulness.
         \note  Caller is responsible for releasing the returned object.
         @param listener  The listener.
-        @return  The URLs as a Fleece array of strings. */
-    FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull);
+        @return  The URLs as a Fleece array of strings (which must be released). */
+    _cbl_warn_unused
+    FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull) CBLAPI;
 
     /** Returns information about how many current connections a P2P connection listener has. */
-    CBLConnectionStatus CBLURLEndpointListener_GetStatus(CBLURLEndpointListener* _cbl_nonnull);
+    CBLConnectionStatus CBLURLEndpointListener_GetStatus(CBLURLEndpointListener* _cbl_nonnull) CBLAPI;
 
     /** Stops a P2P connection listener. */
-    void CBLURLEndpointListener_Stop(CBLURLEndpointListener* _cbl_nonnull);
+    void CBLURLEndpointListener_Stop(CBLURLEndpointListener* _cbl_nonnull) CBLAPI;
 
     CBL_REFCOUNTED(CBLURLEndpointListener*, URLEndpointListener);
 

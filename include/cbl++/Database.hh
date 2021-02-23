@@ -24,6 +24,7 @@
 #include "CBLQuery.h"
 #include "fleece/Mutable.hh"
 #include <functional>
+#include <string>
 #include <vector>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
@@ -109,7 +110,7 @@ namespace cbl {
         // Accessors:
 
         slice name() const                                  {return CBLDatabase_Name(ref());}
-        slice path() const                                  {return CBLDatabase_Path(ref());}
+        std::string path() const                            {return std::string(CBLDatabase_Path(ref()));}
         uint64_t count() const                              {return CBLDatabase_Count(ref());}
         CBLDatabaseConfiguration config() const             {return CBLDatabase_Config(ref());}
 
@@ -118,10 +119,20 @@ namespace cbl {
         inline Document getDocument(slice id) const;
         inline MutableDocument getMutableDocument(slice id) const;
 
-        inline Document saveDocument(MutableDocument &doc,
-                                     CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);
+        inline void saveDocument(MutableDocument &doc);
 
-        inline Document saveDocument(MutableDocument &doc, SaveConflictHandler conflictandler);
+        _cbl_warn_unused
+        inline bool saveDocument(MutableDocument &doc, CBLConcurrencyControl c);
+
+        _cbl_warn_unused
+        inline bool saveDocument(MutableDocument &doc, SaveConflictHandler conflictHandler);
+
+        inline void deleteDocument(Document &doc) {
+            (void) deleteDocument(doc, kCBLConcurrencyControlLastWriteWins);
+        }
+
+        _cbl_warn_unused
+        inline bool deleteDocument(Document &doc, CBLConcurrencyControl c);
 
         time_t getDocumentExpiration(slice docID) const {
             CBLError error;
@@ -135,9 +146,14 @@ namespace cbl {
             check(CBLDatabase_SetDocumentExpiration(ref(), docID, expiration, &error), error);
         }
 
-        void purgeDocumentByID(slice docID) {
+        inline void purgeDocument(Document &doc);
+
+        bool purgeDocumentByID(slice docID) {
             CBLError error;
-            check(CBLDatabase_PurgeDocumentByID(ref(), docID, &error), error);
+            bool purged = CBLDatabase_PurgeDocumentByID(ref(), docID, &error);
+            if (!purged && error.code != 0)
+                throw error;
+            return purged;
         }
 
         // Indexes:

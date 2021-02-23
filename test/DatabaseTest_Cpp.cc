@@ -50,16 +50,17 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ New Document") {
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Empty Document") {
     MutableDocument doc("foo");
-    Document saved = db.saveDocument(doc);
-    REQUIRE(saved);
-    CHECK(string(saved.id()) == "foo");
-    CHECK(saved.sequence() == 1);
-    CHECK(saved.properties().toJSONString() == "{}");
-
-    doc = db.getMutableDocument("foo");
+    db.saveDocument(doc);
     CHECK(string(doc.id()) == "foo");
     CHECK(doc.sequence() == 1);
+    CHECK(doc.revisionID() != nullslice);
     CHECK(doc.properties().toJSONString() == "{}");
+
+    MutableDocument doc2 = db.getMutableDocument("foo");
+    CHECK(string(doc2.id()) == "foo");
+    CHECK(doc2.sequence() == 1);
+    CHECK(doc2.revisionID() == doc.revisionID());
+    CHECK(doc2.properties().toJSONString() == "{}");
 }
 
 
@@ -69,25 +70,26 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
     CHECK(doc["greeting"].asString() == "Howdy!");
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
-    auto saved = db.saveDocument(doc);
-    REQUIRE(saved);
-    CHECK(string(saved.id()) == "foo");
-    CHECK(saved.sequence() == 1);
-    CHECK(saved.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
-    CHECK(saved["greeting"].asString() == "Howdy!");
-
-    doc = db.getMutableDocument("foo");
+    db.saveDocument(doc);
     CHECK(string(doc.id()) == "foo");
     CHECK(doc.sequence() == 1);
+    CHECK(doc.revisionID() != nullslice);
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CHECK(doc["greeting"].asString() == "Howdy!");
+
+    MutableDocument doc2 = db.getMutableDocument("foo");
+    CHECK(string(doc2.id()) == "foo");
+    CHECK(doc2.sequence() == 1);
+    CHECK(doc2.revisionID() == doc.revisionID());
+    CHECK(doc2.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
+    CHECK(doc2["greeting"].asString() == "Howdy!");
 }
 
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Delete Unsaved Doc") {
     MutableDocument doc("foo");
     CBLError error;
-    REQUIRE(!CBLDocument_Delete(doc.ref(), kCBLConcurrencyControlLastWriteWins, &error));
+    REQUIRE(!CBLDatabase_DeleteDocumentWithConcurrencyControl(db.ref(), doc.ref(), kCBLConcurrencyControlLastWriteWins, &error));
     CHECK(error.domain == CBLDomain);
     CHECK(error.code == CBLErrorNotFound);
 }
@@ -98,8 +100,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch") {
 
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
-    Document newDoc = db.saveDocument(doc);
-    doc = newDoc.mutableCopy();
+    db.saveDocument(doc);
     doc["meeting"] = 23;
     db.saveDocument(doc);
 
@@ -119,12 +120,11 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch With Exception", "[!throws]") {
 
         MutableDocument doc("foo");
         doc["greeting"] = "Howdy!";
-        Document newDoc = db.saveDocument(doc);
+        db.saveDocument(doc);
 
         if (sqrt(2) > 1.0)
             throw runtime_error("intentional");
 
-        doc = newDoc.mutableCopy();
         doc["meeting"] = 23;
         db.saveDocument(doc);
 
@@ -235,8 +235,6 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Add new key") {
     doc["greeting"] = "Howdy!";
     db.saveDocument(doc);
 
-    // Get existing doc:
-    doc = db.getMutableDocument("foo");
     // Add a new, shareable key:
     doc.set("new", 10);
     db.saveDocument(doc);
@@ -255,44 +253,43 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Data disappears") {
     // Regression test for <https://github.com/couchbaselabs/couchbase-lite-C/issues/19>
     MutableDocument doc = MutableDocument("foo");
     doc["var1"]= 1;
-    Document saved = db.saveDocument(doc);
-    CHECK(saved.properties().toJSONString() == "{\"var1\":1}");
+    db.saveDocument(doc);
+    CHECK(doc.properties().toJSONString() == "{\"var1\":1}");
 
     doc = db.getMutableDocument("foo");
     doc["var2"]= 2;
-    saved = db.saveDocument(doc);
-    CHECK(saved.properties().toJSONString() == "{\"var1\":1,\"var2\":2}");
+    db.saveDocument(doc);
+    CHECK(doc.properties().toJSONString() == "{\"var1\":1,\"var2\":2}");
 
     doc = db.getMutableDocument("foo");
     doc["var3"]= 3;
-    saved = db.saveDocument(doc);
-    CHECK(saved.properties().toJSONString() == "{\"var1\":1,\"var2\":2,\"var3\":3}");
+    db.saveDocument(doc);
+    CHECK(doc.properties().toJSONString() == "{\"var1\":1,\"var2\":2,\"var3\":3}");
 }
 
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Conflict") {
     MutableDocument doc("foo");
     doc["n"] = 10;
-    REQUIRE(db.saveDocument(doc));
+    db.saveDocument(doc);
 
     MutableDocument shadowDoc = db.getMutableDocument("foo");
     shadowDoc["n"] = 7;
-    REQUIRE(db.saveDocument(shadowDoc));
+    db.saveDocument(shadowDoc);
 
     doc["n"] = 11;
     REQUIRE(!db.saveDocument(doc, kCBLConcurrencyControlFailOnConflict));
     REQUIRE(db.saveDocument(doc, kCBLConcurrencyControlLastWriteWins));
 
     shadowDoc["n"] = 8;
-    Document result = db.saveDocument(shadowDoc, [&](MutableDocument myDoc,
-                                                            Document otherDoc) {
+    bool result = db.saveDocument(shadowDoc, [&](MutableDocument myDoc, Document otherDoc) {
         CHECK(myDoc["n"].asInt() == 8);
         CHECK(otherDoc["n"].asInt() == 11);
         myDoc["n"] = 19;
         return true;
     });
     CHECK(result);
-    CHECK(result["n"].asInt() == 19);
+    CHECK(shadowDoc["n"].asInt() == 19);
 }
 
 
@@ -310,6 +307,8 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Retaining immutable Fleece") {
     }
     CHECK(mdoc["FOO"].asInt() == 18);
     CHECK(mdoc["BAR"].asString() == "Wahooma");
-    auto doc = db.saveDocument(mdoc);
-    CHECK(doc.propertiesAsJSON() == R"({"BAR":"Wahooma","FOO":18})");
+    db.saveDocument(mdoc);
+    CHECK(mdoc.propertiesAsJSON() == R"({"BAR":"Wahooma","FOO":18})");
+    auto savedDoc = db.getDocument("ubiq");
+    CHECK(savedDoc.propertiesAsJSON() == mdoc.propertiesAsJSON());
 }

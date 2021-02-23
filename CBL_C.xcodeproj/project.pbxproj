@@ -975,7 +975,7 @@
 		271C2A6921CAD5950045856E /* LiteCore-iOS.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
-			path = "LiteCore-iOS shell.app";
+			path = "LiteCore-iOS.app";
 			remoteRef = 271C2A6821CAD5950045856E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -1165,15 +1165,15 @@
 			files = (
 				275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */,
 				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
-				27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */,
-				2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,
 				275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */,
 				277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */,
+				2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,
 				27D30F9F23A2D30500392107 /* PerfTest.cc in Sources */,
+				27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

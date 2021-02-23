@@ -57,6 +57,20 @@ static inline slice effectiveDir(slice inDirectory) {
     }
 }
 
+static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
+              "C4EncryptionKey and CBLEncryptionKey size do not match");
+
+static C4EncryptionKey asC4Key(const CBLEncryptionKey *key) {
+    C4EncryptionKey c4key;
+    if (key) {
+        c4key.algorithm = static_cast<C4EncryptionAlgorithm>(key->algorithm);
+        memcpy(c4key.bytes, key->bytes, sizeof(CBLEncryptionKey::bytes));
+    } else {
+        c4key.algorithm = kC4EncryptionNone;
+    }
+    return c4key;
+}
+
 static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
     CBLDatabaseConfiguration defaultConfig;
     if (!config) {
@@ -73,21 +87,25 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
         c4Config.flags |= kC4DB_NoUpgrade;
     if (config->flags & kCBLDatabase_VersionVectors)
         c4Config.flags |= kC4DB_VersionVectors;
-    if (config->encryptionKey) {
-        c4Config.encryptionKey.algorithm = static_cast<C4EncryptionAlgorithm>(
-                                                            config->encryptionKey->algorithm);
-        static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
-                      "C4EncryptionKey and CBLEncryptionKey size do not match");
-        memcpy(c4Config.encryptionKey.bytes, config->encryptionKey->bytes,
-               sizeof(CBLEncryptionKey::bytes));
-    } else {
-        c4Config.encryptionKey.algorithm = kC4EncryptionNone;
-    }
+    c4Config.encryptionKey = asC4Key(config->encryptionKey);
     return c4Config;
 }
 
 
-CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() {
+bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBLAPI {
+    C4EncryptionKey c4key;
+    if (c4key_setPassword(&c4key, password, kC4EncryptionAES256)) {
+        key->algorithm = CBLEncryptionAlgorithm(c4key.algorithm);
+        memcpy(key->bytes, c4key.bytes, sizeof(key->bytes));
+        return true;
+    } else {
+        key->algorithm = kCBLEncryptionNone;
+        return false;
+    }
+}
+
+
+CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() CBLAPI {
     CBLDatabaseConfiguration config = {};
     config.directory = effectiveDir(nullslice);
     config.flags = kDefaultFlags;
@@ -167,9 +185,13 @@ bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
 }
 
 #ifdef COUCHBASE_ENTERPRISE
-bool CBLDatabase_Rekey(CBLDatabase* db, const CBLEncryptionKey *newKey, CBLError* outError) CBLAPI {
+bool CBLDatabase_ChangeEncryptionKey(CBLDatabase *db,
+                                     const CBLEncryptionKey *newKey,
+                                     CBLError* outError) CBLAPI
+{
     return db->use<bool>([=](C4Database *c4db) {
-        return c4db_rekey(c4db, (const C4EncryptionKey*)newKey, internal(outError));
+        C4EncryptionKey c4key = asC4Key(newKey);
+        return c4db_rekey(c4db, &c4key, internal(outError));
     });
 }
 #endif
@@ -201,8 +223,10 @@ FLString CBLDatabase_Name(const CBLDatabase* db) CBLAPI {
     });
 }
 
-FLString CBLDatabase_Path(const CBLDatabase* db) CBLAPI {
-    return db->path;
+FLStringResult CBLDatabase_Path(const CBLDatabase* db) CBLAPI {
+    return db->use<FLStringResult>([](C4Database *c4db) {
+        return c4db_getPath(c4db);
+    });
 }
 
 const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) CBLAPI {

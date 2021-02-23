@@ -49,7 +49,7 @@ CBLDatabase_SendNotifications
 CBLDatabase_GetDocument
 CBLDatabase_GetMutableDocument
 CBLDatabase_SaveDocument
-CBLDatabase_SaveDocumentResolving
+CBLDatabase_SaveDocumentWithConflictHandler
 CBLDatabase_DeleteDocumentByID
 CBLDatabase_PurgeDocumentByID
 CBLDatabase_PurgeDocumentByID_s
@@ -72,8 +72,8 @@ CBLDocument_SetProperties
 CBLDocument_CreateFleeceDoc
 CBLDocument_PropertiesAsJSON
 CBLDocument_SetPropertiesAsJSON
-CBLDocument_Delete
-CBLDocument_Purge
+CBLDatabase_DeleteDocument
+CBLDatabase_PurgeDocument
 
 kCBLTypeProperty
 kCBLBlobType

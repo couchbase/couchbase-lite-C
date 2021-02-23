@@ -53,22 +53,6 @@ namespace cbl {
 
         inline MutableDocument mutableCopy() const;
 
-        bool deleteDoc(CBLConcurrencyControl concurrency =kCBLConcurrencyControlFailOnConflict) const {
-            CBLError error;
-            bool deleted = CBLDocument_Delete(ref(), concurrency, &error);
-            if (!deleted && error.code != 0)
-                throw error;
-            return deleted;
-        }
-
-        bool purge() const {
-            CBLError error;
-            bool purged = CBLDocument_Purge(ref(), &error);
-            if (!purged && error.code != 0)
-                throw error;
-            return purged;
-        }
-
     protected:
         Document(CBLRefCounted* r)                      :RefCounted(r) { }
 
@@ -78,11 +62,11 @@ namespace cbl {
             return doc;
         }
 
-        static Document checkSave(const CBLDocument *savedDoc, CBLError &error) {
-            if (savedDoc)
-                return Document::adopt(savedDoc);
+        static bool checkSave(bool saveResult, CBLError &error) {
+            if (saveResult)
+                return true;
             else if (error.code == CBLErrorConflict && error.domain == CBLDomain)
-                return nullptr;
+                return false;
             else
                 throw error;
         }
@@ -147,23 +131,43 @@ namespace cbl {
     }
 
 
-    inline Document Database::saveDocument(MutableDocument &doc, CBLConcurrencyControl c) {
-        CBLError error;
-        return Document::checkSave(CBLDatabase_SaveDocument(ref(), doc.ref(), c, &error), error);
+    inline void Database::saveDocument(MutableDocument &doc) {
+        (void) saveDocument(doc, kCBLConcurrencyControlLastWriteWins);
     }
 
 
-    inline Document Database::saveDocument(MutableDocument &doc,
-                                           SaveConflictHandler conflictHandler)
+    inline bool Database::saveDocument(MutableDocument &doc, CBLConcurrencyControl c) {
+        CBLError error;
+        return Document::checkSave(
+            CBLDatabase_SaveDocumentWithConcurrencyControl(ref(), doc.ref(), c, &error),
+            error);
+    }
+
+
+    inline bool Database::saveDocument(MutableDocument &doc,
+                                       SaveConflictHandler conflictHandler)
     {
-        CBLSaveConflictHandler cHandler = [](void *context, CBLDocument *myDoc,
+        CBLConflictHandler cHandler = [](void *context, CBLDocument *myDoc,
                                              const CBLDocument *otherDoc) -> bool {
             return (*(SaveConflictHandler*)context)(MutableDocument(myDoc),
                                                     Document(otherDoc));
         };
         CBLError error;
-        return Document::checkSave(CBLDatabase_SaveDocumentResolving(ref(), doc.ref(), cHandler,
-                                                             &conflictHandler, &error), error);
+        return Document::checkSave(
+            CBLDatabase_SaveDocumentWithConflictHandler(ref(), doc.ref(), cHandler, &conflictHandler, &error),
+            error);
+    }
+
+    inline bool Database::deleteDocument(Document &doc, CBLConcurrencyControl cc) {
+        CBLError error;
+        return Document::checkSave(CBLDatabase_DeleteDocumentWithConcurrencyControl(
+                                                                    ref(), doc.ref(), cc, &error),
+                                   error);
+    }
+
+    inline void Database::purgeDocument(Document &doc) {
+        CBLError error;
+        check(CBLDatabase_PurgeDocument(ref(), doc.ref(), &error), error);
     }
 
 

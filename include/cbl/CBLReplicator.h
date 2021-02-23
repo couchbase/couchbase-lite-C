@@ -43,10 +43,12 @@ typedef struct CBLEndpoint CBLEndpoint;
     and its path must be the name of the database on that server.
     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
     For example: `wss://example.org/dbname` */
+_cbl_warn_unused
 CBLEndpoint* CBLEndpoint_NewWithURL(FLString url) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Creates a new endpoint representing another local database. (Enterprise Edition only.) */
+_cbl_warn_unused
 CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase* _cbl_nonnull) CBLAPI;
 #endif
 
@@ -58,11 +60,13 @@ void CBLEndpoint_Free(CBLEndpoint*) CBLAPI;
 typedef struct CBLAuthenticator CBLAuthenticator;
 
 /** Creates an authenticator for HTTP Basic (username/password) auth. */
+_cbl_warn_unused
 CBLAuthenticator* CBLAuth_NewBasic(FLString username,
                                    FLString password) CBLAPI;
 
 /** Creates an authenticator using a Couchbase Sync Gateway login session identifier,
     and optionally a cookie name (pass NULL for the default.) */
+_cbl_warn_unused
 CBLAuthenticator* CBLAuth_NewSession(FLString sessionID,
                                      FLString cookieName) CBLAPI;
 
@@ -163,6 +167,7 @@ typedef struct {
 CBL_REFCOUNTED(CBLReplicator*, Replicator);
 
 /** Creates a replicator with the given configuration. */
+_cbl_warn_unused
 CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* _cbl_nonnull,
                                  CBLError*) CBLAPI;
 
@@ -246,6 +251,7 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator* _cbl_nonnull) CBLAPI;
     \note  Documents that would never be pushed by this replicator, due to its configuration's
            `pushFilter` or `docIDs`, are ignored.
     \warning  You are responsible for releasing the returned array via \ref FLValue_Release. */
+_cbl_warn_unused
 FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator* _cbl_nonnull,
                                         CBLError*) CBLAPI;
 
@@ -274,6 +280,7 @@ typedef void (*CBLReplicatorChangeListener)(void *context,
                                             const CBLReplicatorStatus *status _cbl_nonnull);
 
 /** Adds a listener that will be called when the replicator's status changes. */
+_cbl_warn_unused
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* _cbl_nonnull,
                                                   CBLReplicatorChangeListener _cbl_nonnull, 
                                                   void *context) CBLAPI;
@@ -309,6 +316,7 @@ typedef void (*CBLReplicatedDocumentListener)(void *context,
                                               const CBLReplicatedDocument* documents);
 
 /** Adds a listener that will be called when documents are replicated. */
+_cbl_warn_unused
 CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* _cbl_nonnull,
                                                     CBLReplicatedDocumentListener _cbl_nonnull,
                                                     void *context) CBLAPI;

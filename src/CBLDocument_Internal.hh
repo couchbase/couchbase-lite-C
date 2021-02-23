@@ -39,13 +39,13 @@ public:
     CBLDocument(slice docID, bool isMutable);
 
     // Construct on an existing document
-    CBLDocument(CBLDatabase *db, slice docID, bool isMutable, bool allRevisions =false);
+    CBLDocument(CBLDatabase *db _cbl_nonnull, slice docID, bool isMutable, bool allRevisions =false);
 
     // Mutable copy of another CBLDocument
     CBLDocument(const CBLDocument* otherDoc);
 
     // Document loaded from db without a C4Document (e.g. a replicator validation callback)
-    CBLDocument(CBLDatabase *db,
+    CBLDocument(CBLDatabase *db _cbl_nonnull,
                 slice docID,
                 slice revID,
                 C4RevisionFlags revFlags,
@@ -79,19 +79,21 @@ public:
 
     struct SaveOptions {
         SaveOptions(CBLConcurrencyControl c)             :concurrency(c) { }
-        SaveOptions(CBLSaveConflictHandler h, void *ctx) :conflictHandler(h), context(ctx) { }
+        SaveOptions(CBLConflictHandler h, void *ctx) :conflictHandler(h), context(ctx) { }
 
         CBLConcurrencyControl concurrency;
-        CBLSaveConflictHandler conflictHandler = nullptr;
+        CBLConflictHandler conflictHandler = nullptr;
         void *context;
         bool deleting = false;
     };
 
-    RetainedConstDocument save(CBLDatabase* db _cbl_nonnull,
-                                    const SaveOptions&,
-                                    C4Error* outError);
+    bool save(CBLDatabase* db _cbl_nonnull,
+              const SaveOptions&,
+              C4Error* outError);
 
-    bool deleteDoc(CBLConcurrencyControl, C4Error* outError);
+    bool deleteDoc(CBLDatabase* _cbl_nonnull,
+                   CBLConcurrencyControl,
+                   C4Error* outError);
 
     static bool deleteDoc(CBLDatabase* db _cbl_nonnull,
                           slice docID,
@@ -138,10 +140,10 @@ private:
 
     static UnretainedValueToBlobMap* sNewBlobs;
 
+    RetainedDatabase            _db;                    // Database (null for new doc)
     alloc_slice const           _docID;                 // Document ID (never empty)
-    mutable alloc_slice         _revID;                 // Revision ID (if no _c4doc)
-    RetainedDatabase const      _db;                    // Database (null for new doc)
-    c4::ref<C4Document> const   _c4doc;                 // LiteCore doc (null for new doc)
+    mutable alloc_slice         _revID;                 // Revision ID
+    c4::ref<C4Document>         _c4doc;                 // LiteCore doc (null for new doc)
     Doc                         _fromJSON;              // Properties read from JSON
     mutable RetainedValue       _properties;            // Properties, initialized lazily
     ValueToBlobMap              _blobs;                 // Maps Dicts in _properties to CBLBlobs

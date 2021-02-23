@@ -179,7 +179,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     cerr << "Deleting a doc...\n";
     const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl);
     REQUIRE(doc);
-    CHECK(CBLDocument_Delete(doc, kCBLConcurrencyControlLastWriteWins, &error));
+    CHECK(CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
     CBLDocument_Release(doc);
 
     cerr << "Waiting for listener again...\n";
@@ -263,7 +263,7 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
     cerr << "Deleting a doc...\n";
     Document doc = db.getDocument("0000012");
     REQUIRE(doc);
-    doc.deleteDoc();
+    REQUIRE(db.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
 
     cerr << "Waiting for listener again...\n";
     while (resultCount < 0)

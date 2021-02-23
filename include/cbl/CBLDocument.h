@@ -46,17 +46,17 @@ typedef CBL_ENUM(uint8_t, CBLConcurrencyControl) {
     (probably by a pull replicator, or by application code on another thread)
     since it was loaded into the CBLDocument being saved.
     @param context  The value of the \p context parameter you passed to
-                    \ref CBLDatabase_SaveDocumentResolving.
+                    \ref CBLDatabase_SaveDocumentWithConflictHandler.
     @param documentBeingSaved  The document being saved (same as the parameter you passed to
-                    \ref CBLDatabase_SaveDocumentResolving.) The callback may modify
+                    \ref CBLDatabase_SaveDocumentWithConflictHandler.) The callback may modify
                     this document's properties as necessary to resolve the conflict.
     @param conflictingDocument  The revision of the document currently in the database,
                     which has been changed since \p documentBeingSaved was loaded.
                     May be NULL, meaning that the document has been deleted.
     @return  True to save the document, false to abort the save. */
-typedef bool (*CBLSaveConflictHandler)(void *context,
-                                       CBLDocument *documentBeingSaved,
-                                       const CBLDocument *conflictingDocument);
+typedef bool (*CBLConflictHandler)(void *context,
+                                   CBLDocument *documentBeingSaved,
+                                   const CBLDocument *conflictingDocument);
 
 
 /** Reads a document from the database, creating a new (immutable) \ref CBLDocument object.
@@ -73,36 +73,55 @@ const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database _cbl_nonn
 CBL_REFCOUNTED(CBLDocument*, Document);
 
 /** Saves a (mutable) document to the database.
+    \warning If a newer revision has been saved since \p doc was loaded, it will be overwritten by
+            this one. This can lead to data loss! To avoid this, call
+            \ref CBLDatabase_SaveDocumentWithConcurrencyControl or
+            \ref CBLDatabase_SaveDocumentWithConflictHandler instead.
+    @param db  The database to save to.
+    @param doc  The mutable document to save.
+    @param error  On failure, the error will be written here.
+    @return  True on success, false on failure. */
+bool CBLDatabase_SaveDocument(CBLDatabase* db _cbl_nonnull,
+                              CBLDocument* doc _cbl_nonnull,
+                              CBLError* error) CBLAPI;
+
+/** Saves a (mutable) document to the database.
     If a conflicting revision has been saved since \p doc was loaded, the \p concurrency
     parameter specifies whether the save should fail, or the conflicting revision should
     be overwritten with the revision being saved.
-    If you need finer-grained control, call \ref CBLDatabase_SaveDocumentResolving instead.
+    If you need finer-grained control, call \ref CBLDatabase_SaveDocumentWithConflictHandler instead.
     @param db  The database to save to.
     @param doc  The mutable document to save.
     @param concurrency  Conflict-handling strategy (fail or overwrite).
     @param error  On failure, the error will be written here.
-    @return  An updated document reflecting the saved changes, or NULL on failure. */
-_cbl_warn_unused
-const CBLDocument* CBLDatabase_SaveDocument(CBLDatabase* db _cbl_nonnull,
-                                            CBLDocument* doc _cbl_nonnull,
-                                            CBLConcurrencyControl concurrency,
-                                            CBLError* error) CBLAPI;
+    @return  True on success, false on failure. */
+bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db _cbl_nonnull,
+                                                    CBLDocument* doc _cbl_nonnull,
+                                                    CBLConcurrencyControl concurrency,
+                                                    CBLError* error) CBLAPI;
 
-/** Saves a (mutable) document to the database. This function is the same as \ref
-    CBLDatabase_SaveDocument, except that it allows for custom conflict handling in the event
+/** Saves a (mutable) document to the database, allowing for custom conflict handling in the event
     that the document has been updated since \p doc was loaded.
     @param db  The database to save to.
     @param doc  The mutable document to save.
     @param conflictHandler  The callback to be invoked if there is a conflict.
     @param context  An arbitrary value to be passed to the \p conflictHandler.
     @param error  On failure, the error will be written here.
-    @return  An updated document reflecting the saved changes, or NULL on failure. */
-_cbl_warn_unused
-const CBLDocument* CBLDatabase_SaveDocumentResolving(CBLDatabase* db _cbl_nonnull,
-                                                     CBLDocument* doc _cbl_nonnull,
-                                                     CBLSaveConflictHandler conflictHandler,
-                                                     void *context,
-                                                     CBLError* error) CBLAPI;
+    @return  True on success, false on failure. */
+bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db _cbl_nonnull,
+                                                 CBLDocument* doc _cbl_nonnull,
+                                                 CBLConflictHandler conflictHandler,
+                                                 void *context,
+                                                 CBLError* error) CBLAPI;
+
+/** Deletes a document from the database. Deletions are replicated.
+    @warning  You are still responsible for releasing the CBLDocument.
+    @param document  The document to delete.
+    @param error  On failure, the error will be written here.
+    @return  True if the document was deleted, false if an error occurred. */
+bool CBLDatabase_DeleteDocument(CBLDatabase *db _cbl_nonnull,
+                                const CBLDocument* document _cbl_nonnull,
+                                CBLError* error) CBLAPI;
 
 /** Deletes a document from the database. Deletions are replicated.
     @warning  You are still responsible for releasing the CBLDocument.
@@ -110,9 +129,10 @@ const CBLDocument* CBLDatabase_SaveDocumentResolving(CBLDatabase* db _cbl_nonnul
     @param concurrency  Conflict-handling strategy.
     @param error  On failure, the error will be written here.
     @return  True if the document was deleted, false if an error occurred. */
-bool CBLDocument_Delete(const CBLDocument* document _cbl_nonnull,
-                        CBLConcurrencyControl concurrency,
-                        CBLError* error) CBLAPI;
+bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db _cbl_nonnull,
+                                                      const CBLDocument* document _cbl_nonnull,
+                                                      CBLConcurrencyControl concurrency,
+                                                      CBLError* error) CBLAPI;
 
 /** Purges a document. This removes all traces of the document from the database.
     Purges are _not_ replicated. If the document is changed on a server, it will be re-created
@@ -123,8 +143,9 @@ bool CBLDocument_Delete(const CBLDocument* document _cbl_nonnull,
     @param document  The document to delete.
     @param error  On failure, the error will be written here.
     @return  True if the document was purged, false if it doesn't exist or the purge failed. */
-bool CBLDocument_Purge(const CBLDocument* document _cbl_nonnull,
-                       CBLError* error) CBLAPI;
+bool CBLDatabase_PurgeDocument(CBLDatabase* db _cbl_nonnull,
+                               const CBLDocument* document _cbl_nonnull,
+                               CBLError* error) CBLAPI;
 
 /** Purges a document, given only its ID.
     @note  If no document with that ID exists, this function will return false but the error
@@ -162,12 +183,14 @@ CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
 /** Creates a new, empty document in memory. It will not be added to a database until saved.
     @param docID  The ID of the new document, or NULL to assign a new unique ID.
     @return  The mutable document instance. */
+_cbl_warn_unused
 CBLDocument* CBLDocument_New(FLString docID) CBLAPI _cbl_warn_unused _cbl_returns_nonnull;
 
 /** Creates a new mutable CBLDocument instance that refers to the same document as the original.
     If the original document has unsaved changes, the new one will also start out with the same
     changes; but mutating one document thereafter will not affect the other.
     @note  You must release the new reference when you're done with it. */
+_cbl_warn_unused
 CBLDocument* CBLDocument_MutableCopy(const CBLDocument* original _cbl_nonnull) CBLAPI
     _cbl_warn_unused _cbl_returns_nonnull;
 
@@ -227,6 +250,7 @@ FLDoc CBLDocument_CreateFleeceDoc(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Returns a document's properties as JSON.
     @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
+_cbl_warn_unused
 FLSliceResult CBLDocument_PropertiesAsJSON(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Sets a mutable document's properties from a JSON string. */

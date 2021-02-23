@@ -37,6 +37,8 @@ extern "C" {
     CBL_REFCOUNTED(CBLCertificate*, Cert);
     CBL_REFCOUNTED(CBLTLSIdentity*, Identity);
 
+    // TODO: Define & implement API
+
 /** @} */
 
 #ifdef __cplusplus
