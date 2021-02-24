@@ -82,19 +82,18 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:ga2e112f0e281d3bc5f3732f854e902b20"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#ga2e112f0e281d3bc5f3732f854e902b20">CBLErrorDomain</a> : uint32_t { <br />
-&#160;&#160;<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a64d3b8eec45b196c2f548c3c674540ad">CBLDomain</a> = 1, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a971c5ad661670fdde5fd595acae21791">CBLPOSIXDomain</a>, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a33d44c4f85ee650fde73ecfaf8f85d91">CBLSQLiteDomain</a>, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20ab2e12ae18a834dd1c4ba78a6e2d16127">CBLFleeceDomain</a>, 
+<tr class="memitem:ga2d569fb440396cf223ed8776d84e5bc5"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#ga2d569fb440396cf223ed8776d84e5bc5">CBLErrorDomain</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5a64d3b8eec45b196c2f548c3c674540ad">CBLDomain</a> = 1, 
+<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5a971c5ad661670fdde5fd595acae21791">CBLPOSIXDomain</a>, 
+<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5a33d44c4f85ee650fde73ecfaf8f85d91">CBLSQLiteDomain</a>, 
+<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5ab2e12ae18a834dd1c4ba78a6e2d16127">CBLFleeceDomain</a>, 
 <br />
-&#160;&#160;<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20aeba951148f4f36384f7d697f101d9ea7">CBLNetworkDomain</a>, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a4f626aa4e1bd8cbc619fa5a88fdd9d05">CBLWebSocketDomain</a>, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a18312fd4278a2cd7035fb10d5494311b">CBLMaxErrorDomainPlus1</a>
+&#160;&#160;<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5aeba951148f4f36384f7d697f101d9ea7">CBLNetworkDomain</a>, 
+<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5a4f626aa4e1bd8cbc619fa5a88fdd9d05">CBLWebSocketDomain</a>
 <br />
  }</td></tr>
-<tr class="memdesc:ga2e112f0e281d3bc5f3732f854e902b20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error domains, serving as namespaces for numeric error codes.  <a href="group__errors.html#ga2e112f0e281d3bc5f3732f854e902b20">More...</a><br /></td></tr>
-<tr class="separator:ga2e112f0e281d3bc5f3732f854e902b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:ga2d569fb440396cf223ed8776d84e5bc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error domains, serving as namespaces for numeric error codes.  <a href="group__errors.html#ga2d569fb440396cf223ed8776d84e5bc5">More...</a><br /></td></tr>
+<tr class="separator:ga2d569fb440396cf223ed8776d84e5bc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad43e348ca76e9a8fe7c10ec916bf0528"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#gad43e348ca76e9a8fe7c10ec916bf0528">CBLErrorCode</a> : int32_t { <br />
 &#160;&#160;<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a18e2cc03e094c9a3dd7ea574f7d29e0f">CBLErrorAssertionFailed</a> = 1, 
 <a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a59874123005ca526d0533ffb0466844a">CBLErrorUnimplemented</a>, 
@@ -132,8 +131,7 @@ Enumerations</h2></td></tr>
 <a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528aa33e72cadd02e2d8d46971f9393ae0f8">CBLErrorDatabaseTooNew</a>, 
 <br />
 &#160;&#160;<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a4ee6d6b8615511a441c49d4af1e27e30">CBLErrorBadDocID</a>, 
-<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a7e1095129cfeb7e2c2b61bc53d2da022">CBLErrorCantUpgradeDatabase</a>, 
-<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a4184bf6403e10b27517e68cd28b21c73">CBLNumErrorCodesPlus1</a>
+<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a7e1095129cfeb7e2c2b61bc53d2da022">CBLErrorCantUpgradeDatabase</a>
 <br />
  }</td></tr>
 <tr class="memdesc:gad43e348ca76e9a8fe7c10ec916bf0528"><td class="mdescLeft">&#160;</td><td class="mdescRight">Couchbase Lite error codes, in the CBLDomain.  <a href="group__errors.html#gad43e348ca76e9a8fe7c10ec916bf0528">More...</a><br /></td></tr>
@@ -152,7 +150,11 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a0c8bcad7409930957e9826891e8e285d">CBLNetErrTLSClientCertRequired</a>, 
 <a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a14cc18429ec6e216d363150ecf629dea">CBLNetErrTLSClientCertRejected</a>, 
 <a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3aaf38c7879ac962a198f3b4862cd59ba9">CBLNetErrTLSCertUnknownRoot</a>, 
-<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3ad7b0048213b1c23960b920434e711c67">CBLNetErrInvalidRedirect</a>
+<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3ad7b0048213b1c23960b920434e711c67">CBLNetErrInvalidRedirect</a>, 
+<br />
+&#160;&#160;<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a4c026c2e26eacb8c7a0951e23b541168">CBLNetErrUnknown</a>, 
+<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a4c6f8210233e835e3049506cd281a9c1">CBLNetErrTLSCertRevoked</a>, 
+<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a71031196353249b5d81e13b52acbe363">CBLNetErrTLSCertNameMismatch</a>
 <br />
  }</td></tr>
 <tr class="memdesc:ga2849714bdf45e1804e2c3e3e265c1ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Network error codes, in the CBLNetworkDomain.  <a href="group__errors.html#ga2849714bdf45e1804e2c3e3e265c1ff3">More...</a><br /></td></tr>
@@ -160,9 +162,9 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga0ab89bedccf3bdda3caa6a089cac79b7"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#ga0ab89bedccf3bdda3caa6a089cac79b7">CBLError_Message</a> (const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
-<tr class="memdesc:ga0ab89bedccf3bdda3caa6a089cac79b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a message describing an error.  <a href="#ga0ab89bedccf3bdda3caa6a089cac79b7">More...</a><br /></td></tr>
-<tr class="separator:ga0ab89bedccf3bdda3caa6a089cac79b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1e472b0d85475b305b6cfebe2c2d9f55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#ga1e472b0d85475b305b6cfebe2c2d9f55">CBLError_Message</a> (const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
+<tr class="memdesc:ga1e472b0d85475b305b6cfebe2c2d9f55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a message describing an error.  <a href="#ga1e472b0d85475b305b6cfebe2c2d9f55">More...</a><br /></td></tr>
+<tr class="separator:ga1e472b0d85475b305b6cfebe2c2d9f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Types and constants for communicating errors from API calls. </p>
@@ -240,39 +242,36 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="ggad43e348ca76e9a8fe7c10ec916bf0528a4ee6d6b8615511a441c49d4af1e27e30"></a>CBLErrorBadDocID&#160;</td><td class="fielddoc"><p>Invalid document ID. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ggad43e348ca76e9a8fe7c10ec916bf0528a7e1095129cfeb7e2c2b61bc53d2da022"></a>CBLErrorCantUpgradeDatabase&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="ggad43e348ca76e9a8fe7c10ec916bf0528a4184bf6403e10b27517e68cd28b21c73"></a>CBLNumErrorCodesPlus1&#160;</td><td class="fielddoc"><p>DB can't be upgraded (might be unsupported dev version) </p>
-</td></tr>
 </table>
 
 </div>
 </div>
-<a id="ga2e112f0e281d3bc5f3732f854e902b20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga2e112f0e281d3bc5f3732f854e902b20">&#9670;&nbsp;</a></span>CBLErrorDomain</h2>
+<a id="ga2d569fb440396cf223ed8776d84e5bc5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2d569fb440396cf223ed8776d84e5bc5">&#9670;&nbsp;</a></span>CBLErrorDomain</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="group__errors.html#ga2e112f0e281d3bc5f3732f854e902b20">CBLErrorDomain</a> : uint32_t</td>
+          <td class="memname">enum <a class="el" href="group__errors.html#ga2d569fb440396cf223ed8776d84e5bc5">CBLErrorDomain</a> : uint8_t</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Error domains, serving as namespaces for numeric error codes. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga2e112f0e281d3bc5f3732f854e902b20a64d3b8eec45b196c2f548c3c674540ad"></a>CBLDomain&#160;</td><td class="fielddoc"><p>code is a Couchbase Lite error code; see <a class="el" href="group__errors.html#gad43e348ca76e9a8fe7c10ec916bf0528">CBLErrorCode</a> </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga2d569fb440396cf223ed8776d84e5bc5a64d3b8eec45b196c2f548c3c674540ad"></a>CBLDomain&#160;</td><td class="fielddoc"><p>code is a Couchbase Lite error code; see <a class="el" href="group__errors.html#gad43e348ca76e9a8fe7c10ec916bf0528">CBLErrorCode</a> </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga2e112f0e281d3bc5f3732f854e902b20a971c5ad661670fdde5fd595acae21791"></a>CBLPOSIXDomain&#160;</td><td class="fielddoc"><p>code is a POSIX <code>errno</code>; see "errno.h" </p>
+<tr><td class="fieldname"><a id="gga2d569fb440396cf223ed8776d84e5bc5a971c5ad661670fdde5fd595acae21791"></a>CBLPOSIXDomain&#160;</td><td class="fielddoc"><p>code is a POSIX <code>errno</code>; see "errno.h" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga2e112f0e281d3bc5f3732f854e902b20a33d44c4f85ee650fde73ecfaf8f85d91"></a>CBLSQLiteDomain&#160;</td><td class="fielddoc"><p>code is a SQLite error; see "sqlite3.h" </p>
+<tr><td class="fieldname"><a id="gga2d569fb440396cf223ed8776d84e5bc5a33d44c4f85ee650fde73ecfaf8f85d91"></a>CBLSQLiteDomain&#160;</td><td class="fielddoc"><p>code is a SQLite error; see "sqlite3.h" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga2e112f0e281d3bc5f3732f854e902b20ab2e12ae18a834dd1c4ba78a6e2d16127"></a>CBLFleeceDomain&#160;</td><td class="fielddoc"><p>code is a Fleece error; see "FleeceException.h" </p>
+<tr><td class="fieldname"><a id="gga2d569fb440396cf223ed8776d84e5bc5ab2e12ae18a834dd1c4ba78a6e2d16127"></a>CBLFleeceDomain&#160;</td><td class="fielddoc"><p>code is a Fleece error; see "FleeceException.h" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga2e112f0e281d3bc5f3732f854e902b20aeba951148f4f36384f7d697f101d9ea7"></a>CBLNetworkDomain&#160;</td><td class="fielddoc"><p>code is a network error; see <a class="el" href="group__errors.html#ga2849714bdf45e1804e2c3e3e265c1ff3">CBLNetworkErrorCode</a> </p>
+<tr><td class="fieldname"><a id="gga2d569fb440396cf223ed8776d84e5bc5aeba951148f4f36384f7d697f101d9ea7"></a>CBLNetworkDomain&#160;</td><td class="fielddoc"><p>code is a network error; see <a class="el" href="group__errors.html#ga2849714bdf45e1804e2c3e3e265c1ff3">CBLNetworkErrorCode</a> </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga2e112f0e281d3bc5f3732f854e902b20a4f626aa4e1bd8cbc619fa5a88fdd9d05"></a>CBLWebSocketDomain&#160;</td><td class="fielddoc"><p>code is a WebSocket close code (1000...1015) or HTTP error (300..599) </p>
+<tr><td class="fieldname"><a id="gga2d569fb440396cf223ed8776d84e5bc5a4f626aa4e1bd8cbc619fa5a88fdd9d05"></a>CBLWebSocketDomain&#160;</td><td class="fielddoc"><p>code is a WebSocket close code (1000...1015) or HTTP error (300..599) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga2e112f0e281d3bc5f3732f854e902b20a18312fd4278a2cd7035fb10d5494311b"></a>CBLMaxErrorDomainPlus1&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -315,19 +314,25 @@ Functions</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="gga2849714bdf45e1804e2c3e3e265c1ff3ad7b0048213b1c23960b920434e711c67"></a>CBLNetErrInvalidRedirect&#160;</td><td class="fielddoc"><p>Attempted redirect to invalid URL. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="gga2849714bdf45e1804e2c3e3e265c1ff3a4c026c2e26eacb8c7a0951e23b541168"></a>CBLNetErrUnknown&#160;</td><td class="fielddoc"><p>Unknown networking error. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga2849714bdf45e1804e2c3e3e265c1ff3a4c6f8210233e835e3049506cd281a9c1"></a>CBLNetErrTLSCertRevoked&#160;</td><td class="fielddoc"><p>Server's cert has been revoked. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga2849714bdf45e1804e2c3e3e265c1ff3a71031196353249b5d81e13b52acbe363"></a>CBLNetErrTLSCertNameMismatch&#160;</td><td class="fielddoc"><p>Server cert's name does not match DNS name. </p>
+</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ga0ab89bedccf3bdda3caa6a089cac79b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga0ab89bedccf3bdda3caa6a089cac79b7">&#9670;&nbsp;</a></span>CBLError_Message()</h2>
+<a id="ga1e472b0d85475b305b6cfebe2c2d9f55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1e472b0d85475b305b6cfebe2c2d9f55">&#9670;&nbsp;</a></span>CBLError_Message()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* CBLError_Message </td>
+          <td class="memname"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a> CBLError_Message </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -337,7 +342,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns a message describing an error. </p>
-<dl class="section note"><dt>Note</dt><dd>It is the caller's responsibility to free the returned C string by calling <code>free</code>. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>You are responsible for releasing the result by calling <a class="el" href="group___f_l_slice.html#ga254cef250e1fb2b3cc8668c30373af04">FLSliceResult_Release</a>. </dd></dl>
 
 </div>
 </div>

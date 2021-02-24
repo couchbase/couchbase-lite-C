@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['paths',['Paths',['../group___f_l_key_path.html',1,'']]]
+  ['queries',['Queries',['../group__queries.html',1,'']]]
 ];

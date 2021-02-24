@@ -116,6 +116,7 @@ bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db _cbl_nonnull,
 
 /** Deletes a document from the database. Deletions are replicated.
     @warning  You are still responsible for releasing the CBLDocument.
+    @param db  The database containing the document.
     @param document  The document to delete.
     @param error  On failure, the error will be written here.
     @return  True if the document was deleted, false if an error occurred. */
@@ -125,6 +126,7 @@ bool CBLDatabase_DeleteDocument(CBLDatabase *db _cbl_nonnull,
 
 /** Deletes a document from the database. Deletions are replicated.
     @warning  You are still responsible for releasing the CBLDocument.
+    @param db  The database containing the document.
     @param document  The document to delete.
     @param concurrency  Conflict-handling strategy.
     @param error  On failure, the error will be written here.
@@ -140,6 +142,7 @@ bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db _cbl_nonnu
     @warning  You are still responsible for releasing the \ref CBLDocument reference.
     @note If you don't have the document in memory already, \ref CBLDatabase_PurgeDocumentByID is a
           simpler shortcut.
+    @param db  The database containing the document.
     @param document  The document to delete.
     @param error  On failure, the error will be written here.
     @return  True if the document was purged, false if it doesn't exist or the purge failed. */

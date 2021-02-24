@@ -43,13 +43,15 @@ extern "C" {
     \ref FLDict_GetBlob on it to create a \ref CBLBlob object you can call.
     The object has accessors for the blob's metadata and for loading the data itself.
 
-    To create a new blob from in-memory data, call \ref CBLBlob_CreateWithData, then call
-    \ref FLMutableDict_SetBlob or \ref FLMutableArray_SetBlob to add the \ref CBLBlob to the
-    document (or to a dictionary or array property of the document.)
+    To create a new blob from in-memory data, call \ref CBLBlob_NewWithData, then call
+    \ref FLSlot_SetBlob to add the \ref CBLBlob to a mutable array or dictionary in the
+    document. For example:
+
+        FLSlot_SetBlob(FLMutableDict_Set(properties, key), blob);
 
     To create a new blob from a stream, call \ref CBLBlobWriter_New to create a
     \ref CBLBlobWriteStream, then make one or more calls to \ref CBLBlobWriter_Write to write
-    data to the blob, then finally call \ref CBLBlob_CreateWithStream to create the blob.
+    data to the blob, then finally call \ref CBLBlob_NewWithStream to create the blob.
     To store the blob into a document, do as in the previous paragraph.
 
  */
@@ -142,7 +144,7 @@ extern "C" {
 
     /** Opens a stream for writing a new blob.
         You should next call \ref CBLBlobWriter_Write one or more times to write the data,
-        then \ref CBLBlob_CreateWithStream to create the blob.
+        then \ref CBLBlob_NewWithStream to create the blob.
 
         If for some reason you need to abort, just call \ref CBLBlobWriter_Close. */
     _cbl_warn_unused
@@ -165,7 +167,7 @@ extern "C" {
 
     /** Creates a new blob after its data has been written to a \ref CBLBlobWriteStream.
         You should then add the blob to a mutable document as a property -- see
-        \ref FLMutableDict_SetBlob and \ref FLMutableArray_SetBlob.
+        \ref FLSlot_SetBlob.
         @note  You are responsible for releasing the CBLBlob reference.
         @note  Do not free the stream; the blob will do that.
         @param contentType  The MIME type (optional).

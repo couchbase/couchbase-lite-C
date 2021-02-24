@@ -65,95 +65,114 @@ $(function() {
   <div class="summary">
 <a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">CBLLogFileConfiguration Struct Reference</div>  </div>
+<div class="title">CBLLogFileConfiguration Struct Reference<div class="ingroups"><a class="el" href="group__logging.html">Logging</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>An object containing properties for file logging configuration.  
+<p>The properties for configuring logging to files.  
  <a href="struct_c_b_l_log_file_configuration.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_c_b_l_log_8h_source.html">cbl/CBLLog.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:ab1729f1fffdab0563b5a35235fa36b93"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#ab1729f1fffdab0563b5a35235fa36b93">directory</a></td></tr>
-<tr class="memdesc:ab1729f1fffdab0563b5a35235fa36b93"><td class="mdescLeft">&#160;</td><td class="mdescRight">The directory to write logs to (UTF-8 encoded)  <a href="#ab1729f1fffdab0563b5a35235fa36b93">More...</a><br /></td></tr>
-<tr class="separator:ab1729f1fffdab0563b5a35235fa36b93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb6ae5f4546804de3269587814ee0b39"><td class="memItemLeft" align="right" valign="top">const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#abb6ae5f4546804de3269587814ee0b39">maxRotateCount</a></td></tr>
-<tr class="memdesc:abb6ae5f4546804de3269587814ee0b39"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum number of <em>rotated</em> logs to keep (i.e. the total number of logs will be one more)  <a href="#abb6ae5f4546804de3269587814ee0b39">More...</a><br /></td></tr>
-<tr class="separator:abb6ae5f4546804de3269587814ee0b39"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7df99a4a12a233e9e3db5f73afd8057"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#af7df99a4a12a233e9e3db5f73afd8057">maxSize</a></td></tr>
-<tr class="memdesc:af7df99a4a12a233e9e3db5f73afd8057"><td class="mdescLeft">&#160;</td><td class="mdescRight">The max size to write to a log file before rotating (best-effort)  <a href="#af7df99a4a12a233e9e3db5f73afd8057">More...</a><br /></td></tr>
-<tr class="separator:af7df99a4a12a233e9e3db5f73afd8057"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53e0e6ba881a590395e1249f9a1a766d"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#a53e0e6ba881a590395e1249f9a1a766d">usePlaintext</a></td></tr>
-<tr class="memdesc:a53e0e6ba881a590395e1249f9a1a766d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to log in plaintext (as opposed to binary)  <a href="#a53e0e6ba881a590395e1249f9a1a766d">More...</a><br /></td></tr>
-<tr class="separator:a53e0e6ba881a590395e1249f9a1a766d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba0bbafc065b765360963532b98f3aa8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#aba0bbafc065b765360963532b98f3aa8">level</a></td></tr>
+<tr class="memdesc:aba0bbafc065b765360963532b98f3aa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The minimum level of message to write.  <a href="#aba0bbafc065b765360963532b98f3aa8">More...</a><br /></td></tr>
+<tr class="separator:aba0bbafc065b765360963532b98f3aa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6c2c2839694308a6f3ae8cccff98b2f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#ac6c2c2839694308a6f3ae8cccff98b2f">directory</a></td></tr>
+<tr class="memdesc:ac6c2c2839694308a6f3ae8cccff98b2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The directory where log files will be created.  <a href="#ac6c2c2839694308a6f3ae8cccff98b2f">More...</a><br /></td></tr>
+<tr class="separator:ac6c2c2839694308a6f3ae8cccff98b2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ce13f49863ec35a54f8edc574417d5d"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#a5ce13f49863ec35a54f8edc574417d5d">maxRotateCount</a></td></tr>
+<tr class="memdesc:a5ce13f49863ec35a54f8edc574417d5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Max number of older log files to keep (in addition to current one.)  <a href="#a5ce13f49863ec35a54f8edc574417d5d">More...</a><br /></td></tr>
+<tr class="separator:a5ce13f49863ec35a54f8edc574417d5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61ccdf64b186e5597f80d78943ce1278"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#a61ccdf64b186e5597f80d78943ce1278">maxSize</a></td></tr>
+<tr class="memdesc:a61ccdf64b186e5597f80d78943ce1278"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size in bytes at which a file will be rotated out (best effort).  <a href="#a61ccdf64b186e5597f80d78943ce1278">More...</a><br /></td></tr>
+<tr class="separator:a61ccdf64b186e5597f80d78943ce1278"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6fe8002b56d5502db77724ed06a47be"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html#aa6fe8002b56d5502db77724ed06a47be">usePlaintext</a></td></tr>
+<tr class="memdesc:aa6fe8002b56d5502db77724ed06a47be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether or not to log in plaintext (as opposed to binary.) Plaintext logging is slower and bigger.  <a href="#aa6fe8002b56d5502db77724ed06a47be">More...</a><br /></td></tr>
+<tr class="separator:aa6fe8002b56d5502db77724ed06a47be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An object containing properties for file logging configuration. </p>
-<dl class="section warning"><dt>Warning</dt><dd><a class="el" href="struct_c_b_l_log_file_configuration.html#a53e0e6ba881a590395e1249f9a1a766d">usePlaintext</a> results in significantly larger log files; we recommend turning it off in production. </dd></dl>
+<div class="textblock"><p>The properties for configuring logging to files. </p>
+<dl class="section warning"><dt>Warning</dt><dd><code>usePlaintext</code> results in significantly larger log files and higher CPU usage that may slow down your app; we recommend turning it off in production. </dd></dl>
 </div><h2 class="groupheader">Field Documentation</h2>
-<a id="ab1729f1fffdab0563b5a35235fa36b93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab1729f1fffdab0563b5a35235fa36b93">&#9670;&nbsp;</a></span>directory</h2>
+<a id="ac6c2c2839694308a6f3ae8cccff98b2f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6c2c2839694308a6f3ae8cccff98b2f">&#9670;&nbsp;</a></span>directory</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* CBLLogFileConfiguration::directory</td>
+          <td class="memname"><a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> CBLLogFileConfiguration::directory</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>The directory to write logs to (UTF-8 encoded) </p>
+<p>The directory where log files will be created. </p>
 
 </div>
 </div>
-<a id="abb6ae5f4546804de3269587814ee0b39"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb6ae5f4546804de3269587814ee0b39">&#9670;&nbsp;</a></span>maxRotateCount</h2>
+<a id="aba0bbafc065b765360963532b98f3aa8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba0bbafc065b765360963532b98f3aa8">&#9670;&nbsp;</a></span>level</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const uint32_t CBLLogFileConfiguration::maxRotateCount</td>
+          <td class="memname"><a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a> CBLLogFileConfiguration::level</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>The maximum number of <em>rotated</em> logs to keep (i.e. the total number of logs will be one more) </p>
+<p>The minimum level of message to write. </p>
 
 </div>
 </div>
-<a id="af7df99a4a12a233e9e3db5f73afd8057"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7df99a4a12a233e9e3db5f73afd8057">&#9670;&nbsp;</a></span>maxSize</h2>
+<a id="a5ce13f49863ec35a54f8edc574417d5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ce13f49863ec35a54f8edc574417d5d">&#9670;&nbsp;</a></span>maxRotateCount</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const size_t CBLLogFileConfiguration::maxSize</td>
+          <td class="memname">uint32_t CBLLogFileConfiguration::maxRotateCount</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>The max size to write to a log file before rotating (best-effort) </p>
+<p>Max number of older log files to keep (in addition to current one.) </p>
 
 </div>
 </div>
-<a id="a53e0e6ba881a590395e1249f9a1a766d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53e0e6ba881a590395e1249f9a1a766d">&#9670;&nbsp;</a></span>usePlaintext</h2>
+<a id="a61ccdf64b186e5597f80d78943ce1278"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61ccdf64b186e5597f80d78943ce1278">&#9670;&nbsp;</a></span>maxSize</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const bool CBLLogFileConfiguration::usePlaintext</td>
+          <td class="memname">size_t CBLLogFileConfiguration::maxSize</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Whether or not to log in plaintext (as opposed to binary) </p>
+<p>The size in bytes at which a file will be rotated out (best effort). </p>
+
+</div>
+</div>
+<a id="aa6fe8002b56d5502db77724ed06a47be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6fe8002b56d5502db77724ed06a47be">&#9670;&nbsp;</a></span>usePlaintext</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool CBLLogFileConfiguration::usePlaintext</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether or not to log in plaintext (as opposed to binary.) Plaintext logging is slower and bigger. </p>
 
 </div>
 </div>

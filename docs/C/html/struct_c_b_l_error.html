@@ -76,12 +76,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
-<tr class="memitem:a3d786296f00e0951eab5d728638ba5f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__errors.html#ga2e112f0e281d3bc5f3732f854e902b20">CBLErrorDomain</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_error.html#a3d786296f00e0951eab5d728638ba5f1">domain</a></td></tr>
+<tr class="memitem:a3d786296f00e0951eab5d728638ba5f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__errors.html#ga2d569fb440396cf223ed8776d84e5bc5">CBLErrorDomain</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_error.html#a3d786296f00e0951eab5d728638ba5f1">domain</a>: 8</td></tr>
 <tr class="memdesc:a3d786296f00e0951eab5d728638ba5f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Domain of errors; a namespace for the <code>code</code>.  <a href="#a3d786296f00e0951eab5d728638ba5f1">More...</a><br /></td></tr>
 <tr class="separator:a3d786296f00e0951eab5d728638ba5f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ca861e3e186c3c125d9035dbde3e2b6"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_error.html#a4ca861e3e186c3c125d9035dbde3e2b6">code</a></td></tr>
-<tr class="memdesc:a4ca861e3e186c3c125d9035dbde3e2b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code, specific to the domain. 0 always means no error.  <a href="#a4ca861e3e186c3c125d9035dbde3e2b6">More...</a><br /></td></tr>
-<tr class="separator:a4ca861e3e186c3c125d9035dbde3e2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c970c9cc8b54d5d843d5f32d1416183"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_error.html#a1c970c9cc8b54d5d843d5f32d1416183">code</a>:24</td></tr>
+<tr class="memdesc:a1c970c9cc8b54d5d843d5f32d1416183"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code, specific to the domain. 0 always means no error.  <a href="#a1c970c9cc8b54d5d843d5f32d1416183">More...</a><br /></td></tr>
+<tr class="separator:a1c970c9cc8b54d5d843d5f32d1416183"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add97fd30bfe681d9cb2048641d5a6d55"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_error.html#add97fd30bfe681d9cb2048641d5a6d55">internal_info</a></td></tr>
 <tr class="separator:add97fd30bfe681d9cb2048641d5a6d55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -89,14 +89,14 @@ Data Fields</h2></td></tr>
 <div class="textblock"><p>A struct holding information about an error. </p>
 <p>It's declared on the stack by a caller, and its address is passed to an API function. If the function's return value indicates that there was an error (usually by returning NULL or false), then the <a class="el" href="struct_c_b_l_error.html" title="A struct holding information about an error.">CBLError</a> will have been filled in with the details. </p>
 </div><h2 class="groupheader">Field Documentation</h2>
-<a id="a4ca861e3e186c3c125d9035dbde3e2b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ca861e3e186c3c125d9035dbde3e2b6">&#9670;&nbsp;</a></span>code</h2>
+<a id="a1c970c9cc8b54d5d843d5f32d1416183"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c970c9cc8b54d5d843d5f32d1416183">&#9670;&nbsp;</a></span>code</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int32_t CBLError::code</td>
+          <td class="memname">int CBLError::code</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -112,7 +112,7 @@ Data Fields</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__errors.html#ga2e112f0e281d3bc5f3732f854e902b20">CBLErrorDomain</a> CBLError::domain</td>
+          <td class="memname"><a class="el" href="group__errors.html#ga2d569fb440396cf223ed8776d84e5bc5">CBLErrorDomain</a> CBLError::domain</td>
         </tr>
       </table>
 </div><div class="memdoc">
