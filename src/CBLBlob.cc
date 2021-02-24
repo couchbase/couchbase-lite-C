@@ -89,17 +89,17 @@ static CBLBlob* createNewBlob(slice contentType,
                               FLSlice contents,
                               CBLBlobWriteStream *writer)
 {
-    return retain(new CBLNewBlob(contentType, contents, internal(writer)));
+    return make_nothrow<CBLNewBlob>(nullptr, contentType, contents, internal(writer)).detach();
 }
 
 CBLBlob* CBLBlob_NewWithData(FLString contentType,
-                                FLSlice contents) CBLAPI
+                             FLSlice contents) CBLAPI
 {
     return createNewBlob(contentType, contents, nullptr);
 }
 
 CBLBlob* CBLBlob_NewWithStream(FLString contentType,
-                                  CBLBlobWriteStream* writer) CBLAPI
+                               CBLBlobWriteStream* writer) CBLAPI
 {
     return createNewBlob(contentType, nullslice, writer);
 }
@@ -114,9 +114,9 @@ void CBLBlobWriter_Close(CBLBlobWriteStream* writer) CBLAPI {
 }
 
 bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
-                          const void *data,
-                          size_t length,
-                          CBLError *outError) CBLAPI
+                         const void *data,
+                         size_t length,
+                         CBLError *outError) CBLAPI
 {
     return c4stream_write(internal(writer), data, length, internal(outError));
 }

@@ -154,9 +154,9 @@ CBLDatabase* CBLDatabase_Open(FLString name,
         return nullptr;
     if (c4db_mayHaveExpiration(c4db))
         c4db_startHousekeeping(c4db);
-    return retain(new CBLDatabase(c4db, name,
-                                  c4config.parentDirectory,
-                                  (config ? config->flags : kDefaultFlags)));
+    return make_nothrow<CBLDatabase>(outError, c4db, name,
+                                                c4config.parentDirectory,
+                                                (config ? config->flags : kDefaultFlags)).detach();
 }
 
 
@@ -395,8 +395,10 @@ Retained<CBLListenerToken> CBLDatabase::addDocListener(slice docID,
                                                        CBLDocumentChangeListener listener,
                                                        void *context)
 {
-    auto token = new ListenerToken<CBLDocumentChangeListener>(this, docID, listener, context);
-    _docListeners.add(token);
+    auto token = make_nothrow<ListenerToken<CBLDocumentChangeListener>>(nullptr, this,
+                                                                        docID, listener, context);
+    if (token)
+        _docListeners.add(token);
     return token;
 }
 

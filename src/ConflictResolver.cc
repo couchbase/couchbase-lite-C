@@ -74,13 +74,17 @@ namespace cbl_internal {
 
 
     void ConflictResolver::_runAsyncNow() noexcept {
+#ifdef __cpp_exceptions
         try {
+#endif
             runNow();
+#ifdef __cpp_exceptions
         } catch (std::exception &x) {
             errorFromException(&x, "Conflict resolution");
         } catch (...) {
             errorFromException(nullptr, "Conflict resolution");
         }
+#endif
         _completionHandler(this);       // the handler will most likely delete me
     }
 
@@ -91,7 +95,8 @@ namespace cbl_internal {
         int retryCount = 0;
         do {
             // Create a CBLDocument that reflects the conflict revision:
-            Retained<CBLDocument> conflict = new CBLDocument(_db, _docID, true, true);
+            Retained<CBLDocument> conflict = new (nothrow) CBLDocument(_db, _docID, true, true);
+            postcondition(conflict != nullptr);
             if (!conflict->exists()) {
                 SyncLog(Info, "Doc '%.*s' no longer exists, no conflict to resolve",
                         FMTSLICE(_docID));
@@ -151,7 +156,8 @@ namespace cbl_internal {
         CBLDocument *otherDoc = conflict;
         if (otherDoc->revisionFlags() & kRevDeleted)
             otherDoc = nullptr;
-        RetainedConst<CBLDocument> myDoc = new CBLDocument(_db, _docID, false);
+        RetainedConst<CBLDocument> myDoc = new (nothrow) CBLDocument(_db, _docID, false);
+        postcondition(myDoc != nullptr);
         if (!myDoc->exists())
             myDoc = nullptr;
 
@@ -160,8 +166,12 @@ namespace cbl_internal {
                 FMTSLICE(_docID));
         Stopwatch st;
         const CBLDocument *resolved;
+
+#ifdef __cpp_exceptions
         try {
+#endif
             resolved = _clientResolver(_clientResolverContext, _docID, myDoc, otherDoc);
+#ifdef __cpp_exceptions
         } catch (std::exception &x) {
             errorFromException(&x, "Custom conflict resolver");
             return false;
@@ -169,6 +179,7 @@ namespace cbl_internal {
             errorFromException(nullptr, "Custom conflict resolver");
             return false;
         }
+#endif
         SyncLog(Info, "Custom conflict resolver for '%.*s' took %.0fms",
                 FMTSLICE(_docID), st.elapsedMS());
 

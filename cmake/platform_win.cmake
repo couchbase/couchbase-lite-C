@@ -27,7 +27,6 @@ function(init_vars)
     string(
         CONCAT CBL_CXX_FLAGS
         "/utf-8 "
-        "/EHsc "
         "/wd4068 "
         "/wd4099 "
         "-D_CRT_SECURE_NO_WARNINGS=1"

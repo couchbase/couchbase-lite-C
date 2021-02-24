@@ -1088,7 +1088,6 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/libFleeceBase.a",
 				"$(BUILT_PRODUCTS_DIR)/libLiteCore-static.a",
 				"$(BUILT_PRODUCTS_DIR)/libLiteCoreREST-static.a",
 				"$(BUILT_PRODUCTS_DIR)/libLiteCoreWebSocket.a",

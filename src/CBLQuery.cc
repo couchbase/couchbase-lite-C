@@ -21,18 +21,22 @@
 #include <string>
 
 
-Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
+Retained<CBLResultSet> CBLQuery::execute(CBLError* outError) {
     auto qe = use<C4QueryEnumerator*>([=](C4Query *c4query) {
-        return c4query_run(c4query, nullptr, nullslice, outError);
+        return c4query_run(c4query, nullptr, nullslice, internal(outError));
     });
-    return qe ? retained(new CBLResultSet(this, qe)) : nullptr;
+    if (!qe)
+        return nullptr;
+    return make_nothrow<CBLResultSet>(outError, this, qe);
 }
 
 
 Retained<CBLListenerToken> CBLQuery::addChangeListener(CBLQueryChangeListener listener, void *context) {
-    auto token = retained(new ListenerToken<CBLQueryChangeListener>(this, listener, context));
-    _listeners.add(token);
-    token->setEnabled(true);
+    auto token = make_nothrow<ListenerToken<CBLQueryChangeListener>>(nullptr, this, listener, context);
+    if (token) {
+        _listeners.add(token);
+        token->setEnabled(true);
+    }
     return token;
 }
 
@@ -46,8 +50,11 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        int *outErrorPos,
                        CBLError* outError) CBLAPI
 {
-    auto query = retained(new CBLQuery(db, language, queryString, outErrorPos, internal(outError)));
-    return query->valid() ? move(query).detach() : nullptr;
+    auto query = make_nothrow<CBLQuery>(outError,
+                                        db, language, queryString, outErrorPos, internal(outError));
+    if (!query || !query->valid())
+        return nullptr;
+    return move(query).detach();
 }
 
 FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI {
@@ -59,7 +66,7 @@ void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBL
 }
 
 CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError) CBLAPI {
-    return query->execute(internal(outError)).detach();
+    return query->execute(outError).detach();
 }
 
 FLSliceResult CBLQuery_Explain(const CBLQuery* query _cbl_nonnull) CBLAPI {

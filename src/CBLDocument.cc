@@ -189,7 +189,10 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                 // Conflict!
                 if (opt.conflictHandler) {
                     // Custom conflict resolution:
-                    Retained<CBLDocument> conflictingDoc = new CBLDocument(db, _docID, false);
+                    auto conflictingDoc = make_nothrow<CBLDocument>(external(outError),
+                                                                    db, _docID, false);
+                    if (!conflictingDoc)
+                        return;
                     if (!conflictingDoc->exists())
                         conflictingDoc = nullptr;
                     if (!opt.conflictHandler(opt.context, this, conflictingDoc)) {
@@ -444,8 +447,8 @@ CBLBlob* CBLDocument::getBlob(FLDict dict) {
             return newBlob;
     }
     // Not found; create a new blob and remember it:
-    auto blob = retained(new CBLBlob(this, dict));
-    if (!blob->valid())
+    auto blob = make_nothrow<CBLBlob>(nullptr, this, dict);
+    if (!blob || !blob->valid())
         return nullptr;
     _blobs.insert({dict, blob});
     return blob;
@@ -454,8 +457,10 @@ CBLBlob* CBLDocument::getBlob(FLDict dict) {
 
 void CBLDocument::registerNewBlob(CBLNewBlob* blob) {
     LOCK(sNewBlobsMutex);
-    if (!sNewBlobs)
-        sNewBlobs = new UnretainedValueToBlobMap;
+    if (!sNewBlobs) {
+        sNewBlobs = new (nothrow) UnretainedValueToBlobMap;
+        postcondition(sNewBlobs != nullptr);
+    }
     sNewBlobs->insert({blob->properties(), blob});
 }
 
@@ -518,8 +523,10 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool &outHasBlobs, C4Error *outErro
 
 
 static CBLDocument* getDocument(CBLDatabase* db, slice docID, bool isMutable) CBLAPI {
-    auto doc = retained(new CBLDocument(db, docID, isMutable));
-    return doc->exists() ? move(doc).detach() : nullptr;
+    auto doc = make_nothrow<CBLDocument>(nullptr, db, docID, isMutable);
+    if (!doc || !doc->exists())
+        return nullptr;
+    return move(doc).detach();
 }
 
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID) CBLAPI {
@@ -535,11 +542,11 @@ CBLDocument* CBLDocument_New() CBLAPI {
 }
 
 CBLDocument* CBLDocument_NewWithID(FLString docID) CBLAPI {
-    return retain(new CBLDocument(docID, true));
+    return make_nothrow<CBLDocument>(nullptr, docID, true).detach();
 }
 
 CBLDocument* CBLDocument_ToMutable(const CBLDocument* doc) CBLAPI {
-    return retain(new CBLDocument(doc));
+    return make_nothrow<CBLDocument>(nullptr, doc).detach();
 }
 
 FLSlice CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->docID();}

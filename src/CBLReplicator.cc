@@ -24,12 +24,12 @@ const FLString kCBLAuthDefaultCookieName = FLSTR("SyncGatewaySession");
 
 
 CBLEndpoint* CBLEndpoint_NewWithURL(FLString url) CBLAPI {
-    return new CBLURLEndpoint(url);
+    return new (nothrow) CBLURLEndpoint(url);
 }
 
 #ifdef COUCHBASE_ENTERPRISE
 CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase* db) CBLAPI {
-    return new CBLLocalEndpoint(db);
+    return new (nothrow) CBLLocalEndpoint(db);
 }
 #endif
 
@@ -38,11 +38,11 @@ void CBLEndpoint_Free(CBLEndpoint *endpoint) CBLAPI {
 }
 
 CBLAuthenticator* CBLAuth_NewPassword(FLString username, FLString password) CBLAPI {
-    return new BasicAuthenticator(username, password);
+    return new (nothrow) BasicAuthenticator(username, password);
 }
 
 CBLAuthenticator* CBLAuth_NewSession(FLString sessionID, FLString cookieName) CBLAPI {
-    return new SessionAuthenticator(sessionID, cookieName);
+    return new (nothrow) SessionAuthenticator(sessionID, cookieName);
 }
 
 void CBLAuth_Free(CBLAuthenticator *auth) CBLAPI {
@@ -50,7 +50,7 @@ void CBLAuth_Free(CBLAuthenticator *auth) CBLAPI {
 }
 
 CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* conf, CBLError *outError) CBLAPI {
-    return validated(new CBLReplicator(conf), outError);
+    return make_nothrow<CBLReplicator>(outError, conf).detach();
 }
 
 const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator* repl) CBLAPI {
