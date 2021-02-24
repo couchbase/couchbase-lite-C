@@ -168,7 +168,7 @@ public:
         if (deleteMerged) {
             return nullptr;
         } else {
-            CBLDocument *merged = CBLDocument_New(documentID);
+            CBLDocument *merged = CBLDocument_NewWithID(documentID);
             MutableDict mergedProps(CBLDocument_MutableProperties(merged));
             mergedProps.set("greeting"_sl, "¡Hola!");
             // do not release `merged`, otherwise it would be freed before returning!

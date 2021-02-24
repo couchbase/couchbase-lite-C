@@ -58,11 +58,6 @@ void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBL
     query->setParameters(parameters);
 }
 
-bool CBLQuery_SetParametersAsJSON(CBLQuery* query, FLString json5) CBLAPI {
-    query->setParametersAsJSON(json5);
-    return true;
-}
-
 CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError) CBLAPI {
     return query->execute(internal(outError)).detach();
 }
@@ -111,11 +106,11 @@ FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* rs _cbl_nonnull, unsigned 
     return rs->column(column);
 }
 
-FLArray CBLResultSet_RowArray(const CBLResultSet *rs) CBLAPI {
+FLArray CBLResultSet_ResultArray(const CBLResultSet *rs) CBLAPI {
     return rs->asArray();
 }
 
-FLDict CBLResultSet_RowDict(const CBLResultSet *rs) CBLAPI {
+FLDict CBLResultSet_ResultDict(const CBLResultSet *rs) CBLAPI {
     return rs->asDict();
 }
 

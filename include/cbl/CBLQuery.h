@@ -92,14 +92,6 @@ void CBLQuery_SetParameters(CBLQuery* _cbl_nonnull query,
 /** Returns the query's current parameter bindings, if any. */
 FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI;
 
-/** Assigns values to the query's parameters, from JSON data.
-    See \ref CBLQuery_SetParameters for details.
-    @param query  The query.
-    @param json  The parameters in the form of a JSON-encoded object whose
-            keys are the parameter names. (You may use JSON5 syntax.) */
-bool CBLQuery_SetParametersAsJSON(CBLQuery* _cbl_nonnull query,
-                                  FLString json) CBLAPI;
-
 /** Runs the query, returning the results.
     To obtain the results you'll typically call \ref CBLResultSet_Next in a `while` loop,
     examining the values in the \ref CBLResultSet each time around.
@@ -175,12 +167,12 @@ FLValue CBLResultSet_ValueForKey(const CBLResultSet* _cbl_nonnull,
 /** Returns the current result as an array of column values.
     @warning The array reference is only valid until the result-set is advanced or released.
             If you want to keep it for longer, call \ref FLArray_Retain (and release it when done.) */
-FLArray CBLResultSet_RowArray(const CBLResultSet* _cbl_nonnull) CBLAPI;
+FLArray CBLResultSet_ResultArray(const CBLResultSet* _cbl_nonnull) CBLAPI;
 
 /** Returns the current result as a dictionary mapping column names to values.
     @warning The dict reference is only valid until the result-set is advanced or released.
             If you want to keep it for longer, call \ref FLDict_Retain (and release it when done.) */
-FLDict CBLResultSet_RowDict(const CBLResultSet* _cbl_nonnull) CBLAPI;
+FLDict CBLResultSet_ResultDict(const CBLResultSet* _cbl_nonnull) CBLAPI;
 
 /** Returns the Query that created this ResultSet. */
 CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) CBLAPI;
@@ -235,10 +227,10 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
     @param listener  The query listener that was notified.
     @param error  If the query failed to run, the error will be stored here.
     @return  A new object containing the query's current results, or NULL if the query failed to run. */
-    _cbl_warn_unused
-    CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query _cbl_nonnull,
-                                              CBLListenerToken *listener _cbl_nonnull,
-                                              CBLError *error) CBLAPI;
+_cbl_warn_unused
+CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query _cbl_nonnull,
+                                          CBLListenerToken *listener _cbl_nonnull,
+                                          CBLError *error) CBLAPI;
 
 /** @} */
 

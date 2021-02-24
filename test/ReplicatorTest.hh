@@ -41,13 +41,13 @@ public:
             ((ReplicatorTest*)context)->statusChanged(r, *status);
         }, this);
 
-        auto dtoken = CBLReplicator_AddDocumentListener(repl, [](void *context, CBLReplicator *r, bool isPush,
+        auto dtoken = CBLReplicator_AddDocumentReplicationListener(repl, [](void *context, CBLReplicator *r, bool isPush,
                                                                  unsigned numDocuments,
                                                                  const CBLReplicatedDocument* documents) {
             ((ReplicatorTest*)context)->docProgress(r, isPush, numDocuments, documents);
         }, this);
 
-        CBLReplicator_Start(repl);
+        CBLReplicator_Start(repl, false);
 
         cerr << "Waiting...\n";
         CBLReplicatorStatus status;

@@ -63,7 +63,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
 
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replicator]") {
     config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg/foobar"_sl);
-    config.authenticator = CBLAuth_NewBasic("username"_sl, "p@ssw0RD"_sl);
+    config.authenticator = CBLAuth_NewPassword("username"_sl, "p@ssw0RD"_sl);
 
     CBLProxySettings proxy = {};
     proxy.type = kCBLProxyHTTP;
@@ -142,10 +142,10 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "HTTP auth", "[Replicator][.Server]
         auth = nullptr;
     }
     SECTION("Invalid credentials") {
-        auth = CBLAuth_NewBasic("manhog"_sl, "whim"_sl);
+        auth = CBLAuth_NewPassword("manhog"_sl, "whim"_sl);
     }
     SECTION("Valid credentials") {
-        auth = CBLAuth_NewBasic("pupshaw"_sl, "frank"_sl);
+        auth = CBLAuth_NewPassword("pupshaw"_sl, "frank"_sl);
         expectedError = {};
     }
     config.authenticator = auth;

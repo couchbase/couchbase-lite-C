@@ -45,6 +45,14 @@ public:
     bool valid() const              {return _properties != nullptr;}
     Dict properties() const         {return _properties;}
 
+    alloc_slice propertiesAsJSON() const {
+        if (!_properties)
+            return fleece::nullslice;
+        fleece::JSONEncoder enc;
+        enc.writeValue(_properties);
+        return enc.finish();
+    }
+
     uint64_t contentLength() const {
         Value len = _properties[kCBLBlobLengthProperty];
         if (len.isInteger())

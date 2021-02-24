@@ -61,8 +61,8 @@ typedef struct CBLAuthenticator CBLAuthenticator;
 
 /** Creates an authenticator for HTTP Basic (username/password) auth. */
 _cbl_warn_unused
-CBLAuthenticator* CBLAuth_NewBasic(FLString username,
-                                   FLString password) CBLAPI;
+CBLAuthenticator* CBLAuth_NewPassword(FLString username,
+                                      FLString password) CBLAPI;
 
 /** Creates an authenticator using a Couchbase Sync Gateway login session identifier,
     and optionally a cookie name (pass NULL for the default.) */
@@ -174,14 +174,15 @@ CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* _cbl_nonnull,
 /** Returns the configuration of an existing replicator. */
 const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator* _cbl_nonnull) CBLAPI;
 
-/** Instructs the replicator to ignore existing checkpoints the next time it runs.
-    This will cause it to scan through all the documents on the remote database, which takes
-    a lot longer, but it can resolve problems with missing documents if the client and
-    server have gotten out of sync somehow. */
-void CBLReplicator_ResetCheckpoint(CBLReplicator* _cbl_nonnull) CBLAPI;
-
-/** Starts a replicator, asynchronously. Does nothing if it's already started. */
-void CBLReplicator_Start(CBLReplicator* _cbl_nonnull) CBLAPI;
+/** Starts a replicator, asynchronously. Does nothing if it's already started.
+    @param replicator  The replicator instance.
+    @param resetCheckpoint  If true, the persistent saved state ("checkpoint") for this replication
+                        will be discarded, causing it to re-scan all documents. This significantly
+                        increases time and bandwidth (redundant docs are not transferred, but their
+                        IDs are) but can resolve unexpected problems with missing documents if one
+                        side or the other has gotten out of sync. */
+void CBLReplicator_Start(CBLReplicator *replicator _cbl_nonnull,
+                         bool resetCheckpoint) CBLAPI;
 
 /** Stops a running replicator, asynchronously. Does nothing if it's not already started.
     The replicator will call your \ref CBLReplicatorChangeListener with an activity level of
@@ -309,17 +310,17 @@ typedef struct {
     @param isPush  True if the document(s) were pushed, false if pulled.
     @param numDocuments  The number of documents reported by this callback.
     @param documents  An array with information about each document. */
-typedef void (*CBLReplicatedDocumentListener)(void *context,
-                                              CBLReplicator *replicator _cbl_nonnull,
-                                              bool isPush,
-                                              unsigned numDocuments,
-                                              const CBLReplicatedDocument* documents);
+typedef void (*CBLDocumentReplicationListener)(void *context,
+                                               CBLReplicator *replicator _cbl_nonnull,
+                                               bool isPush,
+                                               unsigned numDocuments,
+                                               const CBLReplicatedDocument* documents);
 
 /** Adds a listener that will be called when documents are replicated. */
-_cbl_warn_unused
-CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* _cbl_nonnull,
-                                                    CBLReplicatedDocumentListener _cbl_nonnull,
-                                                    void *context) CBLAPI;
+_cbl_warn_unused CBLListenerToken*
+CBLReplicator_AddDocumentReplicationListener(CBLReplicator* _cbl_nonnull,
+                                             CBLDocumentReplicationListener _cbl_nonnull,
+                                             void *context) CBLAPI;
 
 /** @} */
 /** @} */

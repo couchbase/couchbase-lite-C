@@ -43,8 +43,6 @@ typedef CBL_ENUM(uint8_t, CBLErrorDomain) {
     CBLFleeceDomain,       ///< code is a Fleece error; see "FleeceException.h"
     CBLNetworkDomain,      ///< code is a network error; see \ref CBLNetworkErrorCode
     CBLWebSocketDomain,    ///< code is a WebSocket close code (1000...1015) or HTTP error (300..599)
-
-    CBLMaxErrorDomainPlus1
 };
 
 /** Couchbase Lite error codes, in the CBLDomain. */
@@ -79,8 +77,6 @@ typedef CBL_ENUM(int32_t, CBLErrorCode) {
     CBLErrorDatabaseTooNew,         ///< Database file format is newer than what I can open
     CBLErrorBadDocID,               ///< Invalid document ID
     CBLErrorCantUpgradeDatabase,/*30*/ ///< DB can't be upgraded (might be unsupported dev version)
-
-    CBLNumErrorCodesPlus1
 };
 
 /** Network error codes, in the CBLNetworkDomain. */

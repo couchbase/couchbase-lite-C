@@ -151,21 +151,14 @@ public:
     void stop()                                     {c4repl_stop(_c4repl);}
 
 
-    void resetCheckpoint() {
-        LOCK(_mutex);
-        _resetCheckpoint = true;
-    }
-
-
-    void start() {
+    void start(bool reset) {
         LOCK(_mutex);
         _retainSelf = this;     // keep myself from being freed until the replicator stops
         if (_optionsChanged) {
             c4repl_setOptions(_c4repl, encodeOptions());
             _optionsChanged = false;
         }
-        c4repl_start(_c4repl, _resetCheckpoint);
-        _resetCheckpoint = false;
+        c4repl_start(_c4repl, reset);
     }
 
 
@@ -206,7 +199,7 @@ public:
     }
 
 
-    Retained<CBLListenerToken> addDocumentListener(CBLReplicatedDocumentListener listener,
+    Retained<CBLListenerToken> addDocumentListener(CBLDocumentReplicationListener listener,
                                                    void *context)
     {
         LOCK(_mutex);
@@ -322,9 +315,8 @@ private:
     c4::ref<C4Replicator>           _c4repl;
     C4ReplicatorStatus              _c4status {kC4Stopped};
     bool                            _optionsChanged {false};
-    bool                            _resetCheckpoint {false};
     Retained<CBLReplicator>         _retainSelf;
     int                             _activeConflictResolvers {0};
     Listeners<CBLReplicatorChangeListener>    _changeListeners;
-    Listeners<CBLReplicatedDocumentListener>  _docListeners;
+    Listeners<CBLDocumentReplicationListener>  _docListeners;
 };

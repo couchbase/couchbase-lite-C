@@ -180,19 +180,30 @@ _cbl_warn_unused
 CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
                                             FLString docID) CBLAPI;
 
-/** Creates a new, empty document in memory. It will not be added to a database until saved.
-    @param docID  The ID of the new document, or NULL to assign a new unique ID.
-    @return  The mutable document instance. */
+/** Creates a new, empty document in memory, with a randomly-generated unique ID.
+    It will not be added to a database until saved.
+    @return  The new mutable document instance. */
 _cbl_warn_unused
-CBLDocument* CBLDocument_New(FLString docID) CBLAPI _cbl_warn_unused _cbl_returns_nonnull;
+CBLDocument* CBLDocument_New(void) CBLAPI _cbl_returns_nonnull;
+
+/** Creates a new, empty document in memory, with the given ID.
+    It will not be added to a database until saved.
+    @note  If the given ID conflicts with a document already in the database, that will not
+           be apparent until this document is saved. At that time, the result depends on the
+           conflict handling mode used when saving; see the save functions for details.
+    @param docID  The ID of the new document, or NULL to assign a new unique ID.
+    @return  The new mutable document instance. */
+_cbl_warn_unused
+CBLDocument* CBLDocument_NewWithID(FLString docID) CBLAPI _cbl_returns_nonnull;
 
 /** Creates a new mutable CBLDocument instance that refers to the same document as the original.
     If the original document has unsaved changes, the new one will also start out with the same
     changes; but mutating one document thereafter will not affect the other.
-    @note  You must release the new reference when you're done with it. */
+    @note  You must release the new reference when you're done with it. Similarly, the original
+           document still exists and must also be released when you're done with it.*/
 _cbl_warn_unused
-CBLDocument* CBLDocument_MutableCopy(const CBLDocument* original _cbl_nonnull) CBLAPI
-    _cbl_warn_unused _cbl_returns_nonnull;
+CBLDocument* CBLDocument_ToMutable(const CBLDocument* original _cbl_nonnull) CBLAPI
+    _cbl_returns_nonnull;
 
 /** @} */
 
@@ -246,17 +257,17 @@ FLMutableDict CBLDocument_MutableProperties(CBLDocument* _cbl_nonnull) CBLAPI _c
 void CBLDocument_SetProperties(CBLDocument* _cbl_nonnull,
                                FLMutableDict properties _cbl_nonnull) CBLAPI;
 
-FLDoc CBLDocument_CreateFleeceDoc(const CBLDocument* _cbl_nonnull) CBLAPI;
+FLDoc CBLDocument_ToFleeceDoc(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Returns a document's properties as JSON.
     @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
 _cbl_warn_unused
-FLSliceResult CBLDocument_PropertiesAsJSON(const CBLDocument* _cbl_nonnull) CBLAPI;
+FLSliceResult CBLDocument_ToJSON(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Sets a mutable document's properties from a JSON string. */
-bool CBLDocument_SetPropertiesAsJSON(CBLDocument* _cbl_nonnull,
-                                     FLSlice json,
-                                     CBLError*) CBLAPI;
+bool CBLDocument_SetJSON(CBLDocument* _cbl_nonnull,
+                         FLSlice json,
+                         CBLError*) CBLAPI;
 
 /** Returns the time, if any, at which a given document will expire and be purged.
     Documents don't normally expire; you have to call \ref CBLDatabase_SetDocumentExpiration

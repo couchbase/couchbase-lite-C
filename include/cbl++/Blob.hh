@@ -34,7 +34,7 @@ namespace cbl {
         To work with a blob, you construct a Blob object with that dictionary. */
     class Blob : protected RefCounted {
     public:
-        static bool isBlob(fleece::Dict d)          {return CBL_IsBlob(d);}
+        static bool isBlob(fleece::Dict d)          {return FLDict_IsBlob(d);}
 
         /* Creates a new blobgiven its contents as a single block of data.
             @note  The memory pointed to by `contents` is no longer needed after this call completes
@@ -44,7 +44,7 @@ namespace cbl {
         Blob(slice contentType,
              slice contents)
         {
-            _ref = (CBLRefCounted*) CBLBlob_CreateWithData(contentType, contents);
+            _ref = (CBLRefCounted*) CBLBlob_NewWithData(contentType, contents);
         }
 
         /** Creates a new blob from the data written to a \ref CBLBlobWriteStream.
@@ -55,7 +55,7 @@ namespace cbl {
 
         /** Constructs a Blob instance on an existing blob reference in a document. */
         Blob(fleece::Dict d)
-        :RefCounted((CBLRefCounted*) CBLBlob_Get(d))
+        :RefCounted((CBLRefCounted*) FLDict_GetBlob(d))
         { }
 
         uint64_t length() const                     {return CBLBlob_Length(ref()); }
@@ -65,7 +65,7 @@ namespace cbl {
 
         alloc_slice loadContent() {
             CBLError error;
-            fleece::alloc_slice content = CBLBlob_LoadContent(ref(), &error);
+            fleece::alloc_slice content = CBLBlob_Content(ref(), &error);
             check(content.buf, error);
             return content;
         }
@@ -136,7 +136,7 @@ namespace cbl {
 
 
     inline Blob::Blob(slice contentType, BlobWriteStream& writer) {
-        _ref = (CBLRefCounted*) CBLBlob_CreateWithStream(contentType, writer._writer);
+        _ref = (CBLRefCounted*) CBLBlob_NewWithStream(contentType, writer._writer);
         writer._writer = nullptr;
     }
 

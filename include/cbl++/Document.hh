@@ -43,7 +43,7 @@ namespace cbl {
         fleece::Dict properties() const                 {return CBLDocument_Properties(ref());}
 
         std::string propertiesAsJSON() const {
-            alloc_slice json(CBLDocument_PropertiesAsJSON(ref()));
+            alloc_slice json(CBLDocument_ToJSON(ref()));
             return std::string(json);
         }
 
@@ -80,8 +80,8 @@ namespace cbl {
 
     class MutableDocument : public Document {
     public:
-        explicit MutableDocument(nullptr_t)             {_ref = (CBLRefCounted*)CBLDocument_New(fleece::nullslice);}
-        explicit MutableDocument(slice docID)     {_ref = (CBLRefCounted*)CBLDocument_New(docID);}
+        explicit MutableDocument(nullptr_t)             {_ref = (CBLRefCounted*)CBLDocument_NewWithID(fleece::nullslice);}
+        explicit MutableDocument(slice docID)     {_ref = (CBLRefCounted*)CBLDocument_NewWithID(docID);}
 
         fleece::MutableDict properties()                {return CBLDocument_MutableProperties(ref());}
 
@@ -103,7 +103,7 @@ namespace cbl {
 
         void setPropertiesAsJSON(slice json) {
             CBLError error;
-            if (!CBLDocument_SetPropertiesAsJSON(ref(), json, &error))
+            if (!CBLDocument_SetJSON(ref(), json, &error))
                 throw error;
         }
 
@@ -172,7 +172,7 @@ namespace cbl {
 
 
     inline MutableDocument Document::mutableCopy() const {
-        return MutableDocument::adopt(CBLDocument_MutableCopy(ref()));
+        return MutableDocument::adopt(CBLDocument_ToMutable(ref()));
     }
 
 

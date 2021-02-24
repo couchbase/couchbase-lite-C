@@ -10,6 +10,9 @@
 
 SCRIPT_DIR=`dirname $0`
 cd "$SCRIPT_DIR"
+
+src/exports/generate_exports.sh
+
 mkdir -p build_cmake
 cd build_cmake
 

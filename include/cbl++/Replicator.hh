@@ -48,7 +48,7 @@ namespace cbl {
     public:
         void setBasic(slice username,
                       slice password)
-                                                    {_ref = CBLAuth_NewBasic(username, password);}
+                                                    {_ref = CBLAuth_NewPassword(username, password);}
 
         void setSession(slice sessionId, slice cookieName) {
           _ref = CBLAuth_NewSession(sessionId, cookieName);
@@ -128,10 +128,8 @@ namespace cbl {
             check(_ref, error);
         }
 
-        void start()                        {CBLReplicator_Start(ref());}
+        void start(bool resetCheckpoint =false) {CBLReplicator_Start(ref(), resetCheckpoint);}
         void stop()                         {CBLReplicator_Stop(ref());}
-
-        void resetCheckpoint()              {CBLReplicator_ResetCheckpoint(ref());}
 
         void setHostReachable(bool r)       {CBLReplicator_SetHostReachable(ref(), r);}
         void setSuspended(bool s)           {CBLReplicator_SetSuspended(ref(), s);}
@@ -165,7 +163,7 @@ namespace cbl {
 
         [[nodiscard]] DocumentListener addDocumentListener(DocumentListener::Callback f) {
             auto l = DocumentListener(f);
-            l.setToken( CBLReplicator_AddDocumentListener(ref(), &_callDocListener, l.context()) );
+            l.setToken( CBLReplicator_AddDocumentReplicationListener(ref(), &_callDocListener, l.context()) );
             return l;
         }
 

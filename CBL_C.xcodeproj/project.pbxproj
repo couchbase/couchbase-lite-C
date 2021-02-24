@@ -1023,9 +1023,10 @@
 			);
 			inputPaths = (
 				"$(SRCROOT)/Xcode/generate_exports.sh",
-				"$(SRCROOT)/src/exports/Fleece.exp",
-				"$(SRCROOT)/src/exports/CBL.exp",
-				"$(SRCROOT)/src/exports/CBL_EE.exp",
+				"$(SRCROOT)/src/exports/Fleece_Exports.txt",
+				"$(SRCROOT)/src/exports/Fleece_Apple_Exports.txt",
+				"$(SRCROOT)/src/exports/CBL_Exports.txt",
+				"$(SRCROOT)/src/exports/CBL_EE_Exports.txt",
 			);
 			name = "Generate Export List";
 			outputFileListPaths = (

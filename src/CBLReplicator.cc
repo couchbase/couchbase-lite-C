@@ -37,7 +37,7 @@ void CBLEndpoint_Free(CBLEndpoint *endpoint) CBLAPI {
     delete endpoint;
 }
 
-CBLAuthenticator* CBLAuth_NewBasic(FLString username, FLString password) CBLAPI {
+CBLAuthenticator* CBLAuth_NewPassword(FLString username, FLString password) CBLAPI {
     return new BasicAuthenticator(username, password);
 }
 
@@ -61,9 +61,8 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator* repl) CBLAPI {
     return repl->status();
 }
 
-void CBLReplicator_Start(CBLReplicator* repl) CBLAPI            {repl->start();}
+void CBLReplicator_Start(CBLReplicator* repl, bool reset) CBLAPI{repl->start(reset);}
 void CBLReplicator_Stop(CBLReplicator* repl) CBLAPI             {repl->stop();}
-void CBLReplicator_ResetCheckpoint(CBLReplicator* repl) CBLAPI  {repl->resetCheckpoint();}
 void CBLReplicator_SetHostReachable(CBLReplicator* repl, bool r) CBLAPI {repl->setHostReachable(r);}
 void CBLReplicator_SetSuspended(CBLReplicator* repl, bool sus) CBLAPI   {repl->setSuspended(sus);}
 
@@ -82,8 +81,8 @@ CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* repl,
     return retain(repl->addChangeListener(listener, context));
 }
 
-CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* repl,
-                                                    CBLReplicatedDocumentListener listener,
+CBLListenerToken* CBLReplicator_AddDocumentReplicationListener(CBLReplicator* repl,
+                                                    CBLDocumentReplicationListener listener,
                                                     void *context) CBLAPI
 {
     return retain(repl->addDocumentListener(listener, context));

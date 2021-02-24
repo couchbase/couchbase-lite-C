@@ -173,8 +173,8 @@ unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
     ReadFileByLines(path, [&](FLSlice line) {
         char docID[20];
         sprintf(docID, "%07u", numDocs+1);
-        auto doc = CBLDocument_New(slice(docID));
-        REQUIRE(CBLDocument_SetPropertiesAsJSON(doc, line, &error));
+        auto doc = CBLDocument_NewWithID(slice(docID));
+        REQUIRE(CBLDocument_SetJSON(doc, line, &error));
         CHECK(CBLDatabase_SaveDocumentWithConcurrencyControl(database, doc, kCBLConcurrencyControlFailOnConflict, &error));
         CBLDocument_Release(doc);
         ++numDocs;

@@ -25,7 +25,7 @@ function(init_vars)
     #   4099 (type first seen as struct now seen as class)
     # Disable warning about "insecure" C runtime functions (strcpy vs strcpy_s)
     string(
-        CONCAT CBL_CXX_FLAGS 
+        CONCAT CBL_CXX_FLAGS
         "/utf-8 "
         "/EHsc "
         "/wd4068 "
@@ -38,7 +38,7 @@ function(init_vars)
         CONCAT CBL_C_FLAGS
         "/utf-8 "
         "/wd4068 "
-        "-D_CRT_SECURE_NO_WARNINGS=1" 
+        "-D_CRT_SECURE_NO_WARNINGS=1"
     )
     set(CBL_C_FLAGS ${CBL_C_FLAGS} CACHE INTERNAL "")
 endfunction()
@@ -50,7 +50,7 @@ function(set_dylib_properties)
         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /nodefaultlib:kernel32.lib /nodefaultlib:ole32.lib")
     endif()
     set_target_properties(CouchbaseLiteC PROPERTIES LINK_FLAGS
-        "/def:${PROJECT_SOURCE_DIR}/src/exports/CBL.def")
+        "/def:${PROJECT_SOURCE_DIR}/src/exports/generated/CBL.def")
     target_link_libraries(CouchbaseLiteC PRIVATE zlibstatic Ws2_32)
     target_compile_definitions(CouchbaseLiteCStatic PRIVATE LITECORE_EXPORTS)
 endfunction()

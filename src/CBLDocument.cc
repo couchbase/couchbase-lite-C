@@ -492,10 +492,10 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool &outHasBlobs, C4Error *outErro
         if (dict) {
             if (!dict.asMutable()) {
                 if (!foundBlobs)
-                    foundBlobs = CBL_IsBlob(dict);
+                    foundBlobs = FLDict_IsBlob(dict);
                 if (foundBlobs)
                     i.skipChildren();
-            } else if (CBL_IsBlob(dict)) {
+            } else if (FLDict_IsBlob(dict)) {
                 foundBlobs = true;
                 CBLNewBlob *newBlob = findNewBlob(dict);
                 if (newBlob) {
@@ -530,11 +530,15 @@ CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID) CBL
     return getDocument(db, docID, true);
 }
 
-CBLDocument* CBLDocument_New(FLString docID) CBLAPI {
+CBLDocument* CBLDocument_New() CBLAPI {
+    return CBLDocument_NewWithID(nullslice);
+}
+
+CBLDocument* CBLDocument_NewWithID(FLString docID) CBLAPI {
     return retain(new CBLDocument(docID, true));
 }
 
-CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
+CBLDocument* CBLDocument_ToMutable(const CBLDocument* doc) CBLAPI {
     return retain(new CBLDocument(doc));
 }
 
@@ -543,15 +547,15 @@ FLSlice CBLDocument_RevisionID(const CBLDocument* doc) CBLAPI      {return doc->
 uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
 FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}
-FLDoc CBLDocument_CreateFleeceDoc(const CBLDocument* doc) CBLAPI       {return doc->createFleeceDoc();}
+FLDoc CBLDocument_ToFleeceDoc(const CBLDocument* doc) CBLAPI       {return doc->createFleeceDoc();}
 
-FLSliceResult CBLDocument_PropertiesAsJSON(const CBLDocument* doc) CBLAPI {return FLSliceResult(doc->propertiesAsJSON());}
+FLSliceResult CBLDocument_ToJSON(const CBLDocument* doc) CBLAPI {return FLSliceResult(doc->propertiesAsJSON());}
 
 void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties _cbl_nonnull) CBLAPI {
     doc->setProperties(properties);
 }
 
-bool CBLDocument_SetPropertiesAsJSON(CBLDocument* doc, FLSlice json, CBLError* outError) CBLAPI {
+bool CBLDocument_SetJSON(CBLDocument* doc, FLSlice json, CBLError* outError) CBLAPI {
     return doc->setPropertiesAsJSON(json, internal(outError));
 }
 

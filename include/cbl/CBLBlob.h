@@ -40,7 +40,7 @@ extern "C" {
 
     A \ref CBLBlob object acts as a proxy for such a dictionary in a \ref CBLDocument. Once
     you've loaded a document and located the \ref FLDict holding the blob reference, call
-    \ref CBLBlob_Get on it to create a \ref CBLBlob object you can call.
+    \ref FLDict_GetBlob on it to create a \ref CBLBlob object you can call.
     The object has accessors for the blob's metadata and for loading the data itself.
 
     To create a new blob from in-memory data, call \ref CBLBlob_CreateWithData, then call
@@ -62,19 +62,19 @@ extern "C" {
     CBL_CORE_API extern const FLSlice kCBLBlobContentTypeProperty;  ///< `"content_type"`
 
 
+    CBL_REFCOUNTED(CBLBlob*, Blob);
+
+
     /** Returns true if a dictionary in a document is a blob reference.
-        If so, you can call \ref CBLBlob_Get to access it.
+        If so, you can call \ref FLDict_GetBlob to access it.
         @note This function tests whether the dictionary has a `@type` property,
                 whose value is `"blob"`. */
-    bool CBL_IsBlob(FLDict) CBLAPI;
-
-    
-    CBL_REFCOUNTED(CBLBlob*, Blob);
+    bool FLDict_IsBlob(FLDict) CBLAPI;
 
     /** Returns a CBLBlob object corresponding to a blob dictionary in a document.
         @param blobDict  A dictionary in a document.
         @return  A CBLBlob instance for this blob, or NULL if the dictionary is not a blob. */
-    const CBLBlob* CBLBlob_Get(FLDict blobDict) CBLAPI;
+    const CBLBlob* FLDict_GetBlob(FLDict blobDict) CBLAPI;
 
 
 #pragma mark - BLOB METADATA:
@@ -88,17 +88,20 @@ extern "C" {
     /** Returns a blob's MIME type, if its metadata has a `content_type` property. */
     FLString CBLBlob_ContentType(const CBLBlob* _cbl_nonnull) CBLAPI;
 
-    /** Returns a blob's metadata. This includes the `digest`, `length` and `content_type`
-        properties, as well as any custom ones that may have been added. */
+    /** Returns a blob's metadata. This includes the `digest`, `length`, `content_type`,
+        and `@type` properties, as well as any custom ones that may have been added. */
     FLDict CBLBlob_Properties(const CBLBlob* _cbl_nonnull) CBLAPI;
 
+    /** Returns a blob's metadata as JSON. */
+    _cbl_warn_unused
+    FLStringResult CBLBlob_ToJSON(const CBLBlob* blob _cbl_nonnull) CBLAPI;
 
 #pragma mark - READING:
 
     /** Reads the blob's contents into memory and returns them.
         @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
     _cbl_warn_unused
-    FLSliceResult CBLBlob_LoadContent(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
+    FLSliceResult CBLBlob_Content(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
 
     /** A stream for reading a blob's content. */
     typedef struct CBLBlobReadStream CBLBlobReadStream;
@@ -131,8 +134,8 @@ extern "C" {
         @param contents  The data's address and length.
         @return  A new CBLBlob instance. */
     _cbl_warn_unused
-    CBLBlob* CBLBlob_CreateWithData(FLString contentType,
-                                    FLSlice contents) CBLAPI;
+    CBLBlob* CBLBlob_NewWithData(FLString contentType,
+                                 FLSlice contents) CBLAPI;
 
     /** A stream for writing a new blob to the database. */
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
@@ -169,15 +172,15 @@ extern "C" {
         @param writer  The blob-writing stream the data was written to.
         @return  A new CBLBlob instance. */
     _cbl_warn_unused
-    CBLBlob* CBLBlob_CreateWithStream(FLString contentType,
-                                      CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
+    CBLBlob* CBLBlob_NewWithStream(FLString contentType,
+                                   CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
 
 #pragma mark - FLEECE UTILITIES:
 
     /** Returns true if a value in a document is a blob reference.
         If so, you can call \ref FLValue_GetBlob to access it. */
     static inline bool FLValue_IsBlob(FLValue v) {
-        return CBL_IsBlob(FLValue_AsDict(v));
+        return FLDict_IsBlob(FLValue_AsDict(v));
     }
 
     /** Instantiates a \ref CBLBlob object corresponding to a blob dictionary in a document.
@@ -185,21 +188,15 @@ extern "C" {
         @return  A \ref CBLBlob instance for this blob, or `NULL` if the value is not a blob.
         @note You are responsible for releasing the \ref CBLBlob object.  */
     static inline const CBLBlob* FLValue_GetBlob(FLValue value) {
-        return CBLBlob_Get(FLValue_AsDict(value));
+        return FLDict_GetBlob(FLValue_AsDict(value));
     }
 
+    /** Stores a blob reference in a Fleece mutable Array or Dict.
+        @param slot  The position in the collection, as returned by functions like
+                    \ref FLMutableArray_Set or \ref FLMutableDict_Set.
+        @param blob  The CBLBlob to store (as a Dict) in the collection. */
     void FLSlot_SetBlob(FLSlot slot _cbl_nonnull,
                         CBLBlob* blob _cbl_nonnull) CBLAPI;
-    
-    /** Stores a blob in a mutable array. */
-    void FLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
-                                uint32_t index,
-                                CBLBlob* blob _cbl_nonnull) CBLAPI _cbl_deprecated;
-
-    /** Stores a blob in a mutable dictionary. */
-    void FLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
-                               FLString key,
-                               CBLBlob* blob _cbl_nonnull) CBLAPI _cbl_deprecated;
 
 
 /** @} */

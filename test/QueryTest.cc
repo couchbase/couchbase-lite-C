@@ -119,7 +119,12 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
         cerr << string(explanation);
 
         CHECK(CBLQuery_Parameters(query) == nullptr);
-        CHECK(CBLQuery_SetParametersAsJSON(query, R"({"zip0":"30000","zip1":"39999"})"_sl));
+        {
+            auto params = MutableDict::newDict();
+            params["zip0"] = "30000";
+            params["zip1"] = "39999";
+            CBLQuery_SetParameters(query, params);
+        }
 
         FLDict params = CBLQuery_Parameters(query);
         CHECK(FLValue_AsString(FLDict_Get(params, "zip0"_sl)) == "30000"_sl);

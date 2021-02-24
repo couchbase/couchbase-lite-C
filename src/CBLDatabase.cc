@@ -92,6 +92,7 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
 }
 
 
+#ifdef COUCHBASE_ENTERPRISE
 bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBLAPI {
     C4EncryptionKey c4key;
     if (c4key_setPassword(&c4key, password, kC4EncryptionAES256)) {
@@ -103,6 +104,7 @@ bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBL
         return false;
     }
 }
+#endif
 
 
 CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() CBLAPI {

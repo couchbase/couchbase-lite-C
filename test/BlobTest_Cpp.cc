@@ -61,7 +61,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
         Dict props = blob.properties();
         checkBlob(props);
 
-        CHECK(CBLBlob_Get(props) == nullptr);
+        CHECK(FLDict_GetBlob(props) == nullptr);
 
         // Add blob to document:
         doc["picture"] = props;
@@ -143,11 +143,11 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in arrays/dicts", "[Blob]") {
         MutableDocument doc("blobbo");
         MutableArray array = MutableArray::newArray();
         array.insertNulls(0, 1);
-        CBLBlob *blob1 = CBLBlob_CreateWithData(kBlobContentType, kBlobContents);
+        CBLBlob *blob1 = CBLBlob_NewWithData(kBlobContentType, kBlobContents);
         FLSlot_SetBlob(array[0], blob1);
 
         MutableDict dict = MutableDict::newDict();
-        CBLBlob *blob2 = CBLBlob_CreateWithData(kBlobContentType, kBlobContents);
+        CBLBlob *blob2 = CBLBlob_NewWithData(kBlobContentType, kBlobContents);
         FLSlot_SetBlob(dict["b"], blob2);
 
         doc["array"] = array;

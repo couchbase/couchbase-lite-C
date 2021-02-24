@@ -86,15 +86,20 @@ typedef void (*CBLLogCallback)(CBLLogDomain domain,
                                FLString message);
 
 /** Gets the current log level for debug console logging.
-    Only messages at this level or higher will be logged to the console or callback. */
+    Only messages at this level or higher will be logged to the console. */
 CBLLogLevel CBLLog_ConsoleLevel(void) CBLAPI;
 
 /** Sets the detail level of logging.
-    Only messages whose level is ≥ the given level will be logged to the console or callback. */
+    Only messages whose level is ≥ the given level will be logged to the console. */
 void CBLLog_SetConsoleLevel(CBLLogLevel) CBLAPI;
 
-/** Returns true if a message with the given domain and level would be logged to the console. */
-bool CBLLog_WillLogToConsole(CBLLogDomain domain, CBLLogLevel level) CBLAPI;
+/** Gets the current log level for debug console logging.
+    Only messages at this level or higher will be logged to the callback. */
+CBLLogLevel CBLLog_CallbackLevel(void) CBLAPI;
+
+/** Sets the detail level of logging.
+    Only messages whose level is ≥ the given level will be logged to the callback. */
+void CBLLog_SetCallbackLevel(CBLLogLevel) CBLAPI;
 
 /** Gets the current log callback. */
 CBLLogCallback CBLLog_Callback(void) CBLAPI;
@@ -113,17 +118,18 @@ void CBLLog_SetCallback(CBLLogCallback) CBLAPI;
     @warning `usePlaintext` results in significantly larger log files and higher CPU usage that may slow
             down your app; we recommend turning it off in production. */
 typedef struct {
-    FLString directory;    ///< The directory where log files will be created.
-    uint32_t maxRotateCount;  ///< Max number of older logs to keep (i.e. total number will be one more.)
-    size_t maxSize;           ///< The size in bytes at which a file will be rotated out (best effort).
-    bool usePlaintext;        ///< Whether or not to log in plaintext (as opposed to binary)
+    CBLLogLevel level;       ///< The minimum level of message to write
+    FLString directory;      ///< The directory where log files will be created.
+    uint32_t maxRotateCount; ///< Max number of older log files to keep (in addition to current one.)
+    size_t maxSize;          ///< The size in bytes at which a file will be rotated out (best effort).
+    bool usePlaintext;       ///< Whether or not to log in plaintext (as opposed to binary.) Plaintext logging is slower and bigger.
 } CBLLogFileConfiguration;
 
-/** Gets the current file logging configuration. */
+/** Gets the current file logging configuration, or NULL if none is configured. */
 const CBLLogFileConfiguration* CBLLog_FileConfig(void) CBLAPI;
 
-/** Sets the file logging configuration. */
-void CBLLog_SetFileConfig(CBLLogFileConfiguration) CBLAPI;
+/** Sets the file logging configuration, and begins logging to files. */
+bool CBLLog_SetFileConfig(CBLLogFileConfiguration, CBLError *outError) CBLAPI;
 
 /** @} */
 
