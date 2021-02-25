@@ -36,21 +36,6 @@ static alloc_slice generateID() {
 }
 
 
-static C4Document* getC4Doc(CBLDatabase *db, slice docID, bool allRevisions) {
-    return db->use<C4Document*>([&](C4Database *c4db) {
-        C4Document *doc = c4db_getDoc(c4db, docID,
-                                      true, // mustExist
-                                      (allRevisions ? kDocGetAll : kDocGetCurrentRev),
-                                      nullptr);
-        if (!allRevisions && doc && doc->flags & kDocDeleted) {
-            c4doc_release(doc);
-            doc = nullptr;
-        }
-        return doc;
-    });
-}
-
-
 // Core constructor
 CBLDocument::CBLDocument(slice docID,
                          CBLDatabase *db,
@@ -71,12 +56,6 @@ CBLDocument::CBLDocument(slice docID,
 // Construct a new document (not in any database yet)
 CBLDocument::CBLDocument(slice docID, bool isMutable)
 :CBLDocument(docID ? docID : generateID(), nullptr, nullptr, isMutable)
-{ }
-
-
-// Construct on an existing document
-CBLDocument::CBLDocument(CBLDatabase *db, slice docID, bool isMutable, bool allRevisions)
-:CBLDocument(docID, db, getC4Doc(db, docID, allRevisions), isMutable)
 { }
 
 
@@ -108,8 +87,7 @@ CBLDocument::CBLDocument(CBLDatabase *db,
 }
 
 
-CBLDocument::~CBLDocument() {
-}
+CBLDocument::~CBLDocument() = default;
 
 
 C4RevisionFlags CBLDocument::revisionFlags() const {
@@ -189,8 +167,7 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                 // Conflict!
                 if (opt.conflictHandler) {
                     // Custom conflict resolution:
-                    auto conflictingDoc = make_nothrow<CBLDocument>(external(outError),
-                                                                    db, _docID, false);
+                    auto conflictingDoc = db->getDocument(_docID, false, external(outError));
                     if (!conflictingDoc)
                         return;
                     if (!conflictingDoc->exists())
@@ -521,21 +498,6 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool &outHasBlobs, C4Error *outErro
 
 #pragma mark - PUBLIC API:
 
-
-static CBLDocument* getDocument(CBLDatabase* db, slice docID, bool isMutable) CBLAPI {
-    auto doc = make_nothrow<CBLDocument>(nullptr, db, docID, isMutable);
-    if (!doc || !doc->exists())
-        return nullptr;
-    return move(doc).detach();
-}
-
-const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID) CBLAPI {
-    return getDocument((CBLDatabase*)db, docID, false);
-}
-
-CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID) CBLAPI {
-    return getDocument(db, docID, true);
-}
 
 CBLDocument* CBLDocument_New() CBLAPI {
     return CBLDocument_NewWithID(nullslice);

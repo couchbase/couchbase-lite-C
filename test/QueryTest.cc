@@ -182,7 +182,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     resultCount = -1;
 
     cerr << "Deleting a doc...\n";
-    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl);
+    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
     REQUIRE(doc);
     CHECK(CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
     CBLDocument_Release(doc);

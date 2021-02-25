@@ -31,8 +31,8 @@ namespace cbl_internal {
     class CBLLocalEndpoint;
 }
 
-struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Database*> {
-
+class CBLDatabase final : public CBLRefCounted, public litecore::access_lock<C4Database*> {
+public:
     CBLDatabase(C4Database* _cbl_nonnull db,
                 slice name_,
                 slice dir_,
@@ -57,6 +57,10 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
 
     alloc_slice const dir;
     CBLDatabaseFlags const flags;
+
+    RetainedConst<CBLDocument> getDocument(slice docID, bool allRevisions, CBLError*) const;
+
+    Retained<CBLDocument> getMutableDocument(slice docID, bool allRevisions, CBLError*);
 
     Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener _cbl_nonnull,
                                                    void *ctx);
@@ -87,9 +91,11 @@ struct CBLDatabase : public CBLRefCounted, public litecore::access_lock<C4Databa
 private:
     friend class CBLURLEndpointListener;
     friend class cbl_internal::CBLLocalEndpoint;
-    C4Database* _getC4Database() const;
 
-    Retained<CBLListenerToken> addListener(fleece::function_ref<CBLListenerToken*()>);
+    C4Database* _getC4Database() const;
+    Retained<CBLDocument> _getDocument(slice docID, bool isMutable, bool allRevisions,
+                                       CBLError *outError);
+    Retained<CBLListenerToken> addListener(fleece::function_ref<fleece::Retained<CBLListenerToken>()>);
     void databaseChanged();
     void callDBListeners();
     void callDocListeners();

@@ -46,8 +46,8 @@ protected:
     using alloc_slice = fleece::alloc_slice;
     using slice = fleece::slice;
 
-    template <class T>
-    using Retained = fleece::Retained<T>;
+    template <class T> using Retained = fleece::Retained<T>;
+    template <class T> using RetainedConst = fleece::RetainedConst<T>;
 };
 
 

@@ -65,10 +65,12 @@ typedef bool (*CBLConflictHandler)(void *context,
             \ref CBLDatabase_GetMutableDocument instead.
     @param database  The database.
     @param docID  The ID of the document.
-    @return  A new \ref CBLDocument instance, or NULL if no document with that ID exists. */
+    @param error  On failure, the error will be written here.
+    @return  A new \ref CBLDocument instance, or NULL on error. */
 _cbl_warn_unused
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database _cbl_nonnull,
-                                           FLString docID) CBLAPI;
+                                           FLString docID,
+                                           CBLError *error) CBLAPI;
 
 CBL_REFCOUNTED(CBLDocument*, Document);
 
@@ -178,10 +180,12 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* database _cbl_nonnull,
     @note  You must release the document when you're done with it.
     @param database  The database.
     @param docID  The ID of the document.
-    @return  A new mutable CBLDocument instance, or NULL if no document with that ID exists. */
+    @param error  On failure, the error will be written here.
+    @return  A new mutable \ref CBLDocument instance, or NULL on error. */
 _cbl_warn_unused
 CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
-                                            FLString docID) CBLAPI;
+                                            FLString docID,
+                                            CBLError *error) CBLAPI;
 
 /** Creates a new, empty document in memory, with a randomly-generated unique ID.
     It will not be added to a database until saved.

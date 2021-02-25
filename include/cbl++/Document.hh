@@ -56,7 +56,9 @@ namespace cbl {
     protected:
         Document(CBLRefCounted* r)                      :RefCounted(r) { }
 
-        static Document adopt(const CBLDocument *d) {
+        static Document adopt(const CBLDocument *d, CBLError *error) {
+            if (!d && error)
+                throw *error;
             Document doc;
             doc._ref = (CBLRefCounted*)d;
             return doc;
@@ -108,7 +110,9 @@ namespace cbl {
         }
 
     protected:
-        static MutableDocument adopt(CBLDocument *d) {
+        static MutableDocument adopt(CBLDocument *d, CBLError *error) {
+            if (!d && error)
+                throw *error;
             MutableDocument doc;
             doc._ref = (CBLRefCounted*)d;
             return doc;
@@ -123,11 +127,13 @@ namespace cbl {
     // Database method bodies:
 
     inline Document Database::getDocument(slice id) const {
-        return Document::adopt(CBLDatabase_GetDocument(ref(), id));
+        CBLError error;
+        return Document::adopt(CBLDatabase_GetDocument(ref(), id, &error), &error);
     }
 
     inline MutableDocument Database::getMutableDocument(slice id) const {
-        return MutableDocument::adopt(CBLDatabase_GetMutableDocument(ref(), id));
+        CBLError error;
+        return MutableDocument::adopt(CBLDatabase_GetMutableDocument(ref(), id, &error), &error);
     }
 
 
@@ -172,7 +178,7 @@ namespace cbl {
 
 
     inline MutableDocument Document::mutableCopy() const {
-        return MutableDocument::adopt(CBLDocument_ToMutable(ref()));
+        return MutableDocument::adopt(CBLDocument_ToMutable(ref()), nullptr);
     }
 
 

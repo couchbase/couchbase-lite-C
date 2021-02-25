@@ -53,7 +53,7 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
 }
 
 
-class CBLReplicator : public CBLRefCounted {
+class CBLReplicator final : public CBLRefCounted {
 public:
     CBLReplicator(const CBLReplicatorConfiguration *conf _cbl_nonnull)
     :_conf(*conf)

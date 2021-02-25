@@ -17,6 +17,7 @@
 //
 
 #include "CBLDatabase_Internal.hh"
+#include "CBLDocument_Internal.hh"
 #include "CBLPrivate.h"
 #include "Internal.hh"
 #include "Util.hh"
@@ -248,6 +249,51 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) CBLAPI {
 }
 
 
+#pragma mark - DOCUMENTS:
+
+
+Retained<CBLDocument> CBLDatabase::_getDocument(slice docID, bool isMutable, bool allRevisions,
+                                                CBLError *outError)
+{
+    C4Document *c4doc = use<C4Document*>([&](C4Database *c4db) {
+        return c4db_getDoc(c4db, docID, true, // mustExist
+                           (allRevisions ? kDocGetAll : kDocGetCurrentRev),
+                           internal(outError));
+    });
+    if (!c4doc) {
+        return nullptr;
+    } else if (!allRevisions && c4doc->flags & kDocDeleted) {
+        c4doc_release(c4doc);
+        c4error_return(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
+        return nullptr;
+    } else {
+        return make_nothrow<CBLDocument>(nullptr, docID, this, c4doc, isMutable);
+    }
+}
+
+
+RetainedConst<CBLDocument>
+CBLDatabase::getDocument(slice docID, bool allRevisions, CBLError *outError) const {
+    return const_cast<CBLDatabase*>(this)->_getDocument(docID, false, allRevisions, outError);
+}
+
+
+Retained<CBLDocument>
+CBLDatabase::getMutableDocument(slice docID, bool allRevisions, CBLError* outError) {
+    return this->_getDocument(docID, true, allRevisions, outError);
+}
+
+
+const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID, CBLError* outError) CBLAPI {
+    return db->getDocument(docID, false, outError).detach();
+}
+
+
+CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID, CBLError* outError) CBLAPI {
+    return db->getMutableDocument(docID, false, outError).detach();
+}
+
+
 #pragma mark - NOTIFICATIONS:
 
 
@@ -266,7 +312,7 @@ void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI {
 #pragma mark - DATABASE CHANGE LISTENERS:
 
 
-Retained<CBLListenerToken> CBLDatabase::addListener(function_ref<CBLListenerToken*()> callback) {
+Retained<CBLListenerToken> CBLDatabase::addListener(function_ref<Retained<CBLListenerToken>()> callback) {
     return use<Retained<CBLListenerToken>>([=](C4Database *c4db) {
         Retained<CBLListenerToken> token = callback();
         if (!_observer) {

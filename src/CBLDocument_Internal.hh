@@ -31,15 +31,12 @@ class CBLBlob;
 class CBLNewBlob;
 
 
-class CBLDocument : public CBLRefCounted {
+class CBLDocument final : public CBLRefCounted {
     using RetainedConstDocument = fleece::RetainedConst<CBLDocument>;
 
 public:
     // Construct a new document (not in any database yet)
     CBLDocument(slice docID, bool isMutable);
-
-    // Construct on an existing document
-    CBLDocument(CBLDatabase *db _cbl_nonnull, slice docID, bool isMutable, bool allRevisions =false);
 
     // Mutable copy of another CBLDocument
     CBLDocument(const CBLDocument* otherDoc);
@@ -78,7 +75,7 @@ public:
     //---- Save/delete:
 
     struct SaveOptions {
-        SaveOptions(CBLConcurrencyControl c)             :concurrency(c) { }
+        SaveOptions(CBLConcurrencyControl c)         :concurrency(c) { }
         SaveOptions(CBLConflictHandler h, void *ctx) :conflictHandler(h), context(ctx) { }
 
         CBLConcurrencyControl concurrency;
@@ -122,8 +119,9 @@ public:
 
     bool resolveConflict(Resolution, const CBLDocument *mergeDoc, CBLError*);
 
-private:
+// private by convention
     CBLDocument(slice docID, CBLDatabase *db, C4Document *d, bool isMutable);
+private:
     virtual ~CBLDocument();
 
     bool checkMutable(C4Error *outError) const;

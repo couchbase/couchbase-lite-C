@@ -68,16 +68,20 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
 
 
 TEST_CASE_METHOD(CBLTest, "Missing Document") {
-    const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo"_sl);
+    CBLError error;
+    const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo"_sl, &error);
     CHECK(doc == nullptr);
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorNotFound);
 
-    CBLDocument* mdoc = CBLDatabase_GetMutableDocument(db, "foo"_sl);
+    CBLDocument* mdoc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
     CHECK(mdoc == nullptr);
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorNotFound);
 
-    CBLError err;
-    CHECK(!CBLDatabase_PurgeDocumentByID(db, "foo"_sl, &err));
-    CHECK(err.domain == CBLDomain);
-    CHECK(err.code == CBLErrorNotFound);
+    CHECK(!CBLDatabase_PurgeDocumentByID(db, "foo"_sl, &error));
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorNotFound);
 }
 
 
@@ -102,7 +106,7 @@ TEST_CASE_METHOD(CBLTest, "Save Empty Document") {
     CHECK(alloc_slice(CBLDocument_ToJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);
 
-    doc = CBLDatabase_GetMutableDocument(db, "foo"_sl);
+    doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_RevisionID(doc) == "1-581ad726ee407c8376fc94aad966051d013893c4"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
@@ -127,7 +131,7 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CBLDocument_Release(doc);
 
-    doc = CBLDatabase_GetMutableDocument(db, "foo"_sl);
+    doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
     CHECK(alloc_slice(CBLDocument_ToJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
@@ -205,7 +209,8 @@ TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
     CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeCompact, &error));
     
     // Make sure the blob still exists after compact: (issue #73)
-    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl);
+    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    REQUIRE(doc);
     const CBLBlob* blob2 = FLValue_GetBlob(FLDict_Get(CBLDocument_Properties(doc), FLStr("blob")));
     FLSliceResult content = CBLBlob_Content(blob2, &error);
     CHECK((slice)content == blobContent);
