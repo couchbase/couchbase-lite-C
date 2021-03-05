@@ -177,7 +177,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     cerr << "Waiting for listener...\n";
     resultCount = -1;
     while (resultCount < 0)
-        this_thread::sleep_for(chrono::milliseconds(100));
+        this_thread::sleep_for(100ms);
     CHECK(resultCount == 3);
     resultCount = -1;
 
@@ -189,7 +189,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
 
     cerr << "Waiting for listener again...\n";
     while (resultCount < 0)
-        this_thread::sleep_for(chrono::milliseconds(100));
+        this_thread::sleep_for(100ms);
     CHECK(resultCount == 2);
 }
 
@@ -261,7 +261,7 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
     cerr << "Waiting for listener...\n";
     resultCount = -1;
     while (resultCount < 0)
-        this_thread::sleep_for(chrono::milliseconds(100));
+        this_thread::sleep_for(100ms);
     CHECK(resultCount == 3);
     resultCount = -1;
 
@@ -272,6 +272,6 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
 
     cerr << "Waiting for listener again...\n";
     while (resultCount < 0)
-        this_thread::sleep_for(chrono::milliseconds(100));
+        this_thread::sleep_for(100ms);
     CHECK(resultCount == 2);
 }

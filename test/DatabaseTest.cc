@@ -164,7 +164,7 @@ TEST_CASE_METHOD(CBLTest, "Expiration") {
     CHECK(CBLDatabase_GetDocumentExpiration(db, "doc2"_sl, &error) == 0);
     CHECK(CBLDatabase_GetDocumentExpiration(db, "docX"_sl, &error) == 0);
 
-    this_thread::sleep_for(chrono::milliseconds(1700));
+    this_thread::sleep_for(1700ms);
     CHECK(CBLDatabase_Count(db) == 1);
 }
 
@@ -186,7 +186,7 @@ TEST_CASE_METHOD(CBLTest, "Expiration After Reopen") {
     db = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
 
     // Now wait for expiration:
-    this_thread::sleep_for(chrono::milliseconds(3000));
+    this_thread::sleep_for(3000ms);
     CHECK(CBLDatabase_Count(db) == 1);
 }
 

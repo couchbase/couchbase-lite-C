@@ -52,7 +52,7 @@ public:
         cerr << "Waiting...\n";
         CBLReplicatorStatus status;
         while ((status = CBLReplicator_Status(repl)).activity != kCBLReplicatorStopped) {
-            this_thread::sleep_for(chrono::milliseconds(100));
+            this_thread::sleep_for(100ms);
         }
         cerr << "Finished with activity=" << status.activity
              << ", error=(" << status.error.domain << "/" << status.error.code << ")\n";
