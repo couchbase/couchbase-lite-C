@@ -50,8 +50,8 @@ CBL_C {
 		CBLDatabase_Count;
 		CBLDatabase_LastSequence;
 		CBLDatabase_Delete;
-		CBLDatabase_BeginBatch;
-		CBLDatabase_EndBatch;
+		CBLDatabase_BeginTransaction;
+		CBLDatabase_EndTransaction;
 		CBLDatabase_PerformMaintenance;
 		CBLDatabase_AddChangeListener;
 		CBLDatabase_AddChangeDetailListener;

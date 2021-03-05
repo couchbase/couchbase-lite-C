@@ -95,16 +95,18 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Delete Unsaved Doc") {
 }
 
 
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch") {
-    Batch b(db);
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction") {
+    {
+        Transaction t(db);
 
-    MutableDocument doc("foo");
-    doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
-    doc["meeting"] = 23;
-    db.saveDocument(doc);
+        MutableDocument doc("foo");
+        doc["greeting"] = "Howdy!";
+        db.saveDocument(doc);
+        doc["meeting"] = 23;
+        db.saveDocument(doc);
 
-    b.end();
+        t.commit();
+    }
 
     Document checkDoc = db.getDocument("foo");
     REQUIRE(checkDoc);
@@ -113,10 +115,27 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch") {
 }
 
 
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction, Aborted") {
+    {
+        Transaction t(db);
+
+        MutableDocument doc("foo");
+        doc["greeting"] = "Howdy!";
+        db.saveDocument(doc);
+        doc["meeting"] = 23;
+        db.saveDocument(doc);
+        // no explicit commit means abort
+    }
+
+    Document checkDoc = db.getDocument("foo");
+    REQUIRE(!checkDoc);
+}
+
+
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch With Exception", "[!throws]") {
     bool threw = false;
     try {
-        Batch b(db);
+        Transaction t(db);
 
         MutableDocument doc("foo");
         doc["greeting"] = "Howdy!";
@@ -127,6 +146,8 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch With Exception", "[!throws]") {
 
         doc["meeting"] = 23;
         db.saveDocument(doc);
+
+        t.commit();
 
     } catch (runtime_error &x) {
         threw = true;

@@ -169,15 +169,15 @@ bool CBLDatabase_Close(CBLDatabase* db, CBLError* outError) CBLAPI {
     });
 }
 
-bool CBLDatabase_BeginBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
+bool CBLDatabase_BeginTransaction(CBLDatabase* db, CBLError* outError) CBLAPI {
     return db->use<bool>([=](C4Database *c4db) {
         return c4db_beginTransaction(c4db, internal(outError));
     });
 }
 
-bool CBLDatabase_EndBatch(CBLDatabase* db, CBLError* outError) CBLAPI {
+bool CBLDatabase_EndTransaction(CBLDatabase* db, bool commit, CBLError* outError) CBLAPI {
     return db->use<bool>([=](C4Database *c4db) {
-        return c4db_endTransaction(c4db, true, internal(outError));
+        return c4db_endTransaction(c4db, commit, internal(outError));
     });
 }
 

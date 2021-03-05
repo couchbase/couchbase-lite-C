@@ -169,7 +169,7 @@ unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
     CBLError error;
     unsigned numDocs = 0;
 
-    CHECK(CBLDatabase_BeginBatch(database, &error));
+    CHECK(CBLDatabase_BeginTransaction(database, &error));
     ReadFileByLines(path, [&](FLSlice line) {
         char docID[20];
         sprintf(docID, "%07u", numDocs+1);
@@ -181,6 +181,6 @@ unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
         return true;
     });
     CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Committing %u docs...", numDocs);
-    CHECK(CBLDatabase_EndBatch(database, &error));
+    CHECK(CBLDatabase_EndTransaction(database, true, &error));
     return numDocs;
 }

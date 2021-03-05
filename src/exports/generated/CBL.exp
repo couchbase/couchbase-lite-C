@@ -41,8 +41,8 @@ _CBLDatabase_Config
 _CBLDatabase_Count
 _CBLDatabase_LastSequence
 _CBLDatabase_Delete
-_CBLDatabase_BeginBatch
-_CBLDatabase_EndBatch
+_CBLDatabase_BeginTransaction
+_CBLDatabase_EndTransaction
 _CBLDatabase_PerformMaintenance
 _CBLDatabase_AddChangeListener
 _CBLDatabase_AddChangeDetailListener

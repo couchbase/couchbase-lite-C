@@ -227,43 +227,46 @@ namespace cbl {
     };
 
 
-    /** A helper object used to begin and end batch operations on a Database.
-        Multiple writes in a batch are more efficient than if done separately.
-        A Batch object should be declared as a local (auto) variable; the batch will end
-        when the object goes out of scope. */
-    class Batch {
+    /** A helper object for database transactions.
+        A Transaction object should be declared as a local (auto) variable.
+        You must explicitly call \ref commit to commit changes; if you don't, the transaction
+        will abort when it goes out of scope. */
+    class Transaction {
     public:
         /** Begins a batch operation on the database that will end when the Batch instance
             goes out of scope. */
-        explicit Batch(Database db) {
+        explicit Transaction(Database db) {
             CBLError error;
-            RefCounted::check(CBLDatabase_BeginBatch(db.ref(), &error), error);
+            RefCounted::check(CBLDatabase_BeginTransaction(db.ref(), &error), error);
             _db = db;
         }
 
-        /** Ends a batch immediately. The Batch object's destructor will then do nothing. */
-        void end() {
+        /** Commits changes and ends the transaction. */
+        void commit()   {end(true);}
+
+        /** Ends the transaction, rolling back changes. */
+        void abort()    {end(false);}
+
+        ~Transaction()        {end(false);}
+
+    private:
+        void end(bool commit) {
             Database db = std::move(_db);  // clears _db
             if (db) {
                 CBLError error;
-                if (!CBLDatabase_EndBatch(db.ref(), &error)) {
+                if (!CBLDatabase_EndTransaction(db.ref(), commit, &error)) {
                     // If an exception is thrown while a Batch is in scope, its destructor will
                     // call end(). If I'm in this situation I cannot throw another exception or
                     // the C++ runtime will abort the process. Detect this and just warn instead.
                     if (std::current_exception())
                         CBL_Log(kCBLLogDomainDatabase, CBLLogWarning,
-                                "Batch::end failed, while handling an exception");
+                                "Transaction::end failed, while handling an exception");
                     else
                         RefCounted::check(false, error);
                 }
             }
         }
 
-        ~Batch() {
-            end();
-        }
-
-    private:
         Database _db;
     };
 

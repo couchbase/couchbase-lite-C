@@ -151,16 +151,16 @@ CBL_REFCOUNTED(CBLDatabase*, Database);
     an error is returned. */
 bool CBLDatabase_Delete(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
-/** Begins a batch operation, similar to a transaction. You **must** later call \ref
-    CBLDatabase_EndBatch to end (commit) the batch.
-    @note  Multiple writes are much faster when grouped inside a single batch.
+/** Begins a transaction. You **must** later call \ref
+    CBLDatabase_EndTransaction to commit or abort the transaction.
+    @note  Multiple writes are much faster when grouped in a transaction.
     @note  Changes will not be visible to other CBLDatabase instances on the same database until
-            the batch operation ends.
-    @note  Batch operations can nest. Changes are not committed until the outer batch ends. */
-bool CBLDatabase_BeginBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+            the transaction ends.
+    @note  Transactions can nest. Changes are not committed until the outer transaction ends. */
+bool CBLDatabase_BeginTransaction(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
 
-/** Ends a batch operation. This **must** be called after \ref CBLDatabase_BeginBatch. */
-bool CBLDatabase_EndBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+/** Ends a transaction, either committing or aborting. */
+bool CBLDatabase_EndTransaction(CBLDatabase* _cbl_nonnull, bool commit, CBLError*) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Encrypts or decrypts a database, or changes its encryption key.
