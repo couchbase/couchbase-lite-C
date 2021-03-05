@@ -70,7 +70,6 @@ CBL_C {
 		CBLDocument_Properties;
 		CBLDocument_MutableProperties;
 		CBLDocument_SetProperties;
-		CBLDocument_ToFleeceDoc;
 		CBLDocument_ToJSON;
 		CBLDocument_SetJSON;
 		CBLDatabase_GetDocument;

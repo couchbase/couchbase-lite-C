@@ -516,7 +516,6 @@ FLSlice CBLDocument_RevisionID(const CBLDocument* doc) CBLAPI      {return doc->
 uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
 FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}
-FLDoc CBLDocument_ToFleeceDoc(const CBLDocument* doc) CBLAPI       {return doc->createFleeceDoc();}
 
 FLSliceResult CBLDocument_ToJSON(const CBLDocument* doc) CBLAPI {return FLSliceResult(doc->propertiesAsJSON());}
 

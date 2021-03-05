@@ -70,7 +70,6 @@ _CBLDocument_ToMutable
 _CBLDocument_Properties
 _CBLDocument_MutableProperties
 _CBLDocument_SetProperties
-_CBLDocument_ToFleeceDoc
 _CBLDocument_ToJSON
 _CBLDocument_SetJSON
 _CBLDatabase_GetDocument

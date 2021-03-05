@@ -264,8 +264,6 @@ FLMutableDict CBLDocument_MutableProperties(CBLDocument* _cbl_nonnull) CBLAPI _c
 void CBLDocument_SetProperties(CBLDocument* _cbl_nonnull,
                                FLMutableDict properties _cbl_nonnull) CBLAPI;
 
-FLDoc CBLDocument_ToFleeceDoc(const CBLDocument* _cbl_nonnull) CBLAPI;
-
 /** Returns a document's properties as JSON.
     @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
 _cbl_warn_unused
