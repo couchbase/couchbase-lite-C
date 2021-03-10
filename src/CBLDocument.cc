@@ -499,15 +499,15 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool &outHasBlobs, C4Error *outErro
 #pragma mark - PUBLIC API:
 
 
-CBLDocument* CBLDocument_New() CBLAPI {
-    return CBLDocument_NewWithID(nullslice);
+CBLDocument* CBLDocument_Create() CBLAPI {
+    return CBLDocument_CreateWithID(nullslice);
 }
 
-CBLDocument* CBLDocument_NewWithID(FLString docID) CBLAPI {
+CBLDocument* CBLDocument_CreateWithID(FLString docID) CBLAPI {
     return make_nothrow<CBLDocument>(nullptr, docID, true).detach();
 }
 
-CBLDocument* CBLDocument_ToMutable(const CBLDocument* doc) CBLAPI {
+CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
     return make_nothrow<CBLDocument>(nullptr, doc).detach();
 }
 
@@ -517,7 +517,7 @@ uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return d
 FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}
 
-FLSliceResult CBLDocument_ToJSON(const CBLDocument* doc) CBLAPI {return FLSliceResult(doc->propertiesAsJSON());}
+FLSliceResult CBLDocument_CreateJSON(const CBLDocument* doc) CBLAPI {return FLSliceResult(doc->propertiesAsJSON());}
 
 void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties _cbl_nonnull) CBLAPI {
     doc->setProperties(properties);

@@ -55,14 +55,13 @@ CBL_C {
 		CBLDocument_ID;
 		CBLDocument_RevisionID;
 		CBLDocument_Sequence;
-		CBLDocument_New;
-		CBLDocument_NewWithID;
-		CBLDocument_ToMutable;
+		CBLDocument_Create;
+		CBLDocument_CreateWithID;
+		CBLDocument_MutableCopy;
 		CBLDocument_Properties;
 		CBLDocument_MutableProperties;
 		CBLDocument_SetProperties;
-		CBLDocument_ToFleeceDoc;
-		CBLDocument_ToJSON;
+		CBLDocument_CreateJSON;
 		CBLDocument_SetJSON;
 		CBLDatabase_GetDocument;
 		CBLDatabase_GetMutableDocument;

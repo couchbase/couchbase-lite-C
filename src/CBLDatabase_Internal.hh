@@ -35,11 +35,9 @@ class CBLDatabase final : public CBLRefCounted, public litecore::access_lock<C4D
 public:
     CBLDatabase(C4Database* _cbl_nonnull db,
                 slice name_,
-                slice dir_,
-                CBLDatabaseFlags flags_)
+                slice dir_)
     :access_lock(std::move(db))
     ,dir(dir_)
-    ,flags(flags_)
     ,_blobStore(c4db_getBlobStore(db, nullptr))
     ,_notificationQueue(this)
     { }
@@ -56,7 +54,6 @@ public:
     static std::string defaultDirectory();
 
     alloc_slice const dir;
-    CBLDatabaseFlags const flags;
 
     RetainedConst<CBLDocument> getDocument(slice docID, bool allRevisions, CBLError*) const;
 

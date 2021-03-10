@@ -132,7 +132,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction, Aborted") {
 }
 
 
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch With Exception", "[!throws]") {
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction With Exception", "[!throws]") {
     bool threw = false;
     try {
         Transaction t(db);
@@ -156,8 +156,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Batch With Exception", "[!throws]") {
     CHECK(threw);
 
     Document doc = db.getDocument("foo");
-    CHECK(doc["greeting"].asString() == "Howdy!");
-    CHECK(doc["meeting"] == nullptr);
+    REQUIRE(!doc);
 }
 
 

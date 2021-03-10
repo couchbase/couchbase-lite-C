@@ -43,7 +43,7 @@ namespace cbl {
         fleece::Dict properties() const                 {return CBLDocument_Properties(ref());}
 
         std::string propertiesAsJSON() const {
-            alloc_slice json(CBLDocument_ToJSON(ref()));
+            alloc_slice json(CBLDocument_CreateJSON(ref()));
             return std::string(json);
         }
 
@@ -57,8 +57,11 @@ namespace cbl {
         Document(CBLRefCounted* r)                      :RefCounted(r) { }
 
         static Document adopt(const CBLDocument *d, CBLError *error) {
-            if (!d && error)
+            if (!d && error) {
+                if (error->code == CBLErrorNotFound && error->domain == CBLDomain)
+                    return nullptr;
                 throw *error;
+            }
             Document doc;
             doc._ref = (CBLRefCounted*)d;
             return doc;
@@ -82,8 +85,8 @@ namespace cbl {
 
     class MutableDocument : public Document {
     public:
-        explicit MutableDocument(nullptr_t)             {_ref = (CBLRefCounted*)CBLDocument_NewWithID(fleece::nullslice);}
-        explicit MutableDocument(slice docID)     {_ref = (CBLRefCounted*)CBLDocument_NewWithID(docID);}
+        explicit MutableDocument(nullptr_t)             {_ref = (CBLRefCounted*)CBLDocument_CreateWithID(fleece::nullslice);}
+        explicit MutableDocument(slice docID)     {_ref = (CBLRefCounted*)CBLDocument_CreateWithID(docID);}
 
         fleece::MutableDict properties()                {return CBLDocument_MutableProperties(ref());}
 
@@ -111,8 +114,10 @@ namespace cbl {
 
     protected:
         static MutableDocument adopt(CBLDocument *d, CBLError *error) {
-            if (!d && error)
+            if (!d && error) {
                 throw *error;
+            }
+            
             MutableDocument doc;
             doc._ref = (CBLRefCounted*)d;
             return doc;
@@ -178,7 +183,7 @@ namespace cbl {
 
 
     inline MutableDocument Document::mutableCopy() const {
-        return MutableDocument::adopt(CBLDocument_ToMutable(ref()), nullptr);
+        return MutableDocument::adopt(CBLDocument_MutableCopy(ref()), nullptr);
     }
 
 

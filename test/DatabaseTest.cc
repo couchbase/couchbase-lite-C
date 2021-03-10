@@ -28,7 +28,7 @@ using namespace fleece;
 
 
 static void createDocument(CBLDatabase *db, slice docID, slice property, slice value) {
-    CBLDocument* doc = CBLDocument_NewWithID(docID);
+    CBLDocument* doc = CBLDocument_CreateWithID(docID);
     MutableDict props = CBLDocument_MutableProperties(doc);
     FLSlot_SetString(FLMutableDict_Set(props, property), value);
     CBLError error;
@@ -57,7 +57,6 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
 
     CBLDatabaseConfiguration config = CBLDatabase_Config(defaultdb);
     CHECK(config.directory != nullslice);     // exact value is platform-specific
-    CHECK(config.flags == kCBLDatabase_Create);
     CHECK(config.encryptionKey == nullptr);
 
     CHECK(CBLDatabase_Delete(defaultdb, &error));
@@ -86,55 +85,55 @@ TEST_CASE_METHOD(CBLTest, "Missing Document") {
 
 
 TEST_CASE_METHOD(CBLTest, "New Document") {
-    CBLDocument* doc = CBLDocument_NewWithID("foo"_sl);
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     CHECK(doc != nullptr);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_RevisionID(doc) == nullslice);
     CHECK(CBLDocument_Sequence(doc) == 0);
-    CHECK(CBLDocument_ToJSON(doc) == "{}"_sl);
+    CHECK(CBLDocument_CreateJSON(doc) == "{}"_sl);
     CHECK(CBLDocument_MutableProperties(doc) == CBLDocument_Properties(doc));
     CBLDocument_Release(doc);
 }
 
 
 TEST_CASE_METHOD(CBLTest, "Save Empty Document") {
-    CBLDocument* doc = CBLDocument_NewWithID("foo"_sl);
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     CBLError error;
     REQUIRE(CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlFailOnConflict, &error));
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
-    CHECK(alloc_slice(CBLDocument_ToJSON(doc)) == "{}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);
 
     doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
-    CHECK(CBLDocument_RevisionID(doc) == "1-581ad726ee407c8376fc94aad966051d013893c4"_sl);
+    CHECK(CBLDocument_RevisionID(doc) == "1@*"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
-    CHECK(alloc_slice(CBLDocument_ToJSON(doc)) == "{}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);
 }
 
 
 TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
-    CBLDocument* doc = CBLDocument_NewWithID("foo"_sl);
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     MutableDict props = CBLDocument_MutableProperties(doc);
     props["greeting"_sl] = "Howdy!"_sl;
     // or alternatively:  FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
-    CHECK(alloc_slice(CBLDocument_ToJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
     CBLError error;
     REQUIRE(CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlFailOnConflict, &error));
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
-    CHECK(alloc_slice(CBLDocument_ToJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CBLDocument_Release(doc);
 
     doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
-    CHECK(alloc_slice(CBLDocument_ToJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CBLDocument_Release(doc);
 }
@@ -193,7 +192,7 @@ TEST_CASE_METHOD(CBLTest, "Expiration After Reopen") {
 
 TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
     // Create a doc with blob:
-    CBLDocument* doc = CBLDocument_NewWithID("doc1"_sl);
+    CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
     FLMutableDict dict = CBLDocument_MutableProperties(doc);
     FLSlice blobContent = FLStr("I'm Blob.");
     CBLBlob *blob1 = CBLBlob_NewWithData("text/plain"_sl, blobContent);

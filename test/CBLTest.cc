@@ -53,7 +53,6 @@ slice       const CBLTest::kDatabaseName = "CBLtest";
 
 const CBLDatabaseConfiguration CBLTest::kDatabaseConfiguration = []{
     CBLDatabaseConfiguration config = {kDatabaseDir};
-    config.flags = kCBLDatabase_Create;
     return config;
 }();
 
@@ -173,7 +172,7 @@ unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
     ReadFileByLines(path, [&](FLSlice line) {
         char docID[20];
         sprintf(docID, "%07u", numDocs+1);
-        auto doc = CBLDocument_NewWithID(slice(docID));
+        auto doc = CBLDocument_CreateWithID(slice(docID));
         REQUIRE(CBLDocument_SetJSON(doc, line, &error));
         CHECK(CBLDatabase_SaveDocumentWithConcurrencyControl(database, doc, kCBLConcurrencyControlFailOnConflict, &error));
         CBLDocument_Release(doc);
