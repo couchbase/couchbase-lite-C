@@ -73,7 +73,7 @@ namespace cbl_internal {
 
     /** Type-safe CBLListenerToken. Thread-safe. */
     template <class LISTENER>
-    class ListenerToken : public CBLListenerToken {
+    struct ListenerToken : public CBLListenerToken {
     public:
         ListenerToken(LISTENER callback, void *context)
         :CBLListenerToken((const void*)callback, context)

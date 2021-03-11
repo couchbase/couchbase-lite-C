@@ -28,10 +28,10 @@
 #include <utility>
 
 namespace cbl_internal {
-    class CBLLocalEndpoint;
+    struct CBLLocalEndpoint;
 }
 
-class CBLDatabase final : public CBLRefCounted, public litecore::access_lock<C4Database*> {
+struct CBLDatabase final : public CBLRefCounted, public litecore::access_lock<C4Database*> {
 public:
     CBLDatabase(C4Database* _cbl_nonnull db,
                 slice name_,
@@ -86,7 +86,7 @@ public:
     C4BlobStore* blobStore() const      {return _blobStore;}
 
 private:
-    friend class CBLURLEndpointListener;
+    friend struct CBLURLEndpointListener;
     friend class cbl_internal::CBLLocalEndpoint;
 
     C4Database* _getC4Database() const;

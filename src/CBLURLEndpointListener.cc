@@ -26,7 +26,7 @@
 using namespace fleece;
 
 
-class CBLURLEndpointListener : public CBLRefCounted {
+struct CBLURLEndpointListener : public CBLRefCounted {
 public:
     CBLURLEndpointListener(CBLURLEndpointListenerConfiguration* config _cbl_nonnull) {
         _db                 = config->database;

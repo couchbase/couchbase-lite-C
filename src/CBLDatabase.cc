@@ -378,7 +378,7 @@ namespace cbl_internal {
     // Custom subclass of CBLListenerToken for document listeners.
     // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
     template<>
-    class ListenerToken<CBLDocumentChangeListener> : public CBLListenerToken {
+    struct ListenerToken<CBLDocumentChangeListener> : public CBLListenerToken {
     public:
         ListenerToken(CBLDatabase *db, slice docID, CBLDocumentChangeListener callback, void *context)
         :CBLListenerToken((const void*)callback, context)
