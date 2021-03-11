@@ -211,7 +211,7 @@ public:
 
 static int countResults(ResultSet &results) {
     int n = 0;
-    for (__unused auto &result : results)
+    for (CBL_UNUSED auto &result : results)
         ++n;
     return n;
 }
