@@ -11,6 +11,10 @@ vendor/couchbase-lite-core-EE
 .vscode
 *.sublime-workspace
 
+# Xcode
+xcuserdata
+
+
 # Python
 python/CouchbaseLite/*.c
 *.pyc
