@@ -25,7 +25,7 @@ using namespace fleece;
 #pragma mark - QUERY CLASS:
 
 
-class CBLQuery final : public CBLRefCounted, public litecore::shared_access_lock<C4Query*> {
+struct CBLQuery final : public CBLRefCounted, public litecore::shared_access_lock<C4Query*> {
 public:
 
     CBLQuery(const CBLDatabase* db _cbl_nonnull,
@@ -158,7 +158,7 @@ private:
 #pragma mark - RESULT SET CLASS:
 
 
-class CBLResultSet final : public CBLRefCounted {
+struct CBLResultSet final : public CBLRefCounted {
 public:
     CBLResultSet(CBLQuery* query, C4QueryEnumerator* qe _cbl_nonnull)
     :_query(query)

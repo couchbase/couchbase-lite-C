@@ -27,11 +27,10 @@
 #include <mutex>
 #include <unordered_map>
 
-class CBLBlob;
-class CBLNewBlob;
+struct CBLBlob;
+struct CBLNewBlob;
 
-
-class CBLDocument final : public CBLRefCounted {
+struct CBLDocument final : public CBLRefCounted {
     using RetainedConstDocument = fleece::RetainedConst<CBLDocument>;
 
 public:

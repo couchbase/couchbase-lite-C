@@ -144,7 +144,7 @@ namespace cbl_internal {
 
 namespace cbl_internal {
     // Managed config object that retains/releases its properties.
-    class ReplicatorConfiguration : public CBLReplicatorConfiguration {
+    struct ReplicatorConfiguration : public CBLReplicatorConfiguration {
         using Encoder = fleece::Encoder;
         using Dict = fleece::Dict;
         using slice = fleece::slice;

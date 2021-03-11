@@ -34,7 +34,7 @@ static inline C4ReadStream*  internal(CBLBlobReadStream *reader)  {return (C4Rea
 static inline C4WriteStream* internal(CBLBlobWriteStream *writer) {return (C4WriteStream*)writer;}
 
 
-class CBLBlob : public CBLRefCounted {
+struct CBLBlob : public CBLRefCounted {
 public:
     // Constructor for existing blobs -- called by CBLDocument::getBlob()
     CBLBlob(CBLDocument *doc, Dict properties)
@@ -130,7 +130,7 @@ private:
 };
 
 
-class CBLNewBlob : public CBLBlob {
+struct CBLNewBlob : public CBLBlob {
 public:
     // Constructor for new blobs, given contents or writer (but not both)
     CBLNewBlob(slice contentType,
