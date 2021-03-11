@@ -30,6 +30,14 @@ constexpr char kPathSeparator[] = "\\";
 constexpr char kPathSeparator[] = "/";
 #endif
 
+#ifdef __APPLE__
+#define CBL_UNUSED __unused
+#elif !defined(_MSC_VER)
+#define CBL_UNUSED __attribute__((unused))
+#else
+#define CBL_UNUSED
+#endif
+
 // Has to be declared before including catch.hpp, so Catch macros can use it
 namespace fleece {
     static inline std::ostream& operator << (std::ostream &out, slice s) {
