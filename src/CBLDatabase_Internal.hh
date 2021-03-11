@@ -57,7 +57,7 @@ public:
 
     RetainedConst<CBLDocument> getDocument(slice docID, bool allRevisions, CBLError*) const;
 
-    Retained<CBLDocument> getMutableDocument(slice docID, bool allRevisions, CBLError*);
+    Retained<CBLDocument> getMutableDocument(slice docID, CBLError*);
 
     Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener _cbl_nonnull,
                                                    void *ctx);

@@ -57,11 +57,8 @@ namespace cbl {
         Document(CBLRefCounted* r)                      :RefCounted(r) { }
 
         static Document adopt(const CBLDocument *d, CBLError *error) {
-            if (!d && error) {
-                if (error->code == CBLErrorNotFound && error->domain == CBLDomain)
-                    return nullptr;
+            if (!d && error->code != 0)
                 throw *error;
-            }
             Document doc;
             doc._ref = (CBLRefCounted*)d;
             return doc;
@@ -114,10 +111,8 @@ namespace cbl {
 
     protected:
         static MutableDocument adopt(CBLDocument *d, CBLError *error) {
-            if (!d && error) {
-                throw *error;
-            }
-            
+            if (!d && error->code != 0)
+                throw *error;            
             MutableDocument doc;
             doc._ref = (CBLRefCounted*)d;
             return doc;

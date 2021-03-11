@@ -65,8 +65,9 @@ typedef bool (*CBLConflictHandler)(void *context,
             \ref CBLDatabase_GetMutableDocument instead.
     @param database  The database.
     @param docID  The ID of the document.
-    @param error  On failure, the error will be written here.
-    @return  A new \ref CBLDocument instance, or NULL on error. */
+    @param error  On failure, the error will be written here. (A nonexistent document is not
+                    considered a failure; in that event the error code will be zero.)
+    @return  A new \ref CBLDocument instance, or NULL if the doc doesn't exist or an error occurred. */
 _cbl_warn_unused
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database _cbl_nonnull,
                                            FLString docID,
@@ -180,8 +181,9 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* database _cbl_nonnull,
     @note  You must release the document when you're done with it.
     @param database  The database.
     @param docID  The ID of the document.
-    @param error  On failure, the error will be written here.
-    @return  A new mutable \ref CBLDocument instance, or NULL on error. */
+    @param error  On failure, the error will be written here. (A nonexistent document is not
+                    considered a failure; in that event the error code will be zero.)
+    @return  A new \ref CBLDocument instance, or NULL if the doc doesn't exist or an error occurred. */
 _cbl_warn_unused
 CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
                                             FLString docID,

@@ -95,7 +95,7 @@ namespace cbl_internal {
         int retryCount = 0;
         do {
             // Create a CBLDocument that reflects the conflict revision:
-            auto conflict = _db->getMutableDocument(_docID, true, &_error);
+            auto conflict = _db->getMutableDocument(_docID, &_error);
             if (!conflict)
                 return false;
             if (!conflict->exists()) {
@@ -144,9 +144,12 @@ namespace cbl_internal {
             SyncLog(Info, "Successfully resolved and saved doc '%.*s'", FMTSLICE(_docID));
             _error = {};
         } else {
-            SyncLog(Error, "%s conflict resolution of doc '%.*s' failed: %s",
+            alloc_slice backtrace = c4error_getBacktrace(internal(_error));
+            SyncLog(Error, "%s conflict resolution of doc '%.*s' failed: %s\n%.*s",
                     (_clientResolver ? "Custom" : "Default"),
-                    FMTSLICE(_docID), c4error_descriptionStr(internal(_error)));
+                    FMTSLICE(_docID),
+                    c4error_descriptionStr(internal(_error)),
+                    FMTSLICE(backtrace));
         }
         return ok;
     }
@@ -157,10 +160,10 @@ namespace cbl_internal {
         CBLDocument *otherDoc = conflict;
         if (otherDoc->revisionFlags() & kRevDeleted)
             otherDoc = nullptr;
-        auto myDoc = _db->getDocument(_docID, false, &_error);
+        auto myDoc = _db->getDocument(_docID, true, &_error);
         if (!myDoc)
             return false;
-        if (!myDoc->exists())
+        if (myDoc->revisionFlags() & kRevDeleted)
             myDoc = nullptr;
 
         // Call the custom resolver (this could take a long time to return)

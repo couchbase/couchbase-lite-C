@@ -248,10 +248,13 @@ Retained<CBLDocument> CBLDatabase::_getDocument(slice docID, bool isMutable, boo
                            internal(outError));
     });
     if (!c4doc) {
+        if (outError && outError->code == CBLErrorNotFound && outError->domain == CBLDomain)
+            *outError = {};             // not-found is not treated as an error.
         return nullptr;
-    } else if (!allRevisions && c4doc->flags & kDocDeleted) {
+    } else if (!allRevisions && (c4doc->flags & kDocDeleted)) {
         c4doc_release(c4doc);
-        c4error_return(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
+        if (outError)
+            *outError = {};             // not-found is not treated as an error.
         return nullptr;
     } else {
         return make_nothrow<CBLDocument>(nullptr, docID, this, c4doc, isMutable);
@@ -266,8 +269,8 @@ CBLDatabase::getDocument(slice docID, bool allRevisions, CBLError *outError) con
 
 
 Retained<CBLDocument>
-CBLDatabase::getMutableDocument(slice docID, bool allRevisions, CBLError* outError) {
-    return this->_getDocument(docID, true, allRevisions, outError);
+CBLDatabase::getMutableDocument(slice docID, CBLError* outError) {
+    return this->_getDocument(docID, true, true, outError);
 }
 
 
@@ -277,7 +280,7 @@ const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID
 
 
 CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID, CBLError* outError) CBLAPI {
-    return db->getMutableDocument(docID, false, outError).detach();
+    return db->getMutableDocument(docID, outError).detach();
 }
 
 

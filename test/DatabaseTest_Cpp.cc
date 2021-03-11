@@ -36,6 +36,15 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database") {
 }
 
 
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Missing Document") {
+    Document doc = db.getDocument("foo");
+    CHECK(!doc);
+
+    MutableDocument mdoc = db.getMutableDocument("foo");
+    CHECK(!mdoc);
+}
+
+
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ New Document") {
     MutableDocument doc("foo");
     CHECK(doc);

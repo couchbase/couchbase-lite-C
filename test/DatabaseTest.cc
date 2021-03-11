@@ -70,13 +70,11 @@ TEST_CASE_METHOD(CBLTest, "Missing Document") {
     CBLError error;
     const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo"_sl, &error);
     CHECK(doc == nullptr);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.code == 0);
 
     CBLDocument* mdoc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
     CHECK(mdoc == nullptr);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.code == 0);
 
     CHECK(!CBLDatabase_PurgeDocumentByID(db, "foo"_sl, &error));
     CHECK(error.domain == CBLDomain);
