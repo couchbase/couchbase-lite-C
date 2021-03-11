@@ -191,7 +191,7 @@ CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
     It will not be added to a database until saved.
     @return  The new mutable document instance. */
 _cbl_warn_unused
-CBLDocument* CBLDocument_New(void) CBLAPI _cbl_returns_nonnull;
+CBLDocument* CBLDocument_Create(void) CBLAPI _cbl_returns_nonnull;
 
 /** Creates a new, empty document in memory, with the given ID.
     It will not be added to a database until saved.
@@ -201,7 +201,7 @@ CBLDocument* CBLDocument_New(void) CBLAPI _cbl_returns_nonnull;
     @param docID  The ID of the new document, or NULL to assign a new unique ID.
     @return  The new mutable document instance. */
 _cbl_warn_unused
-CBLDocument* CBLDocument_NewWithID(FLString docID) CBLAPI _cbl_returns_nonnull;
+CBLDocument* CBLDocument_CreateWithID(FLString docID) CBLAPI _cbl_returns_nonnull;
 
 /** Creates a new mutable CBLDocument instance that refers to the same document as the original.
     If the original document has unsaved changes, the new one will also start out with the same
@@ -209,7 +209,7 @@ CBLDocument* CBLDocument_NewWithID(FLString docID) CBLAPI _cbl_returns_nonnull;
     @note  You must release the new reference when you're done with it. Similarly, the original
            document still exists and must also be released when you're done with it.*/
 _cbl_warn_unused
-CBLDocument* CBLDocument_ToMutable(const CBLDocument* original _cbl_nonnull) CBLAPI
+CBLDocument* CBLDocument_MutableCopy(const CBLDocument* original _cbl_nonnull) CBLAPI
     _cbl_returns_nonnull;
 
 /** @} */
@@ -267,7 +267,7 @@ void CBLDocument_SetProperties(CBLDocument* _cbl_nonnull,
 /** Returns a document's properties as JSON.
     @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
 _cbl_warn_unused
-FLSliceResult CBLDocument_ToJSON(const CBLDocument* _cbl_nonnull) CBLAPI;
+FLSliceResult CBLDocument_CreateJSON(const CBLDocument* _cbl_nonnull) CBLAPI;
 
 /** Sets a mutable document's properties from a JSON string. */
 bool CBLDocument_SetJSON(CBLDocument* _cbl_nonnull,

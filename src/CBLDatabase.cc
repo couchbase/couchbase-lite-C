@@ -37,9 +37,6 @@ using namespace cbl_internal;
 #pragma mark - CONFIGURATION:
 
 
-static constexpr CBLDatabaseFlags kDefaultFlags = kC4DB_Create;
-
-
 // Default location for databases. This is platform-dependent.
 // (The implementation for Apple platforms is in CBLDatabase+ObjC.mm)
 #ifndef __APPLE__
@@ -80,14 +77,7 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
     }
     C4DatabaseConfig2 c4Config = {};
     c4Config.parentDirectory = effectiveDir(config->directory);
-    if (config->flags & kCBLDatabase_Create)
-        c4Config.flags |= kC4DB_Create;
-    if (config->flags & kCBLDatabase_ReadOnly)
-        c4Config.flags |= kC4DB_ReadOnly;
-    if (config->flags & kCBLDatabase_NoUpgrade)
-        c4Config.flags |= kC4DB_NoUpgrade;
-    if (config->flags & kCBLDatabase_VersionVectors)
-        c4Config.flags |= kC4DB_VersionVectors;
+    c4Config.flags = kC4DB_Create | kC4DB_VersionVectors;
     c4Config.encryptionKey = asC4Key(config->encryptionKey);
     return c4Config;
 }
@@ -111,7 +101,6 @@ bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBL
 CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() CBLAPI {
     CBLDatabaseConfiguration config = {};
     config.directory = effectiveDir(nullslice);
-    config.flags = kDefaultFlags;
     return config;
 }
 
@@ -155,9 +144,7 @@ CBLDatabase* CBLDatabase_Open(FLString name,
         return nullptr;
     if (c4db_mayHaveExpiration(c4db))
         c4db_startHousekeeping(c4db);
-    return make_nothrow<CBLDatabase>(outError, c4db, name,
-                                                c4config.parentDirectory,
-                                                (config ? config->flags : kDefaultFlags)).detach();
+    return make_nothrow<CBLDatabase>(outError, c4db, name, c4config.parentDirectory).detach();
 }
 
 
@@ -233,7 +220,7 @@ FLStringResult CBLDatabase_Path(const CBLDatabase* db) CBLAPI {
 }
 
 const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) CBLAPI {
-    return {db->dir, db->flags};
+    return {db->dir};
 }
 
 uint64_t CBLDatabase_Count(const CBLDatabase* db) CBLAPI {

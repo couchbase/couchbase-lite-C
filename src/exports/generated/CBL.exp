@@ -55,13 +55,13 @@ _CBLDatabase_IndexNames
 _CBLDocument_ID
 _CBLDocument_RevisionID
 _CBLDocument_Sequence
-_CBLDocument_New
-_CBLDocument_NewWithID
-_CBLDocument_ToMutable
+_CBLDocument_Create
+_CBLDocument_CreateWithID
+_CBLDocument_MutableCopy
 _CBLDocument_Properties
 _CBLDocument_MutableProperties
 _CBLDocument_SetProperties
-_CBLDocument_ToJSON
+_CBLDocument_CreateJSON
 _CBLDocument_SetJSON
 _CBLDatabase_GetDocument
 _CBLDatabase_GetMutableDocument
