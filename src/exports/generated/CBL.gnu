@@ -6,6 +6,8 @@ CBL_C {
 		CBL_DumpInstances;
 		CBL_Now;
 		CBLError_Message;
+		CBLError_GetCaptureBacktraces;
+		CBLError_SetCaptureBacktraces;
 		CBLListener_Remove;
 		kCBLTypeProperty;
 		kCBLBlobType;
@@ -54,6 +56,7 @@ CBL_C {
 		CBLDatabase_IndexNames;
 		CBLDocument_ID;
 		CBLDocument_RevisionID;
+		CBLDocument_CanonicalRevisionID;
 		CBLDocument_Sequence;
 		CBLDocument_Create;
 		CBLDocument_CreateWithID;
@@ -87,6 +90,8 @@ CBL_C {
 		CBLLog_SetConsoleLevelOfDomain;
 		CBLLog_FileConfig;
 		CBLLog_SetFileConfig;
+		CBLLog_BeginExpectingExceptions;
+		CBLLog_EndExpectingExceptions;
 		CBLQuery_New;
 		CBLQuery_Parameters;
 		CBLQuery_SetParameters;
@@ -125,6 +130,7 @@ CBL_C {
 		kFLEmptyDict;
 		FLSlice_Equal;
 		FLSlice_Compare;
+		FLSlice_Hash;
 		FLSlice_Copy;
 		FLSlice_ToCString;
 		FLSliceResult_New;

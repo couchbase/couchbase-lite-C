@@ -133,19 +133,25 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction, Aborted") {
 
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction With Exception", "[!throws]") {
+    {
+        MutableDocument doc("foo");
+        doc["greeting"] = "Howdy!";
+        db.saveDocument(doc);
+    }
+
     bool threw = false;
     try {
         Transaction t(db);
 
         MutableDocument doc("foo");
-        doc["greeting"] = "Howdy!";
-        db.saveDocument(doc);
-
-        if (sqrt(2) > 1.0)
-            throw runtime_error("intentional");
-
         doc["meeting"] = 23;
         db.saveDocument(doc);
+
+        if (sqrt(2) > 1.0) {
+            ExpectingExceptions x;
+            CBL_Log(kCBLLogDomainDatabase, CBLLogWarning, "INTENTIONALLY THROWING EXCEPTION!");
+            throw runtime_error("intentional");
+        }
 
         t.commit();
 
@@ -156,7 +162,9 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction With Exception", "[!throws]") {
     CHECK(threw);
 
     Document doc = db.getDocument("foo");
-    REQUIRE(!doc);
+    REQUIRE(doc);
+    CHECK(doc["greeting"].asString() == "Howdy!");
+    CHECK(doc["meeting"] == nullptr);
 }
 
 

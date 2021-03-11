@@ -24,13 +24,19 @@ extern "C" {
 #endif
 
 
-void CBLLog_SetConsoleLevelOfDomain(CBLLogDomain domain, CBLLogLevel level) CBLAPI;
+    void CBLError_SetCaptureBacktraces(bool) CBLAPI;
+    bool CBLError_GetCaptureBacktraces(void) CBLAPI;
 
-CBLLogLevel CBLLog_ConsoleLevelOfDomain(CBLLogDomain domain) CBLAPI;
+    void CBLLog_BeginExpectingExceptions() CBLAPI;
+    void CBLLog_EndExpectingExceptions() CBLAPI;
 
-/** Returns the last sequence number assigned in the database.
-    This starts at zero and increments every time a document is saved or deleted. */
-uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
+    void CBLLog_SetConsoleLevelOfDomain(CBLLogDomain domain, CBLLogLevel level) CBLAPI;
+
+    CBLLogLevel CBLLog_ConsoleLevelOfDomain(CBLLogDomain domain) CBLAPI;
+
+    /** Returns the last sequence number assigned in the database.
+        This starts at zero and increments every time a document is saved or deleted. */
+    uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
 
 /** Deletes a document from the database, given only its ID.
     @note  If no document with that ID exists, this function will return false but the error
@@ -77,6 +83,9 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* _cbl_nonnull) CBLAPI;
                                       const FLSlice revIDs[],
                                       bool outIsNew[],
                                       CBLError *outError);
+
+    FLSliceResult CBLDocument_CanonicalRevisionID(const CBLDocument* doc) CBLAPI;
+
 #ifdef __cplusplus
 }
 #endif

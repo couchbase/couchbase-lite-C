@@ -19,6 +19,7 @@
 #define CATCH_CONFIG_CONSOLE_WIDTH 120
 
 #include "CBLTest.hh"
+#include "CBLPrivate.h"
 #include "fleece/slice.hh"
 #include <fstream>
 
@@ -52,6 +53,8 @@ alloc_slice const CBLTest::kDatabaseDir(databaseDir());
 slice       const CBLTest::kDatabaseName = "CBLtest";
 
 const CBLDatabaseConfiguration CBLTest::kDatabaseConfiguration = []{
+    // One-time setup:
+    CBLError_SetCaptureBacktraces(true);
     CBLDatabaseConfiguration config = {kDatabaseDir};
     return config;
 }();

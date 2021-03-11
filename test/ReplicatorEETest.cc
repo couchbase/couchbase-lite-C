@@ -17,6 +17,7 @@
 //
 
 #include "ReplicatorTest.hh"
+#include "CBLPrivate.h"
 
 
 #ifdef COUCHBASE_ENTERPRISE     // Local-to-local replication is an EE feature
@@ -106,7 +107,7 @@ public:
         } else {
             doc["expletive"] = "Frak!";
             otherDB.saveDocument(doc);
-            expectedRemoteRevID = doc.revisionID();
+            expectedRemoteRevID = CBLDocument_CanonicalRevisionID(doc.ref());
         }
 
         config.conflictResolver = [](void *context,
@@ -168,7 +169,7 @@ public:
         if (deleteMerged) {
             return nullptr;
         } else {
-            CBLDocument *merged = CBLDocument_NewWithID(documentID);
+            CBLDocument *merged = CBLDocument_CreateWithID(documentID);
             MutableDict mergedProps(CBLDocument_MutableProperties(merged));
             mergedProps.set("greeting"_sl, "¡Hola!");
             // do not release `merged`, otherwise it would be freed before returning!

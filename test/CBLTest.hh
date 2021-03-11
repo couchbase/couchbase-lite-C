@@ -19,6 +19,7 @@
 #pragma once
 #include "CouchbaseLite.h"
 #include "CouchbaseLite.hh"
+#include "CBLPrivate.h"
 #include <functional>
 #include <iostream>
 #include <string>
@@ -83,3 +84,11 @@ std::string GetTestFilePath(const std::string &filename);
 bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)> &callback);
 
 unsigned ImportJSONLines(std::string &&path, CBLDatabase* database);
+
+
+// RAII utility to suppress reporting C++ exceptions (or breaking at them, in the Xcode debugger.)
+// Declare an instance when testing something that's expected to throw an exception internally.
+struct ExpectingExceptions {
+    ExpectingExceptions()   {CBLLog_BeginExpectingExceptions();}
+    ~ExpectingExceptions()  {CBLLog_EndExpectingExceptions();}
+};

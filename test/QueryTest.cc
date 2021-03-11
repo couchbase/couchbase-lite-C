@@ -48,9 +48,13 @@ public:
 TEST_CASE_METHOD(QueryTest, "Invalid Query", "[Query][!throws]") {
     CBLError error;
     int errPos;
-    query = CBLQuery_New(db, kCBLN1QLLanguage,
-                         "SELECT name WHERE"_sl,
-                         &errPos, &error);
+    {
+        ExpectingExceptions x;
+        CBL_Log(kCBLLogDomainQuery, CBLLogWarning, "INTENTIONALLY THROWING EXCEPTION!");
+        query = CBLQuery_New(db, kCBLN1QLLanguage,
+                             "SELECT name WHERE"_sl,
+                             &errPos, &error);
+    }
     REQUIRE(!query);
     CHECK(errPos == 17);
     CHECK(error.domain == CBLDomain);

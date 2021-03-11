@@ -90,6 +90,14 @@ CBLDocument::CBLDocument(CBLDatabase *db,
 CBLDocument::~CBLDocument() = default;
 
 
+alloc_slice CBLDocument::canonicalRevisionID() const {
+    if (!_c4doc)
+        return nullslice;
+    c4doc_selectCurrentRevision(_c4doc);
+    return c4doc_getSelectedRevIDGlobalForm(_c4doc);
+}
+
+
 C4RevisionFlags CBLDocument::revisionFlags() const {
     return _c4doc ? _c4doc->selectedRev.flags : (kRevNew | kRevLeaf);
 }
@@ -515,7 +523,14 @@ FLSlice CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->
 FLSlice CBLDocument_RevisionID(const CBLDocument* doc) CBLAPI      {return doc->revisionID();}
 uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
 FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
-FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI   {return doc->mutableProperties();}
+
+FLSliceResult CBLDocument_CanonicalRevisionID(const CBLDocument* doc) CBLAPI {
+    return FLSliceResult(doc->canonicalRevisionID());
+}
+
+FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI {
+    return doc->mutableProperties();
+}
 
 FLSliceResult CBLDocument_CreateJSON(const CBLDocument* doc) CBLAPI {return FLSliceResult(doc->propertiesAsJSON());}
 

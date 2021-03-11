@@ -164,3 +164,17 @@ bool CBLLog_SetFileConfig(CBLLogFileConfiguration config, CBLError *outError) CB
 
     return c4log_writeToBinaryFile(c4opt, internal(outError));
 }
+
+
+extern "C" CBL_CORE_API std::atomic_int gC4ExpectExceptions;
+
+void CBLLog_BeginExpectingExceptions() CBLAPI {
+    ++gC4ExpectExceptions;
+    c4log_warnOnErrors(false);
+}
+
+void CBLLog_EndExpectingExceptions() CBLAPI {
+    if (--gC4ExpectExceptions == 0)
+        c4log_warnOnErrors(true);
+}
+

@@ -11,6 +11,7 @@ kFLEmptyDict
 
 FLSlice_Equal
 FLSlice_Compare
+FLSlice_Hash
 FLSlice_Copy
 FLSlice_ToCString
 FLSliceResult_New

@@ -29,12 +29,9 @@ set(TEST_SRC
     QueryTest.cc
     ReplicatorTest.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/Backtrace.cc
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/API_Impl/FLSlice.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/LibC++Debug.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/betterassert.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/slice.cc
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/libb64/cdecode.c
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/libb64/cencode.c
 )
 add_executable(CBL_C_Tests ${TEST_SRC} )
 

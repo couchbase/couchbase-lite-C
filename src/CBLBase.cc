@@ -17,6 +17,7 @@
 //
 
 #include "CBLBase.h"
+#include "CBLPrivate.h"
 #include "Internal.hh"
 #include "Listener.hh"
 #include "Util.hh"
@@ -29,6 +30,16 @@ static_assert(sizeof(CBLError) == sizeof(C4Error));
 FLSliceResult CBLError_Message(const CBLError* error _cbl_nonnull) CBLAPI {
     return c4error_getMessage(internal(*error));
 }
+
+
+void CBLError_SetCaptureBacktraces(bool capture) CBLAPI {
+    c4error_setCaptureBacktraces(capture);
+}
+
+bool CBLError_GetCaptureBacktraces(void) CBLAPI {
+    return c4error_getCaptureBacktraces();
+}
+
 
 
 CBLTimestamp CBL_Now(void) CBLAPI {

@@ -308,7 +308,7 @@
 		27310FD7235F686D0046F8C8 /* CBL_Framework_Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework_Debug.xcconfig; sourceTree = "<group>"; };
 		2736A625242E5A07002B9D65 /* ReplicatorTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ReplicatorTest.hh; sourceTree = "<group>"; };
 		2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorEETest.cc; sourceTree = "<group>"; };
-		273CE7F624534A6100D01CA2 /* platform_apple.cmake */ = {isa = PBXFileReference; lastKnownFileType = text; name = platform_apple.cmake; path = cmake/platform_apple.cmake; sourceTree = "<group>"; };
+		273CD2D025E81C8F00B93C59 /* cmake */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cmake; sourceTree = "<group>"; };
 		274BAB9D24DA2DB900F4F810 /* generate_exports.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_exports.sh; sourceTree = "<group>"; };
 		275B3567234810C400FE9CF0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CouchbaseLiteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -444,7 +444,7 @@
 				27B61D6721D6B5DA0027CCDB /* test */,
 				27B61DBF21DD33930027CCDB /* Doxyfile */,
 				27B61DC321DEE1C20027CCDB /* CMakeLists.txt */,
-				273CE7F624534A6100D01CA2 /* platform_apple.cmake */,
+				273CD2D025E81C8F00B93C59 /* cmake */,
 				27C9B5B921F12C970040BC45 /* python */,
 				27B61D8321D6B9F60027CCDB /* Xcode */,
 				271C2A3721CAC9B50045856E /* vendor */,

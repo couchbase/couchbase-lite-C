@@ -56,6 +56,7 @@ public:
     CBLDatabase* database() const               {return _db;}
     slice docID() const                         {return _docID;}
     slice revisionID() const                    {return _revID;}
+    alloc_slice canonicalRevisionID() const;
     C4RevisionFlags revisionFlags() const;
     bool exists() const                         {return _c4doc != nullptr;}
     uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence : 0;}
