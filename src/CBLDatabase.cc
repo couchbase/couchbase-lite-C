@@ -144,7 +144,7 @@ CBLDatabase* CBLDatabase_Open(FLString name,
         return nullptr;
     if (c4db_mayHaveExpiration(c4db))
         c4db_startHousekeeping(c4db);
-    return make_nothrow<CBLDatabase>(outError, c4db, name, c4config.parentDirectory).detach();
+    return retain(new CBLDatabase(c4db, name, c4config.parentDirectory));
 }
 
 
@@ -257,7 +257,7 @@ Retained<CBLDocument> CBLDatabase::_getDocument(slice docID, bool isMutable, boo
             *outError = {};             // not-found is not treated as an error.
         return nullptr;
     } else {
-        return make_nothrow<CBLDocument>(nullptr, docID, this, c4doc, isMutable);
+        return make_retained<CBLDocument>(docID, this, c4doc, isMutable);
     }
 }
 
@@ -431,10 +431,8 @@ Retained<CBLListenerToken> CBLDatabase::addDocListener(slice docID,
                                                        CBLDocumentChangeListener listener,
                                                        void *context)
 {
-    auto token = make_nothrow<ListenerToken<CBLDocumentChangeListener>>(nullptr, this,
-                                                                        docID, listener, context);
-    if (token)
-        _docListeners.add(token);
+    auto token = new ListenerToken<CBLDocumentChangeListener>(this, docID, listener, context);
+    _docListeners.add(token);
     return token;
 }
 

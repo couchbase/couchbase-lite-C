@@ -55,10 +55,8 @@ void NotificationQueue::add(Notification notification) {
     _state.use([&](State &state) {
         if (state.callback) {
             bool first = !state.queue;
-            if (first) {
-                state.queue.reset( new (nothrow) vector<Notification> );
-                postcondition(state.queue);
-            }
+            if (first)
+                state.queue.reset( new vector<Notification> );
             state.queue->push_back(notification);
             if (first) {
                 readyCallback = state.callback;

@@ -89,7 +89,7 @@ static CBLBlob* createNewBlob(slice contentType,
                               FLSlice contents,
                               CBLBlobWriteStream *writer)
 {
-    return make_nothrow<CBLNewBlob>(nullptr, contentType, contents, internal(writer)).detach();
+    return retain(new CBLNewBlob(contentType, contents, internal(writer)));
 }
 
 CBLBlob* CBLBlob_NewWithData(FLString contentType,

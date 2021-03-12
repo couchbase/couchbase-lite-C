@@ -271,12 +271,9 @@ private:
             auto src = *c4Docs[i];
             if (!pushing && src.flags & kRevIsConflict) {
                 // Conflict -- start an async resolver task:
-                auto resolver = new (nothrow) ConflictResolver(_db, _conf.conflictResolver,
-                                                               _conf.context, src);
-                postcondition(resolver != nullptr);
+                auto r = new ConflictResolver(_db, _conf.conflictResolver, _conf.context, src);
                 bumpConflictResolverCount(1);
-                resolver->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this,
-                                         std::placeholders::_1) );
+                r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, std::placeholders::_1) );
             } else if (docs) {
                 // Otherwise add to list of changes to notify:
                 CBLReplicatedDocument doc = {};
@@ -306,9 +303,7 @@ private:
 
 
     bool _filter(slice docID, slice revID, C4RevisionFlags flags, Dict body, bool pushing) {
-        Retained<CBLDocument> doc = new (nothrow) CBLDocument(_conf.database, docID, revID, flags, body);
-        if (!doc)
-            return false;
+        Retained<CBLDocument> doc = new CBLDocument(_conf.database, docID, revID, flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
         return filter(_conf.context, doc, (flags & kRevDeleted) != 0);
     }

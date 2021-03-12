@@ -111,7 +111,7 @@ public:
         return _encodeParameters(enc);
     }
 
-    Retained<CBLResultSet> execute(CBLError* outError);
+    Retained<CBLResultSet> execute(C4Error* outError);
 
     using ColumnNamesMap = unordered_map<slice, uint32_t>;
 
@@ -274,9 +274,7 @@ namespace cbl_internal {
 
         Retained<CBLResultSet> resultSet(CBLError *error) {
             auto e = c4queryobs_getEnumerator(_c4obs, false, internal(error));
-            if (!e)
-                return nullptr;
-            return make_nothrow<CBLResultSet>(error, _query, e);
+            return e ? new CBLResultSet(_query, e) : nullptr;
         }
 
     private:

@@ -432,8 +432,8 @@ CBLBlob* CBLDocument::getBlob(FLDict dict) {
             return newBlob;
     }
     // Not found; create a new blob and remember it:
-    auto blob = make_nothrow<CBLBlob>(nullptr, this, dict);
-    if (!blob || !blob->valid())
+    auto blob = retained(new CBLBlob(this, dict));
+    if (!blob->valid())
         return nullptr;
     _blobs.insert({dict, blob});
     return blob;
@@ -442,10 +442,8 @@ CBLBlob* CBLDocument::getBlob(FLDict dict) {
 
 void CBLDocument::registerNewBlob(CBLNewBlob* blob) {
     LOCK(sNewBlobsMutex);
-    if (!sNewBlobs) {
-        sNewBlobs = new (nothrow) UnretainedValueToBlobMap;
-        postcondition(sNewBlobs != nullptr);
-    }
+    if (!sNewBlobs)
+        sNewBlobs = new UnretainedValueToBlobMap;
     sNewBlobs->insert({blob->properties(), blob});
 }
 
@@ -512,11 +510,11 @@ CBLDocument* CBLDocument_Create() CBLAPI {
 }
 
 CBLDocument* CBLDocument_CreateWithID(FLString docID) CBLAPI {
-    return make_nothrow<CBLDocument>(nullptr, docID, true).detach();
+    return make_retained<CBLDocument>(docID, true).detach();
 }
 
 CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
-    return make_nothrow<CBLDocument>(nullptr, doc).detach();
+    return make_retained<CBLDocument>(doc).detach();
 }
 
 FLSlice CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->docID();}

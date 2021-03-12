@@ -88,7 +88,7 @@ private:
 
 
 CBLURLEndpointListener* CBLURLEndpointListener_New(CBLURLEndpointListenerConfiguration* config) noexcept {
-    return make_nothrow<CBLURLEndpointListener>(nullptr, config).detach();
+    return new CBLURLEndpointListener(config);
 
 }
 

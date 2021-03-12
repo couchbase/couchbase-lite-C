@@ -77,10 +77,3 @@ void CBLListener_Remove(CBLListenerToken *token) CBLAPI {
         release(token);
     }
 }
-
-
-namespace cbl_internal {
-    void setAllocFailedError(CBLError *outError) {
-        c4error_return(LiteCoreDomain, kC4ErrorMemoryError, fleece::nullslice, internal(outError));
-    }
-}

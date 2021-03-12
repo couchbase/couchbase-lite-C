@@ -43,10 +43,6 @@ public:
 
     virtual ~CBLListenerToken()  { }
 
-    bool validate(CBLError*) const {
-        return true;
-    }
-
     void addedTo(cbl_internal::ListenersBase *owner _cbl_nonnull) {
         assert(!_owner);
         _owner = owner;
@@ -154,9 +150,8 @@ namespace cbl_internal {
     class Listeners : private ListenersBase {
     public:
         fleece::Retained<CBLListenerToken> add(LISTENER listener, void *context) {
-            auto t = new (std::nothrow) ListenerToken<LISTENER>(listener, context);
-            if (t)
-                add(t);
+            auto t = new ListenerToken<LISTENER>(listener, context);
+            add(t);
             return t;
         }
 
