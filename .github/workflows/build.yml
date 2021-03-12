@@ -64,6 +64,17 @@ jobs:
 
 #### TEST
 
+      # CBL_C_Tests is in a subdir, but expects the current directory to be the project root.
+
     - name: Test
+      if: runner.os != 'Windows'
       working-directory: ${{github.workspace}}
+      shell: bash
       run: build/test/CBL_C_Tests -r list
+
+    - name: Test On Windows
+      if: runner.os == 'Windows'
+      working-directory: ${{github.workspace}}
+      shell: bash
+      # Windows CMake puts the binary in a subdirectory named after the build type...
+      run: build/test/$BUILD_TYPE/CBL_C_Tests -r list
