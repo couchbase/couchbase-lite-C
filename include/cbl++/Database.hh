@@ -235,9 +235,13 @@ namespace cbl {
     public:
         /** Begins a batch operation on the database that will end when the Batch instance
             goes out of scope. */
-        explicit Transaction(Database db) {
+        explicit Transaction(Database db)
+        :Transaction(db.ref())
+        { }
+
+        explicit Transaction (CBLDatabase *db) {
             CBLError error;
-            RefCounted::check(CBLDatabase_BeginTransaction(db.ref(), &error), error);
+            RefCounted::check(CBLDatabase_BeginTransaction(db, &error), error);
             _db = db;
         }
 
@@ -247,14 +251,15 @@ namespace cbl {
         /** Ends the transaction, rolling back changes. */
         void abort()    {end(false);}
 
-        ~Transaction()        {end(false);}
+        ~Transaction()  {end(false);}
 
     private:
         void end(bool commit) {
-            Database db = std::move(_db);  // clears _db
+            CBLDatabase *db = _db;
             if (db) {
+                _db = nullptr;
                 CBLError error;
-                if (!CBLDatabase_EndTransaction(db.ref(), commit, &error)) {
+                if (!CBLDatabase_EndTransaction(db, commit, &error)) {
                     // If an exception is thrown while a Batch is in scope, its destructor will
                     // call end(). If I'm in this situation I cannot throw another exception or
                     // the C++ runtime will abort the process. Detect this and just warn instead.
@@ -267,7 +272,7 @@ namespace cbl {
             }
         }
 
-        Database _db;
+        CBLDatabase* _db = nullptr;
     };
 
 }
