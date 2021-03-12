@@ -6,6 +6,7 @@ set(TOP ${PROJECT_SOURCE_DIR}/../)
 add_definitions(
     -DCBL_TESTS
     -DCATCH_CONFIG_CPP11_STREAM_INSERTABLE_CHECK
+    -DNOMINMAX # Get rid of min/max macros that interfere with std::min/std::max
 )
 
 include_directories(
@@ -43,7 +44,6 @@ if(MSVC)
         CBL_C_Tests PRIVATE
         ${TOP}vendor/couchbase-lite-core/vendor/fleece/MSVC/asprintf.c
         ${TOP}vendor/couchbase-lite-core/vendor/fleece/MSVC/vasprintf-msvc.c
-        ${TOP}vendor/couchbase-lite-core/vendor/fleece/MSVC/memmem.cc
     )
     target_include_directories(
         CBL_C_Tests PRIVATE
