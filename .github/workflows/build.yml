@@ -1,0 +1,68 @@
+name: Build And Test
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+      - 'release/*'
+  pull_request:
+    branches:
+      - '**'
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  # NOTE: If we decide to archive the build products we should build with RelWithDebInfo instead.
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    # Build/test on Ubuntu Linux + GCC, macOS + Apple Clang, Windows + MSVC.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+#### BUILD
+
+    - name: Create Build Environment
+      # Create a build directory, as our working directory for all subsequent commands
+      working-directory: ${{github.workspace}}
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Generate Export Lists
+      shell: bash
+      run: ${{github.workspace}}/src/exports/generate_exports.sh
+
+    - name: Configure CMake
+      # "Note the current convention is to use the -S and -B options here to specify source
+      # and build directories, but this is only available with CMake 3.13 and higher.
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12"
+      if: runner.os != 'Windows'
+      working-directory: ${{github.workspace}}/build
+      run: cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+
+    - name: Configure CMake (Windows)
+      # "Note the current convention is to use the -S and -B options here to specify source
+      # and build directories, but this is only available with CMake 3.13 and higher.
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12"
+      if: runner.os == 'Windows'
+      working-directory: ${{github.workspace}}/build
+      run: cmake .. -A x64
+
+    - name: Build
+      # Use cmake to build -- this will invoke `make` on Linux/Mac, Visual Studio on Windows.
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --config $BUILD_TYPE
+
+#### TEST
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: test/CBL_C_Tests
