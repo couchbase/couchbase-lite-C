@@ -47,8 +47,8 @@ CBLDocument::CBLDocument(slice docID,
 ,_mutable(isMutable)
 {
     if (_c4doc) {
-        _c4doc->extraInfo = {this, nullptr};
-        _revID = _c4doc->selectedRev.revID;
+        _c4doc->extraInfo() = {this, nullptr};
+        _revID = _c4doc->selectedRev().revID;
     }
 }
 
@@ -99,7 +99,7 @@ alloc_slice CBLDocument::canonicalRevisionID() const {
 
 
 C4RevisionFlags CBLDocument::revisionFlags() const {
-    return _c4doc ? _c4doc->selectedRev.flags : (kRevNew | kRevLeaf);
+    return _c4doc ? _c4doc->selectedRev().flags : (kRevNew | kRevLeaf);
 }
 
 
@@ -213,7 +213,7 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull,
     // Update my C4Document:
     _db = db;
     _c4doc = move(newDoc);
-    _revID = _c4doc->selectedRev.revID;
+    _revID = _c4doc->selectedRev().revID;
     return true;
 }
 
@@ -269,7 +269,7 @@ bool CBLDocument::selectNextConflictingRevision() {
     _properties = nullptr;
     _fromJSON = nullptr;
     while (c4doc_selectNextLeafRevision(_c4doc, true, true, nullptr))
-        if (_c4doc->selectedRev.flags & kRevIsConflict)
+        if (_c4doc->selectedRev().flags & kRevIsConflict)
             return true;
     return false;
 }
@@ -291,7 +291,7 @@ bool CBLDocument::resolveConflict(Resolution resolution,
     _properties = nullptr;
     _fromJSON = nullptr;
 
-    slice winner(_c4doc->selectedRev.revID), loser(_c4doc->revID);
+    slice winner(_c4doc->selectedRev().revID), loser(_c4doc->revID());
     if (resolution != Resolution::useRemote)
         std::swap(winner, loser);
 

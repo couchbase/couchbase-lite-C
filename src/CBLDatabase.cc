@@ -86,7 +86,7 @@ static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
 #ifdef COUCHBASE_ENTERPRISE
 bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBLAPI {
     C4EncryptionKey c4key;
-    if (c4key_setPassword(&c4key, password, kC4EncryptionAES256)) {
+    if (&c4key->setPassword(password, kC4EncryptionAES256)) {
         key->algorithm = CBLEncryptionAlgorithm(c4key.algorithm);
         memcpy(key->bytes, c4key.bytes, sizeof(key->bytes));
         return true;
@@ -109,7 +109,7 @@ CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() CBLAPI {
 
 
 bool CBL_DatabaseExists(FLString name, FLString inDirectory) CBLAPI {
-    return c4db_exists(name, effectiveDir(inDirectory));
+    return C4Database::exists(name, effectiveDir(inDirectory));
 }
 
 
@@ -119,7 +119,7 @@ bool CBL_CopyDatabase(FLString fromPath,
                       CBLError* outError) CBLAPI
 {
     C4DatabaseConfig2 c4config = asC4Config(config);
-    return c4db_copyNamed(fromPath, toName, &c4config, internal(outError));
+    C4Database::copyNamed(fromPath, toName, c4config);
 }
 
 
@@ -127,7 +127,7 @@ bool CBL_DeleteDatabase(FLString name,
                         FLString inDirectory,
                         CBLError *outError) CBLAPI
 {
-    return c4db_deleteNamed(name, effectiveDir(inDirectory), internal(outError));
+    C4Database::deleteNamed(name, effectiveDir(inDirectory));
 }
 
 
@@ -139,12 +139,12 @@ CBLDatabase* CBLDatabase_Open(FLString name,
                               CBLError *outError) CBLAPI
 {
     C4DatabaseConfig2 c4config = asC4Config(config);
-    C4Database *c4db = c4db_openNamed(name, &c4config, internal(outError));
+    C4Database *c4db = C4Database::openNamed(name, &c4config, internal(outError));
     if (!c4db)
         return nullptr;
-    if (c4db_mayHaveExpiration(c4db))
-        c4db_startHousekeeping(c4db);
-    return retain(new CBLDatabase(c4db, name, c4config.parentDirectory));
+    if (c4db->mayHaveExpiration())
+        c4db->startHousekeeping();
+    return make_retained<CBLDatabase>(c4db, name, c4config.parentDirectory).detach();
 }
 
 
@@ -152,25 +152,25 @@ bool CBLDatabase_Close(CBLDatabase* db, CBLError* outError) CBLAPI {
     if (!db)
         return true;
     return db->use<bool>([=](C4Database *c4db) {
-        return c4db_close(c4db, internal(outError));
+        return c4db->close(internal(outError));
     });
 }
 
 bool CBLDatabase_BeginTransaction(CBLDatabase* db, CBLError* outError) CBLAPI {
     return db->use<bool>([=](C4Database *c4db) {
-        return c4db_beginTransaction(c4db, internal(outError));
+        return c4db->beginTransaction(internal(outError));
     });
 }
 
 bool CBLDatabase_EndTransaction(CBLDatabase* db, bool commit, CBLError* outError) CBLAPI {
     return db->use<bool>([=](C4Database *c4db) {
-        return c4db_endTransaction(c4db, commit, internal(outError));
+        return c4db->endTransaction(commit, internal(outError));
     });
 }
 
 bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
     return db->use<bool>([=](C4Database *c4db) {
-        return c4db_delete(c4db, internal(outError));
+        return c4db->delete(internal(outError));
     });
 }
 
@@ -181,7 +181,7 @@ bool CBLDatabase_ChangeEncryptionKey(CBLDatabase *db,
 {
     return db->use<bool>([=](C4Database *c4db) {
         C4EncryptionKey c4key = asC4Key(newKey);
-        return c4db_rekey(c4db, &c4key, internal(outError));
+        return c4db->rekey(&c4key, internal(outError));
     });
 }
 #endif
@@ -191,7 +191,7 @@ bool CBLDatabase_PerformMaintenance(CBLDatabase* db,
                                     CBLError* outError) CBLAPI
 {
     return db->use<bool>([=](C4Database *c4db) {
-        return c4db_maintenance(c4db, (C4MaintenanceType)type, internal(outError));
+        return c4db->maintenance((C4MaintenanceType)type, internal(outError));
     });
 }
 
@@ -209,13 +209,13 @@ C4Database* CBLDatabase::_getC4Database() const {
 
 FLString CBLDatabase_Name(const CBLDatabase* db) CBLAPI {
     return db->use<FLString>([](C4Database *c4db) {
-        return c4db_getName(c4db);
+        return c4db->getName();
     });
 }
 
 FLStringResult CBLDatabase_Path(const CBLDatabase* db) CBLAPI {
     return db->use<FLStringResult>([](C4Database *c4db) {
-        return c4db_getPath(c4db);
+        return c4db->getPath();
     });
 }
 
@@ -225,13 +225,13 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) CBLAPI 
 
 uint64_t CBLDatabase_Count(const CBLDatabase* db) CBLAPI {
     return db->use<uint64_t>([](C4Database *c4db) {
-        return c4db_getDocumentCount(c4db);
+        return c4db->getDocumentCount();
     });
 }
 
 uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) CBLAPI {
     return db->use<uint64_t>([](C4Database *c4db) {
-        return c4db_getLastSequence(c4db);
+        return c4db->getLastSequence();
     });
 }
 
@@ -243,7 +243,7 @@ Retained<CBLDocument> CBLDatabase::_getDocument(slice docID, bool isMutable, boo
                                                 CBLError *outError)
 {
     C4Document *c4doc = use<C4Document*>([&](C4Database *c4db) {
-        return c4db_getDoc(c4db, docID, true, // mustExist
+        return c4db->getDoc(docID, true, // mustExist
                            (allRevisions ? kDocGetAll : kDocGetCurrentRev),
                            internal(outError));
     });
@@ -251,8 +251,8 @@ Retained<CBLDocument> CBLDatabase::_getDocument(slice docID, bool isMutable, boo
         if (outError && outError->code == CBLErrorNotFound && outError->domain == CBLDomain)
             *outError = {};             // not-found is not treated as an error.
         return nullptr;
-    } else if (!allRevisions && (c4doc->flags & kDocDeleted)) {
-        c4doc_release(c4doc);
+    } else if (!allRevisions && (c4doc->flags() & kDocDeleted)) {
+        c4doc->release();
         if (outError)
             *outError = {};             // not-found is not treated as an error.
         return nullptr;
@@ -306,11 +306,11 @@ Retained<CBLListenerToken> CBLDatabase::addListener(function_ref<Retained<CBLLis
     return use<Retained<CBLListenerToken>>([=](C4Database *c4db) {
         Retained<CBLListenerToken> token = callback();
         if (!_observer) {
-            _observer = c4dbobs_create(c4db,
+            _observer = c4db,
                                        [](C4DatabaseObserver* observer, void *context) {
                 ((CBLDatabase*)context)->databaseChanged();
             },
-                                       this);
+                                       this->create();
         }
         return token;
     });
@@ -337,7 +337,7 @@ void CBLDatabase::callDBListeners() {
     while (true) {
         C4DatabaseChange c4changes[kMaxChanges];
         bool external;
-        uint32_t nChanges = c4dbobs_getChanges(_observer, c4changes, kMaxChanges, &external);
+        uint32_t nChanges = _observer->getChanges(c4changes, kMaxChanges, &external);
         if (nChanges == 0)
             break;
 
@@ -386,20 +386,20 @@ namespace cbl_internal {
         ,_docID(docID)
         {
             db->use([&](C4Database *c4db) {
-                _c4obs = c4docobs_create(c4db,
+                _c4obs = c4db,
                                          docID,
                                          [](C4DocumentObserver* observer, C4String docID,
                                             C4SequenceNumber sequence, void *context)
                                          {
                                              ((ListenerToken*)context)->docChanged();
                                          },
-                                         this);
+                                         this->create();
             });
         }
 
         ~ListenerToken() {
             _db->use([&](C4Database *c4db) {
-                c4docobs_free(_c4obs);
+                _c4obs->free();
             });
         }
 

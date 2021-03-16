@@ -17,6 +17,7 @@
 //
 
 #pragma once
+#include "c4Base.hh"
 #include "c4.h"
 #include "fleece/slice.hh"
 #include "fleece/Fleece.hh"

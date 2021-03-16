@@ -41,7 +41,7 @@ public:
     ,_context(context)
     { }
 
-    virtual ~CBLListenerToken()  { }
+    virtual ~CBLListenerToken()  =default;
 
     void addedTo(cbl_internal::ListenersBase *owner _cbl_nonnull) {
         assert(!_owner);

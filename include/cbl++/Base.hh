@@ -110,7 +110,7 @@ protected: \
     public:
         using Callback = std::function<void(Args...)>;
 
-        ListenerToken()                                  { }
+        ListenerToken()                                  =default;
         ~ListenerToken()                                 {CBLListener_Remove(_token);}
 
         ListenerToken(Callback cb)

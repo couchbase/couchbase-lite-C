@@ -49,7 +49,7 @@ public:
 
     static CBLDocument* containing(Value value) {
         C4Document* doc = c4doc_containingValue(value);
-        return doc ? (CBLDocument*)doc->extraInfo.pointer : nullptr;
+        return doc ? (CBLDocument*)doc->extraInfo().pointer : nullptr;
     }
 
     CBLDatabase* database() const               {return _db;}
@@ -58,7 +58,7 @@ public:
     alloc_slice canonicalRevisionID() const;
     C4RevisionFlags revisionFlags() const;
     bool exists() const                         {return _c4doc != nullptr;}
-    uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence : 0;}
+    uint64_t sequence() const                   {return _c4doc ? _c4doc->sequence() : 0;}
     bool isMutable() const                      {return _mutable;}
 
 

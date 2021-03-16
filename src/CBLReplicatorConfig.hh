@@ -34,7 +34,7 @@
 
 
 struct CBLEndpoint {
-    virtual ~CBLEndpoint()                                      { }
+    virtual ~CBLEndpoint()                                      =default;
     virtual bool valid() const =0;
     const C4Address& remoteAddress() const                      {return _address;}
     virtual C4String remoteDatabaseName() const =0;
@@ -93,7 +93,7 @@ protected:
     using alloc_slice = fleece::alloc_slice;
 
 public:
-    virtual ~CBLAuthenticator()                                 { }
+    virtual ~CBLAuthenticator()                                 =default;
     virtual void writeOptions(Encoder&) =0;
 };
 

@@ -20,6 +20,7 @@
 #include "CBLDatabase.h"
 #include "CBLDocument.h"
 #include "CBLPrivate.h"
+#include "c4Database.hh"
 #include "Internal.hh"
 #include "Listener.hh"
 #include "access_lock.hh"
@@ -31,22 +32,21 @@ namespace cbl_internal {
     struct CBLLocalEndpoint;
 }
 
-struct CBLDatabase final : public CBLRefCounted, public litecore::access_lock<C4Database*> {
+struct CBLDatabase final : public CBLRefCounted, public litecore::access_lock<fleece::Retained<C4Database>> {
 public:
     CBLDatabase(C4Database* _cbl_nonnull db,
                 slice name_,
                 slice dir_)
     :access_lock(std::move(db))
     ,dir(dir_)
-    ,_blobStore(c4db_getBlobStore(db, nullptr))
+    ,_blobStore(&db->getBlobStore())
     ,_notificationQueue(this)
     { }
 
     virtual ~CBLDatabase() {
-        use([&](C4Database *c4db) {
-            c4dbobs_free(_observer);
+        use([&](Retained<C4Database> &c4db) {
             _docListeners.clear();
-            c4db_release(c4db);
+            _observer = nullptr;
         });
     }
 
@@ -98,7 +98,7 @@ private:
     void callDocListeners();
 
     C4BlobStore* _blobStore;
-    C4DatabaseObserver* _observer {nullptr};
+    std::unique_ptr<C4DatabaseObserver> _observer;
     cbl_internal::Listeners<CBLDatabaseChangeListener> _listeners;
     cbl_internal::Listeners<CBLDatabaseChangeDetailListener> _detailListeners;
     cbl_internal::Listeners<CBLDocumentChangeListener> _docListeners;
