@@ -18,8 +18,10 @@
 
 #include "CBLDatabase_Internal.hh"
 #include "CBLDocument_Internal.hh"
+#include "CBLQuery_Internal.hh"
 #include "CBLPrivate.h"
 #include "c4Observer.hh"
+#include "c4Query.hh"
 #include "Internal.hh"
 #include "Util.hh"
 #include "function_ref.hh"
@@ -114,12 +116,12 @@ void CBLDatabase::copyDatabase(slice fromPath,
                                const CBLDatabaseConfiguration *config)
 {
     C4DatabaseConfig2 c4config = asC4Config(config);
-    C4Database::copyNamed(fromPath, toName, c4config);  //FIXME: Catch exceptions
+    C4Database::copyNamed(fromPath, toName, c4config);
 }
 
 
 void CBLDatabase::deleteDatabase(slice name, slice inDirectory) {
-    C4Database::deleteNamed(name, effectiveDir(inDirectory));  //FIXME: Catch exceptions
+    C4Database::deleteNamed(name, effectiveDir(inDirectory));
 }
 
 
@@ -127,15 +129,15 @@ void CBLDatabase::deleteDatabase(slice name, slice inDirectory) {
 
 
 CBLDatabase::CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
-:access_lock(std::move(db))
-,dir(dir_)
+:_c4db(std::move(db))
+,_dir(dir_)
 ,_blobStore(&db->getBlobStore())
 ,_notificationQueue(this)
 { }
 
 
 CBLDatabase::~CBLDatabase() {
-    use([&](Retained<C4Database> &c4db) {
+    _c4db.use([&](Retained<C4Database> &c4db) {
         _docListeners.clear();
         _observer = nullptr;
     });
@@ -152,40 +154,40 @@ Retained<CBLDatabase> CBLDatabase::open(slice name, const CBLDatabaseConfigurati
 
 
 void CBLDatabase::close() {
-    use([=](C4Database *c4db) {
-        c4db->close();  //FIXME: Catch exceptions
+    _c4db.use([=](C4Database *c4db) {
+        c4db->close();
     });
 }
 
 void CBLDatabase::beginTransaction() {
-    use([=](C4Database *c4db) {
-        c4db->beginTransaction();  //FIXME: Catch exceptions
+    _c4db.use([=](C4Database *c4db) {
+        c4db->beginTransaction();
     });
 }
 
 void CBLDatabase::endTransaction(bool commit) {
-    use([=](C4Database *c4db) {
-        c4db->endTransaction(commit);  //FIXME: Catch exceptions
+    _c4db.use([=](C4Database *c4db) {
+        c4db->endTransaction(commit);
     });
 }
 
 void CBLDatabase::closeAndDelete() {
-    use([=](C4Database *c4db) {
-        return c4db->closeAndDeleteFile();  //FIXME: Catch exceptions
+    _c4db.use([=](C4Database *c4db) {
+        return c4db->closeAndDeleteFile();
     });
 }
 
 #ifdef COUCHBASE_ENTERPRISE
 void CBLDatabase::changeEncryptionKey(const CBLEncryptionKey *newKey) {
-    use([=](C4Database *c4db) {
+    _c4db.use([=](C4Database *c4db) {
         C4EncryptionKey c4key = asC4Key(newKey);
-        c4db->rekey(&c4key);  //FIXME: Catch exceptions
+        c4db->rekey(&c4key);
     });
 }
 #endif
 
 bool CBLDatabase::performMaintenance(CBLMaintenanceType type) {
-    use([=](C4Database *c4db) {
+    _c4db.use([=](C4Database *c4db) {
         return c4db->maintenance((C4MaintenanceType)type);
     });
     return true;
@@ -197,36 +199,36 @@ bool CBLDatabase::performMaintenance(CBLMaintenanceType type) {
 
 // For use only by CBLURLEndpointListener and CBLLocalEndpoint
 C4Database* CBLDatabase::_getC4Database() const {
-    return use<C4Database*>([](C4Database *c4db) {
+    return _c4db.use<C4Database*>([](C4Database *c4db) {
         return c4db;
     });
 }
 
 
 slice CBLDatabase::name() const noexcept {
-    return use<FLString>([](C4Database *c4db) {
+    return _c4db.use<FLString>([](C4Database *c4db) {
         return c4db->getName();
     });
 }
 
 alloc_slice CBLDatabase::path() const {
-    return use<FLStringResult>([](C4Database *c4db) {
+    return _c4db.use<FLStringResult>([](C4Database *c4db) {
         return FLStringResult(c4db->path());
     });
 }
 
 CBLDatabaseConfiguration CBLDatabase::config() const noexcept {
-    return {dir, nullptr};
+    return {_dir, nullptr};
 }
 
 uint64_t CBLDatabase::count() const {
-    return use<uint64_t>([](C4Database *c4db) {
+    return _c4db.use<uint64_t>([](C4Database *c4db) {
         return c4db->getDocumentCount();
     });
 }
 
 uint64_t CBLDatabase::lastSequence() const {
-    return use<uint64_t>([](C4Database *c4db) {
+    return _c4db.use<uint64_t>([](C4Database *c4db) {
         return c4db->getLastSequence();
     });
 }
@@ -240,9 +242,9 @@ Retained<CBLDocument> CBLDatabase::_getDocument(slice docID,
                                                 bool allRevisions) const
 {
     Retained<C4Document> c4doc;
-    use([&](const C4Database *c4db) {
+    _c4db.use([&](const C4Database *c4db) {
         c4doc = c4db->getDocument(docID, true, // mustExist
-                                 (allRevisions ? kDocGetAll : kDocGetCurrentRev));  //FIXME: Catch exceptions
+                                  (allRevisions ? kDocGetAll : kDocGetCurrentRev));
     });
     if (!c4doc || (!allRevisions && (c4doc->flags() & kDocDeleted)))
         return nullptr;
@@ -264,6 +266,64 @@ Retained<CBLDocument> CBLDatabase::getMutableDocument(slice docID) {
 }
 
 
+#pragma mark - QUERIES & INDEXES:
+
+
+Retained<CBLQuery> CBLDatabase::createQuery(CBLQueryLanguage language,
+                                            slice queryString,
+                                            int *outErrPos) const
+{
+    alloc_slice json;
+    if (language == kCBLJSONLanguage) {
+        json = convertJSON5(queryString, nullptr); // allow JSON5 as a convenience
+        if (!json)
+            C4Error::raise(FleeceDomain, kFLJSONError);
+        queryString = json;
+    }
+    auto c4query = _c4db.use<Retained<C4Query>>([&](C4Database* c4db) {
+        return c4db->newQuery((C4QueryLanguage)language, queryString, outErrPos);
+    });
+    if (!c4query)
+        return nullptr;
+    return new CBLQuery(this, move(c4query), _c4db);
+}
+
+
+void CBLDatabase::createIndex(slice name, CBLIndexSpec spec) {
+    C4IndexOptions options = {};
+    options.ignoreDiacritics = spec.ignoreAccents;
+    string languageStr;
+    if (spec.language.buf) {
+        languageStr = string(spec.language);
+        options.language = languageStr.c_str();
+    }
+    _c4db.use([&](C4Database *c4db) {
+        c4db->createIndex(name,
+                                 spec.keyExpressionsJSON,
+                                 (C4IndexType)spec.type,
+                                 &options);
+    });
+}
+
+void CBLDatabase::deleteIndex(slice name) {
+    _c4db.use([&](C4Database *c4db) {
+        c4db->deleteIndex(name);
+    });
+}
+
+FLMutableArray CBLDatabase::indexNames() {
+    return _c4db.use<FLMutableArray>([&](C4Database *c4db) {
+        Doc doc(alloc_slice(c4db_getIndexesInfo(c4db, nullptr)));
+        MutableArray indexes = MutableArray::newArray();
+        for (Array::iterator i(doc.root().asArray()); i; ++i) {
+            Dict info = i.value().asDict();
+            indexes.append(info["name"]);
+        }
+        return FLMutableArray_Retain(indexes);
+    });
+}
+
+
 #pragma mark - DATABASE CHANGE LISTENERS:
 
 
@@ -277,7 +337,7 @@ void CBLDatabase::bufferNotifications(CBLNotificationsReadyCallback callback, vo
 
 
 Retained<CBLListenerToken> CBLDatabase::addListener(function_ref<Retained<CBLListenerToken>()> callback) {
-    return use<Retained<CBLListenerToken>>([=](C4Database *c4db) {
+    return _c4db.use<Retained<CBLListenerToken>>([=](C4Database *c4db) {
         Retained<CBLListenerToken> token = callback();
         if (!_observer)
             _observer = c4db->observe([this](C4DatabaseObserver*) { this->databaseChanged(); });
@@ -338,7 +398,7 @@ namespace cbl_internal {
         ,_db(db)
         ,_docID(docID)
         {
-            db->use([&](C4Database *c4db) {
+            db->_c4db.use([&](C4Database *c4db) {
                 _c4obs = c4db->observeDocument(docID,
                                          [this](C4DocumentObserver*, slice docID, C4SequenceNumber)
                                          {
@@ -348,7 +408,7 @@ namespace cbl_internal {
         }
 
         ~ListenerToken() {
-            _db->use([&](C4Database *c4db) {
+            _db->_c4db.use([&](C4Database *c4db) {
                 _c4obs = nullptr;
             });
         }

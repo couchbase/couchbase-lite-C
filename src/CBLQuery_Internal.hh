@@ -11,7 +11,7 @@
 #include "Listener.hh"
 #include "Util.hh"
 #include "c4.hh"
-#include "c4Query.h"
+#include "c4Query.hh"
 #include "access_lock.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
@@ -25,46 +25,12 @@ using namespace fleece;
 #pragma mark - QUERY CLASS:
 
 
-struct CBLQuery final : public CBLRefCounted, public litecore::shared_access_lock<C4Query*> {
+struct CBLQuery final : public CBLRefCounted {
 public:
 
-    CBLQuery(const CBLDatabase* db _cbl_nonnull,
-             CBLQueryLanguage language,
-             slice queryString,
-             int *outErrPos,
-             C4Error* outError)
-    :shared_access_lock<C4Query*>(createC4Query(db, language, queryString, outErrPos, outError), db)
-    ,_database(db)
-    { }
-
     ~CBLQuery() {
-        use([](C4Query *c4query) {
-            c4query_release(c4query);
-        });
-    }
-
-    static C4Query* createC4Query(const CBLDatabase* db _cbl_nonnull,
-                                  CBLQueryLanguage language,
-                                  slice queryString,
-                                  int *outErrPos,
-                                  C4Error* outError)
-    {
-        alloc_slice json;
-        if (language == kCBLJSONLanguage) {
-            json = convertJSON5(queryString, outError);
-            if (!json)
-                return nullptr;
-            queryString = json;
-        }
-        return db->use<C4Query*>([&](C4Database* c4db) {
-            return c4query_new2(c4db, (C4QueryLanguage)language, queryString,
-                                outErrPos, outError);
-        });
-    }
-
-    bool valid() const {
-        return use<bool>([](C4Query *c4query) {
-            return c4query != nullptr;
+        _c4query.use([](Retained<C4Query> &c4query) {
+            c4query = nullptr;
         });
     }
 
@@ -73,20 +39,20 @@ public:
     }
 
     alloc_slice explain() const {
-        return use<alloc_slice>([](C4Query *c4query) {
-            return c4query_explain(c4query);
+        return _c4query.use<alloc_slice>([](C4Query *c4query) {
+            return c4query->explain();
         });
     }
 
     unsigned columnCount() const {
-        return use<unsigned>([](C4Query *c4query) {
-            return c4query_columnCount(c4query);
+        return _c4query.use<unsigned>([](C4Query *c4query) {
+            return c4query->columnCount();
         });
     }
 
     slice columnName(unsigned col) const {
-        return use<slice>([=](C4Query *c4query) {
-            return c4query_columnTitle(c4query, col);
+        return _c4query.use<slice>([=](C4Query *c4query) {
+            return c4query->columnTitle(col);
         });
     }
 
@@ -111,7 +77,7 @@ public:
         return _encodeParameters(enc);
     }
 
-    Retained<CBLResultSet> execute(C4Error* outError);
+    Retained<CBLResultSet> execute();
 
     using ColumnNamesMap = unordered_map<slice, uint32_t>;
 
@@ -135,17 +101,28 @@ public:
     }
 
 private:
+    friend class CBLDatabase;
+    friend class cbl_internal::ListenerToken<CBLQueryChangeListener>;
+
+    CBLQuery(const CBLDatabase *db,
+             Retained<C4Query>&& c4query,
+             const litecore::access_lock<Retained<C4Database>> &owner)
+    :_c4query(std::move(c4query), owner)
+    ,_database(db)
+    { }
+
     bool _encodeParameters(Encoder &enc) {
         alloc_slice encodedParameters = enc.finish();
         if (!encodedParameters)
             return false;
         _parameters = encodedParameters;
-        use([&](C4Query *c4query) {
-            c4query_setParameters(c4query, encodedParameters);
+        _c4query.use([&](C4Query *c4query) {
+            c4query->setParameters(encodedParameters);
         });
         return true;
     }
 
+    litecore::shared_access_lock<Retained<C4Query>> _c4query;
     RetainedConst<CBLDatabase>          _database;          // Owning database
     alloc_slice                         _parameters;        // Fleece-encoded param values
     mutable optional<ColumnNamesMap>    _columnNames;       // Maps colum name to index
@@ -160,20 +137,15 @@ private:
 
 struct CBLResultSet final : public CBLRefCounted {
 public:
-    CBLResultSet(CBLQuery* query, C4QueryEnumerator* qe _cbl_nonnull)
+    CBLResultSet(CBLQuery* query, C4Query::Enumerator qe)
     :_query(query)
-    ,_enum(qe)
+    ,_enum(move(qe))
     { }
 
     bool next() {
         _asArray = nullptr;
         _asDict = nullptr;
-        C4Error error;
-        bool more = c4queryenum_next(_enum, &error);
-        if (!more && error.code != 0)
-            C4LogToAt(kC4QueryLog, kC4LogWarning,
-                      "cbl_result_next: got error %d/%d", error.domain, error.code);
-        return more;
+        return _enum.next();
     }
 
     Value property(slice prop) const {
@@ -182,9 +154,7 @@ public:
     }
 
     Value column(unsigned col) const {
-        if (col < 64 && (_enum->missingColumns & (1ULL<<col)))
-            return nullptr;
-        return FLArrayIterator_GetValueAt(&_enum->columns, uint32_t(col));
+        return _enum.column(col);
     }
 
     Array asArray() const {
@@ -222,7 +192,7 @@ public:
 
 private:
     Retained<CBLQuery> const         _query;    // The query
-    c4::ref<C4QueryEnumerator> const _enum;     // The query enumerator
+    C4Query::Enumerator              _enum;     // The query enumerator
     mutable MutableArray             _asArray;  // Column values as a Fleece Array
     mutable MutableDict              _asDict;   // Column names/values as a Fleece Dict
 };
@@ -244,21 +214,14 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         ,_query(query)
         {
-            query->use([&](C4Query *c4query) {
-                _c4obs = c4queryobs_create(c4query,
-                                           [](C4QueryObserver*, C4Query*, void *context)
-                                                { ((ListenerToken*)context)->queryChanged(); },
-                                           this);
+            query->_c4query.use([&](C4Query *c4query) {
+                _c4obs = c4query->observe([this](C4QueryObserver*) { this->queryChanged(); });
             });
         }
 
-        ~ListenerToken() {
-            c4queryobs_free(_c4obs);
-        }
-
         void setEnabled(bool enabled) {
-            _query->use([&](C4Query *c4query) {
-                c4queryobs_setEnabled(_c4obs, enabled);
+            _query->_c4query.use([&](C4Query *c4query) {
+                _c4obs->setEnabled(enabled);
             });
         }
 
@@ -272,9 +235,8 @@ namespace cbl_internal {
                 cb(_context, _query);
         }
 
-        Retained<CBLResultSet> resultSet(CBLError *error) {
-            auto e = c4queryobs_getEnumerator(_c4obs, false, internal(error));
-            return e ? new CBLResultSet(_query, e) : nullptr;
+        Retained<CBLResultSet> resultSet() {
+            return new CBLResultSet(_query, _c4obs->getEnumerator(false));
         }
 
     private:
@@ -283,7 +245,7 @@ namespace cbl_internal {
         }
 
         Retained<CBLQuery>  _query;
-        C4QueryObserver*    _c4obs {nullptr};
+        std::unique_ptr<C4QueryObserver> _c4obs;
     };
 
 }

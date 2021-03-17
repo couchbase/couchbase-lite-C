@@ -1115,19 +1115,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
-				271C2A7621CC4BD60045856E /* Util.cc in Sources */,
-				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
 				271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */,
-				27DBD098246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm in Sources */,
-				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
-				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
-				275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */,
-				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
-				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
 				277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */,
+				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
+				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
+				27DBD098246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm in Sources */,
+				275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */,
+				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
+				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
 				271A989E243BFDBF008C032D /* CBLURLEndpointListener.cc in Sources */,
 				277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */,
+				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
+				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
+				271C2A7621CC4BD60045856E /* Util.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

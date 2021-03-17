@@ -62,32 +62,23 @@ CBLDatabase* CBLDatabase_Open(FLString name,
 
 
 bool CBLDatabase_Close(CBLDatabase* db, CBLError* outError) CBLAPI {
-    if (!db)
-        return true;
-    db->use([=](C4Database *c4db) {
-        c4db->close();  //FIXME: Catch exceptions
-    });
+    if (db)
+        db->close();  //FIXME: Catch exceptions
     return true;
 }
 
 bool CBLDatabase_BeginTransaction(CBLDatabase* db, CBLError* outError) CBLAPI {
-    db->use([=](C4Database *c4db) {
-        c4db->beginTransaction();  //FIXME: Catch exceptions
-    });
+    db->beginTransaction();  //FIXME: Catch exceptions
     return true;
 }
 
 bool CBLDatabase_EndTransaction(CBLDatabase* db, bool commit, CBLError* outError) CBLAPI {
-    db->use([=](C4Database *c4db) {
-        c4db->endTransaction(commit);  //FIXME: Catch exceptions
-    });
+    db->endTransaction(commit);  //FIXME: Catch exceptions
     return true;
 }
 
 bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
-    db->use([=](C4Database *c4db) {
-        return c4db->closeAndDeleteFile();  //FIXME: Catch exceptions
-    });
+    db->closeAndDelete();  //FIXME: Catch exceptions
     return true;
 }
 
@@ -147,6 +138,30 @@ CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID,
     if (!doc && outError)
         outError->code = 0;
     return doc;
+}
+
+
+bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
+                             FLString name,
+                             CBLIndexSpec spec,
+                             CBLError *outError) CBLAPI
+{
+    db->createIndex(name, spec);  //FIXME: Catch
+    return true;
+}
+
+
+bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
+                             FLString name,
+                             CBLError *outError) CBLAPI
+{
+    db->deleteIndex(name);  //FIXME: Catch
+    return true;
+}
+
+
+FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) CBLAPI {
+    return db->indexNames();  //FIXME: Catch
 }
 
 

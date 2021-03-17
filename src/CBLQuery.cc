@@ -21,11 +21,11 @@
 #include <string>
 
 
-Retained<CBLResultSet> CBLQuery::execute(C4Error* outError) {
-    auto qe = use<C4QueryEnumerator*>([=](C4Query *c4query) {
-        return c4query_run(c4query, nullptr, nullslice, outError);
+Retained<CBLResultSet> CBLQuery::execute() {
+    auto qe = _c4query.use<C4Query::Enumerator>([=](C4Query *c4query) {
+        return c4query->run();
     });
-    return qe ? retained(new CBLResultSet(this, qe)) : nullptr;
+    return retained(new CBLResultSet(this, move(qe)));
 }
 
 
@@ -46,8 +46,12 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        int *outErrorPos,
                        CBLError* outError) CBLAPI
 {
-    auto query = retained(new CBLQuery(db, language, queryString, outErrorPos, internal(outError)));
-    return query->valid() ? move(query).detach() : nullptr;
+    auto query = db->createQuery(language, queryString, outErrorPos); //FIXME: Catch
+    if (!query) {
+        c4error_return(LiteCoreDomain, kC4ErrorInvalidQuery, {}, internal(outError));
+        return nullptr;
+    }
+    return move(query).detach();
 }
 
 FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI {
@@ -59,7 +63,7 @@ void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBL
 }
 
 CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError) CBLAPI {
-    return query->execute(internal(outError)).detach();
+    return query->execute().detach();
 }
 
 FLSliceResult CBLQuery_Explain(const CBLQuery* query _cbl_nonnull) CBLAPI {
@@ -91,7 +95,7 @@ CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
                  "Listener token is not valid for this query"_sl);
         return nullptr;
     }
-    return listener->resultSet(outError).detach();
+    return listener->resultSet().detach();
 }
 
 bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
@@ -117,51 +121,3 @@ FLDict CBLResultSet_ResultDict(const CBLResultSet *rs) CBLAPI {
 CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) CBLAPI {
     return rs->query();
 }
-
-
-#pragma mark - INDEXES:
-
-
-bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
-                             FLString name,
-                             CBLIndexSpec spec,
-                             CBLError *outError) CBLAPI
-{
-    C4IndexOptions options = {};
-    options.ignoreDiacritics = spec.ignoreAccents;
-    string languageStr;
-    if (spec.language.buf) {
-        languageStr = string(spec.language);
-        options.language = languageStr.c_str();
-    }
-    return db->use<bool>([&](C4Database *c4db) {
-        return c4db_createIndex(c4db,
-                                name,
-                                spec.keyExpressionsJSON,
-                                (C4IndexType)spec.type,
-                                &options,
-                                internal(outError));
-    });
-}
-
-bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
-                             FLString name,
-                             CBLError *outError) CBLAPI
-{
-    return db->use<bool>([&](C4Database *c4db) {
-        return c4db_deleteIndex(c4db, name, internal(outError));
-    });
-}
-
-FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) CBLAPI {
-    return db->use<FLMutableArray>([&](C4Database *c4db) {
-        Doc doc(alloc_slice(c4db_getIndexesInfo(c4db, nullptr)));
-        MutableArray indexes = MutableArray::newArray();
-        for (Array::iterator i(doc.root().asArray()); i; ++i) {
-            Dict info = i.value().asDict();
-            indexes.append(info["name"]);
-        }
-        return FLMutableArray_Retain(indexes);
-    });
-}
-

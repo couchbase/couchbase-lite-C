@@ -32,7 +32,7 @@ namespace cbl_internal {
     struct CBLLocalEndpoint;
 }
 
-struct CBLDatabase final : public CBLRefCounted, public litecore::access_lock<fleece::Retained<C4Database>> {
+struct CBLDatabase final : public CBLRefCounted {
 public:
     // Lifecycle:
 
@@ -79,6 +79,16 @@ public:
 
     Retained<CBLDocument> getMutableDocument(slice docID);
 
+    // Queries & Indexes:
+
+    Retained<CBLQuery> createQuery(CBLQueryLanguage language,
+                                   slice queryString,
+                                   int *outErrPos) const;
+
+    void createIndex(slice name, CBLIndexSpec);
+    void deleteIndex(slice name);
+    FLMutableArray indexNames();
+
     // Listeners:
 
     Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener _cbl_nonnull,
@@ -107,9 +117,15 @@ public:
 
     void notify(Notification n) const   {const_cast<CBLDatabase*>(this)->_notificationQueue.add(n);}
 
+    template <class LAMBDA>
+    void use(LAMBDA callback) { _c4db.use(callback); }
+    template <class RESULT, class LAMBDA>
+    RESULT use(LAMBDA callback) { return _c4db.use<RESULT>(callback); }
+
 private:
     friend struct CBLURLEndpointListener;
     friend class cbl_internal::CBLLocalEndpoint;
+    friend class cbl_internal::ListenerToken<CBLDocumentChangeListener>;
 
     CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_);
     virtual ~CBLDatabase();
@@ -126,7 +142,8 @@ private:
     void callDBListeners();
     void callDocListeners();
 
-    alloc_slice const dir;
+    litecore::access_lock<fleece::Retained<C4Database>> _c4db;
+    alloc_slice const _dir;
     C4BlobStore* _blobStore;
     std::unique_ptr<C4DatabaseObserver> _observer;
     cbl_internal::Listeners<CBLDatabaseChangeListener> _listeners;
