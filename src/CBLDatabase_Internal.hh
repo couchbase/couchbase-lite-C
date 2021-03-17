@@ -34,30 +34,52 @@ namespace cbl_internal {
 
 struct CBLDatabase final : public CBLRefCounted, public litecore::access_lock<fleece::Retained<C4Database>> {
 public:
-    CBLDatabase(C4Database* _cbl_nonnull db,
-                slice name_,
-                slice dir_)
-    :access_lock(std::move(db))
-    ,dir(dir_)
-    ,_blobStore(&db->getBlobStore())
-    ,_notificationQueue(this)
-    { }
+    // Lifecycle:
 
-    virtual ~CBLDatabase() {
-        use([&](Retained<C4Database> &c4db) {
-            _docListeners.clear();
-            _observer = nullptr;
-        });
-    }
+    static CBLDatabaseConfiguration defaultConfiguration();
 
-    // Default location for databases. This is platform-dependent.
-    static std::string defaultDirectory();
+    static bool exists(slice name,
+                       slice inDirectory);
 
-    alloc_slice const dir;
+    static void copyDatabase(slice fromPath,
+                             slice toName,
+                             const CBLDatabaseConfiguration *config);
 
-    RetainedConst<CBLDocument> getDocument(slice docID, bool allRevisions, CBLError*) const;
+    static void deleteDatabase(slice name,
+                               slice inDirectory);
 
-    Retained<CBLDocument> getMutableDocument(slice docID, CBLError*);
+    static Retained<CBLDatabase> open(slice name,
+                                      const CBLDatabaseConfiguration *config =nullptr);
+
+    bool performMaintenance(CBLMaintenanceType);
+
+#ifdef COUCHBASE_ENTERPRISE
+    void changeEncryptionKey(const CBLEncryptionKey*);
+#endif
+
+    void beginTransaction();
+    void endTransaction(bool commit);
+
+    void close();
+    void closeAndDelete();
+
+    // Accessors:
+
+    slice name() const noexcept;
+    alloc_slice path() const;
+    CBLDatabaseConfiguration config() const noexcept;
+    C4BlobStore* blobStore() const      {return _blobStore;}
+
+    uint64_t count() const;
+    uint64_t lastSequence() const;
+
+    // Documents:
+
+    RetainedConst<CBLDocument> getDocument(slice docID) const ;
+
+    Retained<CBLDocument> getMutableDocument(slice docID);
+
+    // Listeners:
 
     Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener _cbl_nonnull,
                                                    void *ctx);
@@ -68,12 +90,12 @@ public:
                                               CBLDocumentChangeListener _cbl_nonnull,
                                               void *context);
 
-    void notify(Notification n) const   {const_cast<CBLDatabase*>(this)->_notificationQueue.add(n);}
-    void sendNotifications()            {_notificationQueue.notifyAll();}
+    void sendNotifications();
 
-    void bufferNotifications(CBLNotificationsReadyCallback callback, void *context) {
-        _notificationQueue.setCallback(callback, context);
-    }
+    void bufferNotifications(CBLNotificationsReadyCallback callback, void *context);
+
+//protected:
+    RetainedConst<CBLDocument> getDocument(slice docID, bool allRevisions) const;
 
     template <class LISTENER, class... Args>
     void notify(ListenerToken<LISTENER> *listener, Args... args) const {
@@ -83,20 +105,28 @@ public:
         });
     }
 
-    C4BlobStore* blobStore() const      {return _blobStore;}
+    void notify(Notification n) const   {const_cast<CBLDatabase*>(this)->_notificationQueue.add(n);}
 
 private:
     friend struct CBLURLEndpointListener;
     friend class cbl_internal::CBLLocalEndpoint;
 
+    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_);
+    virtual ~CBLDatabase();
+
+    // Default location for databases. This is platform-dependent.
+    static std::string defaultDirectory();
+    static slice effectiveDir(slice inDirectory);
+    static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration*);
+
     C4Database* _getC4Database() const;
-    Retained<CBLDocument> _getDocument(slice docID, bool isMutable, bool allRevisions,
-                                       CBLError *outError);
+    Retained<CBLDocument> _getDocument(slice docID, bool isMutable, bool allRevisions) const;
     Retained<CBLListenerToken> addListener(fleece::function_ref<fleece::Retained<CBLListenerToken>()>);
     void databaseChanged();
     void callDBListeners();
     void callDocListeners();
 
+    alloc_slice const dir;
     C4BlobStore* _blobStore;
     std::unique_ptr<C4DatabaseObserver> _observer;
     cbl_internal::Listeners<CBLDatabaseChangeListener> _listeners;

@@ -91,10 +91,8 @@ namespace cbl_internal {
         int retryCount = 0;
         do {
             // Create a CBLDocument that reflects the conflict revision:
-            auto conflict = _db->getMutableDocument(_docID, &_error);
-            if (!conflict)
-                return false;
-            if (!conflict->exists()) {
+            auto conflict = _db->getMutableDocument(_docID);
+            if (!conflict) {
                 SyncLog(Info, "Doc '%.*s' no longer exists, no conflict to resolve",
                         FMTSLICE(_docID));
                 return true;
@@ -156,10 +154,8 @@ namespace cbl_internal {
         CBLDocument *otherDoc = conflict;
         if (otherDoc->revisionFlags() & kRevDeleted)
             otherDoc = nullptr;
-        auto myDoc = _db->getDocument(_docID, true, &_error);
-        if (!myDoc)
-            return false;
-        if (myDoc->revisionFlags() & kRevDeleted)
+        auto myDoc = _db->getDocument(_docID, true);
+        if (myDoc && myDoc->revisionFlags() & kRevDeleted)
             myDoc = nullptr;
 
         // Call the custom resolver (this could take a long time to return)

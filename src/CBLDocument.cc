@@ -175,10 +175,8 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull,
                 // Conflict!
                 if (opt.conflictHandler) {
                     // Custom conflict resolution:
-                    auto conflictingDoc = db->getDocument(_docID, true, external(outError));
-                    if (!conflictingDoc)
-                        return;
-                    if (conflictingDoc->revisionFlags() & kRevDeleted)
+                    auto conflictingDoc = db->getDocument(_docID, true);
+                    if (conflictingDoc && conflictingDoc->revisionFlags() & kRevDeleted)
                         conflictingDoc = nullptr;
                     if (!opt.conflictHandler(opt.context, this, conflictingDoc)) {
                         c4err = {LiteCoreDomain, kC4ErrorConflict};

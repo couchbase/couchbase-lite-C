@@ -38,6 +38,7 @@
 		275B35A1234D0ADC00FE9CF0 /* names_100.json in Resources */ = {isa = PBXBuildFile; fileRef = 275B35A0234D0A9F00FE9CF0 /* names_100.json */; };
 		275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4DD2201323700DBE7D2 /* CBLBlob.cc */; };
 		275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
+		276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */; };
 		277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; };
 		277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B77D4245B44E900B222D3 /* CBLLog.cc */; };
 		277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
@@ -323,6 +324,7 @@
 		275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlobTest_Cpp.cc; sourceTree = "<group>"; };
 		275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLBlob_Internal.hh; sourceTree = "<group>"; };
 		275FA3342236E54D001C392D /* CBLPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLPrivate.h; sourceTree = "<group>"; };
+		276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDatabase_CAPI.cc; sourceTree = "<group>"; };
 		2779ED2722DE83A60026ACD0 /* Blob.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Blob.py; sourceTree = "<group>"; };
 		2779ED3622DE83A60026ACD0 /* Collections.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Collections.py; sourceTree = "<group>"; };
 		2779ED5022E2493F0026ACD0 /* build_python.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = build_python.sh; path = Xcode/build_python.sh; sourceTree = SOURCE_ROOT; };
@@ -500,6 +502,7 @@
 				275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */,
 				271C2A7121CADB170045856E /* CBLDatabase.cc */,
 				27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */,
+				276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */,
 				27DBD097246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm */,
 				271C2A7721CC750E0045856E /* CBLDocument.cc */,
 				277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */,
@@ -1120,6 +1123,7 @@
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */,
+				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
 				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
 				277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */,
 				271A989E243BFDBF008C032D /* CBLURLEndpointListener.cc in Sources */,
