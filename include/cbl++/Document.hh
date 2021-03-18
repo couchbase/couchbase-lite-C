@@ -18,7 +18,7 @@
 
 #pragma once
 #include "Database.hh"
-#include "CBLDocument.h"
+#include "cbl/CBLDocument.h"
 #include "fleece/Mutable.hh"
 #include <string>
 

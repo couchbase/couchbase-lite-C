@@ -18,7 +18,7 @@
 
 #pragma once
 #include "Document.hh"
-#include "CBLBlob.h"
+#include "cbl/CBLBlob.h"
 #include "fleece/Mutable.hh"
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.

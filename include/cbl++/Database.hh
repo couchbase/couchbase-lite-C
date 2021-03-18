@@ -18,10 +18,10 @@
 
 #pragma once
 #include "Base.hh"
-#include "CBLDatabase.h"
-#include "CBLDocument.h"
-#include "CBLLog.h"
-#include "CBLQuery.h"
+#include "cbl/CBLDatabase.h"
+#include "cbl/CBLDocument.h"
+#include "cbl/CBLLog.h"
+#include "cbl/CBLQuery.h"
 #include "fleece/Mutable.hh"
 #include <functional>
 #include <string>

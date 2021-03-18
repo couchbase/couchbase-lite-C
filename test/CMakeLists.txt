@@ -1,4 +1,5 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.1)
+cmake_policy(VERSION 3.1)
 project (CBL_C_Tests)
 
 set(TOP ${PROJECT_SOURCE_DIR}/../)
@@ -12,7 +13,6 @@ add_definitions(
 include_directories(
     ${TOP}test/
     ${TOP}include/
-    ${TOP}include/cbl++/
     ${TOP}/src/        # Just for CBLPrivate.h
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/API/
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/catch/

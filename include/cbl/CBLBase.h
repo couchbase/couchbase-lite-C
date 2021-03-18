@@ -18,7 +18,7 @@
 
 #pragma once
 #ifdef CMAKE
-#include "cbl_config.h"
+#include "cbl/cbl_config.h"
 #endif
 
 #include "CBL_Edition.h"

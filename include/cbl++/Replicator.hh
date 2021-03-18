@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "CBLReplicator.h"
+#include "cbl/CBLReplicator.h"
 
 #include "Document.hh"
 
