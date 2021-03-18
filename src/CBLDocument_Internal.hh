@@ -21,7 +21,7 @@
 #include "Internal.hh"
 #include "CBLDatabase_Internal.hh"
 #include "c4.hh"
-#include "c4Document+Fleece.h"
+#include "c4Document.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <mutex>
@@ -48,7 +48,7 @@ public:
                 Dict body);
 
     static CBLDocument* containing(Value value) {
-        C4Document* doc = c4doc_containingValue(value);
+        C4Document* doc = C4Document::containingValue(value);
         return doc ? (CBLDocument*)doc->extraInfo().pointer : nullptr;
     }
 
@@ -67,10 +67,10 @@ public:
     FLDoc createFleeceDoc() const;
     Dict properties() const;
     MutableDict mutableProperties()             {return properties().asMutable();}
-    void setProperties(MutableDict d)           {if (checkMutable(nullptr)) _properties = d;}
+    void setProperties(MutableDict d)           {checkMutable(); _properties = d;}
 
     alloc_slice propertiesAsJSON() const;
-    bool setPropertiesAsJSON(slice json, C4Error* outError);
+    void setPropertiesAsJSON(slice json);
 
     //---- Save/delete:
 
@@ -85,16 +85,13 @@ public:
     };
 
     bool save(CBLDatabase* db _cbl_nonnull,
-              const SaveOptions&,
-              C4Error* outError);
+              const SaveOptions&);
 
     bool deleteDoc(CBLDatabase* _cbl_nonnull,
-                   CBLConcurrencyControl,
-                   C4Error* outError);
+                   CBLConcurrencyControl);
 
     static bool deleteDoc(CBLDatabase* db _cbl_nonnull,
-                          slice docID,
-                          C4Error* outError);
+                          slice docID);
 
     //---- Blobs:
 
@@ -117,19 +114,19 @@ public:
         useMerge
     };
 
-    bool resolveConflict(Resolution, const CBLDocument *mergeDoc, CBLError*);
+    bool resolveConflict(Resolution, const CBLDocument *mergeDoc);
 
 // private by convention
-    CBLDocument(slice docID, CBLDatabase *db, C4Document *d, bool isMutable);
+    CBLDocument(slice docID, CBLDatabase *db, Retained<C4Document>, bool isMutable);
 private:
     virtual ~CBLDocument();
 
-    bool checkMutable(C4Error *outError) const;
+    void checkMutable() const;
 
     static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
-    bool saveBlobs(CBLDatabase *db, bool &outHasBlobs, C4Error *outError) const;
+    bool saveBlobs(CBLDatabase *db) const;  // returns true if there are blobs
     alloc_slice encodeBody(CBLDatabase* _cbl_nonnull, C4Database* _cbl_nonnull,
-                           C4RevisionFlags &outRevFlags, C4Error *outError) const;
+                           C4RevisionFlags &outRevFlags) const;
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
     using UnretainedValueToBlobMap = std::unordered_map<FLDict, CBLNewBlob*>;
     using RetainedDatabase = Retained<CBLDatabase>;
@@ -141,8 +138,8 @@ private:
     RetainedDatabase            _db;                    // Database (null for new doc)
     alloc_slice const           _docID;                 // Document ID (never empty)
     mutable alloc_slice         _revID;                 // Revision ID
-    c4::ref<C4Document>         _c4doc;                 // LiteCore doc (null for new doc)
-    Doc                         _fromJSON;              // Properties read from JSON
+    Retained<C4Document>        _c4doc;                 // LiteCore doc (null for new doc)
+    fleece::Doc                 _fromJSON;              // Properties read from JSON
     mutable RetainedValue       _properties;            // Properties, initialized lazily
     ValueToBlobMap              _blobs;                 // Maps Dicts in _properties to CBLBlobs
     mutable recursive_mutex     _mutex;                 // For accessing _c4doc, _properties, _blobs

@@ -96,7 +96,8 @@ bool CBLDatabase_PerformMaintenance(CBLDatabase* db,
                                     CBLMaintenanceType type,
                                     CBLError* outError) CBLAPI
 {
-    return db->performMaintenance(type);//FIXME: Catch
+    db->performMaintenance(type);//FIXME: Catch
+    return true;
 }
 
 
@@ -121,6 +122,9 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) CBLAPI {
 }
 
 
+#pragma mark - DOCUMENTS:
+
+
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID,
                                            CBLError* outError) CBLAPI
 {
@@ -139,6 +143,117 @@ CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID,
         outError->code = 0;
     return doc;
 }
+
+
+bool CBLDatabase_SaveDocument(CBLDatabase* db,
+                              CBLDocument* doc,
+                              CBLError* outError) CBLAPI
+{
+    return CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc,
+                                                          kCBLConcurrencyControlLastWriteWins,
+                                                          outError);
+}
+
+bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
+                                                    CBLDocument* doc,
+                                                    CBLConcurrencyControl concurrency,
+                                                    CBLError* outError) CBLAPI
+{
+    if (doc->save(db, {concurrency}))//FIXME: Catch
+        return true;
+    c4error_return(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
+    return false;
+}
+
+bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db _cbl_nonnull,
+                                                 CBLDocument* doc _cbl_nonnull,
+                                                 CBLConflictHandler conflictHandler,
+                                                 void *context,
+                                                 CBLError* outError) CBLAPI
+{
+    if (doc->save(db, {conflictHandler, context}))//FIXME: Catch
+        return true;
+    c4error_return(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
+    return false;
+}
+
+bool CBLDatabase_DeleteDocument(CBLDatabase *db _cbl_nonnull,
+                                const CBLDocument* doc _cbl_nonnull,
+                                CBLError* outError) CBLAPI
+{
+    return CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc,
+                                                            kCBLConcurrencyControlLastWriteWins,
+                                                            outError);
+}
+
+bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db _cbl_nonnull,
+                                                      const CBLDocument* doc _cbl_nonnull,
+                                                      CBLConcurrencyControl concurrency,
+                                                      CBLError* outError) CBLAPI
+{
+    try {
+        if (const_cast<CBLDocument*>(doc)->deleteDoc(db, concurrency))
+            return true;
+        c4error_return(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
+        return false;
+    } catch (...) {
+        C4Error::fromCurrentException(internal(outError));
+        return false;
+    }
+}
+
+bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db _cbl_nonnull,
+                                    FLString docID,
+                                    CBLError* outError) CBLAPI
+{
+    if (CBLDocument::deleteDoc(db, docID))//FIXME: Catch
+        return true;
+    c4error_return(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
+    return false;
+
+}
+
+bool CBLDatabase_PurgeDocument(CBLDatabase* db _cbl_nonnull,
+                               const CBLDocument* doc _cbl_nonnull,
+                               CBLError* outError) CBLAPI
+{
+    return CBLDatabase_PurgeDocumentByID(doc->database(), doc->docID(), outError);
+}
+
+bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
+                                   FLString docID,
+                                   CBLError* outError) CBLAPI
+{
+    if (db->purgeDocument(docID))//FIXME: Catch
+        return true;
+    c4error_return(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
+    return false;
+}
+
+CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+                                               FLSlice docID,
+                                               CBLError* error) CBLAPI
+{
+    return db->use<CBLTimestamp>([&](C4Database *c4db) {
+        return c4db->getExpiration(docID);//FIXME: Catch
+    });
+}
+
+bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+                                       FLSlice docID,
+                                       CBLTimestamp expiration,
+                                       CBLError* error) CBLAPI
+{
+    return db->use<bool>([&](C4Database *c4db) {
+        c4db->setExpiration(docID, expiration); //FIXME: Catch
+        if (expiration > 0)
+            c4db_startHousekeeping(c4db);
+        return true;
+    });
+}
+
+
+#pragma mark - QUERIES:
 
 
 bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,

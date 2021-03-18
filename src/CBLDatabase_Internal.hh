@@ -51,7 +51,7 @@ public:
     static Retained<CBLDatabase> open(slice name,
                                       const CBLDatabaseConfiguration *config =nullptr);
 
-    bool performMaintenance(CBLMaintenanceType);
+    void performMaintenance(CBLMaintenanceType);
 
 #ifdef COUCHBASE_ENTERPRISE
     void changeEncryptionKey(const CBLEncryptionKey*);
@@ -78,6 +78,8 @@ public:
     RetainedConst<CBLDocument> getDocument(slice docID) const ;
 
     Retained<CBLDocument> getMutableDocument(slice docID);
+
+    bool purgeDocument(slice docID);
 
     // Queries & Indexes:
 
@@ -117,8 +119,9 @@ public:
 
     void notify(Notification n) const   {const_cast<CBLDatabase*>(this)->_notificationQueue.add(n);}
 
+    auto use()                  { return _c4db.use(); }
     template <class LAMBDA>
-    void use(LAMBDA callback) { _c4db.use(callback); }
+    void use(LAMBDA callback)   { _c4db.use(callback); }
     template <class RESULT, class LAMBDA>
     RESULT use(LAMBDA callback) { return _c4db.use<RESULT>(callback); }
 
@@ -142,7 +145,7 @@ private:
     void callDBListeners();
     void callDocListeners();
 
-    litecore::access_lock<fleece::Retained<C4Database>> _c4db;
+    litecore::access_lock<Retained<C4Database>> _c4db;
     alloc_slice const _dir;
     C4BlobStore* _blobStore;
     std::unique_ptr<C4DatabaseObserver> _observer;

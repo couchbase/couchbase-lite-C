@@ -87,7 +87,7 @@ namespace cbl_internal {
 
     // Performs conflict resolution. Returns true on success, false on failure. Sets _error.
     bool ConflictResolver::runNow() {
-        bool ok, inConflict;
+        bool ok, inConflict = false;
         int retryCount = 0;
         do {
             // Create a CBLDocument that reflects the conflict revision:
@@ -117,20 +117,20 @@ namespace cbl_internal {
             if (_clientResolver)
                 ok = customResolve(conflict);
             else
-                ok = conflict->resolveConflict(CBLDocument::Resolution::useLocal, nullptr, &_error);
+                ok = conflict->resolveConflict(CBLDocument::Resolution::useLocal, nullptr);
 
             if (ok) {
                 _revID = conflict->revisionID();
                 _flags = conflict->revisionFlags();
-            }
-
-            // If a local revision is saved at the same time we'll fail with a conflict, so retry:
-            inConflict = (!ok && internal(_error) == C4Error{LiteCoreDomain, kC4ErrorConflict}
-                              && ++retryCount < 10);
-            if (inConflict) {
-                SyncLog(Warning, "%s conflict resolution of doc '%.*s' conflicted with newer saved"
-                        " revision; retrying...",
-                        (_clientResolver ? "Custom" : "Default"), FMTSLICE(_docID));
+            } else {
+                _error = external(c4error_make(LiteCoreDomain, kC4ErrorConflict, {}));
+                // If a local revision is saved at the same time we'll fail with a conflict, so retry:
+                inConflict = (++retryCount < 10);
+                if (inConflict) {
+                    SyncLog(Warning, "%s conflict resolution of doc '%.*s' conflicted with newer saved"
+                            " revision; retrying...",
+                            (_clientResolver ? "Custom" : "Default"), FMTSLICE(_docID));
+                }
             }
         } while (inConflict);
 
@@ -162,15 +162,12 @@ namespace cbl_internal {
         SyncLog(Verbose, "Calling custom conflict resolver for doc '%.*s' ...",
                 FMTSLICE(_docID));
         Stopwatch st;
-        const CBLDocument *resolved;
+        RetainedConst<CBLDocument> resolved;
         try {
-            resolved = _clientResolver(_clientResolverContext, _docID, myDoc, otherDoc);
-        } catch (std::exception &x) {
-            errorFromException(&x, "Custom conflict resolver");
-            return false;
+            resolved = adopt(_clientResolver(_clientResolverContext, _docID, myDoc, otherDoc));
         } catch (...) {
-            errorFromException(nullptr, "Custom conflict resolver");
-            return false;
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnexpectedError,
+                           "Custom conflict handler threw an exception");
         }
         SyncLog(Info, "Custom conflict resolver for '%.*s' took %.0fms",
                 FMTSLICE(_docID), st.elapsedMS());
@@ -184,28 +181,25 @@ namespace cbl_internal {
             resolution = CBLDocument::Resolution::useRemote;
             resolved = nullptr;
         } else {
-            resolution = CBLDocument::Resolution::useMerge;
             if (resolved) {
                 // Sanity check the resolved document:
                 if (resolved->database() && resolved->database() != _db) {
-                    c4error_return(LiteCoreDomain, kC4ErrorInvalidParameter,
+                    C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
                                    "CBLDocument returned from custom conflict resolver belongs to"
-                                   " wrong database"_sl, internal(&_error));
-                    return false;
+                                   " wrong database");
                 }
                 if (resolved->docID() != _docID) {
-                    SyncLog(Warning, "CBLDocument returned from custom conflict resolver has wrong"
-                            " docID `%.*s` (should be %.*s)",
-                            FMTSLICE(resolved->docID()), FMTSLICE(_docID));
+                    C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                                   "CBLDocument returned from custom conflict resolver has wrong"
+                                   " docID `%.*s` (should be %.*s)",
+                                   FMTSLICE(resolved->docID()), FMTSLICE(_docID));
                 }
             }
+            resolution = CBLDocument::Resolution::useMerge;
         }
 
         // Actually resolve the conflict & save the document:
-        bool ok = conflict->resolveConflict(resolution, resolved, &_error);
-
-        CBLDocument_Release(resolved);
-        return ok;
+        return conflict->resolveConflict(resolution, resolved);
     }
 
 

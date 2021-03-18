@@ -29,9 +29,7 @@ struct CBLQuery final : public CBLRefCounted {
 public:
 
     ~CBLQuery() {
-        _c4query.use([](Retained<C4Query> &c4query) {
-            c4query = nullptr;
-        });
+        _c4query.use().get() = nullptr;
     }
 
     const CBLDatabase* database() const {
@@ -39,21 +37,15 @@ public:
     }
 
     alloc_slice explain() const {
-        return _c4query.use<alloc_slice>([](C4Query *c4query) {
-            return c4query->explain();
-        });
+        return _c4query.use()->explain();
     }
 
     unsigned columnCount() const {
-        return _c4query.use<unsigned>([](C4Query *c4query) {
-            return c4query->columnCount();
-        });
+        return _c4query.use()->columnCount();
     }
 
     slice columnName(unsigned col) const {
-        return _c4query.use<slice>([=](C4Query *c4query) {
-            return c4query->columnTitle(col);
-        });
+        return _c4query.use()->columnTitle(col);
     }
 
     Dict parameters() const {
@@ -116,19 +108,16 @@ private:
         if (!encodedParameters)
             return false;
         _parameters = encodedParameters;
-        _c4query.use([&](C4Query *c4query) {
-            c4query->setParameters(encodedParameters);
-        });
+        _c4query.use()->setParameters(encodedParameters);
         return true;
     }
 
-    litecore::shared_access_lock<Retained<C4Query>> _c4query;
+    litecore::shared_access_lock<Retained<C4Query>> _c4query;// Thread-safe access to C4Query
     RetainedConst<CBLDatabase>          _database;          // Owning database
     alloc_slice                         _parameters;        // Fleece-encoded param values
     mutable optional<ColumnNamesMap>    _columnNames;       // Maps colum name to index
     mutable once_flag                   _onceColumnNames;   // For lazy init of _columnNames
     Listeners<CBLQueryChangeListener>   _listeners;         // Query listeners
-    // Note: Where's the C4Query? It's owned by the base class shared_access_lock.
 };
 
 
