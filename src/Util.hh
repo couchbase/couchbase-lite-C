@@ -17,7 +17,8 @@
 //
 
 #pragma once
-#include "fleece/slice.hh"
+#include "CBLBase.h"
+#include "Internal.hh"
 
 
 #define LOCK(MUTEX)     std::lock_guard<decltype(MUTEX)> _lock(MUTEX)
@@ -25,6 +26,19 @@
 
 namespace cbl_internal {
 
+    void BridgeException(const char *fnName, CBLError *outError) noexcept;
+
+    void BridgeExceptionWarning(const char *fnName) noexcept;
+
     fleece::alloc_slice convertJSON5(fleece::slice json5);
 
 }
+
+#define catchAndBridgeReturning(OUTERROR, VALUE) \
+    catch (...) { cbl_internal::BridgeException(__FUNCTION__, OUTERROR); return VALUE; }
+
+#define catchAndBridge(OUTERROR) \
+    catchAndBridgeReturning(OUTERROR, {})
+
+#define catchAndWarn() \
+    catchAndBridge(nullptr)

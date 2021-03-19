@@ -25,50 +25,56 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
                        CBLQueryLanguage language,
                        FLString queryString,
                        int *outErrorPos,
-                       CBLError* outError) CBLAPI
+                       CBLError* outError) noexcept
 {
-    auto query = db->createQuery(language, queryString, outErrorPos); //FIXME: Catch
-    if (!query) {
-        C4Error::set(LiteCoreDomain, kC4ErrorInvalidQuery, {}, internal(outError));
-        return nullptr;
-    }
-    return move(query).detach();
+    try {
+        auto query = db->createQuery(language, queryString, outErrorPos);
+        if (!query) {
+            C4Error::set(LiteCoreDomain, kC4ErrorInvalidQuery, {}, internal(outError));
+            return nullptr;
+        }
+        return move(query).detach();
+    } catchAndBridge(outError)
 }
 
-FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI {
+FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) noexcept {
     return query->parameters();
 }
 
-void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) CBLAPI {
+void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) noexcept {
     query->setParameters(parameters);
 }
 
-CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError) CBLAPI {
-    return query->execute().detach();
+CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError) noexcept {
+    try {
+        return query->execute().detach();
+    } catchAndBridge(outError)
 }
 
-FLSliceResult CBLQuery_Explain(const CBLQuery* query _cbl_nonnull) CBLAPI {
-    return FLSliceResult(query->explain());
+FLSliceResult CBLQuery_Explain(const CBLQuery* query _cbl_nonnull) noexcept {
+    try {
+        return FLSliceResult(query->explain());
+    } catchAndWarn()
 }
 
-unsigned CBLQuery_ColumnCount(const CBLQuery* query _cbl_nonnull) CBLAPI {
+unsigned CBLQuery_ColumnCount(const CBLQuery* query _cbl_nonnull) noexcept {
     return query->columnCount();
 }
 
-FLSlice CBLQuery_ColumnName(const CBLQuery* query _cbl_nonnull, unsigned col) CBLAPI {
+FLSlice CBLQuery_ColumnName(const CBLQuery* query _cbl_nonnull, unsigned col) noexcept {
     return query->columnName(col);
 }
 
 CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
                                              CBLQueryChangeListener listener _cbl_nonnull,
-                                             void *context) CBLAPI
+                                             void *context) noexcept
 {
     return query->addChangeListener(listener, context).detach();
 }
 
 CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
                                           CBLListenerToken *token,
-                                          CBLError *outError) CBLAPI
+                                          CBLError *outError) noexcept
 {
     auto listener = query->getChangeListener(token);
     if (!listener) {
@@ -79,26 +85,28 @@ CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
     return listener->resultSet().detach();
 }
 
-bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) CBLAPI {
-    return rs->next();
+bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) noexcept {
+    try {
+        return rs->next();
+    } catchAndWarn();
 }
 
-FLValue CBLResultSet_ValueForKey(const CBLResultSet* rs, FLString property) CBLAPI {
+FLValue CBLResultSet_ValueForKey(const CBLResultSet* rs, FLString property) noexcept {
     return rs->property(property);
 }
 
-FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* rs _cbl_nonnull, unsigned column) CBLAPI {
+FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* rs _cbl_nonnull, unsigned column) noexcept {
     return rs->column(column);
 }
 
-FLArray CBLResultSet_ResultArray(const CBLResultSet *rs) CBLAPI {
+FLArray CBLResultSet_ResultArray(const CBLResultSet *rs) noexcept {
     return rs->asArray();
 }
 
-FLDict CBLResultSet_ResultDict(const CBLResultSet *rs) CBLAPI {
+FLDict CBLResultSet_ResultDict(const CBLResultSet *rs) noexcept {
     return rs->asDict();
 }
 
-CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) CBLAPI {
+CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) noexcept {
     return rs->query();
 }

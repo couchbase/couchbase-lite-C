@@ -21,38 +21,42 @@
 using namespace fleece;
 
 
-CBLDocument* CBLDocument_Create() CBLAPI {
+CBLDocument* CBLDocument_Create() noexcept {
     return CBLDocument_CreateWithID(nullslice);
 }
 
-CBLDocument* CBLDocument_CreateWithID(FLString docID) CBLAPI {
+CBLDocument* CBLDocument_CreateWithID(FLString docID) noexcept {
     return make_retained<CBLDocument>(docID, true).detach();
 }
 
-CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
+CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) noexcept {
     return make_retained<CBLDocument>(doc).detach();
 }
 
-FLSlice CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->docID();}
-FLSlice CBLDocument_RevisionID(const CBLDocument* doc) CBLAPI      {return doc->revisionID();}
-uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
-FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
+FLSlice CBLDocument_ID(const CBLDocument* doc) noexcept               {return doc->docID();}
+FLSlice CBLDocument_RevisionID(const CBLDocument* doc) noexcept       {return doc->revisionID();}
+uint64_t CBLDocument_Sequence(const CBLDocument* doc) noexcept        {return doc->sequence();}
+FLDict CBLDocument_Properties(const CBLDocument* doc) noexcept        {return doc->properties();}
 
-FLSliceResult CBLDocument_CanonicalRevisionID(const CBLDocument* doc) CBLAPI {
+FLSliceResult CBLDocument_CanonicalRevisionID(const CBLDocument* doc) noexcept {
     return FLSliceResult(doc->canonicalRevisionID());
 }
 
-FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI {
+FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) noexcept {
     return doc->mutableProperties();
 }
 
-FLSliceResult CBLDocument_CreateJSON(const CBLDocument* doc) CBLAPI {return FLSliceResult(doc->propertiesAsJSON());}
+FLSliceResult CBLDocument_CreateJSON(const CBLDocument* doc) noexcept {
+    return FLSliceResult(doc->propertiesAsJSON());
+}
 
-void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties _cbl_nonnull) CBLAPI {
+void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties _cbl_nonnull) noexcept {
     doc->setProperties(properties);
 }
 
-bool CBLDocument_SetJSON(CBLDocument* doc, FLSlice json, CBLError* outError) CBLAPI {
-    doc->setPropertiesAsJSON(json);//FIXME: Catch
-    return true;
+bool CBLDocument_SetJSON(CBLDocument* doc, FLSlice json, CBLError* outError) noexcept {
+    try {
+        doc->setPropertiesAsJSON(json);//FIXME: Catch
+        return true;
+    } catchAndBridge(outError)
 }

@@ -25,100 +25,124 @@ using namespace fleece;
 using namespace cbl_internal;
 
 
-CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() CBLAPI {
-    return CBLDatabase::defaultConfiguration(); //FIXME: Catch?
+CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() noexcept {
+    return CBLDatabase::defaultConfiguration();
 }
 
 
-bool CBL_DatabaseExists(FLString name, FLString inDirectory) CBLAPI {
-    return CBLDatabase::exists(name, inDirectory);//FIXME: Catch
+bool CBL_DatabaseExists(FLString name, FLString inDirectory) noexcept {
+    try {
+        return CBLDatabase::exists(name, inDirectory);
+    } catchAndWarn();
 }
 
 
 bool CBL_CopyDatabase(FLString fromPath,
                       FLString toName,
                       const CBLDatabaseConfiguration* config,
-                      CBLError* outError) CBLAPI
+                      CBLError* outError) noexcept
 {
-    CBLDatabase::copyDatabase(fromPath, toName, config);//FIXME: Catch
-    return true;
+    try {
+        CBLDatabase::copyDatabase(fromPath, toName, config);
+        return true;
+    } catchAndBridge(outError)
 }
 
 
 bool CBL_DeleteDatabase(FLString name,
                         FLString inDirectory,
-                        CBLError *outError) CBLAPI
+                        CBLError *outError) noexcept
 {
-    CBLDatabase::deleteDatabase(name, inDirectory);  //FIXME: Catch exceptions
-    return true;
+    try {
+        CBLDatabase::deleteDatabase(name, inDirectory);
+        return true;
+    } catchAndBridge(outError)
 }
 
 CBLDatabase* CBLDatabase_Open(FLString name,
                               const CBLDatabaseConfiguration *config,
-                              CBLError *outError) CBLAPI
+                              CBLError *outError) noexcept
 {
-    return CBLDatabase::open(name, config).detach(); //FIXME: Catch
+    try {
+        return CBLDatabase::open(name, config).detach();
+    } catchAndBridge(outError)
 }
 
 
-bool CBLDatabase_Close(CBLDatabase* db, CBLError* outError) CBLAPI {
-    if (db)
-        db->close();  //FIXME: Catch exceptions
-    return true;
+bool CBLDatabase_Close(CBLDatabase* db, CBLError* outError) noexcept {
+    try {
+        if (db)
+            db->close();
+        return true;
+    } catchAndBridge(outError)
 }
 
-bool CBLDatabase_BeginTransaction(CBLDatabase* db, CBLError* outError) CBLAPI {
-    db->beginTransaction();  //FIXME: Catch exceptions
-    return true;
+bool CBLDatabase_BeginTransaction(CBLDatabase* db, CBLError* outError) noexcept {
+    try {
+        db->beginTransaction();
+        return true;
+    } catchAndBridge(outError)
 }
 
-bool CBLDatabase_EndTransaction(CBLDatabase* db, bool commit, CBLError* outError) CBLAPI {
-    db->endTransaction(commit);  //FIXME: Catch exceptions
-    return true;
+bool CBLDatabase_EndTransaction(CBLDatabase* db, bool commit, CBLError* outError) noexcept {
+    try {
+        db->endTransaction(commit);
+        return true;
+    } catchAndBridge(outError)
 }
 
-bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) CBLAPI {
-    db->closeAndDelete();  //FIXME: Catch exceptions
-    return true;
+bool CBLDatabase_Delete(CBLDatabase* db, CBLError* outError) noexcept {
+    try {
+        db->closeAndDelete();
+        return true;
+    } catchAndBridge(outError)
 }
 
 #ifdef COUCHBASE_ENTERPRISE
 bool CBLDatabase_ChangeEncryptionKey(CBLDatabase *db,
                                      const CBLEncryptionKey *newKey,
-                                     CBLError* outError) CBLAPI
+                                     CBLError* outError) noexcept
 {
-    db->changeEncryptionKey(newKey);//FIXME: Catch
-    return true;
+    try {
+        db->changeEncryptionKey(newKey);
+        return true;
+    } catchAndBridge(outError)
 }
 #endif
 
 bool CBLDatabase_PerformMaintenance(CBLDatabase* db,
                                     CBLMaintenanceType type,
-                                    CBLError* outError) CBLAPI
+                                    CBLError* outError) noexcept
 {
-    db->performMaintenance(type);//FIXME: Catch
-    return true;
+    try {
+        db->performMaintenance(type);
+        return true;
+    } catchAndBridge(outError)
 }
 
 
-FLString CBLDatabase_Name(const CBLDatabase* db) CBLAPI {
+FLString CBLDatabase_Name(const CBLDatabase* db) noexcept {
     return db->name();
 }
 
-FLStringResult CBLDatabase_Path(const CBLDatabase* db) CBLAPI {
-    return FLStringResult(db->path());//FIXME: Catch
+FLStringResult CBLDatabase_Path(const CBLDatabase* db) noexcept {
+    return FLStringResult(db->path());
 }
 
-const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) CBLAPI {
+const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) noexcept {
     return db->config();
 }
 
-uint64_t CBLDatabase_Count(const CBLDatabase* db) CBLAPI {
-    return db->count();//FIXME: Catch
+uint64_t CBLDatabase_Count(const CBLDatabase* db) noexcept {
+    try {
+        return db->count();
+    } catchAndWarn();
 }
 
-uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) CBLAPI {
-    return db->lastSequence();//FIXME: Catch
+uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) noexcept {
+    try {
+        return db->lastSequence();
+    } catchAndWarn()
 }
 
 
@@ -126,28 +150,32 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) CBLAPI {
 
 
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID,
-                                           CBLError* outError) CBLAPI
+                                           CBLError* outError) noexcept
 {
-    auto doc = db->getDocument(docID, false).detach();  //FIXME: Catch
-    if (!doc && outError)
-        outError->code = 0;
-    return doc;
+    try {
+        auto doc = db->getDocument(docID, false).detach();
+        if (!doc && outError)
+            outError->code = 0;
+        return doc;
+    } catchAndBridge(outError)
 }
 
 
 CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID,
-                                            CBLError* outError) CBLAPI
+                                            CBLError* outError) noexcept
 {
-    auto doc = db->getMutableDocument(docID).detach();  //FIXME: Catch
-    if (!doc && outError)
-        outError->code = 0;
-    return doc;
+    try {
+        auto doc = db->getMutableDocument(docID).detach();
+        if (!doc && outError)
+            outError->code = 0;
+        return doc;
+    } catchAndBridge(outError)
 }
 
 
 bool CBLDatabase_SaveDocument(CBLDatabase* db,
                               CBLDocument* doc,
-                              CBLError* outError) CBLAPI
+                              CBLError* outError) noexcept
 {
     return CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc,
                                                           kCBLConcurrencyControlLastWriteWins,
@@ -157,29 +185,33 @@ bool CBLDatabase_SaveDocument(CBLDatabase* db,
 bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
                                                     CBLDocument* doc,
                                                     CBLConcurrencyControl concurrency,
-                                                    CBLError* outError) CBLAPI
+                                                    CBLError* outError) noexcept
 {
-    if (doc->save(db, {concurrency}))//FIXME: Catch
-        return true;
-    C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
-    return false;
+    try {
+        if (doc->save(db, {concurrency}))
+            return true;
+        C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
+        return false;
+    } catchAndBridge(outError)
 }
 
 bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db _cbl_nonnull,
                                                  CBLDocument* doc _cbl_nonnull,
                                                  CBLConflictHandler conflictHandler,
                                                  void *context,
-                                                 CBLError* outError) CBLAPI
+                                                 CBLError* outError) noexcept
 {
-    if (doc->save(db, {conflictHandler, context}))//FIXME: Catch
-        return true;
-    C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
-    return false;
+    try {
+        if (doc->save(db, {conflictHandler, context}))
+            return true;
+        C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
+        return false;
+    } catchAndBridge(outError)
 }
 
 bool CBLDatabase_DeleteDocument(CBLDatabase *db _cbl_nonnull,
                                 const CBLDocument* doc _cbl_nonnull,
-                                CBLError* outError) CBLAPI
+                                CBLError* outError) noexcept
 {
     return CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc,
                                                             kCBLConcurrencyControlLastWriteWins,
@@ -189,61 +221,65 @@ bool CBLDatabase_DeleteDocument(CBLDatabase *db _cbl_nonnull,
 bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db _cbl_nonnull,
                                                       const CBLDocument* doc _cbl_nonnull,
                                                       CBLConcurrencyControl concurrency,
-                                                      CBLError* outError) CBLAPI
+                                                      CBLError* outError) noexcept
 {
     try {
         if (const_cast<CBLDocument*>(doc)->deleteDoc(db, concurrency))
             return true;
         C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
         return false;
-    } catch (...) {
-        C4Error::fromCurrentException(internal(outError));
-        return false;
-    }
+    } catchAndBridge(outError)
 }
 
 bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db _cbl_nonnull,
                                     FLString docID,
-                                    CBLError* outError) CBLAPI
+                                    CBLError* outError) noexcept
 {
-    if (CBLDocument::deleteDoc(db, docID))//FIXME: Catch
-        return true;
-    C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
-    return false;
-
+    try {
+        if (CBLDocument::deleteDoc(db, docID))
+            return true;
+        C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
+        return false;
+    } catchAndBridge(outError)
 }
 
 bool CBLDatabase_PurgeDocument(CBLDatabase* db _cbl_nonnull,
                                const CBLDocument* doc _cbl_nonnull,
-                               CBLError* outError) CBLAPI
+                               CBLError* outError) noexcept
 {
     return CBLDatabase_PurgeDocumentByID(doc->database(), doc->docID(), outError);
 }
 
 bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
                                    FLString docID,
-                                   CBLError* outError) CBLAPI
+                                   CBLError* outError) noexcept
 {
-    if (db->purgeDocument(docID))//FIXME: Catch
-        return true;
-    C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
-    return false;
+    try {
+        if (db->purgeDocument(docID))
+            return true;
+        C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
+        return false;
+    } catchAndBridge(outError)
 }
 
 CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
                                                FLSlice docID,
-                                               CBLError* error) CBLAPI
+                                               CBLError* outError) noexcept
 {
-    return db->getDocumentExpiration(docID);//FIXME: Catch
+    try {
+        return db->getDocumentExpiration(docID);
+    } catchAndBridge(outError)
 }
 
 bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
                                        FLSlice docID,
                                        CBLTimestamp expiration,
-                                       CBLError* error) CBLAPI
+                                       CBLError* outError) noexcept
 {
-    db->setDocumentExpiration(docID, expiration); //FIXME: Catch
-    return true;
+    try {
+        db->setDocumentExpiration(docID, expiration);
+        return true;
+    } catchAndBridge(outError)
 }
 
 
@@ -253,30 +289,36 @@ bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
 bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
                              FLString name,
                              CBLIndexSpec spec,
-                             CBLError *outError) CBLAPI
+                             CBLError *outError) noexcept
 {
-    db->createIndex(name, spec);  //FIXME: Catch
-    return true;
+    try {
+        db->createIndex(name, spec);
+        return true;
+    } catchAndBridge(outError)
 }
 
 
 bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
                              FLString name,
-                             CBLError *outError) CBLAPI
+                             CBLError *outError) noexcept
 {
-    db->deleteIndex(name);  //FIXME: Catch
-    return true;
+    try {
+        db->deleteIndex(name);
+        return true;
+    } catchAndBridge(outError)
 }
 
 
-FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) CBLAPI {
-    return db->indexNames();  //FIXME: Catch
+FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) noexcept {
+    try {
+        return db->indexNames();
+    } catchAndWarn()
 }
 
 
 CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* constdb,
                                                 CBLDatabaseChangeListener listener,
-                                                void *context) CBLAPI
+                                                void *context) noexcept
 {
     return const_cast<CBLDatabase*>(constdb)->addListener(listener, context).detach();
 }
@@ -284,7 +326,7 @@ CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* constdb,
 
 CBLListenerToken* CBLDatabase_AddChangeDetailListener(const CBLDatabase* constdb,
                                                       CBLDatabaseChangeDetailListener listener,
-                                                      void *context) CBLAPI
+                                                      void *context) noexcept
 {
     return const_cast<CBLDatabase*>(constdb)->addListener(listener, context).detach();
 }
@@ -292,12 +334,12 @@ CBLListenerToken* CBLDatabase_AddChangeDetailListener(const CBLDatabase* constdb
 
 void CBLDatabase_BufferNotifications(CBLDatabase *db,
                                      CBLNotificationsReadyCallback callback,
-                                     void *context) CBLAPI
+                                     void *context) noexcept
 {
     db->bufferNotifications(callback, context);
 }
 
-void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI {
+void CBLDatabase_SendNotifications(CBLDatabase *db) noexcept {
     db->sendNotifications();
 }
 
@@ -305,7 +347,7 @@ void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI {
 CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db _cbl_nonnull,
                                                         FLString docID,
                                                         CBLDocumentChangeListener listener _cbl_nonnull,
-                                                        void *context) CBLAPI
+                                                        void *context) noexcept
 {
     return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context).detach();
 }

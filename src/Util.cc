@@ -24,6 +24,14 @@ using namespace fleece;
 
 namespace cbl_internal {
 
+    void BridgeException(const char *fnName, CBLError *outError) noexcept {
+        C4Error error = C4Error::fromCurrentException();
+        if (outError)
+            *outError = external(error);
+        else
+            C4WarnError("Function %s() failed: %s", fnName, error.description().c_str());
+    }
+
     alloc_slice convertJSON5(slice json5) {
         FLStringResult errMsg;
         FLError flError;
