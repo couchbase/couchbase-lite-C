@@ -23,8 +23,8 @@
 #include "CBLDocument_Internal.hh"
 #include "Internal.hh"
 #include "Util.hh"
-#include "c4BlobStore.h"
-#include "c4Document+Fleece.h"
+#include "c4BlobStore.hh"
+#include "c4Document.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <mutex>
@@ -39,7 +39,7 @@ public:
     // Constructor for existing blobs -- called by CBLDocument::getBlob()
     CBLBlob(CBLDocument *doc, Dict properties)
     :_db(doc->database())
-    ,_properties( (_db && c4doc_dictIsBlob(properties, &_key)) ? properties : nullptr)
+    ,_properties( (_db && C4Blob::isBlob(properties, _key)) ? properties : nullptr)
     { }
 
     bool valid() const              {return _properties != nullptr;}
@@ -58,13 +58,13 @@ public:
         if (len.isInteger())
             return len.asUnsigned();
         else
-            return c4blob_getSize(store(), _key);
+            return store()->getSize(_key);
     }
 
     slice digest() const {
         LOCK(_mutex);
         if (!_digest)
-            _digest = c4blob_keyToString(_key);
+            _digest = C4Blob::keyToString(_key);
         return _digest;
     }
 
@@ -78,15 +78,15 @@ public:
         return _contentTypeCache;
     }
 
-    virtual FLSliceResult getContents(C4Error *outError) const {
-        return c4blob_getContents(store(), _key, outError);
+    virtual alloc_slice getContents() const {
+        return store()->getContents(_key);
     }
 
-    virtual C4ReadStream* openStream(C4Error *outError) const {
-        return c4blob_openReadStream(store(), _key, outError);
+    virtual std::unique_ptr<C4ReadStream> openStream() const {
+        return std::make_unique<C4ReadStream>(*store(), _key);
     }
 
-    virtual bool install(CBLDatabase *db _cbl_nonnull, C4Error *outError) {
+    virtual bool install(CBLDatabase *db _cbl_nonnull) {
         return true;
     }
 
@@ -135,10 +135,8 @@ public:
     // Constructor for new blobs, given contents or writer (but not both)
     CBLNewBlob(slice contentType,
                slice contents,
-               C4WriteStream *writer)
+               C4WriteStream *writerOrNull)
     :CBLBlob()
-    ,_contents(contents)
-    ,_writer(writer)
     {
         assert(mutableProperties() != nullptr);
         mutableProperties()[kCBLTypeProperty] = kCBLBlobType;
@@ -148,57 +146,52 @@ public:
         C4BlobKey key;
         uint64_t length;
         if (contents) {
-            assert(!writer);
-            key = c4blob_computeKey(contents);
+            assert(!writerOrNull);
+            _contents = contents;
+            key = C4Blob::computeKey(contents);
             length = contents.size;
         } else {
-            assert(writer);
-            key = c4stream_computeBlobKey(writer);
-            length = c4stream_bytesWritten(writer);
+            assert(writerOrNull);
+            _writer.emplace(std::move(*writerOrNull));
+            key = _writer->computeBlobKey();
+            length = _writer->bytesWritten();
         }
         setKey(key, length);
         CBLDocument::registerNewBlob(this);
     }
 
-    virtual FLSliceResult getContents(C4Error *outError) const override {
+    virtual alloc_slice getContents() const override {
         if (database())
-            return CBLBlob::getContents(outError);
+            return CBLBlob::getContents();
 
         LOCK(_mutex);
-        if (_contents) {
-            return FLSliceResult(const_cast<alloc_slice&>(_contents));
-        } else {
-            setError(outError, LiteCoreDomain, kC4ErrorNotFound,
-                     slice("Can't get streamed blob contents until doc is saved"));
-            return FLSliceResult{};
+        if (!_contents) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorNotFound,
+                           "Can't get streamed blob contents until doc is saved");
         }
+        return _contents;
     }
 
-    virtual C4ReadStream* openStream(C4Error *outError) const override {
-        if (database()) {
-            return CBLBlob::openStream(outError);
-        } else {
-            setError(outError, LiteCoreDomain, kC4ErrorNotFound,
-                     slice("Can't stream blob until doc is saved"));
-            return nullptr;
+    virtual std::unique_ptr<C4ReadStream> openStream() const override {
+        if (!database()) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorNotFound,
+                           "Can't stream blob contents until doc is saved");
         }
+        return CBLBlob::openStream();
     }
 
-    virtual bool install(CBLDatabase *db _cbl_nonnull, C4Error *outError) override {
+    virtual bool install(CBLDatabase *db _cbl_nonnull) override {
         CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%.*s'", FMTSLICE(digest()));
         LOCK(_mutex);
         assert(database() == nullptr || database() == db);
         const C4BlobKey &expectedKey = key();
         if (_contents) {
-            if (!c4blob_create(db->blobStore(), _contents, &expectedKey, nullptr, outError))
-                return false;
+            db->blobStore()->createBlob(_contents, &expectedKey);
             _contents = fleece::nullslice;
         } else {
             assert(_writer);
-            if (!c4stream_install(_writer, &expectedKey, outError))
-                return false;
-            c4stream_closeWriter(_writer);
-            _writer = nullptr;
+            _writer->install(&expectedKey);
+            _writer = std::nullopt;
         }
         setDatabase(db);
         CBLDocument::unregisterNewBlob(this);
@@ -207,7 +200,6 @@ public:
 
 protected:
     ~CBLNewBlob() {
-        c4stream_closeWriter(_writer);
         if (!database())
             CBLDocument::unregisterNewBlob(this);
     }
@@ -220,5 +212,5 @@ private:
     }
 
     alloc_slice     _contents;              // Contents, before save
-    C4WriteStream*  _writer {nullptr};      // Stream, before save
+    std::optional<C4WriteStream>  _writer ;      // Stream, before save
 };

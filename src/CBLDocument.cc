@@ -307,7 +307,7 @@ FLDoc CBLDocument::createFleeceDoc() const {
 
 
 Dict CBLDocument::properties() const {
-    //TODO: Convert this to use c4doc_getProperties()
+    //TODO: Convert this to use C4Document::getProperties()
     LOCK(_mutex);
     if (!_properties) {
         slice storage;
@@ -364,7 +364,7 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase *db _cbl_nonnull,
     outRevFlags = hasBlobs ? kRevHasAttachments : 0;
 
     // Now encode the properties to Fleece:
-    SharedEncoder enc(c4db_getSharedFleeceEncoder(c4db));
+    SharedEncoder enc(c4db->getSharedFleeceEncoder());
     enc.writeValue(properties());
     FLError flErr;
     alloc_slice body = enc.finish(&flErr);
@@ -448,7 +448,7 @@ bool CBLDocument::saveBlobs(CBLDatabase *db) const {
                 foundBlobs = true;
                 CBLNewBlob *newBlob = findNewBlob(dict);
                 if (newBlob)
-                    newBlob->install(db, nullptr);
+                    newBlob->install(db);
                 i.skipChildren();
             }
         } else if (!i.value().asArray().asMutable()) {

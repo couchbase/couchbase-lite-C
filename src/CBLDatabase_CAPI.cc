@@ -161,7 +161,7 @@ bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
 {
     if (doc->save(db, {concurrency}))//FIXME: Catch
         return true;
-    c4error_return(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
+    C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
     return false;
 }
 
@@ -173,7 +173,7 @@ bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db _cbl_nonnull,
 {
     if (doc->save(db, {conflictHandler, context}))//FIXME: Catch
         return true;
-    c4error_return(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
+    C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
     return false;
 }
 
@@ -194,7 +194,7 @@ bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db _cbl_nonnu
     try {
         if (const_cast<CBLDocument*>(doc)->deleteDoc(db, concurrency))
             return true;
-        c4error_return(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
+        C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
         return false;
     } catch (...) {
         C4Error::fromCurrentException(internal(outError));
@@ -208,7 +208,7 @@ bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db _cbl_nonnull,
 {
     if (CBLDocument::deleteDoc(db, docID))//FIXME: Catch
         return true;
-    c4error_return(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
+    C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
     return false;
 
 }
@@ -226,7 +226,7 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
 {
     if (db->purgeDocument(docID))//FIXME: Catch
         return true;
-    c4error_return(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
+    C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
     return false;
 }
 
@@ -234,9 +234,7 @@ CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
                                                FLSlice docID,
                                                CBLError* error) CBLAPI
 {
-    return db->use<CBLTimestamp>([&](C4Database *c4db) {
-        return c4db->getExpiration(docID);//FIXME: Catch
-    });
+    return db->getDocumentExpiration(docID);//FIXME: Catch
 }
 
 bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
@@ -244,12 +242,8 @@ bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
                                        CBLTimestamp expiration,
                                        CBLError* error) CBLAPI
 {
-    return db->use<bool>([&](C4Database *c4db) {
-        c4db->setExpiration(docID, expiration); //FIXME: Catch
-        if (expiration > 0)
-            c4db_startHousekeeping(c4db);
-        return true;
-    });
+    db->setDocumentExpiration(docID, expiration); //FIXME: Catch
+    return true;
 }
 
 

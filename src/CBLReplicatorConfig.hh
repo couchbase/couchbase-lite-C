@@ -189,7 +189,7 @@ namespace cbl_internal {
 
             if (!problem)
                 return true;
-            c4error_return(LiteCoreDomain, kC4ErrorInvalidParameter, problem, internal(outError));
+            C4Error::set(LiteCoreDomain, kC4ErrorInvalidParameter, problem, internal(outError));
             return false;
         }
 

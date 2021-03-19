@@ -123,7 +123,7 @@ namespace cbl_internal {
                 _revID = conflict->revisionID();
                 _flags = conflict->revisionFlags();
             } else {
-                _error = external(c4error_make(LiteCoreDomain, kC4ErrorConflict, {}));
+                _error = external(C4Error::make(LiteCoreDomain, kC4ErrorConflict));
                 // If a local revision is saved at the same time we'll fail with a conflict, so retry:
                 inConflict = (++retryCount < 10);
                 if (inConflict) {
@@ -222,7 +222,7 @@ namespace cbl_internal {
         else
             message += " threw an unknown exception";
         SyncLog(Error, "%s", message.c_str());
-        c4error_return(LiteCoreDomain, kC4ErrorUnexpectedError, slice(message), internal(&_error));
+        C4Error::set(LiteCoreDomain, kC4ErrorUnexpectedError, slice(message), internal(&_error));
     }
 
 

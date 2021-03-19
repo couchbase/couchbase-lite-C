@@ -17,6 +17,7 @@
 //
 
 #include "CBLBlob_Internal.hh"
+#include "c4BlobStore.hh"
 
 using namespace std;
 using namespace fleece;
@@ -31,7 +32,7 @@ CBL_CORE_API const FLSlice kCBLBlobContentTypeProperty   = "content_type"_sl;
 
 bool FLDict_IsBlob(FLDict dict) CBLAPI {
     C4BlobKey digest;
-    return dict && c4doc_dictIsBlob(dict, &digest);
+    return dict && C4Blob::isBlob(dict, digest);
 }
 
 const CBLBlob* FLDict_GetBlob(FLDict blobDict) CBLAPI {
@@ -62,23 +63,24 @@ FLString CBLBlob_Digest(const CBLBlob* blob) CBLAPI {
 }
 
 FLSliceResult CBLBlob_Content(const CBLBlob* blob, CBLError *outError) CBLAPI {
-    return blob->getContents(internal(outError));
+    return FLSliceResult(blob->getContents());
 }
 
 CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* blob, CBLError *outError) CBLAPI {
-    return (CBLBlobReadStream*)blob->openStream(internal(outError));
+    // CBLBlobReadStream is just an alias for C4ReadStream
+    return (CBLBlobReadStream*)blob->openStream().release();
 }
 
 int CBLBlobReader_Read(CBLBlobReadStream* stream,
-                            void *dst,
-                            size_t maxLength,
-                            CBLError *outError) CBLAPI
+                       void *dst,
+                       size_t maxLength,
+                       CBLError *outError) CBLAPI
 {
-    return (int) c4stream_read(internal(stream), dst, maxLength, internal(outError));
+    return (int) internal(stream)->read(dst, maxLength);
 }
 
 void CBLBlobReader_Close(CBLBlobReadStream* stream) CBLAPI {
-    c4stream_close(internal(stream));
+    delete internal(stream);
 }
 
 
@@ -105,12 +107,12 @@ CBLBlob* CBLBlob_NewWithStream(FLString contentType,
 }
 
 CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError) CBLAPI {
-    return (CBLBlobWriteStream*) c4blob_openWriteStream(db->blobStore(),
-                                                        internal(outError));
+    // CBLBlobWriteStream is just an alias for C4WriteStream
+    return (CBLBlobWriteStream*) new C4WriteStream(*db->blobStore());
 }
 
 void CBLBlobWriter_Close(CBLBlobWriteStream* writer) CBLAPI {
-    c4stream_closeWriter(internal(writer));
+    delete internal(writer);
 }
 
 bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
@@ -118,7 +120,8 @@ bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
                          size_t length,
                          CBLError *outError) CBLAPI
 {
-    return c4stream_write(internal(writer), data, length, internal(outError));
+    internal(writer)->write({data, length});
+    return true;
 }
 
 

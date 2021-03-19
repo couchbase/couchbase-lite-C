@@ -81,6 +81,9 @@ public:
 
     bool purgeDocument(slice docID);
 
+    CBLTimestamp getDocumentExpiration(slice docID);
+    void setDocumentExpiration(slice docID, CBLTimestamp expiration);
+
     // Queries & Indexes:
 
     Retained<CBLQuery> createQuery(CBLQueryLanguage language,

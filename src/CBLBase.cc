@@ -33,11 +33,11 @@ FLSliceResult CBLError_Message(const CBLError* error _cbl_nonnull) CBLAPI {
 
 
 void CBLError_SetCaptureBacktraces(bool capture) CBLAPI {
-    c4error_setCaptureBacktraces(capture);
+    C4Error::setCaptureBacktraces(capture);
 }
 
 bool CBLError_GetCaptureBacktraces(void) CBLAPI {
-    return c4error_getCaptureBacktraces();
+    return C4Error::getCaptureBacktraces();
 }
 
 

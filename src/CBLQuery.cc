@@ -48,7 +48,7 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
 {
     auto query = db->createQuery(language, queryString, outErrorPos); //FIXME: Catch
     if (!query) {
-        c4error_return(LiteCoreDomain, kC4ErrorInvalidQuery, {}, internal(outError));
+        C4Error::set(LiteCoreDomain, kC4ErrorInvalidQuery, {}, internal(outError));
         return nullptr;
     }
     return move(query).detach();

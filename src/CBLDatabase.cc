@@ -246,6 +246,18 @@ bool CBLDatabase::purgeDocument(slice docID) {
 }
 
 
+CBLTimestamp CBLDatabase::getDocumentExpiration(slice docID) {
+    return _c4db.use()->getExpiration(docID);
+}
+
+void CBLDatabase::setDocumentExpiration(slice docID, CBLTimestamp expiration) {
+    auto c4db = _c4db.use();
+    c4db->setExpiration(docID, expiration);
+    if (expiration > 0)
+        c4db->startHousekeeping();
+}
+
+
 #pragma mark - QUERIES & INDEXES:
 
 
