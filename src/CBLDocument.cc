@@ -433,7 +433,7 @@ bool CBLDocument::saveBlobs(CBLDatabase *db) const {
     // they can't contain new blobs.
     LOCK(_mutex);
     if (!isMutable())
-        return C4Document::dictContainsBlobs(properties());
+        return C4Blob::dictContainsBlobs(properties());
 
     bool foundBlobs = false;
     for (DeepIterator i(properties()); i; ++i) {
@@ -457,44 +457,4 @@ bool CBLDocument::saveBlobs(CBLDatabase *db) const {
         }
     }
     return foundBlobs;
-}
-
-
-#pragma mark - PUBLIC API:
-
-
-CBLDocument* CBLDocument_Create() CBLAPI {
-    return CBLDocument_CreateWithID(nullslice);
-}
-
-CBLDocument* CBLDocument_CreateWithID(FLString docID) CBLAPI {
-    return make_retained<CBLDocument>(docID, true).detach();
-}
-
-CBLDocument* CBLDocument_MutableCopy(const CBLDocument* doc) CBLAPI {
-    return make_retained<CBLDocument>(doc).detach();
-}
-
-FLSlice CBLDocument_ID(const CBLDocument* doc) CBLAPI              {return doc->docID();}
-FLSlice CBLDocument_RevisionID(const CBLDocument* doc) CBLAPI      {return doc->revisionID();}
-uint64_t CBLDocument_Sequence(const CBLDocument* doc) CBLAPI           {return doc->sequence();}
-FLDict CBLDocument_Properties(const CBLDocument* doc) CBLAPI           {return doc->properties();}
-
-FLSliceResult CBLDocument_CanonicalRevisionID(const CBLDocument* doc) CBLAPI {
-    return FLSliceResult(doc->canonicalRevisionID());
-}
-
-FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) CBLAPI {
-    return doc->mutableProperties();
-}
-
-FLSliceResult CBLDocument_CreateJSON(const CBLDocument* doc) CBLAPI {return FLSliceResult(doc->propertiesAsJSON());}
-
-void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties _cbl_nonnull) CBLAPI {
-    doc->setProperties(properties);
-}
-
-bool CBLDocument_SetJSON(CBLDocument* doc, FLSlice json, CBLError* outError) CBLAPI {
-    doc->setPropertiesAsJSON(json);//FIXME: Catch
-    return true;
 }

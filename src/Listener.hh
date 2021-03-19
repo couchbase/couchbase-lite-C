@@ -34,7 +34,7 @@ namespace cbl_internal {
 
 
 /** Abstract base class of listener tokens. (In the public API, as an opaque typeef.) */
-struct CBLListenerToken : public fleece::RefCounted, public fleece::InstanceCounted {
+struct CBLListenerToken : public CBLRefCounted {
 public:
     CBLListenerToken(const void *callback _cbl_nonnull, void *context)
     :_callback(callback)

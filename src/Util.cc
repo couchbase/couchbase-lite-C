@@ -17,6 +17,7 @@
 //
 
 #include "Util.hh"
+#include "c4Base.hh"
 #include "fleece/Fleece.h"
 
 using namespace fleece;

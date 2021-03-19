@@ -21,8 +21,7 @@
 #include "CBLReplicator.h"
 #include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
-#include "c4.hh"
-#include "c4Replicator.h"
+#include "c4ReplicatorTypes.h"
 #include "c4Private.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
@@ -240,8 +239,8 @@ namespace cbl_internal {
         }
 
 
-        alloc_slice _pinnedServerCert, _trustedRootCerts;
+        alloc_slice      _pinnedServerCert, _trustedRootCerts;
         CBLProxySettings _proxy;
-        alloc_slice _proxyHostname, _proxyUsername, _proxyPassword;
+        alloc_slice      _proxyHostname, _proxyUsername, _proxyPassword;
     };
 }

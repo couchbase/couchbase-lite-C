@@ -1,5 +1,5 @@
 //
-// CBLBlob.cc
+// CBLBlob_CAPI.cc
 //
 // Copyright © 2019 Couchbase. All rights reserved.
 //
@@ -23,11 +23,11 @@ using namespace std;
 using namespace fleece;
 
 
-CBL_CORE_API const FLSlice kCBLTypeProperty              = FLSTR(kC4ObjectTypeProperty);
-CBL_CORE_API const FLSlice kCBLBlobType                  = FLSTR(kC4ObjectType_Blob);
-CBL_CORE_API const FLSlice kCBLBlobDigestProperty        = FLSTR(kC4BlobDigestProperty);
-CBL_CORE_API const FLSlice kCBLBlobLengthProperty        = "length"_sl;
-CBL_CORE_API const FLSlice kCBLBlobContentTypeProperty   = "content_type"_sl;
+CBL_CORE_API const FLSlice kCBLTypeProperty              = C4Blob::kObjectTypeProperty;
+CBL_CORE_API const FLSlice kCBLBlobType                  = C4Blob::kObjectType_Blob;
+CBL_CORE_API const FLSlice kCBLBlobDigestProperty        = C4Blob::kDigestProperty;
+CBL_CORE_API const FLSlice kCBLBlobLengthProperty        = C4Blob::kLengthProperty;
+CBL_CORE_API const FLSlice kCBLBlobContentTypeProperty   = C4Blob::kContentTypeProperty;
 
 
 bool FLDict_IsBlob(FLDict dict) CBLAPI {
@@ -67,8 +67,7 @@ FLSliceResult CBLBlob_Content(const CBLBlob* blob, CBLError *outError) CBLAPI {
 }
 
 CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* blob, CBLError *outError) CBLAPI {
-    // CBLBlobReadStream is just an alias for C4ReadStream
-    return (CBLBlobReadStream*)blob->openStream().release();
+    return external(blob->openStream().release());
 }
 
 int CBLBlobReader_Read(CBLBlobReadStream* stream,
@@ -87,28 +86,20 @@ void CBLBlobReader_Close(CBLBlobReadStream* stream) CBLAPI {
 #pragma mark - CREATING BLOBS:
 
 
-static CBLBlob* createNewBlob(slice contentType,
-                              FLSlice contents,
-                              CBLBlobWriteStream *writer)
-{
-    return retain(new CBLNewBlob(contentType, contents, internal(writer)));
-}
-
 CBLBlob* CBLBlob_NewWithData(FLString contentType,
                              FLSlice contents) CBLAPI
 {
-    return createNewBlob(contentType, contents, nullptr);
+    return retain(new CBLNewBlob(contentType, contents));
 }
 
 CBLBlob* CBLBlob_NewWithStream(FLString contentType,
                                CBLBlobWriteStream* writer) CBLAPI
 {
-    return createNewBlob(contentType, nullslice, writer);
+    return retain(new CBLNewBlob(contentType, *internal(writer)));
 }
 
 CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError) CBLAPI {
-    // CBLBlobWriteStream is just an alias for C4WriteStream
-    return (CBLBlobWriteStream*) new C4WriteStream(*db->blobStore());
+    return external(new C4WriteStream(*db->blobStore()));
 }
 
 void CBLBlobWriter_Close(CBLBlobWriteStream* writer) CBLAPI {

@@ -6,7 +6,6 @@
 
 #pragma once
 #include "CBLReplicatorConfig.hh"
-#include "c4Replicator.h"
 #include <functional>
 
 struct CBLDatabase;

@@ -18,7 +18,6 @@
 
 #pragma once
 #include "c4Base.hh"
-#include "c4.h"
 #include "fleece/slice.hh"
 #include "fleece/Fleece.hh"
 #include "RefCounted.hh"
@@ -48,14 +47,6 @@ namespace cbl_internal {
 
     static inline       CBLError* external(      C4Error *error) {return (CBLError*)error;}
     static inline const CBLError& external(const C4Error &error) {return (const CBLError&)error;}
-
-    template <typename T>
-    T* validated(T *obj, CBLError *outError) {
-        if (obj->validate(outError))
-            return retain(obj);
-        delete obj;
-        return nullptr;
-    }
 
     template <typename T>
     static inline void writeOptionalKey(fleece::Encoder &enc, const char *propName, T value) {

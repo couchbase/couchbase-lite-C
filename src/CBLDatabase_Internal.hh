@@ -148,12 +148,14 @@ private:
     void callDBListeners();
     void callDocListeners();
 
+    template <class T> using Listeners = cbl_internal::Listeners<T>;
+
     litecore::access_lock<Retained<C4Database>> _c4db;
-    alloc_slice const _dir;
-    C4BlobStore* _blobStore;
-    std::unique_ptr<C4DatabaseObserver> _observer;
-    cbl_internal::Listeners<CBLDatabaseChangeListener> _listeners;
-    cbl_internal::Listeners<CBLDatabaseChangeDetailListener> _detailListeners;
-    cbl_internal::Listeners<CBLDocumentChangeListener> _docListeners;
-    NotificationQueue _notificationQueue;
+    alloc_slice const                           _dir;
+    C4BlobStore*                                _blobStore;
+    std::unique_ptr<C4DatabaseObserver>         _observer;
+    Listeners<CBLDatabaseChangeListener>        _listeners;
+    Listeners<CBLDatabaseChangeDetailListener>  _detailListeners;
+    Listeners<CBLDocumentChangeListener>        _docListeners;
+    NotificationQueue                           _notificationQueue;
 };

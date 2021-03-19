@@ -17,9 +17,7 @@
 //
 
 #pragma once
-#include "CBLBase.h"
 #include "fleece/slice.hh"
-#include "c4Base.h"
 
 
 #define LOCK(MUTEX)     std::lock_guard<decltype(MUTEX)> _lock(MUTEX)

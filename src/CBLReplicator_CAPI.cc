@@ -1,5 +1,5 @@
 //
-// CBLReplicator.cc
+// CBLReplicator_CAPI.cc
 //
 // Copyright © 2019 Couchbase. All rights reserved.
 //

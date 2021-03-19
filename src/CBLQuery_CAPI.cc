@@ -1,5 +1,5 @@
 //
-// CBLQuery.cc
+// CBLQuery_CAPI.cc
 //
 // Copyright © 2018 Couchbase. All rights reserved.
 //
@@ -19,25 +19,6 @@
 #include "CBLQuery.h"
 #include "CBLQuery_Internal.hh"
 #include <string>
-
-
-Retained<CBLResultSet> CBLQuery::execute() {
-    auto qe = _c4query.use<C4Query::Enumerator>([=](C4Query *c4query) {
-        return c4query->run();
-    });
-    return retained(new CBLResultSet(this, move(qe)));
-}
-
-
-Retained<CBLListenerToken> CBLQuery::addChangeListener(CBLQueryChangeListener listener, void *context) {
-    auto token = retained(new ListenerToken<CBLQueryChangeListener>(this, listener, context));
-    _listeners.add(token);
-    token->setEnabled(true);
-    return token;
-}
-
-
-#pragma mark - PUBLIC API:
 
 
 CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,

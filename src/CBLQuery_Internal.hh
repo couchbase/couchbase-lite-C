@@ -10,7 +10,6 @@
 #include "Internal.hh"
 #include "Listener.hh"
 #include "Util.hh"
-#include "c4.hh"
 #include "c4Query.hh"
 #include "access_lock.hh"
 #include "fleece/Fleece.hh"
@@ -66,7 +65,7 @@ public:
         _encodeParameters(enc);
     }
 
-    Retained<CBLResultSet> execute();
+    inline Retained<CBLResultSet> execute();
 
     using ColumnNamesMap = unordered_map<slice, uint32_t>;
 
@@ -83,7 +82,7 @@ public:
         return (i != _columnNames->end()) ? i->second : -1;
     }
 
-    Retained<CBLListenerToken> addChangeListener(CBLQueryChangeListener listener, void *context);
+    inline Retained<CBLListenerToken> addChangeListener(CBLQueryChangeListener listener, void *context);
 
     ListenerToken<CBLQueryChangeListener>* getChangeListener(CBLListenerToken *token) const {
         return _listeners.find(token);
@@ -176,10 +175,10 @@ public:
     }
 
 private:
-    Retained<CBLQuery> const         _query;    // The query
-    C4Query::Enumerator              _enum;     // The query enumerator
-    mutable MutableArray             _asArray;  // Column values as a Fleece Array
-    mutable MutableDict              _asDict;   // Column names/values as a Fleece Dict
+    Retained<CBLQuery> const    _query;    // The query
+    C4Query::Enumerator         _enum;     // The query enumerator
+    mutable MutableArray        _asArray;  // Column values as a Fleece Array
+    mutable MutableDict         _asDict;   // Column names/values as a Fleece Dict
 };
 
 
@@ -233,4 +232,20 @@ namespace cbl_internal {
         std::unique_ptr<C4QueryObserver> _c4obs;
     };
 
+}
+
+
+inline Retained<CBLResultSet> CBLQuery::execute() {
+    auto qe = _c4query.use<C4Query::Enumerator>([=](C4Query *c4query) {
+        return c4query->run();
+    });
+    return retained(new CBLResultSet(this, move(qe)));
+}
+
+
+inline Retained<CBLListenerToken> CBLQuery::addChangeListener(CBLQueryChangeListener listener, void *context) {
+    auto token = retained(new ListenerToken<CBLQueryChangeListener>(this, listener, context));
+    _listeners.add(token);
+    token->setEnabled(true);
+    return token;
 }

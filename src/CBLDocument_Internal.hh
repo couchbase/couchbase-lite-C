@@ -20,7 +20,6 @@
 #include "CBLDocument.h"
 #include "Internal.hh"
 #include "CBLDatabase_Internal.hh"
-#include "c4.hh"
 #include "c4Document.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"

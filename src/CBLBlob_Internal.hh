@@ -32,16 +32,12 @@
 
 static inline C4ReadStream*  internal(CBLBlobReadStream *reader)  {return (C4ReadStream*)reader;}
 static inline C4WriteStream* internal(CBLBlobWriteStream *writer) {return (C4WriteStream*)writer;}
+static inline CBLBlobReadStream*  external(C4ReadStream *reader)  {return (CBLBlobReadStream*)reader;}
+static inline CBLBlobWriteStream* external(C4WriteStream *writer) {return (CBLBlobWriteStream*)writer;}
 
 
 struct CBLBlob : public CBLRefCounted {
 public:
-    // Constructor for existing blobs -- called by CBLDocument::getBlob()
-    CBLBlob(CBLDocument *doc, Dict properties)
-    :_db(doc->database())
-    ,_properties( (_db && C4Blob::isBlob(properties, _key)) ? properties : nullptr)
-    { }
-
     bool valid() const              {return _properties != nullptr;}
     Dict properties() const         {return _properties;}
 
@@ -91,7 +87,15 @@ public:
     }
 
 protected:
-    // constructor for CBLNewBlob to call
+    friend class CBLDocument;
+
+    // Constructor for existing blobs -- called by CBLDocument::getBlob()
+    CBLBlob(CBLDocument *doc, Dict properties)
+    :_db(doc->database())
+    ,_properties( (_db && C4Blob::isBlob(properties, _key)) ? properties : nullptr)
+    { }
+
+    // constructor for subclass CBLNewBlob to call
     CBLBlob()
     :_mutableProperties(MutableDict::newDict())
     ,_properties(_mutableProperties)
@@ -132,33 +136,11 @@ private:
 
 struct CBLNewBlob : public CBLBlob {
 public:
-    // Constructor for new blobs, given contents or writer (but not both)
-    CBLNewBlob(slice contentType,
-               slice contents,
-               C4WriteStream *writerOrNull)
-    :CBLBlob()
-    {
-        assert(mutableProperties() != nullptr);
-        mutableProperties()[kCBLTypeProperty] = kCBLBlobType;
-        if (contentType)
-            mutableProperties()[kCBLBlobContentTypeProperty] = contentType;
+    CBLNewBlob(slice contentType, slice contents)
+    :CBLNewBlob(contentType, contents, nullptr) { }
 
-        C4BlobKey key;
-        uint64_t length;
-        if (contents) {
-            assert(!writerOrNull);
-            _contents = contents;
-            key = C4Blob::computeKey(contents);
-            length = contents.size;
-        } else {
-            assert(writerOrNull);
-            _writer.emplace(std::move(*writerOrNull));
-            key = _writer->computeBlobKey();
-            length = _writer->bytesWritten();
-        }
-        setKey(key, length);
-        CBLDocument::registerNewBlob(this);
-    }
+    CBLNewBlob(slice contentType, C4WriteStream &writer)
+    :CBLNewBlob(contentType, {}, &writer) { }
 
     virtual alloc_slice getContents() const override {
         if (database())
@@ -199,6 +181,34 @@ public:
     }
 
 protected:
+    // Constructor for new blobs, given contents or writer (but not both)
+    CBLNewBlob(slice contentType,
+               slice contents,
+               C4WriteStream *writerOrNull)
+    :CBLBlob()
+    {
+        assert(mutableProperties() != nullptr);
+        mutableProperties()[kCBLTypeProperty] = kCBLBlobType;
+        if (contentType)
+            mutableProperties()[kCBLBlobContentTypeProperty] = contentType;
+
+        C4BlobKey key;
+        uint64_t length;
+        if (contents) {
+            assert(!writerOrNull);
+            _contents = contents;
+            key = C4Blob::computeKey(contents);
+            length = contents.size;
+        } else {
+            assert(writerOrNull);
+            _writer.emplace(std::move(*writerOrNull));
+            key = _writer->computeBlobKey();
+            length = _writer->bytesWritten();
+        }
+        setKey(key, length);
+        CBLDocument::registerNewBlob(this);
+    }
+
     ~CBLNewBlob() {
         if (!database())
             CBLDocument::unregisterNewBlob(this);
@@ -211,6 +221,6 @@ private:
         mutableProperties()[kCBLBlobLengthProperty] = length;
     }
 
-    alloc_slice     _contents;              // Contents, before save
-    std::optional<C4WriteStream>  _writer ;      // Stream, before save
+    alloc_slice                  _contents; // Contents, before save
+    std::optional<C4WriteStream> _writer ;  // Stream, before save
 };

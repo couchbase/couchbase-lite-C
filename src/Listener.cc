@@ -17,7 +17,6 @@
 //
 
 #include "Listener.hh"
-#include "CBLDatabase.h"
 
 using namespace std;
 
