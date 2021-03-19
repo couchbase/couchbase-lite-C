@@ -50,7 +50,12 @@ void CBLAuth_Free(CBLAuthenticator *auth) CBLAPI {
 }
 
 CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* conf, CBLError *outError) CBLAPI {
-    return validated(new CBLReplicator(conf), outError);
+    try {
+        return retain(new CBLReplicator(conf));
+    } catch (...) {
+        C4Error::fromCurrentException(internal(outError));
+        return nullptr;
+    }
 }
 
 const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator* repl) CBLAPI {
@@ -67,11 +72,11 @@ void CBLReplicator_SetHostReachable(CBLReplicator* repl, bool r) CBLAPI {repl->s
 void CBLReplicator_SetSuspended(CBLReplicator* repl, bool sus) CBLAPI   {repl->setSuspended(sus);}
 
 FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator *repl, CBLError *outError) CBLAPI {
-    return FLDict_Retain(repl->pendingDocumentIDs(outError));
+    return FLDict_Retain(repl->pendingDocumentIDs());//FIXME: Catch
 }
 
 bool CBLReplicator_IsDocumentPending(CBLReplicator *repl, FLString docID, CBLError *error) CBLAPI {
-    return repl->isDocumentPending(docID, error);
+    return repl->isDocumentPending(docID);//FIXME: Catch
 }
 
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* repl,

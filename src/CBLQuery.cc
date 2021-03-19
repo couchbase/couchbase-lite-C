@@ -91,8 +91,8 @@ CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
 {
     auto listener = query->getChangeListener(token);
     if (!listener) {
-        setError(internal(outError), LiteCoreDomain, kC4ErrorNotFound,
-                 "Listener token is not valid for this query"_sl);
+        C4Error::set(internal(outError), LiteCoreDomain, kC4ErrorNotFound,
+                     "Listener token is not valid for this query");
         return nullptr;
     }
     return listener->resultSet().detach();

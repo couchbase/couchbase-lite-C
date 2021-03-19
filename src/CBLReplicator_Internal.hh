@@ -22,8 +22,7 @@
 #include "ConflictResolver.hh"
 #include "Internal.hh"
 #include "Util.hh"
-#include "c4.hh"
-#include "c4Replicator.h"
+#include "c4Replicator.hh"
 #include "c4Private.h"
 #include "StringUtil.hh"
 #include "fleece/Fleece.hh"
@@ -64,8 +63,7 @@ public:
         call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
 
         // Set up the LiteCore replicator parameters:
-        if (!_conf.validate(external(&_c4status.error)))
-            return;
+        _conf.validate();
         C4ReplicatorParameters params = { };
         auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
         if (_conf.replicatorType != kCBLReplicatorTypePull)
@@ -113,67 +111,45 @@ public:
         _conf.database->use([&](C4Database *c4db) {
 #ifdef COUCHBASE_ENTERPRISE
             if (_conf.endpoint->otherLocalDB()) {
-                _c4repl = c4repl_newLocal(c4db,
-                                          _conf.endpoint->otherLocalDB(),
-                                          params,
-                                          &_c4status.error);
+                _c4repl = c4db->newLocalReplicator(_conf.endpoint->otherLocalDB(), params);
             } else
 #endif
             {
-                _c4repl = c4repl_new(c4db,
-                                     _conf.endpoint->remoteAddress(),
-                                     _conf.endpoint->remoteDatabaseName(),
-                                     params,
-                                     &_c4status.error);
+                _c4repl = c4db->newReplicator(_conf.endpoint->remoteAddress(),
+                                              _conf.endpoint->remoteDatabaseName(),
+                                              params);
             }
         });
-        if (_c4repl)
-            _c4status = c4repl_getStatus(_c4repl);
+        _c4status = _c4repl->getStatus();
     }
-
-
-    bool validate(CBLError *err) const {
-        if (!_c4repl) {
-            if (err) *err = external(_c4status.error);
-            return false;
-        }
-        return true;
-    }
-
-
-    // The rest of the implementation can assume that _c4repl is non-null, and fixed,
-    // because CBLReplicator_New will detect a replicator that fails validate() and return NULL.
 
 
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
-    void setHostReachable(bool reachable)           {c4repl_setHostReachable(_c4repl, reachable);}
-    void setSuspended(bool suspended)               {c4repl_setSuspended(_c4repl, suspended);}
-    void stop()                                     {c4repl_stop(_c4repl);}
+    void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}
+    void setSuspended(bool suspended)                       {_c4repl->setSuspended(suspended);}
+    void stop()                                             {_c4repl->stop();}
 
 
     void start(bool reset) {
         LOCK(_mutex);
         _retainSelf = this;     // keep myself from being freed until the replicator stops
         if (_optionsChanged) {
-            c4repl_setOptions(_c4repl, encodeOptions());
+            _c4repl->setOptions(encodeOptions());
             _optionsChanged = false;
         }
-        c4repl_start(_c4repl, reset);
+        _c4repl->start(reset);
     }
 
 
 
     CBLReplicatorStatus status() {
-        return effectiveStatus(c4repl_getStatus(_c4repl));
+        return effectiveStatus(_c4repl->getStatus());
     }
 
 
-    MutableDict pendingDocumentIDs(CBLError *outError) {
-        C4Error c4err;
-        alloc_slice arrayData(c4repl_getPendingDocIDs(_c4repl, &c4err));
-        if (outError)
-            *outError = external(c4err);
-        if (!arrayData && c4err.code != 0)
+    MutableDict pendingDocumentIDs() {
+        alloc_slice arrayData(_c4repl->pendingDocIDs());
+        if (!arrayData)
             return nullptr;
 
         MutableDict result = MutableDict::newDict();
@@ -186,8 +162,8 @@ public:
     }
 
 
-    bool isDocumentPending(FLSlice docID, CBLError *outError) {
-        return c4repl_isDocumentPending(_c4repl, docID, internal(outError));
+    bool isDocumentPending(FLSlice docID) {
+        return _c4repl->isDocumentPending(docID);
     }
 
 
@@ -309,14 +285,14 @@ private:
     }
 
 
-    recursive_mutex                 _mutex;
-    ReplicatorConfiguration const   _conf;
-    Retained<CBLDatabase>           _db;
-    c4::ref<C4Replicator>           _c4repl;
-    C4ReplicatorStatus              _c4status {kC4Stopped};
-    bool                            _optionsChanged {false};
-    Retained<CBLReplicator>         _retainSelf;
-    int                             _activeConflictResolvers {0};
-    Listeners<CBLReplicatorChangeListener>    _changeListeners;
-    Listeners<CBLDocumentReplicationListener>  _docListeners;
+    recursive_mutex                             _mutex;
+    ReplicatorConfiguration const               _conf;
+    Retained<CBLDatabase>                       _db;
+    Retained<C4Replicator>                      _c4repl;
+    C4ReplicatorStatus                          _c4status {kC4Stopped};
+    bool                                        _optionsChanged {false};
+    Retained<CBLReplicator>                     _retainSelf;
+    int                                         _activeConflictResolvers {0};
+    Listeners<CBLReplicatorChangeListener>      _changeListeners;
+    Listeners<CBLDocumentReplicationListener>   _docListeners;
 };

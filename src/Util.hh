@@ -27,7 +27,6 @@
 
 namespace cbl_internal {
 
-    fleece::alloc_slice convertJSON5(fleece::slice json5, C4Error *outError);
+    fleece::alloc_slice convertJSON5(fleece::slice json5);
 
-    void setError(C4Error* outError, C4ErrorDomain domain, int code, fleece::slice message);
 }

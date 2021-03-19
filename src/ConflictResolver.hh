@@ -44,9 +44,8 @@ namespace cbl_internal {
         CBLReplicatedDocument result() const;
 
     private:
-        void _runAsyncNow() noexcept;
+        bool _runNow();
         bool customResolve(CBLDocument *conflict _cbl_nonnull);
-        void errorFromException(const std::exception*, const char *what);
 
         Retained<CBLDatabase>   _db;
         CBLConflictResolver     _clientResolver;
@@ -69,12 +68,12 @@ namespace cbl_internal {
         void runNow();
 
     private:
-        alloc_slice next(C4DocumentEnded &doc, C4Error *c4err);
-
+        bool next();
+        
         Retained<CBLDatabase>               _db;
         CBLConflictResolver                 _clientResolver;
         void*                               _clientResolverContext;
-        c4::ref<C4DocEnumerator>            _enum;
+        std::unique_ptr<C4DocEnumerator>    _enum;
     };
 
 }

@@ -267,9 +267,7 @@ Retained<CBLQuery> CBLDatabase::createQuery(CBLQueryLanguage language,
 {
     alloc_slice json;
     if (language == kCBLJSONLanguage) {
-        json = convertJSON5(queryString, nullptr); // allow JSON5 as a convenience
-        if (!json)
-            C4Error::raise(FleeceDomain, kFLJSONError);
+        json = convertJSON5(queryString); // allow JSON5 as a convenience
         queryString = json;
     }
     auto c4query = _c4db.use()->newQuery((C4QueryLanguage)language, queryString, outErrPos);

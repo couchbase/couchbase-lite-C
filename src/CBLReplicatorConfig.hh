@@ -53,7 +53,7 @@ namespace cbl_internal {
         CBLURLEndpoint(fleece::slice url)
         :_url(url)
         {
-            if (!c4address_fromURL(_url, &_address, &_dbName))
+            if (!C4Address::fromURL(_url, &_address, (fleece::slice*)&_dbName))
                 _dbName = fleece::nullslice; // mark as invalid
         }
 
@@ -177,8 +177,8 @@ namespace cbl_internal {
         }
 
 
-        bool validate(CBLError *outError) const {
-            slice problem;
+        void validate() const {
+            const char *problem = nullptr;
             if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull)
                 problem = "Invalid replicator config: missing endpoints or bad type";
             else if (!endpoint->valid())
@@ -187,10 +187,8 @@ namespace cbl_internal {
                                                     !proxy->hostname.buf || !proxy->port))
                 problem = "Invalid replicator proxy settings";
 
-            if (!problem)
-                return true;
-            C4Error::set(LiteCoreDomain, kC4ErrorInvalidParameter, problem, internal(outError));
-            return false;
+            if (problem)
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "%s", problem);
         }
 
 

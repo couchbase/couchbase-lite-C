@@ -60,13 +60,10 @@ public:
         _encodeParameters(enc);
     }
 
-    bool setParametersAsJSON(slice json5) {
-        alloc_slice json = convertJSON5(json5, nullptr);
-        if (!json)
-            return false;
+    void setParametersAsJSON(slice json5) {
         Encoder enc;
-        enc.convertJSON(json);
-        return _encodeParameters(enc);
+        enc.convertJSON(convertJSON5(json5));
+        _encodeParameters(enc);
     }
 
     Retained<CBLResultSet> execute();
@@ -103,13 +100,12 @@ private:
     ,_database(db)
     { }
 
-    bool _encodeParameters(Encoder &enc) {
+    void _encodeParameters(Encoder &enc) {
         alloc_slice encodedParameters = enc.finish();
         if (!encodedParameters)
-            return false;
+            C4Error::raise(FleeceDomain, enc.error(), "%s", enc.errorMessage());
         _parameters = encodedParameters;
         _c4query.use()->setParameters(encodedParameters);
-        return true;
     }
 
     litecore::shared_access_lock<Retained<C4Query>> _c4query;// Thread-safe access to C4Query

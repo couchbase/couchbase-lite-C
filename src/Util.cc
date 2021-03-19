@@ -23,20 +23,15 @@ using namespace fleece;
 
 namespace cbl_internal {
 
-    alloc_slice convertJSON5(slice json5, C4Error *outError) {
+    alloc_slice convertJSON5(slice json5) {
         FLStringResult errMsg;
         FLError flError;
         alloc_slice json(FLJSON5_ToJSON(json5, &errMsg, nullptr, &flError));
         if (!json) {
-            setError(outError, FleeceDomain, flError, slice(errMsg));
-            FLSliceResult_Release(errMsg);
+            alloc_slice msg(std::move(errMsg));
+            C4Error::raise(FleeceDomain, flError, "%.*s", FMTSLICE(msg));
         }
         return json;
-    }
-
-    void setError(C4Error* outError, C4ErrorDomain domain, int code, slice message) {
-        if (outError)
-            *outError = c4error_make(domain, code, message);
     }
 
 }
