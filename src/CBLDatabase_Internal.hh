@@ -166,19 +166,32 @@ public:
             return nullptr;
         return new CBLQuery(this, std::move(c4query), _c4db);
     }
-
-    void createIndex(slice name, CBLIndexSpec spec) {
+    
+    void createValueIndex(slice name, CBLValueIndex index) {
+        if (index.expressionLanguage == kCBLN1QLLanguage) {
+            // CBL-1734: Support N1QL expressions
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
+        }
+        
         C4IndexOptions options = {};
-        options.ignoreDiacritics = spec.ignoreAccents;
+        _c4db.useLocked()->createIndex(name, index.expressions, kC4ValueIndex, &options);
+    }
+    
+    void createFullTextIndex(slice name, CBLFullTextIndex index) {
+        if (index.expressionLanguage == kCBLN1QLLanguage) {
+            // CBL-1734: Support N1QL expressions
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
+        }
+        
+        C4IndexOptions options = {};
+        options.ignoreDiacritics = index.ignoreAccents;
+        
         std::string languageStr;
-        if (spec.language.buf) {
-            languageStr = std::string(spec.language);
+        if (index.language.buf) {
+            languageStr = std::string(index.language);
             options.language = languageStr.c_str();
         }
-        _c4db.useLocked()->createIndex(name,
-                                 spec.keyExpressionsJSON,
-                                 (C4IndexType)spec.type,
-                                 &options);
+        _c4db.useLocked()->createIndex(name, index.expressions, kC4FullTextIndex, &options);
     }
 
     void deleteIndex(slice name) {

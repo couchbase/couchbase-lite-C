@@ -270,19 +270,40 @@ typedef CBL_ENUM(uint32_t, CBLIndexType) {
 };
 
 
-/** Parameters for creating a database index. */
+/** Value Index Specification. */
 typedef struct {
-    /** The type of index to create. */
-    CBLIndexType type;
+    /** The language used in the expressions. Only JSON language is supported now. */
+    CBLQueryLanguage expressionLanguage;
+    
+    /** The expressions describing each coloumn of the index. The expressions could be specified
+        in a JSON Array or in N1QL syntax using comma delimiter. */
+    FLString expressions;
+} CBLValueIndex;
 
-    /** A JSON array describing each column of the index. */
-    FLString keyExpressionsJSON;
+/** Creates a value index.
+    Indexes are persistent.
+    If an identical index with that name already exists, nothing happens (and no error is returned.)
+    If a non-identical index with that name already exists, it is deleted and re-created. */
+bool CBLDatabase_CreateValueIndex(CBLDatabase *db _cbl_nonnull,
+                                  FLString name,
+                                  CBLValueIndex index,
+                                  CBLError *outError) CBLAPI;
 
-    /** In a full-text index, should diacritical marks (accents) be ignored?
+
+/** Full-Text Index Specification. */
+typedef struct {
+    /** The language used in the expressions. */
+    CBLQueryLanguage expressionLanguage;
+    
+    /** The expressions describing each coloumn of the index. The expressions could be specified
+        in a JSON Array or in N1QL syntax using comma delimiter. */
+    FLString expressions;
+    
+    /** Should diacritical marks (accents) be ignored?
         Defaults to false. Generally this should be left `false` for non-English text. */
     bool ignoreAccents;
-
-    /** In a full-text index, the dominant language. Setting this enables word stemming, i.e.
+    
+    /** The dominant language. Setting this enables word stemming, i.e.
         matching different cases of the same word ("big" and "bigger", for instance) and ignoring
         common "stop-words" ("the", "a", "of", etc.)
 
@@ -294,17 +315,16 @@ typedef struct {
         If left null,  or set to an unrecognized language, no language-specific behaviors
         such as stemming and stop-word removal occur. */
     FLString language;
-} CBLIndexSpec;
+} CBLFullTextIndex;
 
-
-/** Creates a database index.
+/** Creates a full-text index.
     Indexes are persistent.
     If an identical index with that name already exists, nothing happens (and no error is returned.)
     If a non-identical index with that name already exists, it is deleted and re-created. */
-bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
-                             FLString name,
-                             CBLIndexSpec spec,
-                             CBLError *outError) CBLAPI;
+bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db _cbl_nonnull,
+                                     FLString name,
+                                     CBLFullTextIndex index,
+                                     CBLError *outError) CBLAPI;
 
 /** Deletes an index given its name. */
 bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,

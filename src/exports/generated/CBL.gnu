@@ -51,7 +51,8 @@ CBL_C {
 		CBLDatabase_AddDocumentChangeListener;
 		CBLDatabase_BufferNotifications;
 		CBLDatabase_SendNotifications;
-		CBLDatabase_CreateIndex;
+		CBLDatabase_CreateValueIndex;
+		CBLDatabase_CreateFullTextIndex;
 		CBLDatabase_DeleteIndex;
 		CBLDatabase_IndexNames;
 		CBLDocument_ID;

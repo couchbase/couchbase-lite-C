@@ -286,13 +286,24 @@ bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
 #pragma mark - QUERIES:
 
 
-bool CBLDatabase_CreateIndex(CBLDatabase *db _cbl_nonnull,
-                             FLString name,
-                             CBLIndexSpec spec,
-                             CBLError *outError) noexcept
+bool CBLDatabase_CreateValueIndex(CBLDatabase *db _cbl_nonnull,
+                                  FLString name,
+                                  CBLValueIndex index,
+                                  CBLError *outError) noexcept
 {
     try {
-        db->createIndex(name, spec);
+        db->createValueIndex(name, index);
+        return true;
+    } catchAndBridge(outError)
+}
+
+bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db _cbl_nonnull,
+                                     FLString name,
+                                     CBLFullTextIndex index,
+                                     CBLError *outError) noexcept
+{
+    try {
+        db->createFullTextIndex(name, index);
         return true;
     } catchAndBridge(outError)
 }
