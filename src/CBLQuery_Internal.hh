@@ -9,7 +9,6 @@
 #include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
 #include "Listener.hh"
-#include "Util.hh"
 #include "c4Query.hh"
 #include "access_lock.hh"
 #include "fleece/Fleece.hh"
@@ -224,9 +223,7 @@ namespace cbl_internal {
         }
 
     private:
-        void queryChanged() {
-            _query->database()->notify(this);
-        }
+        void queryChanged();    // defn is in CBLDatabase.cc, to prevent circular hdr dependency
 
         Retained<CBLQuery>  _query;
         std::unique_ptr<C4QueryObserver> _c4obs;

@@ -17,8 +17,6 @@
 //
 
 #include "CBLBlob_Internal.hh"
-#include "c4BlobStore.hh"
-#include "Util.hh"
 
 using namespace std;
 using namespace fleece;
@@ -31,24 +29,12 @@ CBL_CORE_API const FLSlice kCBLBlobLengthProperty        = C4Blob::kLengthProper
 CBL_CORE_API const FLSlice kCBLBlobContentTypeProperty   = C4Blob::kContentTypeProperty;
 
 
-bool FLDict_IsBlob(FLDict dict) noexcept {
-    C4BlobKey digest;
-    return dict && C4Blob::isBlob(dict, digest);
-}
-
-const CBLBlob* FLDict_GetBlob(FLDict blobDict) noexcept {
-    auto doc = CBLDocument::containing(Dict(blobDict));
-    if (!doc)
-        return nullptr;
-    return doc->getBlob(blobDict);
-}
-
 FLDict CBLBlob_Properties(const CBLBlob* blob) noexcept {
     return blob->properties();
 }
 
 FLStringResult CBLBlob_ToJSON(const CBLBlob* blob _cbl_nonnull) noexcept {
-    return FLStringResult(blob->propertiesAsJSON());
+    return FLStringResult(blob->toJSON());
 }
 
 FLString CBLBlob_ContentType(const CBLBlob* blob) noexcept {
@@ -65,13 +51,13 @@ FLString CBLBlob_Digest(const CBLBlob* blob) noexcept {
 
 FLSliceResult CBLBlob_Content(const CBLBlob* blob, CBLError *outError) noexcept {
     try {
-        return FLSliceResult(blob->getContents());
+        return FLSliceResult(blob->content());
     } catchAndBridge(outError)
 }
 
 CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* blob, CBLError *outError) noexcept {
     try {
-        return external(blob->openStream().release());
+        return blob->openContentStream().release();
     } catchAndBridge(outError)
 }
 
@@ -81,12 +67,12 @@ int CBLBlobReader_Read(CBLBlobReadStream* stream,
                        CBLError *outError) noexcept
 {
     try {
-        return (int) internal(stream)->read(dst, maxLength);
+        return (int) stream->read(dst, maxLength);
     } catchAndBridgeReturning(outError, -1)
 }
 
 void CBLBlobReader_Close(CBLBlobReadStream* stream) noexcept {
-    delete internal(stream);
+    delete stream;
 }
 
 
@@ -105,18 +91,18 @@ CBLBlob* CBLBlob_NewWithStream(FLString contentType,
                                CBLBlobWriteStream* writer) noexcept
 {
     try {
-        return retain(new CBLNewBlob(contentType, *internal(writer)));
+        return retain(new CBLNewBlob(contentType, move(*writer)));
     } catchAndWarn()
 }
 
 CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError) noexcept {
     try {
-        return external(new C4WriteStream(*db->blobStore()));
+        return CBLBlobWriteStream::create(db).release();
     } catchAndBridge(outError)
 }
 
 void CBLBlobWriter_Close(CBLBlobWriteStream* writer) noexcept {
-    delete internal(writer);
+    delete writer;
 }
 
 bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
@@ -125,7 +111,7 @@ bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
                          CBLError *outError) noexcept
 {
     try {
-        internal(writer)->write({data, length});
+        writer->write({data, length});
         return true;
     } catchAndBridge(outError)
 }
@@ -134,9 +120,17 @@ bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
 #pragma mark - FLEECE UTILITIES:
 
 
+bool FLDict_IsBlob(FLDict dict) noexcept {
+    return CBLBlob::isBlob(dict);
+}
+
+const CBLBlob* FLDict_GetBlob(FLDict blobDict) noexcept {
+    return CBLBlob::getBlob(blobDict);
+}
+
 void FLSlot_SetBlob(FLSlot slot _cbl_nonnull, CBLBlob* blob _cbl_nonnull) noexcept
 {
-    Dict props = CBLBlob_Properties(blob);
+    Dict props = blob->properties();
     MutableDict mProps = props.asMutable();
     if (!mProps)
         mProps = props.mutableCopy();

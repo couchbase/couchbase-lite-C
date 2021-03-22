@@ -17,6 +17,7 @@
 //
 
 #pragma once
+#include "CBLBase.h"
 #include "c4Base.hh"
 #include "fleece/slice.hh"
 #include "fleece/Fleece.hh"
@@ -53,6 +54,25 @@ namespace cbl_internal {
         if (value)
             enc[fleece::slice(propName)] = value;
     }
+
+    void BridgeException(const char *fnName, CBLError *outError) noexcept;
+
+    void BridgeExceptionWarning(const char *fnName) noexcept;
+
+    fleece::alloc_slice convertJSON5(fleece::slice json5);
 }
 
 using namespace cbl_internal;
+
+
+#define catchAndBridgeReturning(OUTERROR, VALUE) \
+    catch (...) { cbl_internal::BridgeException(__FUNCTION__, OUTERROR); return VALUE; }
+
+#define catchAndBridge(OUTERROR) \
+    catchAndBridgeReturning(OUTERROR, {})
+
+#define catchAndWarn() \
+    catchAndBridge(nullptr)
+
+
+#define LOCK(MUTEX)     std::lock_guard<decltype(MUTEX)> _lock(MUTEX)

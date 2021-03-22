@@ -22,7 +22,6 @@
 #include "CBLBlob_Internal.hh"
 #include "c4BlobStore.hh"
 #include "c4Private.h"
-#include "Util.hh"
 #include <mutex>
 
 using namespace std;
@@ -30,103 +29,49 @@ using namespace fleece;
 using namespace cbl_internal;
 
 
-// Core constructor
-CBLDocument::CBLDocument(slice docID,
-                         CBLDatabase *db,
-                         Retained<C4Document> c4doc,
-                         bool isMutable)
+// The methods below cannot be in C4Document_Internal.hh because they depend on
+// CBLDatabase_Internal.hh, which would create a circular header dependency.
+
+
+CBLDocument::CBLDocument(slice docID, CBLDatabase *db, C4Document *c4doc, bool isMutable)
 :_docID(docID)
 ,_db(db)
-,_c4doc(move(c4doc))
+,_c4doc(c4doc)
 ,_mutable(isMutable)
 {
-    if (_c4doc) {
-        _c4doc->extraInfo() = {this, nullptr};
-        _revID = _c4doc->selectedRev().revID;
+    if (c4doc) {
+        c4doc->extraInfo() = {this, nullptr};
+        _revID = c4doc->selectedRev().revID;
     }
-}
-
-
-// Construct a new document (not in any database yet)
-CBLDocument::CBLDocument(slice docID, bool isMutable)
-:CBLDocument(docID ? docID : C4Document::createDocID(), nullptr, nullptr, isMutable)
-{ }
-
-
-// Mutable copy of another CBLDocument
-CBLDocument::CBLDocument(const CBLDocument* otherDoc)
-:CBLDocument(otherDoc->_docID,
-             otherDoc->_db,
-             otherDoc->_c4doc,
-             true)
-{
-    if (otherDoc->isMutable()) {
-        LOCK(otherDoc->_mutex);
-        if (otherDoc->_properties)
-            _properties = otherDoc->_properties.asDict().mutableCopy(kFLDeepCopyImmutables);
-    }
-}
-
-
-// Document loaded from db without a C4Document (e.g. a replicator validation callback)
-CBLDocument::CBLDocument(CBLDatabase *db,
-                         slice docID,
-                         slice revID,
-                         C4RevisionFlags revFlags,
-                         Dict body)
-:CBLDocument(docID, db, nullptr, false)
-{
-    _properties = body;
-    _revID = revID;
 }
 
 
 CBLDocument::~CBLDocument() {
-    if (_c4doc)
-        _c4doc->extraInfo() = {nullptr, nullptr};
+    auto c4doc = _c4doc.use();
+    if (c4doc)
+        c4doc->extraInfo() = {nullptr, nullptr};
 }
 
 
-alloc_slice CBLDocument::canonicalRevisionID() const {
-    if (!_c4doc)
-        return nullslice;
-    _c4doc->selectCurrentRevision();
-    return _c4doc->getSelectedRevIDGlobalForm();
-}
-
-
-C4RevisionFlags CBLDocument::revisionFlags() const {
-    return _c4doc ? _c4doc->selectedRev().flags : (kRevNew | kRevLeaf);
-}
-
-
-void CBLDocument::checkMutable() const {
-    if (!_usuallyTrue(_mutable))
-        C4Error::raise(LiteCoreDomain, kC4ErrorNotWriteable, "Document object is immutable");
-}
-
-
-#pragma mark - SAVING / DELETING:
-
-
-static void checkDBMatches(CBLDatabase *myDB, CBLDatabase *dbParam _cbl_nonnull) {
-    if (myDB && myDB != dbParam)
-        C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Saving doc to wrong database");
-}
+#pragma mark - SAVING:
 
 
 bool CBLDocument::save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt) {
-    LOCK(_mutex);
+    auto c4doc = _c4doc.use();
 
-    if (!opt.deleting)
+    if (opt.deleting) {
+        if (!c4doc)
+            C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document is not in any database");
+    } else {
         checkMutable();
+    }
     checkDBMatches(_db, db);
 
     Retained<C4Document> newDoc = nullptr;
     db->use([&](C4Database *c4db) {
         C4Database::Transaction t(c4db);
 
-        // Encode properties:
+        // Encode properties: 
         alloc_slice body;
         C4RevisionFlags revFlags;
         if (!opt.deleting) {
@@ -136,7 +81,7 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt) {
         }
 
         // Save:
-        Retained<C4Document> savingDoc = _c4doc;
+        Retained<C4Document> savingDoc = c4doc.get();
 
         bool retrying;
         do {
@@ -167,7 +112,11 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt) {
                     if (!opt.conflictHandler(opt.context, this, conflictingDoc))
                         break;
                     body = encodeBody(db, c4db, revFlags);
-                    savingDoc = conflictingDoc ? conflictingDoc->_c4doc : nullptr;
+                    if (conflictingDoc) {
+                        savingDoc = const_cast<C4Document*>(conflictingDoc->_c4doc.use().get());
+                    } else {
+                        savingDoc = nullptr;
+                    }
                     retrying = true;
                 } else if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
                     // Last-write-wins; load current revision and retry:
@@ -186,76 +135,45 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt) {
 
     // Update my C4Document:
     _db = db;
-    _c4doc = move(newDoc);
-    _revID = _c4doc->selectedRev().revID;
+    c4doc.get() = move(newDoc);
+    _revID = c4doc->selectedRev().revID;
     return true;
 }
 
 
-bool CBLDocument::deleteDoc(CBLDatabase *db _cbl_nonnull,
-                            CBLConcurrencyControl concurrency)
+alloc_slice CBLDocument::encodeBody(CBLDatabase* _cbl_nonnull db,
+                                    C4Database* _cbl_nonnull c4db,
+                                    C4RevisionFlags &outRevFlags) const
 {
-    if (!_c4doc)
-        C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document is not in any database");
-    SaveOptions opt(concurrency);
-    opt.deleting = true;
-    return save(db, opt);
-}
+    auto c4doc = _c4doc.use();
+    // Save new blobs:
+    bool hasBlobs = saveBlobs(db);
+    outRevFlags = hasBlobs ? kRevHasAttachments : 0;
 
-
-/*static*/ bool CBLDocument::deleteDoc(CBLDatabase* db _cbl_nonnull,
-                                       slice docID)
-{
-    return db->use<bool>([&](C4Database *c4db) {
-        C4Database::Transaction t(c4db);
-        Retained<C4Document> c4doc = c4db->getDocument(docID, false, kDocGetCurrentRev);
-        if (c4doc)
-            c4doc = c4doc->update(nullslice, kRevDeleted);
-        if (!c4doc)
-            return false;
-        t.commit();
-        return true;
-    });
+    // Now encode the properties to Fleece:
+    SharedEncoder enc(c4db->getSharedFleeceEncoder());
+    enc.writeValue(properties());
+    FLError flErr;
+    alloc_slice body = enc.finish(&flErr);
+    if (!body)
+        C4Error::raise(FleeceDomain, flErr);
+    return body;
 }
 
 
 #pragma mark - CONFLICT RESOLUTION:
 
 
-bool CBLDocument::selectRevision(slice revID) {
-    LOCK(_mutex);
-    if (!_c4doc || !_c4doc->selectRevision(revID, true))
-        return false;
-    _revID = revID;
-    _properties = nullptr;
-    _fromJSON = nullptr;
-    return true;
-}
-
-
-bool CBLDocument::selectNextConflictingRevision() {
-    LOCK(_mutex);
-    if (!_c4doc)
-        return false;
-    _properties = nullptr;
-    _fromJSON = nullptr;
-    while (_c4doc->selectNextLeafRevision(true, true))
-        if (_c4doc->selectedRev().flags & kRevIsConflict)
-            return true;
-    return false;
-}
-
-
 bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *mergeDoc) {
-    LOCK(_mutex);
+    auto c4doc = _c4doc.use();
 
-    if (!_c4doc)
+    if (!c4doc)
         C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document has not been saved to a database");
 
     _properties = nullptr;
     _fromJSON = nullptr;
 
-    slice winner(_c4doc->selectedRev().revID), loser(_c4doc->revID());
+    slice winner(c4doc->selectedRev().revID), loser(c4doc->revID());
     if (resolution != Resolution::useRemote)
         std::swap(winner, loser);
 
@@ -276,7 +194,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
         }
 
         try {
-            _c4doc->resolveConflict(winner, loser, mergeBody, mergeFlags);
+            c4doc->resolveConflict(winner, loser, mergeBody, mergeFlags);
         } catch (...) {
             C4Error err = C4Error::fromCurrentException();
             if (err == C4Error{LiteCoreDomain, kC4ErrorConflict})
@@ -284,105 +202,46 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
             throw;
         }
 
-        _c4doc->save();
+        c4doc->save();
         t.commit();
         return true;
     });
 }
 
 
-#pragma mark - PROPERTIES:
-
-
-FLDoc CBLDocument::createFleeceDoc() const {
-#if 1 // TODO: RE-enable this
-    return nullptr;
-#else
-    if (_c4doc)
-        return _c4doc->createFleeceDoc();
-    else
-        return FLDoc_FromJSON("{}"_sl, nullptr);
-#endif
-}
-
-
-Dict CBLDocument::properties() const {
-    //TODO: Convert this to use C4Document::getProperties()
-    LOCK(_mutex);
-    if (!_properties) {
-        slice storage;
-        if (_fromJSON)
-            storage = _fromJSON.data();
-        else if (_c4doc)
-            storage = _c4doc->getRevisionBody();
-        
-        if (storage)
-            _properties = Value::fromData(storage);
-        if (_mutable) {
-            if (_properties)
-                _properties = _properties.asDict().mutableCopy();
-            if (!_properties)
-                _properties = MutableDict::newDict();
-        } else {
-            if (!_properties)
-                _properties = Dict::emptyDict();
-        }
-    }
-    return _properties.asDict();
-}
-
-
-alloc_slice CBLDocument::propertiesAsJSON() const {
-    LOCK(_mutex);
-    if (!_mutable && _c4doc)
-        return _c4doc->bodyAsJSON(false);        // fast path
-    else
-        return properties().toJSON();
-}
-
-
-void CBLDocument::setPropertiesAsJSON(slice json) {
-    checkMutable();
-    Doc fromJSON = Doc::fromJSON(json);
-    if (!fromJSON)
-        C4Error::raise(FleeceDomain, kFLJSONError, "Invalid JSON");
-    LOCK(_mutex);
-    // Store the transcoded Fleece and clear _properties. If app accesses properties(),
-    // it'll get a mutable version of this.
-    _fromJSON = fromJSON;
-    _properties = nullptr;
-}
-
-
-alloc_slice CBLDocument::encodeBody(CBLDatabase *db _cbl_nonnull,
-                                    C4Database *c4db _cbl_nonnull,
-                                    C4RevisionFlags &outRevFlags) const
-{
-    LOCK(_mutex);
-    // Save new blobs:
-    bool hasBlobs = saveBlobs(db);
-    outRevFlags = hasBlobs ? kRevHasAttachments : 0;
-
-    // Now encode the properties to Fleece:
-    SharedEncoder enc(c4db->getSharedFleeceEncoder());
-    enc.writeValue(properties());
-    FLError flErr;
-    alloc_slice body = enc.finish(&flErr);
-    if (!body)
-        C4Error::raise(FleeceDomain, flErr);
-    return body;
-}
-
-
 #pragma mark - BLOBS:
 
 
-CBLDocument::UnretainedValueToBlobMap* CBLDocument::sNewBlobs = nullptr;
-mutex sNewBlobsMutex;
+using UnretainedValueToBlobMap = litecore::access_lock<std::unordered_map<FLDict, CBLNewBlob*>>;
+
+static UnretainedValueToBlobMap& newBlobs() {
+    static UnretainedValueToBlobMap sNewBlobs;
+    return sNewBlobs;
+}
+
+
+void CBLDocument::registerNewBlob(CBLNewBlob* blob) {
+    newBlobs().use()->insert({blob->properties(), blob});
+}
+
+
+void CBLDocument::unregisterNewBlob(CBLNewBlob* blob) {
+    newBlobs().use().get().erase(blob->properties());
+}
+
+
+CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
+    return newBlobs().use<CBLNewBlob*>([dict](auto &newBlobs) -> CBLNewBlob* {
+        auto i = newBlobs.find(dict);
+        if (i == newBlobs.end())
+            return nullptr;
+        return i->second;
+    });
+}
 
 
 CBLBlob* CBLDocument::getBlob(FLDict dict) {
-    LOCK(_mutex);
+    auto c4doc = _c4doc.use();
     // Is it already registered by a previous call to getBlob?
     auto i = _blobs.find(dict);
     if (i != _blobs.end())
@@ -394,35 +253,12 @@ CBLBlob* CBLDocument::getBlob(FLDict dict) {
             return newBlob;
     }
     // Not found; create a new blob and remember it:
-    auto blob = retained(new CBLBlob(this, dict));
-    if (!blob->valid())
+    auto key = C4Blob::getKey(dict);
+    if (!key)
         return nullptr;
+    auto blob = retained(new CBLBlob(this, dict, *key));
     _blobs.insert({dict, blob});
     return blob;
-}
-
-
-void CBLDocument::registerNewBlob(CBLNewBlob* blob) {
-    LOCK(sNewBlobsMutex);
-    if (!sNewBlobs)
-        sNewBlobs = new UnretainedValueToBlobMap;
-    sNewBlobs->insert({blob->properties(), blob});
-}
-
-
-void CBLDocument::unregisterNewBlob(CBLNewBlob* blob) {
-    lock_guard<mutex> lock(sNewBlobsMutex);
-    if (sNewBlobs)
-        sNewBlobs->erase(blob->properties());
-}
-
-
-CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
-    LOCK(sNewBlobsMutex);
-    auto i = sNewBlobs->find(dict);
-    if (i == sNewBlobs->end())
-        return nullptr;
-    return i->second;
 }
 
 
@@ -431,7 +267,7 @@ bool CBLDocument::saveBlobs(CBLDatabase *db) const {
     // and also checking if there are any blobs at all (mutable or not.)
     // Once we've found at least one blob, we can skip immutable collections, because
     // they can't contain new blobs.
-    LOCK(_mutex);
+    auto c4doc = _c4doc.use();
     if (!isMutable())
         return C4Blob::dictContainsBlobs(properties());
 

@@ -20,7 +20,6 @@
 #include "CBLDatabase.h"
 #include "Internal.hh"
 #include "InstanceCounted.hh"
-#include "Util.hh"
 #include <access_lock.hh>
 #include <atomic>
 #include <functional>

@@ -17,6 +17,7 @@
 //
 
 #include "CBLDocument_Internal.hh"
+#include "CBLPrivate.h"
 
 using namespace fleece;
 

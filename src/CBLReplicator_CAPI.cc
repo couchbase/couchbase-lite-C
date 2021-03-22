@@ -18,6 +18,7 @@
 
 #include "CBLReplicator.h"
 #include "CBLReplicator_Internal.hh"
+#include "CBLURLEndpointListener_Internal.hh"
 
 
 const FLString kCBLAuthDefaultCookieName = FLSTR("SyncGatewaySession");
@@ -107,3 +108,36 @@ CBLListenerToken* CBLReplicator_AddDocumentReplicationListener(CBLReplicator* re
 {
     return retain(repl->addDocumentListener(listener, context));
 }
+
+
+#pragma mark - CBLURLEndpointListener:
+
+
+#ifdef COUCHBASE_ENTERPRISE
+
+CBLURLEndpointListener* CBLURLEndpointListener_New(CBLURLEndpointListenerConfiguration* config) noexcept {
+    return new CBLURLEndpointListener(config);
+
+}
+
+bool CBLURLEndpointListener_Start(CBLURLEndpointListener* listener, CBLError *outError) noexcept {
+    return listener->start(outError);
+}
+
+void CBLURLEndpointListener_Stop(CBLURLEndpointListener* listener) noexcept {
+    listener->stop();
+}
+
+uint16_t CBLURLEndpointListener_GetPort(CBLURLEndpointListener* listener) noexcept {
+    return listener->port();
+}
+
+FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull) noexcept {
+    return listener->URLs();
+}
+
+CBLConnectionStatus CBLURLEndpointListener_GetStatus(CBLURLEndpointListener* listener) noexcept {
+    return listener->status();
+}
+
+#endif

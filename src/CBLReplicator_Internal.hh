@@ -21,7 +21,6 @@
 #include "CBLDocument_Internal.hh"
 #include "ConflictResolver.hh"
 #include "Internal.hh"
-#include "Util.hh"
 #include "c4Replicator.hh"
 #include "c4Private.h"
 #include "StringUtil.hh"
@@ -111,7 +110,8 @@ public:
         _conf.database->use([&](C4Database *c4db) {
 #ifdef COUCHBASE_ENTERPRISE
             if (_conf.endpoint->otherLocalDB()) {
-                _c4repl = c4db->newLocalReplicator(_conf.endpoint->otherLocalDB(), params);
+                _c4repl = c4db->newLocalReplicator(_conf.endpoint->otherLocalDB()->use().get(),
+                                                   params);
             } else
 #endif
             {

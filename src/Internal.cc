@@ -1,5 +1,5 @@
 //
-// Util.cc
+// Internal.cc
 //
 // Copyright © 2018 Couchbase. All rights reserved.
 //
@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "Util.hh"
+#include "Internal.hh"
 #include "c4Base.hh"
 #include "fleece/Fleece.h"
 

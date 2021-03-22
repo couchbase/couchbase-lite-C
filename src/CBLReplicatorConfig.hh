@@ -38,7 +38,7 @@ struct CBLEndpoint {
     const C4Address& remoteAddress() const                      {return _address;}
     virtual C4String remoteDatabaseName() const =0;
 #ifdef COUCHBASE_ENTERPRISE
-    virtual C4Database* otherLocalDB() const                    {return nullptr;}
+    virtual CBLDatabase* otherLocalDB() const                   {return nullptr;}
 #endif
 
 protected:
@@ -73,7 +73,7 @@ namespace cbl_internal {
 
         bool valid() const override                             {return true;}
         virtual C4String remoteDatabaseName() const override    {return fleece::nullslice;}
-        virtual C4Database* otherLocalDB() const override       {return _db->_getC4Database();}
+        virtual CBLDatabase* otherLocalDB() const override      {return _db;}
 
     private:
         fleece::Retained<CBLDatabase> _db;

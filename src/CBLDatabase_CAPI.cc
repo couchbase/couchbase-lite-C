@@ -153,7 +153,7 @@ const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID
                                            CBLError* outError) noexcept
 {
     try {
-        auto doc = db->getDocument(docID, false).detach();
+        auto doc = db->getDocument(docID).detach();
         if (!doc && outError)
             outError->code = 0;
         return doc;
@@ -224,7 +224,7 @@ bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db _cbl_nonnu
                                                       CBLError* outError) noexcept
 {
     try {
-        if (const_cast<CBLDocument*>(doc)->deleteDoc(db, concurrency))
+        if (db->deleteDocument(doc, concurrency))
             return true;
         C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
         return false;
@@ -236,7 +236,7 @@ bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db _cbl_nonnull,
                                     CBLError* outError) noexcept
 {
     try {
-        if (CBLDocument::deleteDoc(db, docID))
+        if (db->deleteDocument(docID))
             return true;
         C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
         return false;
@@ -311,7 +311,7 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
 
 FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) noexcept {
     try {
-        return db->indexNames();
+        return FLMutableArray_Retain(db->indexNames());
     } catchAndWarn()
 }
 

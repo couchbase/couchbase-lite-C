@@ -23,7 +23,6 @@
 #include "c4Observer.hh"
 #include "c4Query.hh"
 #include "Internal.hh"
-#include "Util.hh"
 #include "function_ref.hh"
 #include "PlatformCompat.hh"
 #include <sys/stat.h>
@@ -49,49 +48,8 @@ std::string CBLDatabase::defaultDirectory() {
 #endif
 
 
-slice CBLDatabase::effectiveDir(slice inDirectory) {
-    if (inDirectory) {
-        return inDirectory;
-    } else {
-        static const string kDir = defaultDirectory();
-        return slice(kDir);
-    }
-}
-
 static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
               "C4EncryptionKey and CBLEncryptionKey size do not match");
-
-static C4EncryptionKey asC4Key(const CBLEncryptionKey *key) {
-    C4EncryptionKey c4key;
-    if (key) {
-        c4key.algorithm = static_cast<C4EncryptionAlgorithm>(key->algorithm);
-        memcpy(c4key.bytes, key->bytes, sizeof(CBLEncryptionKey::bytes));
-    } else {
-        c4key.algorithm = kC4EncryptionNone;
-    }
-    return c4key;
-}
-
-C4DatabaseConfig2 CBLDatabase::asC4Config(const CBLDatabaseConfiguration *config) {
-    CBLDatabaseConfiguration defaultConfig;
-    if (!config) {
-        defaultConfig = CBLDatabaseConfiguration_Default();
-        config = &defaultConfig;
-    }
-    C4DatabaseConfig2 c4Config = {};
-    c4Config.parentDirectory = effectiveDir(config->directory);
-    c4Config.flags = kC4DB_Create | kC4DB_VersionVectors;
-    c4Config.encryptionKey = asC4Key(config->encryptionKey);
-    return c4Config;
-}
-
-
-CBLDatabaseConfiguration CBLDatabase::defaultConfiguration() {
-    CBLDatabaseConfiguration config = {};
-    config.directory = effectiveDir(nullslice);
-    return config;
-}
-
 
 #ifdef COUCHBASE_ENTERPRISE
 bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBLAPI {
@@ -103,271 +61,18 @@ bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBL
 #endif
 
 
-#pragma mark - STATIC METHODS:
+#pragma mark - QUERY:
 
 
-bool CBLDatabase::exists(slice name, slice inDirectory) {
-    return C4Database::exists(name, effectiveDir(inDirectory));
-}
+namespace cbl_internal {
 
-
-void CBLDatabase::copyDatabase(slice fromPath,
-                               slice toName,
-                               const CBLDatabaseConfiguration *config)
-{
-    C4DatabaseConfig2 c4config = asC4Config(config);
-    C4Database::copyNamed(fromPath, toName, c4config);
-}
-
-
-void CBLDatabase::deleteDatabase(slice name, slice inDirectory) {
-    C4Database::deleteNamed(name, effectiveDir(inDirectory));
-}
-
-
-#pragma mark - LIFECYCLE & OPERATIONS:
-
-
-CBLDatabase::CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
-:_c4db(std::move(db))
-,_dir(dir_)
-,_blobStore(&db->getBlobStore())
-,_notificationQueue(this)
-{ }
-
-
-CBLDatabase::~CBLDatabase() {
-    _c4db.use([&](Retained<C4Database> &c4db) {
-        _docListeners.clear();
-        _observer = nullptr;
-    });
-}
-
-
-Retained<CBLDatabase> CBLDatabase::open(slice name, const CBLDatabaseConfiguration *config) {
-    C4DatabaseConfig2 c4config = asC4Config(config);
-    Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
-    if (c4db->mayHaveExpiration())
-        c4db->startHousekeeping();
-    return new CBLDatabase(c4db, name, c4config.parentDirectory);
-}
-
-
-void CBLDatabase::close() {
-    _c4db.use()->close();
-}
-
-void CBLDatabase::beginTransaction() {
-    _c4db.use()->beginTransaction();
-}
-
-void CBLDatabase::endTransaction(bool commit) {
-    _c4db.use()->endTransaction(commit);
-}
-
-void CBLDatabase::closeAndDelete() {
-    _c4db.use()->closeAndDeleteFile();
-}
-
-#ifdef COUCHBASE_ENTERPRISE
-void CBLDatabase::changeEncryptionKey(const CBLEncryptionKey *newKey) {
-    C4EncryptionKey c4key = asC4Key(newKey);
-    _c4db.use()->rekey(&c4key);
-}
-#endif
-
-void CBLDatabase::performMaintenance(CBLMaintenanceType type) {
-    _c4db.use()->maintenance((C4MaintenanceType)type);
-}
-
-
-#pragma mark - ACCESSORS:
-
-
-// For use only by CBLURLEndpointListener and CBLLocalEndpoint
-C4Database* CBLDatabase::_getC4Database() const {
-    return _c4db.use().get(); //FIXME: Don't do this
-}
-
-
-slice CBLDatabase::name() const noexcept {
-    return _c4db.use()->getName();
-}
-
-alloc_slice CBLDatabase::path() const {
-    return _c4db.use()->path();
-}
-
-CBLDatabaseConfiguration CBLDatabase::config() const noexcept {
-    return {_dir, nullptr};
-}
-
-uint64_t CBLDatabase::count() const {
-    return _c4db.use()->getDocumentCount();
-}
-
-uint64_t CBLDatabase::lastSequence() const {
-    return _c4db.use()->getLastSequence();
-}
-
-
-#pragma mark - DOCUMENTS:
-
-
-Retained<CBLDocument> CBLDatabase::_getDocument(slice docID,
-                                                bool isMutable,
-                                                bool allRevisions) const
-{
-    C4DocContentLevel content = (allRevisions ? kDocGetAll : kDocGetCurrentRev);
-    Retained<C4Document> c4doc = _c4db.use()->getDocument(docID, true, content);
-    if (!c4doc || (!allRevisions && (c4doc->flags() & kDocDeleted)))
-        return nullptr;
-    return new CBLDocument(docID, const_cast<CBLDatabase*>(this), c4doc, isMutable);
-}
-
-
-RetainedConst<CBLDocument> CBLDatabase::getDocument(slice docID) const {
-    return _getDocument(docID, false, false);
-}
-
-RetainedConst<CBLDocument> CBLDatabase::getDocument(slice docID, bool allRevisions) const {
-    return _getDocument(docID, false, allRevisions);
-}
-
-Retained<CBLDocument> CBLDatabase::getMutableDocument(slice docID) {
-    return _getDocument(docID, true, true);
-}
-
-
-bool CBLDatabase::purgeDocument(slice docID) {
-    return use<bool>([&](C4Database *c4db) {
-        return c4db->purgeDoc(docID);
-    });
-}
-
-
-CBLTimestamp CBLDatabase::getDocumentExpiration(slice docID) {
-    return _c4db.use()->getExpiration(docID);
-}
-
-void CBLDatabase::setDocumentExpiration(slice docID, CBLTimestamp expiration) {
-    auto c4db = _c4db.use();
-    c4db->setExpiration(docID, expiration);
-    if (expiration > 0)
-        c4db->startHousekeeping();
-}
-
-
-#pragma mark - QUERIES & INDEXES:
-
-
-Retained<CBLQuery> CBLDatabase::createQuery(CBLQueryLanguage language,
-                                            slice queryString,
-                                            int *outErrPos) const
-{
-    alloc_slice json;
-    if (language == kCBLJSONLanguage) {
-        json = convertJSON5(queryString); // allow JSON5 as a convenience
-        queryString = json;
+    void ListenerToken<CBLQueryChangeListener>::queryChanged() {
+        _query->database()->notify(this);
     }
-    auto c4query = _c4db.use()->newQuery((C4QueryLanguage)language, queryString, outErrPos);
-    if (!c4query)
-        return nullptr;
-    return new CBLQuery(this, move(c4query), _c4db);
-}
-
-
-void CBLDatabase::createIndex(slice name, CBLIndexSpec spec) {
-    C4IndexOptions options = {};
-    options.ignoreDiacritics = spec.ignoreAccents;
-    string languageStr;
-    if (spec.language.buf) {
-        languageStr = string(spec.language);
-        options.language = languageStr.c_str();
-    }
-    _c4db.use()->createIndex(name,
-                             spec.keyExpressionsJSON,
-                             (C4IndexType)spec.type,
-                             &options);
-}
-
-void CBLDatabase::deleteIndex(slice name) {
-    _c4db.use()->deleteIndex(name);
-}
-
-FLMutableArray CBLDatabase::indexNames() {
-    Doc doc(_c4db.use()->getIndexesInfo());
-    MutableArray indexes = MutableArray::newArray();
-    for (Array::iterator i(doc.root().asArray()); i; ++i) {
-        Dict info = i.value().asDict();
-        indexes.append(info["name"]);
-    }
-    return FLMutableArray_Retain(indexes);
-}
-
-
-#pragma mark - DATABASE CHANGE LISTENERS:
-
-
-void CBLDatabase::sendNotifications() {
-    _notificationQueue.notifyAll();
-}
-
-void CBLDatabase::bufferNotifications(CBLNotificationsReadyCallback callback, void *context) {
-    _notificationQueue.setCallback(callback, context);
-}
-
-
-Retained<CBLListenerToken> CBLDatabase::addListener(function_ref<Retained<CBLListenerToken>()> callback) {
-    auto c4db = _c4db.use(); // locks DB mutex, so the callback can run thread-safe
-    Retained<CBLListenerToken> token = callback();
-    if (!_observer)
-        _observer = c4db->observe([this](C4DatabaseObserver*) { this->databaseChanged(); });
-    return token;
-}
-
-
-Retained<CBLListenerToken> CBLDatabase::addListener(CBLDatabaseChangeListener listener, void *ctx) {
-    return addListener([&]{ return _listeners.add(listener, ctx); });
-}
-
-
-Retained<CBLListenerToken> CBLDatabase::addListener(CBLDatabaseChangeDetailListener listener, void *ctx) {
-    return addListener([&]{ return _detailListeners.add(listener, ctx); });
-}
-
-
-void CBLDatabase::databaseChanged() {
-    notify(bind(&CBLDatabase::callDBListeners, this));
-}
-
-
-void CBLDatabase::callDBListeners() {
-    static const uint32_t kMaxChanges = 100;
-    while (true) {
-        C4DatabaseObserver::Change c4changes[kMaxChanges];
-        bool external;
-        uint32_t nChanges = _observer->getChanges(c4changes, kMaxChanges, &external);
-        if (nChanges == 0)
-            break;
-
-        static_assert(sizeof(CBLDatabaseChange) == sizeof(C4DatabaseObserver::Change));
-        _detailListeners.call(this, nChanges, (const CBLDatabaseChange*)c4changes);
-
-        if (!_listeners.empty()) {
-            FLString docIDs[kMaxChanges];
-            for (uint32_t i = 0; i < nChanges; ++i)
-                docIDs[i] = c4changes[i].docID;
-            _listeners.call(this, nChanges, docIDs);
-        }
-    }
-}
 
 
 #pragma mark - DOCUMENT LISTENERS:
 
-
-namespace cbl_internal {
 
     // Custom subclass of CBLListenerToken for document listeners.
     // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
