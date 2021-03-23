@@ -7,7 +7,7 @@ function(set_platform_source_files)
 
     set(
         ${PLATFORM_RESULT}
-        src/CBLDatabase+ObjC.mm
+        src/CBLDatabase+Apple.mm
         PARENT_SCOPE
     )
 endfunction()

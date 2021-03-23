@@ -64,7 +64,7 @@ add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
 ### SOURCE FILES:
 
 include_directories("vendor/couchbase-lite-core/C/include"
-                    "vendor/couchbase-lite-core/LiteCore/C"
+                    "vendor/couchbase-lite-core/C/Cpp_include"
                     "vendor/couchbase-lite-core/LiteCore/Support"
                     "vendor/couchbase-lite-core/vendor/fleece/API"
                     "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support")
@@ -78,16 +78,19 @@ endif()
 set_platform_source_files(RESULT PLATFORM_SRC)
 set(
     ALL_SRC_FILES
-    src/CBLBase.cc
+    src/CBLBase_CAPI.cc
+    src/CBLBlob_CAPI.cc
     src/CBLBlob.cc
     src/CBLDatabase.cc
+    src/CBLDatabase_CAPI.cc
     src/CBLDocument.cc
+    src/CBLDocument_CAPI.cc
     src/CBLLog.cc
-    src/CBLQuery.cc
-    src/CBLReplicator.cc
+    src/CBLQuery_CAPI.cc
+    src/CBLReplicator_CAPI.cc
     src/ConflictResolver.cc
+    src/Internal.cc
     src/Listener.cc
-    src/Util.cc
     ${PLATFORM_SRC}
 )
 
