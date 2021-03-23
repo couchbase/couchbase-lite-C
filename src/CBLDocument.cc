@@ -243,8 +243,7 @@ CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
 CBLBlob* CBLDocument::getBlob(FLDict dict) {
     auto c4doc = _c4doc.use();
     // Is it already registered by a previous call to getBlob?
-    auto i = _blobs.find(dict);
-    if (i != _blobs.end())
+    if (auto i = _blobs.find(dict); i != _blobs.end())
         return i->second;
     // Is it a NewBlob?
     if (Dict(dict).asMutable()) {
@@ -252,10 +251,13 @@ CBLBlob* CBLDocument::getBlob(FLDict dict) {
         if (newBlob)
             return newBlob;
     }
-    // Not found; create a new blob and remember it:
+
+    // Not found; is it a blob or attachment at all?
     auto key = C4Blob::getKey(dict);
-    if (!key)
+    if (!key || !(C4Blob::isBlob(dict) || C4Blob::isAttachmentIn(dict, properties())))
         return nullptr;
+
+    // Create a new CBLBlob and remember it:
     auto blob = retained(new CBLBlob(this, dict, *key));
     _blobs.insert({dict, blob});
     return blob;
