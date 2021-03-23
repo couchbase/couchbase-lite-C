@@ -66,6 +66,51 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
 }
 
 
+#ifdef COUCHBASE_ENTERPRISE
+
+TEST_CASE_METHOD(CBLTest, "Database Encryption") {
+    // Ensure no database:
+    CBL_DeleteDatabase("encdb"_sl, nullslice, nullptr);
+    CHECK(!CBL_DatabaseExists("encdb"_sl, nullslice));
+    
+    // Correct key:
+    CBLError error;
+    CBLEncryptionKey key;
+    CBLEncryptionKey_FromPassword(&key, "sekrit"_sl);
+    CBLDatabaseConfiguration config = {nullslice, &key};
+    CBLDatabase *defaultdb = CBLDatabase_Open("encdb"_sl, &config, &error);
+    REQUIRE(defaultdb);
+    alloc_slice path = CBLDatabase_Path(defaultdb);
+    cerr << "Default database is at " << path << "\n";
+    CHECK(CBL_DatabaseExists("encdb"_sl, nullslice));
+
+    CBLDatabaseConfiguration config1 = CBLDatabase_Config(defaultdb);
+    CHECK(config1.directory != nullslice);     // exact value is platform-specific
+    CHECK(config1.encryptionKey == &key);
+    
+    // No key:
+    CBLDatabase *nokeydb = CBLDatabase_Open("encdb"_sl, nullptr, &error);
+    CHECK(nokeydb == nullptr);
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorNotADatabaseFile);
+    
+    // Wrong key:
+    CBLEncryptionKey key2;
+    CBLEncryptionKey_FromPassword(&key2, "wrongpassword"_sl);
+    CBLDatabaseConfiguration config2 = {nullslice, &key2};
+    CBLDatabase *wrongkeydb = CBLDatabase_Open("encdb"_sl, &config2, &error);
+    CHECK(wrongkeydb == nullptr);
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorNotADatabaseFile);
+    
+    CHECK(CBLDatabase_Delete(defaultdb, &error));
+    CBLDatabase_Release(defaultdb);
+    CHECK(!CBL_DatabaseExists("encdb"_sl, nullslice));
+}
+
+#endif
+
+
 TEST_CASE_METHOD(CBLTest, "Missing Document") {
     CBLError error;
     const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo"_sl, &error);

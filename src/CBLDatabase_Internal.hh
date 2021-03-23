@@ -69,7 +69,10 @@ public:
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
         if (c4db->mayHaveExpiration())
             c4db->startHousekeeping();
-        return new CBLDatabase(c4db, name, c4config.parentDirectory);
+        CBLEncryptionKey* key = nullptr;
+        if (config)
+            key = config->encryptionKey;
+        return new CBLDatabase(c4db, name, c4config.parentDirectory, key);
     }
 
     void performMaintenance(CBLMaintenanceType type) {
@@ -95,7 +98,7 @@ public:
 
     slice name() const noexcept                      {return _c4db.useLocked()->getName();}
     alloc_slice path() const                         {return _c4db.useLocked()->path();}
-    CBLDatabaseConfiguration config() const noexcept {return {_dir, nullptr};}
+    CBLDatabaseConfiguration config() const noexcept {return {_dir, _key};}
     C4BlobStore* blobStore() const                   {return _blobStore;}
 
     uint64_t count() const                           {return _c4db.useLocked()->getDocumentCount();}
@@ -263,9 +266,10 @@ protected:
     RESULT useLocked(LAMBDA callback) { return _c4db.useLocked<RESULT>(callback); }
 
 private:
-    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
+    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_, CBLEncryptionKey* key_)
     :_c4db(std::move(db))
     ,_dir(dir_)
+    ,_key(key_)
     ,_blobStore(&db->getBlobStore())
     ,_notificationQueue(this)
     { }
@@ -365,6 +369,7 @@ private:
 
     litecore::access_lock<Retained<C4Database>> _c4db;
     alloc_slice const                           _dir;
+    CBLEncryptionKey*                           _key;
     C4BlobStore*                                _blobStore;
     std::unique_ptr<C4DatabaseObserver>         _observer;
     Listeners<CBLDatabaseChangeListener>        _listeners;
