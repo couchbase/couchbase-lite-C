@@ -27,6 +27,7 @@
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <mutex>
+#include "betterassert.hh"
 
 
 struct CBLBlob : public CBLRefCounted {
