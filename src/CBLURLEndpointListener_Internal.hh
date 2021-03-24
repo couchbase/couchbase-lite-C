@@ -1,5 +1,5 @@
 //
-// CBLURLEndpointListener.cc
+// CBLURLEndpointListener.hh
 //
 // Copyright © 2020 Couchbase. All rights reserved.
 //
@@ -48,8 +48,7 @@ public:
         if (!_listener)
             return false;
 
-        C4Database* c4db = _db->_getC4Database();
-        if (!c4listener_shareDB(_listener, nullslice, c4db, internal(outError))) {
+        if (!c4listener_shareDB(_listener, nullslice, _db->useLocked().get(), internal(outError))) {
             stop();
             return false;
         }
@@ -68,7 +67,7 @@ public:
     }
 
     FLMutableArray URLs() {
-        return c4listener_getURLs(_listener, _db->_getC4Database(), kC4SyncAPI, nullptr);
+        return c4listener_getURLs(_listener, _db->useLocked().get(), kC4SyncAPI, nullptr);
     }
 
     CBLConnectionStatus status() {
@@ -82,34 +81,5 @@ private:
     C4ListenerConfig    _c4config = {};
     C4Listener*         _listener;
 };
-
-
-#pragma mark - PUBLIC API:
-
-
-CBLURLEndpointListener* CBLURLEndpointListener_New(CBLURLEndpointListenerConfiguration* config) noexcept {
-    return make_nothrow<CBLURLEndpointListener>(nullptr, config).detach();
-
-}
-
-bool CBLURLEndpointListener_Start(CBLURLEndpointListener* listener, CBLError *outError) noexcept {
-    return listener->start(outError);
-}
-
-void CBLURLEndpointListener_Stop(CBLURLEndpointListener* listener) noexcept {
-    listener->stop();
-}
-
-uint16_t CBLURLEndpointListener_GetPort(CBLURLEndpointListener* listener) noexcept {
-    return listener->port();
-}
-
-FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull) noexcept {
-    return listener->URLs();
-}
-
-CBLConnectionStatus CBLURLEndpointListener_GetStatus(CBLURLEndpointListener* listener) noexcept {
-    return listener->status();
-}
 
 #endif

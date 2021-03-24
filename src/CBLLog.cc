@@ -18,7 +18,7 @@
 
 #include "CBLLog.h"
 #include "CBLPrivate.h"
-#include "c4Base.h"
+#include "c4Base.hh"
 #include "Internal.hh"
 #include "fleece/slice.hh"
 #include <atomic>

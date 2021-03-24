@@ -17,25 +17,15 @@
 //
 
 #pragma once
-#include "c4.h"
+#include "CBLBase.h"
+#include "c4Base.hh"
 #include "fleece/slice.hh"
 #include "fleece/Fleece.hh"
 #include "RefCounted.hh"
 #include "InstanceCounted.hh"
-#include "betterassert.hh"
 
 
 struct CBLRefCounted : public fleece::RefCounted, fleece::InstanceCountedIn<CBLRefCounted> {
-public:
-    // The 'nothrow' version should be called instead.
-    static void* operator new(size_t size) =delete;
-
-    static void* operator new(size_t size, std::nothrow_t nt) {
-        return ::operator new(size, nt);
-    }
-
-    bool validate(CBLError*) const {return true;}
-
 protected:
     using Value = fleece::Value;
     using Dict = fleece::Dict;
@@ -59,24 +49,30 @@ namespace cbl_internal {
     static inline       CBLError* external(      C4Error *error) {return (CBLError*)error;}
     static inline const CBLError& external(const C4Error &error) {return (const CBLError&)error;}
 
-    void setAllocFailedError(CBLError*);
-
-    template<class T, class... _Args>
-    static inline fleece::Retained<T>
-    make_nothrow(CBLError *outError, _Args&&... __args) {
-        fleece::Retained<T> obj = new (std::nothrow) T(std::forward<_Args>(__args)...);
-        if (_usuallyFalse(!obj))
-            setAllocFailedError(outError);
-        else if (!obj->validate(outError))
-            obj = nullptr;
-        return obj;
-    }
-
     template <typename T>
     static inline void writeOptionalKey(fleece::Encoder &enc, const char *propName, T value) {
         if (value)
             enc[fleece::slice(propName)] = value;
     }
+
+    void BridgeException(const char *fnName, CBLError *outError) noexcept;
+
+    void BridgeExceptionWarning(const char *fnName) noexcept;
+
+    fleece::alloc_slice convertJSON5(fleece::slice json5);
 }
 
 using namespace cbl_internal;
+
+
+#define catchAndBridgeReturning(OUTERROR, VALUE) \
+    catch (...) { cbl_internal::BridgeException(__FUNCTION__, OUTERROR); return VALUE; }
+
+#define catchAndBridge(OUTERROR) \
+    catchAndBridgeReturning(OUTERROR, {})
+
+#define catchAndWarn() \
+    catchAndBridge(nullptr)
+
+
+#define LOCK(MUTEX)     std::lock_guard<decltype(MUTEX)> _lock(MUTEX)

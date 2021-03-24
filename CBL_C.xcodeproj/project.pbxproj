@@ -7,17 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		271A989E243BFDBF008C032D /* CBLURLEndpointListener.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271A989D243BFDBF008C032D /* CBLURLEndpointListener.cc */; };
 		271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2C21CAC98F0045856E /* CBLReplicator.h */; };
 		271C2A3221CAC98F0045856E /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; };
 		271C2A3321CAC98F0045856E /* CBLDocument.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2E21CAC98F0045856E /* CBLDocument.h */; };
 		271C2A3421CAC98F0045856E /* CBLDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2F21CAC98F0045856E /* CBLDatabase.h */; };
 		271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A3021CAC98F0045856E /* CBLQuery.h */; };
-		271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A6E21CAD5B30045856E /* CBLBase.cc */; };
+		271C2A6F21CAD5B30045856E /* CBLBase_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A6E21CAD5B30045856E /* CBLBase_CAPI.cc */; };
 		271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7121CADB170045856E /* CBLDatabase.cc */; };
-		271C2A7521CC4BD60045856E /* Util.hh in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A7321CC4BD60045856E /* Util.hh */; };
-		271C2A7621CC4BD60045856E /* Util.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7421CC4BD60045856E /* Util.cc */; };
+		271C2A7621CC4BD60045856E /* Internal.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7421CC4BD60045856E /* Internal.cc */; };
 		271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */ = {isa = PBXBuildFile; fileRef = 271C2A7721CC750E0045856E /* CBLDocument.cc */; };
 		2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */; };
 		2736A635242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */; };
@@ -36,14 +34,16 @@
 		275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
 		275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
 		275B35A1234D0ADC00FE9CF0 /* names_100.json in Resources */ = {isa = PBXBuildFile; fileRef = 275B35A0234D0A9F00FE9CF0 /* names_100.json */; };
-		275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4DD2201323700DBE7D2 /* CBLBlob.cc */; };
+		275BC4DE2201323700DBE7D2 /* CBLBlob_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4DD2201323700DBE7D2 /* CBLBlob_CAPI.cc */; };
 		275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
+		276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */; };
+		276634192605338300B9BD36 /* CBLDocument_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 276634182605338300B9BD36 /* CBLDocument_CAPI.cc */; };
 		277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; };
 		277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B77D4245B44E900B222D3 /* CBLLog.cc */; };
 		277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
 		277CC9C022BC4E2E00B245CB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 		277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */; };
-		277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */; };
+		277FEE7521ED3C4900B60E3C /* CBLReplicator_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277FEE7421ED3C4900B60E3C /* CBLReplicator_CAPI.cc */; };
 		277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */; };
 		27886C8D21F64C1400069BEA /* Listener.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27886C8B21F64C1400069BEA /* Listener.hh */; };
 		27886C8E21F64C1400069BEA /* Listener.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27886C8C21F64C1400069BEA /* Listener.cc */; };
@@ -66,7 +66,7 @@
 		27984E362249A247000FE777 /* Query.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4F21E6AB1100B60E3C /* Query.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E372249A247000FE777 /* Replicator.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27C9B5F121F7D74A0040BC45 /* Replicator.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27984E3F2249A85E000FE777 /* CouchbaseLite_Umbrella.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery.cc */; };
+		27B61D5621D5ABA60027CCDB /* CBLQuery_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */; };
 		27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61D6821D6B60D0027CCDB /* CBLTest.hh */; };
 		27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
 		27B61D7F21D6B6900027CCDB /* dylib_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D7E21D6B6900027CCDB /* dylib_main.cc */; };
@@ -82,7 +82,7 @@
 		27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */; };
 		27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */; };
 		27DBD095246C9573002FD7A7 /* LibC++Debug.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */; };
-		27DBD098246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27DBD097246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm */; };
+		27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */; };
 		27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
@@ -289,7 +289,7 @@
 		2716F8F5247D9D6700BE21D9 /* exports */ = {isa = PBXFileReference; lastKnownFileType = folder; path = exports; sourceTree = "<group>"; };
 		271A988E243BF278008C032D /* CBLURLEndpointListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLURLEndpointListener.h; sourceTree = "<group>"; };
 		271A989C243BFCDA008C032D /* CBLCertificate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLCertificate.h; sourceTree = "<group>"; };
-		271A989D243BFDBF008C032D /* CBLURLEndpointListener.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLURLEndpointListener.cc; sourceTree = "<group>"; };
+		271A989D243BFDBF008C032D /* CBLURLEndpointListener_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLURLEndpointListener_Internal.hh; sourceTree = "<group>"; };
 		271A98AF243FDF55008C032D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libCouchbaseLiteC-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		271C2A2C21CAC98F0045856E /* CBLReplicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLReplicator.h; sourceTree = "<group>"; };
@@ -298,11 +298,10 @@
 		271C2A2F21CAC98F0045856E /* CBLDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLDatabase.h; sourceTree = "<group>"; };
 		271C2A3021CAC98F0045856E /* CBLQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLQuery.h; sourceTree = "<group>"; };
 		271C2A3821CAD5950045856E /* LiteCore.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LiteCore.xcodeproj; path = "couchbase-lite-core/Xcode/LiteCore.xcodeproj"; sourceTree = "<group>"; };
-		271C2A6E21CAD5B30045856E /* CBLBase.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBase.cc; sourceTree = "<group>"; };
+		271C2A6E21CAD5B30045856E /* CBLBase_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBase_CAPI.cc; sourceTree = "<group>"; };
 		271C2A7021CAD6440045856E /* CBL_Compat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBL_Compat.h; sourceTree = "<group>"; };
 		271C2A7121CADB170045856E /* CBLDatabase.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDatabase.cc; sourceTree = "<group>"; };
-		271C2A7321CC4BD60045856E /* Util.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Util.hh; sourceTree = "<group>"; };
-		271C2A7421CC4BD60045856E /* Util.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Util.cc; sourceTree = "<group>"; };
+		271C2A7421CC4BD60045856E /* Internal.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Internal.cc; sourceTree = "<group>"; };
 		271C2A7721CC750E0045856E /* CBLDocument.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDocument.cc; sourceTree = "<group>"; };
 		271C2A7921CC756A0045856E /* Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Internal.hh; sourceTree = "<group>"; };
 		27310FD7235F686D0046F8C8 /* CBL_Framework_Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework_Debug.xcconfig; sourceTree = "<group>"; };
@@ -318,11 +317,13 @@
 		275B359D234D064600FE9CF0 /* QueryTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = QueryTest.cc; sourceTree = "<group>"; };
 		275B35A0234D0A9F00FE9CF0 /* names_100.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = names_100.json; sourceTree = "<group>"; };
 		275BC4CC22012D8700DBE7D2 /* CBLBlob.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLBlob.h; sourceTree = "<group>"; };
-		275BC4DD2201323700DBE7D2 /* CBLBlob.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBlob.cc; sourceTree = "<group>"; };
+		275BC4DD2201323700DBE7D2 /* CBLBlob_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBlob_CAPI.cc; sourceTree = "<group>"; };
 		275BC4E22204E6A800DBE7D2 /* Blob.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Blob.hh; sourceTree = "<group>"; };
 		275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlobTest_Cpp.cc; sourceTree = "<group>"; };
 		275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLBlob_Internal.hh; sourceTree = "<group>"; };
 		275FA3342236E54D001C392D /* CBLPrivate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLPrivate.h; sourceTree = "<group>"; };
+		276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDatabase_CAPI.cc; sourceTree = "<group>"; };
+		276634182605338300B9BD36 /* CBLDocument_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDocument_CAPI.cc; sourceTree = "<group>"; };
 		2779ED2722DE83A60026ACD0 /* Blob.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Blob.py; sourceTree = "<group>"; };
 		2779ED3622DE83A60026ACD0 /* Collections.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Collections.py; sourceTree = "<group>"; };
 		2779ED5022E2493F0026ACD0 /* build_python.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = build_python.sh; path = Xcode/build_python.sh; sourceTree = SOURCE_ROOT; };
@@ -335,7 +336,7 @@
 		277FEE4F21E6AB1100B60E3C /* Query.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Query.hh; sourceTree = "<group>"; };
 		277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CouchbaseLite.hh; sourceTree = "<group>"; };
 		277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DatabaseTest_Cpp.cc; sourceTree = "<group>"; };
-		277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLReplicator.cc; sourceTree = "<group>"; };
+		277FEE7421ED3C4900B60E3C /* CBLReplicator_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLReplicator_CAPI.cc; sourceTree = "<group>"; };
 		277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLReplicatorConfig.hh; sourceTree = "<group>"; };
 		277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDocument_Internal.hh; sourceTree = "<group>"; };
 		27886C8B21F64C1400069BEA /* Listener.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Listener.hh; sourceTree = "<group>"; };
@@ -347,7 +348,7 @@
 		27984E412249ACD2000FE777 /* CBL_Framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework.xcconfig; sourceTree = "<group>"; };
 		27984E482249AF44000FE777 /* CBL_Dylib_Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Dylib_Release.xcconfig; sourceTree = "<group>"; };
 		27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework_Release.xcconfig; sourceTree = "<group>"; };
-		27B61D5521D5ABA60027CCDB /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
+		27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery_CAPI.cc; sourceTree = "<group>"; };
 		27B61D6821D6B60D0027CCDB /* CBLTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTest.hh; sourceTree = "<group>"; };
 		27B61D6921D6B60D0027CCDB /* CBLTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTest.cc; sourceTree = "<group>"; };
 		27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCouchbaseLiteC.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -386,7 +387,7 @@
 		27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLQuery_Internal.hh; sourceTree = "<group>"; };
 		27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "LibC++Debug.cc"; sourceTree = "<group>"; };
 		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
-		27DBD097246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+ObjC.mm"; sourceTree = "<group>"; };
+		27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+Apple.mm"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -495,29 +496,25 @@
 		271C2A3621CAC9A50045856E /* src */ = {
 			isa = PBXGroup;
 			children = (
-				271C2A6E21CAD5B30045856E /* CBLBase.cc */,
-				275BC4DD2201323700DBE7D2 /* CBLBlob.cc */,
 				275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */,
 				271C2A7121CADB170045856E /* CBLDatabase.cc */,
 				27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */,
-				27DBD097246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm */,
+				27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */,
 				271C2A7721CC750E0045856E /* CBLDocument.cc */,
 				277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */,
 				277B77D4245B44E900B222D3 /* CBLLog.cc */,
-				27B61D5521D5ABA60027CCDB /* CBLQuery.cc */,
 				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
-				277FEE7421ED3C4900B60E3C /* CBLReplicator.cc */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
-				271A989D243BFDBF008C032D /* CBLURLEndpointListener.cc */,
+				271A989D243BFDBF008C032D /* CBLURLEndpointListener_Internal.hh */,
 				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
 				27D11BED2351043B00C58A70 /* ConflictResolver.hh */,
+				271C2A7421CC4BD60045856E /* Internal.cc */,
 				271C2A7921CC756A0045856E /* Internal.hh */,
 				27886C8C21F64C1400069BEA /* Listener.cc */,
 				27886C8B21F64C1400069BEA /* Listener.hh */,
-				271C2A7321CC4BD60045856E /* Util.hh */,
-				271C2A7421CC4BD60045856E /* Util.cc */,
 				275FA3342236E54D001C392D /* CBLPrivate.h */,
+				27229262260BD3D600A3A41F /* C Glue */,
 				27B61D7E21D6B6900027CCDB /* dylib_main.cc */,
 				2716F8F5247D9D6700BE21D9 /* exports */,
 			);
@@ -562,6 +559,19 @@
 				27B61D8121D6B8230027CCDB /* libz.tbd */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		27229262260BD3D600A3A41F /* C Glue */ = {
+			isa = PBXGroup;
+			children = (
+				271C2A6E21CAD5B30045856E /* CBLBase_CAPI.cc */,
+				275BC4DD2201323700DBE7D2 /* CBLBlob_CAPI.cc */,
+				276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */,
+				276634182605338300B9BD36 /* CBLDocument_CAPI.cc */,
+				27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */,
+				277FEE7421ED3C4900B60E3C /* CBLReplicator_CAPI.cc */,
+			);
+			name = "C Glue";
 			sourceTree = "<group>";
 		};
 		277FEE6321ED37D500B60E3C /* cbl++ */ = {
@@ -674,7 +684,6 @@
 				27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */,
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
 				271C2A3421CAC98F0045856E /* CBLDatabase.h in Headers */,
-				271C2A7521CC4BD60045856E /* Util.hh in Headers */,
 				271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */,
 				271C2A3221CAC98F0045856E /* CBLBase.h in Headers */,
 				27886C8D21F64C1400069BEA /* Listener.hh in Headers */,
@@ -1088,6 +1097,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/libFleeceBase.a",
 				"$(BUILT_PRODUCTS_DIR)/libLiteCore-static.a",
 				"$(BUILT_PRODUCTS_DIR)/libLiteCoreREST-static.a",
 				"$(BUILT_PRODUCTS_DIR)/libLiteCoreWebSocket.a",
@@ -1111,18 +1121,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
-				271C2A7621CC4BD60045856E /* Util.cc in Sources */,
-				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
-				271C2A6F21CAD5B30045856E /* CBLBase.cc in Sources */,
-				27DBD098246C9DE7002FD7A7 /* CBLDatabase+ObjC.mm in Sources */,
-				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
-				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
-				275BC4DE2201323700DBE7D2 /* CBLBlob.cc in Sources */,
-				27B61D5621D5ABA60027CCDB /* CBLQuery.cc in Sources */,
+				271C2A6F21CAD5B30045856E /* CBLBase_CAPI.cc in Sources */,
 				277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */,
-				271A989E243BFDBF008C032D /* CBLURLEndpointListener.cc in Sources */,
-				277FEE7521ED3C4900B60E3C /* CBLReplicator.cc in Sources */,
+				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
+				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
+				27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */,
+				275BC4DE2201323700DBE7D2 /* CBLBlob_CAPI.cc in Sources */,
+				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
+				276634192605338300B9BD36 /* CBLDocument_CAPI.cc in Sources */,
+				27B61D5621D5ABA60027CCDB /* CBLQuery_CAPI.cc in Sources */,
+				277FEE7521ED3C4900B60E3C /* CBLReplicator_CAPI.cc in Sources */,
+				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
+				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
+				271C2A7621CC4BD60045856E /* Internal.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

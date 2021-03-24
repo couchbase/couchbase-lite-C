@@ -97,6 +97,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Delete Unsaved Doc") {
     MutableDocument doc("foo");
+    ExpectingExceptions x;
     CBLError error;
     REQUIRE(!CBLDatabase_DeleteDocumentWithConcurrencyControl(db.ref(), doc.ref(), kCBLConcurrencyControlLastWriteWins, &error));
     CHECK(error.domain == CBLDomain);

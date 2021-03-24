@@ -64,7 +64,7 @@ add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
 ### SOURCE FILES:
 
 include_directories("vendor/couchbase-lite-core/C/include"
-                    "vendor/couchbase-lite-core/LiteCore/C"
+                    "vendor/couchbase-lite-core/C/Cpp_include"
                     "vendor/couchbase-lite-core/LiteCore/Support"
                     "vendor/couchbase-lite-core/vendor/fleece/API"
                     "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support")
@@ -78,16 +78,18 @@ endif()
 set_platform_source_files(RESULT PLATFORM_SRC)
 set(
     ALL_SRC_FILES
-    src/CBLBase.cc
-    src/CBLBlob.cc
+    src/CBLBase_CAPI.cc
+    src/CBLBlob_CAPI.cc
     src/CBLDatabase.cc
+    src/CBLDatabase_CAPI.cc
     src/CBLDocument.cc
+    src/CBLDocument_CAPI.cc
     src/CBLLog.cc
-    src/CBLQuery.cc
-    src/CBLReplicator.cc
+    src/CBLQuery_CAPI.cc
+    src/CBLReplicator_CAPI.cc
     src/ConflictResolver.cc
+    src/Internal.cc
     src/Listener.cc
-    src/Util.cc
     ${PLATFORM_SRC}
 )
 
@@ -95,20 +97,13 @@ add_library(CouchbaseLiteCStatic STATIC ${ALL_SRC_FILES})
 target_include_directories(CouchbaseLiteCStatic PUBLIC include/cbl)
 set_platform_include_directories(RESULT PLATFORM_INCLUDE)
 target_include_directories(
-    CouchbaseLiteCStatic
+    CouchbaseLiteCStatic 
     PRIVATE
     src
     vendor/couchbase-lite-core/C
     ${PROJECT_BINARY_DIR}/include/cbl/
     ${PLATFORM_INCLUDE}
 )
-
-# Disable C++ exceptions, since CBL-C doesn't use them:
-if(MSVC)
-    target_compile_options(CouchbaseLiteCStatic PRIVATE "/EHs-c-")
-else()
-    target_compile_options(CouchbaseLiteCStatic PRIVATE "-fno-exceptions")
-endif()
 
 target_link_libraries(
     CouchbaseLiteCStatic INTERFACE
@@ -140,7 +135,7 @@ set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
     # C/C++ atomic operations on ARM6/7 emit calls to functions in libatomic
-    set(CBL_LIBRARIES_PRIVATE ${CBL_LIBRARIES_PRIVATE}
+    set(CBL_LIBRARIES_PRIVATE ${CBL_LIBRARIES_PRIVATE} 
                               atomic)
 endif()
 

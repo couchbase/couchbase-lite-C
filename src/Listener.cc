@@ -17,7 +17,6 @@
 //
 
 #include "Listener.hh"
-#include "CBLDatabase.h"
 
 using namespace std;
 
@@ -38,7 +37,7 @@ NotificationQueue::NotificationQueue(CBLDatabase *database _cbl_nonnull)
 { }
 
 void NotificationQueue::setCallback(CBLNotificationsReadyCallback callback, void *context) {
-    auto pending = _state.use<Notifications>([&](State &state) {
+    auto pending = _state.useLocked<Notifications>([&](State &state) {
         state.callback = callback;
         state.context = context;
         return callback ? nullptr : move(state.queue);
@@ -52,13 +51,11 @@ void NotificationQueue::add(Notification notification) {
     CBLNotificationsReadyCallback readyCallback = nullptr;
     void* readyContext;
 
-    _state.use([&](State &state) {
+    _state.useLocked([&](State &state) {
         if (state.callback) {
             bool first = !state.queue;
-            if (first) {
-                state.queue.reset( new (nothrow) vector<Notification> );
-                postcondition(state.queue);
-            }
+            if (first)
+                state.queue.reset( new vector<Notification> );
             state.queue->push_back(notification);
             if (first) {
                 readyCallback = state.callback;
@@ -77,9 +74,7 @@ void NotificationQueue::add(Notification notification) {
 
 
 void NotificationQueue::notifyAll() {
-    auto queue = _state.use<Notifications>([&](State &state) {
-        return move(state.queue);
-    });
+    auto queue = move(_state.useLocked()->queue);
     call(queue);
 }
 

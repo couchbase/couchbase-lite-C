@@ -20,49 +20,48 @@
 #include "CBLPrivate.h"
 #include "Internal.hh"
 #include "Listener.hh"
-#include "Util.hh"
 #include <iostream>
 
 
 static_assert(sizeof(CBLError) == sizeof(C4Error));
 
 
-FLSliceResult CBLError_Message(const CBLError* error _cbl_nonnull) CBLAPI {
+FLSliceResult CBLError_Message(const CBLError* error _cbl_nonnull) noexcept {
     return c4error_getMessage(internal(*error));
 }
 
 
-void CBLError_SetCaptureBacktraces(bool capture) CBLAPI {
-    c4error_setCaptureBacktraces(capture);
+void CBLError_SetCaptureBacktraces(bool capture) noexcept {
+    C4Error::setCaptureBacktraces(capture);
 }
 
-bool CBLError_GetCaptureBacktraces(void) CBLAPI {
-    return c4error_getCaptureBacktraces();
+bool CBLError_GetCaptureBacktraces(void) noexcept {
+    return C4Error::getCaptureBacktraces();
 }
 
 
 
-CBLTimestamp CBL_Now(void) CBLAPI {
+CBLTimestamp CBL_Now(void) noexcept {
     return c4_now();
 }
 
 
-CBLRefCounted* CBL_Retain(CBLRefCounted *self) CBLAPI {
+CBLRefCounted* CBL_Retain(CBLRefCounted *self) noexcept {
     return retain(self);
 }
 
 
-void CBL_Release(CBLRefCounted *self) CBLAPI {
+void CBL_Release(CBLRefCounted *self) noexcept {
     release(self);
 }
 
 
-unsigned CBL_InstanceCount() CBLAPI {
+unsigned CBL_InstanceCount() noexcept {
     return fleece::InstanceCounted::count();
 }
 
 
-void CBL_DumpInstances(void) CBLAPI {
+void CBL_DumpInstances(void) noexcept {
 #if INSTANCECOUNTED_TRACK
     fleece::InstanceCounted::dumpInstances();
 #else
@@ -71,16 +70,9 @@ void CBL_DumpInstances(void) CBLAPI {
 }
 
 
-void CBLListener_Remove(CBLListenerToken *token) CBLAPI {
+void CBLListener_Remove(CBLListenerToken *token) noexcept {
     if (token) {
         token->remove();
         release(token);
-    }
-}
-
-
-namespace cbl_internal {
-    void setAllocFailedError(CBLError *outError) {
-        c4error_return(LiteCoreDomain, kC4ErrorMemoryError, fleece::nullslice, internal(outError));
     }
 }

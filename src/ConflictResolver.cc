@@ -20,11 +20,11 @@
 #include "CBLReplicator_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "Internal.hh"
-#include "c4DocEnumerator.h"
-#include "c4.hh"
+#include "c4DocEnumerator.hh"
 #include "StringUtil.hh"
 #include "Stopwatch.hh"
 #include <string>
+#include "betterassert.hh"
 
 
 static const CBLDocument* defaultConflictResolver(void *context,
@@ -68,89 +68,78 @@ namespace cbl_internal {
         _completionHandler = completionHandler;
         SyncLog(Info, "Scheduling async resolution of conflict in doc '%.*s'",
                 FMTSLICE(_docID));
-        c4_runAsyncTask([](void *context) { ((ConflictResolver*)context)->_runAsyncNow(); },
+        c4_runAsyncTask([](void *context) { ((ConflictResolver*)context)->runNow(); },
                         this);
-    }
-
-
-    void ConflictResolver::_runAsyncNow() noexcept {
-#ifdef __cpp_exceptions
-        try {
-#endif
-            runNow();
-#ifdef __cpp_exceptions
-        } catch (std::exception &x) {
-            errorFromException(&x, "Conflict resolution");
-        } catch (...) {
-            errorFromException(nullptr, "Conflict resolution");
-        }
-#endif
-        _completionHandler(this);       // the handler will most likely delete me
     }
 
 
     // Performs conflict resolution. Returns true on success, false on failure. Sets _error.
     bool ConflictResolver::runNow() {
-        bool ok, inConflict;
+        bool ok, inConflict = false;
         int retryCount = 0;
-        do {
-            // Create a CBLDocument that reflects the conflict revision:
-            auto conflict = _db->getMutableDocument(_docID, &_error);
-            if (!conflict)
-                return false;
-            if (!conflict->exists()) {
-                SyncLog(Info, "Doc '%.*s' no longer exists, no conflict to resolve",
-                        FMTSLICE(_docID));
-                return true;
-            }
+        try {
+            do {
+                // Create a CBLDocument that reflects the conflict revision:
+                auto conflict = _db->getMutableDocument(_docID);
+                if (!conflict) {
+                    SyncLog(Info, "Doc '%.*s' no longer exists, no conflict to resolve",
+                            FMTSLICE(_docID));
+                    return true;
+                }
 
-            if (_revID) {
-                ok = conflict->selectRevision(_revID) &&
-                     (conflict->revisionFlags() & (kRevLeaf|kRevIsConflict)) ==
-                                                  (kRevLeaf|kRevIsConflict);
-            } else {
-                ok = conflict->selectNextConflictingRevision();
-                _revID = conflict->revisionID();
-            }
-            if (!ok) {
-                // Revision is gone or not a leaf: Conflict must be resolved, so stop
-                SyncLog(Info, "Conflict in doc '%.*s' already resolved, nothing to do",
-                        FMTSLICE(_docID));
-                return true;
-            }
+                if (_revID) {
+                    ok = conflict->selectRevision(_revID) &&
+                         (conflict->revisionFlags() & (kRevLeaf|kRevIsConflict)) ==
+                                                      (kRevLeaf|kRevIsConflict);
+                } else {
+                    ok = conflict->selectNextConflictingRevision();
+                    _revID = conflict->revisionID();
+                }
+                if (!ok) {
+                    // Revision is gone or not a leaf: Conflict must be resolved, so stop
+                    SyncLog(Info, "Conflict in doc '%.*s' already resolved, nothing to do",
+                            FMTSLICE(_docID));
+                    return true;
+                }
 
-            // Now resolve the conflict:
-            if (_clientResolver)
-                ok = customResolve(conflict);
-            else
-                ok = conflict->resolveConflict(CBLDocument::Resolution::useLocal, nullptr, &_error);
+                // Now resolve the conflict:
+                if (_clientResolver)
+                    ok = customResolve(conflict);
+                else
+                    ok = conflict->resolveConflict(CBLDocument::Resolution::useLocal, nullptr);
 
-            if (ok) {
-                _revID = conflict->revisionID();
-                _flags = conflict->revisionFlags();
-            }
-
-            // If a local revision is saved at the same time we'll fail with a conflict, so retry:
-            inConflict = (!ok && internal(_error) == C4Error{LiteCoreDomain, kC4ErrorConflict}
-                              && ++retryCount < 10);
-            if (inConflict) {
-                SyncLog(Warning, "%s conflict resolution of doc '%.*s' conflicted with newer saved"
-                        " revision; retrying...",
-                        (_clientResolver ? "Custom" : "Default"), FMTSLICE(_docID));
-            }
-        } while (inConflict);
+                if (ok) {
+                    _revID = conflict->revisionID();
+                    _flags = conflict->revisionFlags();
+                } else {
+                    _error = external(C4Error::make(LiteCoreDomain, kC4ErrorConflict));
+                    // If a local revision is saved at the same time we'll fail with a conflict, so retry:
+                    inConflict = (++retryCount < 10);
+                    if (inConflict) {
+                        SyncLog(Warning, "%s conflict resolution of doc '%.*s' conflicted with newer saved"
+                                " revision; retrying...",
+                                (_clientResolver ? "Custom" : "Default"), FMTSLICE(_docID));
+                    }
+                }
+            } while (inConflict);
+        } catch (...) {
+            C4Error::fromCurrentException(internal(&_error));
+            ok = false;
+        }
 
         if (ok) {
             SyncLog(Info, "Successfully resolved and saved doc '%.*s'", FMTSLICE(_docID));
             _error = {};
         } else {
-            alloc_slice backtrace = c4error_getBacktrace(internal(_error));
-            SyncLog(Error, "%s conflict resolution of doc '%.*s' failed: %s\n%.*s",
+            SyncLog(Error, "%s conflict resolution of doc '%.*s' failed: %s\n%s",
                     (_clientResolver ? "Custom" : "Default"),
                     FMTSLICE(_docID),
-                    c4error_descriptionStr(internal(_error)),
-                    FMTSLICE(backtrace));
+                    internal(_error).description().c_str(),
+                    internal(_error).backtrace().c_str());
         }
+        
+        if (_completionHandler)
+            _completionHandler(this);       // the handler will most likely delete me
         return ok;
     }
 
@@ -160,31 +149,21 @@ namespace cbl_internal {
         CBLDocument *otherDoc = conflict;
         if (otherDoc->revisionFlags() & kRevDeleted)
             otherDoc = nullptr;
-        auto myDoc = _db->getDocument(_docID, true, &_error);
-        if (!myDoc)
-            return false;
-        if (myDoc->revisionFlags() & kRevDeleted)
+        auto myDoc = _db->getDocument(_docID, true);
+        if (myDoc && myDoc->revisionFlags() & kRevDeleted)
             myDoc = nullptr;
 
         // Call the custom resolver (this could take a long time to return)
         SyncLog(Verbose, "Calling custom conflict resolver for doc '%.*s' ...",
                 FMTSLICE(_docID));
         Stopwatch st;
-        const CBLDocument *resolved;
-
-#ifdef __cpp_exceptions
+        RetainedConst<CBLDocument> resolved;
         try {
-#endif
-            resolved = _clientResolver(_clientResolverContext, _docID, myDoc, otherDoc);
-#ifdef __cpp_exceptions
-        } catch (std::exception &x) {
-            errorFromException(&x, "Custom conflict resolver");
-            return false;
+            resolved = adopt(_clientResolver(_clientResolverContext, _docID, myDoc, otherDoc));
         } catch (...) {
-            errorFromException(nullptr, "Custom conflict resolver");
-            return false;
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnexpectedError,
+                           "Custom conflict handler threw an exception");
         }
-#endif
         SyncLog(Info, "Custom conflict resolver for '%.*s' took %.0fms",
                 FMTSLICE(_docID), st.elapsedMS());
 
@@ -197,28 +176,25 @@ namespace cbl_internal {
             resolution = CBLDocument::Resolution::useRemote;
             resolved = nullptr;
         } else {
-            resolution = CBLDocument::Resolution::useMerge;
             if (resolved) {
                 // Sanity check the resolved document:
                 if (resolved->database() && resolved->database() != _db) {
-                    c4error_return(LiteCoreDomain, kC4ErrorInvalidParameter,
+                    C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
                                    "CBLDocument returned from custom conflict resolver belongs to"
-                                   " wrong database"_sl, internal(&_error));
-                    return false;
+                                   " wrong database");
                 }
                 if (resolved->docID() != _docID) {
-                    SyncLog(Warning, "CBLDocument returned from custom conflict resolver has wrong"
-                            " docID `%.*s` (should be %.*s)",
-                            FMTSLICE(resolved->docID()), FMTSLICE(_docID));
+                    C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                                   "CBLDocument returned from custom conflict resolver has wrong"
+                                   " docID `%.*s` (should be %.*s)",
+                                   FMTSLICE(resolved->docID()), FMTSLICE(_docID));
                 }
             }
+            resolution = CBLDocument::Resolution::useMerge;
         }
 
         // Actually resolve the conflict & save the document:
-        bool ok = conflict->resolveConflict(resolution, resolved, &_error);
-
-        CBLDocument_Release(resolved);
-        return ok;
+        return conflict->resolveConflict(resolution, resolved);
     }
 
 
@@ -234,17 +210,6 @@ namespace cbl_internal {
     }
 
 
-    void ConflictResolver::errorFromException(const std::exception *x, const char *what) {
-        string message = what;
-        if (x)
-            (message += " threw an exception: ") += x->what();
-        else
-            message += " threw an unknown exception";
-        SyncLog(Error, "%s", message.c_str());
-        c4error_return(LiteCoreDomain, kC4ErrorUnexpectedError, slice(message), internal(&_error));
-    }
-
-
 #pragma mark - ALL CONFLICTS RESOLVER:
 
 
@@ -257,31 +222,21 @@ namespace cbl_internal {
 
 
     void AllConflictsResolver::runNow() {
-        C4DocumentEnded doc;
-        C4Error c4err;
-        alloc_slice docID;
-        while (nullslice != (docID = next(doc, &c4err))) {
+        while (next()) {
+            alloc_slice docID = _enum->documentInfo().docID;
             ConflictResolver resolver(_db, _clientResolver, _clientResolverContext, docID);
             resolver.runNow();
         }
     }
 
 
-    alloc_slice AllConflictsResolver::next(C4DocumentEnded &doc, C4Error *c4err) {
-        return _db->use<alloc_slice>([&](C4Database *c4db) -> alloc_slice {
+    bool AllConflictsResolver::next() {
+        return _db->useLocked<bool>([&](C4Database *c4db) {
             if (!_enum) {
-                C4EnumeratorOptions options = { 0 };  // i.e. without kC4IncludeNonConflicted
-                _enum = c4db_enumerateAllDocs(c4db, &options, c4err);
-                if (!_enum)
-                    return nullslice;
+                // Flags value of 0 means without kC4IncludeNonConflicted, i.e. only conflicted.
+                _enum = make_unique<C4DocEnumerator>(c4db, C4EnumeratorOptions{ 0 });
             }
-
-            if (!c4enum_next(_enum, c4err))
-                return nullslice;
-
-            C4DocumentInfo info;
-            c4enum_getDocumentInfo(_enum, &info);
-            return info.docID;
+            return _enum->next();
         });
     }
 

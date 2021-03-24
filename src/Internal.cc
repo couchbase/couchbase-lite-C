@@ -1,5 +1,5 @@
 //
-// Util.cc
+// Internal.cc
 //
 // Copyright © 2018 Couchbase. All rights reserved.
 //
@@ -16,27 +16,31 @@
 // limitations under the License.
 //
 
-#include "Util.hh"
+#include "Internal.hh"
+#include "c4Base.hh"
 #include "fleece/Fleece.h"
 
 using namespace fleece;
 
 namespace cbl_internal {
 
-    alloc_slice convertJSON5(slice json5, C4Error *outError) {
+    void BridgeException(const char *fnName, CBLError *outError) noexcept {
+        C4Error error = C4Error::fromCurrentException();
+        if (outError)
+            *outError = external(error);
+        else
+            C4WarnError("Function %s() failed: %s", fnName, error.description().c_str());
+    }
+
+    alloc_slice convertJSON5(slice json5) {
         FLStringResult errMsg;
         FLError flError;
         alloc_slice json(FLJSON5_ToJSON(json5, &errMsg, nullptr, &flError));
         if (!json) {
-            setError(outError, FleeceDomain, flError, slice(errMsg));
-            FLSliceResult_Release(errMsg);
+            alloc_slice msg(std::move(errMsg));
+            C4Error::raise(FleeceDomain, flError, "%.*s", FMTSLICE(msg));
         }
         return json;
-    }
-
-    void setError(C4Error* outError, C4ErrorDomain domain, int code, slice message) {
-        if (outError)
-            *outError = c4error_make(domain, code, message);
     }
 
 }

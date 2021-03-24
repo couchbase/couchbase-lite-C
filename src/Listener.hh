@@ -20,13 +20,13 @@
 #include "CBLDatabase.h"
 #include "Internal.hh"
 #include "InstanceCounted.hh"
-#include "Util.hh"
 #include <access_lock.hh>
 #include <atomic>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <vector>
+#include "betterassert.hh"
 
 namespace cbl_internal {
     class ListenersBase;
@@ -34,18 +34,14 @@ namespace cbl_internal {
 
 
 /** Abstract base class of listener tokens. (In the public API, as an opaque typeef.) */
-struct CBLListenerToken : public fleece::RefCounted, public fleece::InstanceCounted {
+struct CBLListenerToken : public CBLRefCounted {
 public:
     CBLListenerToken(const void *callback _cbl_nonnull, void *context)
     :_callback(callback)
     ,_context(context)
     { }
 
-    virtual ~CBLListenerToken()  { }
-
-    bool validate(CBLError*) const {
-        return true;
-    }
+    virtual ~CBLListenerToken()  =default;
 
     void addedTo(cbl_internal::ListenersBase *owner _cbl_nonnull) {
         assert(!_owner);
@@ -154,9 +150,8 @@ namespace cbl_internal {
     class Listeners : private ListenersBase {
     public:
         fleece::Retained<CBLListenerToken> add(LISTENER listener, void *context) {
-            auto t = new (std::nothrow) ListenerToken<LISTENER>(listener, context);
-            if (t)
-                add(t);
+            auto t = new ListenerToken<LISTENER>(listener, context);
+            add(t);
             return t;
         }
 

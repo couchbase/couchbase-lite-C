@@ -21,8 +21,7 @@
 #include "CBLReplicator.h"
 #include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
-#include "c4.hh"
-#include "c4Replicator.h"
+#include "c4ReplicatorTypes.h"
 #include "c4Private.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
@@ -34,12 +33,12 @@
 
 
 struct CBLEndpoint {
-    virtual ~CBLEndpoint()                                      { }
+    virtual ~CBLEndpoint()                                      =default;
     virtual bool valid() const =0;
     const C4Address& remoteAddress() const                      {return _address;}
     virtual C4String remoteDatabaseName() const =0;
 #ifdef COUCHBASE_ENTERPRISE
-    virtual C4Database* otherLocalDB() const                    {return nullptr;}
+    virtual CBLDatabase* otherLocalDB() const                   {return nullptr;}
 #endif
 
 protected:
@@ -53,7 +52,7 @@ namespace cbl_internal {
         CBLURLEndpoint(fleece::slice url)
         :_url(url)
         {
-            if (!c4address_fromURL(_url, &_address, &_dbName))
+            if (!C4Address::fromURL(_url, &_address, (fleece::slice*)&_dbName))
                 _dbName = fleece::nullslice; // mark as invalid
         }
 
@@ -74,7 +73,7 @@ namespace cbl_internal {
 
         bool valid() const override                             {return true;}
         virtual C4String remoteDatabaseName() const override    {return fleece::nullslice;}
-        virtual C4Database* otherLocalDB() const override       {return _db->_getC4Database();}
+        virtual CBLDatabase* otherLocalDB() const override      {return _db;}
 
     private:
         fleece::Retained<CBLDatabase> _db;
@@ -93,7 +92,7 @@ protected:
     using alloc_slice = fleece::alloc_slice;
 
 public:
-    virtual ~CBLAuthenticator()                                 { }
+    virtual ~CBLAuthenticator()                                 =default;
     virtual void writeOptions(Encoder&) =0;
 };
 
@@ -177,8 +176,8 @@ namespace cbl_internal {
         }
 
 
-        bool validate(CBLError *outError) const {
-            slice problem;
+        void validate() const {
+            const char *problem = nullptr;
             if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull)
                 problem = "Invalid replicator config: missing endpoints or bad type";
             else if (!endpoint->valid())
@@ -187,10 +186,8 @@ namespace cbl_internal {
                                                     !proxy->hostname.buf || !proxy->port))
                 problem = "Invalid replicator proxy settings";
 
-            if (!problem)
-                return true;
-            c4error_return(LiteCoreDomain, kC4ErrorInvalidParameter, problem, internal(outError));
-            return false;
+            if (problem)
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "%s", problem);
         }
 
 
@@ -242,8 +239,8 @@ namespace cbl_internal {
         }
 
 
-        alloc_slice _pinnedServerCert, _trustedRootCerts;
+        alloc_slice      _pinnedServerCert, _trustedRootCerts;
         CBLProxySettings _proxy;
-        alloc_slice _proxyHostname, _proxyUsername, _proxyPassword;
+        alloc_slice      _proxyHostname, _proxyUsername, _proxyPassword;
     };
 }

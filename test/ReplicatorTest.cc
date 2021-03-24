@@ -25,19 +25,22 @@ using namespace fleece;
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
-    CBLError error;
-    config.database = nullptr;
-    CHECK(!CBLReplicator_New(&config, &error));
-
-    config.database = db.ref();
-    CHECK(!CBLReplicator_New(&config, &error));
-
-    config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg:9999/foobar"_sl);
     CBLProxySettings proxy = {};
-    proxy.type = kCBLProxyHTTP;
-    config.proxy = &proxy;
-    CHECK(!CBLReplicator_New(&config, &error));
+    CBLError error;
+    {
+        ExpectingExceptions x;
 
+        config.database = nullptr;
+        CHECK(!CBLReplicator_New(&config, &error));
+
+        config.database = db.ref();
+        CHECK(!CBLReplicator_New(&config, &error));
+
+        config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg:9999/foobar"_sl);
+        proxy.type = kCBLProxyHTTP;
+        config.proxy = &proxy;
+        CHECK(!CBLReplicator_New(&config, &error));
+    }
     proxy.hostname = "localhost"_sl;
     proxy.port = 9998;
     repl = CBLReplicator_New(&config, &error);

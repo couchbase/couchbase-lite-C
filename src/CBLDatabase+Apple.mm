@@ -1,5 +1,5 @@
 //
-// CBLDatabase+ObjC.mm
+// CBLDatabase+Apple.mm
 //
 // Copyright © 2020 Couchbase. All rights reserved.
 //
