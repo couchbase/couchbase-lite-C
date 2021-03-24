@@ -48,7 +48,7 @@ public:
         if (!_listener)
             return false;
 
-        if (!c4listener_shareDB(_listener, nullslice, _db->use().get(), internal(outError))) {
+        if (!c4listener_shareDB(_listener, nullslice, _db->useLocked().get(), internal(outError))) {
             stop();
             return false;
         }
@@ -67,7 +67,7 @@ public:
     }
 
     FLMutableArray URLs() {
-        return c4listener_getURLs(_listener, _db->use().get(), kC4SyncAPI, nullptr);
+        return c4listener_getURLs(_listener, _db->useLocked().get(), kC4SyncAPI, nullptr);
     }
 
     CBLConnectionStatus status() {

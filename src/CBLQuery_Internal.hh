@@ -27,7 +27,7 @@ struct CBLQuery final : public CBLRefCounted {
 public:
 
     ~CBLQuery() {
-        _c4query.use().get() = nullptr;
+        _c4query.useLocked().get() = nullptr;
     }
 
     const CBLDatabase* database() const {
@@ -35,15 +35,15 @@ public:
     }
 
     alloc_slice explain() const {
-        return _c4query.use()->explain();
+        return _c4query.useLocked()->explain();
     }
 
     unsigned columnCount() const {
-        return _c4query.use()->columnCount();
+        return _c4query.useLocked()->columnCount();
     }
 
     slice columnName(unsigned col) const {
-        return _c4query.use()->columnTitle(col);
+        return _c4query.useLocked()->columnTitle(col);
     }
 
     Dict parameters() const {
@@ -103,7 +103,7 @@ private:
         if (!encodedParameters)
             C4Error::raise(FleeceDomain, enc.error(), "%s", enc.errorMessage());
         _parameters = encodedParameters;
-        _c4query.use()->setParameters(encodedParameters);
+        _c4query.useLocked()->setParameters(encodedParameters);
     }
 
     litecore::shared_access_lock<Retained<C4Query>> _c4query;// Thread-safe access to C4Query
@@ -197,13 +197,13 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         ,_query(query)
         {
-            query->_c4query.use([&](C4Query *c4query) {
+            query->_c4query.useLocked([&](C4Query *c4query) {
                 _c4obs = c4query->observe([this](C4QueryObserver*) { this->queryChanged(); });
             });
         }
 
         void setEnabled(bool enabled) {
-            _query->_c4query.use([&](C4Query *c4query) {
+            _query->_c4query.useLocked([&](C4Query *c4query) {
                 _c4obs->setEnabled(enabled);
             });
         }
@@ -233,9 +233,7 @@ namespace cbl_internal {
 
 
 inline Retained<CBLResultSet> CBLQuery::execute() {
-    auto qe = _c4query.use<C4Query::Enumerator>([=](C4Query *c4query) {
-        return c4query->run();
-    });
+    auto qe = _c4query.useLocked()->run();
     return retained(new CBLResultSet(this, move(qe)));
 }
 

@@ -97,7 +97,7 @@ CBLBlob* CBLBlob_NewWithStream(FLString contentType,
 
 CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError) noexcept {
     try {
-        return CBLBlobWriteStream::create(db).release();
+        return new CBLBlobWriteStream(db);
     } catchAndBridge(outError)
 }
 

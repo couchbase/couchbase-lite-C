@@ -40,7 +40,7 @@ using namespace cbl_internal;
 
 
 // Default location for databases. This is platform-dependent.
-// (The implementation for Apple platforms is in CBLDatabase+ObjC.mm)
+// (The implementation for Apple platforms is in CBLDatabase+Apple.mm)
 #ifndef __APPLE__
 std::string CBLDatabase::defaultDirectory() {
     return cbl_getcwd(nullptr, 0);
@@ -84,7 +84,7 @@ namespace cbl_internal {
         ,_db(db)
         ,_docID(docID)
         {
-            auto c4db = _db->use(); // locks DB mutex
+            auto c4db = _db->useLocked(); // locks DB mutex
             _c4obs = c4db->observeDocument(docID,
                                          [this](C4DocumentObserver*, slice docID, C4SequenceNumber)
                                          {
@@ -93,7 +93,7 @@ namespace cbl_internal {
         }
 
         ~ListenerToken() {
-            auto c4db = _db->use(); // locks DB mutex
+            auto c4db = _db->useLocked(); // locks DB mutex
             _c4obs = nullptr;
         }
 

@@ -47,7 +47,7 @@ public:
 
     virtual alloc_slice content() const                     {return blobStore()->getContents(_key);}
 
-    std::unique_ptr<CBLBlobReadStream> openContentStream() const;
+    inline std::unique_ptr<CBLBlobReadStream> openContentStream() const;
 
     alloc_slice toJSON() const {
         if (!_properties)
@@ -95,7 +95,7 @@ protected:
         auto mp = properties().asMutable();
         assert(mp != nullptr);
         mp[kCBLTypeProperty] = kCBLBlobType;
-        mp[kCBLBlobDigestProperty] = C4Blob::keyToString(_key);
+        mp[kCBLBlobDigestProperty] = key.digestString();
         mp[kCBLBlobLengthProperty] = length;
         if (contentType)
             mp[kCBLBlobContentTypeProperty] = contentType;
@@ -111,6 +111,8 @@ protected:
     }
 
 private:
+    friend struct CBLBlobReadStream;
+
     RetainedValue const _properties;
     C4BlobKey           _key;
     CBLDatabase*        _db {nullptr};
@@ -121,20 +123,20 @@ private:
 struct CBLNewBlob : public CBLBlob {
 public:
     CBLNewBlob(slice contentType, slice contents)
-    :CBLBlob(C4Blob::computeKey(contents), contents.size, contentType)
+    :CBLBlob(C4BlobKey::computeDigestOfContent(contents), contents.size, contentType)
     {
         precondition(contents);
         _content = contents;
         CBLDocument::registerNewBlob(this);
     }
 
-    CBLNewBlob(slice contentType, CBLBlobWriteStream &&writer);
+    inline CBLNewBlob(slice contentType, CBLBlobWriteStream &&writer);
 
     virtual alloc_slice content() const override {
         {
             LOCK(_mutex);
             if (_content)
-                    return _content;
+                return _content;
         }
         return CBLBlob::content();
     }
@@ -181,21 +183,34 @@ private:
 
 
 struct CBLBlobReadStream {
-    virtual size_t read(void *buffer, size_t maxBytes) =0;
-    virtual int64_t getLength() const =0;
-    virtual void seek(int64_t pos) =0;
-    virtual ~CBLBlobReadStream();
-protected:
-    CBLBlobReadStream() = default;
+    CBLBlobReadStream(const CBLBlob &blob)      :_c4stream(*blob.blobStore(), blob.key()) { }
+    size_t read(void *buffer, size_t maxBytes)  {return _c4stream.read(buffer, maxBytes);}
+    int64_t getLength() const                   {return _c4stream.getLength();}
+    void seek(int64_t pos)                      {return _c4stream.seek(pos);}
+private:
+    C4ReadStream _c4stream;
 };
 
 
 
 struct CBLBlobWriteStream {
-    static std::unique_ptr<CBLBlobWriteStream> create(CBLDatabase*);
-    virtual void write(slice) =0;
-    virtual ~CBLBlobWriteStream();
-protected:
+    CBLBlobWriteStream(CBLDatabase *db)         :_c4stream(*db->blobStore()) { }
+    void write(slice data)                      {return _c4stream.write(data);}
+private:
     friend class CBLNewBlob;
-    CBLBlobWriteStream() = default;
+    C4WriteStream _c4stream;
 };
+
+
+inline std::unique_ptr<CBLBlobReadStream> CBLBlob::openContentStream() const {
+    return std::make_unique<CBLBlobReadStream>(*this);
+}
+
+
+inline CBLNewBlob::CBLNewBlob(slice contentType, CBLBlobWriteStream &&writer)
+:CBLBlob(writer._c4stream.computeBlobKey(), writer._c4stream.bytesWritten(), contentType) {
+    _writer.emplace(std::move(writer._c4stream));
+    // Nothing more will be written, but don't install the stream until the owning document
+    // is saved and calls my install() method.
+    CBLDocument::registerNewBlob(this);
+}

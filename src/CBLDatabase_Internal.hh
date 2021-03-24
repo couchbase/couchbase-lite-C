@@ -73,33 +73,33 @@ public:
     }
 
     void performMaintenance(CBLMaintenanceType type) {
-        _c4db.use()->maintenance((C4MaintenanceType)type);
+        _c4db.useLocked()->maintenance((C4MaintenanceType)type);
     }
 
 #ifdef COUCHBASE_ENTERPRISE
     void changeEncryptionKey(const CBLEncryptionKey *newKey) {
         C4EncryptionKey c4key = asC4Key(newKey);
-        _c4db.use()->rekey(&c4key);
+        _c4db.useLocked()->rekey(&c4key);
     }
 #endif
 
-    void beginTransaction()                          {_c4db.use()->beginTransaction();}
-    void endTransaction(bool commit)                 {_c4db.use()->endTransaction(commit);}
+    void beginTransaction()                          {_c4db.useLocked()->beginTransaction();}
+    void endTransaction(bool commit)                 {_c4db.useLocked()->endTransaction(commit);}
 
-    void close()                                     {_c4db.use()->close();}
-    void closeAndDelete()                            {_c4db.use()->closeAndDeleteFile();}
+    void close()                                     {_c4db.useLocked()->close();}
+    void closeAndDelete()                            {_c4db.useLocked()->closeAndDeleteFile();}
 
 
 #pragma mark - Accessors:
 
 
-    slice name() const noexcept                      {return _c4db.use()->getName();}
-    alloc_slice path() const                         {return _c4db.use()->path();}
+    slice name() const noexcept                      {return _c4db.useLocked()->getName();}
+    alloc_slice path() const                         {return _c4db.useLocked()->path();}
     CBLDatabaseConfiguration config() const noexcept {return {_dir, nullptr};}
     C4BlobStore* blobStore() const                   {return _blobStore;}
 
-    uint64_t count() const                           {return _c4db.use()->getDocumentCount();}
-    uint64_t lastSequence() const                    {return _c4db.use()->getLastSequence();}
+    uint64_t count() const                           {return _c4db.useLocked()->getDocumentCount();}
+    uint64_t lastSequence() const                    {return _c4db.useLocked()->getLastSequence();}
 
 
 #pragma mark - Documents:
@@ -122,30 +122,27 @@ public:
     }
 
     bool deleteDocument(slice docID) {
-        return _c4db.use<bool>([&](C4Database *c4db) {
-            C4Database::Transaction t(c4db);
-            Retained<C4Document> c4doc = c4db->getDocument(docID, false, kDocGetCurrentRev);
-            if (c4doc)
-                c4doc = c4doc->update(nullslice, kRevDeleted);
-            if (!c4doc)
-                return false;
-            t.commit();
-            return true;
-        });
+        auto c4db = _c4db.useLocked();
+        C4Database::Transaction t(c4db);
+        Retained<C4Document> c4doc = c4db->getDocument(docID, false, kDocGetCurrentRev);
+        if (c4doc)
+            c4doc = c4doc->update(nullslice, kRevDeleted);
+        if (!c4doc)
+            return false;
+        t.commit();
+        return true;
     }
 
     bool purgeDocument(slice docID) {
-        return _c4db.use<bool>([&](C4Database *c4db) {
-            return c4db->purgeDoc(docID);
-        });
+        return _c4db.useLocked()->purgeDoc(docID);
     }
 
     CBLTimestamp getDocumentExpiration(slice docID) {
-        return _c4db.use()->getExpiration(docID);
+        return _c4db.useLocked()->getExpiration(docID);
     }
 
     void setDocumentExpiration(slice docID, CBLTimestamp expiration) {
-        auto c4db = _c4db.use();
+        auto c4db = _c4db.useLocked();
         c4db->setExpiration(docID, expiration);
         if (expiration > 0)
             c4db->startHousekeeping();
@@ -164,7 +161,7 @@ public:
             json = convertJSON5(queryString); // allow JSON5 as a convenience
             queryString = json;
         }
-        auto c4query = _c4db.use()->newQuery((C4QueryLanguage)language, queryString, outErrPos);
+        auto c4query = _c4db.useLocked()->newQuery((C4QueryLanguage)language, queryString, outErrPos);
         if (!c4query)
             return nullptr;
         return new CBLQuery(this, std::move(c4query), _c4db);
@@ -178,18 +175,18 @@ public:
             languageStr = std::string(spec.language);
             options.language = languageStr.c_str();
         }
-        _c4db.use()->createIndex(name,
+        _c4db.useLocked()->createIndex(name,
                                  spec.keyExpressionsJSON,
                                  (C4IndexType)spec.type,
                                  &options);
     }
 
     void deleteIndex(slice name) {
-        _c4db.use()->deleteIndex(name);
+        _c4db.useLocked()->deleteIndex(name);
     }
 
     fleece::MutableArray indexNames() {
-        Doc doc(_c4db.use()->getIndexesInfo());
+        Doc doc(_c4db.useLocked()->getIndexesInfo());
         auto indexes = fleece::MutableArray::newArray();
         for (Array::iterator i(doc.root().asArray()); i; ++i) {
             Dict info = i.value().asDict();
@@ -246,11 +243,11 @@ protected:
 
     void notify(Notification n) const   {const_cast<CBLDatabase*>(this)->_notificationQueue.add(n);}
 
-    auto use()                  { return _c4db.use(); }
+    auto useLocked()                  { return _c4db.useLocked(); }
     template <class LAMBDA>
-    void use(LAMBDA callback)   { _c4db.use(callback); }
+    void useLocked(LAMBDA callback)   { _c4db.useLocked(callback); }
     template <class RESULT, class LAMBDA>
-    RESULT use(LAMBDA callback) { return _c4db.use<RESULT>(callback); }
+    RESULT useLocked(LAMBDA callback) { return _c4db.useLocked<RESULT>(callback); }
 
 private:
     CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
@@ -261,7 +258,7 @@ private:
     { }
 
     virtual ~CBLDatabase() {
-        _c4db.use([&](Retained<C4Database> &c4db) {
+        _c4db.useLocked([&](Retained<C4Database> &c4db) {
             _docListeners.clear();
             _observer = nullptr;
         });
@@ -310,14 +307,14 @@ private:
 
     Retained<CBLDocument> _getDocument(slice docID, bool isMutable, bool allRevisions) const {
         C4DocContentLevel content = (allRevisions ? kDocGetAll : kDocGetCurrentRev);
-        Retained<C4Document> c4doc = _c4db.use()->getDocument(docID, true, content);
+        Retained<C4Document> c4doc = _c4db.useLocked()->getDocument(docID, true, content);
         if (!c4doc || (!allRevisions && (c4doc->flags() & kDocDeleted)))
             return nullptr;
         return new CBLDocument(docID, const_cast<CBLDatabase*>(this), c4doc, isMutable);
     }
 
     Retained<CBLListenerToken> addListener(fleece::function_ref<Retained<CBLListenerToken>()> cb) {
-        auto c4db = _c4db.use(); // locks DB mutex, so the callback can run thread-safe
+        auto c4db = _c4db.useLocked(); // locks DB mutex, so the callback can run thread-safe
         Retained<CBLListenerToken> token = cb();
         if (!_observer)
             _observer = c4db->observe([this](C4DatabaseObserver*) { this->databaseChanged(); });

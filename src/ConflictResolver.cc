@@ -230,7 +230,7 @@ namespace cbl_internal {
 
 
     bool AllConflictsResolver::next() {
-        return _db->use<bool>([&](C4Database *c4db) {
+        return _db->useLocked<bool>([&](C4Database *c4db) {
             if (!_enum) {
                 // Flags value of 0 means without kC4IncludeNonConflicted, i.e. only conflicted.
                 _enum = make_unique<C4DocEnumerator>(c4db, C4EnumeratorOptions{ 0 });

@@ -41,11 +41,11 @@ public:
     CBLDocument(const CBLDocument* otherDoc)
     :CBLDocument(otherDoc->_docID,
                  otherDoc->_db,
-                 const_cast<C4Document*>(otherDoc->_c4doc.use().get()),
+                 const_cast<C4Document*>(otherDoc->_c4doc.useLocked().get()),
                  true)
     {
         if (otherDoc->isMutable()) {
-            auto other = otherDoc->_c4doc.use();
+            auto other = otherDoc->_c4doc.useLocked();
             if (otherDoc->_properties)
                 _properties = otherDoc->_properties.asDict().mutableCopy(kFLDeepCopyImmutables);
         }
@@ -75,19 +75,19 @@ public:
 
 
     CBLDatabase* database() const               {return _db;}
-    bool exists() const                         {return _c4doc.use().get() != nullptr;}
+    bool exists() const                         {return _c4doc.useLocked().get() != nullptr;}
     bool isMutable() const                      {return _mutable;}
     slice docID() const                         {return _docID;}
     slice revisionID() const                    {return _revID;}
 
     uint64_t sequence() const {
-        auto c4doc = _c4doc.use();
+        auto c4doc = _c4doc.useLocked();
         return c4doc ? c4doc->sequence() : 0;
     }
 
 
     alloc_slice canonicalRevisionID() const {
-        auto c4doc = _c4doc.use();
+        auto c4doc = _c4doc.useLocked();
         if (!c4doc)
             return fleece::nullslice;
         const_cast<C4Document*>(c4doc.get())->selectCurrentRevision();
@@ -96,7 +96,7 @@ public:
 
 
     C4RevisionFlags revisionFlags() const {
-        auto c4doc = _c4doc.use();
+        auto c4doc = _c4doc.useLocked();
         return c4doc ? c4doc->selectedRev().flags : (kRevNew | kRevLeaf);
     }
 
@@ -106,7 +106,7 @@ public:
 
     Dict properties() const {
         //TODO: Convert this to use C4Document::getProperties()
-        auto c4doc = _c4doc.use();
+        auto c4doc = _c4doc.useLocked();
         if (!_properties) {
             slice storage;
             if (_fromJSON)
@@ -143,7 +143,7 @@ public:
 
 
     alloc_slice propertiesAsJSON() const {
-        auto c4doc = _c4doc.use();
+        auto c4doc = _c4doc.useLocked();
         if (!_mutable && c4doc)
             return c4doc->bodyAsJSON(false);        // fast path
         else
@@ -156,7 +156,7 @@ public:
         Doc fromJSON = Doc::fromJSON(json);
         if (!fromJSON)
             C4Error::raise(FleeceDomain, kFLJSONError, "Invalid JSON");
-        auto c4doc = _c4doc.use(); // lock mutex
+        auto c4doc = _c4doc.useLocked(); // lock mutex
         // Store the transcoded Fleece and clear _properties. If app accesses properties(),
         // it'll get a mutable version of this.
         _fromJSON = fromJSON;
@@ -195,7 +195,7 @@ public:
 
     // Select a specific revision. Only works if constructed with allRevisions=true.
     bool selectRevision(slice revID) {
-        auto c4doc = _c4doc.use();
+        auto c4doc = _c4doc.useLocked();
         if (!c4doc || !c4doc->selectRevision(revID, true))
             return false;
         _revID = revID;
@@ -207,7 +207,7 @@ public:
 
     // Select a conflicting revision. Only works if constructed with allRevisions=true.
     bool selectNextConflictingRevision() {
-        auto c4doc = _c4doc.use();
+        auto c4doc = _c4doc.useLocked();
         if (!c4doc)
             return false;
         _properties = nullptr;

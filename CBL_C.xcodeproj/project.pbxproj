@@ -20,7 +20,6 @@
 		2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */; };
 		2736A635242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */; };
 		273CE7E22452123400D01CA2 /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
-		2754F94B2609363D0081E787 /* CBLBlob.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2754F94A2609363D0081E787 /* CBLBlob.cc */; };
 		275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 275B3567234810C400FE9CF0 /* Foundation.framework */; };
 		275B358723481AE700FE9CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 275B3567234810C400FE9CF0 /* Foundation.framework */; };
 		275B358923481D0C00FE9CF0 /* CBLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D6921D6B60D0027CCDB /* CBLTest.cc */; };
@@ -310,7 +309,6 @@
 		2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorEETest.cc; sourceTree = "<group>"; };
 		273CD2D025E81C8F00B93C59 /* cmake */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cmake; sourceTree = "<group>"; };
 		274BAB9D24DA2DB900F4F810 /* generate_exports.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_exports.sh; sourceTree = "<group>"; };
-		2754F94A2609363D0081E787 /* CBLBlob.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBlob.cc; sourceTree = "<group>"; };
 		275B3567234810C400FE9CF0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CouchbaseLiteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		275B358823481C5200FE9CF0 /* XCTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = XCTests.xcconfig; sourceTree = "<group>"; };
@@ -498,7 +496,6 @@
 		271C2A3621CAC9A50045856E /* src */ = {
 			isa = PBXGroup;
 			children = (
-				2754F94A2609363D0081E787 /* CBLBlob.cc */,
 				275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */,
 				271C2A7121CADB170045856E /* CBLDatabase.cc */,
 				27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */,
@@ -517,12 +514,7 @@
 				27886C8C21F64C1400069BEA /* Listener.cc */,
 				27886C8B21F64C1400069BEA /* Listener.hh */,
 				275FA3342236E54D001C392D /* CBLPrivate.h */,
-				271C2A6E21CAD5B30045856E /* CBLBase_CAPI.cc */,
-				275BC4DD2201323700DBE7D2 /* CBLBlob_CAPI.cc */,
-				276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */,
-				276634182605338300B9BD36 /* CBLDocument_CAPI.cc */,
-				27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */,
-				277FEE7421ED3C4900B60E3C /* CBLReplicator_CAPI.cc */,
+				27229262260BD3D600A3A41F /* C Glue */,
 				27B61D7E21D6B6900027CCDB /* dylib_main.cc */,
 				2716F8F5247D9D6700BE21D9 /* exports */,
 			);
@@ -567,6 +559,19 @@
 				27B61D8121D6B8230027CCDB /* libz.tbd */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		27229262260BD3D600A3A41F /* C Glue */ = {
+			isa = PBXGroup;
+			children = (
+				271C2A6E21CAD5B30045856E /* CBLBase_CAPI.cc */,
+				275BC4DD2201323700DBE7D2 /* CBLBlob_CAPI.cc */,
+				276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */,
+				276634182605338300B9BD36 /* CBLDocument_CAPI.cc */,
+				27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */,
+				277FEE7421ED3C4900B60E3C /* CBLReplicator_CAPI.cc */,
+			);
+			name = "C Glue";
 			sourceTree = "<group>";
 		};
 		277FEE6321ED37D500B60E3C /* cbl++ */ = {
@@ -1118,7 +1123,6 @@
 			files = (
 				271C2A6F21CAD5B30045856E /* CBLBase_CAPI.cc in Sources */,
 				277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */,
-				2754F94B2609363D0081E787 /* CBLBlob.cc in Sources */,
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
 				27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */,

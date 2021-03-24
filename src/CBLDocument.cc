@@ -47,7 +47,7 @@ CBLDocument::CBLDocument(slice docID, CBLDatabase *db, C4Document *c4doc, bool i
 
 
 CBLDocument::~CBLDocument() {
-    auto c4doc = _c4doc.use();
+    auto c4doc = _c4doc.useLocked();
     if (c4doc)
         c4doc->extraInfo() = {nullptr, nullptr};
 }
@@ -57,7 +57,7 @@ CBLDocument::~CBLDocument() {
 
 
 bool CBLDocument::save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt) {
-    auto c4doc = _c4doc.use();
+    auto c4doc = _c4doc.useLocked();
 
     if (opt.deleting) {
         if (!c4doc)
@@ -68,7 +68,7 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt) {
     checkDBMatches(_db, db);
 
     Retained<C4Document> newDoc = nullptr;
-    db->use([&](C4Database *c4db) {
+    db->useLocked([&](C4Database *c4db) {
         C4Database::Transaction t(c4db);
 
         // Encode properties: 
@@ -113,7 +113,7 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt) {
                         break;
                     body = encodeBody(db, c4db, revFlags);
                     if (conflictingDoc) {
-                        savingDoc = const_cast<C4Document*>(conflictingDoc->_c4doc.use().get());
+                        savingDoc = const_cast<C4Document*>(conflictingDoc->_c4doc.useLocked().get());
                     } else {
                         savingDoc = nullptr;
                     }
@@ -145,7 +145,7 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase* _cbl_nonnull db,
                                     C4Database* _cbl_nonnull c4db,
                                     C4RevisionFlags &outRevFlags) const
 {
-    auto c4doc = _c4doc.use();
+    auto c4doc = _c4doc.useLocked();
     // Save new blobs:
     bool hasBlobs = saveBlobs(db);
     outRevFlags = hasBlobs ? kRevHasAttachments : 0;
@@ -165,7 +165,7 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase* _cbl_nonnull db,
 
 
 bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *mergeDoc) {
-    auto c4doc = _c4doc.use();
+    auto c4doc = _c4doc.useLocked();
 
     if (!c4doc)
         C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document has not been saved to a database");
@@ -177,7 +177,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *merg
     if (resolution != Resolution::useRemote)
         std::swap(winner, loser);
 
-    return _db->use<bool>([&](C4Database *c4db) {
+    return _db->useLocked<bool>([&](C4Database *c4db) {
         C4Database::Transaction t(c4db);
 
         alloc_slice mergeBody;
@@ -221,17 +221,17 @@ static UnretainedValueToBlobMap& newBlobs() {
 
 
 void CBLDocument::registerNewBlob(CBLNewBlob* blob) {
-    newBlobs().use()->insert({blob->properties(), blob});
+    newBlobs().useLocked()->insert({blob->properties(), blob});
 }
 
 
 void CBLDocument::unregisterNewBlob(CBLNewBlob* blob) {
-    newBlobs().use().get().erase(blob->properties());
+    newBlobs().useLocked().get().erase(blob->properties());
 }
 
 
 CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
-    return newBlobs().use<CBLNewBlob*>([dict](auto &newBlobs) -> CBLNewBlob* {
+    return newBlobs().useLocked<CBLNewBlob*>([dict](auto &newBlobs) -> CBLNewBlob* {
         auto i = newBlobs.find(dict);
         if (i == newBlobs.end())
             return nullptr;
@@ -241,7 +241,7 @@ CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
 
 
 CBLBlob* CBLDocument::getBlob(FLDict dict) {
-    auto c4doc = _c4doc.use();
+    auto c4doc = _c4doc.useLocked();
     // Is it already registered by a previous call to getBlob?
     if (auto i = _blobs.find(dict); i != _blobs.end())
         return i->second;
@@ -253,7 +253,7 @@ CBLBlob* CBLDocument::getBlob(FLDict dict) {
     }
 
     // Not found; is it a blob or attachment at all?
-    auto key = C4Blob::getKey(dict);
+    auto key = C4Blob::keyFromDigestProperty(dict);
     if (!key || !(C4Blob::isBlob(dict) || C4Blob::isAttachmentIn(dict, properties())))
         return nullptr;
 
@@ -269,7 +269,7 @@ bool CBLDocument::saveBlobs(CBLDatabase *db) const {
     // and also checking if there are any blobs at all (mutable or not.)
     // Once we've found at least one blob, we can skip immutable collections, because
     // they can't contain new blobs.
-    auto c4doc = _c4doc.use();
+    auto c4doc = _c4doc.useLocked();
     if (!isMutable())
         return C4Blob::dictContainsBlobs(properties());
 

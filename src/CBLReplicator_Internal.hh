@@ -107,10 +107,10 @@ public:
         params.optionsDictFleece = options;
 
         // Create the LiteCore replicator:
-        _conf.database->use([&](C4Database *c4db) {
+        _conf.database->useLocked([&](C4Database *c4db) {
 #ifdef COUCHBASE_ENTERPRISE
             if (_conf.endpoint->otherLocalDB()) {
-                _c4repl = c4db->newLocalReplicator(_conf.endpoint->otherLocalDB()->use().get(),
+                _c4repl = c4db->newLocalReplicator(_conf.endpoint->otherLocalDB()->useLocked().get(),
                                                    params);
             } else
 #endif

@@ -80,7 +80,6 @@ set(
     ALL_SRC_FILES
     src/CBLBase_CAPI.cc
     src/CBLBlob_CAPI.cc
-    src/CBLBlob.cc
     src/CBLDatabase.cc
     src/CBLDatabase_CAPI.cc
     src/CBLDocument.cc
