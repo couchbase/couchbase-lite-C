@@ -24,6 +24,7 @@
 #include "StringUtil.hh"
 #include "Stopwatch.hh"
 #include <string>
+#include "betterassert.hh"
 
 
 static const CBLDocument* defaultConflictResolver(void *context,

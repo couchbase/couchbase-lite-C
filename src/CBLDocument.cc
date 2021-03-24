@@ -23,6 +23,7 @@
 #include "c4BlobStore.hh"
 #include "c4Private.h"
 #include <mutex>
+#include "betterassert.hh"
 
 using namespace std;
 using namespace fleece;

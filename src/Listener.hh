@@ -26,6 +26,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include "betterassert.hh"
 
 namespace cbl_internal {
     class ListenersBase;
