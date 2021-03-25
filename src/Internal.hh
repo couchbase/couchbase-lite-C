@@ -24,6 +24,7 @@
 #include "RefCounted.hh"
 #include "InstanceCounted.hh"
 
+CBL_ASSUME_NONNULL_BEGIN
 
 struct CBLRefCounted : public fleece::RefCounted, fleece::InstanceCountedIn<CBLRefCounted> {
 protected:
@@ -43,10 +44,10 @@ protected:
 
 namespace cbl_internal {
     // Converting C4Error <--> CBLError
-    static inline       C4Error* internal(      CBLError *error) {return (C4Error*)error;}
+    static inline       C4Error* internal(      CBLError* _cbl_nullable error) {return (C4Error*)error;}
     static inline const C4Error& internal(const CBLError &error) {return (const C4Error&)error;}
 
-    static inline       CBLError* external(      C4Error *error) {return (CBLError*)error;}
+    static inline       CBLError* external(      C4Error* _cbl_nullable error) {return (CBLError*)error;}
     static inline const CBLError& external(const C4Error &error) {return (const CBLError&)error;}
 
     template <typename T>
@@ -55,7 +56,7 @@ namespace cbl_internal {
             enc[fleece::slice(propName)] = value;
     }
 
-    void BridgeException(const char *fnName, CBLError *outError) noexcept;
+    void BridgeException(const char *fnName, CBLError* _cbl_nullable outError) noexcept;
 
     void BridgeExceptionWarning(const char *fnName) noexcept;
 
@@ -76,3 +77,5 @@ using namespace cbl_internal;
 
 
 #define LOCK(MUTEX)     std::lock_guard<decltype(MUTEX)> _lock(MUTEX)
+
+CBL_ASSUME_NONNULL_END

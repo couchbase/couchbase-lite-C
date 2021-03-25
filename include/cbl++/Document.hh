@@ -25,6 +25,8 @@
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
 
+CBL_ASSUME_NONNULL_BEGIN
+
 namespace cbl {
     class MutableDocument;
 
@@ -56,7 +58,7 @@ namespace cbl {
     protected:
         Document(CBLRefCounted* r)                      :RefCounted(r) { }
 
-        static Document adopt(const CBLDocument *d, CBLError *error) {
+        static Document adopt(const CBLDocument* _cbl_nullable d, CBLError *error) {
             if (!d && error->code != 0)
                 throw *error;
             Document doc;
@@ -110,7 +112,7 @@ namespace cbl {
         }
 
     protected:
-        static MutableDocument adopt(CBLDocument *d, CBLError *error) {
+        static MutableDocument adopt(CBLDocument* _cbl_nullable d, CBLError *error) {
             if (!d && error->code != 0)
                 throw *error;            
             MutableDocument doc;
@@ -178,8 +180,12 @@ namespace cbl {
 
 
     inline MutableDocument Document::mutableCopy() const {
-        return MutableDocument::adopt(CBLDocument_MutableCopy(ref()), nullptr);
+        MutableDocument doc;
+        doc._ref = (CBLRefCounted*) CBLDocument_MutableCopy(ref());
+        return doc;
     }
 
 
 }
+
+CBL_ASSUME_NONNULL_END

@@ -19,9 +19,7 @@
 #pragma once
 #include "CBLBase.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CBL_CAPI_BEGIN
 
 
 /** \defgroup logging   Logging
@@ -61,7 +59,7 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
                  and corresponding arguments must follow. */
 void CBL_Log(CBLLogDomain domain,
              CBLLogLevel level,
-             const char *format _cbl_nonnull, ...) CBLAPI __printflike(3, 4);
+             const char *format, ...) CBLAPI __printflike(3, 4);
 
 /** Writes a pre-formatted message to the log, exactly as given.
     @param domain  The log domain to associate this message with.
@@ -129,12 +127,10 @@ typedef struct {
 const CBLLogFileConfiguration* CBLLog_FileConfig(void) CBLAPI;
 
 /** Sets the file logging configuration, and begins logging to files. */
-bool CBLLog_SetFileConfig(CBLLogFileConfiguration, CBLError *outError) CBLAPI;
+bool CBLLog_SetFileConfig(CBLLogFileConfiguration, CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+CBL_CAPI_END

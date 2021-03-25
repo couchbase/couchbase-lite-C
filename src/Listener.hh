@@ -28,6 +28,8 @@
 #include <vector>
 #include "betterassert.hh"
 
+CBL_ASSUME_NONNULL_BEGIN
+
 namespace cbl_internal {
     class ListenersBase;
 }
@@ -36,14 +38,14 @@ namespace cbl_internal {
 /** Abstract base class of listener tokens. (In the public API, as an opaque typeef.) */
 struct CBLListenerToken : public CBLRefCounted {
 public:
-    CBLListenerToken(const void *callback _cbl_nonnull, void *context)
+    CBLListenerToken(const void *callback, void* _cbl_nullable context)
     :_callback(callback)
     ,_context(context)
     { }
 
     virtual ~CBLListenerToken()  =default;
 
-    void addedTo(cbl_internal::ListenersBase *owner _cbl_nonnull) {
+    void addedTo(cbl_internal::ListenersBase *owner) {
         assert(!_owner);
         _owner = owner;
     }
@@ -59,9 +61,9 @@ protected:
         _callback = nullptr;
     }
 
-    std::atomic<const void*>     _callback;          // Really a C fn pointer
-    void* const                  _context;
-    cbl_internal::ListenersBase* _owner {nullptr};
+    std::atomic<const void*>                   _callback;          // Really a C fn pointer
+    void* const  _cbl_nullable                 _context;
+    cbl_internal::ListenersBase* _cbl_nullable _owner {nullptr};
 };
 
 
@@ -71,7 +73,7 @@ namespace cbl_internal {
     template <class LISTENER>
     struct ListenerToken : public CBLListenerToken {
     public:
-        ListenerToken(LISTENER callback, void *context)
+        ListenerToken(LISTENER callback, void* _cbl_nullable context)
         :CBLListenerToken((const void*)callback, context)
         { }
 
@@ -94,13 +96,13 @@ namespace cbl_internal {
             clear();
         }
 
-        void add(CBLListenerToken* t _cbl_nonnull) {
+        void add(CBLListenerToken* t) {
             LOCK(_mutex);
             _tokens.emplace_back(t);
             t->addedTo(this);
         }
 
-        void remove(CBLListenerToken* t _cbl_nonnull) {
+        void remove(CBLListenerToken* t) {
             LOCK(_mutex);
             for (auto i = _tokens.begin(); i != _tokens.end(); ++i) {
                 if (i->get() == t) {
@@ -118,7 +120,7 @@ namespace cbl_internal {
             _tokens.clear();
         }
 
-        bool contains(CBLListenerToken *token _cbl_nonnull) const {
+        bool contains(CBLListenerToken *token) const {
             LOCK(_mutex);
             for (auto &tok : _tokens) {
                 if (tok == token)
@@ -155,11 +157,11 @@ namespace cbl_internal {
             return t;
         }
 
-        void add(ListenerToken<LISTENER> *token)                {ListenersBase::add(token);}
+        void add(ListenerToken<LISTENER>* _cbl_nonnull token)                {ListenersBase::add(token);}
         void clear()                                            {ListenersBase::clear();}
         bool empty() const                                      {return ListenersBase::empty();}
         
-        ListenerToken<LISTENER>* find(CBLListenerToken *token) const {
+        ListenerToken<LISTENER>* _cbl_nullable find(CBLListenerToken *token) const {
             return contains(token) ? (ListenerToken<LISTENER>*) token : nullptr;
         }
 
@@ -177,10 +179,10 @@ namespace cbl_internal {
     /** Manages a queue of pending calls to listeners. Owned by CBLDatabase. Thread-safe. */
     class NotificationQueue {
     public:
-        NotificationQueue(CBLDatabase* _cbl_nonnull);
+        NotificationQueue(CBLDatabase*);
 
         /** Sets or clears the client callback. */
-        void setCallback(CBLNotificationsReadyCallback callback, void *context);
+        void setCallback(CBLNotificationsReadyCallback callback, void* _cbl_nullable context);
 
         /** If there is a callback, this adds a notification to the queue, and if the queue was
             empty, invokes the callback to tell the client.
@@ -197,8 +199,8 @@ namespace cbl_internal {
         void call(const Notifications&);
         
         struct State {
-            CBLNotificationsReadyCallback callback {nullptr};
-            void* context;
+            CBLNotificationsReadyCallback _cbl_nullable callback {nullptr};
+            void* _cbl_nullable context;
             Notifications queue;
         };
 
@@ -207,3 +209,5 @@ namespace cbl_internal {
     };
 
 }
+
+CBL_ASSUME_NONNULL_END

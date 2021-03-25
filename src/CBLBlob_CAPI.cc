@@ -33,7 +33,7 @@ FLDict CBLBlob_Properties(const CBLBlob* blob) noexcept {
     return blob->properties();
 }
 
-FLStringResult CBLBlob_ToJSON(const CBLBlob* blob _cbl_nonnull) noexcept {
+FLStringResult CBLBlob_ToJSON(const CBLBlob* blob) noexcept {
     return FLStringResult(blob->toJSON());
 }
 
@@ -128,7 +128,7 @@ const CBLBlob* FLDict_GetBlob(FLDict blobDict) noexcept {
     return CBLBlob::getBlob(blobDict);
 }
 
-void FLSlot_SetBlob(FLSlot slot _cbl_nonnull, CBLBlob* blob _cbl_nonnull) noexcept
+void FLSlot_SetBlob(FLSlot slot, CBLBlob* blob) noexcept
 {
     Dict props = blob->properties();
     MutableDict mProps = props.asMutable();

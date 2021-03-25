@@ -31,6 +31,8 @@
 #include <string>
 #include <utility>
 
+CBL_ASSUME_NONNULL_BEGIN
+
 namespace cbl_internal {
     class AllConflictsResolver;
     struct CBLLocalEndpoint;
@@ -54,7 +56,7 @@ public:
 
     static void copyDatabase(slice fromPath,
                              slice toName,
-                             const CBLDatabaseConfiguration *config)
+                             const CBLDatabaseConfiguration* _cbl_nullable config)
     {
         C4DatabaseConfig2 c4config = asC4Config(config);
         C4Database::copyNamed(fromPath, toName, c4config);
@@ -64,7 +66,9 @@ public:
         C4Database::deleteNamed(name, effectiveDir(inDirectory));
     }
 
-    static Retained<CBLDatabase> open(slice name, const CBLDatabaseConfiguration *config =nullptr) {
+    static Retained<CBLDatabase> open(slice name,
+                                      const CBLDatabaseConfiguration* _cbl_nullable config =nullptr)
+    {
         C4DatabaseConfig2 c4config = asC4Config(config);
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
         if (c4db->mayHaveExpiration())
@@ -82,7 +86,7 @@ public:
     }
 
 #ifdef COUCHBASE_ENTERPRISE
-    void changeEncryptionKey(const CBLEncryptionKey *newKey) {
+    void changeEncryptionKey(const CBLEncryptionKey* _cbl_nullable newKey) {
         C4EncryptionKey c4key = asC4Key(newKey);
         _c4db.useLocked()->rekey(&c4key);
     }
@@ -108,8 +112,6 @@ public:
         return {_dir};
 #endif
     }
-    
-    C4BlobStore* blobStore() const                   {return _blobStore;}
 
     uint64_t count() const                           {return _c4db.useLocked()->getDocumentCount();}
     uint64_t lastSequence() const                    {return _c4db.useLocked()->getLastSequence();}
@@ -126,7 +128,7 @@ public:
         return _getDocument(docID, true, true);
     }
 
-    bool deleteDocument(const CBLDocument *doc _cbl_nonnull,
+    bool deleteDocument(const CBLDocument *doc,
                         CBLConcurrencyControl concurrency)
     {
         CBLDocument::SaveOptions opt(concurrency);
@@ -167,7 +169,7 @@ public:
 
     Retained<CBLQuery> createQuery(CBLQueryLanguage language,
                                    slice queryString,
-                                   int *outErrPos) const
+                                   int* _cbl_nullable outErrPos) const
     {
         alloc_slice json;
         if (language == kCBLJSONLanguage) {
@@ -225,18 +227,21 @@ public:
 #pragma mark - Listeners:
 
 
-    Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener _cbl_nonnull listener, void *ctx) {
+    Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener listener,
+                                           void* _cbl_nullable ctx)
+    {
         return addListener([&]{ return _listeners.add(listener, ctx); });
     }
 
-    Retained<CBLListenerToken> addListener(CBLDatabaseChangeDetailListener _cbl_nonnull listener,
-                                           void *ctx) {
+    Retained<CBLListenerToken> addListener(CBLDatabaseChangeDetailListener listener,
+                                           void* _cbl_nullable ctx)
+    {
         return addListener([&]{ return _detailListeners.add(listener, ctx); });
     }
 
     Retained<CBLListenerToken> addDocListener(slice docID,
-                                              CBLDocumentChangeListener _cbl_nonnull,
-                                              void *context);
+                                              CBLDocumentChangeListener,
+                                              void* _cbl_nullable context);
 
     void sendNotifications() {
         _notificationQueue.notifyAll();
@@ -251,15 +256,21 @@ public:
 
 
 protected:
-    friend class CBLDocument;
-    friend class CBLReplicator;
+    friend struct CBLBlob;
+    friend struct CBLNewBlob;
+    friend struct CBLBlobWriteStream;
+    friend struct CBLDocument;
+    friend struct CBLReplicator;
+    friend struct CBLURLEndpointListener;
     friend class cbl_internal::AllConflictsResolver;
     friend class cbl_internal::CBLLocalEndpoint;
     friend class cbl_internal::ListenerToken<CBLDocumentChangeListener>;
     friend class cbl_internal::ListenerToken<CBLQueryChangeListener>;
 
+    C4BlobStore* blobStore() const                   {return &_c4db.useLocked()->getBlobStore();}
+
     template <class LISTENER, class... Args>
-    void notify(ListenerToken<LISTENER> *listener, Args... args) const {
+    void notify(ListenerToken<LISTENER>* _cbl_nonnull listener, Args... args) const {
         Retained<ListenerToken<LISTENER>> retained = listener;
         notify([=]() {
             retained->call(args...);
@@ -285,7 +296,6 @@ private:
 #ifdef COUCHBASE_ENTERPRISE
     ,_key(key_)
 #endif
-    ,_blobStore(&db->getBlobStore())
     ,_notificationQueue(this)
     { }
 
@@ -300,7 +310,7 @@ private:
     static std::string defaultDirectory();
 
 #ifdef COUCHBASE_ENTERPRISE
-    static C4EncryptionKey asC4Key(const CBLEncryptionKey *key) {
+    static C4EncryptionKey asC4Key(const CBLEncryptionKey* _cbl_nullable key) {
         C4EncryptionKey c4key;
         if (key) {
             c4key.algorithm = static_cast<C4EncryptionAlgorithm>(key->algorithm);
@@ -312,7 +322,7 @@ private:
     }
 #endif
 
-    static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration *config) {
+    static C4DatabaseConfig2 asC4Config(const CBLDatabaseConfiguration* _cbl_nullable config) {
         CBLDatabaseConfiguration defaultConfig;
         if (!config) {
             defaultConfig = CBLDatabaseConfiguration_Default();
@@ -387,10 +397,11 @@ private:
 #ifdef COUCHBASE_ENTERPRISE
     CBLEncryptionKey                            _key;
 #endif
-    C4BlobStore*                                _blobStore;
     std::unique_ptr<C4DatabaseObserver>         _observer;
     Listeners<CBLDatabaseChangeListener>        _listeners;
     Listeners<CBLDatabaseChangeDetailListener>  _detailListeners;
     Listeners<CBLDocumentChangeListener>        _docListeners;
     NotificationQueue                           _notificationQueue;
 };
+
+CBL_ASSUME_NONNULL_END

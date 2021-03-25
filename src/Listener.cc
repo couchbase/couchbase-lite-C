@@ -31,7 +31,7 @@ void CBLListenerToken::remove() {
 }
 
 
-NotificationQueue::NotificationQueue(CBLDatabase *database _cbl_nonnull)
+NotificationQueue::NotificationQueue(CBLDatabase *database)
 :_database(database)
 ,_state(State())
 { }

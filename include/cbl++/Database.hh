@@ -30,6 +30,8 @@
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
 
+CBL_ASSUME_NONNULL_BEGIN
+
 namespace cbl {
     class Document;
     class MutableDocument;
@@ -217,14 +219,16 @@ namespace cbl {
         void sendNotifications()                            {CBLDatabase_SendNotifications(ref());}
 
     private:
-        static void _callListener(void *context, const CBLDatabase *db,
+        static void _callListener(void* _cbl_nullable context,
+                                  const CBLDatabase *db,
                                   unsigned nDocs, FLString *docIDs)
         {
             std::vector<slice> vec((slice*)&docIDs[0], (slice*)&docIDs[nDocs]);
             Listener::call(context, Database((CBLDatabase*)db), vec);
         }
 
-        static void _callDocListener(void *context, const CBLDatabase *db, FLString docID) {
+        static void _callDocListener(void* _cbl_nullable context,
+                                     const CBLDatabase *db, FLString docID) {
             DocumentListener::call(context, Database((CBLDatabase*)db), docID);
         }
 
@@ -277,7 +281,9 @@ namespace cbl {
             }
         }
 
-        CBLDatabase* _db = nullptr;
+        CBLDatabase* _cbl_nullable _db = nullptr;
     };
 
 }
+
+CBL_ASSUME_NONNULL_END

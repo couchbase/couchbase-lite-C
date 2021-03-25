@@ -20,9 +20,7 @@
 #include "CBLBase.h"
 #include "fleece/Fleece.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CBL_CAPI_BEGIN
 
 
 /** \defgroup queries   Queries
@@ -64,14 +62,14 @@ typedef CBL_ENUM(uint32_t, CBLQueryLanguage) {
     @param queryString  The query string.
     @param outErrorPos  If non-NULL, then on a parse error the approximate byte offset in the
                     input expression will be stored here (or -1 if not known/applicable.)
-    @param error  On failure, the error will be written here.
+    @param outError  On failure, the error will be written here.
     @return  The new query object. */
 _cbl_warn_unused
-CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
+CBLQuery* CBLQuery_New(const CBLDatabase* db,
                        CBLQueryLanguage language,
                        FLString queryString,
-                       int *outErrorPos,
-                       CBLError* error) CBLAPI;
+                       int* _cbl_nullable outErrorPos,
+                       CBLError* _cbl_nullable outError) CBLAPI;
 
 CBL_REFCOUNTED(CBLQuery*, Query);
 
@@ -86,18 +84,19 @@ CBL_REFCOUNTED(CBLQuery*, Query);
     @param parameters  The parameters in the form of a Fleece \ref FLDict "dictionary" whose
             keys are the parameter names. (It's easiest to construct this by using the mutable
             API, i.e. calling \ref FLMutableDict_New and adding keys/values.) */
-void CBLQuery_SetParameters(CBLQuery* _cbl_nonnull query,
+void CBLQuery_SetParameters(CBLQuery* query,
                             FLDict parameters) CBLAPI;
 
 /** Returns the query's current parameter bindings, if any. */
-FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) CBLAPI;
+FLDict CBLQuery_Parameters(const CBLQuery* query) CBLAPI;
 
 /** Runs the query, returning the results.
     To obtain the results you'll typically call \ref CBLResultSet_Next in a `while` loop,
     examining the values in the \ref CBLResultSet each time around.
     @note  You must release the result set when you're finished with it. */
 _cbl_warn_unused
-CBLResultSet* CBLQuery_Execute(CBLQuery* _cbl_nonnull, CBLError*) CBLAPI;
+CBLResultSet* CBLQuery_Execute(CBLQuery*,
+                               CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns information about the query, including the translated SQLite form, and the search
     strategy. You can use this to help optimize the query: the word `SCAN` in the strategy
@@ -106,10 +105,10 @@ CBLResultSet* CBLQuery_Execute(CBLQuery* _cbl_nonnull, CBLError*) CBLAPI;
     @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
 
 _cbl_warn_unused
-FLSliceResult CBLQuery_Explain(const CBLQuery* _cbl_nonnull) CBLAPI;
+FLSliceResult CBLQuery_Explain(const CBLQuery*) CBLAPI;
 
 /** Returns the number of columns in each result. */
-unsigned CBLQuery_ColumnCount(const CBLQuery* _cbl_nonnull) CBLAPI;
+unsigned CBLQuery_ColumnCount(const CBLQuery*) CBLAPI;
 
 /** Returns the name of a column in the result.
     The column name is based on its expression in the `SELECT...` or `WHAT:` section of the
@@ -117,7 +116,7 @@ unsigned CBLQuery_ColumnCount(const CBLQuery* _cbl_nonnull) CBLAPI;
     A column that returns an expression will have an automatically-generated name like `$1`.
     To give a column a custom name, use the `AS` syntax in the query.
     Every column is guaranteed to have a unique name. */
-FLSlice CBLQuery_ColumnName(const CBLQuery* _cbl_nonnull,
+FLSlice CBLQuery_ColumnName(const CBLQuery*,
                             unsigned columnIndex) CBLAPI;
 
 /** @} */
@@ -148,12 +147,12 @@ FLSlice CBLQuery_ColumnName(const CBLQuery* _cbl_nonnull,
     Returns false if there are no more results.
     @warning This must be called _before_ examining the first result. */
 _cbl_warn_unused
-bool CBLResultSet_Next(CBLResultSet* _cbl_nonnull) CBLAPI;
+bool CBLResultSet_Next(CBLResultSet*) CBLAPI;
 
 /** Returns the value of a column of the current result, given its (zero-based) numeric index.
     This may return a NULL pointer, indicating `MISSING`, if the value doesn't exist, e.g. if
     the column is a property that doesn't exist in the document. */
-FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* _cbl_nonnull,
+FLValue CBLResultSet_ValueAtIndex(const CBLResultSet*,
                                   unsigned index) CBLAPI;
 
 /** Returns the value of a column of the current result, given its name.
@@ -161,21 +160,21 @@ FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* _cbl_nonnull,
     the column is a property that doesn't exist in the document. (Or, of course, if the key
     is not a column name in this query.)
     @note  See \ref CBLQuery_ColumnName for a discussion of column names. */
-FLValue CBLResultSet_ValueForKey(const CBLResultSet* _cbl_nonnull,
+FLValue CBLResultSet_ValueForKey(const CBLResultSet*,
                                  FLString key) CBLAPI;
 
 /** Returns the current result as an array of column values.
     @warning The array reference is only valid until the result-set is advanced or released.
             If you want to keep it for longer, call \ref FLArray_Retain (and release it when done.) */
-FLArray CBLResultSet_ResultArray(const CBLResultSet* _cbl_nonnull) CBLAPI;
+FLArray CBLResultSet_ResultArray(const CBLResultSet*) CBLAPI;
 
 /** Returns the current result as a dictionary mapping column names to values.
     @warning The dict reference is only valid until the result-set is advanced or released.
             If you want to keep it for longer, call \ref FLDict_Retain (and release it when done.) */
-FLDict CBLResultSet_ResultDict(const CBLResultSet* _cbl_nonnull) CBLAPI;
+FLDict CBLResultSet_ResultDict(const CBLResultSet*) CBLAPI;
 
 /** Returns the Query that created this ResultSet. */
-CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) CBLAPI;
+CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs) CBLAPI;
 
 CBL_REFCOUNTED(CBLResultSet*, ResultSet);
 
@@ -201,8 +200,8 @@ CBL_REFCOUNTED(CBLResultSet*, ResultSet);
                     so that listeners will be called in a safe context.
     @param context  The same `context` value that you passed when adding the listener.
     @param query  The query that triggered the listener. */
-typedef void (*CBLQueryChangeListener)(void *context,
-                                       CBLQuery* query _cbl_nonnull);
+typedef void (*CBLQueryChangeListener)(void* _cbl_nullable context,
+                                       CBLQuery* query);
 
 /** Registers a change listener callback with a query, turning it into a "live query" until
     the listener is removed (via \ref CBLListener_Remove).
@@ -216,21 +215,21 @@ typedef void (*CBLQueryChangeListener)(void *context,
     @return  A token to be passed to \ref CBLListener_Remove when it's time to remove the
             listener.*/
 _cbl_warn_unused
-CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
-                                             CBLQueryChangeListener listener _cbl_nonnull,
-                                             void *context) CBLAPI;
+CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query,
+                                             CBLQueryChangeListener listener,
+                                             void* _cbl_nullable context) CBLAPI;
 
 /** Returns the query's _entire_ current result set, after it's been announced via a call to the
     listener's callback.
     @note  You must release the result set when you're finished with it.
     @param query  The query being listened to.
     @param listener  The query listener that was notified.
-    @param error  If the query failed to run, the error will be stored here.
+    @param outError  If the query failed to run, the error will be stored here.
     @return  A new object containing the query's current results, or NULL if the query failed to run. */
 _cbl_warn_unused
-CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query _cbl_nonnull,
-                                          CBLListenerToken *listener _cbl_nonnull,
-                                          CBLError *error) CBLAPI;
+CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
+                                          CBLListenerToken *listener,
+                                          CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 
@@ -284,10 +283,10 @@ typedef struct {
     Indexes are persistent.
     If an identical index with that name already exists, nothing happens (and no error is returned.)
     If a non-identical index with that name already exists, it is deleted and re-created. */
-bool CBLDatabase_CreateValueIndex(CBLDatabase *db _cbl_nonnull,
+bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   FLString name,
                                   CBLValueIndex index,
-                                  CBLError *outError) CBLAPI;
+                                  CBLError* _cbl_nullable outError) CBLAPI;
 
 
 /** Full-Text Index Specification. */
@@ -321,24 +320,22 @@ typedef struct {
     Indexes are persistent.
     If an identical index with that name already exists, nothing happens (and no error is returned.)
     If a non-identical index with that name already exists, it is deleted and re-created. */
-bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db _cbl_nonnull,
+bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      FLString name,
                                      CBLFullTextIndex index,
-                                     CBLError *outError) CBLAPI;
+                                     CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Deletes an index given its name. */
-bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
+bool CBLDatabase_DeleteIndex(CBLDatabase *db,
                              FLString name,
-                             CBLError *outError) CBLAPI;
+                             CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the names of the indexes on this database, as a Fleece array of strings.
     @note  You are responsible for releasing the returned Fleece array. */
 _cbl_warn_unused
-FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) CBLAPI;
+FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db) CBLAPI;
 
 /** @} */
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+CBL_CAPI_END

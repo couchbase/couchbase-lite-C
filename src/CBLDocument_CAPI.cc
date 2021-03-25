@@ -51,7 +51,7 @@ FLSliceResult CBLDocument_CreateJSON(const CBLDocument* doc) noexcept {
     return FLSliceResult(doc->propertiesAsJSON());
 }
 
-void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties _cbl_nonnull) noexcept {
+void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties) noexcept {
     doc->setProperties(properties);
 }
 

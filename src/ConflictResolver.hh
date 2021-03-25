@@ -8,6 +8,8 @@
 #include "CBLReplicatorConfig.hh"
 #include <functional>
 
+CBL_ASSUME_NONNULL_BEGIN
+
 struct CBLDatabase;
 
 namespace cbl_internal {
@@ -18,14 +20,15 @@ namespace cbl_internal {
     class ConflictResolver {
     public:
         /// Basic constructor.
-        ConflictResolver(CBLDatabase *db _cbl_nonnull,
-                         CBLConflictResolver customResolver, void* context,
+        ConflictResolver(CBLDatabase *db,
+                         CBLConflictResolver _cbl_nullable customResolver,
+                         void* _cbl_nullable context,
                          alloc_slice docID,
                          alloc_slice revID = nullslice);
 
-        ConflictResolver(CBLDatabase* _cbl_nonnull,
-                         CBLConflictResolver,
-                         void *context,
+        ConflictResolver(CBLDatabase*,
+                         CBLConflictResolver _cbl_nullable,
+                         void* _cbl_nullable context,
                          const C4DocumentEnded&);
 
         using CompletionHandler = function<void(ConflictResolver*)>;
@@ -44,11 +47,11 @@ namespace cbl_internal {
 
     private:
         bool _runNow();
-        bool customResolve(CBLDocument *conflict _cbl_nonnull);
+        bool customResolve(CBLDocument *conflict);
 
         Retained<CBLDatabase>   _db;
-        CBLConflictResolver     _clientResolver;
-        void*                   _clientResolverContext;
+        CBLConflictResolver _cbl_nullable _clientResolver;
+        void* _cbl_nullable     _clientResolverContext;
         alloc_slice const       _docID;
         alloc_slice             _revID;
         C4RevisionFlags         _flags {};
@@ -61,9 +64,9 @@ namespace cbl_internal {
     /** Scans the database for all unresolved conflicts and resolves them. */
     class AllConflictsResolver {
     public:
-        explicit AllConflictsResolver(CBLDatabase* _cbl_nonnull,
+        explicit AllConflictsResolver(CBLDatabase*,
                                       CBLConflictResolver,
-                                      void *context);
+                                      void* _cbl_nullable context);
         void runNow();
 
     private:
@@ -71,8 +74,10 @@ namespace cbl_internal {
         
         Retained<CBLDatabase>               _db;
         CBLConflictResolver                 _clientResolver;
-        void*                               _clientResolverContext;
+        void* _cbl_nullable                 _clientResolverContext;
         std::unique_ptr<C4DocEnumerator>    _enum;
     };
 
 }
+
+CBL_ASSUME_NONNULL_END

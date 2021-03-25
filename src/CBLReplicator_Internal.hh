@@ -31,6 +31,7 @@
 #include <mutex>
 #include <vector>
 
+CBL_ASSUME_NONNULL_BEGIN
 
 #define SyncLog(LEVEL, MSG, ...) C4LogToAt(kC4SyncLog, kC4Log ## LEVEL, MSG, ##__VA_ARGS__)
 
@@ -53,9 +54,9 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
 
 struct CBLReplicator final : public CBLRefCounted {
 public:
-    CBLReplicator(const CBLReplicatorConfiguration *conf _cbl_nonnull)
-    :_conf(*conf)
-    ,_db(conf->database)
+    CBLReplicator(const CBLReplicatorConfiguration &conf)
+    :_conf(conf)
+    ,_db(conf.database)
     {
         // One-time initialization of network transport:
         static once_flag once;
@@ -236,7 +237,10 @@ private:
     }
 
 
-    void _documentsEnded(bool pushing, size_t numDocs, const C4DocumentEnded* c4Docs[]) {
+    void _documentsEnded(bool pushing,
+                         size_t numDocs,
+                         const C4DocumentEnded* _cbl_nonnull c4Docs[_cbl_nonnull])
+    {
         LOCK(_mutex);
         std::unique_ptr<std::vector<CBLReplicatedDocument>> docs;
         if (!_docListeners.empty()) {
@@ -296,3 +300,5 @@ private:
     Listeners<CBLReplicatorChangeListener>      _changeListeners;
     Listeners<CBLDocumentReplicationListener>   _docListeners;
 };
+
+CBL_ASSUME_NONNULL_END

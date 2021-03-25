@@ -19,6 +19,8 @@
 using namespace std;
 using namespace fleece;
 
+CBL_ASSUME_NONNULL_BEGIN
+
 
 #pragma mark - QUERY CLASS:
 
@@ -81,7 +83,8 @@ public:
         return (i != _columnNames->end()) ? i->second : -1;
     }
 
-    inline Retained<CBLListenerToken> addChangeListener(CBLQueryChangeListener listener, void *context);
+    inline Retained<CBLListenerToken> addChangeListener(CBLQueryChangeListener listener,
+                                                        void* _cbl_nullable context);
 
     ListenerToken<CBLQueryChangeListener>* getChangeListener(CBLListenerToken *token) const {
         return _listeners.find(token);
@@ -193,7 +196,7 @@ namespace cbl_internal {
     public:
         ListenerToken(CBLQuery *query,
                       CBLQueryChangeListener callback,
-                      void *context)
+                      void* _cbl_nullable context)
         :CBLListenerToken((const void*)callback, context)
         ,_query(query)
         {
@@ -238,9 +241,13 @@ inline Retained<CBLResultSet> CBLQuery::execute() {
 }
 
 
-inline Retained<CBLListenerToken> CBLQuery::addChangeListener(CBLQueryChangeListener listener, void *context) {
+inline Retained<CBLListenerToken> CBLQuery::addChangeListener(CBLQueryChangeListener listener,
+                                                              void* _cbl_nullable context)
+{
     auto token = retained(new ListenerToken<CBLQueryChangeListener>(this, listener, context));
     _listeners.add(token);
     token->setEnabled(true);
     return token;
 }
+
+CBL_ASSUME_NONNULL_END

@@ -26,7 +26,7 @@
 static_assert(sizeof(CBLError) == sizeof(C4Error));
 
 
-FLSliceResult CBLError_Message(const CBLError* error _cbl_nonnull) noexcept {
+FLSliceResult CBLError_Message(const CBLError* error) noexcept {
     return c4error_getMessage(internal(*error));
 }
 
@@ -57,7 +57,7 @@ void CBL_Release(CBLRefCounted *self) noexcept {
 
 
 unsigned CBL_InstanceCount() noexcept {
-    return fleece::InstanceCounted::count();
+    return fleece::InstanceCounted::liveInstanceCount();
 }
 
 

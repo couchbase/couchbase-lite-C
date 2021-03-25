@@ -26,6 +26,8 @@
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
 
+CBL_ASSUME_NONNULL_BEGIN
+
 namespace cbl {
     class Query;
     class ResultSet;
@@ -77,8 +79,8 @@ namespace cbl {
         fleece::Value operator[](slice key) const                       {return valueForKey(key);}
 
     protected:
-        explicit Result(CBLResultSet *ref)                              :_ref(ref) { }
-        CBLResultSet* _ref;
+        explicit Result(CBLResultSet* _cbl_nullable ref)                :_ref(ref) { }
+        CBLResultSet* _cbl_nullable _ref;
         friend class ResultSetIterator;
     };
 
@@ -193,3 +195,5 @@ namespace cbl {
     }
 
 }
+
+CBL_ASSUME_NONNULL_END

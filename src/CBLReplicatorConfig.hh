@@ -28,6 +28,8 @@
 #include <mutex>
 #include <string>
 
+CBL_ASSUME_NONNULL_BEGIN
+
 
 #pragma mark - ENDPOINT
 
@@ -38,7 +40,7 @@ struct CBLEndpoint {
     const C4Address& remoteAddress() const                      {return _address;}
     virtual C4String remoteDatabaseName() const =0;
 #ifdef COUCHBASE_ENTERPRISE
-    virtual CBLDatabase* otherLocalDB() const                   {return nullptr;}
+    virtual CBLDatabase* _cbl_nullable otherLocalDB() const     {return nullptr;}
 #endif
 
 protected:
@@ -67,7 +69,7 @@ namespace cbl_internal {
 #ifdef COUCHBASE_ENTERPRISE
     // Concrete Endpoint for local databases
     struct CBLLocalEndpoint : public CBLEndpoint {
-        CBLLocalEndpoint(CBLDatabase *db _cbl_nonnull)
+        CBLLocalEndpoint(CBLDatabase *db)
         :_db(db)
         { }
 
@@ -244,3 +246,5 @@ namespace cbl_internal {
         alloc_slice      _proxyHostname, _proxyUsername, _proxyPassword;
     };
 }
+
+CBL_ASSUME_NONNULL_END

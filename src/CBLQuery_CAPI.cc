@@ -22,7 +22,7 @@
 #include <string>
 
 
-CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
+CBLQuery* CBLQuery_New(const CBLDatabase* db,
                        CBLQueryLanguage language,
                        FLString queryString,
                        int *outErrorPos,
@@ -38,36 +38,36 @@ CBLQuery* CBLQuery_New(const CBLDatabase* db _cbl_nonnull,
     } catchAndBridge(outError)
 }
 
-FLDict CBLQuery_Parameters(const CBLQuery* _cbl_nonnull query) noexcept {
+FLDict CBLQuery_Parameters(const CBLQuery* query) noexcept {
     return query->parameters();
 }
 
-void CBLQuery_SetParameters(CBLQuery* query _cbl_nonnull, FLDict parameters) noexcept {
+void CBLQuery_SetParameters(CBLQuery* query, FLDict parameters) noexcept {
     query->setParameters(parameters);
 }
 
-CBLResultSet* CBLQuery_Execute(CBLQuery* query _cbl_nonnull, CBLError* outError) noexcept {
+CBLResultSet* CBLQuery_Execute(CBLQuery* query, CBLError* outError) noexcept {
     try {
         return query->execute().detach();
     } catchAndBridge(outError)
 }
 
-FLSliceResult CBLQuery_Explain(const CBLQuery* query _cbl_nonnull) noexcept {
+FLSliceResult CBLQuery_Explain(const CBLQuery* query) noexcept {
     try {
         return FLSliceResult(query->explain());
     } catchAndWarn()
 }
 
-unsigned CBLQuery_ColumnCount(const CBLQuery* query _cbl_nonnull) noexcept {
+unsigned CBLQuery_ColumnCount(const CBLQuery* query) noexcept {
     return query->columnCount();
 }
 
-FLSlice CBLQuery_ColumnName(const CBLQuery* query _cbl_nonnull, unsigned col) noexcept {
+FLSlice CBLQuery_ColumnName(const CBLQuery* query, unsigned col) noexcept {
     return query->columnName(col);
 }
 
-CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query _cbl_nonnull,
-                                             CBLQueryChangeListener listener _cbl_nonnull,
+CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query,
+                                             CBLQueryChangeListener listener,
                                              void *context) noexcept
 {
     return query->addChangeListener(listener, context).detach();
@@ -86,7 +86,7 @@ CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
     return listener->resultSet().detach();
 }
 
-bool CBLResultSet_Next(CBLResultSet* rs _cbl_nonnull) noexcept {
+bool CBLResultSet_Next(CBLResultSet* rs) noexcept {
     try {
         return rs->next();
     } catchAndWarn();
@@ -96,7 +96,7 @@ FLValue CBLResultSet_ValueForKey(const CBLResultSet* rs, FLString property) noex
     return rs->property(property);
 }
 
-FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* rs _cbl_nonnull, unsigned column) noexcept {
+FLValue CBLResultSet_ValueAtIndex(const CBLResultSet* rs, unsigned column) noexcept {
     return rs->column(column);
 }
 
@@ -108,6 +108,6 @@ FLDict CBLResultSet_ResultDict(const CBLResultSet *rs) noexcept {
     return rs->asDict();
 }
 
-CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs _cbl_nonnull) noexcept {
+CBLQuery* CBLResultSet_GetQuery(const CBLResultSet *rs) noexcept {
     return rs->query();
 }

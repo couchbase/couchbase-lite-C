@@ -29,6 +29,8 @@
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
 
+CBL_ASSUME_NONNULL_BEGIN
+
 namespace cbl {
 
     class Endpoint {
@@ -40,7 +42,7 @@ namespace cbl {
         ~Endpoint()                                 {CBLEndpoint_Free(_ref);}
         CBLEndpoint* ref() const                    {return _ref;}
     private:
-        CBLEndpoint* _ref {nullptr};
+        CBLEndpoint* _cbl_nullable _ref {nullptr};
     };
 
 
@@ -56,7 +58,7 @@ namespace cbl {
         ~Authenticator()                            {CBLAuth_Free(_ref);}
         CBLAuthenticator* ref() const               {return _ref;}
     private:
-        CBLAuthenticator* _ref {nullptr};
+        CBLAuthenticator* _cbl_nullable _ref {nullptr};
     };
 
 
@@ -168,13 +170,15 @@ namespace cbl {
         }
 
     private:
-        static void _callChangeListener(void *context, CBLReplicator *repl,
-                                  const CBLReplicatorStatus *status)
+        static void _callChangeListener(void* _cbl_nullable context,
+                                        CBLReplicator *repl,
+                                        const CBLReplicatorStatus *status)
         {
             ChangeListener::call(context, Replicator(repl), *status);
         }
 
-        static void _callDocListener(void *context, CBLReplicator *repl,
+        static void _callDocListener(void* _cbl_nullable context,
+                                     CBLReplicator *repl,
                                      bool isPush,
                                      unsigned numDocuments,
                                      const CBLReplicatedDocument* documents)
@@ -189,3 +193,5 @@ namespace cbl {
         CBL_REFCOUNTED_BOILERPLATE(Replicator, RefCounted, CBLReplicator)
     };
 }
+
+CBL_ASSUME_NONNULL_END

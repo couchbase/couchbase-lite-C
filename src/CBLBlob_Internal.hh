@@ -29,14 +29,15 @@
 #include <mutex>
 #include "betterassert.hh"
 
+CBL_ASSUME_NONNULL_BEGIN
 
 struct CBLBlob : public CBLRefCounted {
 public:
-    static bool isBlob(FLDict dict) noexcept {
+    static bool isBlob(FLDict _cbl_nullable dict) noexcept {
         return C4Blob::isBlob(dict);
     }
 
-    static const CBLBlob* getBlob(FLDict blobDict) noexcept {
+    static const CBLBlob* _cbl_nullable getBlob(FLDict blobDict) noexcept {
         auto doc = CBLDocument::containing(Dict(blobDict));
         if (!doc)
             return nullptr;
@@ -102,8 +103,8 @@ protected:
     }
 
     const C4BlobKey& key() const                        {return _key;}
-    CBLDatabase* database() const                       {return _db;}
-    void setDatabase(CBLDatabase *db _cbl_nonnull)      {precondition(!_db); _db = db;}
+    CBLDatabase* _cbl_nullable database() const         {return _db;}
+    void setDatabase(CBLDatabase *db)                   {precondition(!_db); _db = db;}
 
     C4BlobStore* blobStore() const {
         if (!_db) C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Unsaved blob");
@@ -113,9 +114,9 @@ protected:
 private:
     friend struct CBLBlobReadStream;
 
-    RetainedValue const _properties;
-    C4BlobKey           _key;
-    CBLDatabase*        _db {nullptr};
+    RetainedValue const         _properties;
+    C4BlobKey                   _key;
+    CBLDatabase* _cbl_nullable  _db {nullptr};
 };
 
 
@@ -141,7 +142,7 @@ public:
         return CBLBlob::content();
     }
 
-    bool install(CBLDatabase *db _cbl_nonnull) {
+    bool install(CBLDatabase *db) {
         {
             LOCK(_mutex);
             CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%.*s'", FMTSLICE(digest()));
@@ -214,3 +215,5 @@ inline CBLNewBlob::CBLNewBlob(slice contentType, CBLBlobWriteStream &&writer)
     // is saved and calls my install() method.
     CBLDocument::registerNewBlob(this);
 }
+
+CBL_ASSUME_NONNULL_END

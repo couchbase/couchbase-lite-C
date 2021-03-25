@@ -25,6 +25,8 @@
 #include "fleece/Mutable.hh"
 #include <unordered_map>
 
+CBL_ASSUME_NONNULL_BEGIN
+
 struct CBLBlob;
 struct CBLNewBlob;
 
@@ -53,7 +55,7 @@ public:
 
 
     // Document loaded from db without a C4Document (e.g. a replicator validation callback)
-    CBLDocument(CBLDatabase *db _cbl_nonnull,
+    CBLDocument(CBLDatabase *db,
                 slice docID,
                 slice revID,
                 C4RevisionFlags revFlags,
@@ -65,7 +67,7 @@ public:
     }
 
 
-    static CBLDocument* containing(Value value) {
+    static CBLDocument* _cbl_nullable containing(Value value) {
         C4Document* doc = C4Document::containingValue(value);
         return doc ? (CBLDocument*)doc->extraInfo().pointer : nullptr;
     }
@@ -74,7 +76,7 @@ public:
 #pragma mark - Accessors:
 
 
-    CBLDatabase* database() const               {return _db;}
+    CBLDatabase*  _cbl_nullable database() const{return _db;}
     bool exists() const                         {return _c4doc.useLocked().get() != nullptr;}
     bool isMutable() const                      {return _mutable;}
     slice docID() const                         {return _docID;}
@@ -167,11 +169,11 @@ public:
 #pragma mark - Blobs:
 
 
-    CBLBlob* getBlob(FLDict _cbl_nonnull dict);
+    CBLBlob*  _cbl_nullable getBlob(FLDict dict);
 
-    static void registerNewBlob(CBLNewBlob* _cbl_nonnull blob);
+    static void registerNewBlob(CBLNewBlob* blob);
 
-    static void unregisterNewBlob(CBLNewBlob* _cbl_nonnull blob);
+    static void unregisterNewBlob(CBLNewBlob* blob);
 
 
 #pragma mark - Save/delete:
@@ -179,15 +181,15 @@ public:
 
     struct SaveOptions {
         SaveOptions(CBLConcurrencyControl c)         :concurrency(c) { }
-        SaveOptions(CBLConflictHandler h, void *ctx) :conflictHandler(h), context(ctx) { }
+        SaveOptions(CBLConflictHandler h, void* _cbl_nullable ctx) :conflictHandler(h), context(ctx) { }
 
         CBLConcurrencyControl concurrency;
-        CBLConflictHandler conflictHandler = nullptr;
-        void *context;
+        CBLConflictHandler _cbl_nullable conflictHandler = nullptr;
+        void* _cbl_nullable context;
         bool deleting = false;
     };
 
-    bool save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt);
+    bool save(CBLDatabase* db, const SaveOptions &opt);
 
 
 #pragma mark - Conflict resolution:
@@ -225,7 +227,7 @@ public:
         useMerge
     };
 
-    bool resolveConflict(Resolution resolution, const CBLDocument *mergeDoc);
+    bool resolveConflict(Resolution resolution, const CBLDocument* _cbl_nullable mergeDoc);
 
 
 #pragma mark - Internals:
@@ -234,7 +236,8 @@ public:
 private:
     friend struct CBLDatabase;
 
-    CBLDocument(slice docID, CBLDatabase *db, C4Document* c4doc, bool isMutable);
+    CBLDocument(slice docID, CBLDatabase* _cbl_nullable db,
+                C4Document* _cbl_nullable c4doc, bool isMutable);
     virtual ~CBLDocument();
 
     void checkMutable() const {
@@ -242,15 +245,15 @@ private:
             C4Error::raise(LiteCoreDomain, kC4ErrorNotWriteable, "Document object is immutable");
     }
 
-    static void checkDBMatches(CBLDatabase *myDB, CBLDatabase *dbParam _cbl_nonnull) {
+    static void checkDBMatches(CBLDatabase* _cbl_nullable myDB, CBLDatabase *dbParam) {
         if (myDB && myDB != dbParam)
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Saving doc to wrong database");
     }
 
-    static CBLNewBlob* findNewBlob(FLDict dict _cbl_nonnull);
+    static CBLNewBlob* _cbl_nullable findNewBlob(FLDict dict);
     bool saveBlobs(CBLDatabase *db) const;  // returns true if there are blobs
-    alloc_slice encodeBody(CBLDatabase* _cbl_nonnull db,
-                           C4Database* _cbl_nonnull c4db,
+    alloc_slice encodeBody(CBLDatabase* db,
+                           C4Database* c4db,
                            C4RevisionFlags &outRevFlags) const;
 
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
@@ -264,3 +267,5 @@ private:
     ValueToBlobMap                _blobs;           // Maps Dicts in _properties to CBLBlobs
     bool const                    _mutable {false}; // True iff I am mutable
 };
+
+CBL_ASSUME_NONNULL_END

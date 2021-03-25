@@ -59,7 +59,7 @@ void CBLAuth_Free(CBLAuthenticator *auth) noexcept {
 
 CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* conf, CBLError *outError) noexcept {
     try {
-        return retain(new CBLReplicator(conf));
+        return retain(new CBLReplicator(*conf));
     } catchAndBridge(outError)
 }
 

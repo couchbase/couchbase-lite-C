@@ -43,7 +43,8 @@ namespace cbl_internal {
     using namespace litecore;
 
     ConflictResolver::ConflictResolver(CBLDatabase *db,
-                                       CBLConflictResolver customResolver, void* context,
+                                       CBLConflictResolver customResolver,
+                                       void* context,
                                        alloc_slice docID,
                                        alloc_slice revID)
     :_db(db)
@@ -57,7 +58,8 @@ namespace cbl_internal {
 
 
     ConflictResolver::ConflictResolver(CBLDatabase *db,
-                                       CBLConflictResolver customResolver, void* context,
+                                       CBLConflictResolver customResolver,
+                                       void* context,
                                        const C4DocumentEnded &docEnded)
     :ConflictResolver(db, customResolver, context, docEnded.docID, docEnded.revID)
     { }

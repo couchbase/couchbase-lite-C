@@ -28,6 +28,8 @@
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
 
+CBL_ASSUME_NONNULL_BEGIN
+
 static inline bool operator== (const CBLError &e1, const CBLError &e2) {
     if (e1.code != 0)
         return e1.domain == e2.domain && e1.code == e2.code;
@@ -44,7 +46,7 @@ namespace cbl {
     class RefCounted {
     protected:
         RefCounted() noexcept                            :_ref(nullptr) { }
-        explicit RefCounted(CBLRefCounted *ref) noexcept :_ref(CBL_Retain(ref)) { }
+        explicit RefCounted(CBLRefCounted* _cbl_nullable ref) noexcept :_ref(CBL_Retain(ref)) { }
         RefCounted(const RefCounted &other) noexcept     :_ref(CBL_Retain(other._ref)) { }
         RefCounted(RefCounted &&other) noexcept          :_ref(other._ref) {other._ref = nullptr;}
         ~RefCounted() noexcept                           {CBL_Release(_ref);}
@@ -78,7 +80,7 @@ namespace cbl {
             }
         }
 
-        CBLRefCounted* _ref;
+        CBLRefCounted* _cbl_nullable _ref;
 
         friend class Transaction;
     };
@@ -137,17 +139,17 @@ protected: \
             _callback = nullptr;
         }
 
-        void* context() const                       {return _callback.get();}
+        void* _cbl_nullable context() const         {return _callback.get();}
         CBLListenerToken* token() const             {return _token;}
         void setToken(CBLListenerToken* token)      {assert(!_token); _token = token;}
 
-        static void call(void* context, Args... args) {
+        static void call(void* _cbl_nullable context, Args... args) {
             auto listener = (Callback*)context;
             (*listener)(args...);
         }
 
     private:
-        CBLListenerToken* _token {nullptr};
+        CBLListenerToken* _cbl_nullable _token {nullptr};
         std::unique_ptr<Callback> _callback;
 
         ListenerToken(const ListenerToken&) =delete;
@@ -156,3 +158,5 @@ protected: \
 
 
 }
+
+CBL_ASSUME_NONNULL_END

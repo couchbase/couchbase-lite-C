@@ -30,9 +30,11 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
     {
         ExpectingExceptions x;
 
+#ifndef __clang__
         config.database = nullptr;
         CHECK(!CBLReplicator_New(&config, &error));
-
+#endif
+        
         config.database = db.ref();
         CHECK(!CBLReplicator_New(&config, &error));
 

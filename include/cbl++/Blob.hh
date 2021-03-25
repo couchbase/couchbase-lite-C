@@ -24,6 +24,8 @@
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
 
+CBL_ASSUME_NONNULL_BEGIN
+
 namespace cbl {
     class BlobReadStream;
     class BlobWriteStream;
@@ -34,7 +36,7 @@ namespace cbl {
         To work with a blob, you construct a Blob object with that dictionary. */
     class Blob : protected RefCounted {
     public:
-        static bool isBlob(fleece::Dict d)          {return FLDict_IsBlob(d);}
+        static bool isBlob(fleece::Dict d)  {return FLDict_IsBlob(d);}
 
         /* Creates a new blobgiven its contents as a single block of data.
             @note  The memory pointed to by `contents` is no longer needed after this call completes
@@ -92,7 +94,7 @@ namespace cbl {
             CBLBlobReader_Close(_stream);
         }
 
-        size_t read(void *dst _cbl_nonnull, size_t maxLength) {
+        size_t read(void *dst, size_t maxLength) {
             CBLError error;
             int bytesRead = CBLBlobReader_Read(_stream, dst, maxLength, &error);
             if (bytesRead < 0)
@@ -101,7 +103,7 @@ namespace cbl {
         }
 
     private:
-        CBLBlobReadStream* _stream {nullptr};
+        CBLBlobReadStream* _cbl_nullable _stream {nullptr};
     };
 
 
@@ -131,7 +133,7 @@ namespace cbl {
 
     private:
         friend class Blob;
-        CBLBlobWriteStream* _writer {nullptr};
+        CBLBlobWriteStream* _cbl_nullable _writer {nullptr};
     };
 
 
@@ -141,3 +143,5 @@ namespace cbl {
     }
 
 }
+
+CBL_ASSUME_NONNULL_END

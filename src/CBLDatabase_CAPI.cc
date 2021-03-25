@@ -195,8 +195,8 @@ bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
     } catchAndBridge(outError)
 }
 
-bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db _cbl_nonnull,
-                                                 CBLDocument* doc _cbl_nonnull,
+bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
+                                                 CBLDocument* doc,
                                                  CBLConflictHandler conflictHandler,
                                                  void *context,
                                                  CBLError* outError) noexcept
@@ -209,8 +209,8 @@ bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db _cbl_nonnull,
     } catchAndBridge(outError)
 }
 
-bool CBLDatabase_DeleteDocument(CBLDatabase *db _cbl_nonnull,
-                                const CBLDocument* doc _cbl_nonnull,
+bool CBLDatabase_DeleteDocument(CBLDatabase *db,
+                                const CBLDocument* doc,
                                 CBLError* outError) noexcept
 {
     return CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc,
@@ -218,8 +218,8 @@ bool CBLDatabase_DeleteDocument(CBLDatabase *db _cbl_nonnull,
                                                             outError);
 }
 
-bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db _cbl_nonnull,
-                                                      const CBLDocument* doc _cbl_nonnull,
+bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db,
+                                                      const CBLDocument* doc,
                                                       CBLConcurrencyControl concurrency,
                                                       CBLError* outError) noexcept
 {
@@ -231,7 +231,7 @@ bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db _cbl_nonnu
     } catchAndBridge(outError)
 }
 
-bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db _cbl_nonnull,
+bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db,
                                     FLString docID,
                                     CBLError* outError) noexcept
 {
@@ -243,8 +243,8 @@ bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db _cbl_nonnull,
     } catchAndBridge(outError)
 }
 
-bool CBLDatabase_PurgeDocument(CBLDatabase* db _cbl_nonnull,
-                               const CBLDocument* doc _cbl_nonnull,
+bool CBLDatabase_PurgeDocument(CBLDatabase* db,
+                               const CBLDocument* doc,
                                CBLError* outError) noexcept
 {
     return CBLDatabase_PurgeDocumentByID(doc->database(), doc->docID(), outError);
@@ -262,7 +262,7 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
     } catchAndBridge(outError)
 }
 
-CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db,
                                                FLSlice docID,
                                                CBLError* outError) noexcept
 {
@@ -271,7 +271,7 @@ CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
     } catchAndBridge(outError)
 }
 
-bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
+bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db,
                                        FLSlice docID,
                                        CBLTimestamp expiration,
                                        CBLError* outError) noexcept
@@ -286,7 +286,7 @@ bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db _cbl_nonnull,
 #pragma mark - QUERIES:
 
 
-bool CBLDatabase_CreateValueIndex(CBLDatabase *db _cbl_nonnull,
+bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   FLString name,
                                   CBLValueIndex index,
                                   CBLError *outError) noexcept
@@ -297,7 +297,7 @@ bool CBLDatabase_CreateValueIndex(CBLDatabase *db _cbl_nonnull,
     } catchAndBridge(outError)
 }
 
-bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db _cbl_nonnull,
+bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      FLString name,
                                      CBLFullTextIndex index,
                                      CBLError *outError) noexcept
@@ -309,7 +309,7 @@ bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db _cbl_nonnull,
 }
 
 
-bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
+bool CBLDatabase_DeleteIndex(CBLDatabase *db,
                              FLString name,
                              CBLError *outError) noexcept
 {
@@ -320,7 +320,7 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db _cbl_nonnull,
 }
 
 
-FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db _cbl_nonnull) noexcept {
+FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db) noexcept {
     try {
         return FLMutableArray_Retain(db->indexNames());
     } catchAndWarn()
@@ -355,9 +355,9 @@ void CBLDatabase_SendNotifications(CBLDatabase *db) noexcept {
 }
 
 
-CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db _cbl_nonnull,
+CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db,
                                                         FLString docID,
-                                                        CBLDocumentChangeListener listener _cbl_nonnull,
+                                                        CBLDocumentChangeListener listener,
                                                         void *context) noexcept
 {
     return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context).detach();

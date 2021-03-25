@@ -114,7 +114,7 @@ static void updateCallback() {
 }
 
 
-void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_nonnull, ...) CBLAPI {
+void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format, ...) CBLAPI {
     precondition((domain <= kCBLLogDomainNetwork));
     precondition((level <= CBLLogNone));
     char *message = nullptr;

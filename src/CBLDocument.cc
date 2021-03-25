@@ -57,7 +57,7 @@ CBLDocument::~CBLDocument() {
 #pragma mark - SAVING:
 
 
-bool CBLDocument::save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt) {
+bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
     auto c4doc = _c4doc.useLocked();
 
     if (opt.deleting) {
@@ -142,8 +142,8 @@ bool CBLDocument::save(CBLDatabase* db _cbl_nonnull, const SaveOptions &opt) {
 }
 
 
-alloc_slice CBLDocument::encodeBody(CBLDatabase* _cbl_nonnull db,
-                                    C4Database* _cbl_nonnull c4db,
+alloc_slice CBLDocument::encodeBody(CBLDatabase* db,
+                                    C4Database* c4db,
                                     C4RevisionFlags &outRevFlags) const
 {
     auto c4doc = _c4doc.useLocked();
@@ -165,7 +165,7 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase* _cbl_nonnull db,
 #pragma mark - CONFLICT RESOLUTION:
 
 
-bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument *mergeDoc) {
+bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cbl_nullable mergeDoc) {
     auto c4doc = _c4doc.useLocked();
 
     if (!c4doc)
