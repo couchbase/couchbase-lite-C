@@ -70,11 +70,18 @@ jobs:
       if: runner.os != 'Windows'
       working-directory: ${{github.workspace}}
       shell: bash
-      run: build/test/CBL_C_Tests -r list
+      run: |
+        pushd build/test
+        ./CBL_C_Tests -r list
+        popd
 
     - name: Test On Windows
       if: runner.os == 'Windows'
       working-directory: ${{github.workspace}}
       shell: bash
       # Windows CMake puts the binary in a subdirectory named after the build type...
-      run: build/test/$BUILD_TYPE/CBL_C_Tests -r list
+      run: |
+        mkdir -p /c/tmp
+        pushd build/test/$BUILD_TYPE
+        ./CBL_C_Tests.exe -r list
+        popd
