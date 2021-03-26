@@ -77,5 +77,7 @@ function(init_vars)
 endfunction()
 
 function(set_dylib_properties)
+    set_exported_symbols_file()
+    
     target_link_libraries(CouchbaseLiteC PUBLIC z ${ICU_LIBS})
 endfunction()
