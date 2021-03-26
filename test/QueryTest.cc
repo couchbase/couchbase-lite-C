@@ -104,10 +104,10 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
     for (int pass = 0; pass < 2; ++pass) {
         if (pass == 1) {
             cerr << "Creating index\n";
-            CBLIndexSpec index = {};
-            index.type = kCBLValueIndex;
-            index.keyExpressionsJSON = R"(["contact.address.zip"])"_sl;
-            CHECK(CBLDatabase_CreateIndex(db, "zips"_sl, index, &error));
+            CBLValueIndex index = {};
+            index.expressionLanguage = kCBLJSONLanguage;
+            index.expressions = R"(["contact.address.zip"])"_sl;
+            CHECK(CBLDatabase_CreateValueIndex(db, "zips"_sl, index, &error));
         }
 
         int errPos;

@@ -158,9 +158,14 @@ namespace cbl {
 
         // Indexes:
 
-        void createIndex(slice name, CBLIndexSpec spec) {
+        void createValueIndex(slice name, CBLValueIndex index) {
             CBLError error;
-            check(CBLDatabase_CreateIndex(ref(), name, spec, &error), error);
+            check(CBLDatabase_CreateValueIndex(ref(), name, index, &error), error);
+        }
+        
+        void createFullTextIndex(slice name, CBLFullTextIndex index) {
+            CBLError error;
+            check(CBLDatabase_CreateFullTextIndex(ref(), name, index, &error), error);
         }
 
         void deleteIndex(slice name) {

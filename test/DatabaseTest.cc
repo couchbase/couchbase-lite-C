@@ -230,10 +230,10 @@ TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
 
 TEST_CASE_METHOD(CBLTest, "Maintenance : Reindex") {
     CBLError error;
-    CBLIndexSpec index = {};
-    index.type = kCBLValueIndex;
-    index.keyExpressionsJSON = R"(["foo"])"_sl;
-    CHECK(CBLDatabase_CreateIndex(db, "foo"_sl, index, &error));
+    CBLValueIndex index = {};
+    index.expressionLanguage = kCBLJSONLanguage;
+    index.expressions = R"(["foo"])"_sl;
+    CHECK(CBLDatabase_CreateValueIndex(db, "foo"_sl, index, &error));
     
     createDocument(db, "doc1", "foo", "bar1");
     createDocument(db, "doc2", "foo", "bar2");
