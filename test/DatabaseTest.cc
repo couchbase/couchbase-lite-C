@@ -85,12 +85,18 @@ TEST_CASE_METHOD(CBLTest, "Database Encryption") {
     CHECK(CBL_DatabaseExists("encdb"_sl, nullslice));
 
     CBLDatabaseConfiguration config1 = CBLDatabase_Config(defaultdb);
-    CHECK(config1.directory != nullslice);     // exact value is platform-specific
-    CHECK(config1.encryptionKey == &key);
+    REQUIRE(config1.encryptionKey);
+    REQUIRE(config1.encryptionKey->algorithm  == key.algorithm);
+    REQUIRE(memcmp(config1.encryptionKey->bytes, key.bytes, 32) == 0);
+    
+    // Correct key from config:
+    CBLDatabase *correctkeydb = CBLDatabase_Open("encdb"_sl, &config1, &error);
+    REQUIRE(correctkeydb);
+    CBLDatabase_Release(correctkeydb);
     
     // No key:
     CBLDatabase *nokeydb = CBLDatabase_Open("encdb"_sl, nullptr, &error);
-    CHECK(nokeydb == nullptr);
+    REQUIRE(nokeydb == nullptr);
     CHECK(error.domain == CBLDomain);
     CHECK(error.code == CBLErrorNotADatabaseFile);
     
@@ -99,7 +105,7 @@ TEST_CASE_METHOD(CBLTest, "Database Encryption") {
     CBLEncryptionKey_FromPassword(&key2, "wrongpassword"_sl);
     CBLDatabaseConfiguration config2 = {nullslice, &key2};
     CBLDatabase *wrongkeydb = CBLDatabase_Open("encdb"_sl, &config2, &error);
-    CHECK(wrongkeydb == nullptr);
+    REQUIRE(wrongkeydb == nullptr);
     CHECK(error.domain == CBLDomain);
     CHECK(error.code == CBLErrorNotADatabaseFile);
     
