@@ -69,14 +69,16 @@ public:
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
         if (c4db->mayHaveExpiration())
             c4db->startHousekeeping();
-        
+#ifdef COUCHBASE_ENTERPRISE
         CBLEncryptionKey key;
         if (config && config->encryptionKey)
             key = *(config->encryptionKey);
         else
             key.algorithm = kCBLEncryptionNone;
-        
         return new CBLDatabase(c4db, name, c4config.parentDirectory, key);
+#else
+        return new CBLDatabase(c4db, name, c4config.parentDirectory);
+#endif
     }
 
     void performMaintenance(CBLMaintenanceType type) {
@@ -104,8 +106,12 @@ public:
     alloc_slice path() const                         {return _c4db.useLocked()->path();}
     
     CBLDatabaseConfiguration config() const noexcept {
+#ifdef COUCHBASE_ENTERPRISE
         const CBLEncryptionKey* key = _key.algorithm != kCBLEncryptionNone ? &_key : nullptr;
         return {_dir, key};
+#else
+        return {_dir};
+#endif
     }
     
     C4BlobStore* blobStore() const                   {return _blobStore;}
@@ -275,10 +281,16 @@ protected:
     RESULT useLocked(LAMBDA callback) { return _c4db.useLocked<RESULT>(callback); }
 
 private:
-    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_, const CBLEncryptionKey key_)
+#ifdef COUCHBASE_ENTERPRISE
+    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_, CBLEncryptionKey key_)
+#else
+    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
+#endif
     :_c4db(std::move(db))
     ,_dir(dir_)
+#ifdef COUCHBASE_ENTERPRISE
     ,_key(key_)
+#endif
     ,_blobStore(&db->getBlobStore())
     ,_notificationQueue(this)
     { }
@@ -378,7 +390,9 @@ private:
 
     litecore::access_lock<Retained<C4Database>> _c4db;
     alloc_slice const                           _dir;
+#ifdef COUCHBASE_ENTERPRISE
     CBLEncryptionKey                            _key;
+#endif
     C4BlobStore*                                _blobStore;
     std::unique_ptr<C4DatabaseObserver>         _observer;
     Listeners<CBLDatabaseChangeListener>        _listeners;

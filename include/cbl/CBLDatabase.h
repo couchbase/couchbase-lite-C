@@ -33,12 +33,11 @@ extern "C" {
 /** \name  Database configuration
     @{ */
 
+#ifdef COUCHBASE_ENTERPRISE
 /** Database encryption algorithms (available only in the Enterprise Edition). */
 typedef CBL_ENUM(uint32_t, CBLEncryptionAlgorithm) {
     kCBLEncryptionNone = 0,         ///< No encryption (default)
-#ifdef COUCHBASE_ENTERPRISE
     kCBLEncryptionAES256            ///< AES with 256-bit key
-#endif
 };
 
 /** Encryption key sizes (in bytes). */
@@ -51,11 +50,14 @@ typedef struct CBLEncryptionKey {
     CBLEncryptionAlgorithm algorithm;       ///< Encryption algorithm
     uint8_t bytes[32];                      ///< Raw key data
 } CBLEncryptionKey;
+#endif
 
 /** Database configuration options. */
 typedef struct {
     FLString directory;                         ///< The parent directory of the database
+#ifdef COUCHBASE_ENTERPRISE
     const CBLEncryptionKey* encryptionKey;      ///< The database's encryption key (if any)
+#endif
 } CBLDatabaseConfiguration;
 
 /** Returns the default database configuration. */

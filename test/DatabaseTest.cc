@@ -57,8 +57,9 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
 
     CBLDatabaseConfiguration config = CBLDatabase_Config(defaultdb);
     CHECK(config.directory != nullslice);     // exact value is platform-specific
+#ifdef COUCHBASE_ENTERPRISE
     CHECK(config.encryptionKey == nullptr);
-
+#endif
     CHECK(CBLDatabase_Delete(defaultdb, &error));
     CBLDatabase_Release(defaultdb);
 
