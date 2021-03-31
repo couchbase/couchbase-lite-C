@@ -240,7 +240,6 @@ public:
 protected:
     friend class CBLDocument;
     friend class CBLReplicator;
-    friend struct CBLURLEndpointListener;
     friend class cbl_internal::AllConflictsResolver;
     friend class cbl_internal::CBLLocalEndpoint;
     friend class cbl_internal::ListenerToken<CBLDocumentChangeListener>;

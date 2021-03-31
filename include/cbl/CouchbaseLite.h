@@ -24,8 +24,3 @@
 #include "CBLLog.h"
 #include "CBLQuery.h"
 #include "CBLReplicator.h"
-
-#ifdef COUCHBASE_ENTERPRISE
-#include "CBLCertificate.h"
-#include "CBLURLEndpointListener.h"
-#endif
