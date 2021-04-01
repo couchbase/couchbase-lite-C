@@ -10,3 +10,6 @@ FLDictIterator_GetKeyAsNSString
 FLValue_GetNSObject
 FLDict_GetWithNSString
 FLErrorDomain
+
+FLEncoder_WriteNSObject
+FLEncoder_FinishWithNSData
