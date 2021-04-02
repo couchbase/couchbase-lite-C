@@ -58,7 +58,7 @@ TEST_CASE_METHOD(CBLTest, "Database w/o config") {
     CBLDatabaseConfiguration config = CBLDatabase_Config(defaultdb);
     CHECK(config.directory != nullslice);     // exact value is platform-specific
 #ifdef COUCHBASE_ENTERPRISE
-    CHECK(config.encryptionKey == nullptr);
+    CHECK(config.encryptionKey.algorithm == kCBLEncryptionNone);
 #endif
     CHECK(CBLDatabase_Delete(defaultdb, &error));
     CBLDatabase_Release(defaultdb);
@@ -78,7 +78,7 @@ TEST_CASE_METHOD(CBLTest, "Database Encryption") {
     CBLError error;
     CBLEncryptionKey key;
     CBLEncryptionKey_FromPassword(&key, "sekrit"_sl);
-    CBLDatabaseConfiguration config = {nullslice, &key};
+    CBLDatabaseConfiguration config = {nullslice, key};
     CBLDatabase *defaultdb = CBLDatabase_Open("encdb"_sl, &config, &error);
     REQUIRE(defaultdb);
     alloc_slice path = CBLDatabase_Path(defaultdb);
@@ -86,9 +86,8 @@ TEST_CASE_METHOD(CBLTest, "Database Encryption") {
     CHECK(CBL_DatabaseExists("encdb"_sl, nullslice));
 
     CBLDatabaseConfiguration config1 = CBLDatabase_Config(defaultdb);
-    REQUIRE(config1.encryptionKey);
-    REQUIRE(config1.encryptionKey->algorithm  == key.algorithm);
-    REQUIRE(memcmp(config1.encryptionKey->bytes, key.bytes, 32) == 0);
+    REQUIRE(config1.encryptionKey.algorithm  == key.algorithm);
+    REQUIRE(memcmp(config1.encryptionKey.bytes, key.bytes, 32) == 0);
     
     // Correct key from config:
     CBLDatabase *correctkeydb = CBLDatabase_Open("encdb"_sl, &config1, &error);
@@ -104,7 +103,7 @@ TEST_CASE_METHOD(CBLTest, "Database Encryption") {
     // Wrong key:
     CBLEncryptionKey key2;
     CBLEncryptionKey_FromPassword(&key2, "wrongpassword"_sl);
-    CBLDatabaseConfiguration config2 = {nullslice, &key2};
+    CBLDatabaseConfiguration config2 = {nullslice, key2};
     CBLDatabase *wrongkeydb = CBLDatabase_Open("encdb"_sl, &config2, &error);
     REQUIRE(wrongkeydb == nullptr);
     CHECK(error.domain == CBLDomain);

@@ -54,9 +54,9 @@ typedef struct CBLEncryptionKey {
 
 /** Database configuration options. */
 typedef struct {
-    FLString directory;                         ///< The parent directory of the database
+    FLString directory;                 ///< The parent directory of the database
 #ifdef COUCHBASE_ENTERPRISE
-    const CBLEncryptionKey* encryptionKey;      ///< The database's encryption key (if any)
+    CBLEncryptionKey encryptionKey;     ///< The database's encryption key (if any)
 #endif
 } CBLDatabaseConfiguration;
 

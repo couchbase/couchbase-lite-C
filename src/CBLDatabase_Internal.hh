@@ -70,12 +70,8 @@ public:
         if (c4db->mayHaveExpiration())
             c4db->startHousekeeping();
 #ifdef COUCHBASE_ENTERPRISE
-        CBLEncryptionKey key;
-        if (config && config->encryptionKey)
-            key = *(config->encryptionKey);
-        else
-            key.algorithm = kCBLEncryptionNone;
-        return new CBLDatabase(c4db, name, c4config.parentDirectory, key);
+        return new CBLDatabase(c4db, name, c4config.parentDirectory,
+                               (config ? config->encryptionKey : CBLEncryptionKey{}));
 #else
         return new CBLDatabase(c4db, name, c4config.parentDirectory);
 #endif
@@ -107,8 +103,7 @@ public:
     
     CBLDatabaseConfiguration config() const noexcept {
 #ifdef COUCHBASE_ENTERPRISE
-        const CBLEncryptionKey* key = _key.algorithm != kCBLEncryptionNone ? &_key : nullptr;
-        return {_dir, key};
+        return {_dir, _key};
 #else
         return {_dir};
 #endif
@@ -328,7 +323,7 @@ private:
         c4Config.parentDirectory = effectiveDir(config->directory);
         c4Config.flags = kC4DB_Create | kC4DB_VersionVectors;
 #ifdef COUCHBASE_ENTERPRISE
-        c4Config.encryptionKey = asC4Key(config->encryptionKey);
+        c4Config.encryptionKey = asC4Key(&config->encryptionKey);
 #endif
         return c4Config;
     }
