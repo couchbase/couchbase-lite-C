@@ -69,7 +69,12 @@ public:
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
         if (c4db->mayHaveExpiration())
             c4db->startHousekeeping();
+#ifdef COUCHBASE_ENTERPRISE
+        return new CBLDatabase(c4db, name, c4config.parentDirectory,
+                               (config ? config->encryptionKey : CBLEncryptionKey{}));
+#else
         return new CBLDatabase(c4db, name, c4config.parentDirectory);
+#endif
     }
 
     void performMaintenance(CBLMaintenanceType type) {
@@ -95,7 +100,15 @@ public:
 
     slice name() const noexcept                      {return _c4db.useLocked()->getName();}
     alloc_slice path() const                         {return _c4db.useLocked()->path();}
-    CBLDatabaseConfiguration config() const noexcept {return {_dir, nullptr};}
+    
+    CBLDatabaseConfiguration config() const noexcept {
+#ifdef COUCHBASE_ENTERPRISE
+        return {_dir, _key};
+#else
+        return {_dir};
+#endif
+    }
+    
     C4BlobStore* blobStore() const                   {return _blobStore;}
 
     uint64_t count() const                           {return _c4db.useLocked()->getDocumentCount();}
@@ -263,9 +276,16 @@ protected:
     RESULT useLocked(LAMBDA callback) { return _c4db.useLocked<RESULT>(callback); }
 
 private:
+#ifdef COUCHBASE_ENTERPRISE
+    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_, CBLEncryptionKey key_)
+#else
     CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
+#endif
     :_c4db(std::move(db))
     ,_dir(dir_)
+#ifdef COUCHBASE_ENTERPRISE
+    ,_key(key_)
+#endif
     ,_blobStore(&db->getBlobStore())
     ,_notificationQueue(this)
     { }
@@ -303,7 +323,7 @@ private:
         c4Config.parentDirectory = effectiveDir(config->directory);
         c4Config.flags = kC4DB_Create | kC4DB_VersionVectors;
 #ifdef COUCHBASE_ENTERPRISE
-        c4Config.encryptionKey = asC4Key(config->encryptionKey);
+        c4Config.encryptionKey = asC4Key(&config->encryptionKey);
 #endif
         return c4Config;
     }
@@ -365,6 +385,9 @@ private:
 
     litecore::access_lock<Retained<C4Database>> _c4db;
     alloc_slice const                           _dir;
+#ifdef COUCHBASE_ENTERPRISE
+    CBLEncryptionKey                            _key;
+#endif
     C4BlobStore*                                _blobStore;
     std::unique_ptr<C4DatabaseObserver>         _observer;
     Listeners<CBLDatabaseChangeListener>        _listeners;

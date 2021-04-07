@@ -49,8 +49,17 @@ function(set_dylib_properties)
         set_target_properties(CouchbaseLiteC PROPERTIES COMPILE_FLAGS /ZW)
         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /nodefaultlib:kernel32.lib /nodefaultlib:ole32.lib")
     endif()
-    set_target_properties(CouchbaseLiteC PROPERTIES LINK_FLAGS
-        "/def:${PROJECT_SOURCE_DIR}/src/exports/generated/CBL.def")
+    
+    if(BUILD_ENTERPRISE)
+        set_target_properties(
+            CouchbaseLiteC PROPERTIES LINK_FLAGS
+            "/def:${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_EE.def")
+    else()
+        set_target_properties(
+            CouchbaseLiteC PROPERTIES LINK_FLAGS
+            "/def:${PROJECT_SOURCE_DIR}/src/exports/generated/CBL.def")
+    endif()
+    
     target_link_libraries(CouchbaseLiteC PRIVATE zlibstatic Ws2_32)
     target_compile_definitions(CouchbaseLiteCStatic PRIVATE LITECORE_EXPORTS)
 endfunction()

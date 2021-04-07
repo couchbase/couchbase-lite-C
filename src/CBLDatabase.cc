@@ -48,10 +48,10 @@ std::string CBLDatabase::defaultDirectory() {
 #endif
 
 
+#ifdef COUCHBASE_ENTERPRISE
 static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
               "C4EncryptionKey and CBLEncryptionKey size do not match");
 
-#ifdef COUCHBASE_ENTERPRISE
 bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBLAPI {
     auto c4key = C4EncryptionKeyFromPassword(password, kC4EncryptionAES256);    //FIXME: Catch
     key->algorithm = CBLEncryptionAlgorithm(c4key.algorithm);
