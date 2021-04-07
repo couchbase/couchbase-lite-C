@@ -130,7 +130,6 @@ install (TARGETS CouchbaseLiteC
 set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
                             CouchbaseLiteCStatic
                             LiteCoreStatic
-                            LiteCoreREST_Static
                            ${NO_WHOLE_LIBRARY_FLAG}
                             LiteCoreWebSocket)
 

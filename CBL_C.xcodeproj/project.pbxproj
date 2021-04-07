@@ -287,9 +287,6 @@
 
 /* Begin PBXFileReference section */
 		2716F8F5247D9D6700BE21D9 /* exports */ = {isa = PBXFileReference; lastKnownFileType = folder; path = exports; sourceTree = "<group>"; };
-		271A988E243BF278008C032D /* CBLURLEndpointListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLURLEndpointListener.h; sourceTree = "<group>"; };
-		271A989C243BFCDA008C032D /* CBLCertificate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLCertificate.h; sourceTree = "<group>"; };
-		271A989D243BFDBF008C032D /* CBLURLEndpointListener_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLURLEndpointListener_Internal.hh; sourceTree = "<group>"; };
 		271A98AF243FDF55008C032D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libCouchbaseLiteC-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		271C2A2C21CAC98F0045856E /* CBLReplicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLReplicator.h; sourceTree = "<group>"; };
@@ -479,7 +476,6 @@
 			isa = PBXGroup;
 			children = (
 				27B61DA321D6E40D0027CCDB /* CouchbaseLite.h */,
-				271A989C243BFCDA008C032D /* CBLCertificate.h */,
 				271C2A2D21CAC98F0045856E /* CBLBase.h */,
 				275BC4CC22012D8700DBE7D2 /* CBLBlob.h */,
 				271C2A2F21CAC98F0045856E /* CBLDatabase.h */,
@@ -487,7 +483,6 @@
 				277B77C6245B44BE00B222D3 /* CBLLog.h */,
 				271C2A3021CAC98F0045856E /* CBLQuery.h */,
 				271C2A2C21CAC98F0045856E /* CBLReplicator.h */,
-				271A988E243BF278008C032D /* CBLURLEndpointListener.h */,
 				271C2A7021CAD6440045856E /* CBL_Compat.h */,
 			);
 			path = cbl;
@@ -506,7 +501,6 @@
 				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
-				271A989D243BFDBF008C032D /* CBLURLEndpointListener_Internal.hh */,
 				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
 				27D11BED2351043B00C58A70 /* ConflictResolver.hh */,
 				271C2A7421CC4BD60045856E /* Internal.cc */,

@@ -3,12 +3,6 @@
 _CBLEncryptionKey_FromPassword
 _CBLDatabase_ChangeEncryptionKey
 _CBLEndpoint_NewWithLocalDB
-_CBLURLEndpointListener_New
-_CBLURLEndpointListener_Start
-_CBLURLEndpointListener_GetPort
-_CBLURLEndpointListener_GetURLs
-_CBLURLEndpointListener_GetStatus
-_CBLURLEndpointListener_Stop
 _CBL_Retain
 _CBL_Release
 _CBL_InstanceCount
