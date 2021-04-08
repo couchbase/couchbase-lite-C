@@ -106,10 +106,11 @@ public:
     alloc_slice path() const                         {return _c4db.useLocked()->path();}
     
     CBLDatabaseConfiguration config() const noexcept {
+        auto &c4config = _c4db.useLocked()->getConfiguration();
 #ifdef COUCHBASE_ENTERPRISE
-        return {_dir, _key};
+        return {c4config.parentDirectory, asCBLKey(c4config.encryptionKey)};
 #else
-        return {_dir};
+        return {c4config.parentDirectory};
 #endif
     }
 
@@ -293,9 +294,6 @@ private:
 #endif
     :_c4db(std::move(db))
     ,_dir(dir_)
-#ifdef COUCHBASE_ENTERPRISE
-    ,_key(key_)
-#endif
     ,_notificationQueue(this)
     { }
 
@@ -319,6 +317,13 @@ private:
             c4key.algorithm = kC4EncryptionNone;
         }
         return c4key;
+    }
+
+    static CBLEncryptionKey asCBLKey(const C4EncryptionKey &c4key) {
+        CBLEncryptionKey key;
+        key.algorithm = static_cast<CBLEncryptionAlgorithm>(c4key.algorithm);
+        memcpy(key.bytes, c4key.bytes, sizeof(CBLEncryptionKey::bytes));
+        return key;
     }
 #endif
 
@@ -394,9 +399,6 @@ private:
 
     litecore::access_lock<Retained<C4Database>> _c4db;
     alloc_slice const                           _dir;
-#ifdef COUCHBASE_ENTERPRISE
-    CBLEncryptionKey                            _key;
-#endif
     std::unique_ptr<C4DatabaseObserver>         _observer;
     Listeners<CBLDatabaseChangeListener>        _listeners;
     Listeners<CBLDatabaseChangeDetailListener>  _detailListeners;
