@@ -17,6 +17,7 @@
 //
 
 #include "CBLDatabase_Internal.hh"
+#include "CBLCollection_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "CBLQuery_Internal.hh"
 #include "CBLPrivate.h"
@@ -61,6 +62,13 @@ bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBL
 #endif
 
 
+// This indirection is just to avoid having to include CBLCollection_Internal.hh in my header.
+CBLCollection* CBLDatabase::wrapCollection(C4Collection* c4coll) const {
+    return CBLCollection::withC4Collection(c4coll, const_cast<CBLDatabase*>(this), _c4db);
+}
+
+
+
 #pragma mark - QUERY:
 
 
@@ -85,7 +93,7 @@ namespace cbl_internal {
         ,_docID(docID)
         {
             auto c4db = _db->useLocked(); // locks DB mutex
-            _c4obs = c4db->observeDocument(docID,
+            _c4obs = c4db->getDefaultCollection()->observeDocument(docID,
                                          [this](C4DocumentObserver*, slice docID, C4SequenceNumber)
                                          {
                                              this->docChanged();

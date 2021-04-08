@@ -20,16 +20,18 @@ namespace cbl_internal {
     class ConflictResolver {
     public:
         /// Basic constructor.
-        ConflictResolver(CBLDatabase *db,
+        ConflictResolver(CBLCollection*,
                          CBLConflictResolver _cbl_nullable customResolver,
                          void* _cbl_nullable context,
                          alloc_slice docID,
                          alloc_slice revID = nullslice);
 
-        ConflictResolver(CBLDatabase*,
+        ConflictResolver(CBLCollection*,
                          CBLConflictResolver _cbl_nullable,
                          void* _cbl_nullable context,
                          const C4DocumentEnded&);
+
+        ~ConflictResolver();
 
         using CompletionHandler = function<void(ConflictResolver*)>;
 
@@ -49,7 +51,7 @@ namespace cbl_internal {
         bool _runNow();
         bool customResolve(CBLDocument *conflict);
 
-        Retained<CBLDatabase>   _db;
+        Retained<CBLCollection>  _collection;
         CBLConflictResolver _cbl_nullable _clientResolver;
         void* _cbl_nullable     _clientResolverContext;
         alloc_slice const       _docID;
@@ -70,7 +72,7 @@ namespace cbl_internal {
         void runNow();
 
     private:
-        bool next();
+        bool next(slice collectionName);
         
         Retained<CBLDatabase>               _db;
         CBLConflictResolver                 _clientResolver;

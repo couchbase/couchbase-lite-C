@@ -42,7 +42,7 @@ public:
     // Mutable copy of another CBLDocument
     CBLDocument(const CBLDocument* otherDoc)
     :CBLDocument(otherDoc->_docID,
-                 otherDoc->_db,
+                 otherDoc->_collection,
                  const_cast<C4Document*>(otherDoc->_c4doc.useLocked().get()),
                  true)
     {
@@ -55,12 +55,12 @@ public:
 
 
     // Document loaded from db without a C4Document (e.g. a replicator validation callback)
-    CBLDocument(CBLDatabase *db,
+    CBLDocument(CBLCollection *coll,
                 slice docID,
                 slice revID,
                 C4RevisionFlags revFlags,
                 Dict body)
-    :CBLDocument(docID, db, nullptr, false)
+    :CBLDocument(docID, coll, nullptr, false)
     {
         _properties = body;
         _revID = revID;
@@ -76,11 +76,12 @@ public:
 #pragma mark - Accessors:
 
 
-    CBLDatabase*  _cbl_nullable database() const{return _db;}
-    bool exists() const                         {return _c4doc.useLocked().get() != nullptr;}
-    bool isMutable() const                      {return _mutable;}
-    slice docID() const                         {return _docID;}
-    slice revisionID() const                    {return _revID;}
+    CBLDatabase* _cbl_nullable database() const;
+    CBLCollection* _cbl_nullable collection() const {return _collection;}
+    bool exists() const                             {return _c4doc.useLocked().get() != nullptr;}
+    bool isMutable() const                          {return _mutable;}
+    slice docID() const                             {return _docID;}
+    slice revisionID() const                        {return _revID;}
 
     uint64_t sequence() const {
         auto c4doc = _c4doc.useLocked();
@@ -189,7 +190,7 @@ public:
         bool deleting = false;
     };
 
-    bool save(CBLDatabase* db, const SaveOptions &opt);
+    bool save(CBLCollection*, const SaveOptions &opt);
 
 
 #pragma mark - Conflict resolution:
@@ -234,9 +235,9 @@ public:
 
 
 private:
-    friend struct CBLDatabase;
+    friend struct CBLCollection;
 
-    CBLDocument(slice docID, CBLDatabase* _cbl_nullable db,
+    CBLDocument(slice docID, CBLCollection* _cbl_nullable collection,
                 C4Document* _cbl_nullable c4doc, bool isMutable);
     virtual ~CBLDocument();
 
@@ -245,9 +246,9 @@ private:
             C4Error::raise(LiteCoreDomain, kC4ErrorNotWriteable, "Document object is immutable");
     }
 
-    static void checkDBMatches(CBLDatabase* _cbl_nullable myDB, CBLDatabase *dbParam) {
-        if (myDB && myDB != dbParam)
-            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Saving doc to wrong database");
+    static void checkCollectionMatches(CBLCollection* _cbl_nullable mine, CBLCollection *param) {
+        if (mine && mine != param)
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Saving doc to wrong collection");
     }
 
     static CBLNewBlob* _cbl_nullable findNewBlob(FLDict dict);
@@ -258,8 +259,8 @@ private:
 
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
 
-    Retained<CBLDatabase>         _db;              // Database (null for new doc)
-    litecore::access_lock<Retained<C4Document>>  _c4doc;           // LiteCore doc (null for new doc)
+    Retained<CBLCollection>        _collection;     // Collection (null for new doc)
+    litecore::access_lock<Retained<C4Document>>  _c4doc; // LiteCore doc (null for new doc)
     alloc_slice const             _docID;           // Document ID (never empty)
     mutable alloc_slice           _revID;           // Revision ID
     fleece::Doc                   _fromJSON;        // Properties read from JSON

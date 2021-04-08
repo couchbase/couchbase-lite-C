@@ -71,8 +71,6 @@ public:
     {
         C4DatabaseConfig2 c4config = asC4Config(config);
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
-        if (c4db->mayHaveExpiration())
-            c4db->startHousekeeping();
         return new CBLDatabase(c4db, name, c4config.parentDirectory);
     }
 
@@ -98,10 +96,9 @@ public:
 
 
     slice name() const noexcept                      {return _c4db.useLocked()->getName();}
-    alloc_slice path() const                         {return _c4db.useLocked()->path();}
-    
+    alloc_slice path() const                         {return _c4db.useLocked()->getPath();}
     CBLDatabaseConfiguration config() const noexcept {
-        auto &c4config = _c4db.useLocked()->getConfig();
+        auto &c4config = _c4db.useLocked()->getConfiguration();
 #ifdef COUCHBASE_ENTERPRISE
         return {c4config.parentDirectory, asCBLKey(c4config.encryptionKey)};
 #else
@@ -113,54 +110,41 @@ public:
     uint64_t lastSequence() const                    {return _c4db.useLocked()->getLastSequence();}
 
 
-#pragma mark - Documents:
+#pragma mark - Collections:
 
 
-    RetainedConst<CBLDocument> getDocument(slice docID, bool allRevisions =false) const {
-        return _getDocument(docID, false, allRevisions);
+    CBLCollection* defaultCollection() const {
+        return wrapCollection(_c4db.useLocked()->getDefaultCollection());
     }
 
-    Retained<CBLDocument> getMutableDocument(slice docID) {
-        return _getDocument(docID, true, true);
+    /// Returns true if the collection exists.
+    bool hasCollection(slice name) const {
+        return _c4db.useLocked()->hasCollection(name);
     }
 
-    bool deleteDocument(const CBLDocument *doc,
-                        CBLConcurrencyControl concurrency)
-    {
-        CBLDocument::SaveOptions opt(concurrency);
-        opt.deleting = true;
-        return const_cast<CBLDocument*>(doc)->save(this, opt);
+    /// Returns the existing collection with the given name, or nullptr if it doesn't exist.
+    CBLCollection* getCollection(slice name) const {
+        return wrapCollection(_c4db.useLocked()->getCollection(name));
     }
 
-    bool deleteDocument(slice docID) {
-        auto c4db = _c4db.useLocked();
-        C4Database::Transaction t(c4db);
-        Retained<C4Document> c4doc = c4db->getDocument(docID, false, kDocGetCurrentRev);
-        if (c4doc)
-            c4doc = c4doc->update(nullslice, kRevDeleted);
-        if (!c4doc)
-            return false;
-        t.commit();
-        return true;
+    /// Creates and returns an empty collection with the given name,
+    /// or returns an existing collection by that name.
+    CBLCollection* createCollection(slice name) {
+        return wrapCollection(_c4db.useLocked()->createCollection(name));
     }
 
-    bool purgeDocument(slice docID) {
-        return _c4db.useLocked()->purgeDoc(docID);
+    /// Deletes the collection with the given name.
+    void deleteCollection(slice name) {
+        _c4db.useLocked()->deleteCollection(name);
     }
 
-    CBLTimestamp getDocumentExpiration(slice docID) {
-        return _c4db.useLocked()->getExpiration(docID);
-    }
-
-    void setDocumentExpiration(slice docID, CBLTimestamp expiration) {
-        auto c4db = _c4db.useLocked();
-        c4db->setExpiration(docID, expiration);
-        if (expiration > 0)
-            c4db->startHousekeeping();
+    /// Returns the names of all existing collections, in the order in which they were created.
+    std::vector<std::string> collectionNames() const {
+        return _c4db.useLocked()->getCollectionNames();
     }
 
 
-#pragma mark - Queries & Indexes:
+#pragma mark - Queries:
 
 
     Retained<CBLQuery> createQuery(CBLQueryLanguage language,
@@ -176,47 +160,6 @@ public:
         if (!c4query)
             return nullptr;
         return new CBLQuery(this, std::move(c4query), _c4db);
-    }
-    
-    void createValueIndex(slice name, CBLValueIndex index) {
-        if (index.expressionLanguage == kCBLN1QLLanguage) {
-            // CBL-1734: Support N1QL expressions
-            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
-        }
-        
-        C4IndexOptions options = {};
-        _c4db.useLocked()->createIndex(name, index.expressions, kC4ValueIndex, &options);
-    }
-    
-    void createFullTextIndex(slice name, CBLFullTextIndex index) {
-        if (index.expressionLanguage == kCBLN1QLLanguage) {
-            // CBL-1734: Support N1QL expressions
-            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
-        }
-        
-        C4IndexOptions options = {};
-        options.ignoreDiacritics = index.ignoreAccents;
-        
-        std::string languageStr;
-        if (index.language.buf) {
-            languageStr = std::string(index.language);
-            options.language = languageStr.c_str();
-        }
-        _c4db.useLocked()->createIndex(name, index.expressions, kC4FullTextIndex, &options);
-    }
-
-    void deleteIndex(slice name) {
-        _c4db.useLocked()->deleteIndex(name);
-    }
-
-    fleece::MutableArray indexNames() {
-        Doc doc(_c4db.useLocked()->getIndexesInfo());
-        auto indexes = fleece::MutableArray::newArray();
-        for (Array::iterator i(doc.root().asArray()); i; ++i) {
-            Dict info = i.value().asDict();
-            indexes.append(info["name"]);
-        }
-        return indexes;
     }
 
 
@@ -343,19 +286,13 @@ private:
         }
     }
 
-    Retained<CBLDocument> _getDocument(slice docID, bool isMutable, bool allRevisions) const {
-        C4DocContentLevel content = (allRevisions ? kDocGetAll : kDocGetCurrentRev);
-        Retained<C4Document> c4doc = _c4db.useLocked()->getDocument(docID, true, content);
-        if (!c4doc || (!allRevisions && (c4doc->flags() & kDocDeleted)))
-            return nullptr;
-        return new CBLDocument(docID, const_cast<CBLDatabase*>(this), c4doc, isMutable);
-    }
+    CBLCollection* _cbl_nullable wrapCollection(C4Collection* _cbl_nullable) const;
 
     Retained<CBLListenerToken> addListener(fleece::function_ref<Retained<CBLListenerToken>()> cb) {
         auto c4db = _c4db.useLocked(); // locks DB mutex, so the callback can run thread-safe
         Retained<CBLListenerToken> token = cb();
         if (!_observer)
-            _observer = c4db->observe([this](C4DatabaseObserver*) { this->databaseChanged(); });
+            _observer = c4db->getDefaultCollection()->observe([this](C4DatabaseObserver*) { this->databaseChanged(); });
         return token;
     }
 

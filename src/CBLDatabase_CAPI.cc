@@ -149,27 +149,19 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) noexcept {
 #pragma mark - DOCUMENTS:
 
 
+#ifndef CBL_STRICT_COLLECTION_API
+
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID,
                                            CBLError* outError) noexcept
 {
-    try {
-        auto doc = db->getDocument(docID).detach();
-        if (!doc && outError)
-            outError->code = 0;
-        return doc;
-    } catchAndBridge(outError)
+    return CBLCollection_GetDocument(db->defaultCollection(), docID, outError);
 }
 
 
 CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID,
                                             CBLError* outError) noexcept
 {
-    try {
-        auto doc = db->getMutableDocument(docID).detach();
-        if (!doc && outError)
-            outError->code = 0;
-        return doc;
-    } catchAndBridge(outError)
+    return CBLCollection_GetMutableDocument(db->defaultCollection(), docID, outError);
 }
 
 
@@ -187,12 +179,8 @@ bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
                                                     CBLConcurrencyControl concurrency,
                                                     CBLError* outError) noexcept
 {
-    try {
-        if (doc->save(db, {concurrency}))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
-        return false;
-    } catchAndBridge(outError)
+    return CBLCollection_SaveDocumentWithConcurrencyControl(db->defaultCollection(),
+                                                            doc, concurrency, outError);
 }
 
 bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
@@ -201,21 +189,15 @@ bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
                                                  void *context,
                                                  CBLError* outError) noexcept
 {
-    try {
-        if (doc->save(db, {conflictHandler, context}))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
-        return false;
-    } catchAndBridge(outError)
+    return CBLCollection_SaveDocumentWithConflictHandler(db->defaultCollection(),
+                                                         doc, conflictHandler, context, outError);
 }
 
 bool CBLDatabase_DeleteDocument(CBLDatabase *db,
                                 const CBLDocument* doc,
                                 CBLError* outError) noexcept
 {
-    return CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc,
-                                                            kCBLConcurrencyControlLastWriteWins,
-                                                            outError);
+    return CBLCollection_DeleteDocument(db->defaultCollection(), doc, outError);
 }
 
 bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db,
@@ -223,24 +205,15 @@ bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db,
                                                       CBLConcurrencyControl concurrency,
                                                       CBLError* outError) noexcept
 {
-    try {
-        if (db->deleteDocument(doc, concurrency))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
-        return false;
-    } catchAndBridge(outError)
+    return CBLCollection_DeleteDocumentWithConcurrencyControl(db->defaultCollection(),
+                                                              doc, concurrency, outError);
 }
 
 bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db,
                                     FLString docID,
                                     CBLError* outError) noexcept
 {
-    try {
-        if (db->deleteDocument(docID))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
-        return false;
-    } catchAndBridge(outError)
+    return CBLCollection_DeleteDocumentByID(db->defaultCollection(), docID, outError);
 }
 
 bool CBLDatabase_PurgeDocument(CBLDatabase* db,
@@ -254,32 +227,22 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
                                    FLString docID,
                                    CBLError* outError) noexcept
 {
-    try {
-        if (db->purgeDocument(docID))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
-        return false;
-    } catchAndBridge(outError)
+    return CBLCollection_PurgeDocumentByID(db->defaultCollection(), docID, outError);
 }
 
 CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db,
                                                FLSlice docID,
                                                CBLError* outError) noexcept
 {
-    try {
-        return db->getDocumentExpiration(docID);
-    } catchAndBridge(outError)
+    return CBLCollection_GetDocumentExpiration(db->defaultCollection(), docID, outError);
 }
 
 bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db,
                                        FLSlice docID,
-                                       CBLTimestamp expiration,
+                                       CBLTimestamp exp,
                                        CBLError* outError) noexcept
 {
-    try {
-        db->setDocumentExpiration(docID, expiration);
-        return true;
-    } catchAndBridge(outError)
+    return CBLCollection_SetDocumentExpiration(db->defaultCollection(), docID, exp, outError);
 }
 
 
@@ -291,10 +254,7 @@ bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   CBLValueIndex index,
                                   CBLError *outError) noexcept
 {
-    try {
-        db->createValueIndex(name, index);
-        return true;
-    } catchAndBridge(outError)
+    return CBLCollection_CreateValueIndex(db->defaultCollection(), name, index, outError);
 }
 
 bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
@@ -302,10 +262,7 @@ bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      CBLFullTextIndex index,
                                      CBLError *outError) noexcept
 {
-    try {
-        db->createFullTextIndex(name, index);
-        return true;
-    } catchAndBridge(outError)
+    return CBLCollection_CreateFullTextIndex(db->defaultCollection(), name, index, outError);
 }
 
 
@@ -313,19 +270,16 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db,
                              FLString name,
                              CBLError *outError) noexcept
 {
-    try {
-        db->deleteIndex(name);
-        return true;
-    } catchAndBridge(outError)
+    return CBLCollection_DeleteIndex(db->defaultCollection(), name, outError);
 }
 
 
 FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db) noexcept {
-    try {
-        return FLMutableArray_Retain(db->indexNames());
-    } catchAndWarn()
+    return CBLCollection_IndexNames(db->defaultCollection());
 }
 
+
+#endif // CBL_STRICT_COLLECTION_API
 
 CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* constdb,
                                                 CBLDatabaseChangeListener listener,

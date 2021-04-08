@@ -209,7 +209,7 @@ inline std::unique_ptr<CBLBlobReadStream> CBLBlob::openContentStream() const {
 
 
 inline CBLNewBlob::CBLNewBlob(slice contentType, CBLBlobWriteStream &&writer)
-:CBLBlob(writer._c4stream.computeBlobKey(), writer._c4stream.bytesWritten(), contentType) {
+:CBLBlob(writer._c4stream.computeBlobKey(), writer._c4stream.getBytesWritten(), contentType) {
     _writer.emplace(std::move(writer._c4stream));
     // Nothing more will be written, but don't install the stream until the owning document
     // is saved and calls my install() method.

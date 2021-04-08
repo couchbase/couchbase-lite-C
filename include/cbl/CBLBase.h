@@ -182,6 +182,12 @@ void CBL_DumpInstances(void) CBLAPI;
 typedef struct CBLDatabase   CBLDatabase;
 /** @} */
 
+/** \defgroup collections  Collections
+     @{ */
+/** A named grouping of documents within a database. */
+typedef struct CBLCollection   CBLCollection;
+/** @} */
+
 /** \defgroup documents  Documents
      @{ */
 /** An in-memory copy of a document.

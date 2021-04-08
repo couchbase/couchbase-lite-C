@@ -297,6 +297,7 @@ typedef CBL_OPTIONS(unsigned, CBLDocumentFlags) {
 
 /** Information about a document that's been pushed or pulled. */
 typedef struct {
+    FLString collectionName;    ///< Name of document's collection
     FLString ID;                ///< The document ID
     CBLDocumentFlags flags;     ///< Indicates whether the document was deleted or removed
     CBLError error;             ///< If the code is nonzero, the document failed to replicate.

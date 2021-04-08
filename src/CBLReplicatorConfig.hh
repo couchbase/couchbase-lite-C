@@ -22,7 +22,6 @@
 #include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
 #include "c4ReplicatorTypes.h"
-#include "c4Private.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <mutex>

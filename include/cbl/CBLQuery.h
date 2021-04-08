@@ -279,6 +279,8 @@ typedef struct {
     FLString expressions;
 } CBLValueIndex;
 
+#ifndef CBL_STRICT_COLLECTION_API
+
 /** Creates a value index.
     Indexes are persistent.
     If an identical index with that name already exists, nothing happens (and no error is returned.)
@@ -287,6 +289,9 @@ bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   FLString name,
                                   CBLValueIndex index,
                                   CBLError* _cbl_nullable outError) CBLAPI;
+
+#endif // CBL_STRICT_COLLECTION_API
+
 
 
 /** Full-Text Index Specification. */
@@ -316,6 +321,9 @@ typedef struct {
     FLString language;
 } CBLFullTextIndex;
 
+
+#ifndef CBL_STRICT_COLLECTION_API
+
 /** Creates a full-text index.
     Indexes are persistent.
     If an identical index with that name already exists, nothing happens (and no error is returned.)
@@ -334,6 +342,9 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db,
     @note  You are responsible for releasing the returned Fleece array. */
 _cbl_warn_unused
 FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db) CBLAPI;
+
+#endif // CBL_STRICT_COLLECTION_API
+
 
 /** @} */
 /** @} */

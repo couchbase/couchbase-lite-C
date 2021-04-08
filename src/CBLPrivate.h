@@ -47,6 +47,17 @@ CBL_CAPI_BEGIN
                                         FLString docID,
                                         CBLError* _cbl_nullable outError) CBLAPI;
 
+/** Deletes a document from the collection, given only its ID.
+    @note  If no document with that ID exists, this function will return false but the error
+            code will be zero.
+    @param collection  The collection.
+    @param docID  The document ID to delete.
+    @param outError  On failure, the error will be written here.
+    @return  True if the document was deleted, false if it doesn't exist or the deletion failed. */
+    bool CBLCollection_DeleteDocumentByID(CBLCollection *collection,
+                                          FLString docID,
+                                          CBLError* _cbl_nullable outError) CBLAPI;
+
     /** A more detailed look at a specific database change. */
     typedef struct {
         FLHeapSlice docID;          ///< The document's ID

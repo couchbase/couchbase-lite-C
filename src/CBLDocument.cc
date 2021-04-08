@@ -18,6 +18,7 @@
 
 #include "CBLDocument.h"
 #include "CBLPrivate.h"
+#include "CBLCollection_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "CBLBlob_Internal.hh"
 #include "c4BlobStore.hh"
@@ -34,9 +35,9 @@ using namespace cbl_internal;
 // CBLDatabase_Internal.hh, which would create a circular header dependency.
 
 
-CBLDocument::CBLDocument(slice docID, CBLDatabase *db, C4Document *c4doc, bool isMutable)
+CBLDocument::CBLDocument(slice docID, CBLCollection *collection, C4Document *c4doc, bool isMutable)
 :_docID(docID)
-,_db(db)
+,_collection(collection)
 ,_c4doc(c4doc)
 ,_mutable(isMutable)
 {
@@ -54,10 +55,16 @@ CBLDocument::~CBLDocument() {
 }
 
 
+CBLDatabase* _cbl_nullable CBLDocument::database() const {
+    return _collection ? _collection->database() : nullptr;
+}
+
+
+
 #pragma mark - SAVING:
 
 
-bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
+bool CBLDocument::save(CBLCollection* toCollection, const SaveOptions &opt) {
     auto c4doc = _c4doc.useLocked();
 
     if (opt.deleting) {
@@ -66,10 +73,12 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
     } else {
         checkMutable();
     }
-    checkDBMatches(_db, db);
+    checkCollectionMatches(_collection, toCollection);
 
+    CBLDatabase *db = toCollection->database();
     Retained<C4Document> newDoc = nullptr;
-    db->useLocked([&](C4Database *c4db) {
+    toCollection->useLocked([&](C4Collection *c4coll) {
+        C4Database *c4db = c4coll->getDatabase();    // note: database & collection share a lock
         C4Database::Transaction t(c4db);
 
         // Encode properties: 
@@ -98,7 +107,7 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
                 rq.revFlags = revFlags;
                 rq.save = true;
                 C4Error c4err;
-                newDoc = c4db->putDocument(rq, nullptr, &c4err);
+                newDoc = c4coll->putDocument(rq, nullptr, &c4err);
                 if (!newDoc && c4err != C4Error{LiteCoreDomain, kC4ErrorConflict})
                     C4Error::raise(c4err);
             }
@@ -107,7 +116,7 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
                 // Conflict!
                 if (opt.conflictHandler) {
                     // Custom conflict resolution:
-                    auto conflictingDoc = db->getDocument(_docID, true);
+                    auto conflictingDoc = toCollection->getDocument(_docID, true);
                     if (conflictingDoc && conflictingDoc->revisionFlags() & kRevDeleted)
                         conflictingDoc = nullptr;
                     if (!opt.conflictHandler(opt.context, this, conflictingDoc))
@@ -135,7 +144,7 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
         return false;
 
     // Update my C4Document:
-    _db = db;
+    _collection = collection();
     c4doc.get() = move(newDoc);
     _revID = c4doc->selectedRev().revID;
     return true;
@@ -152,7 +161,7 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase* db,
     outRevFlags = hasBlobs ? kRevHasAttachments : 0;
 
     // Now encode the properties to Fleece:
-    SharedEncoder enc(c4db->getSharedFleeceEncoder());
+    SharedEncoder enc(c4db->sharedFleeceEncoder());
     enc.writeValue(properties());
     FLError flErr;
     alloc_slice body = enc.finish(&flErr);
@@ -178,14 +187,15 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cb
     if (resolution != Resolution::useRemote)
         std::swap(winner, loser);
 
-    return _db->useLocked<bool>([&](C4Database *c4db) {
+    return _collection->useLocked<bool>([&](C4Collection *c4coll) {
+        C4Database *c4db = c4coll->getDatabase();    // note: database & collection share a lock
         C4Database::Transaction t(c4db);
 
         alloc_slice mergeBody;
         C4RevisionFlags mergeFlags = 0;
         if (resolution == Resolution::useMerge) {
             if (mergeDoc) {
-                mergeBody = mergeDoc->encodeBody(_db, c4db, mergeFlags);
+                mergeBody = mergeDoc->encodeBody(_collection->database(), c4db, mergeFlags);
             } else {
                 mergeBody = alloc_slice(size_t(0));
                 mergeFlags = kRevDeleted;

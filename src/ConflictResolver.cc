@@ -18,6 +18,7 @@
 
 #include "ConflictResolver.hh"
 #include "CBLReplicator_Internal.hh"
+#include "CBLCollection_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "Internal.hh"
 #include "c4DocEnumerator.hh"
@@ -42,12 +43,12 @@ namespace cbl_internal {
     using namespace fleece;
     using namespace litecore;
 
-    ConflictResolver::ConflictResolver(CBLDatabase *db,
+    ConflictResolver::ConflictResolver(CBLCollection *collection,
                                        CBLConflictResolver customResolver,
                                        void* context,
                                        alloc_slice docID,
                                        alloc_slice revID)
-    :_db(db)
+    :_collection(collection)
     ,_clientResolver(customResolver)
     ,_clientResolverContext(context)
     ,_docID(move(docID))
@@ -57,12 +58,15 @@ namespace cbl_internal {
     }
 
 
-    ConflictResolver::ConflictResolver(CBLDatabase *db,
+    ConflictResolver::ConflictResolver(CBLCollection *collection,
                                        CBLConflictResolver customResolver,
                                        void* context,
                                        const C4DocumentEnded &docEnded)
-    :ConflictResolver(db, customResolver, context, docEnded.docID, docEnded.revID)
+    :ConflictResolver(collection, customResolver, context, docEnded.docID, docEnded.revID)
     { }
+
+
+    ConflictResolver::~ConflictResolver() = default;
 
 
     void ConflictResolver::runAsync(CompletionHandler completionHandler) noexcept {
@@ -82,7 +86,7 @@ namespace cbl_internal {
         try {
             do {
                 // Create a CBLDocument that reflects the conflict revision:
-                auto conflict = _db->getMutableDocument(_docID);
+                auto conflict = _collection->getMutableDocument(_docID);
                 if (!conflict) {
                     SyncLog(Info, "Doc '%.*s' no longer exists, no conflict to resolve",
                             FMTSLICE(_docID));
@@ -151,7 +155,7 @@ namespace cbl_internal {
         CBLDocument *otherDoc = conflict;
         if (otherDoc->revisionFlags() & kRevDeleted)
             otherDoc = nullptr;
-        auto myDoc = _db->getDocument(_docID, true);
+        auto myDoc = _collection->getDocument(_docID, true);
         if (myDoc && myDoc->revisionFlags() & kRevDeleted)
             myDoc = nullptr;
 
@@ -180,10 +184,10 @@ namespace cbl_internal {
         } else {
             if (resolved) {
                 // Sanity check the resolved document:
-                if (resolved->database() && resolved->database() != _db) {
+                if (resolved->collection() && resolved->collection() != _collection) {
                     C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
                                    "CBLDocument returned from custom conflict resolver belongs to"
-                                   " wrong database");
+                                   " wrong collection");
                 }
                 if (resolved->docID() != _docID) {
                     C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
@@ -224,19 +228,29 @@ namespace cbl_internal {
 
 
     void AllConflictsResolver::runNow() {
-        while (next()) {
-            alloc_slice docID = _enum->documentInfo().docID;
-            ConflictResolver resolver(_db, _clientResolver, _clientResolverContext, docID);
-            resolver.runNow();
+        for (std::string &collectionName : _db->collectionNames()) {
+            CBLCollection *collection = _db->getCollection(collectionName);
+            if (!collection)
+                continue;
+            _enum = nullptr;
+            while (next(collectionName)) {
+                alloc_slice docID = _enum->documentInfo().docID;
+                ConflictResolver resolver(collection, _clientResolver, _clientResolverContext,
+                                          docID);
+                resolver.runNow();
+            }
         }
     }
 
 
-    bool AllConflictsResolver::next() {
+    bool AllConflictsResolver::next(slice inCollection) {
         return _db->useLocked<bool>([&](C4Database *c4db) {
             if (!_enum) {
+                auto c4coll = c4db->getCollection(inCollection);
+                if (!c4coll)
+                    return false;
                 // Flags value of 0 means without kC4IncludeNonConflicted, i.e. only conflicted.
-                _enum = make_unique<C4DocEnumerator>(c4db, C4EnumeratorOptions{ 0 });
+                _enum = make_unique<C4DocEnumerator>(c4coll, C4EnumeratorOptions{ 0 });
             }
             return _enum->next();
         });

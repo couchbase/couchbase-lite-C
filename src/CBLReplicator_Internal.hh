@@ -22,7 +22,6 @@
 #include "ConflictResolver.hh"
 #include "Internal.hh"
 #include "c4Replicator.hh"
-#include "c4Private.h"
 #include "StringUtil.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
@@ -83,23 +82,25 @@ public:
         };
 
         if (_conf.pushFilter) {
-            params.pushFilter = [](C4String docID,
+            params.pushFilter = [](C4String collName,
+                                   C4String docID,
                                    C4String revID,
                                    C4RevisionFlags flags,
                                    FLDict body,
                                    void* ctx)
             {
-                return ((CBLReplicator*)ctx)->_filter(docID, revID, flags, body, true);
+                return ((CBLReplicator*)ctx)->_filter(collName, docID, revID, flags, body, true);
             };
         }
         if (_conf.pullFilter) {
-            params.validationFunc = [](C4String docID,
+            params.validationFunc = [](C4String collName,
+                                       C4String docID,
                                        C4String revID,
                                        C4RevisionFlags flags,
                                        FLDict body,
                                        void* ctx)
             {
-                return ((CBLReplicator*)ctx)->_filter(docID, revID, flags, body, false);
+                return ((CBLReplicator*)ctx)->_filter(collName, docID, revID, flags, body, false);
             };
         }
 
@@ -248,15 +249,19 @@ private:
             docs->reserve(numDocs);
         }
         for (size_t i = 0; i < numDocs; ++i) {
-            auto src = *c4Docs[i];
+            auto &src = *c4Docs[i];
             if (!pushing && src.flags & kRevIsConflict) {
                 // Conflict -- start an async resolver task:
-                auto r = new ConflictResolver(_db, _conf.conflictResolver, _conf.context, src);
-                bumpConflictResolverCount(1);
-                r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, std::placeholders::_1) );
+                auto coll = _db->getCollection(src.collectionName);
+                if (coll) {
+                    auto r = new ConflictResolver(coll, _conf.conflictResolver, _conf.context, src);
+                    bumpConflictResolverCount(1);
+                    r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, std::placeholders::_1) );
+                }
             } else if (docs) {
                 // Otherwise add to list of changes to notify:
                 CBLReplicatedDocument doc = {};
+                doc.collectionName = src.collectionName;
                 doc.ID = src.docID;
                 doc.error = external(src.error);
                 doc.flags = 0;
@@ -282,8 +287,12 @@ private:
     }
 
 
-    bool _filter(slice docID, slice revID, C4RevisionFlags flags, Dict body, bool pushing) {
-        Retained<CBLDocument> doc = new CBLDocument(_conf.database, docID, revID, flags, body);
+    bool _filter(slice collName, slice docID, slice revID,
+                 C4RevisionFlags flags, Dict body, bool pushing)
+    {
+        CBLCollection *collection = _conf.database->getCollection(collName);
+        assert(collection);
+        Retained<CBLDocument> doc = new CBLDocument(collection, docID, revID, flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
         return filter(_conf.context, doc, (flags & kRevDeleted) != 0);
     }

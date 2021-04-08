@@ -27,6 +27,8 @@ CBL_CAPI_BEGIN
     A \ref CBLDocument is essentially a JSON object with an ID string that's unique in its database.
  */
 
+CBL_REFCOUNTED(CBLDocument*, Document);
+
 /** \name  Document lifecycle
     @{ */
 
@@ -57,6 +59,8 @@ typedef bool (*CBLConflictHandler)(void* _cbl_nullable context,
                                    const CBLDocument* _cbl_nullable conflictingDocument);
 
 
+#ifndef CBL_STRICT_COLLECTION_API
+
 /** Reads a document from the database, creating a new (immutable) \ref CBLDocument object.
     Each call to this function creates a new object (which must later be released.)
     @note  If you are reading the document in order to make changes to it, call
@@ -70,8 +74,6 @@ _cbl_warn_unused
 const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database,
                                            FLString docID,
                                            CBLError* _cbl_nullable outError) CBLAPI;
-
-CBL_REFCOUNTED(CBLDocument*, Document);
 
 /** Saves a (mutable) document to the database.
     \warning If a newer revision has been saved since \p doc was loaded, it will be overwritten by
@@ -186,6 +188,8 @@ _cbl_warn_unused
 CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
                                             FLString docID,
                                             CBLError* _cbl_nullable outError) CBLAPI;
+
+#endif // CBL_STRICT_COLLECTION_API
 
 /** Creates a new, empty document in memory, with a randomly-generated unique ID.
     It will not be added to a database until saved.

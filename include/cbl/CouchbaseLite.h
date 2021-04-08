@@ -19,6 +19,7 @@
 #pragma once
 #include "CBLBase.h"
 #include "CBLBlob.h"
+#include "CBLCollection.h"
 #include "CBLDatabase.h"
 #include "CBLDocument.h"
 #include "CBLLog.h"
