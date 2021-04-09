@@ -73,12 +73,7 @@ public:
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
         if (c4db->mayHaveExpiration())
             c4db->startHousekeeping();
-#ifdef COUCHBASE_ENTERPRISE
-        return new CBLDatabase(c4db, name, c4config.parentDirectory,
-                               (config ? config->encryptionKey : CBLEncryptionKey{}));
-#else
         return new CBLDatabase(c4db, name, c4config.parentDirectory);
-#endif
     }
 
     void performMaintenance(CBLMaintenanceType type) {
@@ -106,7 +101,7 @@ public:
     alloc_slice path() const                         {return _c4db.useLocked()->path();}
     
     CBLDatabaseConfiguration config() const noexcept {
-        auto &c4config = _c4db.useLocked()->getConfiguration();
+        auto &c4config = _c4db.useLocked()->getConfig();
 #ifdef COUCHBASE_ENTERPRISE
         return {c4config.parentDirectory, asCBLKey(c4config.encryptionKey)};
 #else
@@ -287,11 +282,7 @@ protected:
     RESULT useLocked(LAMBDA callback) { return _c4db.useLocked<RESULT>(callback); }
 
 private:
-#ifdef COUCHBASE_ENTERPRISE
-    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_, CBLEncryptionKey key_)
-#else
     CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
-#endif
     :_c4db(std::move(db))
     ,_dir(dir_)
     ,_notificationQueue(this)
