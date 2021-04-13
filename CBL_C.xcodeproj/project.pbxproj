@@ -385,6 +385,7 @@
 		27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "LibC++Debug.cc"; sourceTree = "<group>"; };
 		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
 		27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+Apple.mm"; sourceTree = "<group>"; };
+		93D0AFF1262619B800777AFC /* generate_edition_header.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_edition_header.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -614,6 +615,7 @@
 				27B61D8421D6BA060027CCDB /* xcconfigs */,
 				27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */,
 				274BAB9D24DA2DB900F4F810 /* generate_exports.sh */,
+				93D0AFF1262619B800777AFC /* generate_edition_header.sh */,
 			);
 			path = Xcode;
 			sourceTree = "<group>";
@@ -755,6 +757,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 271C2A2721CAC8920045856E /* Build configuration list for PBXNativeTarget "CBL_C" */;
 			buildPhases = (
+				93D0AF98262559ED00777AFC /* Generate CBL_Edition.h */,
 				271C2A1F21CAC8920045856E /* Headers */,
 				271C2A2021CAC8920045856E /* Sources */,
 				27DBD088246C94B2002FD7A7 /* Merge static libs */,
@@ -793,11 +796,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 27984E1B2249A127000FE777 /* Build configuration list for PBXNativeTarget "CBL_C Framework" */;
 			buildPhases = (
+				93D0AF88262557D200777AFC /* Generate CBL_Edition.h */,
 				279157C824E1CAF2008B56FE /* Generate Export List */,
 				27984E052249A126000FE777 /* Headers */,
 				27984E062249A126000FE777 /* Sources */,
 				27984E072249A126000FE777 /* Frameworks */,
 				27984E382249A36A000FE777 /* Copy Fleece Headers */,
+				93D0AFB626255E7300777AFC /* Copy CBL_Editionh */,
 			);
 			buildRules = (
 			);
@@ -1107,6 +1112,64 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/bash -e";
 			shellScript = "# This script merges the input files into the static lib built by this target.\nsource $SRCROOT/Xcode/mergeIntoStaticLib.sh\n";
+		};
+		93D0AF88262557D200777AFC /* Generate CBL_Edition.h */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Xcode/generate_edition_header.sh",
+			);
+			name = "Generate CBL_Edition.h";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SCRIPT_INPUT_FILE_0\"\n";
+		};
+		93D0AF98262559ED00777AFC /* Generate CBL_Edition.h */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Xcode/generate_edition_header.sh",
+			);
+			name = "Generate CBL_Edition.h";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SCRIPT_INPUT_FILE_0\"\n";
+		};
+		93D0AFB626255E7300777AFC /* Copy CBL_Editionh */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(DERIVED_FILE_DIR)/CBL_Edition.h",
+			);
+			name = "Copy CBL_Editionh";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(PUBLIC_HEADERS_FOLDER_PATH)",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\ncp \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
