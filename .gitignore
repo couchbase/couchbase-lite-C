@@ -6,6 +6,7 @@ bin
 *.dylib
 empty.cpp
 vendor/couchbase-lite-core-EE
+Xcode/generated_headers
 
 # Editors
 .vscode
@@ -13,7 +14,6 @@ vendor/couchbase-lite-core-EE
 
 # Xcode
 xcuserdata
-
 
 # Python
 python/CouchbaseLite/*.c

@@ -21,6 +21,7 @@
 #include "cbl_config.h"
 #endif
 
+#include "CBL_Edition.h"
 #include "CBL_Compat.h"
 #include "fleece/FLSlice.h"
 #include <stdbool.h>
