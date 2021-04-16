@@ -6,5 +6,5 @@
 //  Copyright © 2018 Couchbase. All rights reserved.
 //
 
-HEADER_SEARCH_PATHS     = include  $(FLEECE)/API  $(FLEECE)/Fleece/Support  $(FLEECE)/vendor/catch
+HEADER_SEARCH_PATHS     = include Xcode/generated_headers $(FLEECE)/API  $(FLEECE)/Fleece/Support  $(FLEECE)/vendor/catch
 PRODUCT_NAME            = cbl_tests

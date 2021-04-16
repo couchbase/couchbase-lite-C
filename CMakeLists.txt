@@ -24,8 +24,13 @@ if(CMAKE_COMPILER_IS_GNUCC)
 endif()
 
 if(BUILD_ENTERPRISE)
-    add_definitions(-DCOUCHBASE_ENTERPRISE)         # Tells CBL it's an EE build
+    set(COUCHBASE_ENTERPRISE 1)                     # For generating CBL_Edition.h
 endif()
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/include/cbl/CBL_Edition.h.in"
+    "${PROJECT_BINARY_DIR}/generated_headers/public/cbl/CBL_Edition.h"
+)
 
 add_definitions("-DCMAKE")
 include(CheckIncludeFile)
@@ -36,7 +41,7 @@ check_function_exists(vasprintf CBL_HAVE_VASPRINTF)
 
 configure_file(
     "${PROJECT_SOURCE_DIR}/include/cbl/cbl_config.h.in"
-    "${PROJECT_BINARY_DIR}/include/cbl/cbl_config.h"
+    "${PROJECT_BINARY_DIR}/generated_headers/private/cbl/cbl_config.h"
 )
 if(MSVC)
     include("cmake/platform_win.cmake")
@@ -94,14 +99,19 @@ set(
 )
 
 add_library(CouchbaseLiteCStatic STATIC ${ALL_SRC_FILES})
-target_include_directories(CouchbaseLiteCStatic PUBLIC include/cbl)
+target_include_directories(
+    CouchbaseLiteCStatic
+    PUBLIC
+    include/cbl
+    ${PROJECT_BINARY_DIR}/generated_headers/public/cbl
+)
 set_platform_include_directories(RESULT PLATFORM_INCLUDE)
 target_include_directories(
     CouchbaseLiteCStatic 
     PRIVATE
     src
     vendor/couchbase-lite-core/C
-    ${PROJECT_BINARY_DIR}/include/cbl/
+    ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
     ${PLATFORM_INCLUDE}
 )
 
@@ -112,13 +122,18 @@ target_link_libraries(
 
 file(WRITE empty.cpp)
 add_library(CouchbaseLiteC SHARED empty.cpp)
-target_include_directories(CouchbaseLiteC PUBLIC include/cbl)
+target_include_directories(
+    CouchbaseLiteC
+    PUBLIC
+    include/cbl
+    ${PROJECT_BINARY_DIR}/generated_headers/public/cbl
+)
 target_include_directories(
     CouchbaseLiteC
     PRIVATE
     src
     vendor/couchbase-lite-core/C
-    ${PROJECT_BINARY_DIR}/include/cbl/
+    ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
     ${PLATFORM_INCLUDE}
 )
 
