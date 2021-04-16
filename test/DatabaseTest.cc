@@ -95,20 +95,26 @@ TEST_CASE_METHOD(CBLTest, "Database Encryption") {
     CBLDatabase_Release(correctkeydb);
     
     // No key:
-    CBLDatabase *nokeydb = CBLDatabase_Open("encdb"_sl, nullptr, &error);
-    REQUIRE(nokeydb == nullptr);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotADatabaseFile);
+    {
+        ExpectingExceptions x;
+        CBLDatabase *nokeydb = CBLDatabase_Open("encdb"_sl, nullptr, &error);
+        REQUIRE(nokeydb == nullptr);
+        CHECK(error.domain == CBLDomain);
+        CHECK(error.code == CBLErrorNotADatabaseFile);
+    }
     
     // Wrong key:
-    CBLEncryptionKey key2;
-    CBLEncryptionKey_FromPassword(&key2, "wrongpassword"_sl);
-    CBLDatabaseConfiguration config2 = {nullslice, key2};
-    CBLDatabase *wrongkeydb = CBLDatabase_Open("encdb"_sl, &config2, &error);
-    REQUIRE(wrongkeydb == nullptr);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotADatabaseFile);
-    
+    {
+        ExpectingExceptions x;
+        CBLEncryptionKey key2;
+        CBLEncryptionKey_FromPassword(&key2, "wrongpassword"_sl);
+        CBLDatabaseConfiguration config2 = {nullslice, key2};
+        CBLDatabase *wrongkeydb = CBLDatabase_Open("encdb"_sl, &config2, &error);
+        REQUIRE(wrongkeydb == nullptr);
+        CHECK(error.domain == CBLDomain);
+        CHECK(error.code == CBLErrorNotADatabaseFile);
+    }
+
     CHECK(CBLDatabase_Delete(defaultdb, &error));
     CBLDatabase_Release(defaultdb);
     CHECK(!CBL_DatabaseExists("encdb"_sl, nullslice));
