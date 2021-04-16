@@ -24,7 +24,6 @@ if(CMAKE_COMPILER_IS_GNUCC)
 endif()
 
 if(BUILD_ENTERPRISE)
-    add_definitions(-DCOUCHBASE_ENTERPRISE)         # Tells CBL it's an EE build
     set(COUCHBASE_ENTERPRISE 1)                     # For generating CBL_Edition.h
 endif()
 
