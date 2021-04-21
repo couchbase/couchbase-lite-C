@@ -18,6 +18,7 @@ include_directories(
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/catch/
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/libb64/
     ${PROJECT_BINARY_DIR}/../generated_headers/private/cbl/ # Real independent projects won't need this
+    ${PROJECT_BINARY_DIR}/../generated_headers/public/cbl/ # or this
 )
 
 set(TEST_SRC

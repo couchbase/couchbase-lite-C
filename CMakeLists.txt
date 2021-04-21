@@ -123,6 +123,7 @@ target_include_directories(
     src
     vendor/couchbase-lite-core/C
     ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
+    ${PROJECT_BINARY_DIR}/generated_headers/public/cbl
     ${PLATFORM_INCLUDE}
 )
 
@@ -146,6 +147,7 @@ target_include_directories(
     src
     vendor/couchbase-lite-core/C
     ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
+    ${PROJECT_BINARY_DIR}/generated_headers/public/cbl
     ${PLATFORM_INCLUDE}
 )
 
@@ -175,7 +177,7 @@ file(GLOB FLEECE_HEADERS ${PROJECT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor
 install(EXPORT CouchbaseLiteTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite)
 
 install(FILES ${C_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
-install(FILES ${PROJECT_BINARY_DIR}/generated_headers/cbl/cbl_config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
+install(FILES ${PROJECT_BINARY_DIR}/generated_headers/public/cbl/CBL_Edition.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
 install(FILES ${FLEECE_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fleece)
 
 configure_file(CouchbaseLiteC.pc.in CouchbaseLiteC.pc @ONLY)
