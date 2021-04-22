@@ -18,7 +18,7 @@
 
 #pragma once
 #include "Database.hh"
-#include "CBLQuery.h"
+#include "cbl/CBLQuery.h"
 #include <stdexcept>
 #include <string>
 #include <vector>

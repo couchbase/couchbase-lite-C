@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "CBLBase.h"
+#include "cbl/CBLBase.h"
 #include "fleece/slice.hh"
 #include <algorithm>
 #include <functional>

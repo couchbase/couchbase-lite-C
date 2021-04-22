@@ -6,7 +6,13 @@ if(NOT DEFINED CMAKE_OSX_SYSROOT)
     set(CMAKE_OSX_SYSROOT macosx)      # this line MUST be above the 1st "project()" line!
 endif()
 
-project (CouchbaseLite_C)
+project (
+    CouchbaseLite_C
+    VERSION 3.0.0
+)
+
+set(CBL_LIB_VERSION "3.0.0")
+set(CBL_LIB_SOVERSION "6")
 
 ### BUILD SETTINGS:
 
@@ -16,6 +22,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/out)
 option(BUILD_ENTERPRISE "Set whether or not to build enterprise edition" OFF)
 
 if(CMAKE_COMPILER_IS_GNUCC)
@@ -34,7 +41,8 @@ configure_file(
 
 add_definitions("-DCMAKE")
 include(CheckIncludeFile)
-include (CheckFunctionExists)
+include(CheckFunctionExists)
+include(GNUInstallDirs)
 check_include_file(unistd.h CBL_HAVE_UNISTD_H)
 check_include_file(direct.h CBL_HAVE_DIRECT_H)
 check_function_exists(vasprintf CBL_HAVE_VASPRINTF)
@@ -43,6 +51,7 @@ configure_file(
     "${PROJECT_SOURCE_DIR}/include/cbl/cbl_config.h.in"
     "${PROJECT_BINARY_DIR}/generated_headers/private/cbl/cbl_config.h"
 )
+
 if(MSVC)
     include("cmake/platform_win.cmake")
 elseif(ANDROID)
@@ -68,11 +77,13 @@ add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
 
 ### SOURCE FILES:
 
-include_directories("vendor/couchbase-lite-core/C/include"
-                    "vendor/couchbase-lite-core/C/Cpp_include"
-                    "vendor/couchbase-lite-core/LiteCore/Support"
-                    "vendor/couchbase-lite-core/vendor/fleece/API"
-                    "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support")
+include_directories(
+    "vendor/couchbase-lite-core/C/include"
+    "vendor/couchbase-lite-core/C/Cpp_include"
+    "vendor/couchbase-lite-core/LiteCore/Support"
+    "vendor/couchbase-lite-core/vendor/fleece/API"
+    "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support"
+)
 
 if(!MSVC)
     set_source_files_properties(${C_SRC} PROPERTIES COMPILE_FLAGS -Wno-return-type-c-linkage)
@@ -100,15 +111,17 @@ set(
 
 add_library(CouchbaseLiteCStatic STATIC ${ALL_SRC_FILES})
 target_include_directories(
-    CouchbaseLiteCStatic
-    PUBLIC
-    include/cbl
-    ${PROJECT_BINARY_DIR}/generated_headers/public/cbl
+    CouchbaseLiteCStatic PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated_headers/public/cbl/>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/>
+    $<INSTALL_INTERFACE:include/>
 )
 set_platform_include_directories(RESULT PLATFORM_INCLUDE)
 target_include_directories(
     CouchbaseLiteCStatic 
     PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/cbl
     src
     vendor/couchbase-lite-core/C
     ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
@@ -123,11 +136,13 @@ target_link_libraries(
 file(WRITE empty.cpp)
 add_library(CouchbaseLiteC SHARED empty.cpp)
 target_include_directories(
-    CouchbaseLiteC
-    PUBLIC
-    include/cbl
-    ${PROJECT_BINARY_DIR}/generated_headers/public/cbl
+    CouchbaseLiteC PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated_headers/public/cbl/>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/>
+    $<INSTALL_INTERFACE:include/>
 )
+
 target_include_directories(
     CouchbaseLiteC
     PRIVATE
@@ -136,11 +151,6 @@ target_include_directories(
     ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
     ${PLATFORM_INCLUDE}
 )
-
-install (TARGETS CouchbaseLiteC
-         RUNTIME DESTINATION bin
-         LIBRARY DESTINATION lib
-         PUBLIC_HEADER DESTINATION include)
 
 set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
                             CouchbaseLiteCStatic
@@ -157,6 +167,37 @@ endif()
 target_link_libraries(CouchbaseLiteC PRIVATE ${CBL_LIBRARIES_PRIVATE})
 
 set_dylib_properties()
+
+## Installation
+
+install (TARGETS CouchbaseLiteC EXPORT CouchbaseLiteTargets)
+
+file(GLOB C_HEADERS ${PROJECT_SOURCE_DIR}/include/cbl/*.h)
+file(GLOB FLEECE_HEADERS ${PROJECT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/fleece/*.h)
+
+install(EXPORT CouchbaseLiteTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite)
+
+install(FILES ${C_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
+install(FILES ${PROJECT_BINARY_DIR}/generated_headers/public/cbl/CBL_Edition.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
+install(FILES ${FLEECE_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fleece)
+
+configure_file(CouchbaseLiteC.pc.in CouchbaseLiteC.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CouchbaseLiteC.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+include(CMakePackageConfigHelpers)
+set(TARGETS_EXPORT_NAME "CouchbaseLiteTargets")
+configure_package_config_file(
+  cmake/CouchbaseLiteConfig.cmake.in
+  CouchbaseLiteConfig.cmake
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite"
+)
+write_basic_package_version_file(
+    ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite/CouchbaseLiteConfigVersion.cmake
+    VERSION ${CBL_LIBRARY_VERSION} COMPATIBILITY SameMajorVersion
+)
+
+install(FILES ${CMAKE_BINARY_DIR}/CouchbaseLiteConfig.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite)
 
 ### TESTS:
 

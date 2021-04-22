@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "CouchbaseLite.h"
+#include "cbl/CouchbaseLite.h"
 
 
 CBL_CAPI_BEGIN

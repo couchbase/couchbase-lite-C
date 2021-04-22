@@ -17,8 +17,8 @@
 //
 
 #pragma once
-#include "CouchbaseLite.h"
-#include "CouchbaseLite.hh"
+#include "cbl/CouchbaseLite.h"
+#include "cbl++/CouchbaseLite.hh"
 #include "CBLPrivate.h"
 #include <functional>
 #include <iostream>
