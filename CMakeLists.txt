@@ -77,12 +77,13 @@ add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
 
 ### SOURCE FILES:
 
-include_directories("vendor/couchbase-lite-core/C/include"
-                    "vendor/couchbase-lite-core/C/Cpp_include"
-                    "vendor/couchbase-lite-core/LiteCore/Support"
-                    "vendor/couchbase-lite-core/vendor/fleece/API"
-                    "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support"
-                    "vendor/couchbase-lite-core/C/Cpp_include")
+include_directories(
+    "vendor/couchbase-lite-core/C/include"
+    "vendor/couchbase-lite-core/C/Cpp_include"
+    "vendor/couchbase-lite-core/LiteCore/Support"
+    "vendor/couchbase-lite-core/vendor/fleece/API"
+    "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support"
+)
 
 if(!MSVC)
     set_source_files_properties(${C_SRC} PROPERTIES COMPILE_FLAGS -Wno-return-type-c-linkage)
@@ -112,6 +113,7 @@ add_library(CouchbaseLiteCStatic STATIC ${ALL_SRC_FILES})
 target_include_directories(
     CouchbaseLiteCStatic PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated_headers/public/cbl/>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/>
     $<INSTALL_INTERFACE:include/>
 )
@@ -123,7 +125,6 @@ target_include_directories(
     src
     vendor/couchbase-lite-core/C
     ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
-    ${PROJECT_BINARY_DIR}/generated_headers/public/cbl
     ${PLATFORM_INCLUDE}
 )
 
@@ -137,6 +138,7 @@ add_library(CouchbaseLiteC SHARED empty.cpp)
 target_include_directories(
     CouchbaseLiteC PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated_headers/public/cbl/>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/>
     $<INSTALL_INTERFACE:include/>
 )
@@ -147,7 +149,6 @@ target_include_directories(
     src
     vendor/couchbase-lite-core/C
     ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
-    ${PROJECT_BINARY_DIR}/generated_headers/public/cbl
     ${PLATFORM_INCLUDE}
 )
 
