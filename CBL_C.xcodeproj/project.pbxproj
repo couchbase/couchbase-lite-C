@@ -68,6 +68,8 @@
 		27984E362249A247000FE777 /* Query.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4F21E6AB1100B60E3C /* Query.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E372249A247000FE777 /* Replicator.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27C9B5F121F7D74A0040BC45 /* Replicator.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27984E3F2249A85E000FE777 /* CouchbaseLite_Umbrella.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		27A63F082633373400634F7B /* Collection.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27A63F072633373400634F7B /* Collection.hh */; };
+		27A63F1826333EEC00634F7B /* CollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27A63F1726333EEC00634F7B /* CollectionTest.cc */; };
 		27B61D5621D5ABA60027CCDB /* CBLQuery_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */; };
 		27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61D6821D6B60D0027CCDB /* CBLTest.hh */; };
 		27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
@@ -350,6 +352,8 @@
 		27984E412249ACD2000FE777 /* CBL_Framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework.xcconfig; sourceTree = "<group>"; };
 		27984E482249AF44000FE777 /* CBL_Dylib_Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Dylib_Release.xcconfig; sourceTree = "<group>"; };
 		27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework_Release.xcconfig; sourceTree = "<group>"; };
+		27A63F072633373400634F7B /* Collection.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Collection.hh; sourceTree = "<group>"; };
+		27A63F1726333EEC00634F7B /* CollectionTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CollectionTest.cc; sourceTree = "<group>"; };
 		27A63F252633408000634F7B /* CBLTest_Cpp.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTest_Cpp.hh; sourceTree = "<group>"; };
 		27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery_CAPI.cc; sourceTree = "<group>"; };
 		27B61D6821D6B60D0027CCDB /* CBLTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTest.hh; sourceTree = "<group>"; };
@@ -584,6 +588,7 @@
 				277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */,
 				277FEE3D21DEF0C700B60E3C /* Base.hh */,
 				275BC4E22204E6A800DBE7D2 /* Blob.hh */,
+				27A63F072633373400634F7B /* Collection.hh */,
 				27B61DD821DEEC540027CCDB /* Database.hh */,
 				277FEE4E21DEF54D00B60E3C /* Document.hh */,
 				277FEE4F21E6AB1100B60E3C /* Query.hh */,
@@ -600,6 +605,7 @@
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
 				275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */,
 				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
+				27A63F1726333EEC00634F7B /* CollectionTest.cc */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
 				275B359D234D064600FE9CF0 /* QueryTest.cc */,
@@ -708,6 +714,7 @@
 				27984E2D2249A240000FE777 /* CBLDocument.h in Headers */,
 				27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */,
 				27984E2C2249A240000FE777 /* CBLDatabase.h in Headers */,
+				27A63F082633373400634F7B /* Collection.hh in Headers */,
 				27984E2E2249A240000FE777 /* CBLQuery.h in Headers */,
 				27984E2F2249A240000FE777 /* CBLReplicator.h in Headers */,
 				27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */,
@@ -1223,6 +1230,7 @@
 				275B358C23481D0C00FE9CF0 /* BlobTest_Cpp.cc in Sources */,
 				27DBD095246C9573002FD7A7 /* LibC++Debug.cc in Sources */,
 				275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */,
+				27A63F1826333EEC00634F7B /* CollectionTest.cc in Sources */,
 				275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -19,12 +19,15 @@
 #pragma once
 #include "cbl++/Base.hh"
 #include "cbl/CBLDatabase.h"
-#include "cbl/CBLDocument.h"
-#include "cbl/CBLQuery.h"
-#include "fleece/Mutable.hh"
 #include <functional>
 #include <string>
-#include <vector>
+
+#ifndef CBL_STRICT_COLLECTION_API
+#   include "cbl/CBLDocument.h"
+#   include "cbl/CBLQuery.h"
+#   include "fleece/Mutable.hh"
+#   include <vector>
+#endif
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
@@ -36,8 +39,10 @@ namespace cbl {
     class MutableDocument;
 
 
+#ifndef CBL_STRICT_COLLECTION_API
     using SaveConflictHandler = std::function<bool(MutableDocument documentBeingSaved,
                                                    Document conflictingDocument)>;
+#endif
 
 
     class Database : private RefCounted {
@@ -114,6 +119,8 @@ namespace cbl {
         std::string path() const                        {return asString(CBLDatabase_Path(ref()));}
         uint64_t count() const                          {return CBLDatabase_Count(ref());}
         CBLDatabaseConfiguration config() const         {return CBLDatabase_Config(ref());}
+
+#ifndef CBL_STRICT_COLLECTION_API
 
         // Documents:
 
@@ -200,6 +207,8 @@ namespace cbl {
             return l;
         }
 
+#endif // CBL_STRICT_COLLECTION_API
+
         // Notifications:
 
         using NotificationsReadyCallback = std::function<void(Database)>;
@@ -216,6 +225,9 @@ namespace cbl {
         void sendNotifications()                            {CBLDatabase_SendNotifications(ref());}
 
     private:
+        friend class Collection;
+
+#ifndef CBL_STRICT_COLLECTION_API
         static void _callListener(void* _cbl_nullable context,
                                   const CBLDatabase *db,
                                   unsigned nDocs, FLString *docIDs)
@@ -228,6 +240,7 @@ namespace cbl {
                                      const CBLDatabase *db, FLString docID) {
             DocumentListener::call(context, Database((CBLDatabase*)db), docID);
         }
+#endif // CBL_STRICT_COLLECTION_API
 
         CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)
     };

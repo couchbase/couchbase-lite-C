@@ -1,7 +1,7 @@
 //
-//  CouchbaseLite.hh
+// CollectionTest.cc
 //
-// Copyright (c) 2018 Couchbase, Inc All rights reserved.
+// Copyright (C) 2020 Jens Alfke. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,10 @@
 // limitations under the License.
 //
 
-// PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
-// It is not considered part of the official Couchbase Lite API.
+#define CBL_STRICT_COLLECTIONS
+#include "cbl++/CouchbaseLite.hh"
 
-#pragma once
-#include "Blob.hh"
-#include "Collection.hh"
-#include "Database.hh"
-#include "Document.hh"
-#include "Query.hh"
-#include "Replicator.hh"
+#include "CBLTest_Cpp.hh"
 
+
+// TODO: Write tests  x_x
