@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "Database.hh"
+#include "cbl++/Database.hh"
 #include "cbl/CBLDocument.h"
 #include "fleece/Mutable.hh"
 #include <string>
@@ -34,20 +34,17 @@ namespace cbl {
     public:
         // Metadata:
 
-        slice id() const                                {return CBLDocument_ID(ref());}
+        std::string id() const                     {return asString(CBLDocument_ID(ref()));}
 
-        slice revisionID() const                        {return CBLDocument_RevisionID(ref());}
+        std::string revisionID() const             {return asString(CBLDocument_RevisionID(ref()));}
 
-        uint64_t sequence() const                       {return CBLDocument_Sequence(ref());}
+        uint64_t sequence() const                  {return CBLDocument_Sequence(ref());}
 
         // Properties:
 
-        fleece::Dict properties() const                 {return CBLDocument_Properties(ref());}
+        fleece::Dict properties() const            {return CBLDocument_Properties(ref());}
 
-        std::string propertiesAsJSON() const {
-            alloc_slice json(CBLDocument_CreateJSON(ref()));
-            return std::string(json);
-        }
+        alloc_slice propertiesAsJSON() const       {return alloc_slice(CBLDocument_CreateJSON(ref()));}
 
         fleece::Value operator[] (slice key) const {return properties()[key];}
 
@@ -56,7 +53,7 @@ namespace cbl {
         inline MutableDocument mutableCopy() const;
 
     protected:
-        Document(CBLRefCounted* r)                      :RefCounted(r) { }
+        Document(CBLRefCounted* r)                  :RefCounted(r) { }
 
         static Document adopt(const CBLDocument* _cbl_nullable d, CBLError *error) {
             if (!d && error->code != 0)
@@ -126,6 +123,16 @@ namespace cbl {
     };
 
 
+    
+    // Document method bodies:
+
+    inline MutableDocument Document::mutableCopy() const {
+        MutableDocument doc;
+        doc._ref = (CBLRefCounted*) CBLDocument_MutableCopy(ref());
+        return doc;
+    }
+
+
     // Database method bodies:
 
     inline Document Database::getDocument(slice id) const {
@@ -166,6 +173,10 @@ namespace cbl {
             error);
     }
 
+    inline void Database::deleteDocument(Document &doc) {
+        (void) deleteDocument(doc, kCBLConcurrencyControlLastWriteWins);
+    }
+
     inline bool Database::deleteDocument(Document &doc, CBLConcurrencyControl cc) {
         CBLError error;
         return Document::checkSave(CBLDatabase_DeleteDocumentWithConcurrencyControl(
@@ -176,13 +187,6 @@ namespace cbl {
     inline void Database::purgeDocument(Document &doc) {
         CBLError error;
         check(CBLDatabase_PurgeDocument(ref(), doc.ref(), &error), error);
-    }
-
-
-    inline MutableDocument Document::mutableCopy() const {
-        MutableDocument doc;
-        doc._ref = (CBLRefCounted*) CBLDocument_MutableCopy(ref());
-        return doc;
     }
 
 

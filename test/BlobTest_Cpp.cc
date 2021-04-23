@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBLTest.hh"
+#include "CBLTest_Cpp.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <string>
@@ -28,9 +28,9 @@ using namespace fleece;
 using namespace cbl;
 
 
-static constexpr slice kBlobContents = "This is the content of the blob.";
-static constexpr slice kBlobContentType = "text/plain";
-static constexpr slice kBlobDigest = "sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=";
+static const slice  kBlobContents = "This is the content of the blob.";
+static const string kBlobContentType = "text/plain";
+static const string kBlobDigest = "sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=";
 
 
 static void checkBlob(Dict props) {
@@ -143,11 +143,11 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in arrays/dicts", "[Blob]") {
         MutableDocument doc("blobbo");
         MutableArray array = MutableArray::newArray();
         array.insertNulls(0, 1);
-        CBLBlob *blob1 = CBLBlob_NewWithData(kBlobContentType, kBlobContents);
+        CBLBlob *blob1 = CBLBlob_NewWithData(slice(kBlobContentType), kBlobContents);
         FLSlot_SetBlob(array[0], blob1);
 
         MutableDict dict = MutableDict::newDict();
-        CBLBlob *blob2 = CBLBlob_NewWithData(kBlobContentType, kBlobContents);
+        CBLBlob *blob2 = CBLBlob_NewWithData(slice(kBlobContentType), kBlobContents);
         FLSlot_SetBlob(dict["b"], blob2);
 
         doc["array"] = array;

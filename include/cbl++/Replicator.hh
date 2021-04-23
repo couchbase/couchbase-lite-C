@@ -17,11 +17,8 @@
 //
 
 #pragma once
-
+#include "cbl++/Document.hh"
 #include "cbl/CBLReplicator.h"
-
-#include "Document.hh"
-
 #include <functional>
 #include <string>
 #include <vector>

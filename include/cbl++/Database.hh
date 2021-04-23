@@ -17,10 +17,9 @@
 //
 
 #pragma once
-#include "Base.hh"
+#include "cbl++/Base.hh"
 #include "cbl/CBLDatabase.h"
 #include "cbl/CBLDocument.h"
-#include "cbl/CBLLog.h"
 #include "cbl/CBLQuery.h"
 #include "fleece/Mutable.hh"
 #include <functional>
@@ -111,10 +110,10 @@ namespace cbl {
 
         // Accessors:
 
-        slice name() const                                  {return CBLDatabase_Name(ref());}
-        std::string path() const                            {return std::string(CBLDatabase_Path(ref()));}
-        uint64_t count() const                              {return CBLDatabase_Count(ref());}
-        CBLDatabaseConfiguration config() const             {return CBLDatabase_Config(ref());}
+        std::string name() const                        {return asString(CBLDatabase_Name(ref()));}
+        std::string path() const                        {return asString(CBLDatabase_Path(ref()));}
+        uint64_t count() const                          {return CBLDatabase_Count(ref());}
+        CBLDatabaseConfiguration config() const         {return CBLDatabase_Config(ref());}
 
         // Documents:
 
@@ -129,9 +128,7 @@ namespace cbl {
         _cbl_warn_unused
         inline bool saveDocument(MutableDocument &doc, SaveConflictHandler conflictHandler);
 
-        inline void deleteDocument(Document &doc) {
-            (void) deleteDocument(doc, kCBLConcurrencyControlLastWriteWins);
-        }
+        inline void deleteDocument(Document &doc);
 
         _cbl_warn_unused
         inline bool deleteDocument(Document &doc, CBLConcurrencyControl c);

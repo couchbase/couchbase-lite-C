@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBLTest.hh"
+#include "CBLTest_Cpp.hh"
 #include "Stopwatch.hh"
 #include <fstream>
 

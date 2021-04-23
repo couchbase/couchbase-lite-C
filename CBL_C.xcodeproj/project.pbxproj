@@ -345,6 +345,7 @@
 		27984E412249ACD2000FE777 /* CBL_Framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework.xcconfig; sourceTree = "<group>"; };
 		27984E482249AF44000FE777 /* CBL_Dylib_Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Dylib_Release.xcconfig; sourceTree = "<group>"; };
 		27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework_Release.xcconfig; sourceTree = "<group>"; };
+		27A63F252633408000634F7B /* CBLTest_Cpp.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTest_Cpp.hh; sourceTree = "<group>"; };
 		27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery_CAPI.cc; sourceTree = "<group>"; };
 		27B61D6821D6B60D0027CCDB /* CBLTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTest.hh; sourceTree = "<group>"; };
 		27B61D6921D6B60D0027CCDB /* CBLTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTest.cc; sourceTree = "<group>"; };
@@ -587,11 +588,12 @@
 			isa = PBXGroup;
 			children = (
 				27B61D6821D6B60D0027CCDB /* CBLTest.hh */,
+				27A63F252633408000634F7B /* CBLTest_Cpp.hh */,
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
 				275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */,
+				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
-				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
 				275B359D234D064600FE9CF0 /* QueryTest.cc */,
 				2736A625242E5A07002B9D65 /* ReplicatorTest.hh */,
 				277CC99422BC23DE00B245CB /* ReplicatorTest.cc */,

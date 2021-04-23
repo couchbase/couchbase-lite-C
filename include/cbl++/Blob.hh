@@ -17,9 +17,10 @@
 //
 
 #pragma once
-#include "Document.hh"
+#include "cbl++/Document.hh"
 #include "cbl/CBLBlob.h"
 #include "fleece/Mutable.hh"
+#include <string>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
@@ -60,10 +61,10 @@ namespace cbl {
         :RefCounted((CBLRefCounted*) FLDict_GetBlob(d))
         { }
 
-        uint64_t length() const                     {return CBLBlob_Length(ref()); }
-        slice contentType() const                   {return CBLBlob_ContentType(ref()); }
-        slice digest() const                        {return CBLBlob_Digest(ref()); }
-        fleece::Dict properties() const             {return CBLBlob_Properties(ref()); }
+        uint64_t length() const                     {return CBLBlob_Length(ref());}
+        std::string contentType() const             {return asString(CBLBlob_ContentType(ref()));}
+        std::string digest() const                  {return asString(CBLBlob_Digest(ref()));}
+        fleece::Dict properties() const             {return CBLBlob_Properties(ref());}
 
         alloc_slice loadContent() {
             CBLError error;
@@ -126,8 +127,12 @@ namespace cbl {
         }
 
         void write(fleece::slice data) {
+            write(data.buf, data.size);
+        }
+
+        void write(const void *src, size_t length) {
             CBLError error;
-            if (!CBLBlobWriter_Write(_writer, data.buf, data.size, &error))
+            if (!CBLBlobWriter_Write(_writer, src, length, &error))
                 throw error;
         }
 

@@ -18,8 +18,8 @@
 
 #pragma once
 #include "cbl/CouchbaseLite.h"
-#include "cbl++/CouchbaseLite.hh"
 #include "CBLPrivate.h"
+#include "fleece/slice.hh"
 #include <functional>
 #include <iostream>
 #include <string>
@@ -31,11 +31,11 @@ constexpr char kPathSeparator[] = "/";
 #endif
 
 #ifdef __APPLE__
-#define CBL_UNUSED __unused
+#   define CBL_UNUSED __unused
 #elif !defined(_MSC_VER)
-#define CBL_UNUSED __attribute__((unused))
+#   define CBL_UNUSED __attribute__((unused))
 #else
-#define CBL_UNUSED
+#   define CBL_UNUSED
 #endif
 
 // Has to be declared before including catch.hpp, so Catch macros can use it
@@ -73,19 +73,6 @@ public:
     CBLDatabase *db {nullptr};
 };
 
-
-class CBLTest_Cpp {
-public:
-    static const fleece::alloc_slice kDatabaseDir;
-    static const fleece::slice kDatabaseName;
-
-    CBLTest_Cpp();
-    ~CBLTest_Cpp();
-
-    cbl::Database openEmptyDatabaseNamed(fleece::slice name);
-
-    cbl::Database db;
-};
 
 std::string GetTestFilePath(const std::string &filename);
 

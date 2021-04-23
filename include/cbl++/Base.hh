@@ -25,6 +25,10 @@
 #include <memory>
 #include <utility>
 
+#if DEBUG
+#   include "cbl/CBLLog.h"
+#endif
+
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
 
@@ -68,6 +72,9 @@ namespace cbl {
         }
 
         void clear()                                    {CBL_Release(_ref); _ref = nullptr;}
+
+        static std::string asString(FLSlice s)          {return slice(s).asString();}
+        static std::string asString(FLSliceResult &&s)  {return alloc_slice(s).asString();}
 
         static void check(bool ok, CBLError &error) {
             if (!ok) {

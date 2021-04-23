@@ -19,6 +19,7 @@
 #define CATCH_CONFIG_CONSOLE_WIDTH 120
 
 #include "CBLTest.hh"
+#include "CBLTest_Cpp.hh"
 #include "CBLPrivate.h"
 #include "fleece/slice.hh"
 #include <fstream>

@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBLTest.hh"
+#include "CBLTest_Cpp.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <string>
@@ -29,8 +29,8 @@ using namespace cbl;
 
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database") {
-    CHECK(db.name() == CBLTest::kDatabaseName);
-    CHECK(string(db.path()) == string(kDatabaseDir) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
+    CHECK(db.name() == string(kDatabaseName));
+    CHECK(db.path() == string(kDatabaseDir) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
     CHECK(db.count() == 0);
 //    CHECK(db.lastSequence() == 0);
 }
@@ -62,7 +62,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Empty Document") {
     db.saveDocument(doc);
     CHECK(string(doc.id()) == "foo");
     CHECK(doc.sequence() == 1);
-    CHECK(doc.revisionID() != nullslice);
+    CHECK(!doc.revisionID().empty());
     CHECK(doc.properties().toJSONString() == "{}");
 
     MutableDocument doc2 = db.getMutableDocument("foo");
@@ -82,7 +82,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
     db.saveDocument(doc);
     CHECK(string(doc.id()) == "foo");
     CHECK(doc.sequence() == 1);
-    CHECK(doc.revisionID() != nullslice);
+    CHECK(!doc.revisionID().empty());
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CHECK(doc["greeting"].asString() == "Howdy!");
 

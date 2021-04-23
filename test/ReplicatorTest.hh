@@ -5,7 +5,7 @@
 //
 
 #pragma once
-#include "CBLTest.hh"
+#include "CBLTest_Cpp.hh"
 #include "cbl++/CouchbaseLite.hh"
 #include <iostream>
 #include <thread>

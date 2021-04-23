@@ -18,12 +18,13 @@
 
 #include "CBLTest.hh"
 #include "cbl/CouchbaseLite.h"
+#include "fleece/Fleece.hh"
+#include "fleece/Mutable.hh"
 #include <iostream>
 #include <thread>
 
 using namespace std;
 using namespace fleece;
-using namespace cbl;
 
 
 class QueryTest : public CBLTest {
@@ -199,6 +200,11 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
 
 
 #pragma mark - C++ API:
+
+
+#include "CBLTest_Cpp.hh"
+
+using namespace cbl;
 
 
 class QueryTest_Cpp : public CBLTest_Cpp {
