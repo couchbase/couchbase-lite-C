@@ -22,7 +22,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/out)
 option(BUILD_ENTERPRISE "Set whether or not to build enterprise edition" OFF)
 
 if(CMAKE_COMPILER_IS_GNUCC)
@@ -152,11 +151,12 @@ target_include_directories(
     ${PLATFORM_INCLUDE}
 )
 
-set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
-                            CouchbaseLiteCStatic
-                            LiteCoreStatic
-                           ${NO_WHOLE_LIBRARY_FLAG}
-                            LiteCoreWebSocket)
+set(CBL_LIBRARIES_PRIVATE  
+    ${WHOLE_LIBRARY_FLAG}
+    CouchbaseLiteCStatic
+    ${NO_WHOLE_LIBRARY_FLAG}
+    LiteCoreWebSocket
+)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
     # C/C++ atomic operations on ARM6/7 emit calls to functions in libatomic
@@ -170,7 +170,14 @@ set_dylib_properties()
 
 ## Installation
 
-install (TARGETS CouchbaseLiteC EXPORT CouchbaseLiteTargets)
+if(ANDROID)
+    set(CMAKE_INSTALL_LIBDIR "lib/${CMAKE_LIBRARY_ARCHITECTURE}")
+endif()
+
+install(
+    TARGETS CouchbaseLiteC 
+    EXPORT CouchbaseLiteTargets
+)
 
 file(GLOB C_HEADERS ${PROJECT_SOURCE_DIR}/include/cbl/*.h)
 file(GLOB FLEECE_HEADERS ${PROJECT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/fleece/*.h)
@@ -201,4 +208,6 @@ install(FILES ${CMAKE_BINARY_DIR}/CouchbaseLiteConfig.cmake
 
 ### TESTS:
 
-add_subdirectory(test)
+if(NOT ANDROID)
+    add_subdirectory(test)
+endif()
