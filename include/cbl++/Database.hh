@@ -21,6 +21,7 @@
 #include "cbl/CBLDatabase.h"
 #include "cbl/CBLDocument.h"
 #include "cbl/CBLQuery.h"
+#include "cbl/CBLLog.h"
 #include "fleece/Mutable.hh"
 #include <functional>
 #include <string>
