@@ -117,6 +117,7 @@ _CBLEndpoint_Free
 _CBLAuth_NewPassword
 _CBLAuth_NewSession
 _CBLAuth_Free
+_CBLReplicatorConfiguration_Default
 _CBLReplicator_New
 _CBLReplicator_Config
 _CBLReplicator_Start

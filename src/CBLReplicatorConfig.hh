@@ -25,6 +25,7 @@
 #include "c4Private.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <climits>
 #include <mutex>
 #include <string>
 
@@ -195,6 +196,11 @@ namespace cbl_internal {
 
         // Writes a LiteCore replicator optionsDict
         void writeOptions(Encoder &enc) const {
+            static const unsigned kDefaultMaxRetriesOneShort = 9;
+            static const unsigned kDefaultMaxRetriesContinuous = UINT_MAX;
+            static const unsigned kDefaultMaxRetryWaitTime = 300;
+            static const unsigned kDefaultHeartbeat = 300;
+            
             writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders,  Dict(headers));
             writeOptionalKey(enc, kC4ReplicatorOptionDocIDs,        Array(documentIDs));
             writeOptionalKey(enc, kC4ReplicatorOptionChannels,      Array(channels));
@@ -225,6 +231,18 @@ namespace cbl_internal {
                 }
                 enc.endDict();
             }
+            
+            enc.writeKey(slice(kC4ReplicatorOptionMaxRetries));
+            if (maxRetries < 0)
+                enc.writeUInt(continuous ? kDefaultMaxRetriesContinuous : kDefaultMaxRetriesOneShort);
+            else
+                enc.writeUInt(maxRetries);
+            
+            enc.writeKey(slice(kC4ReplicatorOptionMaxRetryInterval));
+            enc.writeUInt(maxRetryWaitTime == 0 ? kDefaultMaxRetryWaitTime : maxRetryWaitTime);
+            
+            enc.writeKey(slice(kC4ReplicatorHeartbeatInterval));
+            enc.writeUInt(heartbeat == 0 ? kDefaultHeartbeat : heartbeat);
         }
 
 
