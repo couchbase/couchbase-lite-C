@@ -142,10 +142,11 @@ typedef struct {
     CBLReplicatorType replicatorType;   ///< Push, pull or both
     bool continuous;                    ///< Continuous replication?
     //-- Retry Logic:
-    int maxRetries;                     ///< Max retry attempts (-1 for default, 9 for single-shot and max for continuous; 0 for no retries)
-    unsigned maxRetryWaitTime;          ///< Max wait time between retrys in seconds (0 for default, 300 secs)
+    unsigned maxAttempts;               ///< Max retry attempts where the initial connect to replicate counts toward the given value.
+                                        ///< Specify 0 to use the default value, 10 times for a non-continuous replicator and max-int time for a continuous replicator. Specify 1 means there will be no retry after the first attempt.
+    unsigned maxAttemptWaitTime;        ///< Max wait time between retry attempts in seconds. Specify 0 to use the default value of 300 seconds.
     //-- WebSocket:
-    unsigned heartbeat;                 ///< The heartbeat interval in seconds (0 for default, 300 secs)
+    unsigned heartbeat;                 ///< The heartbeat interval in seconds. Specify 0 to use the default value of 300 seconds.
     //-- HTTP settings:
     CBLAuthenticator* _cbl_nullable authenticator;    ///< Authentication credentials, if needed
     const CBLProxySettings* _cbl_nullable proxy;      ///< HTTP client proxy settings
@@ -161,12 +162,6 @@ typedef struct {
     CBLConflictResolver _cbl_nullable conflictResolver;///< Optional conflict-resolver callback
     void* _cbl_nullable context;                      ///< Arbitrary value that will be passed to callbacks
 } CBLReplicatorConfiguration;
-
-
-/** Default replicator configuration without database and endpoint set. The configuration is
-    configured for a single-shot push-and-pull replicator. The other config values are set to null
-    or its default value. */
-CBLReplicatorConfiguration CBLReplicatorConfiguration_Default(void) CBLAPI;
 
 
 /** @} */

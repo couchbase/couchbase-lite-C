@@ -24,22 +24,6 @@ using namespace fleece;
 #pragma mark - BASIC TESTS:
 
 
-TEST_CASE_METHOD(ReplicatorTest, "Default config", "[Replicator]") {
-    CBLReplicatorConfiguration c = CBLReplicatorConfiguration_Default();
-    CHECK(c.replicatorType == kCBLReplicatorTypePushAndPull);
-    CHECK(!c.continuous);
-    CHECK(c.maxRetries == -1);
-    CHECK(c.maxRetryWaitTime == 0);
-    CHECK(c.heartbeat == 0);
-    
-    CBLError error;
-    c.database = db.ref();
-    c.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg/foobar"_sl);
-    repl = CBLReplicator_New(&c, &error);
-    CHECK(repl);
-}
-
-
 TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
     CBLProxySettings proxy = {};
     CBLError error;

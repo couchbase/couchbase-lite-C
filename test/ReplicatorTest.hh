@@ -19,7 +19,7 @@ using namespace cbl;
 
 class ReplicatorTest : public CBLTest_Cpp {
 public:
-    CBLReplicatorConfiguration config = CBLReplicatorConfiguration_Default();
+    CBLReplicatorConfiguration config = {};
     CBLReplicator *repl = nullptr;
     set<string> docsNotified;
     CBLError replError = {};

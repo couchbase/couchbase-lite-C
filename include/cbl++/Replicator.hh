@@ -72,8 +72,8 @@ namespace cbl {
         CBLReplicatorType replicatorType    = kCBLReplicatorTypePushAndPull;
         bool continuous                     = false;
         
-        int maxRetries                      = -1;
-        unsigned maxRetryWaitTime           = 0;
+        unsigned maxAttempts                = 0;
+        unsigned maxAttemptWaitTime         = 0;
         
         unsigned heartbeat                  = 0;
 
@@ -96,8 +96,8 @@ namespace cbl {
             conf.endpoint = endpoint.ref();
             conf.replicatorType = replicatorType;
             conf.continuous = continuous;
-            conf.maxRetries = maxRetries;
-            conf.maxRetryWaitTime = maxRetryWaitTime;
+            conf.maxAttempts = maxAttempts;
+            conf.maxAttemptWaitTime = maxAttemptWaitTime;
             conf.heartbeat = heartbeat;
             conf.authenticator = authenticator.ref();
             conf.proxy = proxy;

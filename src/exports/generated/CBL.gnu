@@ -114,7 +114,6 @@ CBL_C {
 		CBLAuth_NewPassword;
 		CBLAuth_NewSession;
 		CBLAuth_Free;
-		CBLReplicatorConfiguration_Default;
 		CBLReplicator_New;
 		CBLReplicator_Config;
 		CBLReplicator_Start;

@@ -124,18 +124,6 @@ public:
         _c4status = _c4repl->getStatus();
     }
     
-    
-    static CBLReplicatorConfiguration defaultConfiguration()
-    {
-        CBLReplicatorConfiguration config = {};
-        config.replicatorType = kCBLReplicatorTypePushAndPull;
-        config.continuous = false;
-        config.maxRetries = -1;
-        config.maxRetryWaitTime = 0;
-        config.heartbeat = 0;
-        return config;
-    }
-    
 
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
     void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}

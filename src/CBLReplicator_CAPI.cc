@@ -22,9 +22,6 @@
 
 const FLString kCBLAuthDefaultCookieName = FLSTR("SyncGatewaySession");
 
-CBLReplicatorConfiguration CBLReplicatorConfiguration_Default() noexcept {
-    return CBLReplicator::defaultConfiguration();
-}
 
 CBLEndpoint* CBLEndpoint_NewWithURL(FLString url) noexcept {
     try {
