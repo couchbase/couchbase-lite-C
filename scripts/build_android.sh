@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 pushd $SCRIPT_DIR/..
@@ -6,11 +6,11 @@ pushd $SCRIPT_DIR/..
 NDK_DEFAULT_VERSION="21.4.7075529"
 CMAKE_DEFAULT_VERSION="3.18.1"
 
-mkdir build_android_out 2> /dev/null
-mkdir build_android_x86 2> /dev/null
-mkdir build_android_arm 2> /dev/null
-mkdir build_android_x64 2> /dev/null
-mkdir build_android_arm64 2> /dev/null
+mkdir -p build_android_out
+mkdir -p build_android_x86
+mkdir -p build_android_arm
+mkdir -p build_android_x64
+mkdir -p build_android_arm64
 
 if [ -z "${ANDROID_SDK_ROOT}" ]; then
     echo "Error: ANDROID_SDK_ROOT not set, aborting..."
@@ -39,6 +39,7 @@ function build_variant {
     $ANDROID_SDK_ROOT/cmake/$ANDROID_CMAKE_VERSION/bin/cmake --build . --target install
 }
 
+set -x
 cd build_android_x86
 build_variant x86
 
