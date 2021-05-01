@@ -23,10 +23,10 @@ jobs:
       with:
         submodules: recursive
     - name: Setup Android SDK
-        run: |
-          sdkmanager --install "ndk;21.4.7075529" 
-          sdkmanager --install "cmake;3.18.1"
+      run: |
+        sdkmanager --install "ndk;21.4.7075529" \
+        sdkmanager --install "cmake;3.18.1"
     - name: Build
-        working-directory: ${{github.workspace}}/scripts
-        run: build_android.sh
+      working-directory: ${{github.workspace}}/scripts
+      run: build_android.sh
     
