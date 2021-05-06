@@ -141,6 +141,12 @@ typedef struct {
     CBLEndpoint* endpoint;              ///< The address of the other database to replicate with
     CBLReplicatorType replicatorType;   ///< Push, pull or both
     bool continuous;                    ///< Continuous replication?
+    //-- Retry Logic:
+    unsigned maxAttempts;               ///< Max retry attempts where the initial connect to replicate counts toward the given value.
+                                        ///< Specify 0 to use the default value, 10 times for a non-continuous replicator and max-int time for a continuous replicator. Specify 1 means there will be no retry after the first attempt.
+    unsigned maxAttemptWaitTime;        ///< Max wait time between retry attempts in seconds. Specify 0 to use the default value of 300 seconds.
+    //-- WebSocket:
+    unsigned heartbeat;                 ///< The heartbeat interval in seconds. Specify 0 to use the default value of 300 seconds.
     //-- HTTP settings:
     CBLAuthenticator* _cbl_nullable authenticator;    ///< Authentication credentials, if needed
     const CBLProxySettings* _cbl_nullable proxy;      ///< HTTP client proxy settings
@@ -157,8 +163,8 @@ typedef struct {
     void* _cbl_nullable context;                      ///< Arbitrary value that will be passed to callbacks
 } CBLReplicatorConfiguration;
 
-/** @} */
 
+/** @} */
 
 
 /** \name  Lifecycle

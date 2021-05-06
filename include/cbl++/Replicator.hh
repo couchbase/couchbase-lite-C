@@ -71,6 +71,11 @@ namespace cbl {
         Endpoint endpoint;
         CBLReplicatorType replicatorType    = kCBLReplicatorTypePushAndPull;
         bool continuous                     = false;
+        
+        unsigned maxAttempts                = 0;
+        unsigned maxAttemptWaitTime         = 0;
+        
+        unsigned heartbeat                  = 0;
 
         Authenticator authenticator;
         CBLProxySettings* proxy             = nullptr;
@@ -84,13 +89,16 @@ namespace cbl {
 
         ReplicationFilter pushFilter;
         ReplicationFilter pullFilter;
-
+        
         operator CBLReplicatorConfiguration() const {
             CBLReplicatorConfiguration conf = {};
             conf.database = database.ref();
             conf.endpoint = endpoint.ref();
             conf.replicatorType = replicatorType;
             conf.continuous = continuous;
+            conf.maxAttempts = maxAttempts;
+            conf.maxAttemptWaitTime = maxAttemptWaitTime;
+            conf.heartbeat = heartbeat;
             conf.authenticator = authenticator.ref();
             conf.proxy = proxy;
             if (!headers.empty())

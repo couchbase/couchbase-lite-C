@@ -123,7 +123,7 @@ public:
         });
         _c4status = _c4repl->getStatus();
     }
-
+    
 
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
     void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}

@@ -25,6 +25,7 @@
 #include "c4Private.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <climits>
 #include <mutex>
 #include <string>
 
@@ -225,8 +226,22 @@ namespace cbl_internal {
                 }
                 enc.endDict();
             }
+            
+            if (maxAttempts > 0) {
+                enc.writeKey(slice(kC4ReplicatorOptionMaxRetries));
+                enc.writeUInt(maxAttempts - 1);
+            }
+            
+            if (maxAttemptWaitTime > 0) {
+                enc.writeKey(slice(kC4ReplicatorOptionMaxRetryInterval));
+                enc.writeUInt(maxAttemptWaitTime);
+            }
+            
+            if (heartbeat > 0) {
+                enc.writeKey(slice(kC4ReplicatorHeartbeatInterval));
+                enc.writeUInt(heartbeat);
+            }
         }
-
 
         ReplicatorConfiguration(const ReplicatorConfiguration&) =delete;
         ReplicatorConfiguration& operator=(const ReplicatorConfiguration&) =delete;
