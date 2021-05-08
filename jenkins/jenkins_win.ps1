@@ -11,7 +11,7 @@ try {
 
     New-Item -Type Directory -ErrorAction Ignore build
     Set-Location build
-    & 'C:\Program Files\CMake\bin\cmake.exe' -G "Visual Studio 15 2017 Win64" -DBUILD_ENTERPRISE=ON ..
+    & 'C:\Program Files\CMake\bin\cmake.exe' -G "Visual Studio 15 2017" -A x64 -DBUILD_ENTERPRISE=ON -DCMAKE_INSTALL_PREFIX="${pwd}\out" ..
     if($LASTEXITCODE -ne 0) {
         Write-Host "Failed to run CMake!" -ForegroundColor Red
         exit 1
