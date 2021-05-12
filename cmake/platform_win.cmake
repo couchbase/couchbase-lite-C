@@ -13,6 +13,7 @@ function(set_platform_include_directories)
         ${PLATFORM_RESULT}
         vendor/couchbase-lite-core/include/MSVC
         vendor/couchbase-lite-core/vendor/fleece/MSVC
+        vendor/couchbase-lite-core/vendor/SQLiteCpp/sqlite3
         PARENT_SCOPE
     )
 endfunction()
@@ -47,6 +48,13 @@ function(set_dylib_properties)
     if(WINDOWS_STORE)
         target_compile_definitions(CouchbaseLiteCStatic PRIVATE -DMBEDTLS_NO_PLATFORM_ENTROPY)
         set_target_properties(CouchbaseLiteC PROPERTIES COMPILE_FLAGS /ZW)
+
+        # Not that happy about this, but I'm too lazy right now to rework LiteCore
+        target_sources(
+            CouchbaseLiteC PRIVATE
+            vendor/couchbase-lite-core/MSVC/SQLiteTempDirectory.cc
+        )
+        
         set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /nodefaultlib:kernel32.lib /nodefaultlib:ole32.lib")
     endif()
     

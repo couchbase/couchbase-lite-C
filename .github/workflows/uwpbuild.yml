@@ -1,0 +1,46 @@
+name: Build UWP
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+      - 'release/*'
+  pull_request:
+    branches:
+      - '**'
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  # NOTE: If we decide to archive the build products we should build with RelWithDebInfo instead.
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+    # Try both x64 and ARM
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+#### BUILD
+
+    - name: Create Build Environment
+      # Create a build directory, as our working directory for all subsequent commands
+      working-directory: ${{github.workspace}}
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Configure CMake
+      working-directory: ${{github.workspace}}/build
+      run: cmake .. -A ${{matrix.arch}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/build/out -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION="10.0" -DCMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION="10.0.16299.0"
+
+    - name: Build
+      # Use cmake to build -- this will invoke `make` on Linux/Mac, Visual Studio on Windows.
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --target CouchbaseLiteC --config $BUILD_TYPE
