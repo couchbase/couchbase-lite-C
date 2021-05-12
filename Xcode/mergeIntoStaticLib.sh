@@ -8,18 +8,18 @@
 #
 # Thanks to <http://geme.github.io/xcode/2016/10/27/BuildPhaseLoopOverInput.html>
 
-# First concatenate the input file paths:
-FILES=""
+# First, setup an array containing input file paths:
+FILES=()
 COUNTER=0
 while [ $COUNTER -lt $SCRIPT_INPUT_FILE_COUNT ]; do
     tmp="SCRIPT_INPUT_FILE_$COUNTER"
-    FILES="$FILES ${!tmp}"
+    FILES+=("${!tmp}")
     let COUNTER=COUNTER+1
 done
-echo "File list is: $FILES"
+echo "File list is: ${FILES[@]}"
 
 # Now use `libtool` to add those files:
-cd $BUILT_PRODUCTS_DIR
-mv $EXECUTABLE_PATH tmp.a
-libtool -static -o $EXECUTABLE_PATH - tmp.a $FILES
+cd "$BUILT_PRODUCTS_DIR"
+mv "$EXECUTABLE_PATH" tmp.a
+libtool -static -o "$EXECUTABLE_PATH" - tmp.a "${FILES[@]}"
 rm tmp.a
