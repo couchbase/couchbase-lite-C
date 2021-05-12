@@ -45,5 +45,5 @@ jobs:
 
     - name: Build
       # Use cmake to build -- this will invoke `make` on Linux/Mac, Visual Studio on Windows.
-      working-directory: ${{github.workspace}}/build_${{arch}}
+      working-directory: ${{github.workspace}}/build_${{matrix.arch}}
       run: cmake --build . --target CouchbaseLiteC --config $BUILD_TYPE
