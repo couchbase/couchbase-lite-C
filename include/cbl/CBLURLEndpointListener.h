@@ -24,9 +24,7 @@
 #error This API is part of Couchbase Lite Enterprise Edition only.
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CBL_CAPI_BEGIN
 
 /** \defgroup replication   Replication
     @{ */
@@ -34,45 +32,88 @@ extern "C" {
 /** \name  Replication Listener/Server
     @{ */
 
-    /** Authentication callback. Given a username and password, it should return true to allow the
-        connection, false to reject it. */
-    typedef bool (*CBLPasswordAuthenticator)(FLString username, FLString password);
+    /** HTTP Basic authentication callback.
+        @param context  The client-supplied value from the `CBLURLEndpointListenerConfiguration`.
+        @param username  The user name provided by the client.
+        @param password  The password provided by the client.
+        @return  True to allow the connection, false to reject it. */
+    typedef bool (*CBLPasswordAuthenticator)(void* context,
+                                             FLString username,
+                                             FLString password);
+
+    /** TLS client certificate authentication callback.
+        @param context  The client-supplied value from the `CBLURLEndpointListenerConfiguration`.
+        @param certificate  The certificate presented by the client. This may be a certificate
+                            chain; check the `nextInChain` property for supporting certificates.
+        @return  True to allow the connection, false to reject it. */
+    typedef bool (*CBLClientCertAuthenticator)(void* context,
+                                               CBLCertificate* certificate);
 
     
-    /** Describes how clients should authenticate to a CBLURLEndpointListener. */
-    typedef struct {
-        CBLPasswordAuthenticator    passwordAuthenticator;  ///< Username/password callback for HTTP auth
-        CBLCertificate*             certificate;            ///< X.509 certificate for TLS auth
+    /** Describes how clients should authenticate to a CBLURLEndpointListener.
+        Either one field or the other should be non-NULL; not both. */
+    typedef struct CBLListenerAuthenticator {
+        /// For HTTP auth, a callback that validates a username/password.
+        CBLPasswordAuthenticator _cbl_nullable passwordAuthenticator;
+
+        /// For TLS auth, a callback to validate the client's certificate.
+        CBLClientCertAuthenticator _cbl_nullable clientCertAuthenticator;
+
+        /// For TLS auth, an X.509 CA certificate; if given, clients must provide certificates
+        /// that are signed by it.
+        CBLCertificate* _cbl_nullable clientCertificate;
     } CBLListenerAuthenticator;
 
 
     /** Configuration of a P2P connection listener. */
-    typedef struct {
-        CBLDatabase*                database;           ///< Database to share
-        uint16_t                    port;               ///< Port to listen on (0 to pick one at random)
-        FLString                    networkInterface;   ///< Name or address of network interface to listen on (NULL for all interfaces)
-        CBLTLSIdentity*             tlsIdentity;        ///< TLS server certificate & private key
-        CBLListenerAuthenticator*   authenticator;      ///< Authentication for client connections (NULL for no auth)
-        bool                        readOnly;           ///< True to prevent peers from altering the database
+    typedef struct CBLURLEndpointListenerConfiguration {
+        /// Database to share
+        CBLDatabase* database;
+
+        /// Port to listen on (0 to pick one at random)
+        uint16_t port;
+
+        /// Name or address of network interface to listen on (NULL for all interfaces)
+        FLString networkInterface;
+
+        /// If true, listener will not use TLS (not recommended!)
+        bool disableTLS;
+
+        /// TLS server certificate & private key
+        CBLTLSIdentity* _cbl_nullable tlsIdentity;
+
+        /// Authentication for client connections (NULL for no auth)
+        CBLListenerAuthenticator* _cbl_nullable authenticator;
+
+        /// If true, the replicator can send/receive partial updates of documents.
+        bool enableDeltaSync;
+
+        /// If true, clients are not allowed to push changes to this database.
+        bool readOnly;
+
+        /// A client-supplied value passed to the callbacks.
+        void* _cbl_nullable context;
     } CBLURLEndpointListenerConfiguration;
 
 
-    typedef struct {
+    typedef struct CBLConnectionStatus {
         unsigned connectionCount;           ///< Number of TCP connections
         unsigned activeConnectionCount;     ///< Number of connections actively replicating
     } CBLConnectionStatus;
 
+
     typedef struct CBLURLEndpointListener CBLURLEndpointListener;
+
 
     /** Creates a P2P connection listener. */
     _cbl_warn_unused
-    CBLURLEndpointListener* CBLURLEndpointListener_New(CBLURLEndpointListenerConfiguration* _cbl_nonnull) CBLAPI;
+    CBLURLEndpointListener* CBLURLEndpointListener_New(CBLURLEndpointListenerConfiguration*) CBLAPI;
 
     /** Starts a P2P connection listener. */
-    bool CBLURLEndpointListener_Start(CBLURLEndpointListener* _cbl_nonnull, CBLError*) CBLAPI;
+    bool CBLURLEndpointListener_Start(CBLURLEndpointListener*, CBLError* _cbl_nullable) CBLAPI;
 
     /** Returns the actual port number being listened on. */
-    uint16_t CBLURLEndpointListener_GetPort(CBLURLEndpointListener* _cbl_nonnull) CBLAPI;
+    uint16_t CBLURLEndpointListener_GetPort(CBLURLEndpointListener*) CBLAPI;
 
     /** Returns the URL(s) at which the listener can be reached. There is one URL for each network
         address, generally in declining order of usefulness.
@@ -80,19 +121,17 @@ extern "C" {
         @param listener  The listener.
         @return  The URLs as a Fleece array of strings (which must be released). */
     _cbl_warn_unused
-    FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull) CBLAPI;
+    FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener) CBLAPI;
 
     /** Returns information about how many current connections a P2P connection listener has. */
-    CBLConnectionStatus CBLURLEndpointListener_GetStatus(CBLURLEndpointListener* _cbl_nonnull) CBLAPI;
+    CBLConnectionStatus CBLURLEndpointListener_GetStatus(CBLURLEndpointListener*) CBLAPI;
 
     /** Stops a P2P connection listener. */
-    void CBLURLEndpointListener_Stop(CBLURLEndpointListener* _cbl_nonnull) CBLAPI;
+    void CBLURLEndpointListener_Stop(CBLURLEndpointListener*) CBLAPI;
 
     CBL_REFCOUNTED(CBLURLEndpointListener*, URLEndpointListener);
 
 /** @} */
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+CBL_CAPI_END

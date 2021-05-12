@@ -379,6 +379,7 @@
 		27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLDatabase_Internal.hh; sourceTree = "<group>"; };
 		27C9B5F121F7D74A0040BC45 /* Replicator.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Replicator.hh; sourceTree = "<group>"; };
 		27C9B5F221F7EE670040BC45 /* CBLTest.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = CBLTest.c; sourceTree = "<group>"; };
+		27CBF6AD264CAF4800EF08C4 /* CBLCertificate_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLCertificate_Internal.hh; sourceTree = "<group>"; };
 		27D055892358FA40009BB0A1 /* Project_Debug_EE.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project_Debug_EE.xcconfig; sourceTree = "<group>"; };
 		27D0558A2358FA67009BB0A1 /* Project_Release_EE.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project_Release_EE.xcconfig; sourceTree = "<group>"; };
 		27D11BED2351043B00C58A70 /* ConflictResolver.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ConflictResolver.hh; sourceTree = "<group>"; };
@@ -499,6 +500,7 @@
 			isa = PBXGroup;
 			children = (
 				275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */,
+				27CBF6AD264CAF4800EF08C4 /* CBLCertificate_Internal.hh */,
 				271C2A7121CADB170045856E /* CBLDatabase.cc */,
 				27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */,
 				27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */,

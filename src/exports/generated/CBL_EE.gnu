@@ -1,8 +1,16 @@
 CBL_C {
 	global:
-		CBLEncryptionKey_FromPassword;
+		CBLCertificate_NewFromData;
+		CBLCertificate_PEMData;
+		CBLCertificate_DERData;
+		CBLCertificate_NextInChain;
 		CBLDatabase_ChangeEncryptionKey;
+		CBLEncryptionKey_FromPassword;
 		CBLEndpoint_NewWithLocalDB;
+		CBLTLSIdentity_NewFromData;
+		CBLTLSIdentity_GenerateAnonymous;
+		CBLTLSIdentity_GetCertificate;
+		CBLTLSIdentity_PrivateKeyData;
 		CBLURLEndpointListener_New;
 		CBLURLEndpointListener_Start;
 		CBLURLEndpointListener_GetPort;

@@ -24,23 +24,67 @@
 #endif
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CBL_CAPI_BEGIN
 
 /** \defgroup certificates   Certificates And Keys
     @{ */
 
-    typedef struct CBLCertificate CBLCertificate;
-    typedef struct CBLTLSIdentity CBLTLSIdentity;
+typedef struct CBLCertificate CBLCertificate;
+typedef struct CBLTLSIdentity CBLTLSIdentity;
 
-    CBL_REFCOUNTED(CBLCertificate*, Cert);
-    CBL_REFCOUNTED(CBLTLSIdentity*, Identity);
 
-    // TODO: Define & implement API
+/** Creates a certificate object given a pregenerated X.509 certificate.
+    @param certData  The X.509 certificate encoded in PEM or DER format.
+    @param outError  On failure, an error will be stored here.
+    @return  A new CBLCertificate object. */
+_cbl_warn_unused
+CBLCertificate* CBLCertificate_NewFromData(FLSlice certData,
+                                           CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Returns the certificate's data, encoded in PEM (ASCII) format. */
+FLSliceResult CBLCertificate_PEMData(CBLCertificate*) CBLAPI;
+
+/** Returns the certificate's data, encoded in DER (binary) format. */
+FLSliceResult CBLCertificate_DERData(CBLCertificate*) CBLAPI;
+
+/** If this certificate is part of a chain, returns the next certificate in the chain.
+    \warning This returns a new object. You are responsible for releasing it. */
+_cbl_warn_unused
+CBLCertificate* CBLCertificate_NextInChain(CBLCertificate*) CBLAPI;
+
+CBL_REFCOUNTED(CBLCertificate*, Certificate);
+
+
+/** Creates a TLS identity object given an encoded RSA key-pair and a certificate.
+    @param privateKeyData  RSA private key data
+    @param certificate  An X.509 certificate for the public key
+    @param outError  On failure, an error will be stored here.
+    @return  A new CBLTLSIdentity object. */
+_cbl_warn_unused
+CBLTLSIdentity* CBLTLSIdentity_NewFromData(FLSlice privateKeyData,
+                                           CBLCertificate *certificate,
+                                           CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Generates a new random RSA key-pair, and creates a self-signed certificate from the public key.
+    This 'identity' is not useful for any real identification, but can be used with a TLS
+    server to provide encryption of the data stream.
+    @param outError  On failure, an error will be stored here.
+    @return  A new CBLTLSIdentity object. */
+_cbl_warn_unused
+CBLTLSIdentity* CBLTLSIdentity_GenerateAnonymous(CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Returns the identity's certificate. */
+CBLCertificate* CBLTLSIdentity_GetCertificate(CBLTLSIdentity*) CBLAPI;
+
+/** Returns the encoded form of the identity's key-pair. This can be used together with the
+    certificate's data to re-create the CBLTLSIdentity later.
+    \warning This data is highly sensitive, just like a password; it should never be stored where
+             anyone else can read it. */
+FLSliceResult CBLTLSIdentity_PrivateKeyData(CBLTLSIdentity*) CBLAPI;
+
+CBL_REFCOUNTED(CBLTLSIdentity*, TLSIdentity);
+
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+CBL_CAPI_END

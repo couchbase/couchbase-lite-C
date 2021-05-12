@@ -18,7 +18,11 @@
 
 #include "CBLReplicator.h"
 #include "CBLReplicator_Internal.hh"
+
+#ifdef COUCHBASE_ENTERPRISE
+#include "CBLCertificate_Internal.hh"
 #include "CBLURLEndpointListener_Internal.hh"
+#endif
 
 
 const FLString kCBLAuthDefaultCookieName = FLSTR("SyncGatewaySession");
@@ -116,12 +120,15 @@ CBLListenerToken* CBLReplicator_AddDocumentReplicationListener(CBLReplicator* re
 #ifdef COUCHBASE_ENTERPRISE
 
 CBLURLEndpointListener* CBLURLEndpointListener_New(CBLURLEndpointListenerConfiguration* config) noexcept {
-    return new CBLURLEndpointListener(config);
-
+    try {
+        return new CBLURLEndpointListener(config);
+    } catchAndWarn()
 }
 
 bool CBLURLEndpointListener_Start(CBLURLEndpointListener* listener, CBLError *outError) noexcept {
-    return listener->start(outError);
+    try {
+        return listener->start();
+    } catchAndBridge(outError)
 }
 
 void CBLURLEndpointListener_Stop(CBLURLEndpointListener* listener) noexcept {
@@ -132,12 +139,65 @@ uint16_t CBLURLEndpointListener_GetPort(CBLURLEndpointListener* listener) noexce
     return listener->port();
 }
 
-FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener _cbl_nonnull) noexcept {
+FLMutableArray CBLURLEndpointListener_GetURLs(CBLURLEndpointListener* listener) noexcept {
     return listener->URLs();
 }
 
 CBLConnectionStatus CBLURLEndpointListener_GetStatus(CBLURLEndpointListener* listener) noexcept {
     return listener->status();
+}
+
+
+
+CBLCertificate* CBLCertificate_NewFromData(FLSlice certData, CBLError* outError) noexcept {
+    try {
+        return move(CBLCertificate::fromData(certData)).detach();
+    } catchAndBridge(outError);
+}
+
+FLSliceResult CBLCertificate_PEMData(CBLCertificate *cert) noexcept {
+    try {
+        return FLSliceResult(cert->PEMData());
+    } catchAndWarn();
+}
+
+FLSliceResult CBLCertificate_DERData(CBLCertificate *cert) noexcept {
+    try {
+        return FLSliceResult(cert->DERData());
+    } catchAndWarn();
+}
+
+CBLCertificate* CBLCertificate_NextInChain(CBLCertificate *cert) noexcept {
+    try {
+        return move(cert->nextInChain()).detach();
+    } catchAndWarn();
+}
+
+
+
+CBLTLSIdentity* CBLTLSIdentity_NewFromData(FLSlice privateKeyData,
+                                           CBLCertificate *certificate,
+                                           CBLError* outError) noexcept
+{
+    try {
+        return move(CBLTLSIdentity::fromPrivateKeyData(privateKeyData, certificate)).detach();
+    } catchAndBridge(outError);
+}
+
+CBLTLSIdentity* CBLTLSIdentity_GenerateAnonymous(CBLError* outError) noexcept {
+    try {
+        return move(CBLTLSIdentity::generateAnonymous()).detach();
+    } catchAndBridge(outError);
+}
+
+CBLCertificate* CBLTLSIdentity_GetCertificate(CBLTLSIdentity *identity) noexcept {
+    return identity->certificate();
+}
+
+FLSliceResult CBLTLSIdentity_PrivateKeyData(CBLTLSIdentity *identity) noexcept {
+    try {
+        return FLSliceResult(identity->privateKeyData());
+    } catchAndWarn();
 }
 
 #endif
