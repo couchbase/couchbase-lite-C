@@ -3,6 +3,12 @@ CBL_C {
 		CBLEncryptionKey_FromPassword;
 		CBLDatabase_ChangeEncryptionKey;
 		CBLEndpoint_NewWithLocalDB;
+		CBLURLEndpointListener_New;
+		CBLURLEndpointListener_Start;
+		CBLURLEndpointListener_GetPort;
+		CBLURLEndpointListener_GetURLs;
+		CBLURLEndpointListener_GetStatus;
+		CBLURLEndpointListener_Stop;
 		CBL_Retain;
 		CBL_Release;
 		CBL_InstanceCount;

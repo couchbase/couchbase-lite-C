@@ -1,7 +1,7 @@
 //
-//  CouchbaseLite.h
+// CBLCertificate.h
 //
-// Copyright (c) 2018 Couchbase, Inc All rights reserved.
+// Copyright (c) 2020 Couchbase, Inc All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,29 @@
 
 #pragma once
 #include "CBLBase.h"
-#include "CBLBlob.h"
-#include "CBLDatabase.h"
-#include "CBLDocument.h"
-#include "CBLLog.h"
-#include "CBLQuery.h"
-#include "CBLReplicator.h"
 
-#ifdef COUCHBASE_ENTERPRISE
-#include "CBLCertificate.h"
-#include "CBLURLEndpointListener.h"
+#ifndef COUCHBASE_ENTERPRISE
+#error This API is part of Couchbase Lite Enterprise Edition only.
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/** \defgroup certificates   Certificates And Keys
+    @{ */
+
+    typedef struct CBLCertificate CBLCertificate;
+    typedef struct CBLTLSIdentity CBLTLSIdentity;
+
+    CBL_REFCOUNTED(CBLCertificate*, Cert);
+    CBL_REFCOUNTED(CBLTLSIdentity*, Identity);
+
+    // TODO: Define & implement API
+
+/** @} */
+
+#ifdef __cplusplus
+}
 #endif

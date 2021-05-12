@@ -151,12 +151,17 @@ target_include_directories(
     ${PLATFORM_INCLUDE}
 )
 
-set(CBL_LIBRARIES_PRIVATE  
-    ${WHOLE_LIBRARY_FLAG}
-    CouchbaseLiteCStatic
-    ${NO_WHOLE_LIBRARY_FLAG}
-    LiteCoreWebSocket
-)
+install (TARGETS CouchbaseLiteC
+         RUNTIME DESTINATION bin
+         LIBRARY DESTINATION lib
+         PUBLIC_HEADER DESTINATION include)
+
+set(CBL_LIBRARIES_PRIVATE  ${WHOLE_LIBRARY_FLAG}
+                            CouchbaseLiteCStatic
+                            LiteCoreStatic
+                            LiteCoreREST_Static
+                           ${NO_WHOLE_LIBRARY_FLAG}
+                            LiteCoreWebSocket)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
     # C/C++ atomic operations on ARM6/7 emit calls to functions in libatomic
