@@ -91,8 +91,8 @@ public:
     }
 
 private:
-    friend class CBLDatabase;
-    friend class cbl_internal::ListenerToken<CBLQueryChangeListener>;
+    friend struct CBLDatabase;
+    friend struct cbl_internal::ListenerToken<CBLQueryChangeListener>;
 
     CBLQuery(const CBLDatabase *db,
              Retained<C4Query>&& c4query,
@@ -192,7 +192,7 @@ namespace cbl_internal {
     // Custom subclass of CBLListenerToken for query listeners.
     // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
     template<>
-    class ListenerToken<CBLQueryChangeListener> : public CBLListenerToken {
+    struct ListenerToken<CBLQueryChangeListener> : public CBLListenerToken {
     public:
         ListenerToken(CBLQuery *query,
                       CBLQueryChangeListener callback,

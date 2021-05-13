@@ -76,7 +76,7 @@ public:
     }
 
 protected:
-    friend class CBLDocument;
+    friend struct CBLDocument;
 
     // Constructor for existing blobs -- called by CBLDocument::getBlob()
     CBLBlob(CBLDocument *doc, Dict properties, const C4BlobKey &key)
@@ -198,7 +198,7 @@ struct CBLBlobWriteStream {
     CBLBlobWriteStream(CBLDatabase *db)         :_c4stream(*db->blobStore()) { }
     void write(slice data)                      {return _c4stream.write(data);}
 private:
-    friend class CBLNewBlob;
+    friend struct CBLNewBlob;
     C4WriteStream _c4stream;
 };
 

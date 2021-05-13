@@ -256,9 +256,9 @@ protected:
     friend struct CBLReplicator;
     friend struct CBLURLEndpointListener;
     friend class cbl_internal::AllConflictsResolver;
-    friend class cbl_internal::CBLLocalEndpoint;
-    friend class cbl_internal::ListenerToken<CBLDocumentChangeListener>;
-    friend class cbl_internal::ListenerToken<CBLQueryChangeListener>;
+    friend struct cbl_internal::CBLLocalEndpoint;
+    friend struct cbl_internal::ListenerToken<CBLDocumentChangeListener>;
+    friend struct cbl_internal::ListenerToken<CBLQueryChangeListener>;
 
     C4BlobStore* blobStore() const                   {return &_c4db.useLocked()->getBlobStore();}
 
