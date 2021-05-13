@@ -83,7 +83,8 @@ public:
         };
 
         if (_conf.pushFilter) {
-            params.pushFilter = [](C4String docID,
+            params.pushFilter = [](C4String collectionName,
+                                   C4String docID,
                                    C4String revID,
                                    C4RevisionFlags flags,
                                    FLDict body,
@@ -93,7 +94,8 @@ public:
             };
         }
         if (_conf.pullFilter) {
-            params.validationFunc = [](C4String docID,
+            params.validationFunc = [](C4String collectionName,
+                                       C4String docID,
                                        C4String revID,
                                        C4RevisionFlags flags,
                                        FLDict body,

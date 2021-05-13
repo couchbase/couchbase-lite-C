@@ -85,7 +85,7 @@ namespace cbl_internal {
         ,_docID(docID)
         {
             auto c4db = _db->useLocked(); // locks DB mutex
-            _c4obs = c4db->observeDocument(docID,
+            _c4obs = c4db->getDefaultCollection()->observeDocument(docID,
                                          [this](C4DocumentObserver*, slice docID, C4SequenceNumber)
                                          {
                                              this->docChanged();

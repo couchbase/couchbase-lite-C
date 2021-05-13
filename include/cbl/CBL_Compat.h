@@ -88,7 +88,9 @@
 #  define CBL_ASSUME_NONNULL_BEGIN
 #  define CBL_ASSUME_NONNULL_END
 #  define _cbl_nullable
+#ifndef _cbl_nonnull
 #  define _cbl_nonnull
+#endif
 #endif
 
 

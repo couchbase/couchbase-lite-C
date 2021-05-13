@@ -33,7 +33,6 @@ set(TEST_SRC
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/Backtrace.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/LibC++Debug.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/betterassert.cc
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/slice.cc
 )
 add_executable(CBL_C_Tests ${TEST_SRC} )
 

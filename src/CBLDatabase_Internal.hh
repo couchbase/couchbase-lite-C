@@ -71,8 +71,10 @@ public:
     {
         C4DatabaseConfig2 c4config = asC4Config(config);
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
-        if (c4db->mayHaveExpiration())
-            c4db->startHousekeeping();
+        // TODO: Find replacement for this!!!!
+        // https://issues.couchbase.com/browse/CBL-1927
+        /*if (c4db->mayHaveExpiration())
+            c4db->startHousekeeping();*/
         return new CBLDatabase(c4db, name, c4config.parentDirectory);
     }
 
@@ -98,10 +100,10 @@ public:
 
 
     slice name() const noexcept                      {return _c4db.useLocked()->getName();}
-    alloc_slice path() const                         {return _c4db.useLocked()->path();}
+    alloc_slice path() const                         {return _c4db.useLocked()->getPath();}
     
     CBLDatabaseConfiguration config() const noexcept {
-        auto &c4config = _c4db.useLocked()->getConfig();
+        auto &c4config = _c4db.useLocked()->getConfiguration();
 #ifdef COUCHBASE_ENTERPRISE
         return {c4config.parentDirectory, asCBLKey(c4config.encryptionKey)};
 #else
@@ -145,18 +147,20 @@ public:
     }
 
     bool purgeDocument(slice docID) {
-        return _c4db.useLocked()->purgeDoc(docID);
+        return _c4db.useLocked()->purgeDocument(docID);
     }
 
     CBLTimestamp getDocumentExpiration(slice docID) {
-        return _c4db.useLocked()->getExpiration(docID);
+        return _c4db.useLocked()->getDefaultCollection()->getExpiration(docID);
     }
 
     void setDocumentExpiration(slice docID, CBLTimestamp expiration) {
         auto c4db = _c4db.useLocked();
-        c4db->setExpiration(docID, expiration);
-        if (expiration > 0)
-            c4db->startHousekeeping();
+        c4db->getDefaultCollection()->setExpiration(docID, expiration);
+        // TODO: Find replacement for this!!!!
+        // https://issues.couchbase.com/browse/CBL-1927
+        /*if (expiration > 0)
+            c4db->startHousekeeping();*/
     }
 
 
@@ -355,7 +359,7 @@ private:
         auto c4db = _c4db.useLocked(); // locks DB mutex, so the callback can run thread-safe
         Retained<CBLListenerToken> token = cb();
         if (!_observer)
-            _observer = c4db->observe([this](C4DatabaseObserver*) { this->databaseChanged(); });
+            _observer = c4db->getDefaultCollection()->observe([this](C4DatabaseObserver*) { this->databaseChanged(); });
         return token;
     }
 

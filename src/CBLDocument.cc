@@ -152,7 +152,7 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase* db,
     outRevFlags = hasBlobs ? kRevHasAttachments : 0;
 
     // Now encode the properties to Fleece:
-    SharedEncoder enc(c4db->getSharedFleeceEncoder());
+    SharedEncoder enc(c4db->sharedFleeceEncoder());
     enc.writeValue(properties());
     FLError flErr;
     alloc_slice body = enc.finish(&flErr);
