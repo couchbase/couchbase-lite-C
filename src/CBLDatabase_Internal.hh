@@ -21,6 +21,7 @@
 #include "CBLDocument_Internal.hh"
 #include "CBLPrivate.h"
 #include "CBLQuery_Internal.hh"
+#include "c4Collection.hh"
 #include "c4Database.hh"
 #include "c4Observer.hh"
 #include "Internal.hh"
@@ -71,10 +72,6 @@ public:
     {
         C4DatabaseConfig2 c4config = asC4Config(config);
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
-        // TODO: Find replacement for this!!!!
-        // https://issues.couchbase.com/browse/CBL-1927
-        /*if (c4db->mayHaveExpiration())
-            c4db->startHousekeeping();*/
         return new CBLDatabase(c4db, name, c4config.parentDirectory);
     }
 
@@ -151,16 +148,12 @@ public:
     }
 
     CBLTimestamp getDocumentExpiration(slice docID) {
-        return _c4db.useLocked()->getDefaultCollection()->getExpiration(docID);
+        return _c4db.useLocked()->getExpiration(docID);
     }
 
     void setDocumentExpiration(slice docID, CBLTimestamp expiration) {
         auto c4db = _c4db.useLocked();
-        c4db->getDefaultCollection()->setExpiration(docID, expiration);
-        // TODO: Find replacement for this!!!!
-        // https://issues.couchbase.com/browse/CBL-1927
-        /*if (expiration > 0)
-            c4db->startHousekeeping();*/
+        c4db->setExpiration(docID, expiration);
     }
 
 
