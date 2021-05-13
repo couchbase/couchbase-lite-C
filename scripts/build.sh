@@ -9,7 +9,7 @@
 # Mac developers may prefer to use the Xcode project in the Xcode/ directory.
 
 SCRIPT_DIR=`dirname $0`
-cd "$SCRIPT_DIR"
+cd "$SCRIPT_DIR/.."
 
 src/exports/generate_exports.sh
 

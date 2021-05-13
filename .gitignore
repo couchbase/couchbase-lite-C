@@ -22,3 +22,4 @@ python/CouchbaseLite/*.c
 # Rust
 Cargo.lock
 bindings/rust/CouchbaseLite/target/
+build_apple_out
