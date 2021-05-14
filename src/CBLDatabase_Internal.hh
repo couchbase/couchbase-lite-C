@@ -148,12 +148,12 @@ public:
     }
 
     CBLTimestamp getDocumentExpiration(slice docID) {
-        return _c4db.useLocked()->getExpiration(docID);
+        return _c4db.useLocked()->getDefaultCollection()->getExpiration(docID);
     }
 
     void setDocumentExpiration(slice docID, CBLTimestamp expiration) {
         auto c4db = _c4db.useLocked();
-        c4db->setExpiration(docID, expiration);
+        c4db->getDefaultCollection()->setExpiration(docID, expiration);
     }
 
 
