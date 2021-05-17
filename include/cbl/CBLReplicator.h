@@ -169,6 +169,9 @@ typedef struct {
     CBLReplicationFilter _cbl_nullable pullFilter;    ///< Optional callback to validate incoming docs
     CBLConflictResolver _cbl_nullable conflictResolver;///< Optional conflict-resolver callback
     void* _cbl_nullable context;                      ///< Arbitrary value that will be passed to callbacks
+#ifdef COUCHBASE_ENTERPRISE
+    bool acceptOnlySelfSignedServerCertificate;     ///< TLS accepts/requires self-signed server cert; use with P2P
+#endif
 } CBLReplicatorConfiguration;
 
 

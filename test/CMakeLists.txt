@@ -30,6 +30,8 @@ set(TEST_SRC
     DatabaseTest_Cpp.cc
     QueryTest.cc
     ReplicatorTest.cc
+    ReplicatorEETest.cc
+    ReplicatorP2PTest.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/Backtrace.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/LibC++Debug.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/betterassert.cc

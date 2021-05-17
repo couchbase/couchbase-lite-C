@@ -31,9 +31,10 @@ public:
         config.context = this;
     }
 
-    void replicate() {
+    virtual CBLReplicatorStatus replicate() {
         CBLError error;
         repl = CBLReplicator_New(&config, &error);
+        INFO("Error: " << alloc_slice(CBLError_Message(&error)));
         REQUIRE(repl);
 
         auto ctoken = CBLReplicator_AddChangeListener(repl, [](void *context, CBLReplicator *r,
@@ -54,16 +55,17 @@ public:
         while ((status = CBLReplicator_Status(repl)).activity != kCBLReplicatorStopped) {
             this_thread::sleep_for(100ms);
         }
-        cerr << "Finished with activity=" << status.activity
-             << ", error=(" << status.error.domain << "/" << status.error.code << ")\n";
+        cerr << "Finished with activity=" << int(status.activity)
+             << ", error=(" << alloc_slice(CBLError_Description(&status.error)) << ")\n";
 
         CBLListener_Remove(ctoken);
         CBLListener_Remove(dtoken);
+        return status;
     }
 
     void statusChanged(CBLReplicator *r, const CBLReplicatorStatus &status) {
         CHECK(r == repl);
-        cerr << "--- PROGRESS: status=" << status.activity << ", fraction=" << status.progress.fractionComplete << ", err=" << status.error.domain << "/" << status.error.code << "\n";
+        cerr << "--- PROGRESS: status=" << status.activity << ", fraction=" << status.progress.fractionComplete << ", err=" << alloc_slice(CBLError_Description(&status.error)) << "\n";
         if (status.error.code && !replError.code)
             replError = status.error;
     }
@@ -92,7 +94,7 @@ public:
         return alloc_slice(buf, n);
     }
 
-    ~ReplicatorTest() {
+    virtual ~ReplicatorTest() {
         CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
         CBLReplicator_Release(repl);
         CBLAuth_Free(config.authenticator);

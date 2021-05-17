@@ -121,7 +121,7 @@ CBLListenerToken* CBLReplicator_AddDocumentReplicationListener(CBLReplicator* re
 
 CBLURLEndpointListener* CBLURLEndpointListener_New(CBLURLEndpointListenerConfiguration* config) noexcept {
     try {
-        return new CBLURLEndpointListener(config);
+        return retain(new CBLURLEndpointListener(config));
     } catchAndWarn()
 }
 

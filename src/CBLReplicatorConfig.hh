@@ -207,6 +207,10 @@ namespace cbl_internal {
                 enc.writeKey(slice(kC4ReplicatorOptionRootCerts));
                 enc.writeData(trustedRootCertificates);
             }
+#ifdef COUCHBASE_ENTERPRISE
+            enc.writeKey(kC4ReplicatorOptionOnlySelfSignedServerCert);
+            enc.writeBool(acceptOnlySelfSignedServerCertificate);
+#endif
             if (authenticator)
                 authenticator->writeOptions(enc);
             if (proxy) {

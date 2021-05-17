@@ -37,20 +37,21 @@ public:
         _c4config.port      = config->port;
         _c4config.networkInterface = config->networkInterface;
         _c4config.apis      = kC4SyncAPI;
-        _c4config.allowPull = true;
-        _c4config.allowPush = !config->readOnly;
+        _c4config.allowPush = true;
+        _c4config.allowPull = !config->readOnly;
         _c4config.enableDeltaSync = config->enableDeltaSync;
         _callbackContext    = config->context;
 
-        _identity = config->tlsIdentity;
-        if (_identity) {
+        if (!config->disableTLS) {
             // Create C4TLSConfig:
             _tlsConfig = std::make_unique<C4TLSConfig>();
             memset(_tlsConfig.get(), 0, sizeof(*_tlsConfig));
             _tlsConfig->privateKeyRepresentation = kC4PrivateKeyFromKey;
+            _identity = config->tlsIdentity;
+            if (!_identity)
+                _identity = CBLTLSIdentity::generateAnonymous();
             _tlsConfig->key = _identity->c4KeyPair();
             _tlsConfig->certificate = _identity->c4Cert();
-            _tlsConfig->tlsCallbackContext = this;
             _c4config.tlsConfig = _tlsConfig.get();
         }
 
