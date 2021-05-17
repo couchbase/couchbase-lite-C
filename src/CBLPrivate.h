@@ -22,6 +22,7 @@
 
 CBL_CAPI_BEGIN
 
+    FLSliceResult CBLError_Description(const CBLError*) CBLAPI;
     void CBLError_SetCaptureBacktraces(bool) CBLAPI;
     bool CBLError_GetCaptureBacktraces(void) CBLAPI;
 

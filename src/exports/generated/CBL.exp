@@ -6,6 +6,7 @@ _CBL_InstanceCount
 _CBL_DumpInstances
 _CBL_Now
 _CBLError_Message
+_CBLError_Description
 _CBLError_GetCaptureBacktraces
 _CBLError_SetCaptureBacktraces
 _CBLListener_Remove

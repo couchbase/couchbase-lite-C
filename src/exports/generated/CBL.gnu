@@ -6,6 +6,7 @@ CBL_C {
 		CBL_DumpInstances;
 		CBL_Now;
 		CBLError_Message;
+		CBLError_Description;
 		CBLError_GetCaptureBacktraces;
 		CBLError_SetCaptureBacktraces;
 		CBLListener_Remove;

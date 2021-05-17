@@ -30,6 +30,9 @@ FLSliceResult CBLError_Message(const CBLError* error) noexcept {
     return c4error_getMessage(internal(*error));
 }
 
+FLSliceResult CBLError_Description(const CBLError* error) noexcept {
+    return c4error_getDescription(internal(*error));
+}
 
 void CBLError_SetCaptureBacktraces(bool capture) noexcept {
     C4Error::setCaptureBacktraces(capture);
