@@ -40,22 +40,22 @@ public:
         _c4config.allowPush = true;
         _c4config.allowPull = !config->readOnly;
         _c4config.enableDeltaSync = config->enableDeltaSync;
-        _callbackContext    = config->context;
 
         if (!config->disableTLS) {
             // Create C4TLSConfig:
             _tlsConfig = std::make_unique<C4TLSConfig>();
             memset(_tlsConfig.get(), 0, sizeof(*_tlsConfig));
             _tlsConfig->privateKeyRepresentation = kC4PrivateKeyFromKey;
-            _identity = config->tlsIdentity;
-            if (!_identity)
-                _identity = CBLTLSIdentity::generateAnonymous();
-            _tlsConfig->key = _identity->c4KeyPair();
-            _tlsConfig->certificate = _identity->c4Cert();
+            Retained<CBLTLSIdentity> identity = config->tlsIdentity;
+            if (!identity)
+                identity = CBLTLSIdentity::generateAnonymous();
+            _tlsConfig->key = _serverKey = identity->c4KeyPair();
+            _tlsConfig->certificate = _serverCert = identity->c4Cert();
             _c4config.tlsConfig = _tlsConfig.get();
         }
 
         if (config->authenticator) {
+            _callbackContext = config->authenticator->context;
             _passwordAuthenticator = config->authenticator->passwordAuthenticator;
             if (_passwordAuthenticator) {
                 // Password auth:
@@ -80,10 +80,9 @@ public:
 
             if (config->authenticator->clientCertificate) {
                 // Client-cert auth:
-                assert(_c4config.tlsConfig);    //TODO: Create anonymous identity if this is null
-                _clientCert = config->authenticator->clientCertificate->c4Cert();
+                _clientCACert = config->authenticator->clientCertificate->c4Cert();
                 _c4config.tlsConfig->requireClientCerts = true;
-                _c4config.tlsConfig->rootClientCerts = _clientCert;
+                _c4config.tlsConfig->rootClientCerts = _clientCACert;
             }
         }
     }
@@ -145,8 +144,9 @@ private:
     CBLDatabase*                 _db;
     C4ListenerConfig             _c4config = {};
     std::unique_ptr<C4TLSConfig> _tlsConfig;
-    Retained<CBLTLSIdentity>     _identity;
-    Retained<C4Cert>             _clientCert;
+    Retained<C4KeyPair>          _serverKey;
+    Retained<C4Cert>             _serverCert;
+    Retained<C4Cert>             _clientCACert;
     void*                        _callbackContext = {};
     CBLPasswordAuthenticator     _passwordAuthenticator = nullptr;
     CBLClientCertAuthenticator   _clientCertAuthenticator = nullptr;

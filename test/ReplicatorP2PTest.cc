@@ -27,16 +27,17 @@ class ReplicatorP2PTest : public ReplicatorTest {
 public:
     Database otherDB;
     CBLURLEndpointListenerConfiguration listenerConfig = {};
-    CBLListenerAuthenticator auth = {};
+    CBLListenerAuthenticator listenerAuth = {};
     CBLURLEndpointListener* listener = nullptr;
 
     ReplicatorP2PTest()
     :otherDB(openEmptyDatabaseNamed("other"))
     {
-        listenerConfig.database = otherDB.ref();
-        listenerConfig.context = this;
         config.replicatorType = kCBLReplicatorTypePush;
         config.acceptOnlySelfSignedServerCertificate = true;
+
+        listenerConfig.database = otherDB.ref();
+        listenerAuth.context = this;
     }
 
     ~ReplicatorP2PTest() {
@@ -116,8 +117,8 @@ TEST_CASE_METHOD(ReplicatorP2PTest, "P2P Push", "[Replicator][P2P]") {
 
 
 TEST_CASE_METHOD(ReplicatorP2PTest, "P2P Password Missing", "[Replicator][P2P]") {
-    auth.passwordAuthenticator = passwordCallback;
-    listenerConfig.authenticator = &auth;
+    listenerAuth.passwordAuthenticator = passwordCallback;
+    listenerConfig.authenticator = &listenerAuth;
 
     CBLReplicatorStatus status = replicate();
     CHECK(status.error.domain == CBLWebSocketDomain);
@@ -128,8 +129,8 @@ TEST_CASE_METHOD(ReplicatorP2PTest, "P2P Password Missing", "[Replicator][P2P]")
 
 
 TEST_CASE_METHOD(ReplicatorP2PTest, "P2P Password Wrong", "[Replicator][P2P]") {
-    auth.passwordAuthenticator = passwordCallback;
-    listenerConfig.authenticator = &auth;
+    listenerAuth.passwordAuthenticator = passwordCallback;
+    listenerConfig.authenticator = &listenerAuth;
 
     config.authenticator = CBLAuth_NewPassword("admin"_sl, "123456"_sl);
 
@@ -142,8 +143,8 @@ TEST_CASE_METHOD(ReplicatorP2PTest, "P2P Password Wrong", "[Replicator][P2P]") {
 
 
 TEST_CASE_METHOD(ReplicatorP2PTest, "P2P Password Success", "[Replicator][P2P]") {
-    auth.passwordAuthenticator = passwordCallback;
-    listenerConfig.authenticator = &auth;
+    listenerAuth.passwordAuthenticator = passwordCallback;
+    listenerConfig.authenticator = &listenerAuth;
 
     config.authenticator = CBLAuth_NewPassword("mortimer"_sl, "sdrawkcab"_sl);
 

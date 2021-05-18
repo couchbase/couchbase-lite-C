@@ -26,10 +26,14 @@
 
 CBL_CAPI_BEGIN
 
-/** \defgroup certificates   Certificates And Keys
+/** \defgroup certificates   TLS Certificates And Key-Pairs
     @{ */
 
+
+/** Represents an X.509 certificate, used for TLS server or client authentication. */
 typedef struct CBLCertificate CBLCertificate;
+
+/** Represents a combination of an X.509 certificate and the matching private key. */
 typedef struct CBLTLSIdentity CBLTLSIdentity;
 
 
@@ -48,6 +52,8 @@ FLSliceResult CBLCertificate_PEMData(CBLCertificate*) CBLAPI;
 FLSliceResult CBLCertificate_DERData(CBLCertificate*) CBLAPI;
 
 /** If this certificate is part of a chain, returns the next certificate in the chain.
+    PEM data may contain multiple certificates. If you give such data to
+    \ref CBLCertificate_NewFromData, use this function to access the certificates past the first.
     \warning This returns a new object. You are responsible for releasing it. */
 _cbl_warn_unused
 CBLCertificate* CBLCertificate_NextInChain(CBLCertificate*) CBLAPI;
@@ -55,8 +61,8 @@ CBLCertificate* CBLCertificate_NextInChain(CBLCertificate*) CBLAPI;
 CBL_REFCOUNTED(CBLCertificate*, Certificate);
 
 
-/** Creates a TLS identity object given an encoded RSA key-pair and a certificate.
-    @param privateKeyData  RSA private key data
+/** Creates a TLS identity object given an encoded RSA private key and a certificate.
+    @param privateKeyData  RSA private key data, in PKCS#1 or SEC1 DER format.
     @param certificate  An X.509 certificate for the public key
     @param outError  On failure, an error will be stored here.
     @return  A new CBLTLSIdentity object. */
@@ -73,11 +79,11 @@ CBLTLSIdentity* CBLTLSIdentity_NewFromData(FLSlice privateKeyData,
 _cbl_warn_unused
 CBLTLSIdentity* CBLTLSIdentity_GenerateAnonymous(CBLError* _cbl_nullable outError) CBLAPI;
 
-/** Returns the identity's certificate. */
+/** Returns the identity's certificate object. */
 CBLCertificate* CBLTLSIdentity_GetCertificate(CBLTLSIdentity*) CBLAPI;
 
-/** Returns the encoded form of the identity's key-pair. This can be used together with the
-    certificate's data to re-create the CBLTLSIdentity later.
+/** Returns the encoded form of the identity's private key, in PKCS#1 or SEC1 DER format.
+    This can be used together with the certificate's data to re-create the CBLTLSIdentity later.
     \warning This data is highly sensitive, just like a password; it should never be stored where
              anyone else can read it. */
 FLSliceResult CBLTLSIdentity_PrivateKeyData(CBLTLSIdentity*) CBLAPI;
