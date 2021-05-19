@@ -59,7 +59,7 @@ namespace cbl {
     };
 
 
-    using ReplicationFilter = std::function<bool(Document, bool isDeleted)>;
+    using ReplicationFilter = std::function<bool(Document, CBLDocumentFlags flags)>;
 
 
     struct ReplicatorConfiguration {
@@ -120,14 +120,14 @@ namespace cbl {
             CBLReplicatorConfiguration c_config = config;
             _pushFilter = config.pushFilter;
             if (_pushFilter) {
-                c_config.pushFilter = [](void *context, CBLDocument* doc, bool isDeleted) -> bool {
-                    return ((Replicator*)context)->_pushFilter(Document(doc), isDeleted);
+                c_config.pushFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
+                    return ((Replicator*)context)->_pushFilter(Document(doc), flags);
                 };
             }
             _pullFilter = config.pullFilter;
             if (_pullFilter) {
-                c_config.pullFilter = [](void *context, CBLDocument* doc, bool isDeleted) -> bool {
-                    return ((Replicator*)context)->_pullFilter(Document(doc), isDeleted);
+                c_config.pullFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
+                    return ((Replicator*)context)->_pullFilter(Document(doc), flags);
                 };
             }
             c_config.context = this;

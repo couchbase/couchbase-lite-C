@@ -287,7 +287,14 @@ private:
     bool _filter(slice docID, slice revID, C4RevisionFlags flags, Dict body, bool pushing) {
         Retained<CBLDocument> doc = new CBLDocument(_conf.database, docID, revID, flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
-        return filter(_conf.context, doc, (flags & kRevDeleted) != 0);
+        
+        CBLDocumentFlags docFlags = 0;
+        if (flags & kRevDeleted)
+            docFlags |= kCBLDocumentFlagsDeleted;
+        if (flags & kRevPurged)
+            docFlags |= kCBLDocumentFlagsAccessRemoved;
+        
+        return filter(_conf.context, doc, docFlags);
     }
 
 
