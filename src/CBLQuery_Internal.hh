@@ -199,6 +199,7 @@ namespace cbl_internal {
                       void* _cbl_nullable context)
         :CBLListenerToken((const void*)callback, context)
         ,_query(query)
+        ,_notifyLock(this)
         {
             query->_c4query.useLocked([&](C4Query *c4query) {
                 _c4obs = c4query->observe([this](C4QueryObserver*) { this->queryChanged(); });
@@ -217,8 +218,14 @@ namespace cbl_internal {
 
         void call() {
             CBLQueryChangeListener cb = callback();
-            if (cb)
+            if (cb) {
+                auto locked = _notifyLock.useLocked();
                 cb(_context, _query);
+            }
+        }
+        
+        auto useNotifyLocked() {
+            return _notifyLock.useLocked();
         }
 
         Retained<CBLResultSet> resultSet() {
@@ -230,6 +237,7 @@ namespace cbl_internal {
 
         Retained<CBLQuery>  _query;
         std::unique_ptr<C4QueryObserver> _c4obs;
+        litecore::access_lock<ListenerToken*> _notifyLock;
     };
 
 }
@@ -246,6 +254,9 @@ inline Retained<CBLListenerToken> CBLQuery::addChangeListener(CBLQueryChangeList
 {
     auto token = retained(new ListenerToken<CBLQueryChangeListener>(this, listener, context));
     _listeners.add(token);
+    
+    // Make sure that the notification doesn't happen before the token is returned:
+    auto locked = token->useNotifyLocked();
     token->setEnabled(true);
     return token;
 }
