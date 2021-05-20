@@ -54,11 +54,11 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
     config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg/foobar"_sl);
     config.authenticator = CBLAuth_NewSession("SyncGatewaySession"_sl, "NOM_NOM_NOM"_sl);
 
-    config.pullFilter = [](void *context, CBLDocument* document, bool isDeleted) -> bool {
+    config.pullFilter = [](void *context, CBLDocument* document, CBLDocumentFlags flags) -> bool {
         return true;
     };
 
-    config.pushFilter = [](void *context, CBLDocument* document, bool isDeleted) -> bool {
+    config.pushFilter = [](void *context, CBLDocument* document, CBLDocumentFlags flags) -> bool {
         return true;
     };
 

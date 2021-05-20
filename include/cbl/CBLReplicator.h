@@ -79,17 +79,25 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorType) {
     kCBLReplicatorTypePull                ///< Pulling changes from the target
 };
 
+
+/** Flags describing a replicated document. */
+typedef CBL_OPTIONS(unsigned, CBLDocumentFlags) {
+    kCBLDocumentFlagsDeleted        = 1 << 0,   ///< The document has been deleted.
+    kCBLDocumentFlagsAccessRemoved  = 1 << 1    ///< Lost access to the document on the server.
+};
+
+
 /** A callback that can decide whether a particular document should be pushed or pulled.
     @warning  This callback will be called on a background thread managed by the replicator.
                 It must pay attention to thread-safety. It should not take a long time to return,
                 or it will slow down the replicator.
     @param context  The `context` field of the \ref CBLReplicatorConfiguration.
     @param document  The document in question.
-    @param isDeleted True if the document has been deleted.
+    @param flags  Indicates whether the document was deleted or removed.
     @return  True if the document should be replicated, false to skip it. */
 typedef bool (*CBLReplicationFilter)(void* _cbl_nullable context,
                                      CBLDocument* document,
-                                     bool isDeleted);
+                                     CBLDocumentFlags flags);
 
 /** Conflict-resolution callback for use in replications. This callback will be invoked
     when the replicator finds a newer server-side revision of a document that also has local
@@ -292,13 +300,6 @@ _cbl_warn_unused
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator*,
                                                   CBLReplicatorChangeListener,
                                                   void* _cbl_nullable context) CBLAPI;
-
-
-/** Flags describing a replicated document. */
-typedef CBL_OPTIONS(unsigned, CBLDocumentFlags) {
-    kCBLDocumentFlagsDeleted        = 1 << 0,   ///< The document has been deleted.
-    kCBLDocumentFlagsAccessRemoved  = 1 << 1    ///< Lost access to the document on the server.
-};
 
 
 /** Information about a document that's been pushed or pulled. */

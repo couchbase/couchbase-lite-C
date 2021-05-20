@@ -203,4 +203,76 @@ TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict deleting merge (custom r
 }
 
 
+class ReplicatorFilterTest : public ReplicatorLocalTest {
+public:
+    int count = 0;
+    int deletedCount = 0;
+    alloc_slice deletedDocID;
+    
+    void testFilter(bool isPush) {
+        cbl::Database theDB;
+        
+        if (isPush) {
+            theDB = db;
+            config.replicatorType = kCBLReplicatorTypePush;
+            config.pushFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
+                ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
+                return test->filter(context, doc, flags);
+            };
+        } else {
+            theDB = otherDB;
+            config.replicatorType = kCBLReplicatorTypePull;
+            config.pullFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
+                ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
+                return test->filter(context, doc, flags);
+            };
+            
+            // Make local db non-empty for pulling a deleted doc:
+            MutableDocument doc0("doc0");
+            db.saveDocument(doc0);
+        }
+        
+        MutableDocument doc1("doc1");
+        theDB.saveDocument(doc1);
+        
+        MutableDocument doc2("doc2");
+        theDB.saveDocument(doc2);
+        
+        MutableDocument doc3("doc3");
+        theDB.saveDocument(doc3);
+        theDB.deleteDocument(doc3);
+        
+        replicate();
+        
+        CHECK(count == 3);
+        CHECK(deletedCount == 1);
+        CHECK(deletedDocID == "doc3"_sl);
+    }
+    
+    bool filter(void *context, CBLDocument* doc, CBLDocumentFlags flags) {
+        count++;
+        
+        if (flags & kCBLDocumentFlagsDeleted) {
+            deletedCount++;
+            deletedDocID = CBLDocument_ID(doc);
+        }
+        
+        if (FLSlice_Equal(CBLDocument_ID(doc), "doc2"_sl))
+            return false;
+        
+        return true;
+    }
+};
+
+
+TEST_CASE_METHOD(ReplicatorFilterTest, "Push Filter", "[Replicator][Filter]") {
+    testFilter(true);
+}
+
+
+TEST_CASE_METHOD(ReplicatorFilterTest, "Pull Filter", "[Replicator][Filter]") {
+    testFilter(false);
+}
+
+
 #endif // COUCHBASE_ENTERPRISE
