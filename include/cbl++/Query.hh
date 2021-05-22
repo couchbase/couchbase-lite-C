@@ -59,7 +59,7 @@ namespace cbl {
         [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<Query>::Callback);
 
     private:
-        static void _callListener(void *context, CBLQuery*);
+        static void _callListener(void *context, CBLQuery*, CBLListenerToken* token);
         CBL_REFCOUNTED_BOILERPLATE(Query, RefCounted, CBLQuery)
     };
 
@@ -181,7 +181,7 @@ namespace cbl {
     }
 
 
-    inline void Query::_callListener(void *context, CBLQuery *q) {
+    inline void Query::_callListener(void *context, CBLQuery *q, CBLListenerToken* token) {
         ChangeListener::call(context, Query(q));
     }
 

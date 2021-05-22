@@ -21,7 +21,6 @@
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <iostream>
-#include <mutex>
 #include <thread>
 
 using namespace std;
@@ -35,29 +34,15 @@ public:
     }
 
     ~QueryTest() {
-        lock_guard<mutex> lock(_mutex);
         CBLResultSet_Release(results);
-        CBLListener_Remove(_token);
+        CBLListener_Remove(listenerToken);
         CBLQuery_Release(query);
-    }
-    
-    void setToken(CBLListenerToken* t) {
-        lock_guard<mutex> lock(_mutex);
-        _token = t;
-    }
-    
-    CBLListenerToken* token() {
-        lock_guard<mutex> lock(_mutex);
-        return _token;
     }
 
     CBLQuery *query =nullptr;
     CBLResultSet *results =nullptr;
+    CBLListenerToken *listenerToken =nullptr;
     int resultCount =-1;
-    
-private:
-    mutable mutex _mutex;
-    CBLListenerToken* _token = nullptr;
 };
 
 
@@ -185,14 +170,14 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CBLResultSet_Release(results);
 
     cerr << "Adding listener\n";
-    setToken(CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query) {
+    listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
         auto self = (QueryTest*)context;
         CBLError error;
-        auto newResults = CBLQuery_CopyCurrentResults(query, self->token(), &error);
+        auto newResults = CBLQuery_CopyCurrentResults(query, token, &error);
         CHECK(newResults);
         self->resultCount = countResults(newResults);
         CBLResultSet_Release(newResults);
-    }, this));
+    }, this);
 
     cerr << "Waiting for listener...\n";
     resultCount = -1;

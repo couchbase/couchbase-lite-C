@@ -218,7 +218,7 @@ namespace cbl_internal {
         void call() {
             CBLQueryChangeListener cb = callback();
             if (cb)
-                cb(_context, _query);
+                cb(_context, _query, this);
         }
 
         Retained<CBLResultSet> resultSet() {

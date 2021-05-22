@@ -199,9 +199,11 @@ CBL_REFCOUNTED(CBLResultSet*, ResultSet);
                     prepared for that, you may want to use \ref CBLDatabase_BufferNotifications
                     so that listeners will be called in a safe context.
     @param context  The same `context` value that you passed when adding the listener.
-    @param query  The query that triggered the listener. */
+    @param query  The query that triggered the listener.
+    @param token  The token for obtaining the query results by calling \ref CBLQuery_CopyCurrentResults. */
 typedef void (*CBLQueryChangeListener)(void* _cbl_nullable context,
-                                       CBLQuery* query);
+                                       CBLQuery* query,
+                                       CBLListenerToken* token);
 
 /** Registers a change listener callback with a query, turning it into a "live query" until
     the listener is removed (via \ref CBLListener_Remove).
