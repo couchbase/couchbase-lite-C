@@ -170,10 +170,10 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CBLResultSet_Release(results);
 
     cerr << "Adding listener\n";
-    listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query) {
+    listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
         auto self = (QueryTest*)context;
         CBLError error;
-        auto newResults = CBLQuery_CopyCurrentResults(query, self->listenerToken, &error);
+        auto newResults = CBLQuery_CopyCurrentResults(query, token, &error);
         CHECK(newResults);
         self->resultCount = countResults(newResults);
         CBLResultSet_Release(newResults);
