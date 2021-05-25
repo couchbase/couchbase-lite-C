@@ -805,6 +805,7 @@
 				27984E072249A126000FE777 /* Frameworks */,
 				27984E382249A36A000FE777 /* Copy Fleece Headers */,
 				93D0AFB626255E7300777AFC /* Copy CBL_Editionh */,
+				42F2DAB72655DC4B001C9EC3 /* Fix Header References */,
 			);
 			buildRules = (
 			);
@@ -1088,7 +1089,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n# Copy Fleece Headers:\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/fleece/\"\n\n# Remove C++ Headers (Go to the folder to workaroud rm cmd issue with path including spaces): \npushd \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/fleece/\"\nrm -f *.hh\npopd\n";
+			shellScript = "set -e\n# Copy Fleece Headers:\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n\n# Remove C++ Headers (Go to the folder to workaroud rm cmd issue with path including spaces): \npushd \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\nrm -f *.hh\n\npopd\n";
 		};
 		27DBD088246C94B2002FD7A7 /* Merge static libs */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1114,6 +1115,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/bash -e";
 			shellScript = "# This script merges the input files into the static lib built by this target.\nsource $SRCROOT/Xcode/mergeIntoStaticLib.sh\n";
+		};
+		42F2DAB72655DC4B001C9EC3 /* Fix Header References */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Fix Header References";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\npushd \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n\nsed -i '' 's/#include \"fleece\\/\\(.*\\)\"/#include <CouchbaseLite\\/\\1>/' * \nsed -i '' 's/#include \"CBL\\(.*\\)\"/#include <CouchbaseLite\\/CBL\\1>/' *\nsed -i '' 's/#include \"FLSlice.h\"/#include <CouchbaseLite\\/FLSlice.h>/' *\nsed -i '' 's/#include \"Base.h\"/#include <CouchbaseLite\\/Base.h>/' *\n";
 		};
 		93D0AF88262557D200777AFC /* Generate CBL_Edition.h */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1175,7 +1194,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\ncp \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
+			shellScript = "set -e\n\ncp \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
