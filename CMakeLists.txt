@@ -110,7 +110,7 @@ set(
 
 add_library(CouchbaseLiteCStatic STATIC ${ALL_SRC_FILES})
 target_include_directories(
-    CouchbaseLiteCStatic PUBLIC 
+    CouchbaseLiteCStatic PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated_headers/public/cbl/>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/>
@@ -118,7 +118,7 @@ target_include_directories(
 )
 set_platform_include_directories(RESULT PLATFORM_INCLUDE)
 target_include_directories(
-    CouchbaseLiteCStatic 
+    CouchbaseLiteCStatic
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cbl
     src
@@ -135,7 +135,7 @@ target_link_libraries(
 file(WRITE empty.cpp)
 add_library(CouchbaseLiteC SHARED empty.cpp)
 target_include_directories(
-    CouchbaseLiteC PUBLIC 
+    CouchbaseLiteC PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated_headers/public/cbl/>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/>
@@ -151,7 +151,7 @@ target_include_directories(
     ${PLATFORM_INCLUDE}
 )
 
-set(CBL_LIBRARIES_PRIVATE  
+set(CBL_LIBRARIES_PRIVATE
     ${WHOLE_LIBRARY_FLAG}
     CouchbaseLiteCStatic
     ${NO_WHOLE_LIBRARY_FLAG}
@@ -160,7 +160,7 @@ set(CBL_LIBRARIES_PRIVATE
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
     # C/C++ atomic operations on ARM6/7 emit calls to functions in libatomic
-    set(CBL_LIBRARIES_PRIVATE ${CBL_LIBRARIES_PRIVATE} 
+    set(CBL_LIBRARIES_PRIVATE ${CBL_LIBRARIES_PRIVATE}
                               atomic)
 endif()
 
@@ -175,8 +175,9 @@ if(ANDROID)
 endif()
 
 install(
-    TARGETS CouchbaseLiteC 
+    TARGETS CouchbaseLiteC
     EXPORT CouchbaseLiteTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 file(GLOB C_HEADERS ${PROJECT_SOURCE_DIR}/include/cbl/*.h)
