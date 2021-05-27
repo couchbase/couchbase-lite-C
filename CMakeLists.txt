@@ -195,7 +195,7 @@ include(CMakePackageConfigHelpers)
 set(TARGETS_EXPORT_NAME "CouchbaseLiteTargets")
 configure_package_config_file(
   cmake/CouchbaseLiteConfig.cmake.in
-  CouchbaseLiteConfig.cmake
+  ${CMAKE_BINARY_DIR}/CouchbaseLiteConfig.cmake
   INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite"
 )
 write_basic_package_version_file(
