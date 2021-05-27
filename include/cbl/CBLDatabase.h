@@ -27,7 +27,10 @@ CBL_CAPI_BEGIN
     A \ref CBLDatabase is both a filesystem object and a container for documents.
  */
 
+#ifdef __APPLE__
 #pragma mark - CONFIGURATION
+#endif
+
 /** \name  Database configuration
     @{ */
 
@@ -74,8 +77,9 @@ bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBL
 /** @} */
 
 
-
+#ifdef __APPLE__
 #pragma mark - FILE OPERATIONS
+#endif
 /** \name  Database file operations
     @{
     These functions operate on database files without opening them.
@@ -111,8 +115,9 @@ bool CBL_DeleteDatabase(FLString name,
 /** @} */
 
 
-
+#ifdef __APPLE__
 #pragma mark - LIFECYCLE
+#endif
 /** \name  Database lifecycle
     @{
     Opening, closing, and managing open databases.
@@ -182,8 +187,9 @@ bool CBLDatabase_PerformMaintenance(CBLDatabase* db,
 /** @} */
 
 
-
+#ifdef __APPLE__
 #pragma mark - ACCESSORS
+#endif
 /** \name  Database accessors
     @{
     Getting information about a database.
@@ -206,8 +212,9 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*) CBLAPI;
 /** @} */
 
 
-
+#ifdef __APPLE__
 #pragma mark - LISTENERS
+#endif
 /** \name  Database listeners
     @{
     A database change listener lets you detect changes made to all documents in a database.
@@ -245,8 +252,9 @@ CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
 /** @} */    // end of outer \defgroup
 
 
-
+#ifdef __APPLE__
 #pragma mark - NOTIFICATION SCHEDULING
+#endif
 /** \defgroup listeners   Listeners
     @{ */
 /** \name  Scheduling notifications
