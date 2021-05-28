@@ -29,12 +29,12 @@ fi
 
 function build_variant {
     $ANDROID_SDK_ROOT/cmake/$ANDROID_CMAKE_VERSION/bin/cmake -G Ninja \
-	    -DCMAKE_TOOLCHAIN_FILE=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/build/cmake/android.toolchain.cmake \
-	    -DCMAKE_MAKE_PROGRAM=$ANDROID_SDK_ROOT/cmake/$ANDROID_CMAKE_VERSION/bin/ninja \
-	    -DANDROID_NATIVE_API_LEVEL=22 \
-	    -DANDROID_ABI=$1 \
-	    -DCMAKE_INSTALL_PREFIX=`pwd`/../build_android_out \
-	    ..
+        -DCMAKE_TOOLCHAIN_FILE=$ANDROID_SDK_ROOT/ndk/$ANDROID_NDK_VERSION/build/cmake/android.toolchain.cmake \
+        -DCMAKE_MAKE_PROGRAM=$ANDROID_SDK_ROOT/cmake/$ANDROID_CMAKE_VERSION/bin/ninja \
+        -DANDROID_NATIVE_API_LEVEL=22 \
+        -DANDROID_ABI=$1 \
+        -DCMAKE_INSTALL_PREFIX=`pwd`/../build_android_out \
+        ..
 
     $ANDROID_SDK_ROOT/cmake/$ANDROID_CMAKE_VERSION/bin/cmake --build . --target install
 }
