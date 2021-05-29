@@ -16,7 +16,7 @@ fi
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 PKG_CMD='zip -r'
 PKG_TYPE='zip'
-OS="apple"
+OS="ios"
 BUILD_IOS_REL_TARGET='build_ios_release'
 PROP_FILE=${WORKSPACE}/publish_ios.prop
 

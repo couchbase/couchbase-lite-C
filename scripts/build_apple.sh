@@ -71,7 +71,9 @@ function xcarchive
 # Build and archive binary for each platform:
 xcarchive "iossim" "generic/platform=iOS Simulator"
 xcarchive "ios" "generic/platform=iOS"
-xcarchive "macos" "generic/platform=macOS"
+
+# Until required, don't bundle mac since we provide another package for it
+# xcarchive "macos" "generic/platform=macOS"
 
 # Create xcframework
 echo "Creating XCFramework...: ${FRAMEWORK_PATH_ARGS}"
