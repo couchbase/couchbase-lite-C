@@ -15,9 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(CBL_VERSION_STRING)</string>
 	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<string>$(CBL_BUILD_NUMBER)</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2019 Couchbase. All rights reserved.</string>
 </dict>

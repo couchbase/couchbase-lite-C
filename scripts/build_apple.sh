@@ -29,6 +29,20 @@ else
   CONFIGURATION="Release_EE"
 fi
 
+if [ -z "$VERSION" ]; then
+  echo "VERSION environment variable not set, using 0.0.0"
+  XCODE_BUILD_VERSION="CBL_VERSION_STRING=0.0.0"
+else
+  XCODE_BUILD_VERSION="CBL_VERSION_STRING=${VERSION}"
+fi
+
+if [ -z "$BLD_NUM" ]; then
+  echo "BLD_NUM environment variable not set, using 0"
+  XCODE_BUILD_NUMBER="CBL_BUILD_NUMBER=0"
+else
+  XCODE_BUILD_NUMBER="CBL_BUILD_NUMBER=${BLD_NUM}"
+fi
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 pushd $SCRIPT_DIR/.. > /dev/null
@@ -57,7 +71,7 @@ function xcarchive
     -scheme "CBL_C Framework" \
     -configuration "${CONFIGURATION}" \
     -destination "${DESTINATION}" \
-    ${BUILD_VERSION} ${BUILD_NUMBER} \
+    ${XCODE_BUILD_VERSION} ${XCODE_BUILD_NUMBER} \
     -archivePath "${ARCHIVE_PATH}/${FRAMEWORK_NAME}.xcarchive" \
     "ONLY_ACTIVE_ARCH=NO" "BITCODE_GENERATION_MODE=bitcode" \
     "CODE_SIGNING_REQUIRED=NO" "CODE_SIGN_IDENTITY=" \

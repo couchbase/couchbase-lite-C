@@ -78,10 +78,13 @@ mkdir -p ../build_android_arm64
 cd ../build_android_arm64
 build_variant arm64-v8a
 
-PACKAGE_NAME="couchbase-lite-c-android-${VERSION}.${PKG_TYPE}"
+PACKAGE_NAME="couchbase-lite-c-android-${VERSION}-${BLD_NUM}.${PKG_TYPE}"
 echo
 echo "=== Creating ${WORKSPACE}/${PACKAGE_NAME}"
 echo
+
+cd $(pwd)/../build_android_out
+${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} *
 
 cd ${WORKSPACE}
 PROP_FILE="${WORKSPACE}/publish_android.prop"
