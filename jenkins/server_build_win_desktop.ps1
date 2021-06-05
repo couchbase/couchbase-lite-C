@@ -7,14 +7,14 @@
     is meant for the official Couchbase build servers.  Do not try to use it, it will only confuse you.  You have been warned.
 .PARAMETER Version
     The version number to give to the build (e.g. 3.0.0)
-.PARAMETER ShaVersion
-    The commit SHA that this build was built from
+.PARAMETER BuildNum
+    The build number of this build (e.g. 123)
 .PARAMETER Edition
     The edition to build (community vs enterprise)
 #>
 param(
     [Parameter(Mandatory=$true, HelpMessage="The version number to give to the build (e.g. 3.0.0)")][string]$Version,
-    [Parameter(Mandatory=$true, HelpMessage="The commit SHA that this build was built from")][string]$ShaVersion,
+    [Parameter(Mandatory=$true, HelpMessage="The build number of this build (e.g. 123)")][string]$BuildNum,
     [Parameter(Mandatory=$true, HelpMessage="The edition to build (community vs enterprise)")][string]$Edition
 )
 
@@ -32,11 +32,12 @@ function Make-Package() {
         throw "Zip failed"
     }
 
-    $PropFile = "$env:WORKSPACE\publish_$arch.prop"
+    $PropFile = "$env:WORKSPACE\publish_x64.prop"
     New-Item -ItemType File -ErrorAction Ignore -Path $PropFile
     Add-Content $PropFile "PRODUCT=couchbase-lite-c"
-    Add-Content $PropFile "VERSION=$ShaVersion"
-    Add-Content $PropFile "${config}_PACKAGE_NAME_$architecture=$filename"
+    Add-Content $PropFile "VERSION=$Version"
+    Add-Content $PropFile "BLD_NUM=$BuildNum"
+    Add-Content $PropFile "RELEASE_PACKAGE_NAME=$filename"
     Pop-Location
 }
 
@@ -77,7 +78,10 @@ function Run-UnitTest() {
     Pop-Location
 }
 
-Remove-Item -Recurse -Force "${env:WORKSPACE}\build_x64\out"
+Remove-Item -Recurse -Force -ErrorAction Ignore "${env:WORKSPACE}\build_x64\out"
 Build "${env:WORKSPACE}\build_x64"
-Run-UnitTest "${env:WORKSPACE}\build_x64"
-Make-Package "${env:WORKSPACE}\build_x64\out" "couchbase-lite-c-$Version-$ShaVersion-windows-x64.zip"
+if("${Edition}" -eq "enterprise") {
+    Run-UnitTest "${env:WORKSPACE}\build_x64"
+}
+
+Make-Package "${env:WORKSPACE}\build_x64\out" "couchbase-lite-c-$Version-$BuildNum-windows-x64.zip"

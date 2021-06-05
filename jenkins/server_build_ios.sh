@@ -22,7 +22,7 @@ PROP_FILE=${WORKSPACE}/publish_ios.prop
 
 $SCRIPT_DIR/../scripts/build_apple.sh
 
-PACKAGE_NAME=${PRODUCT}-${OS}-${VERSION}.${PKG_TYPE}
+PACKAGE_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}.${PKG_TYPE}
 echo
 echo  "=== Creating ${WORKSPACE}/${PACKAGE_NAME} package ==="
 echo

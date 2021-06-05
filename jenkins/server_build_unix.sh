@@ -83,7 +83,7 @@ fi
 
 cd ${WORKSPACE}
 
-PACKAGE_NAME=${PRODUCT}-${OS}-${VERSION}.${PKG_TYPE}
+PACKAGE_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}.${PKG_TYPE}
 echo
 echo  "=== Creating ${WORKSPACE}/${PACKAGE_NAME} package ==="
 echo
@@ -92,11 +92,11 @@ cd ${WORKSPACE}/build_release/install
 # Create separate symbols pkg
 if [[ ${OS} == 'macosx' ]]; then
     ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} include lib
-    SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-'symbols'.${PKG_TYPE}
+    SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-'symbols'.${PKG_TYPE}
     ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME}  libCouchbaseLiteC.dylib.dSYM
 else # linux
     ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} include lib
-    SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-'symbols'.${PKG_TYPE}
+    SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-'symbols'.${PKG_TYPE}
     ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libCouchbaseLiteC*.sym
 fi
 cd ${WORKSPACE}
