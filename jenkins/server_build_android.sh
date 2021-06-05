@@ -46,8 +46,8 @@ CMAKE_PATH="${ANDROID_HOME}/cmake/${ANDROID_CMAKE_VERSION}/bin"
 
 echo " ======== Installing toolchain with CMake ${ANDROID_CMAKE_VERSION} and NDK ${ANDROID_NDK_VERSION} (this will accept the licenses!)"
 yes | ${SDK_MGR} --licenses > /dev/null 2>&1
-${SDK_MGR} --install "cmake;${ANDROID_CMAKE_VERSION}"
-${SDK_MGR} --install "ndk;${ANDROID_NDK_VERSION}"
+${SDK_MGR} --install "cmake;${ANDROID_CMAKE_VERSION}" > /dev/null
+${SDK_MGR} --install "ndk;${ANDROID_NDK_VERSION}" > /dev/null
 
 function build_variant {
     ${CMAKE_PATH}/cmake -G Ninja \

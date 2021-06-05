@@ -91,11 +91,11 @@ echo
 cd ${WORKSPACE}/build_release/install
 # Create separate symbols pkg
 if [[ ${OS} == 'macosx' ]]; then
-    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} bin include lib
+    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} include lib
     SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-'symbols'.${PKG_TYPE}
     ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME}  libCouchbaseLiteC.dylib.dSYM
 else # linux
-    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} bin include lib
+    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} include lib
     SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-'symbols'.${PKG_TYPE}
     ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libCouchbaseLiteC*.sym
 fi
