@@ -56,7 +56,7 @@ function build_variant {
 	    -DANDROID_NATIVE_API_LEVEL=22 \
 	    -DANDROID_ABI=$1 \
 	    -DCMAKE_INSTALL_PREFIX=$(pwd)/../build_android_out \
-        -DEDITION=$EDITION
+        -DEDITION=$EDITION \
 	    ..
 
     ${CMAKE_PATH}/ninja install/strip

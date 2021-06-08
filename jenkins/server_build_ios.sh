@@ -20,7 +20,7 @@ OS="ios"
 BUILD_IOS_REL_TARGET='build_ios_release'
 PROP_FILE=${WORKSPACE}/publish_ios.prop
 
-if [[ "${EDITION}" == "enterprise" ]]; then
+if [ "${EDITION}" = "enterprise" ]; then
     $SCRIPT_DIR/../scripts/build_apple.sh
 else
     $SCRIPT_DIR/../scripts/build_apple.sh --ee
