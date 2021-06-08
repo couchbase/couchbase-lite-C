@@ -56,6 +56,7 @@ function build_variant {
 	    -DANDROID_NATIVE_API_LEVEL=22 \
 	    -DANDROID_ABI=$1 \
 	    -DCMAKE_INSTALL_PREFIX=$(pwd)/../build_android_out \
+        -DEDITION=$EDITION
 	    ..
 
     ${CMAKE_PATH}/ninja install/strip
@@ -78,7 +79,7 @@ mkdir -p ../build_android_arm64
 cd ../build_android_arm64
 build_variant arm64-v8a
 
-PACKAGE_NAME="couchbase-lite-c-android-${VERSION}-${BLD_NUM}.${PKG_TYPE}"
+PACKAGE_NAME="couchbase-lite-c-android-${VERSION}-${BLD_NUM}-${EDITION}.${PKG_TYPE}"
 echo
 echo "=== Creating ${WORKSPACE}/${PACKAGE_NAME}"
 echo
@@ -93,10 +94,5 @@ echo "BLD_NUM=${BLD_NUM}" >> ${PROP_FILE}
 echo "VERSION=${VERSION}" >> ${PROP_FILE}
 echo "PKG_TYPE=${PKG_TYPE}" >> ${PROP_FILE}
 echo "RELEASE_PKG_NAME=${PACKAGE_NAME}" >> ${PROP_FILE}
-
-PACKAGE_NAME="couchbase-lite-c-android-${VERSION}.${PKG_TYPE}"
-echo
-echo "=== Created ${PROP_FILE}"
-echo
 
 cat ${PROP_FILE}

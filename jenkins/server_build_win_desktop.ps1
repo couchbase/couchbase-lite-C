@@ -84,4 +84,4 @@ if("${Edition}" -eq "enterprise") {
     Run-UnitTest "${env:WORKSPACE}\build_x64"
 }
 
-Make-Package "${env:WORKSPACE}\build_x64\out" "couchbase-lite-c-$Version-$BuildNum-windows-x64.zip"
+Make-Package "${env:WORKSPACE}\build_x64\out" "couchbase-lite-c-windows-x64-$Version-$BuildNum-$Edition.zip"

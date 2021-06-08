@@ -47,7 +47,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 pushd $SCRIPT_DIR/.. > /dev/null
 
-# Use absolute path to workaround an xcodebuild bug that cannot recognize the dSym files 
+# Use absolute path to workaround an xcodebuild bug that cannot recognize the dSym files
 # using their relative paths when creating the xcframework file.
 OUTPUT_DIR=`pwd`/build_apple_out
 BUILD_DIR="$OUTPUT_DIR/build"
@@ -64,7 +64,7 @@ function xcarchive
 {
   PLATFORM_NAME=${1}
   DESTINATION=${2}
-  
+
   echo "Archiving for ${DESTINATION}..."
   ARCHIVE_PATH=${BUILD_DIR}/${PLATFORM_NAME}
   xcodebuild archive \
@@ -75,8 +75,8 @@ function xcarchive
     -archivePath "${ARCHIVE_PATH}/${FRAMEWORK_NAME}.xcarchive" \
     "ONLY_ACTIVE_ARCH=NO" "BITCODE_GENERATION_MODE=bitcode" \
     "CODE_SIGNING_REQUIRED=NO" "CODE_SIGN_IDENTITY=" \
-    "SKIP_INSTALL=NO"
-  
+    "SKIP_INSTALL=NO" | xcpretty
+
   FRAMEWORK_PATH_ARGS+=("-framework "${ARCHIVE_PATH}/${FRAMEWORK_NAME}.xcarchive/Products/Library/Frameworks/${FRAMEWORK_NAME}.framework" \
     -debug-symbols "${ARCHIVE_PATH}/${FRAMEWORK_NAME}.xcarchive/dSYMs/${FRAMEWORK_NAME}.framework.dSYM"")
   echo "Finished archiving ${DESTINATION}."
@@ -93,7 +93,7 @@ xcarchive "ios" "generic/platform=iOS"
 echo "Creating XCFramework...: ${FRAMEWORK_PATH_ARGS}"
 xcodebuild -create-xcframework \
     -output "${OUTPUT_DIR}/${FRAMEWORK_NAME}.xcframework" \
-    ${FRAMEWORK_PATH_ARGS[*]}
+    ${FRAMEWORK_PATH_ARGS[*]} | xcpretty
 
 # Remove build directory
 rm -rf ${BUILD_DIR}
