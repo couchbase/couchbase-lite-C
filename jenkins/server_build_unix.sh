@@ -44,6 +44,8 @@ macosx_lib="libCouchbaseLiteC.dylib"
 echo VERSION=${VERSION}
 # Global define end
 
+ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
+
 echo "====  Building macosx/linux Release binary  ==="
 cd ${WORKSPACE}/build_release
 cmake -DEDITION=${EDITION} -DCMAKE_INSTALL_PREFIX=`pwd`/install -DCMAKE_BUILD_TYPE=MinSizeRel ..
@@ -82,7 +84,6 @@ if [[ -z ${SKIP_TESTS} ]] && [[ ${EDITION} == 'enterprise' ]]; then
 fi
 
 cd ${WORKSPACE}
-ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
 
 PACKAGE_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}.${PKG_TYPE}
 echo
