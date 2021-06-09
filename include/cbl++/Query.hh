@@ -56,7 +56,7 @@ namespace cbl {
 
         class ChangeListener;
 
-        [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<Query>::Callback);
+        [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<ResultSet>::Callback);
 
     private:
         static void _callListener(void *context, CBLQuery*, CBLListenerToken* token);
@@ -155,10 +155,10 @@ namespace cbl {
     }
 
 
-    class Query::ChangeListener : public ListenerToken<Query> {
+    class Query::ChangeListener : public ListenerToken<ResultSet> {
     public:
         ChangeListener(Query query, Callback cb)
-        :ListenerToken<Query>(cb)
+        :ListenerToken<ResultSet>(cb)
         ,_query(std::move(query))
         { }
 
@@ -182,7 +182,10 @@ namespace cbl {
 
 
     inline void Query::_callListener(void *context, CBLQuery *q, CBLListenerToken* token) {
-        ChangeListener::call(context, Query(q));
+        CBLError error;
+        auto rs = CBLQuery_CopyCurrentResults(q, token, &error);
+        check(rs, error);
+        ChangeListener::call(context, ResultSet::adopt(rs));
     }
 
 

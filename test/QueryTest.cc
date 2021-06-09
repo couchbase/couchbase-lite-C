@@ -246,46 +246,43 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
 }
 
 
-//
+
 // CBL-1783 : Disable the test until the issue is fixed
-//
-//static int countResults(ResultSet &results) {
-//    int n = 0;
-//    for (CBL_UNUSED auto &result : results)
-//        ++n;
-//    return n;
-//}
-//
-//
-//TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
-//    Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
-//    {
-//        auto rs = query.execute();
-//        CHECK(countResults(rs) == 3);
-//    }
-//
-//    cerr << "Adding listener\n";
-//    int resultCount = -1;
-//    Query::ChangeListener listenerToken = query.addChangeListener([&](Query q) {
-//        ResultSet rs = listenerToken.results();
-//        resultCount = countResults(rs);
-//    });
-//
-//    cerr << "Waiting for listener...\n";
-//    resultCount = -1;
-//    while (resultCount < 0)
-//        this_thread::sleep_for(100ms);
-//    CHECK(resultCount == 3);
-//    resultCount = -1;
-//
-//    cerr << "Deleting a doc...\n";
-//    Document doc = db.getDocument("0000012");
-//    REQUIRE(doc);
-//    REQUIRE(db.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
-//
-//    cerr << "Waiting for listener again...\n";
-//    while (resultCount < 0)
-//        this_thread::sleep_for(100ms);
-//    CHECK(resultCount == 2);
-//}
-//
+
+static int countResults(ResultSet &results) {
+    int n = 0;
+    for (CBL_UNUSED auto &result : results)
+        ++n;
+    return n;
+}
+
+
+TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
+    Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
+    {
+        auto rs = query.execute();
+        CHECK(countResults(rs) == 3);
+    }
+
+    cerr << "Adding listener\n";
+    atomic_int resultCount{-1};
+    Query::ChangeListener listenerToken = query.addChangeListener([&](ResultSet rs) {
+        resultCount = countResults(rs);
+    });
+
+    cerr << "Waiting for listener...\n";
+    while (resultCount < 0)
+        this_thread::sleep_for(100ms);
+    CHECK(resultCount == 3);
+    resultCount = -1;
+
+    cerr << "Deleting a doc...\n";
+    Document doc = db.getDocument("0000012");
+    REQUIRE(doc);
+    REQUIRE(db.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
+
+    cerr << "Waiting for listener again...\n";
+    while (resultCount < 0)
+        this_thread::sleep_for(100ms);
+    CHECK(resultCount == 2);
+}
