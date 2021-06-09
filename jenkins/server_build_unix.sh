@@ -82,6 +82,7 @@ if [[ -z ${SKIP_TESTS} ]] && [[ ${EDITION} == 'enterprise' ]]; then
 fi
 
 cd ${WORKSPACE}
+ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
 
 PACKAGE_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}.${PKG_TYPE}
 echo

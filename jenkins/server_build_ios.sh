@@ -3,10 +3,10 @@
 # This is the script for the official Couchbase build server.  Do not try to use it, it will only confuse you.
 # You have been warned.
 
-# Global define
+# Global define (export 2 so they get used in the subscript as well)
 PRODUCT=${1}
-BLD_NUM=${2}
-VERSION=${3}
+export BLD_NUM=${2}
+export VERSION=${3}
 EDITION=${4}
 
 if [[ -z "${WORKSPACE}" ]]; then
@@ -19,6 +19,8 @@ PKG_TYPE='zip'
 OS="ios"
 BUILD_IOS_REL_TARGET='build_ios_release'
 PROP_FILE=${WORKSPACE}/publish_ios.prop
+
+ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
 
 if [ "${EDITION}" = "enterprise" ]; then
     $SCRIPT_DIR/../scripts/build_apple.sh --ee

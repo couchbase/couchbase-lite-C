@@ -62,6 +62,8 @@ function build_variant {
     ${CMAKE_PATH}/ninja install/strip
 }
 
+ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
+
 set -x
 mkdir -p build_android_x86
 cd build_android_x86

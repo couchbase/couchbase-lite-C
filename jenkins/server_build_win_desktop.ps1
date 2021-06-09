@@ -79,6 +79,7 @@ function Run-UnitTest() {
 }
 
 Remove-Item -Recurse -Force -ErrorAction Ignore "${env:WORKSPACE}\build_x64\out"
+New-Item -Type Junction -Target ${env:WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE -Path ${env:WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
 Build "${env:WORKSPACE}\build_x64"
 if("${Edition}" -eq "enterprise") {
     Run-UnitTest "${env:WORKSPACE}\build_x64"
