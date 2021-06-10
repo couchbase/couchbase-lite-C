@@ -55,8 +55,9 @@ namespace cbl {
         // Change listener (live query):
 
         class ChangeListener;
+        class Change;
 
-        [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<ResultSet>::Callback);
+        [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<Change>::Callback);
 
     private:
         static void _callListener(void *context, CBLQuery*, CBLListenerToken* token);
@@ -131,7 +132,6 @@ namespace cbl {
         friend class ResultSet;
     };
 
-
     // Method implementations:
 
 
@@ -155,22 +155,48 @@ namespace cbl {
     }
 
 
-    class Query::ChangeListener : public ListenerToken<ResultSet> {
+    class Query::ChangeListener : public ListenerToken<Change> {
     public:
         ChangeListener(Query query, Callback cb)
-        :ListenerToken<ResultSet>(cb)
+        :ListenerToken<Change>(cb)
         ,_query(std::move(query))
         { }
 
         ResultSet results() {
+            return getResults(_query, token());
+        }
+
+    private:
+        static ResultSet getResults(Query query, CBLListenerToken* token) {
             CBLError error;
-            auto rs = CBLQuery_CopyCurrentResults(_query.ref(), token(), &error);
+            auto rs = CBLQuery_CopyCurrentResults(query.ref(), token, &error);
             check(rs, error);
             return ResultSet::adopt(rs);
         }
 
-    private:
         Query _query;
+        friend Change;
+    };
+
+
+    class Query::Change {
+    public:
+        Change(const Change& src) : _query(src._query), _token(src._token) {}
+
+        ResultSet results() {
+            return ChangeListener::getResults(_query, _token);
+        }
+
+        Query query() {
+            return _query;
+        }
+
+    private:
+        friend class Query;
+        Change(Query q, CBLListenerToken* token) : _query(q), _token(token) {}
+
+        Query _query;
+        CBLListenerToken* _token;
     };
 
 
@@ -182,10 +208,7 @@ namespace cbl {
 
 
     inline void Query::_callListener(void *context, CBLQuery *q, CBLListenerToken* token) {
-        CBLError error;
-        auto rs = CBLQuery_CopyCurrentResults(q, token, &error);
-        check(rs, error);
-        ChangeListener::call(context, ResultSet::adopt(rs));
+        ChangeListener::call(context, Change{Query(q), token});
     }
 
 

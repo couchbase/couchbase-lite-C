@@ -266,7 +266,8 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
 
     cerr << "Adding listener\n";
     atomic_int resultCount{-1};
-    Query::ChangeListener listenerToken = query.addChangeListener([&](ResultSet rs) {
+    Query::ChangeListener listenerToken = query.addChangeListener([&](Query::Change change) {
+        ResultSet rs = change.results();
         resultCount = countResults(rs);
     });
 
