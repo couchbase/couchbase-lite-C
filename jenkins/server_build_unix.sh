@@ -76,7 +76,6 @@ else
     cp -p "$libstdcpp" "./install/lib/$libstdcppname"
     ln -s "$libstdcppname" "./install/lib/${libstdcppname}.6"
     cp -p "${libgcc_s}" "./install/lib"
-    cp -r ./install/lib64/* ./install/lib
 fi
 
 if [[ -z ${SKIP_TESTS} ]] && [[ ${EDITION} == 'enterprise' ]]; then

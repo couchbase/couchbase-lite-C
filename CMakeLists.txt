@@ -172,6 +172,8 @@ set_dylib_properties()
 
 if(ANDROID)
     set(CMAKE_INSTALL_LIBDIR "lib/${CMAKE_LIBRARY_ARCHITECTURE}")
+else()
+    set(CMAKE_INSTALL_LIBDIR "lib") # No lib64, stop!
 endif()
 
 install(
