@@ -247,9 +247,6 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
 }
 
 
-
-// CBL-1783 : Disable the test until the issue is fixed
-
 static int countResults(ResultSet &results) {
     int n = 0;
     for (CBL_UNUSED auto &result : results)
