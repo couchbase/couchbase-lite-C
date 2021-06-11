@@ -22,6 +22,7 @@
 #include "fleece/Mutable.hh"
 #include <iostream>
 #include <thread>
+#include <atomic>
 
 using namespace std;
 using namespace fleece;
@@ -265,7 +266,7 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
     }
 
     cerr << "Adding listener\n";
-    atomic_int resultCount{-1};
+    std::atomic_int resultCount{-1};
     Query::ChangeListener listenerToken = query.addChangeListener([&](Query::Change change) {
         ResultSet rs = change.results();
         resultCount = countResults(rs);
