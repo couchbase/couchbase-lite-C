@@ -17,7 +17,7 @@ try {
         exit 1
     }
 
-    & 'C:\Program Files\CMake\bin\cmake.exe' --build .
+    & 'C:\Program Files\CMake\bin\cmake.exe' --build . --parallel 12
     if($LASTEXITCODE -ne 0) {
         Write-Host "Failed to build!" -ForegroundColor Red
         exit 1

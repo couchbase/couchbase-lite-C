@@ -55,7 +55,7 @@ function Build() {
         throw "CMake failed"
     }
 
-    & "C:\Program Files\CMake\bin\cmake.exe" --build . --config MinSizeRel --target install
+    & "C:\Program Files\CMake\bin\cmake.exe" --build . --config MinSizeRel --target install --parallel 12
     if($LASTEXITCODE -ne 0) {
         throw "Build failed ($LASTEXITCODE)"
     }
