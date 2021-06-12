@@ -38,6 +38,16 @@ endfunction()
 
 function(set_dylib_properties)
     set_exported_symbols_file()
-    
-    target_link_libraries(CouchbaseLiteC PUBLIC z ${ICU_LIBS})
+   
+    foreach(LIB ${ICU_LIBS})
+        target_link_libraries(CouchbaseLiteC PUBLIC $<BUILD_INTERFACE:${LIB}>)
+    endforeach()
+ 
+    target_link_libraries(
+        CouchbaseLiteC PUBLIC
+        z
+        $<INSTALL_INTERFACE:icuuc>
+        $<INSTALL_INTERFACE:icudata>
+        $<INSTALL_INTERFACE:icui18n>
+    )
 endfunction()
