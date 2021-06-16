@@ -227,6 +227,11 @@ namespace cbl_internal {
                 enc.endDict();
             }
             
+            if (disableAutoPurge) {
+                enc.writeKey(slice(kC4ReplicatorOptionAutoPurge));
+                enc.writeBool(!disableAutoPurge);
+            }
+            
             if (maxAttempts > 0) {
                 enc.writeKey(slice(kC4ReplicatorOptionMaxRetries));
                 enc.writeUInt(maxAttempts - 1);

@@ -72,6 +72,8 @@ namespace cbl {
         CBLReplicatorType replicatorType    = kCBLReplicatorTypePushAndPull;
         bool continuous                     = false;
         
+        bool enableAutoPurge                = true;
+        
         unsigned maxAttempts                = 0;
         unsigned maxAttemptWaitTime         = 0;
         
@@ -97,6 +99,7 @@ namespace cbl {
             conf.replicatorType = replicatorType;
             conf.continuous = continuous;
             conf.maxAttempts = maxAttempts;
+            conf.disableAutoPurge = !enableAutoPurge;
             conf.maxAttemptWaitTime = maxAttemptWaitTime;
             conf.heartbeat = heartbeat;
             conf.authenticator = authenticator.ref();
