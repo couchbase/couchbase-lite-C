@@ -33,8 +33,10 @@ echo
 echo  "=== Creating ${WORKSPACE}/${PACKAGE_NAME} package ==="
 echo
 
-${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} ${WORKSPACE}/couchbase-lite-c/build_apple_out/CouchbaseLite.xcframework
+pushd ${WORKSPACE}/couchbase-lite-c/build_apple_out/
+${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} CouchbaseLite.xcframework
 RELEASE_IOS_PKG_NAME=${PACKAGE_NAME}
+popd
 
 # Create Nexus publishing prop file
 cd ${WORKSPACE}
