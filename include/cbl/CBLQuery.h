@@ -41,8 +41,8 @@ CBL_CAPI_BEGIN
 
 /** Query languages */
 typedef CBL_ENUM(uint32_t, CBLQueryLanguage) {
-    kCBLJSONLanguage,   ///< [JSON query schema](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema)
-    kCBLN1QLLanguage    ///< [N1QL syntax](https://docs.couchbase.com/server/6.0/n1ql/n1ql-language-reference/index.html)
+    kCBLJSONLanguage,       ///< [JSON query schema](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema)
+    kCBLStringLanguage      ///< [N1QL syntax](https://docs.couchbase.com/server/6.0/n1ql/n1ql-language-reference/index.html)
 };
 
 
@@ -65,11 +65,11 @@ typedef CBL_ENUM(uint32_t, CBLQueryLanguage) {
     @param outError  On failure, the error will be written here.
     @return  The new query object. */
 _cbl_warn_unused
-CBLQuery* CBLQuery_New(const CBLDatabase* db,
-                       CBLQueryLanguage language,
-                       FLString queryString,
-                       int* _cbl_nullable outErrorPos,
-                       CBLError* _cbl_nullable outError) CBLAPI;
+CBLQuery* CBLDatabase_CreateQuery(const CBLDatabase* db,
+                                  CBLQueryLanguage language,
+                                  FLString queryString,
+                                  int* _cbl_nullable outErrorPos,
+                                  CBLError* _cbl_nullable outError) CBLAPI;
 
 CBL_REFCOUNTED(CBLQuery*, Query);
 
@@ -263,14 +263,6 @@ CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
           FTS index for the property/expression being matched. Only a single expression is
           currently allowed, and it must evaluate to a string. */
 
-
-/** Types of database indexes. */
-typedef CBL_ENUM(uint32_t, CBLIndexType) {
-    kCBLValueIndex,         ///< An index that stores property or expression values
-    kCBLFullTextIndex       ///< An index of strings, that enables searching for words with `MATCH`
-};
-
-
 /** Value Index Specification. */
 typedef struct {
     /** The language used in the expressions. Only JSON language is supported now. */
@@ -279,7 +271,7 @@ typedef struct {
     /** The expressions describing each coloumn of the index. The expressions could be specified
         in a JSON Array or in N1QL syntax using comma delimiter. */
     FLString expressions;
-} CBLValueIndex;
+} CBLValueIndexConfiguration;
 
 /** Creates a value index.
     Indexes are persistent.
@@ -287,7 +279,7 @@ typedef struct {
     If a non-identical index with that name already exists, it is deleted and re-created. */
 bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   FLString name,
-                                  CBLValueIndex index,
+                                  CBLValueIndexConfiguration index,
                                   CBLError* _cbl_nullable outError) CBLAPI;
 
 
@@ -316,7 +308,7 @@ typedef struct {
         If left null,  or set to an unrecognized language, no language-specific behaviors
         such as stemming and stop-word removal occur. */
     FLString language;
-} CBLFullTextIndex;
+} CBLFullTextIndexConfiguration;
 
 /** Creates a full-text index.
     Indexes are persistent.
@@ -324,7 +316,7 @@ typedef struct {
     If a non-identical index with that name already exists, it is deleted and re-created. */
 bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      FLString name,
-                                     CBLFullTextIndex index,
+                                     CBLFullTextIndexConfiguration index,
                                      CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Deletes an index given its name. */

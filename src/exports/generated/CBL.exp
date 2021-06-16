@@ -93,7 +93,7 @@ _CBLLog_FileConfig
 _CBLLog_SetFileConfig
 _CBLLog_BeginExpectingExceptions
 _CBLLog_EndExpectingExceptions
-_CBLQuery_New
+_CBLDatabase_CreateQuery
 _CBLQuery_Parameters
 _CBLQuery_SetParameters
 _CBLQuery_Execute

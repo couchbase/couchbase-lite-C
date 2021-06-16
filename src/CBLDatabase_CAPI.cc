@@ -288,22 +288,22 @@ bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db,
 
 bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   FLString name,
-                                  CBLValueIndex index,
+                                  CBLValueIndexConfiguration config,
                                   CBLError *outError) noexcept
 {
     try {
-        db->createValueIndex(name, index);
+        db->createValueIndex(name, config);
         return true;
     } catchAndBridge(outError)
 }
 
 bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      FLString name,
-                                     CBLFullTextIndex index,
+                                     CBLFullTextIndexConfiguration config,
                                      CBLError *outError) noexcept
 {
     try {
-        db->createFullTextIndex(name, index);
+        db->createFullTextIndex(name, config);
         return true;
     } catchAndBridge(outError)
 }

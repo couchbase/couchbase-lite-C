@@ -158,14 +158,14 @@ namespace cbl {
 
         // Indexes:
 
-        void createValueIndex(slice name, CBLValueIndex index) {
+        void createValueIndex(slice name, CBLValueIndexConfiguration config) {
             CBLError error;
-            check(CBLDatabase_CreateValueIndex(ref(), name, index, &error), error);
+            check(CBLDatabase_CreateValueIndex(ref(), name, config, &error), error);
         }
         
-        void createFullTextIndex(slice name, CBLFullTextIndex index) {
+        void createFullTextIndex(slice name, CBLFullTextIndexConfiguration config) {
             CBLError error;
-            check(CBLDatabase_CreateFullTextIndex(ref(), name, index, &error), error);
+            check(CBLDatabase_CreateFullTextIndex(ref(), name, config, &error), error);
         }
 
         void deleteIndex(slice name) {
