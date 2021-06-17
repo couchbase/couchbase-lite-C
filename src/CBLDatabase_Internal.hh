@@ -176,21 +176,12 @@ public:
     }
     
     void createValueIndex(slice name, CBLValueIndexConfiguration config) {
-        if (config.expressionLanguage == kCBLN1QLLanguage) {
-            // CBL-1734: Support N1QL expressions
-            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
-        }
-        
         C4IndexOptions options = {};
-        _c4db.useLocked()->createIndex(name, config.expressions, kC4ValueIndex, &options);
+        _c4db.useLocked()->createIndex(name, config.expressions, (C4QueryLanguage)config.expressionLanguage,
+                                       kC4ValueIndex, &options);
     }
     
     void createFullTextIndex(slice name, CBLFullTextIndexConfiguration config) {
-        if (config.expressionLanguage == kCBLN1QLLanguage) {
-            // CBL-1734: Support N1QL expressions
-            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
-        }
-        
         C4IndexOptions options = {};
         options.ignoreDiacritics = config.ignoreAccents;
         
@@ -199,7 +190,8 @@ public:
             languageStr = std::string(config.language);
             options.language = languageStr.c_str();
         }
-        _c4db.useLocked()->createIndex(name, config.expressions, kC4FullTextIndex, &options);
+        _c4db.useLocked()->createIndex(name, config.expressions, (C4QueryLanguage)config.expressionLanguage,
+                                       kC4FullTextIndex, &options);
     }
 
     void deleteIndex(slice name) {
