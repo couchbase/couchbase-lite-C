@@ -38,7 +38,7 @@ namespace cbl {
     public:
         Query(const Database& db, CBLQueryLanguage language, slice queryString) {
             CBLError error;
-            auto q = CBLQuery_New(db.ref(), language, queryString, nullptr, &error);
+            auto q = CBLDatabase_CreateQuery(db.ref(), language, queryString, nullptr, &error);
             check(q, error);
             _ref = (CBLRefCounted*)q;
         }

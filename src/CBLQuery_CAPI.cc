@@ -22,11 +22,11 @@
 #include <string>
 
 
-CBLQuery* CBLQuery_New(const CBLDatabase* db,
-                       CBLQueryLanguage language,
-                       FLString queryString,
-                       int *outErrorPos,
-                       CBLError* outError) noexcept
+CBLQuery* CBLDatabase_CreateQuery(const CBLDatabase* db,
+                                  CBLQueryLanguage language,
+                                  FLString queryString,
+                                  int *outErrorPos,
+                                  CBLError* outError) noexcept
 {
     try {
         auto query = db->createQuery(language, queryString, outErrorPos);

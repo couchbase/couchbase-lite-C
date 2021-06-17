@@ -175,31 +175,23 @@ public:
         return new CBLQuery(this, std::move(c4query), _c4db);
     }
     
-    void createValueIndex(slice name, CBLValueIndex index) {
-        if (index.expressionLanguage == kCBLN1QLLanguage) {
-            // CBL-1734: Support N1QL expressions
-            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
-        }
-        
+    void createValueIndex(slice name, CBLValueIndexConfiguration config) {
         C4IndexOptions options = {};
-        _c4db.useLocked()->createIndex(name, index.expressions, kC4ValueIndex, &options);
+        _c4db.useLocked()->createIndex(name, config.expressions, (C4QueryLanguage)config.expressionLanguage,
+                                       kC4ValueIndex, &options);
     }
     
-    void createFullTextIndex(slice name, CBLFullTextIndex index) {
-        if (index.expressionLanguage == kCBLN1QLLanguage) {
-            // CBL-1734: Support N1QL expressions
-            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
-        }
-        
+    void createFullTextIndex(slice name, CBLFullTextIndexConfiguration config) {
         C4IndexOptions options = {};
-        options.ignoreDiacritics = index.ignoreAccents;
+        options.ignoreDiacritics = config.ignoreAccents;
         
         std::string languageStr;
-        if (index.language.buf) {
-            languageStr = std::string(index.language);
+        if (config.language.buf) {
+            languageStr = std::string(config.language);
             options.language = languageStr.c_str();
         }
-        _c4db.useLocked()->createIndex(name, index.expressions, kC4FullTextIndex, &options);
+        _c4db.useLocked()->createIndex(name, config.expressions, (C4QueryLanguage)config.expressionLanguage,
+                                       kC4FullTextIndex, &options);
     }
 
     void deleteIndex(slice name) {

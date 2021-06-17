@@ -127,7 +127,8 @@ CBLLog_EndExpectingExceptions
 
 ### QUERY
 
-CBLQuery_New
+CBLDatabase_CreateQuery
+
 CBLQuery_Parameters
 CBLQuery_SetParameters
 CBLQuery_Execute

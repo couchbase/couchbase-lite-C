@@ -53,9 +53,9 @@ TEST_CASE_METHOD(QueryTest, "Invalid Query", "[Query][!throws]") {
     {
         ExpectingExceptions x;
         CBL_Log(kCBLLogDomainQuery, CBLLogWarning, "INTENTIONALLY THROWING EXCEPTION!");
-        query = CBLQuery_New(db, kCBLN1QLLanguage,
-                             "SELECT name WHERE"_sl,
-                             &errPos, &error);
+        query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                        "SELECT name WHERE"_sl,
+                                        &errPos, &error);
     }
     REQUIRE(!query);
     CHECK(errPos == 17);
@@ -67,9 +67,9 @@ TEST_CASE_METHOD(QueryTest, "Invalid Query", "[Query][!throws]") {
 TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     CBLError error;
     int errPos;
-    query = CBLQuery_New(db, kCBLN1QLLanguage,
-                         "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
-                         &errPos, &error);
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    &errPos, &error);
     REQUIRE(query);
 
     CHECK(CBLQuery_ColumnCount(query) == 1);
@@ -106,16 +106,16 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
     for (int pass = 0; pass < 2; ++pass) {
         if (pass == 1) {
             cerr << "Creating index\n";
-            CBLValueIndex index = {};
-            index.expressionLanguage = kCBLJSONLanguage;
-            index.expressions = R"(["contact.address.zip"])"_sl;
-            CHECK(CBLDatabase_CreateValueIndex(db, "zips"_sl, index, &error));
+            CBLValueIndexConfiguration config = {};
+            config.expressionLanguage = kCBLJSONLanguage;
+            config.expressions = R"(["contact.address.zip"])"_sl;
+            CHECK(CBLDatabase_CreateValueIndex(db, "zips"_sl, config, &error));
         }
 
         int errPos;
-        query = CBLQuery_New(db, kCBLN1QLLanguage,
-                             "SELECT count(*) AS n WHERE contact.address.zip BETWEEN $zip0 AND $zip1"_sl,
-                             &errPos, &error);
+        query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                        "SELECT count(*) AS n WHERE contact.address.zip BETWEEN $zip0 AND $zip1"_sl,
+                                        &errPos, &error);
         REQUIRE(query);
 
         CHECK(CBLQuery_ColumnCount(query) == 1);
@@ -161,15 +161,17 @@ static int countResults(CBLResultSet *results) {
 
 TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CBLError error;
-    query = CBLQuery_New(db, kCBLN1QLLanguage,
-                         "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
-                         nullptr, &error);
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    nullptr, &error);
     REQUIRE(query);
 
     CBLResultSet *results = CBLQuery_Execute(query, &error);
     CHECK(countResults(results) == 3);
     CBLResultSet_Release(results);
 
+    resultCount = -1;
+    
     cerr << "Adding listener\n";
     listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
         auto self = (QueryTest*)context;
@@ -181,7 +183,6 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     }, this);
 
     cerr << "Waiting for listener...\n";
-    resultCount = -1;
     while (resultCount < 0)
         this_thread::sleep_for(100ms);
     CHECK(resultCount == 3);
