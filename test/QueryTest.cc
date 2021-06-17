@@ -170,6 +170,8 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CHECK(countResults(results) == 3);
     CBLResultSet_Release(results);
 
+    resultCount = -1;
+    
     cerr << "Adding listener\n";
     listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
         auto self = (QueryTest*)context;
@@ -181,7 +183,6 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     }, this);
 
     cerr << "Waiting for listener...\n";
-    resultCount = -1;
     while (resultCount < 0)
         this_thread::sleep_for(100ms);
     CHECK(resultCount == 3);
