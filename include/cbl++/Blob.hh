@@ -17,12 +17,15 @@
 //
 
 #pragma once
-#include "Document.hh"
-#include "CBLBlob.h"
+#include "cbl++/Document.hh"
+#include "cbl/CBLBlob.h"
 #include "fleece/Mutable.hh"
+#include <string>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
+
+CBL_ASSUME_NONNULL_BEGIN
 
 namespace cbl {
     class BlobReadStream;
@@ -34,38 +37,38 @@ namespace cbl {
         To work with a blob, you construct a Blob object with that dictionary. */
     class Blob : protected RefCounted {
     public:
-        static bool isBlob(fleece::Dict d)          {return CBL_IsBlob(d);}
+        static bool isBlob(fleece::Dict d)  {return FLDict_IsBlob(d);}
 
         /* Creates a new blobgiven its contents as a single block of data.
             @note  The memory pointed to by `contents` is no longer needed after this call completes
                     (it will have been written to the database.)
             @param contentType  The MIME type (optional).
             @param contents  The data's address and length. */
-        Blob(const char *contentType,
-             fleece::slice contents)
+        Blob(slice contentType,
+             slice contents)
         {
-            _ref = (CBLRefCounted*) CBLBlob_CreateWithData(contentType, contents);
+            _ref = (CBLRefCounted*) CBLBlob_NewWithData(contentType, contents);
         }
 
         /** Creates a new blob from the data written to a \ref CBLBlobWriteStream.
             @param contentType  The MIME type (optional).
             @param writer  The blob-writing stream the data was written to. */
-        inline Blob(const char *contentType,
+        inline Blob(slice contentType,
                     BlobWriteStream& writer);
 
         /** Constructs a Blob instance on an existing blob reference in a document. */
         Blob(fleece::Dict d)
-        :RefCounted((CBLRefCounted*) CBLBlob_Get(d))
+        :RefCounted((CBLRefCounted*) FLDict_GetBlob(d))
         { }
 
-        uint64_t length() const                     {return CBLBlob_Length(ref()); }
-        const char* contentType() const             {return CBLBlob_ContentType(ref()); }
-        const char* digest() const                  {return CBLBlob_Digest(ref()); }
-        fleece::Dict properties() const             {return CBLBlob_Properties(ref()); }
+        uint64_t length() const                     {return CBLBlob_Length(ref());}
+        std::string contentType() const             {return asString(CBLBlob_ContentType(ref()));}
+        std::string digest() const                  {return asString(CBLBlob_Digest(ref()));}
+        fleece::Dict properties() const             {return CBLBlob_Properties(ref());}
 
-        fleece::alloc_slice loadContent() {
+        alloc_slice loadContent() {
             CBLError error;
-            fleece::alloc_slice content = CBLBlob_LoadContent(ref(), &error);
+            fleece::alloc_slice content = CBLBlob_Content(ref(), &error);
             check(content.buf, error);
             return content;
         }
@@ -92,7 +95,7 @@ namespace cbl {
             CBLBlobReader_Close(_stream);
         }
 
-        size_t read(void *dst _cbl_nonnull, size_t maxLength) {
+        size_t read(void *dst, size_t maxLength) {
             CBLError error;
             int bytesRead = CBLBlobReader_Read(_stream, dst, maxLength, &error);
             if (bytesRead < 0)
@@ -101,7 +104,7 @@ namespace cbl {
         }
 
     private:
-        CBLBlobReadStream* _stream {nullptr};
+        CBLBlobReadStream* _cbl_nullable _stream {nullptr};
     };
 
 
@@ -124,20 +127,26 @@ namespace cbl {
         }
 
         void write(fleece::slice data) {
+            write(data.buf, data.size);
+        }
+
+        void write(const void *src, size_t length) {
             CBLError error;
-            if (!CBLBlobWriter_Write(_writer, data.buf, data.size, &error))
+            if (!CBLBlobWriter_Write(_writer, src, length, &error))
                 throw error;
         }
 
     private:
         friend class Blob;
-        CBLBlobWriteStream* _writer {nullptr};
+        CBLBlobWriteStream* _cbl_nullable _writer {nullptr};
     };
 
 
-    inline Blob::Blob(const char *contentType, BlobWriteStream& writer) {
-        _ref = (CBLRefCounted*) CBLBlob_CreateWithStream(contentType, writer._writer);
+    inline Blob::Blob(slice contentType, BlobWriteStream& writer) {
+        _ref = (CBLRefCounted*) CBLBlob_NewWithStream(contentType, writer._writer);
         writer._writer = nullptr;
     }
 
 }
+
+CBL_ASSUME_NONNULL_END

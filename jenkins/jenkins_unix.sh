@@ -31,7 +31,7 @@ esac
 ulimit -c unlimited # Enable crash dumps
 mkdir -p build
 pushd build
-cmake -DBUILD_ENTERPRISE=ON ..
+cmake -DBUILD_ENTERPRISE=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=`pwd`/out ..
 make -j8
 pushd test
 ./CBL_C_Tests -r list

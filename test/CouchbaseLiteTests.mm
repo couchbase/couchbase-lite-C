@@ -19,7 +19,7 @@
 
 - (void)testCatchTests {
     Catch::Session session;
-    session.configData().reporterNames.push_back("list");
+    session.configData().reporterName = "list";
 
     NSArray* args = [NSProcessInfo.processInfo arguments];
     NSUInteger nargs = args.count;

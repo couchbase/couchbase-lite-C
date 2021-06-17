@@ -16,6 +16,6 @@
 // limitations under the License.
 //
 
-#include "CouchbaseLite.h"
+#include "cbl/CouchbaseLite.h"
 
 // Just making sure the headers are parseable as plain C. No actual tests here yet...

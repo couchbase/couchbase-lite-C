@@ -32,21 +32,16 @@
 
 #ifdef _MSC_VER
     #include <sal.h>
-    #define CBLINLINE           __forceinline
+    #define CBLINLINE               __forceinline
     #define _cbl_nonnull            _In_
     #define _cbl_returns_nonnull    _Ret_notnull_
     #define _cbl_warn_unused        _Check_return_
     #define _cbl_deprecated
 #else
-    #define CBLINLINE            inline
-    #define _cbl_returns_nonnull __attribute__((returns_nonnull))
-    #define _cbl_warn_unused     __attribute__((warn_unused_result))
-    #ifdef __clang__
-        #define _cbl_nonnull         __attribute((nonnull))
-    #else
-        #define _cbl_nonnull   /* GCC does not support the way we use nonnull */
-    #endif
-    #define _cbl_deprecated    __attribute__((deprecated()))
+    #define CBLINLINE               inline
+    #define _cbl_returns_nonnull    __attribute__((returns_nonnull))
+    #define _cbl_warn_unused        __attribute__((warn_unused_result))
+    #define _cbl_deprecated         __attribute__((deprecated()))
 #endif
 
 // Macros for defining typed enumerations and option flags.
@@ -77,10 +72,36 @@
 #endif
 
 
+// Non-null annotations, for function parameters and struct fields.
+// In between CBL_ASSUME_NONNULL_BEGIN and CBL_ASSUME_NONNULL_END, all pointer declarations implicitly
+// disallow NULL values, unless annotated with _cbl_nullable (which must come after the `*`.)
+// (_cbl_nonnull is occasionally necessary when there are C arrays or multiple levels of pointers.)
+// NOTE: Does not apply to function return values, for some reason. Those may still be null,
+//       unless annotated with _cbl_returns_nonnull.
+// NOTE: Only supported in Clang, so far.
+#if __has_feature(nullability)
+#  define CBL_ASSUME_NONNULL_BEGIN  _Pragma("clang assume_nonnull begin")
+#  define CBL_ASSUME_NONNULL_END    _Pragma("clang assume_nonnull end")
+#  define _cbl_nullable             _Nullable
+#  define _cbl_nonnull              _Nonnull
+#else
+#  define CBL_ASSUME_NONNULL_BEGIN
+#  define CBL_ASSUME_NONNULL_END
+#  define _cbl_nullable
+#ifndef _cbl_nonnull
+#  define _cbl_nonnull
+#endif
+#endif
+
+
 #ifdef __cplusplus
-    #define CBLAPI noexcept
+    #define CBLAPI          noexcept
+    #define CBL_CAPI_BEGIN  extern "C" { CBL_ASSUME_NONNULL_BEGIN
+    #define CBL_CAPI_END    CBL_ASSUME_NONNULL_END }
 #else
     #define CBLAPI
+    #define CBL_CAPI_BEGIN  CBL_ASSUME_NONNULL_BEGIN
+    #define CBL_CAPI_END    CBL_ASSUME_NONNULL_END
 #endif
 
 
@@ -103,3 +124,4 @@
         #define __printflike(fmtarg, firstvararg) __attribute__((__format__ (__printf__, fmtarg, firstvararg)))
     #endif
 #endif
+

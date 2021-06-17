@@ -18,26 +18,31 @@
 
 #include "CBLLog.h"
 #include "CBLPrivate.h"
-#include "c4Base.h"
+#include "c4Base.hh"
+#include "Internal.hh"
+#include "fleece/slice.hh"
+#include <atomic>
 #include <cstdlib>
 #include "betterassert.hh"
+
+using namespace std;
+using namespace fleece;
 
 
 static const C4LogDomain kC4Domains[5] = {
     kC4DefaultLog, kC4DatabaseLog, kC4QueryLog, kC4SyncLog, kC4WebSocketLog
 };
 
-static CBLLogCallback sCallback;
+static atomic<CBLLogCallback> sCallback = nullptr;
+static atomic<CBLLogLevel>    sCallbackLevel = CBLLogInfo;
+
+
+static void updateCallback();
 
 
 CBLLogLevel CBLLog_ConsoleLevelOfDomain(CBLLogDomain domain) CBLAPI {
     precondition((domain <= kCBLLogDomainNetwork));
     return CBLLogLevel(c4log_getLevel(kC4Domains[domain]));
-}
-
-
-CBLLogLevel CBLLog_ConsoleLevel() CBLAPI {
-    return CBLLog_ConsoleLevelOfDomain(kCBLLogDomainAll);
 }
 
 
@@ -54,37 +59,24 @@ void CBLLog_SetConsoleLevelOfDomain(CBLLogDomain domain, CBLLogLevel level) CBLA
 }
 
 
+CBLLogLevel CBLLog_ConsoleLevel() CBLAPI {
+    return CBLLog_ConsoleLevelOfDomain(kCBLLogDomainAll);
+}
+
+
 void CBLLog_SetConsoleLevel(CBLLogLevel level) CBLAPI {
     CBLLog_SetConsoleLevelOfDomain(kCBLLogDomainAll, level);
 }
 
 
-bool CBLLog_WillLogToConsole(CBLLogDomain domain, CBLLogLevel level) CBLAPI {
-    return (domain <= kCBLLogDomainNetwork) && (level <= CBLLogNone)
-        && c4log_willLog(kC4Domains[domain], C4LogLevel(level));
+CBLLogLevel CBLLog_CallbackLevel() CBLAPI {
+    return sCallbackLevel;
 }
 
 
-void CBLLog_SetCallback(CBLLogCallback callback) CBLAPI {
-    auto c4Callback = [](C4LogDomain domain, C4LogLevel level, const char *msg, va_list) noexcept {
-        // Map C4LogDomain to CBLLogDomain:
-        auto callback = sCallback;
-        if (!callback)
-            return;
-        CBLLogDomain cblDomain = kCBLLogDomainAll;
-        for (int d = 0; d < 5; ++d) {
-            if (kC4Domains[d] == domain) {
-                cblDomain = CBLLogDomain(d);
-                break;
-            }
-        }
-        callback(cblDomain, CBLLogLevel(level), msg);
-    };
-
-    sCallback = callback;
-    c4log_writeToCallback(c4log_callbackLevel(),
-                          callback ? c4Callback : (C4LogCallback) nullptr,
-                          true);
+void CBLLog_SetCallbackLevel(CBLLogLevel level) CBLAPI {
+    if (sCallbackLevel.exchange(level) != level)
+        updateCallback();
 }
 
 
@@ -93,7 +85,36 @@ CBLLogCallback CBLLog_Callback() CBLAPI {
 }
 
 
-void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_nonnull, ...) CBLAPI {
+void CBLLog_SetCallback(CBLLogCallback callback) CBLAPI {
+    auto oldCallback = sCallback.exchange(callback);
+    if ((callback != nullptr) != (oldCallback != nullptr))
+        updateCallback();
+}
+
+
+static void updateCallback() {
+    C4LogCallback c4Callback = nullptr;
+    if (sCallback) {
+        c4Callback = [](C4LogDomain domain, C4LogLevel level, const char *msg, va_list) noexcept {
+            // Map C4LogDomain to CBLLogDomain:
+            CBLLogCallback callback = sCallback;
+            if (!callback)
+                return;
+            CBLLogDomain cblDomain = kCBLLogDomainAll;
+            for (int d = 0; d < 5; ++d) {
+                if (kC4Domains[d] == domain) {
+                    cblDomain = CBLLogDomain(d);
+                    break;
+                }
+            }
+            callback(cblDomain, CBLLogLevel(level), slice(msg));
+        };
+    }
+    c4log_writeToCallback(C4LogLevel(sCallbackLevel.load()), c4Callback, true);
+}
+
+
+void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format, ...) CBLAPI {
     precondition((domain <= kCBLLogDomainNetwork));
     precondition((level <= CBLLogNone));
     char *message = nullptr;
@@ -106,19 +127,54 @@ void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_non
 }
 
 
-void CBL_Log_s(CBLLogDomain domain, CBLLogLevel level, FLSlice message) CBLAPI {
+void CBL_LogMessage(CBLLogDomain domain, CBLLogLevel level, FLString message) CBLAPI {
     precondition((domain <= kCBLLogDomainNetwork));
     precondition((level <= CBLLogNone));
     c4slog(kC4Domains[domain], C4LogLevel(level), message);
 }
 
 
+static CBLLogFileConfiguration sLogFileConfig;
+static alloc_slice sLogFileDir;
+
+
 const CBLLogFileConfiguration* CBLLog_FileConfig() CBLAPI {
-    //TODO: Implement file logging API
-    abort();
+    if (sLogFileConfig.directory.buf)
+        return &sLogFileConfig;
+    else
+        return nullptr;
 }
 
-void CBLLog_SetFileConfig(CBLLogFileConfiguration) CBLAPI {
-    //TODO: Implement file logging API
-    abort();
+
+bool CBLLog_SetFileConfig(CBLLogFileConfiguration config, CBLError *outError) CBLAPI {
+    sLogFileDir = config.directory;     // copy string to the heap
+    config.directory = sLogFileDir;     // and put the heap copy in the struct
+    sLogFileConfig = config;
+
+    alloc_slice buildInfo = c4_getBuildInfo();
+    string header = "Generated by Couchbase Lite for C / " + string(buildInfo);
+
+    C4LogFileOptions c4opt = {};
+    c4opt.log_level         = C4LogLevel(config.level);
+    c4opt.base_path         = config.directory;
+    c4opt.max_size_bytes    = config.maxSize;
+    c4opt.max_rotate_count  = config.maxRotateCount;
+    c4opt.use_plaintext     = config.usePlaintext;
+    c4opt.header            = slice(header);
+
+    return c4log_writeToBinaryFile(c4opt, internal(outError));
 }
+
+
+extern "C" CBL_CORE_API std::atomic_int gC4ExpectExceptions;
+
+void CBLLog_BeginExpectingExceptions() CBLAPI {
+    ++gC4ExpectExceptions;
+    c4log_warnOnErrors(false);
+}
+
+void CBLLog_EndExpectingExceptions() CBLAPI {
+    if (--gC4ExpectExceptions == 0)
+        c4log_warnOnErrors(true);
+}
+

@@ -77,20 +77,29 @@ $(function() {
 <li>CBLBlobWriteStream
 : <a class="el" href="group__blobs.html#ga9ca701f23874fa0beb7d88177070759d">CBLBlob.h</a>
 </li>
+<li>CBLCertificate
+: <a class="el" href="group__certificates.html#gab2ed553245c148c358f53e9fafdf70c6">CBLCertificate.h</a>
+</li>
+<li>CBLConflictHandler
+: <a class="el" href="group__documents.html#ga93053dfc457f8a9277dfc86116e65d68">CBLDocument.h</a>
+</li>
 <li>CBLConflictResolver
-: <a class="el" href="group__replication.html#gaebada5d3ac79c87b24fc90f4edfd14ae">CBLReplicator.h</a>
+: <a class="el" href="group__replication.html#ga9e0ecc16faa974ba67a387b487e5a6b6">CBLReplicator.h</a>
 </li>
 <li>CBLDatabase
 : <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLBase.h</a>
 </li>
 <li>CBLDatabaseChangeListener
-: <a class="el" href="group__database.html#ga76f9e32b6550b93c07e163fe229f6dab">CBLDatabase.h</a>
+: <a class="el" href="group__database.html#ga81f97ce1b043d2a060d4acba45ba4817">CBLDatabase.h</a>
 </li>
 <li>CBLDocument
 : <a class="el" href="group__documents.html#ga922bbdd104bbd3a7cea534f5d73e9a51">CBLBase.h</a>
 </li>
 <li>CBLDocumentChangeListener
-: <a class="el" href="group__documents.html#ga174679a9e38565a3c7a82701c182fd93">CBLDocument.h</a>
+: <a class="el" href="group__documents.html#ga9f94e7128a2100ff4c30082146bdeaf4">CBLDocument.h</a>
+</li>
+<li>CBLDocumentReplicationListener
+: <a class="el" href="group__replication.html#ga89aca35d692e3f2d5ff12bc0c530e03f">CBLReplicator.h</a>
 </li>
 <li>CBLEndpoint
 : <a class="el" href="group__replication.html#ga13b3c0a779ab66b887f77512591c7be2">CBLReplicator.h</a>
@@ -99,10 +108,13 @@ $(function() {
 : <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLBase.h</a>
 </li>
 <li>CBLLogCallback
-: <a class="el" href="_c_b_l_log_8h.html#a2656abbfec133e26a714a7e6b33a2928">CBLLog.h</a>
+: <a class="el" href="group__logging.html#ga29f02d46109adc0a44f367efcb8764b6">CBLLog.h</a>
 </li>
 <li>CBLNotificationsReadyCallback
 : <a class="el" href="group__listeners.html#ga20a2e8c2b93639e7a19294f91806369f">CBLDatabase.h</a>
+</li>
+<li>CBLPasswordAuthenticator
+: <a class="el" href="group__replication.html#gacb0c84af70918e90fb8e08b941c0b150">CBLURLEndpointListener.h</a>
 </li>
 <li>CBLQuery
 : <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLBase.h</a>
@@ -112,9 +124,6 @@ $(function() {
 </li>
 <li>CBLRefCounted
 : <a class="el" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLBase.h</a>
-</li>
-<li>CBLReplicatedDocumentListener
-: <a class="el" href="group__replication.html#ga5fde88ba5c344f9e0ccecab1e6449aa4">CBLReplicator.h</a>
 </li>
 <li>CBLReplicationFilter
 : <a class="el" href="group__replication.html#gac38a5f7dfa7dc2ef84fa6a7735dc053e">CBLReplicator.h</a>
@@ -128,11 +137,14 @@ $(function() {
 <li>CBLResultSet
 : <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLBase.h</a>
 </li>
-<li>CBLSaveConflictHandler
-: <a class="el" href="group__documents.html#gae9552271570ce77eea3fdfc932360614">CBLDocument.h</a>
-</li>
 <li>CBLTimestamp
 : <a class="el" href="group__other__types.html#ga37cb77b7ae63bbf1d30e933af074f598">CBLBase.h</a>
+</li>
+<li>CBLTLSIdentity
+: <a class="el" href="group__certificates.html#gaccdb0870fac011df9779310f1c5fcfe5">CBLCertificate.h</a>
+</li>
+<li>CBLURLEndpointListener
+: <a class="el" href="group__replication.html#ga5767a1c6e47de7d1fbee261dc190a879">CBLURLEndpointListener.h</a>
 </li>
 </ul>
 
@@ -151,7 +163,7 @@ $(function() {
 : <a class="el" href="group__reading.html#ga6fcf80a526bde8519ac9e48db7746f14">Fleece.h</a>
 </li>
 <li>FLEncoder
-: <a class="el" href="group___f_l_encoder.html#ga8a91e0aaf4bd2987f0ded9fbcaf05fad">Fleece.h</a>
+: <a class="el" href="group__types.html#ga8a91e0aaf4bd2987f0ded9fbcaf05fad">Fleece.h</a>
 </li>
 <li>FLHeapSlice
 : <a class="el" href="group___f_l_slice.html#gabc10b138e3c1345a4396b39c11a1f0d5">FLSlice.h</a>
@@ -167,6 +179,12 @@ $(function() {
 </li>
 <li>FLSharedKeys
 : <a class="el" href="group__reading.html#gabbd898ed871a7b340c817b6facba7568">Fleece.h</a>
+</li>
+<li>FLSharedKeyScope
+: <a class="el" href="group___f_l_shared_keys.html#ga170f671f7083341403f7530024ec5cfb">Fleece.h</a>
+</li>
+<li>FLSharedKeysReadCallback
+: <a class="el" href="group___f_l_shared_keys.html#gaa196e79d90512aff11133491eaa53464">Fleece.h</a>
 </li>
 <li>FLSlot
 : <a class="el" href="group__types.html#ga264f1860d2c09595ce7870ced22a5ca8">Fleece.h</a>

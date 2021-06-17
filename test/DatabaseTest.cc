@@ -27,25 +27,21 @@ using namespace std;
 using namespace fleece;
 
 
-static void createDocument(CBLDatabase *db, const char *docID,
-                           const char *property, const char *value)
-{
-    CBLDocument* doc = CBLDocument_New(docID);
+static void createDocument(CBLDatabase *db, slice docID, slice property, slice value) {
+    CBLDocument* doc = CBLDocument_CreateWithID(docID);
     MutableDict props = CBLDocument_MutableProperties(doc);
-    FLSlot_SetString(FLMutableDict_Set(props, slice(property)), slice(value));
+    FLSlot_SetString(FLMutableDict_Set(props, property), value);
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict,
-                                                        &error);
+    bool saved = CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlFailOnConflict, &error);
     CBLDocument_Release(doc);
     REQUIRE(saved);
-    CBLDocument_Release(saved);
 }
 
 
 TEST_CASE_METHOD(CBLTest, "Database") {
-    CHECK(string(CBLDatabase_Name(db)) == kDatabaseName);
-    CHECK(string(CBLDatabase_Path(db)) == string(kDatabaseDir) + kPathSeparator + kDatabaseName + ".cblite2" + kPathSeparator);
-    CHECK(CBL_DatabaseExists(kDatabaseName, kDatabaseDir.c_str()));
+    CHECK(CBLDatabase_Name(db) == kDatabaseName);
+    CHECK(string(CBLDatabase_Path(db)) == string(kDatabaseDir) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
+    CHECK(CBL_DatabaseExists(kDatabaseName, kDatabaseDir));
     CHECK(CBLDatabase_Count(db) == 0);
     CHECK(CBLDatabase_LastSequence(db) == 0);       // not public API
 }
@@ -53,92 +49,146 @@ TEST_CASE_METHOD(CBLTest, "Database") {
 
 TEST_CASE_METHOD(CBLTest, "Database w/o config") {
     CBLError error;
-    CBLDatabase *defaultdb = CBLDatabase_Open("unconfig", nullptr, &error);
+    CBLDatabase *defaultdb = CBLDatabase_Open("unconfig"_sl, nullptr, &error);
     REQUIRE(defaultdb);
-    const char * path = CBLDatabase_Path(defaultdb);
+    alloc_slice path = CBLDatabase_Path(defaultdb);
     cerr << "Default database is at " << path << "\n";
-    CHECK(CBL_DatabaseExists("unconfig", nullptr));
+    CHECK(CBL_DatabaseExists("unconfig"_sl, nullslice));
 
     CBLDatabaseConfiguration config = CBLDatabase_Config(defaultdb);
-    CHECK(config.directory != nullptr);     // exact value is platform-specific
-    CHECK(config.flags == kCBLDatabase_Create);
-    CHECK(config.encryptionKey == nullptr);
-
+    CHECK(config.directory != nullslice);     // exact value is platform-specific
+#ifdef COUCHBASE_ENTERPRISE
+    CHECK(config.encryptionKey.algorithm == kCBLEncryptionNone);
+#endif
     CHECK(CBLDatabase_Delete(defaultdb, &error));
     CBLDatabase_Release(defaultdb);
 
-    CHECK(!CBL_DatabaseExists("unconfig", nullptr));
+    CHECK(!CBL_DatabaseExists("unconfig"_sl, nullslice));
 }
 
 
+#ifdef COUCHBASE_ENTERPRISE
+
+TEST_CASE_METHOD(CBLTest, "Database Encryption") {
+    // Ensure no database:
+    CBL_DeleteDatabase("encdb"_sl, nullslice, nullptr);
+    CHECK(!CBL_DatabaseExists("encdb"_sl, nullslice));
+    
+    // Correct key:
+    CBLError error;
+    CBLEncryptionKey key;
+    CBLEncryptionKey_FromPassword(&key, "sekrit"_sl);
+    CBLDatabaseConfiguration config = {nullslice, key};
+    CBLDatabase *defaultdb = CBLDatabase_Open("encdb"_sl, &config, &error);
+    REQUIRE(defaultdb);
+    alloc_slice path = CBLDatabase_Path(defaultdb);
+    cerr << "Default database is at " << path << "\n";
+    CHECK(CBL_DatabaseExists("encdb"_sl, nullslice));
+
+    CBLDatabaseConfiguration config1 = CBLDatabase_Config(defaultdb);
+    REQUIRE(config1.encryptionKey.algorithm  == key.algorithm);
+    REQUIRE(memcmp(config1.encryptionKey.bytes, key.bytes, 32) == 0);
+    
+    // Correct key from config:
+    CBLDatabase *correctkeydb = CBLDatabase_Open("encdb"_sl, &config1, &error);
+    REQUIRE(correctkeydb);
+    CBLDatabase_Release(correctkeydb);
+    
+    // No key:
+    {
+        ExpectingExceptions x;
+        CBLDatabase *nokeydb = CBLDatabase_Open("encdb"_sl, nullptr, &error);
+        REQUIRE(nokeydb == nullptr);
+        CHECK(error.domain == CBLDomain);
+        CHECK(error.code == CBLErrorNotADatabaseFile);
+    }
+    
+    // Wrong key:
+    {
+        ExpectingExceptions x;
+        CBLEncryptionKey key2;
+        CBLEncryptionKey_FromPassword(&key2, "wrongpassword"_sl);
+        CBLDatabaseConfiguration config2 = {nullslice, key2};
+        CBLDatabase *wrongkeydb = CBLDatabase_Open("encdb"_sl, &config2, &error);
+        REQUIRE(wrongkeydb == nullptr);
+        CHECK(error.domain == CBLDomain);
+        CHECK(error.code == CBLErrorNotADatabaseFile);
+    }
+
+    CHECK(CBLDatabase_Delete(defaultdb, &error));
+    CBLDatabase_Release(defaultdb);
+    CHECK(!CBL_DatabaseExists("encdb"_sl, nullslice));
+}
+
+#endif
+
+
 TEST_CASE_METHOD(CBLTest, "Missing Document") {
-    const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo");
+    CBLError error;
+    const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo"_sl, &error);
     CHECK(doc == nullptr);
+    CHECK(error.code == 0);
 
-    CBLDocument* mdoc = CBLDatabase_GetMutableDocument(db, "foo");
+    CBLDocument* mdoc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
     CHECK(mdoc == nullptr);
+    CHECK(error.code == 0);
 
-    CBLError err;
-    CHECK(!CBLDatabase_PurgeDocumentByID(db, "foo", &err));
-    CHECK(err.domain == CBLDomain);
-    CHECK(err.code == CBLErrorNotFound);
+    CHECK(!CBLDatabase_PurgeDocumentByID(db, "foo"_sl, &error));
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorNotFound);
 }
 
 
 TEST_CASE_METHOD(CBLTest, "New Document") {
-    CBLDocument* doc = CBLDocument_New("foo");
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     CHECK(doc != nullptr);
-    CHECK(string(CBLDocument_ID(doc)) == "foo");
-    CHECK(CBLDocument_RevisionID(doc) == nullptr);
+    CHECK(CBLDocument_ID(doc) == "foo"_sl);
+    CHECK(CBLDocument_RevisionID(doc) == nullslice);
     CHECK(CBLDocument_Sequence(doc) == 0);
-    CHECK(string(CBLDocument_PropertiesAsJSON(doc)) == "{}");
+    CHECK(CBLDocument_CreateJSON(doc) == "{}"_sl);
     CHECK(CBLDocument_MutableProperties(doc) == CBLDocument_Properties(doc));
     CBLDocument_Release(doc);
 }
 
 
 TEST_CASE_METHOD(CBLTest, "Save Empty Document") {
-    CBLDocument* doc = CBLDocument_New("foo");
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict, &error);
-    REQUIRE(saved);
-    CHECK(string(CBLDocument_ID(saved)) == "foo");
-    CHECK(CBLDocument_Sequence(saved) == 1);
-    CHECK(string(CBLDocument_PropertiesAsJSON(saved)) == "{}");
-    CBLDocument_Release(saved);
+    REQUIRE(CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlFailOnConflict, &error));
+    CHECK(CBLDocument_ID(doc) == "foo"_sl);
+    CHECK(CBLDocument_Sequence(doc) == 1);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);
 
-    doc = CBLDatabase_GetMutableDocument(db, "foo");
-    CHECK(string(CBLDocument_ID(doc)) == "foo");
-    CHECK(string(CBLDocument_RevisionID(doc)) == "1-581ad726ee407c8376fc94aad966051d013893c4");
+    doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
+    CHECK(CBLDocument_ID(doc) == "foo"_sl);
+    CHECK(CBLDocument_RevisionID(doc) == "1@*"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
-    CHECK(string(CBLDocument_PropertiesAsJSON(doc)) == "{}");
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);
 }
 
 
 TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
-    CBLDocument* doc = CBLDocument_New("foo");
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     MutableDict props = CBLDocument_MutableProperties(doc);
     props["greeting"_sl] = "Howdy!"_sl;
     // or alternatively:  FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
-    CHECK(string(CBLDocument_PropertiesAsJSON(doc)) == "{\"greeting\":\"Howdy!\"}");
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlFailOnConflict, &error);
-    REQUIRE(saved);
-    CHECK(string(CBLDocument_ID(saved)) == "foo");
-    CHECK(CBLDocument_Sequence(saved) == 1);
-    CHECK(string(CBLDocument_PropertiesAsJSON(saved)) == "{\"greeting\":\"Howdy!\"}");
-    CHECK(Dict(CBLDocument_Properties(saved)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
-    CBLDocument_Release(saved);
+    REQUIRE(CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlFailOnConflict, &error));
+    CHECK(CBLDocument_ID(doc) == "foo"_sl);
+    CHECK(CBLDocument_Sequence(doc) == 1);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
+    CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CBLDocument_Release(doc);
 
-    doc = CBLDatabase_GetMutableDocument(db, "foo");
-    CHECK(string(CBLDocument_ID(doc)) == "foo");
+    doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
+    CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
-    CHECK(string(CBLDocument_PropertiesAsJSON(doc)) == "{\"greeting\":\"Howdy!\"}");
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CBLDocument_Release(doc);
 }
@@ -146,10 +196,10 @@ TEST_CASE_METHOD(CBLTest, "Save Document With Property") {
 
 TEST_CASE_METHOD(CBLTest, "Missing document") {
     CBLError error;
-    REQUIRE(!CBLDatabase_PurgeDocumentByID(db, "bogus", &error));
+    REQUIRE(!CBLDatabase_PurgeDocumentByID(db, "bogus"_sl, &error));
     CHECK(error.domain == CBLDomain);
     CHECK(error.code == CBLErrorNotFound);
-    CHECK(string(CBLError_Message(&error)) == "not found");
+    CHECK(alloc_slice(CBLError_Message(&error)) == "not found"_sl);
 }
 
 
@@ -160,15 +210,15 @@ TEST_CASE_METHOD(CBLTest, "Expiration") {
 
     CBLError error;
     CBLTimestamp future = CBL_Now() + 1000;
-    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc1", future, &error));
-    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc3", future, &error));
+    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc1"_sl, future, &error));
+    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc3"_sl, future, &error));
     CHECK(CBLDatabase_Count(db) == 3);
 
-    CHECK(CBLDatabase_GetDocumentExpiration(db, "doc1", &error) == future);
-    CHECK(CBLDatabase_GetDocumentExpiration(db, "doc2", &error) == 0);
-    CHECK(CBLDatabase_GetDocumentExpiration(db, "docX", &error) == 0);
+    CHECK(CBLDatabase_GetDocumentExpiration(db, "doc1"_sl, &error) == future);
+    CHECK(CBLDatabase_GetDocumentExpiration(db, "doc2"_sl, &error) == 0);
+    CHECK(CBLDatabase_GetDocumentExpiration(db, "docX"_sl, &error) == 0);
 
-    this_thread::sleep_for(chrono::milliseconds(1700));
+    this_thread::sleep_for(1700ms);
     CHECK(CBLDatabase_Count(db) == 1);
 }
 
@@ -180,8 +230,8 @@ TEST_CASE_METHOD(CBLTest, "Expiration After Reopen") {
 
     CBLError error;
     CBLTimestamp future = CBL_Now() + 2000;
-    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc1", future, &error));
-    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc3", future, &error));
+    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc1"_sl, future, &error));
+    CHECK(CBLDatabase_SetDocumentExpiration(db, "doc3"_sl, future, &error));
     CHECK(CBLDatabase_Count(db) == 3);
 
     // Close & reopen the database:
@@ -190,35 +240,33 @@ TEST_CASE_METHOD(CBLTest, "Expiration After Reopen") {
     db = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
 
     // Now wait for expiration:
-    this_thread::sleep_for(chrono::milliseconds(3000));
+    this_thread::sleep_for(3000ms);
     CHECK(CBLDatabase_Count(db) == 1);
 }
 
 
 TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
     // Create a doc with blob:
-    CBLDocument* doc = CBLDocument_New("doc1");
+    CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
     FLMutableDict dict = CBLDocument_MutableProperties(doc);
     FLSlice blobContent = FLStr("I'm Blob.");
-    CBLBlob *blob1 = CBLBlob_CreateWithData("text/plain", blobContent);
+    CBLBlob *blob1 = CBLBlob_NewWithData("text/plain"_sl, blobContent);
     FLSlot_SetBlob(FLMutableDict_Set(dict, FLStr("blob")), blob1);
     
     // Save doc:
     CBLError error;
-    const CBLDocument *saved = CBLDatabase_SaveDocument(db, doc, kCBLConcurrencyControlLastWriteWins,
-                                                        &error);
-    REQUIRE(saved);
+    REQUIRE(CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
     CBLBlob_Release(blob1);
     CBLDocument_Release(doc);
-    CBLDocument_Release(saved);
     
     // Compact:
     CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeCompact, &error));
     
     // Make sure the blob still exists after compact: (issue #73)
-    doc = CBLDatabase_GetMutableDocument(db, "doc1");
+    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    REQUIRE(doc);
     const CBLBlob* blob2 = FLValue_GetBlob(FLDict_Get(CBLDocument_Properties(doc), FLStr("blob")));
-    FLSliceResult content = CBLBlob_LoadContent(blob2, &error);
+    FLSliceResult content = CBLBlob_Content(blob2, &error);
     CHECK((slice)content == blobContent);
     FLSliceResult_Release(content);
     
@@ -226,7 +274,7 @@ TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
     // CBLBlob_Release(blob2);
     
     // Delete doc:
-    CHECK(CBLDocument_Delete(doc, kCBLConcurrencyControlLastWriteWins, &error));
+    CHECK(CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
     CBLDocument_Release(doc);
     
     // Compact:
@@ -239,10 +287,10 @@ TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
 
 TEST_CASE_METHOD(CBLTest, "Maintenance : Reindex") {
     CBLError error;
-    CBLIndexSpec index = {};
-    index.type = kCBLValueIndex;
-    index.keyExpressionsJSON = R"(["foo"])";
-    CHECK(CBLDatabase_CreateIndex(db, "foo", index, &error));
+    CBLValueIndexConfiguration config = {};
+    config.expressionLanguage = kCBLJSONLanguage;
+    config.expressions = R"(["foo"])"_sl;
+    CHECK(CBLDatabase_CreateValueIndex(db, "foo"_sl, config, &error));
     
     createDocument(db, "doc1", "foo", "bar1");
     createDocument(db, "doc2", "foo", "bar2");
@@ -264,19 +312,19 @@ TEST_CASE_METHOD(CBLTest, "Maintenance : Reindex") {
 static int dbListenerCalls = 0;
 static int fooListenerCalls = 0;
 
-static void dbListener(void *context, const CBLDatabase *db, unsigned nDocs, const char** docIDs) {
+static void dbListener(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
     ++dbListenerCalls;
     auto test = (CBLTest*)context;
     CHECK(test->db == db);
     CHECK(nDocs == 1);
-    CHECK(string(docIDs[0]) == "foo");
+    CHECK(slice(docIDs[0]) == "foo"_sl);
 }
 
-static void fooListener(void *context, const CBLDatabase *db, const char *docID) {
+static void fooListener(void *context, const CBLDatabase *db, FLString docID) {
     ++fooListenerCalls;
     auto test = (CBLTest*)context;
     CHECK(test->db == db);
-    CHECK(string(docID) == "foo");
+    CHECK(slice(docID) == "foo"_sl);
 }
 
 
@@ -284,7 +332,7 @@ TEST_CASE_METHOD(CBLTest, "Database notifications") {
     // Add a listener:
     dbListenerCalls = fooListenerCalls = 0;
     auto token = CBLDatabase_AddChangeListener(db, dbListener, this);
-    auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo", fooListener, this);
+    auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
 
     // Create a doc, check that the listener was called:
     createDocument(db, "foo", "greeting", "Howdy!");
@@ -310,22 +358,22 @@ static void notificationsReady(void *context, CBLDatabase* db) {
     CHECK(test->db == db);
 }
 
-static void dbListener2(void *context, const CBLDatabase *db, unsigned nDocs, const char** docIDs) {
+static void dbListener2(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
     ++dbListenerCalls;
     auto test = (CBLTest*)context;
     CHECK(test->db == db);
     CHECK(nDocs == 2);
-    CHECK(string(docIDs[0]) == "foo");
-    CHECK(string(docIDs[1]) == "bar");
+    CHECK(docIDs[0] == "foo"_sl);
+    CHECK(docIDs[1] == "bar"_sl);
 }
 
 int barListenerCalls = 0;
 
-static void barListener(void *context, const CBLDatabase *db, const char *docID) {
+static void barListener(void *context, const CBLDatabase *db, FLString docID) {
     ++barListenerCalls;
     auto test = (CBLTest*)context;
     CHECK(test->db == db);
-    CHECK(string(docID) == "bar");
+    CHECK(docID == "bar"_sl);
 }
 
 
@@ -333,8 +381,8 @@ TEST_CASE_METHOD(CBLTest, "Scheduled database notifications") {
     // Add a listener:
     dbListenerCalls = fooListenerCalls = barListenerCalls = 0;
     auto token = CBLDatabase_AddChangeListener(db, dbListener2, this);
-    auto fooToken = CBLDatabase_AddDocumentChangeListener(db, "foo", fooListener, this);
-    auto barToken = CBLDatabase_AddDocumentChangeListener(db, "bar", barListener, this);
+    auto fooToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
+    auto barToken = CBLDatabase_AddDocumentChangeListener(db, "bar"_sl, barListener, this);
     CBLDatabase_BufferNotifications(db, notificationsReady, this);
 
     // Create two docs; no listeners should be called yet:

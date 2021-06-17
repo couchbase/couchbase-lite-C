@@ -17,15 +17,14 @@
 //
 
 #pragma once
-#include "c4.h"
+#include "CBLBase.h"
+#include "c4Base.hh"
 #include "fleece/slice.hh"
 #include "fleece/Fleece.hh"
 #include "RefCounted.hh"
 #include "InstanceCounted.hh"
-#include <memory>
-#include <string>
-#include <mutex>
 
+CBL_ASSUME_NONNULL_BEGIN
 
 struct CBLRefCounted : public fleece::RefCounted, fleece::InstanceCountedIn<CBLRefCounted> {
 protected:
@@ -37,44 +36,46 @@ protected:
     using MutableDict = fleece::MutableDict;
     using alloc_slice = fleece::alloc_slice;
     using slice = fleece::slice;
-    using mutex = std::mutex;
-    using recursive_mutex = std::recursive_mutex;
-    using string = std::string;
-    using once_flag = std::once_flag;
 
-    template <class T>
-    using Retained = fleece::Retained<T>;
+    template <class T> using Retained = fleece::Retained<T>;
+    template <class T> using RetainedConst = fleece::RetainedConst<T>;
 };
 
 
 namespace cbl_internal {
-    template <class RC>
-    static inline RC* retain(fleece::Retained<RC> r) { return fleece::retain(r.get()); }
-    template <class RC>
-    static inline const RC* retain(fleece::RetainedConst<RC> r) { return fleece::retain(r.get()); }
-
-    static inline C4Error* internal(CBLError *error)             {return (C4Error*)error;}
-    static inline const C4Error* internal(const CBLError *error) {return (const C4Error*)error;}
+    // Converting C4Error <--> CBLError
+    static inline       C4Error* internal(      CBLError* _cbl_nullable error) {return (C4Error*)error;}
     static inline const C4Error& internal(const CBLError &error) {return (const C4Error&)error;}
 
-    static inline const CBLError* external(const C4Error *error) {return (const CBLError*)error;}
+    static inline       CBLError* external(      C4Error* _cbl_nullable error) {return (CBLError*)error;}
     static inline const CBLError& external(const C4Error &error) {return (const CBLError&)error;}
-    static inline CBLError* external(C4Error *error) {return (CBLError*)error;}
-    static inline CBLError& external(C4Error &error) {return (CBLError&)error;}
-
-    template <typename T>
-    T* validated(T *obj, CBLError *outError) {
-        if (obj->validate(outError))
-            return retain(obj);
-        delete obj;
-        return nullptr;
-    }
 
     template <typename T>
     static inline void writeOptionalKey(fleece::Encoder &enc, const char *propName, T value) {
         if (value)
             enc[fleece::slice(propName)] = value;
     }
+
+    void BridgeException(const char *fnName, CBLError* _cbl_nullable outError) noexcept;
+
+    void BridgeExceptionWarning(const char *fnName) noexcept;
+
+    fleece::alloc_slice convertJSON5(fleece::slice json5);
 }
 
 using namespace cbl_internal;
+
+
+#define catchAndBridgeReturning(OUTERROR, VALUE) \
+    catch (...) { cbl_internal::BridgeException(__FUNCTION__, OUTERROR); return VALUE; }
+
+#define catchAndBridge(OUTERROR) \
+    catchAndBridgeReturning(OUTERROR, {})
+
+#define catchAndWarn() \
+    catchAndBridge(nullptr)
+
+
+#define LOCK(MUTEX)     std::lock_guard<decltype(MUTEX)> _lock(MUTEX)
+
+CBL_ASSUME_NONNULL_END

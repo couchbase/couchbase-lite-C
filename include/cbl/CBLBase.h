@@ -21,30 +21,26 @@
 #include "cbl_config.h"
 #endif
 
+#include "CBL_Edition.h"
 #include "CBL_Compat.h"
 #include "fleece/FLSlice.h"
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+CBL_CAPI_BEGIN
 
 /** \defgroup errors   Errors
      @{
     Types and constants for communicating errors from API calls. */
 
 /** Error domains, serving as namespaces for numeric error codes. */
-typedef CBL_ENUM(uint32_t, CBLErrorDomain) {
+typedef CBL_ENUM(uint8_t, CBLErrorDomain) {
     CBLDomain = 1,         ///< code is a Couchbase Lite error code; see \ref CBLErrorCode
     CBLPOSIXDomain,        ///< code is a POSIX `errno`; see "errno.h"
     CBLSQLiteDomain,       ///< code is a SQLite error; see "sqlite3.h"
     CBLFleeceDomain,       ///< code is a Fleece error; see "FleeceException.h"
     CBLNetworkDomain,      ///< code is a network error; see \ref CBLNetworkErrorCode
     CBLWebSocketDomain,    ///< code is a WebSocket close code (1000...1015) or HTTP error (300..599)
-
-    CBLMaxErrorDomainPlus1
 };
 
 /** Couchbase Lite error codes, in the CBLDomain. */
@@ -79,8 +75,6 @@ typedef CBL_ENUM(int32_t, CBLErrorCode) {
     CBLErrorDatabaseTooNew,         ///< Database file format is newer than what I can open
     CBLErrorBadDocID,               ///< Invalid document ID
     CBLErrorCantUpgradeDatabase,/*30*/ ///< DB can't be upgraded (might be unsupported dev version)
-
-    CBLNumErrorCodesPlus1
 };
 
 /** Network error codes, in the CBLNetworkDomain. */
@@ -108,16 +102,14 @@ typedef CBL_ENUM(int32_t,  CBLNetworkErrorCode) {
     there was an error (usually by returning NULL or false), then the CBLError will have been
     filled in with the details. */
 typedef struct {
-    CBLErrorDomain domain;      ///< Domain of errors; a namespace for the `code`.
-    int32_t code;               ///< Error code, specific to the domain. 0 always means no error.
-    int32_t internal_info;
+    CBLErrorDomain domain;         ///< Domain of errors; a namespace for the `code`.
+    int            code;           ///< Error code, specific to the domain. 0 always means no error.
+    unsigned       internal_info;  // do not use or modify
 } CBLError;
 
 /** Returns a message describing an error.
-    @note  It is the caller's responsibility to free the returned C string by calling `free`. */
-char* CBLError_Message(const CBLError* _cbl_nonnull) CBLAPI;
-
-FLSliceResult CBLError_Message_s(const CBLError* _cbl_nonnull) CBLAPI;
+    @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
+FLSliceResult CBLError_Message(const CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 
@@ -160,12 +152,12 @@ typedef struct CBLRefCounted CBLRefCounted;
 /** Increments an object's reference-count.
     Usually you'll call one of the type-safe synonyms specific to the object type,
     like \ref CBLDatabase_Retain` */
-CBLRefCounted* CBL_Retain(CBLRefCounted*) CBLAPI;
+CBLRefCounted* CBL_Retain(CBLRefCounted* _cbl_nullable) CBLAPI;
 
 /** Decrements an object's reference-count, freeing the object if the count hits zero.
     Usually you'll call one of the type-safe synonyms specific to the object type,
     like \ref CBLDatabase_Release. */
-void CBL_Release(CBLRefCounted*) CBLAPI;
+void CBL_Release(CBLRefCounted* _cbl_nullable) CBLAPI;
 
 /** Returns the total number of Couchbase Lite objects. Useful for leak checking. */
 unsigned CBL_InstanceCount(void) CBLAPI;
@@ -176,9 +168,9 @@ void CBL_DumpInstances(void) CBLAPI;
 
 // Declares retain/release functions for TYPE. For internal use only.
 #define CBL_REFCOUNTED(TYPE, NAME) \
-    static inline const TYPE CBL##NAME##_Retain(const TYPE _cbl_nonnull t) \
+    static inline const TYPE CBL##NAME##_Retain(const TYPE _cbl_nullable t) \
                                             {return (const TYPE)CBL_Retain((CBLRefCounted*)t);} \
-    static inline void CBL##NAME##_Release(const TYPE t) {CBL_Release((CBLRefCounted*)t);}
+    static inline void CBL##NAME##_Release(const TYPE _cbl_nullable t) {CBL_Release((CBLRefCounted*)t);}
 
 /** @} */
 
@@ -257,11 +249,9 @@ typedef struct CBLReplicator CBLReplicator;
 typedef struct CBLListenerToken CBLListenerToken;
 
 /** Removes a listener callback, given the token that was returned when it was added. */
-void CBLListener_Remove(CBLListenerToken*) CBLAPI;
+void CBLListener_Remove(CBLListenerToken* _cbl_nullable) CBLAPI;
 
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+CBL_CAPI_END

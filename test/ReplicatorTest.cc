@@ -18,25 +18,32 @@
 
 #include "ReplicatorTest.hh"
 
+using namespace fleece;
+
 
 #pragma mark - BASIC TESTS:
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
-    CBLError error;
-    config.database = nullptr;
-    CHECK(!CBLReplicator_New(&config, &error));
-
-    config.database = db.ref();
-    CHECK(!CBLReplicator_New(&config, &error));
-
-    config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar");
     CBLProxySettings proxy = {};
-    proxy.type = kCBLProxyHTTP;
-    config.proxy = &proxy;
-    CHECK(!CBLReplicator_New(&config, &error));
+    CBLError error;
+    {
+        ExpectingExceptions x;
 
-    proxy.hostname = "localhost";
+#ifndef __clang__
+        config.database = nullptr;
+        CHECK(!CBLReplicator_New(&config, &error));
+#endif
+        
+        config.database = db.ref();
+        CHECK(!CBLReplicator_New(&config, &error));
+
+        config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg:9999/foobar"_sl);
+        proxy.type = kCBLProxyHTTP;
+        config.proxy = &proxy;
+        CHECK(!CBLReplicator_New(&config, &error));
+    }
+    proxy.hostname = "localhost"_sl;
     proxy.port = 9998;
     repl = CBLReplicator_New(&config, &error);
     CHECK(repl);
@@ -44,14 +51,14 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
-    config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar");
-    config.authenticator = CBLAuth_NewSession("SyncGatewaySession", "NOM_NOM_NOM");
+    config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg/foobar"_sl);
+    config.authenticator = CBLAuth_NewSession("SyncGatewaySession"_sl, "NOM_NOM_NOM"_sl);
 
-    config.pullFilter = [](void *context, CBLDocument* document, bool isDeleted) -> bool {
+    config.pullFilter = [](void *context, CBLDocument* document, CBLDocumentFlags flags) -> bool {
         return true;
     };
 
-    config.pushFilter = [](void *context, CBLDocument* document, bool isDeleted) -> bool {
+    config.pushFilter = [](void *context, CBLDocument* document, CBLDocumentFlags flags) -> bool {
         return true;
     };
 
@@ -60,15 +67,15 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replicator]") {
-    config.endpoint = CBLEndpoint_NewWithURL("ws://localhost:9999/foobar");
-    config.authenticator = CBLAuth_NewBasic("username", "p@ssw0RD");
+    config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg/foobar"_sl);
+    config.authenticator = CBLAuth_NewPassword("username"_sl, "p@ssw0RD"_sl);
 
     CBLProxySettings proxy = {};
     proxy.type = kCBLProxyHTTP;
-    proxy.hostname = "localhost";
+    proxy.hostname = "jxnbgotn.dvmwk"_sl;
     proxy.port = 9998;
-    proxy.username = "User Name";
-    proxy.password = "123456";
+    proxy.username = "User Name"_sl;
+    proxy.password = "123456"_sl;
     config.proxy = &proxy;
 
     replicate();
@@ -112,7 +119,7 @@ public:
                     "Skipping test; server URL not configured");
             return false;
         }
-        config.endpoint = CBLEndpoint_NewWithURL((serverURL + "/" + dbName).c_str());
+        config.endpoint = CBLEndpoint_NewWithURL(slice(serverURL + "/" + dbName));
         return true;
     }
 
@@ -122,7 +129,7 @@ public:
                     "Skipping test; server URL not configured");
             return false;
         }
-        config.endpoint = CBLEndpoint_NewWithURL((tlsServerURL + "/" + dbName).c_str());
+        config.endpoint = CBLEndpoint_NewWithURL(slice(tlsServerURL + "/" + dbName));
         return true;
     }
 
@@ -140,10 +147,10 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "HTTP auth", "[Replicator][.Server]
         auth = nullptr;
     }
     SECTION("Invalid credentials") {
-        auth = CBLAuth_NewBasic("manhog", "whim");
+        auth = CBLAuth_NewPassword("manhog"_sl, "whim"_sl);
     }
     SECTION("Valid credentials") {
-        auth = CBLAuth_NewBasic("pupshaw", "frank");
+        auth = CBLAuth_NewPassword("pupshaw"_sl, "frank"_sl);
         expectedError = {};
     }
     config.authenticator = auth;

@@ -1,0 +1,11 @@
+# CBL_EE_Exports.txt
+#
+# Copyright (c) 2019 Couchbase, Inc All rights reserved.
+#
+# These are the additional exports for the Enterprise Edition (EE) dynamic library.
+
+CBLEncryptionKey_FromPassword
+
+CBLDatabase_ChangeEncryptionKey
+
+CBLEndpoint_NewWithLocalDB

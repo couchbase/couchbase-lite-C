@@ -17,11 +17,11 @@
 //
 
 #pragma once
-#include "Base.hh"
-#include "CBLDatabase.h"
-#include "CBLDocument.h"
-#include "CBLLog.h"
-#include "CBLQuery.h"
+#include "cbl++/Base.hh"
+#include "cbl/CBLDatabase.h"
+#include "cbl/CBLDocument.h"
+#include "cbl/CBLQuery.h"
+#include "cbl/CBLLog.h"
 #include "fleece/Mutable.hh"
 #include <functional>
 #include <string>
@@ -29,6 +29,8 @@
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
+
+CBL_ASSUME_NONNULL_BEGIN
 
 namespace cbl {
     class Document;
@@ -43,50 +45,52 @@ namespace cbl {
     public:
         // Static database-file operations:
 
-        static bool exists(const std::string &name,
-                           const std::string &inDirectory)
+        static bool exists(slice name,
+                           slice inDirectory)
         {
-            return CBL_DatabaseExists(name.c_str(), inDirectory.c_str());
+            return CBL_DatabaseExists(name, inDirectory);
         }
 
-        static void copyDatabase(const std::string &fromPath,
-                                 const std::string &toName)
+        static void copyDatabase(slice fromPath,
+                                 slice toName)
         {
             CBLError error;
-            check( CBL_CopyDatabase(fromPath.c_str(), toName.c_str(), nullptr, &error), error );
+            check( CBL_CopyDatabase(fromPath, toName,
+                                    nullptr, &error), error );
         }
 
-        static void copyDatabase(const std::string &fromPath,
-                                 const std::string &toName,
+        static void copyDatabase(slice fromPath,
+                                 slice toName,
                                  const CBLDatabaseConfiguration& config)
         {
             CBLError error;
-            check( CBL_CopyDatabase(fromPath.c_str(), toName.c_str(), &config, &error), error );
+            check( CBL_CopyDatabase(fromPath, toName,
+                                    &config, &error), error );
         }
 
-        static void deleteDatabase(const std::string &name,
-                                   const std::string &inDirectory)
+        static void deleteDatabase(slice name,
+                                   slice inDirectory)
         {
             CBLError error;
-            if (!CBL_DeleteDatabase(name.c_str(),
-                                    inDirectory.empty() ? nullptr : inDirectory.c_str(),
+            if (!CBL_DeleteDatabase(name,
+                                    inDirectory,
                                     &error) && error.code != 0)
                 check(false, error);
         }
 
         // Lifecycle:
 
-        Database(const std::string &name) {
+        Database(slice name) {
             CBLError error;
-            _ref = (CBLRefCounted*) CBLDatabase_Open(name.c_str(), nullptr, &error);
+            _ref = (CBLRefCounted*) CBLDatabase_Open(name, nullptr, &error);
             check(_ref != nullptr, error);
         }
 
-        Database(const std::string &name,
+        Database(slice name,
                  const CBLDatabaseConfiguration& config)
         {
             CBLError error;
-            _ref = (CBLRefCounted*) CBLDatabase_Open(name.c_str(), &config, &error);
+            _ref = (CBLRefCounted*) CBLDatabase_Open(name, &config, &error);
             check(_ref != nullptr, error);
         }
 
@@ -107,46 +111,64 @@ namespace cbl {
 
         // Accessors:
 
-        const char* name() const _cbl_nonnull               {return CBLDatabase_Name(ref());}
-        const char* path() const _cbl_nonnull               {return CBLDatabase_Path(ref());}
-        uint64_t count() const                              {return CBLDatabase_Count(ref());}
-        CBLDatabaseConfiguration config() const             {return CBLDatabase_Config(ref());}
+        std::string name() const                        {return asString(CBLDatabase_Name(ref()));}
+        std::string path() const                        {return asString(CBLDatabase_Path(ref()));}
+        uint64_t count() const                          {return CBLDatabase_Count(ref());}
+        CBLDatabaseConfiguration config() const         {return CBLDatabase_Config(ref());}
 
         // Documents:
 
-        inline Document getDocument(const std::string &id) const;
-        inline MutableDocument getMutableDocument(const std::string &id) const;
+        inline Document getDocument(slice id) const;
+        inline MutableDocument getMutableDocument(slice id) const;
 
-        inline Document saveDocument(MutableDocument &doc,
-                                     CBLConcurrencyControl c = kCBLConcurrencyControlFailOnConflict);
+        inline void saveDocument(MutableDocument &doc);
 
-        inline Document saveDocument(MutableDocument &doc, SaveConflictHandler conflictandler);
+        _cbl_warn_unused
+        inline bool saveDocument(MutableDocument &doc, CBLConcurrencyControl c);
 
-        time_t getDocumentExpiration(const std::string &docID) const {
+        _cbl_warn_unused
+        inline bool saveDocument(MutableDocument &doc, SaveConflictHandler conflictHandler);
+
+        inline void deleteDocument(Document &doc);
+
+        _cbl_warn_unused
+        inline bool deleteDocument(Document &doc, CBLConcurrencyControl c);
+
+        time_t getDocumentExpiration(slice docID) const {
             CBLError error;
-            time_t exp = CBLDatabase_GetDocumentExpiration(ref(), docID.c_str(), &error);
+            time_t exp = CBLDatabase_GetDocumentExpiration(ref(), docID, &error);
             check(exp >= 0, error);
             return exp;
         }
 
-        void setDocumentExpiration(const std::string &docID, time_t expiration) {
+        void setDocumentExpiration(slice docID, time_t expiration) {
             CBLError error;
-            check(CBLDatabase_SetDocumentExpiration(ref(), docID.c_str(), expiration, &error), error);
+            check(CBLDatabase_SetDocumentExpiration(ref(), docID, expiration, &error), error);
         }
 
-        void purgeDocumentByID(const std::string &docID) {
+        inline void purgeDocument(Document &doc);
+
+        bool purgeDocumentByID(slice docID) {
             CBLError error;
-            check(CBLDatabase_PurgeDocumentByID(ref(), docID.c_str(), &error), error);
+            bool purged = CBLDatabase_PurgeDocumentByID(ref(), docID, &error);
+            if (!purged && error.code != 0)
+                throw error;
+            return purged;
         }
 
         // Indexes:
 
-        void createIndex(const char *name _cbl_nonnull, CBLIndexSpec spec) {
+        void createValueIndex(slice name, CBLValueIndexConfiguration config) {
             CBLError error;
-            check(CBLDatabase_CreateIndex(ref(), name, spec, &error), error);
+            check(CBLDatabase_CreateValueIndex(ref(), name, config, &error), error);
+        }
+        
+        void createFullTextIndex(slice name, CBLFullTextIndexConfiguration config) {
+            CBLError error;
+            check(CBLDatabase_CreateFullTextIndex(ref(), name, config, &error), error);
         }
 
-        void deleteIndex(const char *name _cbl_nonnull) {
+        void deleteIndex(slice name) {
             CBLError error;
             check(CBLDatabase_DeleteIndex(ref(), name, &error), error);
         }
@@ -160,7 +182,7 @@ namespace cbl {
 
         // Listeners:
 
-        using Listener = cbl::ListenerToken<Database,const std::vector<const char*>&>;
+        using Listener = cbl::ListenerToken<Database,const std::vector<slice>&>;
 
         [[nodiscard]] Listener addListener(Listener::Callback f) {
             auto l = Listener(f);
@@ -169,13 +191,13 @@ namespace cbl {
         }
 
 
-        using DocumentListener = cbl::ListenerToken<Database,const char*>;
+        using DocumentListener = cbl::ListenerToken<Database,slice>;
 
-        [[nodiscard]] DocumentListener addDocumentListener(const std::string &docID,
+        [[nodiscard]] DocumentListener addDocumentListener(slice docID,
                                                            DocumentListener::Callback f)
         {
             auto l = DocumentListener(f);
-            l.setToken( CBLDatabase_AddDocumentChangeListener(ref(), docID.c_str(), &_callDocListener, l.context()) );
+            l.setToken( CBLDatabase_AddDocumentChangeListener(ref(), docID, &_callDocListener, l.context()) );
             return l;
         }
 
@@ -195,14 +217,16 @@ namespace cbl {
         void sendNotifications()                            {CBLDatabase_SendNotifications(ref());}
 
     private:
-        static void _callListener(void *context, const CBLDatabase *db,
-                                  unsigned nDocs, const char **docIDs)
+        static void _callListener(void* _cbl_nullable context,
+                                  const CBLDatabase *db,
+                                  unsigned nDocs, FLString *docIDs)
         {
-            std::vector<const char*> vec(&docIDs[0], &docIDs[nDocs]);
+            std::vector<slice> vec((slice*)&docIDs[0], (slice*)&docIDs[nDocs]);
             Listener::call(context, Database((CBLDatabase*)db), vec);
         }
 
-        static void _callDocListener(void *context, const CBLDatabase *db, const char *docID) {
+        static void _callDocListener(void* _cbl_nullable context,
+                                     const CBLDatabase *db, FLString docID) {
             DocumentListener::call(context, Database((CBLDatabase*)db), docID);
         }
 
@@ -210,44 +234,54 @@ namespace cbl {
     };
 
 
-    /** A helper object used to begin and end batch operations on a Database.
-        Multiple writes in a batch are more efficient than if done separately.
-        A Batch object should be declared as a local (auto) variable; the batch will end
-        when the object goes out of scope. */
-    class Batch {
+    /** A helper object for database transactions.
+        A Transaction object should be declared as a local (auto) variable.
+        You must explicitly call \ref commit to commit changes; if you don't, the transaction
+        will abort when it goes out of scope. */
+    class Transaction {
     public:
         /** Begins a batch operation on the database that will end when the Batch instance
             goes out of scope. */
-        explicit Batch(Database db) {
+        explicit Transaction(Database db)
+        :Transaction(db.ref())
+        { }
+
+        explicit Transaction (CBLDatabase *db) {
             CBLError error;
-            RefCounted::check(CBLDatabase_BeginBatch(db.ref(), &error), error);
+            RefCounted::check(CBLDatabase_BeginTransaction(db, &error), error);
             _db = db;
         }
 
-        /** Ends a batch immediately. The Batch object's destructor will then do nothing. */
-        void end() {
-            Database db = std::move(_db);  // clears _db
+        /** Commits changes and ends the transaction. */
+        void commit()   {end(true);}
+
+        /** Ends the transaction, rolling back changes. */
+        void abort()    {end(false);}
+
+        ~Transaction()  {end(false);}
+
+    private:
+        void end(bool commit) {
+            CBLDatabase *db = _db;
             if (db) {
+                _db = nullptr;
                 CBLError error;
-                if (!CBLDatabase_EndBatch(db.ref(), &error)) {
+                if (!CBLDatabase_EndTransaction(db, commit, &error)) {
                     // If an exception is thrown while a Batch is in scope, its destructor will
                     // call end(). If I'm in this situation I cannot throw another exception or
                     // the C++ runtime will abort the process. Detect this and just warn instead.
                     if (std::current_exception())
                         CBL_Log(kCBLLogDomainDatabase, CBLLogWarning,
-                                "Batch::end failed, while handling an exception");
+                                "Transaction::end failed, while handling an exception");
                     else
                         RefCounted::check(false, error);
                 }
             }
         }
 
-        ~Batch() {
-            end();
-        }
-
-    private:
-        Database _db;
+        CBLDatabase* _cbl_nullable _db = nullptr;
     };
 
 }
+
+CBL_ASSUME_NONNULL_END

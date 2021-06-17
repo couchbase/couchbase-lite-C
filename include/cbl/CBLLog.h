@@ -19,9 +19,7 @@
 #pragma once
 #include "CBLBase.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CBL_CAPI_BEGIN
 
 
 /** \defgroup logging   Logging
@@ -50,23 +48,27 @@ typedef CBL_ENUM(uint8_t, CBLLogLevel) {
 
 /** Formats and writes a message to the log, in the given domain at the given level.
     \warning This function takes a `printf`-style format string, with extra parameters to match the format placeholders, and has the same security vulnerabilities as other `printf`-style functions.
-    If you are logging a fixed string, call \ref CBL_Log_s instead, otherwise any `%` characters in the
-    `format` string will be misinterpreted as placeholders and the dreaded Undefined Behavior will result,
-    possibly including crashes or overwriting the stack.
+
+    If you are logging a fixed string, call \ref CBL_LogMessage instead, otherwise any `%`
+    characters in the `format` string will be misinterpreted as placeholders and the dreaded
+    Undefined Behavior will result, possibly including crashes or overwriting the stack.
     @param domain  The log domain to associate this message with.
     @param level  The severity of the message. If this is lower than the current minimum level for the domain
                  (as set by \ref CBLLog_SetConsoleLevel), nothing is logged.
     @param format  A `printf`-style format string. `%` characters in this string introduce parameters,
                  and corresponding arguments must follow. */
-void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format _cbl_nonnull, ...) CBLAPI
-        __printflike(3, 4);
+void CBL_Log(CBLLogDomain domain,
+             CBLLogLevel level,
+             const char *format, ...) CBLAPI __printflike(3, 4);
 
 /** Writes a pre-formatted message to the log, exactly as given.
     @param domain  The log domain to associate this message with.
     @param level  The severity of the message. If this is lower than the current minimum level for the domain
                  (as set by \ref CBLLog_SetConsoleLevel), nothing is logged.
     @param message  The exact message to write to the log. */
-void CBL_Log_s(CBLLogDomain domain, CBLLogLevel level, FLSlice message) CBLAPI;
+void CBL_LogMessage(CBLLogDomain domain,
+                    CBLLogLevel level,
+                    FLSlice message) CBLAPI;
 
 
 
@@ -79,18 +81,23 @@ void CBL_Log_s(CBLLogDomain domain, CBLLogLevel level, FLSlice message) CBLAPI;
     @param message  The actual formatted message. */
 typedef void (*CBLLogCallback)(CBLLogDomain domain,
                                CBLLogLevel level,
-                               const char *message _cbl_nonnull);
+                               FLString message);
 
 /** Gets the current log level for debug console logging.
-    Only messages at this level or higher will be logged to the console or callback. */
+    Only messages at this level or higher will be logged to the console. */
 CBLLogLevel CBLLog_ConsoleLevel(void) CBLAPI;
 
 /** Sets the detail level of logging.
-    Only messages whose level is ≥ the given level will be logged to the console or callback. */
+    Only messages whose level is ≥ the given level will be logged to the console. */
 void CBLLog_SetConsoleLevel(CBLLogLevel) CBLAPI;
 
-/** Returns true if a message with the given domain and level would be logged to the console. */
-bool CBLLog_WillLogToConsole(CBLLogDomain domain, CBLLogLevel level) CBLAPI;
+/** Gets the current log level for debug console logging.
+    Only messages at this level or higher will be logged to the callback. */
+CBLLogLevel CBLLog_CallbackLevel(void) CBLAPI;
+
+/** Sets the detail level of logging.
+    Only messages whose level is ≥ the given level will be logged to the callback. */
+void CBLLog_SetCallbackLevel(CBLLogLevel) CBLAPI;
 
 /** Gets the current log callback. */
 CBLLogCallback CBLLog_Callback(void) CBLAPI;
@@ -109,22 +116,21 @@ void CBLLog_SetCallback(CBLLogCallback) CBLAPI;
     @warning `usePlaintext` results in significantly larger log files and higher CPU usage that may slow
             down your app; we recommend turning it off in production. */
 typedef struct {
-    const char* directory;    ///< The directory where log files will be created.
-    uint32_t maxRotateCount;  ///< Max number of older logs to keep (i.e. total number will be one more.)
-    size_t maxSize;           ///< The size in bytes at which a file will be rotated out (best effort).
-    bool usePlaintext;        ///< Whether or not to log in plaintext (as opposed to binary)
+    CBLLogLevel level;       ///< The minimum level of message to write
+    FLString directory;      ///< The directory where log files will be created.
+    uint32_t maxRotateCount; ///< Max number of older log files to keep (in addition to current one.)
+    size_t maxSize;          ///< The size in bytes at which a file will be rotated out (best effort).
+    bool usePlaintext;       ///< Whether or not to log in plaintext (as opposed to binary.) Plaintext logging is slower and bigger.
 } CBLLogFileConfiguration;
 
-/** Gets the current file logging configuration. */
+/** Gets the current file logging configuration, or NULL if none is configured. */
 const CBLLogFileConfiguration* CBLLog_FileConfig(void) CBLAPI;
 
-/** Sets the file logging configuration. */
-void CBLLog_SetFileConfig(CBLLogFileConfiguration) CBLAPI;
+/** Sets the file logging configuration, and begins logging to files. */
+bool CBLLog_SetFileConfig(CBLLogFileConfiguration, CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+CBL_CAPI_END

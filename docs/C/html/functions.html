@@ -65,6 +65,9 @@ $(function() {
 <div class="textblock">Here is a list of all struct and union fields with links to the structures/unions they belong to:</div>
 
 <h3><a id="index_a"></a>- a -</h3><ul>
+<li>activeConnectionCount
+: <a class="el" href="struct_c_b_l_connection_status.html#ac4335ebc0966ab5dce7e95317eba9a19">CBLConnectionStatus</a>
+</li>
 <li>activity
 : <a class="el" href="struct_c_b_l_replicator_status.html#a96d2defe6b7bdef71834758920eb9e75">CBLReplicatorStatus</a>
 </li>
@@ -73,6 +76,7 @@ $(function() {
 </li>
 <li>authenticator
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#a53415a42b5e78d95e8905da08dc77129">CBLReplicatorConfiguration</a>
+, <a class="el" href="struct_c_b_l_u_r_l_endpoint_listener_configuration.html#aeaa4e119113ab9c9be273b63902cc0df">CBLURLEndpointListenerConfiguration</a>
 </li>
 </ul>
 
@@ -89,14 +93,20 @@ $(function() {
 
 
 <h3><a id="index_c"></a>- c -</h3><ul>
+<li>certificate
+: <a class="el" href="struct_c_b_l_listener_authenticator.html#ab772751f6c964814f9c49c934eb9facf">CBLListenerAuthenticator</a>
+</li>
 <li>channels
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#ae023f3a599303c82d576bbbb676d334e">CBLReplicatorConfiguration</a>
 </li>
 <li>code
-: <a class="el" href="struct_c_b_l_error.html#a4ca861e3e186c3c125d9035dbde3e2b6">CBLError</a>
+: <a class="el" href="struct_c_b_l_error.html#a1c970c9cc8b54d5d843d5f32d1416183">CBLError</a>
 </li>
 <li>conflictResolver
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#af8fba8fdbb2a4bed08cb41e471792597">CBLReplicatorConfiguration</a>
+</li>
+<li>connectionCount
+: <a class="el" href="struct_c_b_l_connection_status.html#a92c43d3bb6112ec28aa694c1d7a6d6b2">CBLConnectionStatus</a>
 </li>
 <li>context
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#ae7d9e75a9ba32da4be374326985c1621">CBLReplicatorConfiguration</a>
@@ -110,10 +120,11 @@ $(function() {
 <h3><a id="index_d"></a>- d -</h3><ul>
 <li>database
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#a9e6deb70f6e4cb0602891d067951c724">CBLReplicatorConfiguration</a>
+, <a class="el" href="struct_c_b_l_u_r_l_endpoint_listener_configuration.html#a79a013447ea7dfc423e43be1ddb6d2fa">CBLURLEndpointListenerConfiguration</a>
 </li>
 <li>directory
-: <a class="el" href="struct_c_b_l_database_configuration.html#ab7b0adca4e0cc3b302f11d3cfe7d0fd3">CBLDatabaseConfiguration</a>
-, <a class="el" href="struct_c_b_l_log_file_configuration.html#ab1729f1fffdab0563b5a35235fa36b93">CBLLogFileConfiguration</a>
+: <a class="el" href="struct_c_b_l_database_configuration.html#a844a5e7d02dd4ceb072dff39c7e88591">CBLDatabaseConfiguration</a>
+, <a class="el" href="struct_c_b_l_log_file_configuration.html#ac6c2c2839694308a6f3ae8cccff98b2f">CBLLogFileConfiguration</a>
 </li>
 <li>documentCount
 : <a class="el" href="struct_c_b_l_replicator_progress.html#a1de6365276a041880b0a85298c4bd4d8">CBLReplicatorProgress</a>
@@ -129,7 +140,7 @@ $(function() {
 
 <h3><a id="index_e"></a>- e -</h3><ul>
 <li>encryptionKey
-: <a class="el" href="struct_c_b_l_database_configuration.html#aaab04fb9d092ff02693eea611efefc55">CBLDatabaseConfiguration</a>
+: <a class="el" href="struct_c_b_l_database_configuration.html#a7c69ab38e0351ff6906caee16adc8ec5">CBLDatabaseConfiguration</a>
 </li>
 <li>endpoint
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#aa42603364a3518407a2d030d88d62a79">CBLReplicatorConfiguration</a>
@@ -157,14 +168,14 @@ $(function() {
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#a13f1129289f6556ae07fc8e33079855e">CBLReplicatorConfiguration</a>
 </li>
 <li>hostname
-: <a class="el" href="struct_c_b_l_proxy_settings.html#a22d3107a6a13eb1a00eb08b9146ab544">CBLProxySettings</a>
+: <a class="el" href="struct_c_b_l_proxy_settings.html#a7214e7a0dd595eff9bc63db4d9751ec7">CBLProxySettings</a>
 </li>
 </ul>
 
 
 <h3><a id="index_i"></a>- i -</h3><ul>
 <li>ID
-: <a class="el" href="struct_c_b_l_replicated_document.html#ae852ea5b4b2a9f06f397ffcae3946b36">CBLReplicatedDocument</a>
+: <a class="el" href="struct_c_b_l_replicated_document.html#aa90e75e1c57847a592c998710f5e8c04">CBLReplicatedDocument</a>
 </li>
 <li>ignoreAccents
 : <a class="el" href="struct_c_b_l_index_spec.html#a3783fc620dc25c491f6c9e0b38a01cae">CBLIndexSpec</a>
@@ -183,37 +194,51 @@ $(function() {
 : <a class="el" href="struct_f_l_path_component.html#ab5ede4b7db1f077681b2230bfec8346c">FLPathComponent</a>
 </li>
 <li>keyExpressionsJSON
-: <a class="el" href="struct_c_b_l_index_spec.html#a51786bcdddf1003f6c7b20e04e6dfd7d">CBLIndexSpec</a>
+: <a class="el" href="struct_c_b_l_index_spec.html#a03c46e317312cd16fb82939f24565d48">CBLIndexSpec</a>
 </li>
 </ul>
 
 
 <h3><a id="index_l"></a>- l -</h3><ul>
 <li>language
-: <a class="el" href="struct_c_b_l_index_spec.html#aea8b36428d83333d235f16778be3734d">CBLIndexSpec</a>
+: <a class="el" href="struct_c_b_l_index_spec.html#a665cc3d1d95fc982d77518207e9d8bac">CBLIndexSpec</a>
+</li>
+<li>level
+: <a class="el" href="struct_c_b_l_log_file_configuration.html#aba0bbafc065b765360963532b98f3aa8">CBLLogFileConfiguration</a>
 </li>
 </ul>
 
 
 <h3><a id="index_m"></a>- m -</h3><ul>
 <li>maxRotateCount
-: <a class="el" href="struct_c_b_l_log_file_configuration.html#abb6ae5f4546804de3269587814ee0b39">CBLLogFileConfiguration</a>
+: <a class="el" href="struct_c_b_l_log_file_configuration.html#a5ce13f49863ec35a54f8edc574417d5d">CBLLogFileConfiguration</a>
 </li>
 <li>maxSize
-: <a class="el" href="struct_c_b_l_log_file_configuration.html#af7df99a4a12a233e9e3db5f73afd8057">CBLLogFileConfiguration</a>
+: <a class="el" href="struct_c_b_l_log_file_configuration.html#a61ccdf64b186e5597f80d78943ce1278">CBLLogFileConfiguration</a>
+</li>
+</ul>
+
+
+<h3><a id="index_n"></a>- n -</h3><ul>
+<li>networkInterface
+: <a class="el" href="struct_c_b_l_u_r_l_endpoint_listener_configuration.html#a5a10543158ed28e4489d1256cb50309f">CBLURLEndpointListenerConfiguration</a>
 </li>
 </ul>
 
 
 <h3><a id="index_p"></a>- p -</h3><ul>
 <li>password
-: <a class="el" href="struct_c_b_l_proxy_settings.html#aa9ed5416e4e56db423857c952d94d73a">CBLProxySettings</a>
+: <a class="el" href="struct_c_b_l_proxy_settings.html#a7886e8dcbfee5c9e7018fe00e4892264">CBLProxySettings</a>
+</li>
+<li>passwordAuthenticator
+: <a class="el" href="struct_c_b_l_listener_authenticator.html#ab289395196d0bbd4b7bd27bfbf1b9157">CBLListenerAuthenticator</a>
 </li>
 <li>pinnedServerCertificate
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#a4a96fb9fba93dc93f8373b76c3816af6">CBLReplicatorConfiguration</a>
 </li>
 <li>port
 : <a class="el" href="struct_c_b_l_proxy_settings.html#a25450c7313f6a018211e9e2717e7e5f0">CBLProxySettings</a>
+, <a class="el" href="struct_c_b_l_u_r_l_endpoint_listener_configuration.html#ae164b791eeeb816b9e3c3b25722a13a6">CBLURLEndpointListenerConfiguration</a>
 </li>
 <li>progress
 : <a class="el" href="struct_c_b_l_replicator_status.html#ab2d67b056ccaa4141d468a1a2eba533d">CBLReplicatorStatus</a>
@@ -231,6 +256,9 @@ $(function() {
 
 
 <h3><a id="index_r"></a>- r -</h3><ul>
+<li>readOnly
+: <a class="el" href="struct_c_b_l_u_r_l_endpoint_listener_configuration.html#a48f15a9f8cc24476b4f8d81d145a1d55">CBLURLEndpointListenerConfiguration</a>
+</li>
 <li>replicatorType
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#a40f3195389ab0578aa17e63dd832a390">CBLReplicatorConfiguration</a>
 </li>
@@ -246,6 +274,9 @@ $(function() {
 
 
 <h3><a id="index_t"></a>- t -</h3><ul>
+<li>tlsIdentity
+: <a class="el" href="struct_c_b_l_u_r_l_endpoint_listener_configuration.html#a3820c7764a7f413f787275dff0d6c262">CBLURLEndpointListenerConfiguration</a>
+</li>
 <li>trustedRootCertificates
 : <a class="el" href="struct_c_b_l_replicator_configuration.html#abba75db71f5e08718a924d76bc1a0e1e">CBLReplicatorConfiguration</a>
 </li>
@@ -258,10 +289,10 @@ $(function() {
 
 <h3><a id="index_u"></a>- u -</h3><ul>
 <li>usePlaintext
-: <a class="el" href="struct_c_b_l_log_file_configuration.html#a53e0e6ba881a590395e1249f9a1a766d">CBLLogFileConfiguration</a>
+: <a class="el" href="struct_c_b_l_log_file_configuration.html#aa6fe8002b56d5502db77724ed06a47be">CBLLogFileConfiguration</a>
 </li>
 <li>username
-: <a class="el" href="struct_c_b_l_proxy_settings.html#aa353c4c7d98af7fef60eda28a24add19">CBLProxySettings</a>
+: <a class="el" href="struct_c_b_l_proxy_settings.html#abb0f9c744134b0a58d577bff22731304">CBLProxySettings</a>
 </li>
 </ul>
 </div><!-- contents -->

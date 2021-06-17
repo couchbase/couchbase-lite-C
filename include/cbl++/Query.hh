@@ -17,14 +17,16 @@
 //
 
 #pragma once
-#include "Database.hh"
-#include "CBLQuery.h"
+#include "cbl++/Database.hh"
+#include "cbl/CBLQuery.h"
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
+
+CBL_ASSUME_NONNULL_BEGIN
 
 namespace cbl {
     class Query;
@@ -34,9 +36,9 @@ namespace cbl {
     /** A database query. */
     class Query : private RefCounted {
     public:
-        Query(const Database& db, CBLQueryLanguage language, const char *queryString _cbl_nonnull) {
+        Query(const Database& db, CBLQueryLanguage language, slice queryString) {
             CBLError error;
-            auto q = CBLQuery_New(db.ref(), language, queryString, nullptr, &error);
+            auto q = CBLDatabase_CreateQuery(db.ref(), language, queryString, nullptr, &error);
             check(q, error);
             _ref = (CBLRefCounted*)q;
         }
@@ -53,11 +55,12 @@ namespace cbl {
         // Change listener (live query):
 
         class ChangeListener;
+        class Change;
 
-        [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<Query>::Callback);
+        [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<Change>::Callback);
 
     private:
-        static void _callListener(void *context, CBLQuery*);
+        static void _callListener(void *context, CBLQuery*, CBLListenerToken* token);
         CBL_REFCOUNTED_BOILERPLATE(Query, RefCounted, CBLQuery)
     };
 
@@ -69,16 +72,16 @@ namespace cbl {
             return CBLResultSet_ValueAtIndex(_ref, i);
         }
 
-        fleece::Value valueForKey(const char *key _cbl_nonnull) const {
+        fleece::Value valueForKey(slice key) const {
             return CBLResultSet_ValueForKey(_ref, key);
         }
 
-        fleece::Value operator[](int i) const                         {return valueAtIndex(i);}
-        fleece::Value operator[](const char *key _cbl_nonnull) const  {return valueForKey(key);}
+        fleece::Value operator[](int i) const                           {return valueAtIndex(i);}
+        fleece::Value operator[](slice key) const                       {return valueForKey(key);}
 
     protected:
-        explicit Result(CBLResultSet *ref)                      :_ref(ref) { }
-        CBLResultSet* _ref;
+        explicit Result(CBLResultSet* _cbl_nullable ref)                :_ref(ref) { }
+        CBLResultSet* _cbl_nullable _ref;
         friend class ResultSetIterator;
     };
 
@@ -129,7 +132,6 @@ namespace cbl {
         friend class ResultSet;
     };
 
-
     // Method implementations:
 
 
@@ -153,22 +155,48 @@ namespace cbl {
     }
 
 
-    class Query::ChangeListener : public ListenerToken<Query> {
+    class Query::ChangeListener : public ListenerToken<Change> {
     public:
         ChangeListener(Query query, Callback cb)
-        :ListenerToken<Query>(cb)
+        :ListenerToken<Change>(cb)
         ,_query(std::move(query))
         { }
 
         ResultSet results() {
+            return getResults(_query, token());
+        }
+
+    private:
+        static ResultSet getResults(Query query, CBLListenerToken* token) {
             CBLError error;
-            auto rs = CBLQuery_CopyCurrentResults(_query.ref(), token(), &error);
+            auto rs = CBLQuery_CopyCurrentResults(query.ref(), token, &error);
             check(rs, error);
             return ResultSet::adopt(rs);
         }
 
-    private:
         Query _query;
+        friend Change;
+    };
+
+
+    class Query::Change {
+    public:
+        Change(const Change& src) : _query(src._query), _token(src._token) {}
+
+        ResultSet results() {
+            return ChangeListener::getResults(_query, _token);
+        }
+
+        Query query() {
+            return _query;
+        }
+
+    private:
+        friend class Query;
+        Change(Query q, CBLListenerToken* token) : _query(q), _token(token) {}
+
+        Query _query;
+        CBLListenerToken* _token;
     };
 
 
@@ -179,8 +207,8 @@ namespace cbl {
     }
 
 
-    inline void Query::_callListener(void *context, CBLQuery *q) {
-        ChangeListener::call(context, Query(q));
+    inline void Query::_callListener(void *context, CBLQuery *q, CBLListenerToken* token) {
+        ChangeListener::call(context, Change{Query(q), token});
     }
 
 
@@ -193,3 +221,5 @@ namespace cbl {
     }
 
 }
+
+CBL_ASSUME_NONNULL_END

@@ -7,7 +7,7 @@ function(set_platform_source_files)
 
     set(
         ${PLATFORM_RESULT}
-        src/CBLDatabase+ObjC.mm
+        src/CBLDatabase+Apple.mm
         PARENT_SCOPE
     )
 endfunction()
@@ -21,8 +21,16 @@ function(init_vars)
 endfunction()
 
 function(set_dylib_properties)
-    set_target_properties(CouchbaseLiteC PROPERTIES LINK_FLAGS
+    if(BUILD_ENTERPRISE)
+        set_target_properties(
+            CouchbaseLiteC PROPERTIES LINK_FLAGS
+            "-exported_symbols_list ${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_EE.exp")
+    else()
+        set_target_properties(
+            CouchbaseLiteC PROPERTIES LINK_FLAGS
             "-exported_symbols_list ${PROJECT_SOURCE_DIR}/src/exports/generated/CBL.exp")
+    endif()
+    
     target_link_libraries(CouchbaseLiteC PUBLIC
             "-framework CoreFoundation"
             "-framework Foundation"

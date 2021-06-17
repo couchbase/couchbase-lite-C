@@ -21,24 +21,27 @@
 #include "CBLReplicator.h"
 #include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
-#include "c4.hh"
-#include "c4Replicator.h"
+#include "c4ReplicatorTypes.h"
 #include "c4Private.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <climits>
 #include <mutex>
+#include <string>
+
+CBL_ASSUME_NONNULL_BEGIN
 
 
 #pragma mark - ENDPOINT
 
 
 struct CBLEndpoint {
-    virtual ~CBLEndpoint()                                      { }
+    virtual ~CBLEndpoint()                                      =default;
     virtual bool valid() const =0;
     const C4Address& remoteAddress() const                      {return _address;}
     virtual C4String remoteDatabaseName() const =0;
 #ifdef COUCHBASE_ENTERPRISE
-    virtual C4Database* otherLocalDB() const                    {return nullptr;}
+    virtual CBLDatabase* _cbl_nullable otherLocalDB() const     {return nullptr;}
 #endif
 
 protected:
@@ -52,7 +55,7 @@ namespace cbl_internal {
         CBLURLEndpoint(fleece::slice url)
         :_url(url)
         {
-            if (!c4address_fromURL(_url, &_address, &_dbName))
+            if (!C4Address::fromURL(_url, &_address, (fleece::slice*)&_dbName))
                 _dbName = fleece::nullslice; // mark as invalid
         }
 
@@ -67,13 +70,13 @@ namespace cbl_internal {
 #ifdef COUCHBASE_ENTERPRISE
     // Concrete Endpoint for local databases
     struct CBLLocalEndpoint : public CBLEndpoint {
-        CBLLocalEndpoint(CBLDatabase *db _cbl_nonnull)
+        CBLLocalEndpoint(CBLDatabase *db)
         :_db(db)
         { }
 
         bool valid() const override                             {return true;}
         virtual C4String remoteDatabaseName() const override    {return fleece::nullslice;}
-        virtual C4Database* otherLocalDB() const override       {return _db->_getC4Database();}
+        virtual CBLDatabase* otherLocalDB() const override      {return _db;}
 
     private:
         fleece::Retained<CBLDatabase> _db;
@@ -90,10 +93,9 @@ protected:
     using slice = fleece::slice;
     using Encoder = fleece::Encoder;
     using alloc_slice = fleece::alloc_slice;
-    using string = std::string;
 
 public:
-    virtual ~CBLAuthenticator()                                 { }
+    virtual ~CBLAuthenticator()                                 =default;
     virtual void writeOptions(Encoder&) =0;
 };
 
@@ -134,7 +136,7 @@ namespace cbl_internal {
         }
 
     private:
-        string _sessionID, _cookieName;
+        std::string _sessionID, _cookieName;
     };
 }
 
@@ -144,7 +146,7 @@ namespace cbl_internal {
 
 namespace cbl_internal {
     // Managed config object that retains/releases its properties.
-    class ReplicatorConfiguration : public CBLReplicatorConfiguration {
+    struct ReplicatorConfiguration : public CBLReplicatorConfiguration {
         using Encoder = fleece::Encoder;
         using Dict = fleece::Dict;
         using slice = fleece::slice;
@@ -177,19 +179,18 @@ namespace cbl_internal {
         }
 
 
-        bool validate(CBLError *outError) const {
-            slice problem;
+        void validate() const {
+            const char *problem = nullptr;
             if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull)
-                problem = slice("Invalid replicator config: missing endpoints or bad type");
+                problem = "Invalid replicator config: missing endpoints or bad type";
             else if (!endpoint->valid())
-                problem = slice("Invalid endpoint");
-            else if (proxy && (proxy->type > kCBLProxyHTTPS || !proxy->hostname || !proxy->port))
-                problem = slice("Invalid replicator proxy settings");
+                problem = "Invalid endpoint";
+            else if (proxy && (proxy->type > kCBLProxyHTTPS ||
+                                                    !proxy->hostname.buf || !proxy->port))
+                problem = "Invalid replicator proxy settings";
 
-            if (!problem)
-                return true;
-            c4error_return(LiteCoreDomain, kC4ErrorInvalidParameter, problem, internal(outError));
-            return false;
+            if (problem)
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "%s", problem);
         }
 
 
@@ -216,7 +217,7 @@ namespace cbl_internal {
                 enc[slice(kC4ReplicatorProxyType)] = kProxyTypeIDs[proxy->type];
                 enc[slice(kC4ReplicatorProxyHost)] = proxy->hostname;
                 enc[slice(kC4ReplicatorProxyPort)] = proxy->port;
-                if (proxy->username) {
+                if (proxy->username.size > 0) {
                     enc.writeKey(slice(kC4ReplicatorProxyAuth));
                     enc.beginDict();
                     enc[slice(kC4ReplicatorAuthUserName)] = proxy->username;
@@ -225,8 +226,22 @@ namespace cbl_internal {
                 }
                 enc.endDict();
             }
+            
+            if (maxAttempts > 0) {
+                enc.writeKey(slice(kC4ReplicatorOptionMaxRetries));
+                enc.writeUInt(maxAttempts - 1);
+            }
+            
+            if (maxAttemptWaitTime > 0) {
+                enc.writeKey(slice(kC4ReplicatorOptionMaxRetryInterval));
+                enc.writeUInt(maxAttemptWaitTime);
+            }
+            
+            if (heartbeat > 0) {
+                enc.writeKey(slice(kC4ReplicatorHeartbeatInterval));
+                enc.writeUInt(heartbeat);
+            }
         }
-
 
         ReplicatorConfiguration(const ReplicatorConfiguration&) =delete;
         ReplicatorConfiguration& operator=(const ReplicatorConfiguration&) =delete;
@@ -235,15 +250,16 @@ namespace cbl_internal {
         using string = std::string;
         using alloc_slice = fleece::alloc_slice;
 
-        static const char* copyString(const char *cstr, string &str) {
-            if (!cstr) return nullptr;
-            str = cstr;
-            return str.c_str();
+        static slice copyString(slice str, alloc_slice &allocated) {
+            allocated = alloc_slice(str);
+            return allocated;
         }
 
 
-        alloc_slice _pinnedServerCert, _trustedRootCerts;
+        alloc_slice      _pinnedServerCert, _trustedRootCerts;
         CBLProxySettings _proxy;
-        string _proxyHostname, _proxyUsername, _proxyPassword;
+        alloc_slice      _proxyHostname, _proxyUsername, _proxyPassword;
     };
 }
+
+CBL_ASSUME_NONNULL_END

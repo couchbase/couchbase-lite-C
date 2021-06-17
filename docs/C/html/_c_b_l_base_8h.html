@@ -77,8 +77,9 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="_c_b_l___compat_8h_source.html">CBL_Compat.h</a>&quot;</code><br />
-<code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &quot;<a class="el" href="_f_l_slice_8h_source.html">fleece/FLSlice.h</a>&quot;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
+<code>#include &lt;stdint.h&gt;</code><br />
 </div>
 <p><a href="_c_b_l_base_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -124,19 +125,18 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:ga2e112f0e281d3bc5f3732f854e902b20"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#ga2e112f0e281d3bc5f3732f854e902b20">CBLErrorDomain</a> : uint32_t { <br />
-&#160;&#160;<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a64d3b8eec45b196c2f548c3c674540ad">CBLDomain</a> = 1, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a971c5ad661670fdde5fd595acae21791">CBLPOSIXDomain</a>, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a33d44c4f85ee650fde73ecfaf8f85d91">CBLSQLiteDomain</a>, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20ab2e12ae18a834dd1c4ba78a6e2d16127">CBLFleeceDomain</a>, 
+<tr class="memitem:ga2d569fb440396cf223ed8776d84e5bc5"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#ga2d569fb440396cf223ed8776d84e5bc5">CBLErrorDomain</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5a64d3b8eec45b196c2f548c3c674540ad">CBLDomain</a> = 1, 
+<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5a971c5ad661670fdde5fd595acae21791">CBLPOSIXDomain</a>, 
+<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5a33d44c4f85ee650fde73ecfaf8f85d91">CBLSQLiteDomain</a>, 
+<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5ab2e12ae18a834dd1c4ba78a6e2d16127">CBLFleeceDomain</a>, 
 <br />
-&#160;&#160;<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20aeba951148f4f36384f7d697f101d9ea7">CBLNetworkDomain</a>, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a4f626aa4e1bd8cbc619fa5a88fdd9d05">CBLWebSocketDomain</a>, 
-<a class="el" href="group__errors.html#gga2e112f0e281d3bc5f3732f854e902b20a18312fd4278a2cd7035fb10d5494311b">CBLMaxErrorDomainPlus1</a>
+&#160;&#160;<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5aeba951148f4f36384f7d697f101d9ea7">CBLNetworkDomain</a>, 
+<a class="el" href="group__errors.html#gga2d569fb440396cf223ed8776d84e5bc5a4f626aa4e1bd8cbc619fa5a88fdd9d05">CBLWebSocketDomain</a>
 <br />
  }</td></tr>
-<tr class="memdesc:ga2e112f0e281d3bc5f3732f854e902b20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error domains, serving as namespaces for numeric error codes.  <a href="group__errors.html#ga2e112f0e281d3bc5f3732f854e902b20">More...</a><br /></td></tr>
-<tr class="separator:ga2e112f0e281d3bc5f3732f854e902b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:ga2d569fb440396cf223ed8776d84e5bc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error domains, serving as namespaces for numeric error codes.  <a href="group__errors.html#ga2d569fb440396cf223ed8776d84e5bc5">More...</a><br /></td></tr>
+<tr class="separator:ga2d569fb440396cf223ed8776d84e5bc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad43e348ca76e9a8fe7c10ec916bf0528"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#gad43e348ca76e9a8fe7c10ec916bf0528">CBLErrorCode</a> : int32_t { <br />
 &#160;&#160;<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a18e2cc03e094c9a3dd7ea574f7d29e0f">CBLErrorAssertionFailed</a> = 1, 
 <a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a59874123005ca526d0533ffb0466844a">CBLErrorUnimplemented</a>, 
@@ -174,8 +174,7 @@ Enumerations</h2></td></tr>
 <a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528aa33e72cadd02e2d8d46971f9393ae0f8">CBLErrorDatabaseTooNew</a>, 
 <br />
 &#160;&#160;<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a4ee6d6b8615511a441c49d4af1e27e30">CBLErrorBadDocID</a>, 
-<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a7e1095129cfeb7e2c2b61bc53d2da022">CBLErrorCantUpgradeDatabase</a>, 
-<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a4184bf6403e10b27517e68cd28b21c73">CBLNumErrorCodesPlus1</a>
+<a class="el" href="group__errors.html#ggad43e348ca76e9a8fe7c10ec916bf0528a7e1095129cfeb7e2c2b61bc53d2da022">CBLErrorCantUpgradeDatabase</a>
 <br />
  }</td></tr>
 <tr class="memdesc:gad43e348ca76e9a8fe7c10ec916bf0528"><td class="mdescLeft">&#160;</td><td class="mdescRight">Couchbase Lite error codes, in the CBLDomain.  <a href="group__errors.html#gad43e348ca76e9a8fe7c10ec916bf0528">More...</a><br /></td></tr>
@@ -194,48 +193,24 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a0c8bcad7409930957e9826891e8e285d">CBLNetErrTLSClientCertRequired</a>, 
 <a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a14cc18429ec6e216d363150ecf629dea">CBLNetErrTLSClientCertRejected</a>, 
 <a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3aaf38c7879ac962a198f3b4862cd59ba9">CBLNetErrTLSCertUnknownRoot</a>, 
-<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3ad7b0048213b1c23960b920434e711c67">CBLNetErrInvalidRedirect</a>
+<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3ad7b0048213b1c23960b920434e711c67">CBLNetErrInvalidRedirect</a>, 
+<br />
+&#160;&#160;<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a4c026c2e26eacb8c7a0951e23b541168">CBLNetErrUnknown</a>, 
+<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a4c6f8210233e835e3049506cd281a9c1">CBLNetErrTLSCertRevoked</a>, 
+<a class="el" href="group__errors.html#gga2849714bdf45e1804e2c3e3e265c1ff3a71031196353249b5d81e13b52acbe363">CBLNetErrTLSCertNameMismatch</a>
 <br />
  }</td></tr>
 <tr class="memdesc:ga2849714bdf45e1804e2c3e3e265c1ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Network error codes, in the CBLNetworkDomain.  <a href="group__errors.html#ga2849714bdf45e1804e2c3e3e265c1ff3">More...</a><br /></td></tr>
 <tr class="separator:ga2849714bdf45e1804e2c3e3e265c1ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gacb439cc269e1dbb3225680fe05b7cd39"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a> : uint8_t { <br />
-&#160;&#160;<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39afbc4b824d5884d53027746498c892811">kCBLLogDomainAll</a>, 
-<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39a032762fd2c534b01628c216028b2736f">kCBLLogDomainDatabase</a>, 
-<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39abf810c86e8bda9f4a7837319afe1d80a">kCBLLogDomainQuery</a>, 
-<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39a3172f7b059adfb363cd0bef44e116048">kCBLLogDomainReplicator</a>, 
-<br />
-&#160;&#160;<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39a454e8f459079409e71e9c724ad62f09e">kCBLLogDomainNetwork</a>
-<br />
- }</td></tr>
-<tr class="memdesc:gacb439cc269e1dbb3225680fe05b7cd39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subsystems that log information.  <a href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">More...</a><br /></td></tr>
-<tr class="separator:gacb439cc269e1dbb3225680fe05b7cd39"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaccb62d4dd8bcd3ad997baa5feecda195"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a> : uint8_t { <br />
-&#160;&#160;<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195a6cdff64b0bdbb01237eeac97da856660">CBLLogDebug</a>, 
-<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195ab6dc9e55c1611c8bec947ad5f007fbbd">CBLLogVerbose</a>, 
-<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195a619ad347cfd770261fc428fb88802608">CBLLogInfo</a>, 
-<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195a20ac2df8c4780a30304108b7bb9d0bea">CBLLogWarning</a>, 
-<br />
-&#160;&#160;<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195ac903c4099bc2ba489d7fc0b4d178017c">CBLLogError</a>, 
-<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195a94f62cd065d52354ebd1fb39bdfd6f9a">CBLLogNone</a>
-<br />
- }</td></tr>
-<tr class="memdesc:gaccb62d4dd8bcd3ad997baa5feecda195"><td class="mdescLeft">&#160;</td><td class="mdescRight">Levels of log messages.  <a href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">More...</a><br /></td></tr>
-<tr class="separator:gaccb62d4dd8bcd3ad997baa5feecda195"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga0ab89bedccf3bdda3caa6a089cac79b7"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#ga0ab89bedccf3bdda3caa6a089cac79b7">CBLError_Message</a> (const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
-<tr class="memdesc:ga0ab89bedccf3bdda3caa6a089cac79b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a message describing an error.  <a href="group__errors.html#ga0ab89bedccf3bdda3caa6a089cac79b7">More...</a><br /></td></tr>
-<tr class="separator:ga0ab89bedccf3bdda3caa6a089cac79b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga12c764bc7ccacce00632ceb586a8d879"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga12c764bc7ccacce00632ceb586a8d879">CBL_SetLogLevel</a> (<a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>, <a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a>)</td></tr>
-<tr class="memdesc:ga12c764bc7ccacce00632ceb586a8d879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the detail level of logging.  <a href="group__logging.html#ga12c764bc7ccacce00632ceb586a8d879">More...</a><br /></td></tr>
-<tr class="separator:ga12c764bc7ccacce00632ceb586a8d879"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8329d23585788637e8275d10760a18d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga8329d23585788637e8275d10760a18d4">CBL_Log</a> (<a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a>, <a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>, const char *format,...)</td></tr>
-<tr class="separator:ga8329d23585788637e8275d10760a18d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gabdda034bd34bbd4f79111798ce6841f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__other__types.html#ga37cb77b7ae63bbf1d30e933af074f598">CBLTimestamp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__other__types.html#gabdda034bd34bbd4f79111798ce6841f0">CBL_now</a> (void)</td></tr>
-<tr class="memdesc:gabdda034bd34bbd4f79111798ce6841f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current time, in milliseconds since 1/1/1970.  <a href="group__other__types.html#gabdda034bd34bbd4f79111798ce6841f0">More...</a><br /></td></tr>
-<tr class="separator:gabdda034bd34bbd4f79111798ce6841f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1e472b0d85475b305b6cfebe2c2d9f55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__errors.html#ga1e472b0d85475b305b6cfebe2c2d9f55">CBLError_Message</a> (const <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
+<tr class="memdesc:ga1e472b0d85475b305b6cfebe2c2d9f55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a message describing an error.  <a href="group__errors.html#ga1e472b0d85475b305b6cfebe2c2d9f55">More...</a><br /></td></tr>
+<tr class="separator:ga1e472b0d85475b305b6cfebe2c2d9f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga61f5cc2f715ceaa63cae220d3333ca44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__other__types.html#ga37cb77b7ae63bbf1d30e933af074f598">CBLTimestamp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__other__types.html#ga61f5cc2f715ceaa63cae220d3333ca44">CBL_Now</a> (void)</td></tr>
+<tr class="memdesc:ga61f5cc2f715ceaa63cae220d3333ca44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current time, in milliseconds since 1/1/1970.  <a href="group__other__types.html#ga61f5cc2f715ceaa63cae220d3333ca44">More...</a><br /></td></tr>
+<tr class="separator:ga61f5cc2f715ceaa63cae220d3333ca44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga99ce4b160db1a0f2a54cab3371a4cc16"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__refcounting.html#ga99ce4b160db1a0f2a54cab3371a4cc16">CBL_Retain</a> (<a class="el" href="group__refcounting.html#ga0be63aade79a59250cccc4db68fece9f">CBLRefCounted</a> *)</td></tr>
 <tr class="memdesc:ga99ce4b160db1a0f2a54cab3371a4cc16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increments an object's reference-count.  <a href="group__refcounting.html#ga99ce4b160db1a0f2a54cab3371a4cc16">More...</a><br /></td></tr>
 <tr class="separator:ga99ce4b160db1a0f2a54cab3371a4cc16"><td class="memSeparator" colspan="2">&#160;</td></tr>

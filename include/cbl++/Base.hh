@@ -17,14 +17,22 @@
 //
 
 #pragma once
-#include "CBLBase.h"
+#include "cbl/CBLBase.h"
+#include "fleece/slice.hh"
 #include <algorithm>
 #include <functional>
-#include <memory>
 #include <cassert>
+#include <memory>
+#include <utility>
+
+#if DEBUG
+#   include "cbl/CBLLog.h"
+#endif
 
 // PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
 // It is not considered part of the official Couchbase Lite API.
+
+CBL_ASSUME_NONNULL_BEGIN
 
 static inline bool operator== (const CBLError &e1, const CBLError &e2) {
     if (e1.code != 0)
@@ -35,11 +43,14 @@ static inline bool operator== (const CBLError &e1, const CBLError &e2) {
 
 namespace cbl {
 
+    using slice = fleece::slice;
+    using alloc_slice = fleece::alloc_slice;
+
     // Artificial base class of the C++ wrapper classes; just manages ref-counting.
     class RefCounted {
     protected:
         RefCounted() noexcept                            :_ref(nullptr) { }
-        explicit RefCounted(CBLRefCounted *ref) noexcept :_ref(CBL_Retain(ref)) { }
+        explicit RefCounted(CBLRefCounted* _cbl_nullable ref) noexcept :_ref(CBL_Retain(ref)) { }
         RefCounted(const RefCounted &other) noexcept     :_ref(CBL_Retain(other._ref)) { }
         RefCounted(RefCounted &&other) noexcept          :_ref(other._ref) {other._ref = nullptr;}
         ~RefCounted() noexcept                           {CBL_Release(_ref);}
@@ -62,21 +73,23 @@ namespace cbl {
 
         void clear()                                    {CBL_Release(_ref); _ref = nullptr;}
 
+        static std::string asString(FLSlice s)          {return slice(s).asString();}
+        static std::string asString(FLSliceResult &&s)  {return alloc_slice(s).asString();}
+
         static void check(bool ok, CBLError &error) {
             if (!ok) {
 #if DEBUG
-                char *message = CBLError_Message(&error);
-                CBL_Log(kCBLLogDomainAll, CBLLogError, "API returning error %d/%d: %s",
-                        error.domain, error.code, message);
-                free(message);
+                alloc_slice message = CBLError_Message(&error);
+                CBL_Log(kCBLLogDomainAll, CBLLogError, "API returning error %d/%d: %.*s",
+                        error.domain, error.code, (int)message.size, (char*)message.buf);
 #endif
                 throw error;
             }
         }
 
-        CBLRefCounted* _ref;
+        CBLRefCounted* _cbl_nullable _ref;
 
-        friend class Batch;
+        friend class Transaction;
     };
 
 // Internal use only: Copy/move ctors and assignment ops that have to be declared in subclasses
@@ -106,7 +119,7 @@ protected: \
     public:
         using Callback = std::function<void(Args...)>;
 
-        ListenerToken()                                  { }
+        ListenerToken()                                  =default;
         ~ListenerToken()                                 {CBLListener_Remove(_token);}
 
         ListenerToken(Callback cb)
@@ -133,17 +146,17 @@ protected: \
             _callback = nullptr;
         }
 
-        void* context() const                       {return _callback.get();}
+        void* _cbl_nullable context() const         {return _callback.get();}
         CBLListenerToken* token() const             {return _token;}
         void setToken(CBLListenerToken* token)      {assert(!_token); _token = token;}
 
-        static void call(void* context, Args... args) {
+        static void call(void* _cbl_nullable context, Args... args) {
             auto listener = (Callback*)context;
             (*listener)(args...);
         }
 
     private:
-        CBLListenerToken* _token {nullptr};
+        CBLListenerToken* _cbl_nullable _token {nullptr};
         std::unique_ptr<Callback> _callback;
 
         ListenerToken(const ListenerToken&) =delete;
@@ -152,3 +165,5 @@ protected: \
 
 
 }
+
+CBL_ASSUME_NONNULL_END

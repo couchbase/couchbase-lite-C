@@ -67,7 +67,9 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Structures</a>  </div>
+<a href="#nested-classes">Data Structures</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">CBLLog.h File Reference</div>  </div>
 </div><!--header-->
@@ -79,176 +81,75 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_log_file_configuration.html">CBLLogFileConfiguration</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An object containing properties for file logging configuration.  <a href="struct_c_b_l_log_file_configuration.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The properties for configuring logging to files.  <a href="struct_c_b_l_log_file_configuration.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:gacb439cc269e1dbb3225680fe05b7cd39"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39afbc4b824d5884d53027746498c892811">kCBLLogDomainAll</a>, 
+<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39a032762fd2c534b01628c216028b2736f">kCBLLogDomainDatabase</a>, 
+<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39abf810c86e8bda9f4a7837319afe1d80a">kCBLLogDomainQuery</a>, 
+<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39a3172f7b059adfb363cd0bef44e116048">kCBLLogDomainReplicator</a>, 
+<br />
+&#160;&#160;<a class="el" href="group__logging.html#ggacb439cc269e1dbb3225680fe05b7cd39a454e8f459079409e71e9c724ad62f09e">kCBLLogDomainNetwork</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:gacb439cc269e1dbb3225680fe05b7cd39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subsystems that log information.  <a href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">More...</a><br /></td></tr>
+<tr class="separator:gacb439cc269e1dbb3225680fe05b7cd39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaccb62d4dd8bcd3ad997baa5feecda195"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a> : uint8_t { <br />
+&#160;&#160;<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195a6cdff64b0bdbb01237eeac97da856660">CBLLogDebug</a>, 
+<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195ab6dc9e55c1611c8bec947ad5f007fbbd">CBLLogVerbose</a>, 
+<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195a619ad347cfd770261fc428fb88802608">CBLLogInfo</a>, 
+<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195a20ac2df8c4780a30304108b7bb9d0bea">CBLLogWarning</a>, 
+<br />
+&#160;&#160;<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195ac903c4099bc2ba489d7fc0b4d178017c">CBLLogError</a>, 
+<a class="el" href="group__logging.html#ggaccb62d4dd8bcd3ad997baa5feecda195a94f62cd065d52354ebd1fb39bdfd6f9a">CBLLogNone</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:gaccb62d4dd8bcd3ad997baa5feecda195"><td class="mdescLeft">&#160;</td><td class="mdescRight">Levels of log messages.  <a href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">More...</a><br /></td></tr>
+<tr class="separator:gaccb62d4dd8bcd3ad997baa5feecda195"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:gac6df02a96722c0cb4227502dd9941ae4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#gac6df02a96722c0cb4227502dd9941ae4">CBL_Log</a> (<a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a> domain, <a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a> level, const char *format,...) <a class="el" href="_c_b_l___compat_8h.html#ab302334d9a77a6925be4e5b45397e4a3">__printflike</a>(3</td></tr>
+<tr class="memdesc:gac6df02a96722c0cb4227502dd9941ae4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats and writes a message to the log, in the given domain at the given level.  <a href="group__logging.html#gac6df02a96722c0cb4227502dd9941ae4">More...</a><br /></td></tr>
+<tr class="separator:gac6df02a96722c0cb4227502dd9941ae4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga51379b64d5d81c82ef8e0bc3f04ee588"><td class="memItemLeft" align="right" valign="top">void void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga51379b64d5d81c82ef8e0bc3f04ee588">CBL_LogMessage</a> (<a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a> domain, <a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a> level, <a class="el" href="struct_f_l_slice.html">FLSlice</a> message)</td></tr>
+<tr class="memdesc:ga51379b64d5d81c82ef8e0bc3f04ee588"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes a pre-formatted message to the log, exactly as given.  <a href="group__logging.html#ga51379b64d5d81c82ef8e0bc3f04ee588">More...</a><br /></td></tr>
+<tr class="separator:ga51379b64d5d81c82ef8e0bc3f04ee588"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Log File Configuration</div></td></tr>
+<tr class="memitem:ga9b9f14827b4c6a6309a1795d77328d53"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_c_b_l_log_file_configuration.html">CBLLogFileConfiguration</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga9b9f14827b4c6a6309a1795d77328d53">CBLLog_FileConfig</a> (void)</td></tr>
+<tr class="memdesc:ga9b9f14827b4c6a6309a1795d77328d53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current file logging configuration, or NULL if none is configured.  <a href="group__logging.html#ga9b9f14827b4c6a6309a1795d77328d53">More...</a><br /></td></tr>
+<tr class="separator:ga9b9f14827b4c6a6309a1795d77328d53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae4cf1115013b7e13659417bd1fc96022"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#gae4cf1115013b7e13659417bd1fc96022">CBLLog_SetFileConfig</a> (<a class="el" href="struct_c_b_l_log_file_configuration.html">CBLLogFileConfiguration</a>, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:gae4cf1115013b7e13659417bd1fc96022"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the file logging configuration, and begins logging to files.  <a href="group__logging.html#gae4cf1115013b7e13659417bd1fc96022">More...</a><br /></td></tr>
+<tr class="separator:gae4cf1115013b7e13659417bd1fc96022"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-Public API</h2></td></tr>
-<tr class="memitem:a2656abbfec133e26a714a7e6b33a2928"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_log_8h.html#a2656abbfec133e26a714a7e6b33a2928">CBLLogCallback</a>) (<a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a> level, <a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a> domain, const char *message)</td></tr>
-<tr class="memdesc:a2656abbfec133e26a714a7e6b33a2928"><td class="mdescLeft">&#160;</td><td class="mdescRight">A callback function for handling log messages.  <a href="#a2656abbfec133e26a714a7e6b33a2928">More...</a><br /></td></tr>
-<tr class="separator:a2656abbfec133e26a714a7e6b33a2928"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5faaf0ef0bf86ad2e6425d9a0d69911f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_log_8h.html#a5faaf0ef0bf86ad2e6425d9a0d69911f">CBLLog_ConsoleLevel</a> ()</td></tr>
-<tr class="memdesc:a5faaf0ef0bf86ad2e6425d9a0d69911f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current log level for debug console logging.  <a href="#a5faaf0ef0bf86ad2e6425d9a0d69911f">More...</a><br /></td></tr>
-<tr class="separator:a5faaf0ef0bf86ad2e6425d9a0d69911f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1cf937d410233f08de3f44c6aad129a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_log_8h.html#af1cf937d410233f08de3f44c6aad129a">CBLLog_SetConsoleLevel</a> (<a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>)</td></tr>
-<tr class="memdesc:af1cf937d410233f08de3f44c6aad129a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the debug console log level.  <a href="#af1cf937d410233f08de3f44c6aad129a">More...</a><br /></td></tr>
-<tr class="separator:af1cf937d410233f08de3f44c6aad129a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad041c9622541f8a281f3df564800f39b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_c_b_l_log_file_configuration.html">CBLLogFileConfiguration</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_log_8h.html#ad041c9622541f8a281f3df564800f39b">CBLLog_FileConfig</a> ()</td></tr>
-<tr class="memdesc:ad041c9622541f8a281f3df564800f39b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current file logging config.  <a href="#ad041c9622541f8a281f3df564800f39b">More...</a><br /></td></tr>
-<tr class="separator:ad041c9622541f8a281f3df564800f39b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9526dc4353d6f7a43b6c2ed1930758a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_log_8h.html#a9526dc4353d6f7a43b6c2ed1930758a3">CBLLog_SetFileConfig</a> (<a class="el" href="struct_c_b_l_log_file_configuration.html">CBLLogFileConfiguration</a>)</td></tr>
-<tr class="memdesc:a9526dc4353d6f7a43b6c2ed1930758a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the file logging configuration.  <a href="#a9526dc4353d6f7a43b6c2ed1930758a3">More...</a><br /></td></tr>
-<tr class="separator:a9526dc4353d6f7a43b6c2ed1930758a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af04ef53189a628dc4df50b436663acc7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l_log_8h.html#a2656abbfec133e26a714a7e6b33a2928">CBLLogCallback</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_log_8h.html#af04ef53189a628dc4df50b436663acc7">CBLLog_Callback</a> ()</td></tr>
-<tr class="memdesc:af04ef53189a628dc4df50b436663acc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current log callback.  <a href="#af04ef53189a628dc4df50b436663acc7">More...</a><br /></td></tr>
-<tr class="separator:af04ef53189a628dc4df50b436663acc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5eb92f43e50347232be59843abcf04b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_c_b_l_log_8h.html#a5eb92f43e50347232be59843abcf04b7">CBLLog_SetCallback</a> (<a class="el" href="_c_b_l_log_8h.html#a2656abbfec133e26a714a7e6b33a2928">CBLLogCallback</a>)</td></tr>
-<tr class="memdesc:a5eb92f43e50347232be59843abcf04b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the callback for receiving log messages.  <a href="#a5eb92f43e50347232be59843abcf04b7">More...</a><br /></td></tr>
-<tr class="separator:a5eb92f43e50347232be59843abcf04b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+Console Logging and Custom Logging</h2></td></tr>
+<tr class="memitem:ga29f02d46109adc0a44f367efcb8764b6"><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga29f02d46109adc0a44f367efcb8764b6">CBLLogCallback</a>) (<a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a> domain, <a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a> level, <a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> message)</td></tr>
+<tr class="memdesc:ga29f02d46109adc0a44f367efcb8764b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">A logging callback that the application can register.  <a href="group__logging.html#ga29f02d46109adc0a44f367efcb8764b6">More...</a><br /></td></tr>
+<tr class="separator:ga29f02d46109adc0a44f367efcb8764b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8b4a9dbe890c3bf469c6f5c6ae91acf5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga8b4a9dbe890c3bf469c6f5c6ae91acf5">CBLLog_ConsoleLevel</a> (void)</td></tr>
+<tr class="memdesc:ga8b4a9dbe890c3bf469c6f5c6ae91acf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current log level for debug console logging.  <a href="group__logging.html#ga8b4a9dbe890c3bf469c6f5c6ae91acf5">More...</a><br /></td></tr>
+<tr class="separator:ga8b4a9dbe890c3bf469c6f5c6ae91acf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf1cf937d410233f08de3f44c6aad129a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#gaf1cf937d410233f08de3f44c6aad129a">CBLLog_SetConsoleLevel</a> (<a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>)</td></tr>
+<tr class="memdesc:gaf1cf937d410233f08de3f44c6aad129a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the detail level of logging.  <a href="group__logging.html#gaf1cf937d410233f08de3f44c6aad129a">More...</a><br /></td></tr>
+<tr class="separator:gaf1cf937d410233f08de3f44c6aad129a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga34e46a1d091291832aa616f2a334bdd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga34e46a1d091291832aa616f2a334bdd3">CBLLog_CallbackLevel</a> (void)</td></tr>
+<tr class="memdesc:ga34e46a1d091291832aa616f2a334bdd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current log level for debug console logging.  <a href="group__logging.html#ga34e46a1d091291832aa616f2a334bdd3">More...</a><br /></td></tr>
+<tr class="separator:ga34e46a1d091291832aa616f2a334bdd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga279ca1abb898e88ee642615d4321a390"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga279ca1abb898e88ee642615d4321a390">CBLLog_SetCallbackLevel</a> (<a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>)</td></tr>
+<tr class="memdesc:ga279ca1abb898e88ee642615d4321a390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the detail level of logging.  <a href="group__logging.html#ga279ca1abb898e88ee642615d4321a390">More...</a><br /></td></tr>
+<tr class="separator:ga279ca1abb898e88ee642615d4321a390"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga551e225d74b8ddd16d71d83d847fa730"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__logging.html#ga29f02d46109adc0a44f367efcb8764b6">CBLLogCallback</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga551e225d74b8ddd16d71d83d847fa730">CBLLog_Callback</a> (void)</td></tr>
+<tr class="memdesc:ga551e225d74b8ddd16d71d83d847fa730"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current log callback.  <a href="group__logging.html#ga551e225d74b8ddd16d71d83d847fa730">More...</a><br /></td></tr>
+<tr class="separator:ga551e225d74b8ddd16d71d83d847fa730"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5eb92f43e50347232be59843abcf04b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__logging.html#ga5eb92f43e50347232be59843abcf04b7">CBLLog_SetCallback</a> (<a class="el" href="group__logging.html#ga29f02d46109adc0a44f367efcb8764b6">CBLLogCallback</a>)</td></tr>
+<tr class="memdesc:ga5eb92f43e50347232be59843abcf04b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the callback for receiving log messages.  <a href="group__logging.html#ga5eb92f43e50347232be59843abcf04b7">More...</a><br /></td></tr>
+<tr class="separator:ga5eb92f43e50347232be59843abcf04b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a id="a2656abbfec133e26a714a7e6b33a2928"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2656abbfec133e26a714a7e6b33a2928">&#9670;&nbsp;</a></span>CBLLogCallback</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef void(* CBLLogCallback) (<a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a> level, <a class="el" href="group__logging.html#gacb439cc269e1dbb3225680fe05b7cd39">CBLLogDomain</a> domain, const char *message)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A callback function for handling log messages. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">level</td><td>The level of the message being received </td></tr>
-    <tr><td class="paramname">domain</td><td>The domain of the message being received </td></tr>
-    <tr><td class="paramname">message</td><td>The message being received (UTF-8 encoded) </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="af04ef53189a628dc4df50b436663acc7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af04ef53189a628dc4df50b436663acc7">&#9670;&nbsp;</a></span>CBLLog_Callback()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_c_b_l_log_8h.html#a2656abbfec133e26a714a7e6b33a2928">CBLLogCallback</a> CBLLog_Callback </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Gets the current log callback. </p>
-
-</div>
-</div>
-<a id="a5faaf0ef0bf86ad2e6425d9a0d69911f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5faaf0ef0bf86ad2e6425d9a0d69911f">&#9670;&nbsp;</a></span>CBLLog_ConsoleLevel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a> CBLLog_ConsoleLevel </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Gets the current log level for debug console logging. </p>
-
-</div>
-</div>
-<a id="ad041c9622541f8a281f3df564800f39b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad041c9622541f8a281f3df564800f39b">&#9670;&nbsp;</a></span>CBLLog_FileConfig()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="struct_c_b_l_log_file_configuration.html">CBLLogFileConfiguration</a>* CBLLog_FileConfig </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Gets the current file logging config. </p>
-
-</div>
-</div>
-<a id="a5eb92f43e50347232be59843abcf04b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5eb92f43e50347232be59843abcf04b7">&#9670;&nbsp;</a></span>CBLLog_SetCallback()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CBLLog_SetCallback </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_c_b_l_log_8h.html#a2656abbfec133e26a714a7e6b33a2928">CBLLogCallback</a>&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sets the callback for receiving log messages. </p>
-
-</div>
-</div>
-<a id="af1cf937d410233f08de3f44c6aad129a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af1cf937d410233f08de3f44c6aad129a">&#9670;&nbsp;</a></span>CBLLog_SetConsoleLevel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CBLLog_SetConsoleLevel </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__logging.html#gaccb62d4dd8bcd3ad997baa5feecda195">CBLLogLevel</a>&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sets the debug console log level. </p>
-
-</div>
-</div>
-<a id="a9526dc4353d6f7a43b6c2ed1930758a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9526dc4353d6f7a43b6c2ed1930758a3">&#9670;&nbsp;</a></span>CBLLog_SetFileConfig()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CBLLog_SetFileConfig </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="struct_c_b_l_log_file_configuration.html">CBLLogFileConfiguration</a>&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sets the file logging configuration. </p>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

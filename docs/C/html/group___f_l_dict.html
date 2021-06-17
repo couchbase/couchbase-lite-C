@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Couchbase Lite C: Dictionaries</title>
+<title>Couchbase Lite C: Fleece Dictionaries</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,7 +67,7 @@ $(function() {
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
-<div class="title">Dictionaries</div>  </div>
+<div class="title">Fleece Dictionaries</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
@@ -82,18 +82,18 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga2715a3bbb9e540ce3f36c7973aeed974"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga2715a3bbb9e540ce3f36c7973aeed974">FLDict_Count</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>)</td></tr>
-<tr class="memdesc:ga2715a3bbb9e540ce3f36c7973aeed974"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of items in a dictionary, or 0 if the pointer is NULL.  <a href="#ga2715a3bbb9e540ce3f36c7973aeed974">More...</a><br /></td></tr>
-<tr class="separator:ga2715a3bbb9e540ce3f36c7973aeed974"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4b455c250c5f22ab8c6f36d3aff28f97"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga4b455c250c5f22ab8c6f36d3aff28f97">FLDict_IsEmpty</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>)</td></tr>
-<tr class="memdesc:ga4b455c250c5f22ab8c6f36d3aff28f97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a dictionary is empty (or NULL).  <a href="#ga4b455c250c5f22ab8c6f36d3aff28f97">More...</a><br /></td></tr>
-<tr class="separator:ga4b455c250c5f22ab8c6f36d3aff28f97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac2c4eb7ef7155b5f5586c27ded5f79d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#gac2c4eb7ef7155b5f5586c27ded5f79d2">FLDict_AsMutable</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>)</td></tr>
-<tr class="memdesc:gac2c4eb7ef7155b5f5586c27ded5f79d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the dictionary is mutable, returns it cast to FLMutableDict, else NULL.  <a href="#gac2c4eb7ef7155b5f5586c27ded5f79d2">More...</a><br /></td></tr>
-<tr class="separator:gac2c4eb7ef7155b5f5586c27ded5f79d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad60b4d7773b40bc75ce15ec33fd48252"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#gad60b4d7773b40bc75ce15ec33fd48252">FLDict_Get</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>, <a class="el" href="struct_f_l_slice.html">FLSlice</a> keyString)</td></tr>
-<tr class="memdesc:gad60b4d7773b40bc75ce15ec33fd48252"><td class="mdescLeft">&#160;</td><td class="mdescRight">Looks up a key in a dictionary, returning its value.  <a href="#gad60b4d7773b40bc75ce15ec33fd48252">More...</a><br /></td></tr>
-<tr class="separator:gad60b4d7773b40bc75ce15ec33fd48252"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4f9249a399699a5198491bdd4b55d7bc"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga4f9249a399699a5198491bdd4b55d7bc">FLDict_Count</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>) <a class="el" href="_base_8h.html#aaf76422cb887897c286992499106254d">FLPURE</a></td></tr>
+<tr class="memdesc:ga4f9249a399699a5198491bdd4b55d7bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of items in a dictionary, or 0 if the pointer is NULL.  <a href="#ga4f9249a399699a5198491bdd4b55d7bc">More...</a><br /></td></tr>
+<tr class="separator:ga4f9249a399699a5198491bdd4b55d7bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac49609fb1fa700af8aa1870b913e7de2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#gac49609fb1fa700af8aa1870b913e7de2">FLDict_IsEmpty</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>) <a class="el" href="_base_8h.html#aaf76422cb887897c286992499106254d">FLPURE</a></td></tr>
+<tr class="memdesc:gac49609fb1fa700af8aa1870b913e7de2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if a dictionary is empty (or NULL).  <a href="#gac49609fb1fa700af8aa1870b913e7de2">More...</a><br /></td></tr>
+<tr class="separator:gac49609fb1fa700af8aa1870b913e7de2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab90cd8acfb55c3ae1d5c4fb37611605c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#gab90cd8acfb55c3ae1d5c4fb37611605c">FLDict_AsMutable</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>) <a class="el" href="_base_8h.html#aaf76422cb887897c286992499106254d">FLPURE</a></td></tr>
+<tr class="memdesc:gab90cd8acfb55c3ae1d5c4fb37611605c"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the dictionary is mutable, returns it cast to FLMutableDict, else NULL.  <a href="#gab90cd8acfb55c3ae1d5c4fb37611605c">More...</a><br /></td></tr>
+<tr class="separator:gab90cd8acfb55c3ae1d5c4fb37611605c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6bc73141c57d3e810f7144d85b9ffa37"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga6bc73141c57d3e810f7144d85b9ffa37">FLDict_Get</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>, <a class="el" href="struct_f_l_slice.html">FLSlice</a> keyString) <a class="el" href="_base_8h.html#aaf76422cb887897c286992499106254d">FLPURE</a></td></tr>
+<tr class="memdesc:ga6bc73141c57d3e810f7144d85b9ffa37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Looks up a key in a dictionary, returning its value.  <a href="#ga6bc73141c57d3e810f7144d85b9ffa37">More...</a><br /></td></tr>
+<tr class="separator:ga6bc73141c57d3e810f7144d85b9ffa37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -103,22 +103,22 @@ Variables</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Dict iteration</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p><a class="anchor" id="amgrp443a000ca5f09ae53ccf1da4fb005089"></a>Iterating a dictionary typically looks like this:</p>
-<div class="fragment"><div class="line"><a class="code" href="struct_f_l_dict_iterator.html">FLDictIterator</a> iter;</div><div class="line"><a class="code" href="group___f_l_dict.html#ga06e622dea057a31a712e43a502a4b0f2">FLDictIterator_Begin</a>(theDict, &amp;iter);</div><div class="line"><a class="code" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> value;</div><div class="line"><span class="keywordflow">while</span> (NULL != (value = <a class="code" href="group___f_l_dict.html#ga2770330ca9d359273d2afcd3a0ab6f11">FLDictIterator_GetValue</a>(&amp;iter))) {</div><div class="line">    <a class="code" href="struct_f_l_slice.html">FLString</a> key = <a class="code" href="group___f_l_dict.html#ga4c04bec404671f8d81dd494b0fc6e52a">FLDictIterator_GetKeyString</a>(&amp;iter);</div><div class="line">    <span class="comment">// ...</span></div><div class="line">    <a class="code" href="group___f_l_dict.html#gae17b396f8afab727b203a3b917afe495">FLDictIterator_Next</a>(&amp;iter);</div><div class="line">}</div></div><!-- fragment --> </td></tr>
+<div class="fragment"><div class="line"><a class="code" href="struct_f_l_dict_iterator.html">FLDictIterator</a> iter;</div><div class="line"><a class="code" href="group___f_l_dict.html#ga06e622dea057a31a712e43a502a4b0f2">FLDictIterator_Begin</a>(theDict, &amp;iter);</div><div class="line"><a class="code" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> value;</div><div class="line"><span class="keywordflow">while</span> (NULL != (value = <a class="code" href="group___f_l_dict.html#gae4ab81b7087a9be86fa57e6542611b01">FLDictIterator_GetValue</a>(&amp;iter))) {</div><div class="line">    <a class="code" href="struct_f_l_slice.html">FLString</a> key = <a class="code" href="group___f_l_dict.html#ga4c04bec404671f8d81dd494b0fc6e52a">FLDictIterator_GetKeyString</a>(&amp;iter);</div><div class="line">    <span class="comment">// ...</span></div><div class="line">    <a class="code" href="group___f_l_dict.html#gae17b396f8afab727b203a3b917afe495">FLDictIterator_Next</a>(&amp;iter);</div><div class="line">}</div></div><!-- fragment --> </td></tr>
 <tr class="memitem:ga06e622dea057a31a712e43a502a4b0f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga06e622dea057a31a712e43a502a4b0f2">FLDictIterator_Begin</a> (<a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>, <a class="el" href="struct_f_l_dict_iterator.html">FLDictIterator</a> *)</td></tr>
 <tr class="memdesc:ga06e622dea057a31a712e43a502a4b0f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a <a class="el" href="struct_f_l_dict_iterator.html" title="Opaque dictionary iterator.">FLDictIterator</a> struct to iterate over a dictionary.  <a href="#ga06e622dea057a31a712e43a502a4b0f2">More...</a><br /></td></tr>
 <tr class="separator:ga06e622dea057a31a712e43a502a4b0f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf3cfff39690505ca69f43cac2c4867ed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#gaf3cfff39690505ca69f43cac2c4867ed">FLDictIterator_GetKey</a> (const <a class="el" href="struct_f_l_dict_iterator.html">FLDictIterator</a> *)</td></tr>
-<tr class="memdesc:gaf3cfff39690505ca69f43cac2c4867ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current key being iterated over.  <a href="#gaf3cfff39690505ca69f43cac2c4867ed">More...</a><br /></td></tr>
-<tr class="separator:gaf3cfff39690505ca69f43cac2c4867ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadbc204301056a2bdf19c8001f4de56ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#gadbc204301056a2bdf19c8001f4de56ec">FLDictIterator_GetKey</a> (const <a class="el" href="struct_f_l_dict_iterator.html">FLDictIterator</a> *) <a class="el" href="_base_8h.html#aaf76422cb887897c286992499106254d">FLPURE</a></td></tr>
+<tr class="memdesc:gadbc204301056a2bdf19c8001f4de56ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current key being iterated over.  <a href="#gadbc204301056a2bdf19c8001f4de56ec">More...</a><br /></td></tr>
+<tr class="separator:gadbc204301056a2bdf19c8001f4de56ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4c04bec404671f8d81dd494b0fc6e52a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga4c04bec404671f8d81dd494b0fc6e52a">FLDictIterator_GetKeyString</a> (const <a class="el" href="struct_f_l_dict_iterator.html">FLDictIterator</a> *)</td></tr>
 <tr class="memdesc:ga4c04bec404671f8d81dd494b0fc6e52a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current key's string value.  <a href="#ga4c04bec404671f8d81dd494b0fc6e52a">More...</a><br /></td></tr>
 <tr class="separator:ga4c04bec404671f8d81dd494b0fc6e52a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2770330ca9d359273d2afcd3a0ab6f11"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga2770330ca9d359273d2afcd3a0ab6f11">FLDictIterator_GetValue</a> (const <a class="el" href="struct_f_l_dict_iterator.html">FLDictIterator</a> *)</td></tr>
-<tr class="memdesc:ga2770330ca9d359273d2afcd3a0ab6f11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current value being iterated over.  <a href="#ga2770330ca9d359273d2afcd3a0ab6f11">More...</a><br /></td></tr>
-<tr class="separator:ga2770330ca9d359273d2afcd3a0ab6f11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6c1fdc86683dc99145e6e9c06e52ae0a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga6c1fdc86683dc99145e6e9c06e52ae0a">FLDictIterator_GetCount</a> (const <a class="el" href="struct_f_l_dict_iterator.html">FLDictIterator</a> *)</td></tr>
-<tr class="memdesc:ga6c1fdc86683dc99145e6e9c06e52ae0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of items remaining to be iterated, including the current one.  <a href="#ga6c1fdc86683dc99145e6e9c06e52ae0a">More...</a><br /></td></tr>
-<tr class="separator:ga6c1fdc86683dc99145e6e9c06e52ae0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae4ab81b7087a9be86fa57e6542611b01"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#gae4ab81b7087a9be86fa57e6542611b01">FLDictIterator_GetValue</a> (const <a class="el" href="struct_f_l_dict_iterator.html">FLDictIterator</a> *) <a class="el" href="_base_8h.html#aaf76422cb887897c286992499106254d">FLPURE</a></td></tr>
+<tr class="memdesc:gae4ab81b7087a9be86fa57e6542611b01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current value being iterated over.  <a href="#gae4ab81b7087a9be86fa57e6542611b01">More...</a><br /></td></tr>
+<tr class="separator:gae4ab81b7087a9be86fa57e6542611b01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6cd55e7e42020ad59c1380826dcd7cde"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga6cd55e7e42020ad59c1380826dcd7cde">FLDictIterator_GetCount</a> (const <a class="el" href="struct_f_l_dict_iterator.html">FLDictIterator</a> *) <a class="el" href="_base_8h.html#aaf76422cb887897c286992499106254d">FLPURE</a></td></tr>
+<tr class="memdesc:ga6cd55e7e42020ad59c1380826dcd7cde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of items remaining to be iterated, including the current one.  <a href="#ga6cd55e7e42020ad59c1380826dcd7cde">More...</a><br /></td></tr>
+<tr class="separator:ga6cd55e7e42020ad59c1380826dcd7cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gae17b396f8afab727b203a3b917afe495"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#gae17b396f8afab727b203a3b917afe495">FLDictIterator_Next</a> (<a class="el" href="struct_f_l_dict_iterator.html">FLDictIterator</a> *)</td></tr>
 <tr class="memdesc:gae17b396f8afab727b203a3b917afe495"><td class="mdescLeft">&#160;</td><td class="mdescRight">Advances the iterator to the next value, or returns false if at the end.  <a href="#gae17b396f8afab727b203a3b917afe495">More...</a><br /></td></tr>
 <tr class="separator:gae17b396f8afab727b203a3b917afe495"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,6 +158,9 @@ Mutable dictionaries</h2></td></tr>
 <tr class="memitem:ga087e3f7732ca67e16dc5f343d57935e2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga087e3f7732ca67e16dc5f343d57935e2">FLMutableDict_IsChanged</a> (<a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a>)</td></tr>
 <tr class="memdesc:ga087e3f7732ca67e16dc5f343d57935e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the Dict has been changed from the source it was copied from.  <a href="#ga087e3f7732ca67e16dc5f343d57935e2">More...</a><br /></td></tr>
 <tr class="separator:ga087e3f7732ca67e16dc5f343d57935e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5b788fbe95138da6100314c25199ed12"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga5b788fbe95138da6100314c25199ed12">FLMutableDict_SetChanged</a> (<a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a>, bool)</td></tr>
+<tr class="memdesc:ga5b788fbe95138da6100314c25199ed12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets or clears the mutable Dict's "changed" flag.  <a href="#ga5b788fbe95138da6100314c25199ed12">More...</a><br /></td></tr>
+<tr class="separator:ga5b788fbe95138da6100314c25199ed12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5e4aaaf5d5492bb1c875e08608fceb6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga264f1860d2c09595ce7870ced22a5ca8">FLSlot</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___f_l_dict.html#ga5e4aaaf5d5492bb1c875e08608fceb6a">FLMutableDict_Set</a> (<a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a> FL_NONNULL, <a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> key)</td></tr>
 <tr class="memdesc:ga5e4aaaf5d5492bb1c875e08608fceb6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Slot storing the key's value, adding a new one if needed (with a null value.) To set the value itself, call one of the FLSlot functions, e.g.  <a href="#ga5e4aaaf5d5492bb1c875e08608fceb6a">More...</a><br /></td></tr>
 <tr class="separator:ga5e4aaaf5d5492bb1c875e08608fceb6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -176,8 +179,8 @@ Mutable dictionaries</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="gac2c4eb7ef7155b5f5586c27ded5f79d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac2c4eb7ef7155b5f5586c27ded5f79d2">&#9670;&nbsp;</a></span>FLDict_AsMutable()</h2>
+<a id="gab90cd8acfb55c3ae1d5c4fb37611605c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab90cd8acfb55c3ae1d5c4fb37611605c">&#9670;&nbsp;</a></span>FLDict_AsMutable()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -196,8 +199,8 @@ Mutable dictionaries</h2></td></tr>
 
 </div>
 </div>
-<a id="ga2715a3bbb9e540ce3f36c7973aeed974"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga2715a3bbb9e540ce3f36c7973aeed974">&#9670;&nbsp;</a></span>FLDict_Count()</h2>
+<a id="ga4f9249a399699a5198491bdd4b55d7bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4f9249a399699a5198491bdd4b55d7bc">&#9670;&nbsp;</a></span>FLDict_Count()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -216,8 +219,8 @@ Mutable dictionaries</h2></td></tr>
 
 </div>
 </div>
-<a id="gad60b4d7773b40bc75ce15ec33fd48252"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gad60b4d7773b40bc75ce15ec33fd48252">&#9670;&nbsp;</a></span>FLDict_Get()</h2>
+<a id="ga6bc73141c57d3e810f7144d85b9ffa37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6bc73141c57d3e810f7144d85b9ffa37">&#9670;&nbsp;</a></span>FLDict_Get()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -278,8 +281,8 @@ Mutable dictionaries</h2></td></tr>
 
 </div>
 </div>
-<a id="ga4b455c250c5f22ab8c6f36d3aff28f97"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4b455c250c5f22ab8c6f36d3aff28f97">&#9670;&nbsp;</a></span>FLDict_IsEmpty()</h2>
+<a id="gac49609fb1fa700af8aa1870b913e7de2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac49609fb1fa700af8aa1870b913e7de2">&#9670;&nbsp;</a></span>FLDict_IsEmpty()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -385,8 +388,8 @@ Mutable dictionaries</h2></td></tr>
 
 </div>
 </div>
-<a id="ga6c1fdc86683dc99145e6e9c06e52ae0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga6c1fdc86683dc99145e6e9c06e52ae0a">&#9670;&nbsp;</a></span>FLDictIterator_GetCount()</h2>
+<a id="ga6cd55e7e42020ad59c1380826dcd7cde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6cd55e7e42020ad59c1380826dcd7cde">&#9670;&nbsp;</a></span>FLDictIterator_GetCount()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -405,8 +408,8 @@ Mutable dictionaries</h2></td></tr>
 
 </div>
 </div>
-<a id="gaf3cfff39690505ca69f43cac2c4867ed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf3cfff39690505ca69f43cac2c4867ed">&#9670;&nbsp;</a></span>FLDictIterator_GetKey()</h2>
+<a id="gadbc204301056a2bdf19c8001f4de56ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadbc204301056a2bdf19c8001f4de56ec">&#9670;&nbsp;</a></span>FLDictIterator_GetKey()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -446,8 +449,8 @@ Mutable dictionaries</h2></td></tr>
 
 </div>
 </div>
-<a id="ga2770330ca9d359273d2afcd3a0ab6f11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga2770330ca9d359273d2afcd3a0ab6f11">&#9670;&nbsp;</a></span>FLDictIterator_GetValue()</h2>
+<a id="gae4ab81b7087a9be86fa57e6542611b01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae4ab81b7087a9be86fa57e6542611b01">&#9670;&nbsp;</a></span>FLDictIterator_GetValue()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -798,7 +801,37 @@ Mutable dictionaries</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the Slot storing the key's value, adding a new one if needed (with a null value.) To set the value itself, call one of the FLSlot functions, e.g. </p>
-<p><a class="el" href="group___f_l_value.html#ga6e2f352363451aa1ca1cbd5102cec63c">FLSlot_SetInt</a>. </p>
+<p><a class="el" href="group___slots.html#ga6e2f352363451aa1ca1cbd5102cec63c">FLSlot_SetInt</a>. </p>
+
+</div>
+</div>
+<a id="ga5b788fbe95138da6100314c25199ed12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5b788fbe95138da6100314c25199ed12">&#9670;&nbsp;</a></span>FLMutableDict_SetChanged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FLMutableDict_SetChanged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__types.html#ga1a873a1463aac47cc9a6381722049aa1">FLMutableDict</a>&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets or clears the mutable Dict's "changed" flag. </p>
 
 </div>
 </div>

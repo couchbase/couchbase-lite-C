@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBLTest.hh"
+#include "CBLTest_Cpp.hh"
 #include "Stopwatch.hh"
 #include <fstream>
 
@@ -32,9 +32,9 @@ static constexpr const char *kJSONFilePath = "../DataSets/travel-sample/travelSa
 TEST_CASE_METHOD(CBLTest_Cpp, "Benchmark Import JSON", "[.Perf]") {
     Stopwatch st;
 
-    db.createIndex("types",      {kCBLValueIndex, "[[\".type\"]]"});
-    db.createIndex("locations",  {kCBLValueIndex, "[[\".country\"], [\".city\"]]"});
-    db.createIndex("longitudes", {kCBLValueIndex, "[[\".geo.lon\"]]"});
+    db.createValueIndex("types",      {kCBLJSONLanguage, "[[\".type\"]]"_sl});
+    db.createValueIndex("locations",  {kCBLJSONLanguage, "[[\".country\"], [\".city\"]]"_sl});
+    db.createValueIndex("longitudes", {kCBLJSONLanguage, "[[\".geo.lon\"]]"_sl});
 
     ImportJSONLines(kJSONFilePath, db.ref());
 

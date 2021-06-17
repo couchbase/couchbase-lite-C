@@ -20,9 +20,7 @@
 #include "CBLBase.h"
 #include "fleece/Fleece.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CBL_CAPI_BEGIN
 
 /** \defgroup replication   Replication
     A replicator is a background task that synchronizes changes between a local database and
@@ -33,7 +31,7 @@ extern "C" {
     @{ */
 
 /** The name of the HTTP cookie used by Sync Gateway to store session keys. */
-CBL_CORE_API extern const char* const kCBLAuthDefaultCookieName;
+CBL_CORE_API extern const FLString kCBLAuthDefaultCookieName;
 
 /** An opaque object representing the location of a database to replicate with. */
 typedef struct CBLEndpoint CBLEndpoint;
@@ -43,39 +41,35 @@ typedef struct CBLEndpoint CBLEndpoint;
     and its path must be the name of the database on that server.
     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
     For example: `wss://example.org/dbname` */
-CBLEndpoint* CBLEndpoint_NewWithURL(const char *url _cbl_nonnull) CBLAPI;
-
-CBLEndpoint* CBLEndpoint_NewWithURL_s(FLString url) CBLAPI;
+_cbl_warn_unused
+CBLEndpoint* CBLEndpoint_NewWithURL(FLString url) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Creates a new endpoint representing another local database. (Enterprise Edition only.) */
-CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase* _cbl_nonnull) CBLAPI;
+_cbl_warn_unused
+CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase*) CBLAPI;
 #endif
 
 /** Frees a CBLEndpoint object. */
-void CBLEndpoint_Free(CBLEndpoint*) CBLAPI;
+void CBLEndpoint_Free(CBLEndpoint* _cbl_nullable) CBLAPI;
 
 
 /** An opaque object representing authentication credentials for a remote server. */
 typedef struct CBLAuthenticator CBLAuthenticator;
 
 /** Creates an authenticator for HTTP Basic (username/password) auth. */
-CBLAuthenticator* CBLAuth_NewBasic(const char *username _cbl_nonnull,
-                                   const char *password _cbl_nonnull) CBLAPI;
-
-CBLAuthenticator* CBLAuth_NewBasic_s(FLString username,
-                                     FLString password) CBLAPI;
+_cbl_warn_unused
+CBLAuthenticator* CBLAuth_NewPassword(FLString username,
+                                      FLString password) CBLAPI;
 
 /** Creates an authenticator using a Couchbase Sync Gateway login session identifier,
     and optionally a cookie name (pass NULL for the default.) */
-CBLAuthenticator* CBLAuth_NewSession(const char *sessionID _cbl_nonnull,
-                                     const char *cookieName) CBLAPI;
-
-CBLAuthenticator* CBLAuth_NewSession_s(FLString sessionID,
-                                       FLString cookieName) CBLAPI;
+_cbl_warn_unused
+CBLAuthenticator* CBLAuth_NewSession(FLString sessionID,
+                                     FLString cookieName) CBLAPI;
 
 /** Frees a CBLAuthenticator object. */
-void CBLAuth_Free(CBLAuthenticator*) CBLAPI;
+void CBLAuth_Free(CBLAuthenticator* _cbl_nullable) CBLAPI;
 
 
 /** Direction of replication: push, pull, or both. */
@@ -85,15 +79,25 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorType) {
     kCBLReplicatorTypePull                ///< Pulling changes from the target
 };
 
+
+/** Flags describing a replicated document. */
+typedef CBL_OPTIONS(unsigned, CBLDocumentFlags) {
+    kCBLDocumentFlagsDeleted        = 1 << 0,   ///< The document has been deleted.
+    kCBLDocumentFlagsAccessRemoved  = 1 << 1    ///< Lost access to the document on the server.
+};
+
+
 /** A callback that can decide whether a particular document should be pushed or pulled.
     @warning  This callback will be called on a background thread managed by the replicator.
                 It must pay attention to thread-safety. It should not take a long time to return,
                 or it will slow down the replicator.
     @param context  The `context` field of the \ref CBLReplicatorConfiguration.
     @param document  The document in question.
-    @param isDeleted True if the document has been deleted.
+    @param flags  Indicates whether the document was deleted or removed.
     @return  True if the document should be replicated, false to skip it. */
-typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool isDeleted);
+typedef bool (*CBLReplicationFilter)(void* _cbl_nullable context,
+                                     CBLDocument* document,
+                                     CBLDocumentFlags flags);
 
 /** Conflict-resolution callback for use in replications. This callback will be invoked
     when the replicator finds a newer server-side revision of a document that also has local
@@ -113,10 +117,10 @@ typedef bool (*CBLReplicationFilter)(void *context, CBLDocument* document, bool 
         This can be the same as \p localDocument or \p remoteDocument, or you can create
         a mutable copy of either one and modify it appropriately.
         Or return NULL if the resolution is to delete the document. */
-typedef const CBLDocument* (*CBLConflictResolver)(void *context,
-                                                  const char *documentID,
-                                                  const CBLDocument *localDocument,
-                                                  const CBLDocument *remoteDocument);
+typedef const CBLDocument* _cbl_nullable (*CBLConflictResolver)(void* _cbl_nullable context,
+                                                  FLString documentID,
+                                                  const CBLDocument* _cbl_nullable localDocument,
+                                                  const CBLDocument* _cbl_nullable remoteDocument);
 
 /** Default conflict resolver. This always returns `localDocument`. */
 extern const CBLConflictResolver CBLDefaultConflictResolver;
@@ -132,10 +136,10 @@ typedef CBL_ENUM(uint8_t, CBLProxyType) {
 /** Proxy settings for the replicator. */
 typedef struct {
     CBLProxyType type;                  ///< Type of proxy
-    const char *hostname;               ///< Proxy server hostname or IP address
+    FLString hostname;               ///< Proxy server hostname or IP address
     uint16_t port;                      ///< Proxy server port
-    const char *username;               ///< Username for proxy auth (optional)
-    const char *password;               ///< Password for proxy auth
+    FLString username;               ///< Username for proxy auth (optional)
+    FLString password;               ///< Password for proxy auth
 } CBLProxySettings;
 
 
@@ -145,24 +149,30 @@ typedef struct {
     CBLEndpoint* endpoint;              ///< The address of the other database to replicate with
     CBLReplicatorType replicatorType;   ///< Push, pull or both
     bool continuous;                    ///< Continuous replication?
+    //-- Retry Logic:
+    unsigned maxAttempts;               ///< Max retry attempts where the initial connect to replicate counts toward the given value.
+                                        ///< Specify 0 to use the default value, 10 times for a non-continuous replicator and max-int time for a continuous replicator. Specify 1 means there will be no retry after the first attempt.
+    unsigned maxAttemptWaitTime;        ///< Max wait time between retry attempts in seconds. Specify 0 to use the default value of 300 seconds.
+    //-- WebSocket:
+    unsigned heartbeat;                 ///< The heartbeat interval in seconds. Specify 0 to use the default value of 300 seconds.
     //-- HTTP settings:
-    CBLAuthenticator* authenticator;    ///< Authentication credentials, if needed
-    const CBLProxySettings* proxy;      ///< HTTP client proxy settings
-    FLDict headers;                     ///< Extra HTTP headers to add to the WebSocket request
+    CBLAuthenticator* _cbl_nullable authenticator;    ///< Authentication credentials, if needed
+    const CBLProxySettings* _cbl_nullable proxy;      ///< HTTP client proxy settings
+    FLDict _cbl_nullable headers;                     ///< Extra HTTP headers to add to the WebSocket request
     //-- TLS settings:
     FLSlice pinnedServerCertificate;    ///< An X.509 cert to "pin" TLS connections to (PEM or DER)
     FLSlice trustedRootCertificates;    ///< Set of anchor certs (PEM format)
     //-- Filtering:
-    FLArray channels;                   ///< Optional set of channels to pull from
-    FLArray documentIDs;                ///< Optional set of document IDs to replicate
-    CBLReplicationFilter pushFilter;    ///< Optional callback to filter which docs are pushed
-    CBLReplicationFilter pullFilter;    ///< Optional callback to validate incoming docs
-    CBLConflictResolver conflictResolver;///< Optional conflict-resolver callback
-    void* context;                      ///< Arbitrary value that will be passed to callbacks
+    FLArray _cbl_nullable channels;                   ///< Optional set of channels to pull from
+    FLArray _cbl_nullable documentIDs;                ///< Optional set of document IDs to replicate
+    CBLReplicationFilter _cbl_nullable pushFilter;    ///< Optional callback to filter which docs are pushed
+    CBLReplicationFilter _cbl_nullable pullFilter;    ///< Optional callback to validate incoming docs
+    CBLConflictResolver _cbl_nullable conflictResolver;///< Optional conflict-resolver callback
+    void* _cbl_nullable context;                      ///< Arbitrary value that will be passed to callbacks
 } CBLReplicatorConfiguration;
 
-/** @} */
 
+/** @} */
 
 
 /** \name  Lifecycle
@@ -171,32 +181,35 @@ typedef struct {
 CBL_REFCOUNTED(CBLReplicator*, Replicator);
 
 /** Creates a replicator with the given configuration. */
-CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* _cbl_nonnull,
-                                 CBLError*) CBLAPI;
+_cbl_warn_unused
+CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration*,
+                                 CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the configuration of an existing replicator. */
-const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator* _cbl_nonnull) CBLAPI;
+const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator*) CBLAPI;
 
-/** Instructs the replicator to ignore existing checkpoints the next time it runs.
-    This will cause it to scan through all the documents on the remote database, which takes
-    a lot longer, but it can resolve problems with missing documents if the client and
-    server have gotten out of sync somehow. */
-void CBLReplicator_ResetCheckpoint(CBLReplicator* _cbl_nonnull) CBLAPI;
-
-/** Starts a replicator, asynchronously. Does nothing if it's already started. */
-void CBLReplicator_Start(CBLReplicator* _cbl_nonnull) CBLAPI;
+/** Starts a replicator, asynchronously. Does nothing if it's already started.
+    @param replicator  The replicator instance.
+    @param resetCheckpoint  If true, the persistent saved state ("checkpoint") for this replication
+                        will be discarded, causing it to re-scan all documents. This significantly
+                        increases time and bandwidth (redundant docs are not transferred, but their
+                        IDs are) but can resolve unexpected problems with missing documents if one
+                        side or the other has gotten out of sync. */
+void CBLReplicator_Start(CBLReplicator *replicator,
+                         bool resetCheckpoint) CBLAPI;
 
 /** Stops a running replicator, asynchronously. Does nothing if it's not already started.
     The replicator will call your \ref CBLReplicatorChangeListener with an activity level of
     \ref kCBLReplicatorStopped after it stops. Until then, consider it still active. */
-void CBLReplicator_Stop(CBLReplicator* _cbl_nonnull) CBLAPI;
+void CBLReplicator_Stop(CBLReplicator*) CBLAPI;
 
 /** Informs the replicator whether it's considered possible to reach the remote host with
     the current network configuration. The default value is true. This only affects the
     replicator's behavior while it's in the Offline state:
     * Setting it to false will cancel any pending retry and prevent future automatic retries.
     * Setting it back to true will initiate an immediate retry.*/
-void CBLReplicator_SetHostReachable(CBLReplicator* _cbl_nonnull, bool reachable) CBLAPI;
+void CBLReplicator_SetHostReachable(CBLReplicator*,
+                                    bool reachable) CBLAPI;
 
 /** Puts the replicator in or out of "suspended" state. The default is false.
     * Setting suspended=true causes the replicator to disconnect and enter Offline state;
@@ -239,7 +252,7 @@ typedef struct {
 } CBLReplicatorStatus;
 
 /** Returns the replicator's current status. */
-CBLReplicatorStatus CBLReplicator_Status(CBLReplicator* _cbl_nonnull) CBLAPI;
+CBLReplicatorStatus CBLReplicator_Status(CBLReplicator*) CBLAPI;
 
 /** Indicates which documents have local changes that have not yet been pushed to the server
     by this replicator. This is of course a snapshot, that will go out of date as the replicator
@@ -254,8 +267,9 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator* _cbl_nonnull) CBLAPI;
     \note  Documents that would never be pushed by this replicator, due to its configuration's
            `pushFilter` or `docIDs`, are ignored.
     \warning  You are responsible for releasing the returned array via \ref FLValue_Release. */
-FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator* _cbl_nonnull,
-                                        CBLError*) CBLAPI;
+_cbl_warn_unused
+FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator*,
+                                        CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Indicates whether the document with the given ID has local changes that have not yet been
     pushed to the server by this replicator.
@@ -265,9 +279,9 @@ FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator* _cbl_nonnull,
 
     \note  A `false` result means the document is not pending, _or_ there was an error.
            To tell the difference, compare the error code to zero. */
-bool CBLReplicator_IsDocumentPending(CBLReplicator *repl _cbl_nonnull,
+bool CBLReplicator_IsDocumentPending(CBLReplicator *repl,
                                      FLString docID,
-                                     CBLError *outError) CBLAPI;
+                                     CBLError* _cbl_nullable outError) CBLAPI;
 
 
 /** A callback that notifies you when the replicator's status changes.
@@ -277,26 +291,20 @@ bool CBLReplicator_IsDocumentPending(CBLReplicator *repl _cbl_nonnull,
     @param context  The value given when the listener was added.
     @param replicator  The replicator.
     @param status  The replicator's status. */
-typedef void (*CBLReplicatorChangeListener)(void *context, 
-                                            CBLReplicator *replicator _cbl_nonnull,
-                                            const CBLReplicatorStatus *status _cbl_nonnull);
+typedef void (*CBLReplicatorChangeListener)(void* _cbl_nullable context,
+                                            CBLReplicator *replicator,
+                                            const CBLReplicatorStatus *status);
 
 /** Adds a listener that will be called when the replicator's status changes. */
-CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* _cbl_nonnull,
-                                                  CBLReplicatorChangeListener _cbl_nonnull, 
-                                                  void *context) CBLAPI;
-
-
-/** Flags describing a replicated document. */
-typedef CBL_OPTIONS(unsigned, CBLDocumentFlags) {
-    kCBLDocumentFlagsDeleted        = 1 << 0,   ///< The document has been deleted.
-    kCBLDocumentFlagsAccessRemoved  = 1 << 1    ///< Lost access to the document on the server.
-};
+_cbl_warn_unused
+CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator*,
+                                                  CBLReplicatorChangeListener,
+                                                  void* _cbl_nullable context) CBLAPI;
 
 
 /** Information about a document that's been pushed or pulled. */
 typedef struct {
-    const char *ID;             ///< The document ID
+    FLString ID;                ///< The document ID
     CBLDocumentFlags flags;     ///< Indicates whether the document was deleted or removed
     CBLError error;             ///< If the code is nonzero, the document failed to replicate.
 } CBLReplicatedDocument;
@@ -310,20 +318,19 @@ typedef struct {
     @param isPush  True if the document(s) were pushed, false if pulled.
     @param numDocuments  The number of documents reported by this callback.
     @param documents  An array with information about each document. */
-typedef void (*CBLReplicatedDocumentListener)(void *context,
-                                              CBLReplicator *replicator _cbl_nonnull,
-                                              bool isPush,
-                                              unsigned numDocuments,
-                                              const CBLReplicatedDocument* documents);
+typedef void (*CBLDocumentReplicationListener)(void *context,
+                                               CBLReplicator *replicator,
+                                               bool isPush,
+                                               unsigned numDocuments,
+                                               const CBLReplicatedDocument* documents);
 
 /** Adds a listener that will be called when documents are replicated. */
-CBLListenerToken* CBLReplicator_AddDocumentListener(CBLReplicator* _cbl_nonnull,
-                                                    CBLReplicatedDocumentListener _cbl_nonnull,
-                                                    void *context) CBLAPI;
+_cbl_warn_unused CBLListenerToken*
+CBLReplicator_AddDocumentReplicationListener(CBLReplicator*,
+                                             CBLDocumentReplicationListener,
+                                             void* _cbl_nullable context) CBLAPI;
 
 /** @} */
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+CBL_CAPI_END

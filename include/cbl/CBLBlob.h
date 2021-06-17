@@ -20,9 +20,7 @@
 #include "CBLBase.h"
 #include "fleece/Fleece.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CBL_CAPI_BEGIN
 
 /** \defgroup blobs Blobs
     @{
@@ -40,16 +38,18 @@ extern "C" {
 
     A \ref CBLBlob object acts as a proxy for such a dictionary in a \ref CBLDocument. Once
     you've loaded a document and located the \ref FLDict holding the blob reference, call
-    \ref CBLBlob_Get on it to create a \ref CBLBlob object you can call.
+    \ref FLDict_GetBlob on it to create a \ref CBLBlob object you can call.
     The object has accessors for the blob's metadata and for loading the data itself.
 
-    To create a new blob from in-memory data, call \ref CBLBlob_CreateWithData, then call
-    \ref FLMutableDict_SetBlob or \ref FLMutableArray_SetBlob to add the \ref CBLBlob to the
-    document (or to a dictionary or array property of the document.)
+    To create a new blob from in-memory data, call \ref CBLBlob_NewWithData, then call
+    \ref FLSlot_SetBlob to add the \ref CBLBlob to a mutable array or dictionary in the
+    document. For example:
+
+        FLSlot_SetBlob(FLMutableDict_Set(properties, key), blob);
 
     To create a new blob from a stream, call \ref CBLBlobWriter_New to create a
     \ref CBLBlobWriteStream, then make one or more calls to \ref CBLBlobWriter_Write to write
-    data to the blob, then finally call \ref CBLBlob_CreateWithStream to create the blob.
+    data to the blob, then finally call \ref CBLBlob_NewWithStream to create the blob.
     To store the blob into a document, do as in the previous paragraph.
 
  */
@@ -62,49 +62,55 @@ extern "C" {
     CBL_CORE_API extern const FLSlice kCBLBlobContentTypeProperty;  ///< `"content_type"`
 
 
+    CBL_REFCOUNTED(CBLBlob*, Blob);
+
+
     /** Returns true if a dictionary in a document is a blob reference.
-        If so, you can call \ref CBLBlob_Get to access it.
+        If so, you can call \ref FLDict_GetBlob to access it.
         @note This function tests whether the dictionary has a `@type` property,
                 whose value is `"blob"`. */
-    bool CBL_IsBlob(FLDict) CBLAPI;
-
-    
-    CBL_REFCOUNTED(CBLBlob*, Blob);
+    bool FLDict_IsBlob(FLDict _cbl_nullable) CBLAPI;
 
     /** Returns a CBLBlob object corresponding to a blob dictionary in a document.
         @param blobDict  A dictionary in a document.
         @return  A CBLBlob instance for this blob, or NULL if the dictionary is not a blob. */
-    const CBLBlob* CBLBlob_Get(FLDict blobDict) CBLAPI;
+    const CBLBlob* FLDict_GetBlob(FLDict _cbl_nullable blobDict) CBLAPI;
 
 
 #pragma mark - BLOB METADATA:
 
     /** Returns the length in bytes of a blob's content (from its `length` property). */
-    uint64_t CBLBlob_Length(const CBLBlob* _cbl_nonnull) CBLAPI;
+    uint64_t CBLBlob_Length(const CBLBlob*) CBLAPI;
 
     /** Returns the cryptographic digest of a blob's content (from its `digest` property). */
-    const char* CBLBlob_Digest(const CBLBlob* _cbl_nonnull) CBLAPI;
+    FLString CBLBlob_Digest(const CBLBlob*) CBLAPI;
 
     /** Returns a blob's MIME type, if its metadata has a `content_type` property. */
-    const char* CBLBlob_ContentType(const CBLBlob* _cbl_nonnull) CBLAPI;
+    FLString CBLBlob_ContentType(const CBLBlob*) CBLAPI;
 
-    /** Returns a blob's metadata. This includes the `digest`, `length` and `content_type`
-        properties, as well as any custom ones that may have been added. */
-    FLDict CBLBlob_Properties(const CBLBlob* _cbl_nonnull) CBLAPI;
+    /** Returns a blob's metadata. This includes the `digest`, `length`, `content_type`,
+        and `@type` properties, as well as any custom ones that may have been added. */
+    FLDict CBLBlob_Properties(const CBLBlob*) CBLAPI;
 
+    /** Returns a blob's metadata as JSON. */
+    _cbl_warn_unused
+    FLStringResult CBLBlob_ToJSON(const CBLBlob* blob) CBLAPI;
 
 #pragma mark - READING:
 
     /** Reads the blob's contents into memory and returns them.
-        You are responsible for calling \ref FLSliceResult_Release on the returned data when done.
-        @warning  This can potentially allocate a very large heap block! */
-    FLSliceResult CBLBlob_LoadContent(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
+        @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
+    _cbl_warn_unused
+    FLSliceResult CBLBlob_Content(const CBLBlob*,
+                                  CBLError* _cbl_nullable outError) CBLAPI;
 
     /** A stream for reading a blob's content. */
     typedef struct CBLBlobReadStream CBLBlobReadStream;
 
     /** Opens a stream for reading a blob's content. */
-    CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* _cbl_nonnull, CBLError *outError) CBLAPI;
+    _cbl_warn_unused
+    CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob*,
+                                                 CBLError* _cbl_nullable outError) CBLAPI;
 
     /** Reads data from a blob.
         @param stream  The stream to read from.
@@ -112,13 +118,13 @@ extern "C" {
         @param maxLength  The maximum number of bytes to read.
         @param outError  On failure, an error will be stored here if non-NULL.
         @return  The actual number of bytes read; 0 if at EOF, -1 on error. */
-    int CBLBlobReader_Read(CBLBlobReadStream* stream _cbl_nonnull,
-                           void *dst _cbl_nonnull,
+    int CBLBlobReader_Read(CBLBlobReadStream* stream,
+                           void *dst,
                            size_t maxLength,
-                           CBLError *outError) CBLAPI;
+                           CBLError* _cbl_nullable outError) CBLAPI;
 
     /** Closes a CBLBlobReadStream. */
-    void CBLBlobReader_Close(CBLBlobReadStream*) CBLAPI;
+    void CBLBlobReader_Close(CBLBlobReadStream* _cbl_nullable) CBLAPI;
 
 
 #pragma mark - CREATING:
@@ -129,25 +135,24 @@ extern "C" {
         @param contentType  The MIME type (optional).
         @param contents  The data's address and length.
         @return  A new CBLBlob instance. */
-    CBLBlob* CBLBlob_CreateWithData(const char *contentType,
-                                    FLSlice contents) CBLAPI;
-
-    CBLBlob* CBLBlob_CreateWithData_s(FLString contentType,
-                                      FLSlice contents) CBLAPI;
+    _cbl_warn_unused
+    CBLBlob* CBLBlob_NewWithData(FLString contentType,
+                                 FLSlice contents) CBLAPI;
 
     /** A stream for writing a new blob to the database. */
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
 
     /** Opens a stream for writing a new blob.
         You should next call \ref CBLBlobWriter_Write one or more times to write the data,
-        then \ref CBLBlob_CreateWithStream to create the blob.
+        then \ref CBLBlob_NewWithStream to create the blob.
 
         If for some reason you need to abort, just call \ref CBLBlobWriter_Close. */
-    CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db _cbl_nonnull,
-                                          CBLError *outError) CBLAPI;
+    _cbl_warn_unused
+    CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db,
+                                          CBLError* _cbl_nullable outError) CBLAPI;
 
     /** Closes a blob-writing stream, if you need to give up without creating a \ref CBLBlob. */
-    void CBLBlobWriter_Close(CBLBlobWriteStream*) CBLAPI;
+    void CBLBlobWriter_Close(CBLBlobWriteStream* _cbl_nullable) CBLAPI;
 
     /** Writes data to a new blob.
         @param writer  The stream to write to.
@@ -155,57 +160,47 @@ extern "C" {
         @param length  The length of the data to write.
         @param outError  On failure, error info will be written here.
         @return  True on success, false on failure. */
-    bool CBLBlobWriter_Write(CBLBlobWriteStream* writer _cbl_nonnull,
-                              const void *data _cbl_nonnull,
-                              size_t length,
-                              CBLError *outError) CBLAPI;
+    bool CBLBlobWriter_Write(CBLBlobWriteStream* writer,
+                             const void *data,
+                             size_t length,
+                             CBLError* _cbl_nullable outError) CBLAPI;
 
     /** Creates a new blob after its data has been written to a \ref CBLBlobWriteStream.
         You should then add the blob to a mutable document as a property -- see
-        \ref FLMutableDict_SetBlob and \ref FLMutableArray_SetBlob.
+        \ref FLSlot_SetBlob.
         @note  You are responsible for releasing the CBLBlob reference.
         @note  Do not free the stream; the blob will do that.
         @param contentType  The MIME type (optional).
         @param writer  The blob-writing stream the data was written to.
         @return  A new CBLBlob instance. */
-    CBLBlob* CBLBlob_CreateWithStream(const char *contentType,
-                                      CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
-
-    CBLBlob* CBLBlob_CreateWithStream_s(FLString contentType,
-                                        CBLBlobWriteStream* writer _cbl_nonnull) CBLAPI;
+    _cbl_warn_unused
+    CBLBlob* CBLBlob_NewWithStream(FLString contentType,
+                                   CBLBlobWriteStream* writer) CBLAPI;
 
 #pragma mark - FLEECE UTILITIES:
 
     /** Returns true if a value in a document is a blob reference.
         If so, you can call \ref FLValue_GetBlob to access it. */
-    static inline bool FLValue_IsBlob(FLValue v) {
-        return CBL_IsBlob(FLValue_AsDict(v));
+    static inline bool FLValue_IsBlob(FLValue _cbl_nullable v) {
+        return FLDict_IsBlob(FLValue_AsDict(v));
     }
 
     /** Instantiates a \ref CBLBlob object corresponding to a blob dictionary in a document.
         @param value  The value (dictionary) in the document.
         @return  A \ref CBLBlob instance for this blob, or `NULL` if the value is not a blob.
         @note You are responsible for releasing the \ref CBLBlob object.  */
-    static inline const CBLBlob* FLValue_GetBlob(FLValue value) {
-        return CBLBlob_Get(FLValue_AsDict(value));
+    static inline const CBLBlob* FLValue_GetBlob(FLValue _cbl_nullable value) {
+        return FLDict_GetBlob(FLValue_AsDict(value));
     }
 
-    void FLSlot_SetBlob(FLSlot slot _cbl_nonnull,
-                        CBLBlob* blob _cbl_nonnull) CBLAPI;
-    
-    /** Stores a blob in a mutable array. */
-    void FLMutableArray_SetBlob(FLMutableArray array _cbl_nonnull,
-                                uint32_t index,
-                                CBLBlob* blob _cbl_nonnull) CBLAPI _cbl_deprecated;
-
-    /** Stores a blob in a mutable dictionary. */
-    void FLMutableDict_SetBlob(FLMutableDict dict _cbl_nonnull,
-                               FLString key,
-                               CBLBlob* blob _cbl_nonnull) CBLAPI _cbl_deprecated;
+    /** Stores a blob reference in a Fleece mutable Array or Dict.
+        @param slot  The position in the collection, as returned by functions like
+                    \ref FLMutableArray_Set or \ref FLMutableDict_Set.
+        @param blob  The CBLBlob to store (as a Dict) in the collection. */
+    void FLSlot_SetBlob(FLSlot slot,
+                        CBLBlob* blob) CBLAPI;
 
 
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
+CBL_CAPI_END

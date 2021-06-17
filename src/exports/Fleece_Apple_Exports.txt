@@ -1,0 +1,15 @@
+# Fleece_Apple_Exports.txt
+#
+# Copyright (c) 2021 Couchbase, Inc All rights reserved.
+#
+# Fleece exports for Apple platforms only (interop with Objective-C and CoreFoundation)
+
+FLValue_CopyCFObject
+FLDict_GetWithCFString
+FLDictIterator_GetKeyAsNSString
+FLValue_GetNSObject
+FLDict_GetWithNSString
+FLErrorDomain
+
+FLEncoder_WriteNSObject
+FLEncoder_FinishWithNSData

@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBLTest.hh"
+#include "CBLTest_Cpp.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <string>
@@ -28,16 +28,16 @@ using namespace fleece;
 using namespace cbl;
 
 
-static const slice kBlobContents("This is the content of the blob.");
-static const char *kBlobContentType = "text/plain";
-static const string kBlobDigest("sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=");
+static const slice  kBlobContents = "This is the content of the blob.";
+static const string kBlobContentType = "text/plain";
+static const string kBlobDigest = "sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=";
 
 
 static void checkBlob(Dict props) {
     CHECK(props[kCBLTypeProperty].asString() == kCBLBlobType);
-    CHECK(props[kCBLBlobDigestProperty].asString().asString() == kBlobDigest);
+    CHECK(props[kCBLBlobDigestProperty].asString() == kBlobDigest);
     CHECK(props[kCBLBlobLengthProperty].asInt() == kBlobContents.size);
-    CHECK(props[kCBLBlobContentTypeProperty].asString().asString() == kBlobContentType);
+    CHECK(props[kCBLBlobContentTypeProperty].asString() == kBlobContentType);
 }
 
 
@@ -56,12 +56,12 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
             blob = Blob(kBlobContentType, writer);
         }
         CHECK(blob.digest() == kBlobDigest);
-        CHECK(string(blob.contentType()) == kBlobContentType);
+        CHECK(blob.contentType() == kBlobContentType);
         CHECK(blob.length() == kBlobContents.size);
         Dict props = blob.properties();
         checkBlob(props);
 
-        CHECK(CBLBlob_Get(props) == nullptr);
+        CHECK(FLDict_GetBlob(props) == nullptr);
 
         // Add blob to document:
         doc["picture"] = props;
@@ -74,7 +74,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
         CHECK(Blob::isBlob(doc["picture"].asDict()));
         Blob blob(doc["picture"].asDict());
         REQUIRE(blob);
-        CHECK(string(blob.contentType()) == kBlobContentType);
+        CHECK(blob.contentType() == kBlobContentType);
         CHECK(blob.length() == kBlobContents.size);
 
         {
@@ -143,11 +143,11 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in arrays/dicts", "[Blob]") {
         MutableDocument doc("blobbo");
         MutableArray array = MutableArray::newArray();
         array.insertNulls(0, 1);
-        CBLBlob *blob1 = CBLBlob_CreateWithData(kBlobContentType, kBlobContents);
+        CBLBlob *blob1 = CBLBlob_NewWithData(slice(kBlobContentType), kBlobContents);
         FLSlot_SetBlob(array[0], blob1);
 
         MutableDict dict = MutableDict::newDict();
-        CBLBlob *blob2 = CBLBlob_CreateWithData(kBlobContentType, kBlobContents);
+        CBLBlob *blob2 = CBLBlob_NewWithData(slice(kBlobContentType), kBlobContents);
         FLSlot_SetBlob(dict["b"], blob2);
 
         doc["array"] = array;

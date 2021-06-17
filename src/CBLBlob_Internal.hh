@@ -22,196 +22,198 @@
 #include "CBLDatabase_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "Internal.hh"
-#include "Util.hh"
-#include "c4BlobStore.h"
-#include "c4Document+Fleece.h"
+#include "c4BlobStore.hh"
+#include "c4Document.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <mutex>
+#include "betterassert.hh"
 
+CBL_ASSUME_NONNULL_BEGIN
 
-static inline C4ReadStream*  internal(CBLBlobReadStream *reader)  {return (C4ReadStream*)reader;}
-static inline C4WriteStream* internal(CBLBlobWriteStream *writer) {return (C4WriteStream*)writer;}
-
-
-class CBLBlob : public CBLRefCounted {
+struct CBLBlob : public CBLRefCounted {
 public:
-    // Constructor for existing blobs -- called by CBLDocument::getBlob()
-    CBLBlob(CBLDocument *doc, Dict properties)
-    :_db(doc->database())
-    ,_properties( (_db && c4doc_dictIsBlob(properties, &_key)) ? properties : nullptr)
-    { }
+    static bool isBlob(FLDict _cbl_nullable dict) noexcept {
+        return C4Blob::isBlob(dict);
+    }
 
-    bool valid() const              {return _properties != nullptr;}
-    Dict properties() const         {return _properties;}
+    static const CBLBlob* _cbl_nullable getBlob(FLDict blobDict) noexcept {
+        auto doc = CBLDocument::containing(Dict(blobDict));
+        if (!doc)
+            return nullptr;
+        return doc->getBlob(blobDict);
+    }
+
+    Dict properties() const                                 {return _properties.asDict();}
+
+    virtual alloc_slice content() const                     {return blobStore()->getContents(_key);}
+
+    inline std::unique_ptr<CBLBlobReadStream> openContentStream() const;
+
+    alloc_slice toJSON() const {
+        if (!_properties)
+            return fleece::nullslice;
+        fleece::JSONEncoder enc;
+        enc.writeValue(_properties);
+        return enc.finish();
+    }
 
     uint64_t contentLength() const {
-        Value len = _properties[kCBLBlobLengthProperty];
-        if (len.isInteger())
+        if (Value len = properties()[kCBLBlobLengthProperty]; len.isInteger())
             return len.asUnsigned();
         else
-            return c4blob_getSize(store(), _key);
+            return blobStore()->getSize(_key);
     }
 
-    const char* digest() const {
-        LOCK(_mutex);
-        if (_digest.empty()) {
-            alloc_slice digest(c4blob_keyToString(_key));
-            _digest = string(digest);
-        }
-        return _digest.c_str();
+    slice digest() const {
+        auto digest = properties()[kCBLBlobDigestProperty].asString();
+        assert(digest);
+        return digest;
     }
 
-    const char* contentType() const {
-        slice type = _properties[kCBLBlobContentTypeProperty].asString();
-        if (!type)
-            return nullptr;
-        LOCK(_mutex);
-        if (type != slice(_contentTypeCache))
-            _contentTypeCache = string(type);
-        return _contentTypeCache.c_str();
-    }
-
-    virtual FLSliceResult getContents(C4Error *outError) const {
-        return c4blob_getContents(store(), _key, outError);
-    }
-
-    virtual C4ReadStream* openStream(C4Error *outError) const {
-        return c4blob_openReadStream(store(), _key, outError);
-    }
-
-    virtual bool install(CBLDatabase *db _cbl_nonnull, C4Error *outError) {
-        return true;
+    slice contentType() const {
+        return properties()[kCBLBlobContentTypeProperty].asString();
     }
 
 protected:
-    // constructor for CBLNewBlob to call
-    CBLBlob()
-    :_mutableProperties(MutableDict::newDict())
-    ,_properties(_mutableProperties)
-    { }
+    friend struct CBLDocument;
 
-    CBLDatabase* database() const                       {return _db;}
-    void setDatabase(CBLDatabase *db _cbl_nonnull)      {assert(!_db); _db = db;}
+    // Constructor for existing blobs -- called by CBLDocument::getBlob()
+    CBLBlob(CBLDocument *doc, Dict properties, const C4BlobKey &key)
+    :_db(doc->database())
+    ,_key(key)
+    ,_properties(properties)
+    {
+        assert_precondition(_db);
+        assert_precondition(properties);
+    }
 
-    C4BlobStore* store() const {
-        assert(_db);
+    // constructor for subclass CBLNewBlob to call.
+    explicit CBLBlob(const C4BlobKey &key, uint64_t length, slice contentType)
+    :_key(key)
+    ,_properties(MutableDict::newDict())
+    {
+        auto mp = properties().asMutable();
+        assert(mp != nullptr);
+        mp[kCBLTypeProperty] = kCBLBlobType;
+        mp[kCBLBlobDigestProperty] = key.digestString();
+        mp[kCBLBlobLengthProperty] = length;
+        if (contentType)
+            mp[kCBLBlobContentTypeProperty] = contentType;
+    }
+
+    const C4BlobKey& key() const                        {return _key;}
+    CBLDatabase* _cbl_nullable database() const         {return _db;}
+    void setDatabase(CBLDatabase *db)                   {precondition(!_db); _db = db;}
+
+    C4BlobStore* blobStore() const {
+        if (!_db) C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Unsaved blob");
         return _db->blobStore();
     }
 
-    MutableDict mutableProperties()                     {return _mutableProperties;}
-
-    const C4BlobKey& key() const                        {return _key;}
-    void setKey(const C4BlobKey &key)                   {_key = key;}
-
-    mutable mutex     _mutex;
-
 private:
-    bool findDatabase() {
-        assert(!_db);
-        const CBLDocument* doc = CBLDocument::containing(_properties);
-        if (doc)
-            _db = doc->database();
-        return (_db != nullptr);
-    }
+    friend struct CBLBlobReadStream;
 
-    CBLDatabase*      _db {nullptr};
-    MutableDict const _mutableProperties;
-    C4BlobKey         _key {};
-    Dict const        _properties;
-    mutable string    _digest;
-    mutable string    _contentTypeCache;
+    RetainedValue const         _properties;
+    C4BlobKey                   _key;
+    CBLDatabase* _cbl_nullable  _db {nullptr};
 };
 
 
-class CBLNewBlob : public CBLBlob {
-public:
-    // Constructor for new blobs, given contents or writer (but not both)
-    CBLNewBlob(slice contentType,
-               slice contents,
-               C4WriteStream *writer)
-    :CBLBlob()
-    ,_contents(contents)
-    ,_writer(writer)
-    {
-        assert(mutableProperties() != nullptr);
-        mutableProperties()[kCBLTypeProperty] = kCBLBlobType;
-        if (contentType)
-            mutableProperties()[kCBLBlobContentTypeProperty] = contentType;
 
-        C4BlobKey key;
-        uint64_t length;
-        if (contents) {
-            assert(!writer);
-            key = c4blob_computeKey(contents);
-            length = contents.size;
-        } else {
-            assert(writer);
-            key = c4stream_computeBlobKey(writer);
-            length = c4stream_bytesWritten(writer);
-        }
-        setKey(key, length);
+struct CBLNewBlob : public CBLBlob {
+public:
+    CBLNewBlob(slice contentType, slice contents)
+    :CBLBlob(C4BlobKey::computeDigestOfContent(contents), contents.size, contentType)
+    {
+        precondition(contents);
+        _content = contents;
         CBLDocument::registerNewBlob(this);
     }
 
-    virtual FLSliceResult getContents(C4Error *outError) const override {
-        if (database())
-            return CBLBlob::getContents(outError);
+    inline CBLNewBlob(slice contentType, CBLBlobWriteStream &&writer);
 
-        LOCK(_mutex);
-        if (_contents) {
-            return FLSliceResult(const_cast<alloc_slice&>(_contents));
-        } else {
-            setError(outError, LiteCoreDomain, kC4ErrorNotFound,
-                     slice("Can't get streamed blob contents until doc is saved"));
-            return FLSliceResult{};
+    virtual alloc_slice content() const override {
+        {
+            LOCK(_mutex);
+            if (_content)
+                return _content;
         }
+        return CBLBlob::content();
     }
 
-    virtual c4ReadStream* openStream(C4Error *outError) const override {
-        if (database()) {
-            return CBLBlob::openStream(outError);
-        } else {
-            setError(outError, LiteCoreDomain, kC4ErrorNotFound,
-                     slice("Can't stream blob until doc is saved"));
-            return nullptr;
+    bool install(CBLDatabase *db) {
+        {
+            LOCK(_mutex);
+            CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%.*s'", FMTSLICE(digest()));
+            C4BlobKey expectedKey = key();
+            if (_content) {
+                db->blobStore()->createBlob(_content, &expectedKey);
+                _content = fleece::nullslice;
+            } else if (_writer) {
+                if (db->blobStore() != &_writer->blobStore())
+                    C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                                   "Saving blob to wrong database");
+                _writer->install(&expectedKey);
+                _writer = std::nullopt;
+            } else {
+                // I'm already installed; this could be a race condition, else a mistake
+                if (database() != db) {
+                    C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
+                                   "Trying to save an already-saved blob to a different db");
+                }
+                return true;
+            }
+            setDatabase(db);
         }
-    }
-
-    virtual bool install(CBLDatabase *db _cbl_nonnull, C4Error *outError) override {
-        CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%s'", digest());
-        LOCK(_mutex);
-        assert(database() == nullptr || database() == db);
-        const C4BlobKey &expectedKey = key();
-        if (_contents) {
-            if (!c4blob_create(db->blobStore(), _contents, &expectedKey, nullptr, outError))
-                return false;
-            _contents = fleece::nullslice;
-        } else {
-            assert(_writer);
-            if (!c4stream_install(_writer, &expectedKey, outError))
-                return false;
-            c4stream_closeWriter(_writer);
-            _writer = nullptr;
-        }
-        setDatabase(db);
         CBLDocument::unregisterNewBlob(this);
         return true;
     }
 
 protected:
     ~CBLNewBlob() {
-        c4stream_closeWriter(_writer);
         if (!database())
             CBLDocument::unregisterNewBlob(this);
     }
 
 private:
-    void setKey(const C4BlobKey &key, uint64_t length) {
-        CBLBlob::setKey(key);
-        mutableProperties()[kCBLBlobDigestProperty] = digest();
-        mutableProperties()[kCBLBlobLengthProperty] = length;
-    }
-
-    alloc_slice     _contents;              // Contents, before save
-    C4WriteStream*  _writer {nullptr};      // Stream, before save
+    mutable std::mutex           _mutex;
+    alloc_slice                  _content;  // Blob data, before save
+    std::optional<C4WriteStream> _writer ;  // Stream, before save
 };
+
+
+struct CBLBlobReadStream {
+    CBLBlobReadStream(const CBLBlob &blob)      :_c4stream(*blob.blobStore(), blob.key()) { }
+    size_t read(void *buffer, size_t maxBytes)  {return _c4stream.read(buffer, maxBytes);}
+    int64_t getLength() const                   {return _c4stream.getLength();}
+    void seek(int64_t pos)                      {return _c4stream.seek(pos);}
+private:
+    C4ReadStream _c4stream;
+};
+
+
+
+struct CBLBlobWriteStream {
+    CBLBlobWriteStream(CBLDatabase *db)         :_c4stream(*db->blobStore()) { }
+    void write(slice data)                      {return _c4stream.write(data);}
+private:
+    friend struct CBLNewBlob;
+    C4WriteStream _c4stream;
+};
+
+
+inline std::unique_ptr<CBLBlobReadStream> CBLBlob::openContentStream() const {
+    return std::make_unique<CBLBlobReadStream>(*this);
+}
+
+
+inline CBLNewBlob::CBLNewBlob(slice contentType, CBLBlobWriteStream &&writer)
+:CBLBlob(writer._c4stream.computeBlobKey(), writer._c4stream.getBytesWritten(), contentType) {
+    _writer.emplace(std::move(writer._c4stream));
+    // Nothing more will be written, but don't install the stream until the owning document
+    // is saved and calls my install() method.
+    CBLDocument::registerNewBlob(this);
+}
+
+CBL_ASSUME_NONNULL_END

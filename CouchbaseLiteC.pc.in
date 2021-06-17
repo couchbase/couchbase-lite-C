@@ -1,0 +1,10 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=@CMAKE_INSTALL_LIBDIR@
+includedir=@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: CouchbaseLiteC
+Description: Couchbase Lite for C
+Version: @CBL_LIB_VERSION@
+Libs: -L${libdir} -lCouchbaseLiteC
+Cflags: -I${includedir}

@@ -18,12 +18,14 @@
 
 #include "CBLTest.hh"
 #include "cbl/CouchbaseLite.h"
+#include "fleece/Fleece.hh"
+#include "fleece/Mutable.hh"
 #include <iostream>
 #include <thread>
+#include <atomic>
 
 using namespace std;
 using namespace fleece;
-using namespace cbl;
 
 
 class QueryTest : public CBLTest {
@@ -48,9 +50,13 @@ public:
 TEST_CASE_METHOD(QueryTest, "Invalid Query", "[Query][!throws]") {
     CBLError error;
     int errPos;
-    query = CBLQuery_New(db, kCBLN1QLLanguage,
-                         "SELECT name WHERE",
-                         &errPos, &error);
+    {
+        ExpectingExceptions x;
+        CBL_Log(kCBLLogDomainQuery, CBLLogWarning, "INTENTIONALLY THROWING EXCEPTION!");
+        query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                        "SELECT name WHERE"_sl,
+                                        &errPos, &error);
+    }
     REQUIRE(!query);
     CHECK(errPos == 17);
     CHECK(error.domain == CBLDomain);
@@ -61,9 +67,9 @@ TEST_CASE_METHOD(QueryTest, "Invalid Query", "[Query][!throws]") {
 TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     CBLError error;
     int errPos;
-    query = CBLQuery_New(db, kCBLN1QLLanguage,
-                         "SELECT name WHERE birthday like '1959-%' ORDER BY birthday",
-                         &errPos, &error);
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    &errPos, &error);
     REQUIRE(query);
 
     CHECK(CBLQuery_ColumnCount(query) == 1);
@@ -72,15 +78,15 @@ TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     alloc_slice explanation(CBLQuery_Explain(query));
     cerr << string(explanation);
 
-    static const slice kExpectedFirst[3] = {"Tyesha"_sl,  "Eddie"_sl,     "Diedre"_sl};
-    static const slice kExpectedLast [3] = {"Loehrer"_sl, "Colangelo"_sl, "Clinton"_sl};
+    static const slice kExpectedFirst[3] = {"Tyesha",  "Eddie",     "Diedre"};
+    static const slice kExpectedLast [3] = {"Loehrer", "Colangelo", "Clinton"};
 
     int n = 0;
     results = CBLQuery_Execute(query, &error);
     REQUIRE(results);
     while (CBLResultSet_Next(results)) {
         FLValue name = CBLResultSet_ValueAtIndex(results, 0);
-        CHECK(CBLResultSet_ValueForKey(results, "name") == name);
+        CHECK(CBLResultSet_ValueForKey(results, "name"_sl) == name);
         FLDict dict = FLValue_AsDict(name);
         CHECK(dict);
         slice first  = FLValue_AsString(FLDict_Get(dict, "first"_sl));
@@ -100,26 +106,31 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
     for (int pass = 0; pass < 2; ++pass) {
         if (pass == 1) {
             cerr << "Creating index\n";
-            CBLIndexSpec index = {};
-            index.type = kCBLValueIndex;
-            index.keyExpressionsJSON = R"(["contact.address.zip"])";
-            CHECK(CBLDatabase_CreateIndex(db, "zips", index, &error));
+            CBLValueIndexConfiguration config = {};
+            config.expressionLanguage = kCBLJSONLanguage;
+            config.expressions = R"(["contact.address.zip"])"_sl;
+            CHECK(CBLDatabase_CreateValueIndex(db, "zips"_sl, config, &error));
         }
 
         int errPos;
-        query = CBLQuery_New(db, kCBLN1QLLanguage,
-                             "SELECT count(*) AS n WHERE contact.address.zip BETWEEN $zip0 AND $zip1",
-                             &errPos, &error);
+        query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                        "SELECT count(*) AS n WHERE contact.address.zip BETWEEN $zip0 AND $zip1"_sl,
+                                        &errPos, &error);
         REQUIRE(query);
 
         CHECK(CBLQuery_ColumnCount(query) == 1);
-        CHECK(slice(CBLQuery_ColumnName(query, 0)) == "n"_sl);
+        CHECK(CBLQuery_ColumnName(query, 0) == "n"_sl);
 
         alloc_slice explanation(CBLQuery_Explain(query));
         cerr << string(explanation);
 
         CHECK(CBLQuery_Parameters(query) == nullptr);
-        CHECK(CBLQuery_SetParametersAsJSON(query, R"({"zip0":"30000","zip1":"39999"})"));
+        {
+            auto params = MutableDict::newDict();
+            params["zip0"] = "30000";
+            params["zip1"] = "39999";
+            CBLQuery_SetParameters(query, params);
+        }
 
         FLDict params = CBLQuery_Parameters(query);
         CHECK(FLValue_AsString(FLDict_Get(params, "zip0"_sl)) == "30000"_sl);
@@ -150,46 +161,52 @@ static int countResults(CBLResultSet *results) {
 
 TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CBLError error;
-    query = CBLQuery_New(db, kCBLN1QLLanguage,
-                         "SELECT name WHERE birthday like '1959-%' ORDER BY birthday",
-                         nullptr, &error);
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    nullptr, &error);
     REQUIRE(query);
 
     CBLResultSet *results = CBLQuery_Execute(query, &error);
     CHECK(countResults(results) == 3);
     CBLResultSet_Release(results);
 
+    resultCount = -1;
+    
     cerr << "Adding listener\n";
-    listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query) {
+    listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
         auto self = (QueryTest*)context;
         CBLError error;
-        auto newResults = CBLQuery_CopyCurrentResults(query, self->listenerToken, &error);
+        auto newResults = CBLQuery_CopyCurrentResults(query, token, &error);
         CHECK(newResults);
         self->resultCount = countResults(newResults);
         CBLResultSet_Release(newResults);
     }, this);
 
     cerr << "Waiting for listener...\n";
-    resultCount = -1;
     while (resultCount < 0)
-        this_thread::sleep_for(chrono::milliseconds(100));
+        this_thread::sleep_for(100ms);
     CHECK(resultCount == 3);
     resultCount = -1;
 
     cerr << "Deleting a doc...\n";
-    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012");
+    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
     REQUIRE(doc);
-    CHECK(CBLDocument_Delete(doc, kCBLConcurrencyControlLastWriteWins, &error));
+    CHECK(CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
     CBLDocument_Release(doc);
 
     cerr << "Waiting for listener again...\n";
     while (resultCount < 0)
-        this_thread::sleep_for(chrono::milliseconds(100));
+        this_thread::sleep_for(100ms);
     CHECK(resultCount == 2);
 }
 
 
 #pragma mark - C++ API:
+
+
+#include "CBLTest_Cpp.hh"
+
+using namespace cbl;
 
 
 class QueryTest_Cpp : public CBLTest_Cpp {
@@ -200,14 +217,6 @@ public:
 };
 
 
-static int countResults(ResultSet &results) {
-    int n = 0;
-    for (auto &result : results)
-        ++n;
-    return n;
-}
-
-
 TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
     Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
 
@@ -216,8 +225,8 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
     alloc_slice explanation(query.explain());
     cerr << string(explanation);
 
-    static const slice kExpectedFirst[3] = {"Tyesha"_sl,  "Eddie"_sl,     "Diedre"_sl};
-    static const slice kExpectedLast [3] = {"Loehrer"_sl, "Colangelo"_sl, "Clinton"_sl};
+    static const slice kExpectedFirst[3] = {"Tyesha",  "Eddie",     "Diedre"};
+    static const slice kExpectedLast [3] = {"Loehrer", "Colangelo", "Clinton"};
 
     int n = 0;
     auto results = query.execute();
@@ -239,6 +248,14 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
 }
 
 
+static int countResults(ResultSet &results) {
+    int n = 0;
+    for (CBL_UNUSED auto &result : results)
+        ++n;
+    return n;
+}
+
+
 TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
     Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
     {
@@ -247,26 +264,25 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
     }
 
     cerr << "Adding listener\n";
-    int resultCount = -1;
-    Query::ChangeListener listenerToken = query.addChangeListener([&](Query q) {
-        ResultSet rs = listenerToken.results();
+    std::atomic_int resultCount{-1};
+    Query::ChangeListener listenerToken = query.addChangeListener([&](Query::Change change) {
+        ResultSet rs = change.results();
         resultCount = countResults(rs);
     });
 
     cerr << "Waiting for listener...\n";
-    resultCount = -1;
     while (resultCount < 0)
-        this_thread::sleep_for(chrono::milliseconds(100));
+        this_thread::sleep_for(100ms);
     CHECK(resultCount == 3);
     resultCount = -1;
 
     cerr << "Deleting a doc...\n";
     Document doc = db.getDocument("0000012");
     REQUIRE(doc);
-    doc.deleteDoc();
+    REQUIRE(db.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
 
     cerr << "Waiting for listener again...\n";
     while (resultCount < 0)
-        this_thread::sleep_for(chrono::milliseconds(100));
+        this_thread::sleep_for(100ms);
     CHECK(resultCount == 2);
 }

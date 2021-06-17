@@ -19,6 +19,8 @@
 #define CATCH_CONFIG_CONSOLE_WIDTH 120
 
 #include "CBLTest.hh"
+#include "CBLTest_Cpp.hh"
+#include "CBLPrivate.h"
 #include "fleece/slice.hh"
 #include <fstream>
 
@@ -48,12 +50,13 @@ static string databaseDir() {
 }
 
 
-std::string CBLTest::kDatabaseDir = databaseDir();
-const char* const CBLTest::kDatabaseName = "CBLtest";
+alloc_slice const CBLTest::kDatabaseDir(databaseDir());
+slice       const CBLTest::kDatabaseName = "CBLtest";
 
 const CBLDatabaseConfiguration CBLTest::kDatabaseConfiguration = []{
-    CBLDatabaseConfiguration config = {kDatabaseDir.c_str()};
-    config.flags = kCBLDatabase_Create;
+    // One-time setup:
+    CBLError_SetCaptureBacktraces(true);
+    CBLDatabaseConfiguration config = {kDatabaseDir};
     return config;
 }();
 
@@ -83,8 +86,8 @@ CBLTest::~CBLTest() {
 #pragma mark - C++ TEST CLASS:
 
 
-std::string& CBLTest_Cpp::kDatabaseDir = CBLTest::kDatabaseDir;
-const char* const & CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
+alloc_slice const CBLTest_Cpp::kDatabaseDir = CBLTest::kDatabaseDir;
+slice const CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
 
 
 CBLTest_Cpp::CBLTest_Cpp()
@@ -104,7 +107,7 @@ CBLTest_Cpp::~CBLTest_Cpp() {
 }
 
 
-cbl::Database CBLTest_Cpp::openEmptyDatabaseNamed(const char *name) {
+cbl::Database CBLTest_Cpp::openEmptyDatabaseNamed(slice name) {
     cbl::Database::deleteDatabase(name, CBLTest::kDatabaseConfiguration.directory);
     cbl::Database emptyDB = cbl::Database(name, CBLTest::kDatabaseConfiguration);
     REQUIRE(emptyDB);
@@ -169,20 +172,18 @@ unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
     CBLError error;
     unsigned numDocs = 0;
 
-    CHECK(CBLDatabase_BeginBatch(database, &error));
+    cbl::Transaction t(database);
     ReadFileByLines(path, [&](FLSlice line) {
         char docID[20];
         sprintf(docID, "%07u", numDocs+1);
-        auto doc = CBLDocument_New(docID);
-        REQUIRE(CBLDocument_SetPropertiesAsJSON(doc, slice(line).asString().c_str(), &error));
-        auto savedDoc = CBLDatabase_SaveDocument(database, doc, kCBLConcurrencyControlFailOnConflict, &error);
-        CHECK(savedDoc);
+        auto doc = CBLDocument_CreateWithID(slice(docID));
+        REQUIRE(CBLDocument_SetJSON(doc, line, &error));
+        CHECK(CBLDatabase_SaveDocumentWithConcurrencyControl(database, doc, kCBLConcurrencyControlFailOnConflict, &error));
         CBLDocument_Release(doc);
-        CBLDocument_Release(savedDoc);
         ++numDocs;
         return true;
     });
     CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Committing %u docs...", numDocs);
-    CHECK(CBLDatabase_EndBatch(database, &error));
+    t.commit();
     return numDocs;
 }

@@ -17,8 +17,9 @@
 //
 
 #pragma once
-#include "CouchbaseLite.h"
-#include "CouchbaseLite.hh"
+#include "cbl/CouchbaseLite.h"
+#include "CBLPrivate.h"
+#include "fleece/slice.hh"
 #include <functional>
 #include <iostream>
 #include <string>
@@ -27,6 +28,14 @@
 constexpr char kPathSeparator[] = "\\";
 #else
 constexpr char kPathSeparator[] = "/";
+#endif
+
+#ifdef __APPLE__
+#   define CBL_UNUSED __unused
+#elif !defined(_MSC_VER)
+#   define CBL_UNUSED __attribute__((unused))
+#else
+#   define CBL_UNUSED
 #endif
 
 // Has to be declared before including catch.hpp, so Catch macros can use it
@@ -53,8 +62,8 @@ static inline std::ostream& operator<< (std::ostream &out, CBLError err) {
 
 class CBLTest {
 public:
-    static std::string kDatabaseDir;
-    static const char* const kDatabaseName;
+    static const fleece::alloc_slice kDatabaseDir;
+    static const fleece::slice kDatabaseName;
     static const CBLDatabaseConfiguration kDatabaseConfiguration;
 
     CBLTest();
@@ -65,21 +74,16 @@ public:
 };
 
 
-class CBLTest_Cpp {
-public:
-    static std::string& kDatabaseDir;
-    static const char* const &kDatabaseName;
-
-    CBLTest_Cpp();
-    ~CBLTest_Cpp();
-
-    cbl::Database openEmptyDatabaseNamed(const char *name);
-
-    cbl::Database db;
-};
-
 std::string GetTestFilePath(const std::string &filename);
 
 bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)> &callback);
 
 unsigned ImportJSONLines(std::string &&path, CBLDatabase* database);
+
+
+// RAII utility to suppress reporting C++ exceptions (or breaking at them, in the Xcode debugger.)
+// Declare an instance when testing something that's expected to throw an exception internally.
+struct ExpectingExceptions {
+    ExpectingExceptions()   {CBLLog_BeginExpectingExceptions();}
+    ~ExpectingExceptions()  {CBLLog_EndExpectingExceptions();}
+};

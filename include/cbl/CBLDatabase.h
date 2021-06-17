@@ -20,32 +20,25 @@
 #include "CBLBase.h"
 #include "fleece/FLSlice.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+CBL_CAPI_BEGIN
 
 /** \defgroup database   Database
     @{
     A \ref CBLDatabase is both a filesystem object and a container for documents.
  */
 
+#ifdef __APPLE__
 #pragma mark - CONFIGURATION
+#endif
+
 /** \name  Database configuration
     @{ */
 
-/** Flags for how to open a database. */
-typedef CBL_OPTIONS(uint32_t, CBLDatabaseFlags) {
-    kCBLDatabase_Create        = 1,  ///< Create the file if it doesn't exist
-    kCBLDatabase_ReadOnly      = 2,  ///< Open file read-only
-    kCBLDatabase_NoUpgrade     = 4,  ///< Disable upgrading an older-version database
-};
-
+#ifdef COUCHBASE_ENTERPRISE
 /** Database encryption algorithms (available only in the Enterprise Edition). */
 typedef CBL_ENUM(uint32_t, CBLEncryptionAlgorithm) {
-    kCBLEncryptionNone = 0,      ///< No encryption (default)
-#ifdef COUCHBASE_ENTERPRISE
-    kCBLEncryptionAES256,        ///< AES with 256-bit key
-#endif
+    kCBLEncryptionNone = 0,         ///< No encryption (default)
+    kCBLEncryptionAES256            ///< AES with 256-bit key
 };
 
 /** Encryption key sizes (in bytes). */
@@ -58,31 +51,35 @@ typedef struct CBLEncryptionKey {
     CBLEncryptionAlgorithm algorithm;       ///< Encryption algorithm
     uint8_t bytes[32];                      ///< Raw key data
 } CBLEncryptionKey;
+#endif
 
 /** Database configuration options. */
 typedef struct {
-    const char *directory;                  ///< The parent directory of the database
-    CBLDatabaseFlags flags;                 ///< Options for opening the database
-    CBLEncryptionKey* encryptionKey;        ///< The database's encryption key (if any)
+    FLString directory;                 ///< The parent directory of the database
+#ifdef COUCHBASE_ENTERPRISE
+    CBLEncryptionKey encryptionKey;     ///< The database's encryption key (if any)
+#endif
 } CBLDatabaseConfiguration;
 
-typedef struct {
-    FLString directory;                     ///< The parent directory of the database
-    CBLDatabaseFlags flags;                 ///< Options for opening the database
-    CBLEncryptionKey* encryptionKey;        ///< The database's encryption key (if any)
-} CBLDatabaseConfiguration_s;
-
-
 /** Returns the default database configuration. */
-CBLDatabaseConfiguration CBLDatabaseConfiguration_Default(void);
+CBLDatabaseConfiguration CBLDatabaseConfiguration_Default(void) CBLAPI;
 
-CBLDatabaseConfiguration_s CBLDatabaseConfiguration_Default_s(void);
+#ifdef COUCHBASE_ENTERPRISE
+/** Derives an encryption key from a password. If your UI uses passwords, call this function to
+    create the key used to encrypt the database. It is designed for security, and deliberately
+    runs slowly to make brute-force attacks impractical.
+    @param key  The derived AES key will be stored here.
+    @param password  The input password, which can be any data.
+    @return  True on success, false if there was a problem deriving the key. */
+bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBLAPI;
+#endif
 
 /** @} */
 
 
-
+#ifdef __APPLE__
 #pragma mark - FILE OPERATIONS
+#endif
 /** \name  Database file operations
     @{
     These functions operate on database files without opening them.
@@ -92,45 +89,35 @@ CBLDatabaseConfiguration_s CBLDatabaseConfiguration_Default_s(void);
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
                         absolute or relative path to the database. */
-bool CBL_DatabaseExists(const char* _cbl_nonnull name, const char *inDirectory) CBLAPI;
-
-bool CBL_DatabaseExists_s(FLString name, FLString inDirectory) CBLAPI;
+bool CBL_DatabaseExists(FLString name, FLString inDirectory) CBLAPI;
 
 /** Copies a database file to a new location, and assigns it a new internal UUID to distinguish
     it from the original database when replicating.
     @param fromPath  The full filesystem path to the original database (including extension).
     @param toName  The new database name (without the ".cblite2" extension.)
     @param config  The database configuration (directory and encryption option.) */
-bool CBL_CopyDatabase(const char* _cbl_nonnull fromPath,
-                      const char* _cbl_nonnull toName,
-                      const CBLDatabaseConfiguration* config,
-                      CBLError*) CBLAPI;
-
-bool CBL_CopyDatabase_s(FLString fromPath,
-                        FLString toName,
-                        const CBLDatabaseConfiguration_s* config,
-                        CBLError*) CBLAPI;
+bool CBL_CopyDatabase(FLString fromPath,
+                      FLString toName,
+                      const CBLDatabaseConfiguration* _cbl_nullable config,
+                      CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Deletes a database file. If the database file is open, an error is returned.
     @param name  The database name (without the ".cblite2" extension.)
     @param inDirectory  The directory containing the database. If NULL, `name` must be an
                         absolute or relative path to the database.
     @param outError  On return, will be set to the error that occurred, or a 0 code if no error.
-     @return  True if the database was deleted, false if it doesn't exist or deletion failed.
+    @return  True if the database was deleted, false if it doesn't exist or deletion failed.
                 (You can tell the last two cases apart by looking at \p outError.)*/
-bool CBL_DeleteDatabase(const char *name _cbl_nonnull,
-                        const char *inDirectory,
-                        CBLError *outError) CBLAPI;
-
-bool CBL_DeleteDatabase_s(FLString name,
-                          FLString inDirectory,
-                          CBLError *outError) CBLAPI;
+bool CBL_DeleteDatabase(FLString name,
+                        FLString inDirectory,
+                        CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 
 
-
+#ifdef __APPLE__
 #pragma mark - LIFECYCLE
+#endif
 /** \name  Database lifecycle
     @{
     Opening, closing, and managing open databases.
@@ -142,37 +129,37 @@ bool CBL_DeleteDatabase_s(FLString name,
     independent of the others (and must be separately closed and released.)
     @param name  The database name (without the ".cblite2" extension.)
     @param config  The database configuration (directory and encryption option.)
-    @param error  On failure, the error will be written here.
+    @param outError  On failure, the error will be written here.
     @return  The new database object, or NULL on failure. */
 _cbl_warn_unused
-CBLDatabase* CBLDatabase_Open(const char *name _cbl_nonnull,
-                              const CBLDatabaseConfiguration* config,
-                              CBLError* error) CBLAPI;
-
-_cbl_warn_unused
-CBLDatabase* CBLDatabase_Open_s(FLSlice name,
-                                const CBLDatabaseConfiguration_s* config,
-                                CBLError* error) CBLAPI;
+CBLDatabase* CBLDatabase_Open(FLSlice name,
+                              const CBLDatabaseConfiguration* _cbl_nullable config,
+                              CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Closes an open database. */
-bool CBLDatabase_Close(CBLDatabase*, CBLError*) CBLAPI;
+bool CBLDatabase_Close(CBLDatabase*,
+                       CBLError* _cbl_nullable outError) CBLAPI;
 
 CBL_REFCOUNTED(CBLDatabase*, Database);
 
 /** Closes and deletes a database. If there are any other connections to the database,
     an error is returned. */
-bool CBLDatabase_Delete(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+bool CBLDatabase_Delete(CBLDatabase*,
+                        CBLError* _cbl_nullable outError) CBLAPI;
 
-/** Begins a batch operation, similar to a transaction. You **must** later call \ref
-    CBLDatabase_EndBatch to end (commit) the batch.
-    @note  Multiple writes are much faster when grouped inside a single batch.
+/** Begins a transaction. You **must** later call \ref
+    CBLDatabase_EndTransaction to commit or abort the transaction.
+    @note  Multiple writes are much faster when grouped in a transaction.
     @note  Changes will not be visible to other CBLDatabase instances on the same database until
-            the batch operation ends.
-    @note  Batch operations can nest. Changes are not committed until the outer batch ends. */
-bool CBLDatabase_BeginBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+            the transaction ends.
+    @note  Transactions can nest. Changes are not committed until the outer transaction ends. */
+bool CBLDatabase_BeginTransaction(CBLDatabase*,
+                                  CBLError* _cbl_nullable outError) CBLAPI;
 
-/** Ends a batch operation. This **must** be called after \ref CBLDatabase_BeginBatch. */
-bool CBLDatabase_EndBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
+/** Ends a transaction, either committing or aborting. */
+bool CBLDatabase_EndTransaction(CBLDatabase*,
+                                bool commit,
+                                CBLError* _cbl_nullable outError) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Encrypts or decrypts a database, or changes its encryption key.
@@ -180,9 +167,9 @@ bool CBLDatabase_EndBatch(CBLDatabase* _cbl_nonnull, CBLError*) CBLAPI;
     If \p newKey is NULL, or its \p algorithm is \ref kCBLEncryptionNone, the database will be decrypted.
     Otherwise the database will be encrypted with that key; if it was already encrypted, it will be
     re-encrypted with the new key.*/
-bool CBLDatabase_Rekey(CBLDatabase* _cbl_nonnull,
-                       const CBLEncryptionKey *newKey,
-                       CBLError* outError) CBLAPI;
+bool CBLDatabase_ChangeEncryptionKey(CBLDatabase*,
+                                     const CBLEncryptionKey* _cbl_nullable newKey,
+                                     CBLError* outError) CBLAPI;
 #endif
 
 /** Maintenance Type used when performing database maintenance. */
@@ -193,38 +180,41 @@ typedef CBL_ENUM(uint32_t, CBLMaintenanceType) {
 };
 
 /**  Performs database maintenance. */
-bool CBLDatabase_PerformMaintenance(CBLDatabase* db _cbl_nonnull,
+bool CBLDatabase_PerformMaintenance(CBLDatabase* db,
                                     CBLMaintenanceType type,
-                                    CBLError* outError) CBLAPI;
+                                    CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 
 
-
+#ifdef __APPLE__
 #pragma mark - ACCESSORS
+#endif
 /** \name  Database accessors
     @{
     Getting information about a database.
  */
 
 /** Returns the database's name. */
-const char* CBLDatabase_Name(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
+FLString CBLDatabase_Name(const CBLDatabase*) CBLAPI;
 
 /** Returns the database's full filesystem path. */
-const char* CBLDatabase_Path(const CBLDatabase* _cbl_nonnull) CBLAPI _cbl_returns_nonnull;
+_cbl_warn_unused
+FLStringResult CBLDatabase_Path(const CBLDatabase*) CBLAPI;
 
 /** Returns the number of documents in the database. */
-uint64_t CBLDatabase_Count(const CBLDatabase* _cbl_nonnull) CBLAPI;
+uint64_t CBLDatabase_Count(const CBLDatabase*) CBLAPI;
 
 /** Returns the database's configuration, as given when it was opened.
     @note  The encryption key is not filled in, for security reasons. */
-const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* _cbl_nonnull) CBLAPI;
+const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*) CBLAPI;
 
 /** @} */
 
 
-
+#ifdef __APPLE__
 #pragma mark - LISTENERS
+#endif
 /** \name  Database listeners
     @{
     A database change listener lets you detect changes made to all documents in a database.
@@ -241,10 +231,10 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* _cbl_nonnul
     @param db  The database that changed.
     @param numDocs  The number of documents that changed (size of the `docIDs` array)
     @param docIDs  The IDs of the documents that changed, as a C array of `numDocs` C strings. */
-    typedef void (*CBLDatabaseChangeListener)(void *context,
-                                              const CBLDatabase* db _cbl_nonnull,
-                                              unsigned numDocs,
-                                              const char **docIDs _cbl_nonnull);
+typedef void (*CBLDatabaseChangeListener)(void* _cbl_nullable context,
+                                          const CBLDatabase* db,
+                                          unsigned numDocs,
+                                          FLString docIDs[_cbl_nonnull]);
 
 /** Registers a database change listener callback. It will be called after one or more
     documents are changed on disk.
@@ -254,16 +244,17 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* _cbl_nonnul
     @return  A token to be passed to \ref CBLListener_Remove when it's time to remove the
             listener.*/
 _cbl_warn_unused
-CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db _cbl_nonnull,
-                                                CBLDatabaseChangeListener listener _cbl_nonnull,
-                                                void *context) CBLAPI;
+CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
+                                                CBLDatabaseChangeListener listener,
+                                                void* _cbl_nullable context) CBLAPI;
 
 /** @} */
 /** @} */    // end of outer \defgroup
 
 
-
+#ifdef __APPLE__
 #pragma mark - NOTIFICATION SCHEDULING
+#endif
 /** \defgroup listeners   Listeners
     @{ */
 /** \name  Scheduling notifications
@@ -287,8 +278,8 @@ CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db _cbl_nonnu
             you will not be informed that any listeners are ready.
     @warning  This can be called from arbitrary threads. It should do as little work as
               possible, just scheduling a future call to \ref CBLDatabase_SendNotifications. */
-typedef void (*CBLNotificationsReadyCallback)(void *context,
-                                              CBLDatabase* db _cbl_nonnull);
+typedef void (*CBLNotificationsReadyCallback)(void* _cbl_nullable context,
+                                              CBLDatabase* db);
 
 /** Switches the database to buffered-notification mode. Notifications for objects belonging
     to this database (documents, queries, replicators, and of course the database) will not be
@@ -296,17 +287,15 @@ typedef void (*CBLNotificationsReadyCallback)(void *context,
     @param db  The database whose notifications are to be buffered.
     @param callback  The function to be called when a notification is available.
     @param context  An arbitrary value that will be passed to the callback. */
-void CBLDatabase_BufferNotifications(CBLDatabase *db _cbl_nonnull,
-                                     CBLNotificationsReadyCallback callback _cbl_nonnull,
-                                     void *context) CBLAPI;
+void CBLDatabase_BufferNotifications(CBLDatabase *db,
+                                     CBLNotificationsReadyCallback callback,
+                                     void* _cbl_nullable context) CBLAPI;
 
 /** Immediately issues all pending notifications for this database, by calling their listener
     callbacks. */
-void CBLDatabase_SendNotifications(CBLDatabase *db _cbl_nonnull) CBLAPI;
+void CBLDatabase_SendNotifications(CBLDatabase *db) CBLAPI;
                                      
 /** @} */
 /** @} */    // end of outer \defgroup
 
-#ifdef __cplusplus
-}
-#endif
+CBL_CAPI_END

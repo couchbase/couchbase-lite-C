@@ -99,9 +99,9 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Query objects</h2></td></tr>
-<tr class="memitem:ga108d9804e49143f5a50a87d1ccc27d3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga108d9804e49143f5a50a87d1ccc27d3c">CBLQuery_New</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__queries.html#ga5b419d879de00f45eb417c451e21ac82">CBLQueryLanguage</a> language, const char *queryString, int *outErrorPos, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
-<tr class="memdesc:ga108d9804e49143f5a50a87d1ccc27d3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new query by compiling the input string.  <a href="#ga108d9804e49143f5a50a87d1ccc27d3c">More...</a><br /></td></tr>
-<tr class="separator:ga108d9804e49143f5a50a87d1ccc27d3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1df03c28b75a8b8860265f2c007966f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga1df03c28b75a8b8860265f2c007966f6">CBLQuery_New</a> (const <a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group__queries.html#ga5b419d879de00f45eb417c451e21ac82">CBLQueryLanguage</a> language, <a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> queryString, int *outErrorPos, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
+<tr class="memdesc:ga1df03c28b75a8b8860265f2c007966f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new query by compiling the input string.  <a href="#ga1df03c28b75a8b8860265f2c007966f6">More...</a><br /></td></tr>
+<tr class="separator:ga1df03c28b75a8b8860265f2c007966f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5851da5f9dcd02be5ce0c54073c22d7d"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga5851da5f9dcd02be5ce0c54073c22d7d">CBLQuery_Retain</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *t)</td></tr>
 <tr class="separator:ga5851da5f9dcd02be5ce0c54073c22d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9e9d4b09cb767cdaa820996ea9992f43"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga9e9d4b09cb767cdaa820996ea9992f43">CBLQuery_Release</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *t)</td></tr>
@@ -109,40 +109,46 @@ Query objects</h2></td></tr>
 <tr class="memitem:ga3423414402261bfc1a8d66080b09ec96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga3423414402261bfc1a8d66080b09ec96">CBLQuery_SetParameters</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> parameters)</td></tr>
 <tr class="memdesc:ga3423414402261bfc1a8d66080b09ec96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns values to the query's parameters.  <a href="#ga3423414402261bfc1a8d66080b09ec96">More...</a><br /></td></tr>
 <tr class="separator:ga3423414402261bfc1a8d66080b09ec96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6ea36ae2b985b71892c1c515e033e773"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga6ea36ae2b985b71892c1c515e033e773">CBLQuery_Parameters</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query)</td></tr>
-<tr class="memdesc:ga6ea36ae2b985b71892c1c515e033e773"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the query's current parameter bindings, if any.  <a href="#ga6ea36ae2b985b71892c1c515e033e773">More...</a><br /></td></tr>
-<tr class="separator:ga6ea36ae2b985b71892c1c515e033e773"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa681edd999abac721fc4db7c12b5193a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaa681edd999abac721fc4db7c12b5193a">CBLQuery_SetParametersAsJSON</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, const char *json)</td></tr>
-<tr class="memdesc:gaa681edd999abac721fc4db7c12b5193a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns values to the query's parameters, from JSON data.  <a href="#gaa681edd999abac721fc4db7c12b5193a">More...</a><br /></td></tr>
-<tr class="separator:gaa681edd999abac721fc4db7c12b5193a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga817928d138b287462e088a15e4d713cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga817928d138b287462e088a15e4d713cf">CBLQuery_Parameters</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query)</td></tr>
+<tr class="memdesc:ga817928d138b287462e088a15e4d713cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the query's current parameter bindings, if any.  <a href="#ga817928d138b287462e088a15e4d713cf">More...</a><br /></td></tr>
+<tr class="separator:ga817928d138b287462e088a15e4d713cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gacf4a560b717dc9dd929cf4816a6e46d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gacf4a560b717dc9dd929cf4816a6e46d5">CBLQuery_Execute</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *)</td></tr>
 <tr class="memdesc:gacf4a560b717dc9dd929cf4816a6e46d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Runs the query, returning the results.  <a href="#gacf4a560b717dc9dd929cf4816a6e46d5">More...</a><br /></td></tr>
 <tr class="separator:gacf4a560b717dc9dd929cf4816a6e46d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2ce033701d68ef4a20bba8a162a8f069"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga2ce033701d68ef4a20bba8a162a8f069">CBLQuery_Explain</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
-<tr class="memdesc:ga2ce033701d68ef4a20bba8a162a8f069"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns information about the query, including the translated SQLite form, and the search strategy.  <a href="#ga2ce033701d68ef4a20bba8a162a8f069">More...</a><br /></td></tr>
-<tr class="separator:ga2ce033701d68ef4a20bba8a162a8f069"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf173d3368558a02792319a0044b83c63"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaf173d3368558a02792319a0044b83c63">CBLQuery_ColumnCount</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
-<tr class="memdesc:gaf173d3368558a02792319a0044b83c63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of columns in each result.  <a href="#gaf173d3368558a02792319a0044b83c63">More...</a><br /></td></tr>
-<tr class="separator:gaf173d3368558a02792319a0044b83c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4463d6260952ab1dab155410315a0c8d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga4463d6260952ab1dab155410315a0c8d">CBLQuery_ColumnName</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *, unsigned columnIndex)</td></tr>
-<tr class="memdesc:ga4463d6260952ab1dab155410315a0c8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of a column in the result.  <a href="#ga4463d6260952ab1dab155410315a0c8d">More...</a><br /></td></tr>
-<tr class="separator:ga4463d6260952ab1dab155410315a0c8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4c6f1b2adc39570525ef32c2df7edead"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga4c6f1b2adc39570525ef32c2df7edead">CBLQuery_Explain</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
+<tr class="memdesc:ga4c6f1b2adc39570525ef32c2df7edead"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns information about the query, including the translated SQLite form, and the search strategy.  <a href="#ga4c6f1b2adc39570525ef32c2df7edead">More...</a><br /></td></tr>
+<tr class="separator:ga4c6f1b2adc39570525ef32c2df7edead"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadef5a733ba8ad85acc107aca0de196ea"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gadef5a733ba8ad85acc107aca0de196ea">CBLQuery_ColumnCount</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *)</td></tr>
+<tr class="memdesc:gadef5a733ba8ad85acc107aca0de196ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of columns in each result.  <a href="#gadef5a733ba8ad85acc107aca0de196ea">More...</a><br /></td></tr>
+<tr class="separator:gadef5a733ba8ad85acc107aca0de196ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga50ec9db5507921022bc0a1947da9d5eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_f_l_slice.html">FLSlice</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga50ec9db5507921022bc0a1947da9d5eb">CBLQuery_ColumnName</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *, unsigned columnIndex)</td></tr>
+<tr class="memdesc:ga50ec9db5507921022bc0a1947da9d5eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of a column in the result.  <a href="#ga50ec9db5507921022bc0a1947da9d5eb">More...</a><br /></td></tr>
+<tr class="separator:ga50ec9db5507921022bc0a1947da9d5eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Result sets</h2></td></tr>
 <tr><td class="ititle" colspan="2"><p><a class="anchor" id="amgrp927e39946158e696a616aeda4abc9749"></a>A <code>CBLResultSet</code> is an iterator over the results returned by a query.</p>
 <p>It exposes one result at a time &ndash; as a collection of values indexed either by position or by name &ndash; and can be stepped from one result to the next.</p>
-<p>It's important to note that the initial position of the iterator is <em>before</em> the first result, so <a class="el" href="group__queries.html#gaba853a70756d12151e7c34df2c8fb1ad">CBLResultSet_Next</a> must be called <em>first</em>. </p>
-</td></tr>
-<tr class="memitem:gaba853a70756d12151e7c34df2c8fb1ad"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaba853a70756d12151e7c34df2c8fb1ad">CBLResultSet_Next</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *)</td></tr>
-<tr class="memdesc:gaba853a70756d12151e7c34df2c8fb1ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Moves the result-set iterator to the next result.  <a href="#gaba853a70756d12151e7c34df2c8fb1ad">More...</a><br /></td></tr>
-<tr class="separator:gaba853a70756d12151e7c34df2c8fb1ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6298e2a65b725dd5f5edc4296f5687aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga6298e2a65b725dd5f5edc4296f5687aa">CBLResultSet_ValueAtIndex</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *, unsigned index)</td></tr>
-<tr class="memdesc:ga6298e2a65b725dd5f5edc4296f5687aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of a column of the current result, given its (zero-based) numeric index.  <a href="#ga6298e2a65b725dd5f5edc4296f5687aa">More...</a><br /></td></tr>
-<tr class="separator:ga6298e2a65b725dd5f5edc4296f5687aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8e012b431aa192f2064fde2136bfbf5a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga8e012b431aa192f2064fde2136bfbf5a">CBLResultSet_ValueForKey</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *, const char *key)</td></tr>
-<tr class="memdesc:ga8e012b431aa192f2064fde2136bfbf5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of a column of the current result, given its name.  <a href="#ga8e012b431aa192f2064fde2136bfbf5a">More...</a><br /></td></tr>
-<tr class="separator:ga8e012b431aa192f2064fde2136bfbf5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<p>It's important to note that the initial position of the iterator is <em>before</em> the first result, so <a class="el" href="group__queries.html#ga7a908902f5f46ff71ae73e5747b4df94">CBLResultSet_Next</a> must be called <em>first</em>. Example:</p>
+<div class="fragment"><div class="line"><a class="code" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *rs = <a class="code" href="group__queries.html#gacf4a560b717dc9dd929cf4816a6e46d5">CBLQuery_Execute</a>(query, &amp;error);</div><div class="line">assert(rs);</div><div class="line"><span class="keywordflow">while</span> (<a class="code" href="group__queries.html#ga7a908902f5f46ff71ae73e5747b4df94">CBLResultSet_Next</a>(rs) {</div><div class="line">    <a class="code" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> aValue = <a class="code" href="group__queries.html#gae5ce9eb45abb997951a8fda71b309d35">CBLResultSet_ValueAtIndex</a>(rs, 0);</div><div class="line">    ...</div><div class="line">}</div><div class="line"><a class="code" href="group__queries.html#gaa1c246d416e05c7e161fe2c894a645ae">CBLResultSet_Release</a>(rs);</div></div><!-- fragment --> </td></tr>
+<tr class="memitem:ga7a908902f5f46ff71ae73e5747b4df94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga7a908902f5f46ff71ae73e5747b4df94">CBLResultSet_Next</a> (<a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *)</td></tr>
+<tr class="memdesc:ga7a908902f5f46ff71ae73e5747b4df94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Moves the result-set iterator to the next result.  <a href="#ga7a908902f5f46ff71ae73e5747b4df94">More...</a><br /></td></tr>
+<tr class="separator:ga7a908902f5f46ff71ae73e5747b4df94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae5ce9eb45abb997951a8fda71b309d35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gae5ce9eb45abb997951a8fda71b309d35">CBLResultSet_ValueAtIndex</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *, unsigned index)</td></tr>
+<tr class="memdesc:gae5ce9eb45abb997951a8fda71b309d35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of a column of the current result, given its (zero-based) numeric index.  <a href="#gae5ce9eb45abb997951a8fda71b309d35">More...</a><br /></td></tr>
+<tr class="separator:gae5ce9eb45abb997951a8fda71b309d35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1e4443df45a4e56714a1790b841f0b0e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga1e4443df45a4e56714a1790b841f0b0e">CBLResultSet_ValueForKey</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *, <a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> key)</td></tr>
+<tr class="memdesc:ga1e4443df45a4e56714a1790b841f0b0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of a column of the current result, given its name.  <a href="#ga1e4443df45a4e56714a1790b841f0b0e">More...</a><br /></td></tr>
+<tr class="separator:ga1e4443df45a4e56714a1790b841f0b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga57fdd6216578112e0ec7b5073f910983"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga57fdd6216578112e0ec7b5073f910983">CBLResultSet_ResultArray</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *)</td></tr>
+<tr class="memdesc:ga57fdd6216578112e0ec7b5073f910983"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current result as an array of column values.  <a href="#ga57fdd6216578112e0ec7b5073f910983">More...</a><br /></td></tr>
+<tr class="separator:ga57fdd6216578112e0ec7b5073f910983"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga639f61bd8cb0b231b5d54c49389f6a4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga639f61bd8cb0b231b5d54c49389f6a4a">CBLResultSet_ResultDict</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *)</td></tr>
+<tr class="memdesc:ga639f61bd8cb0b231b5d54c49389f6a4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current result as a dictionary mapping column names to values.  <a href="#ga639f61bd8cb0b231b5d54c49389f6a4a">More...</a><br /></td></tr>
+<tr class="separator:ga639f61bd8cb0b231b5d54c49389f6a4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0067d5f5028310d26e6c4aa7c413a848"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga0067d5f5028310d26e6c4aa7c413a848">CBLResultSet_GetQuery</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *rs)</td></tr>
+<tr class="memdesc:ga0067d5f5028310d26e6c4aa7c413a848"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Query that created this ResultSet.  <a href="#ga0067d5f5028310d26e6c4aa7c413a848">More...</a><br /></td></tr>
+<tr class="separator:ga0067d5f5028310d26e6c4aa7c413a848"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3a20876309e1c7f9dadce80636662f06"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga3a20876309e1c7f9dadce80636662f06">CBLResultSet_Retain</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *t)</td></tr>
 <tr class="separator:ga3a20876309e1c7f9dadce80636662f06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa1c246d416e05c7e161fe2c894a645ae"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaa1c246d416e05c7e161fe2c894a645ae">CBLResultSet_Release</a> (const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *t)</td></tr>
@@ -160,9 +166,9 @@ Change listener</h2></td></tr>
 <tr class="memitem:ga0577b29f49f70a1d579beb40ded2cf97"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga0577b29f49f70a1d579beb40ded2cf97">CBLQuery_AddChangeListener</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__queries.html#gaeb35554f81b1d8e9702708940966c869">CBLQueryChangeListener</a> listener, void *context)</td></tr>
 <tr class="memdesc:ga0577b29f49f70a1d579beb40ded2cf97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a change listener callback with a query, turning it into a "live query" until the listener is removed (via <a class="el" href="group__listeners.html#ga6f2cb5bfdfb95332e9c2be1d4f0e7cc9">CBLListener_Remove</a>).  <a href="#ga0577b29f49f70a1d579beb40ded2cf97">More...</a><br /></td></tr>
 <tr class="separator:ga0577b29f49f70a1d579beb40ded2cf97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5ff23d5a5138f74ac0efafbe3b23f521"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga5ff23d5a5138f74ac0efafbe3b23f521">CBLQuery_CurrentResults</a> (<a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *listener, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
-<tr class="memdesc:ga5ff23d5a5138f74ac0efafbe3b23f521"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the query's <em>entire</em> current result set, after it's been announced via a call to the listener's callback.  <a href="#ga5ff23d5a5138f74ac0efafbe3b23f521">More...</a><br /></td></tr>
-<tr class="separator:ga5ff23d5a5138f74ac0efafbe3b23f521"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga60d15fdcf9e070fb9ed8f4d4c7cf9963"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga60d15fdcf9e070fb9ed8f4d4c7cf9963">CBLQuery_CopyCurrentResults</a> (const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *query, <a class="el" href="group__listeners.html#gae39d1de7cc3a46004b597f5eb80620c6">CBLListenerToken</a> *listener, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *error)</td></tr>
+<tr class="memdesc:ga60d15fdcf9e070fb9ed8f4d4c7cf9963"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the query's <em>entire</em> current result set, after it's been announced via a call to the listener's callback.  <a href="#ga60d15fdcf9e070fb9ed8f4d4c7cf9963">More...</a><br /></td></tr>
+<tr class="separator:ga60d15fdcf9e070fb9ed8f4d4c7cf9963"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 Database Indexes</h2></td></tr>
@@ -177,15 +183,15 @@ Database Indexes</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:gac5266cfb9be1fb0441d87df7bb022356"><td class="mdescLeft">&#160;</td><td class="mdescRight">Types of database indexes.  <a href="group__queries.html#gac5266cfb9be1fb0441d87df7bb022356">More...</a><br /></td></tr>
 <tr class="separator:gac5266cfb9be1fb0441d87df7bb022356"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga2ee9cab177b48e23cc014a7352845fe3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga2ee9cab177b48e23cc014a7352845fe3">CBLDatabase_CreateIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *name, <a class="el" href="struct_c_b_l_index_spec.html">CBLIndexSpec</a>, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
-<tr class="memdesc:ga2ee9cab177b48e23cc014a7352845fe3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a database index.  <a href="#ga2ee9cab177b48e23cc014a7352845fe3">More...</a><br /></td></tr>
-<tr class="separator:ga2ee9cab177b48e23cc014a7352845fe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga422db1db49ee8f1b8eabfb309690bed1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga422db1db49ee8f1b8eabfb309690bed1">CBLDatabase_DeleteIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, const char *name, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
-<tr class="memdesc:ga422db1db49ee8f1b8eabfb309690bed1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes an index given its name.  <a href="#ga422db1db49ee8f1b8eabfb309690bed1">More...</a><br /></td></tr>
-<tr class="separator:ga422db1db49ee8f1b8eabfb309690bed1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaff42f742e1571e29975ca2c619602893"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gaff42f742e1571e29975ca2c619602893">CBLDatabase_IndexNames</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db)</td></tr>
-<tr class="memdesc:gaff42f742e1571e29975ca2c619602893"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the names of the indexes on this database, as an array of strings.  <a href="#gaff42f742e1571e29975ca2c619602893">More...</a><br /></td></tr>
-<tr class="separator:gaff42f742e1571e29975ca2c619602893"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga303add478e33be51bfc2b7a14eece722"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga303add478e33be51bfc2b7a14eece722">CBLDatabase_CreateIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> name, <a class="el" href="struct_c_b_l_index_spec.html">CBLIndexSpec</a> spec, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:ga303add478e33be51bfc2b7a14eece722"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a database index.  <a href="#ga303add478e33be51bfc2b7a14eece722">More...</a><br /></td></tr>
+<tr class="separator:ga303add478e33be51bfc2b7a14eece722"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad62586f0d90e0be74ef67d0a3653e6b4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#gad62586f0d90e0be74ef67d0a3653e6b4">CBLDatabase_DeleteIndex</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db, <a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a> name, <a class="el" href="struct_c_b_l_error.html">CBLError</a> *outError)</td></tr>
+<tr class="memdesc:gad62586f0d90e0be74ef67d0a3653e6b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes an index given its name.  <a href="#gad62586f0d90e0be74ef67d0a3653e6b4">More...</a><br /></td></tr>
+<tr class="separator:gad62586f0d90e0be74ef67d0a3653e6b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3d652b932c1ecf735ae9632af79edd98"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__queries.html#ga3d652b932c1ecf735ae9632af79edd98">CBLDatabase_IndexNames</a> (<a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *db)</td></tr>
+<tr class="memdesc:ga3d652b932c1ecf735ae9632af79edd98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the names of the indexes on this database, as a Fleece array of strings.  <a href="#ga3d652b932c1ecf735ae9632af79edd98">More...</a><br /></td></tr>
+<tr class="separator:ga3d652b932c1ecf735ae9632af79edd98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>A CBLQuery represents a compiled database query. </p>
@@ -221,7 +227,7 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>A callback to be invoked after the query's results have changed. </p>
-<p>The actual result set can be obtained by calling <a class="el" href="group__queries.html#ga5ff23d5a5138f74ac0efafbe3b23f521">CBLQuery_CurrentResults</a>, either during the callback or at any time thereafter. </p><dl class="section warning"><dt>Warning</dt><dd>By default, this listener may be called on arbitrary threads. If your code isn't prepared for that, you may want to use <a class="el" href="group__listeners.html#gafe601a68e9e6a7f18904929aa04bce2b">CBLDatabase_BufferNotifications</a> so that listeners will be called in a safe context. </dd></dl>
+<p>The actual result set can be obtained by calling <a class="el" href="group__queries.html#ga60d15fdcf9e070fb9ed8f4d4c7cf9963">CBLQuery_CopyCurrentResults</a>, either during the callback or at any time thereafter. </p><dl class="section warning"><dt>Warning</dt><dd>By default, this listener may be called on arbitrary threads. If your code isn't prepared for that, you may want to use <a class="el" href="group__listeners.html#gafe601a68e9e6a7f18904929aa04bce2b">CBLDatabase_BufferNotifications</a> so that listeners will be called in a safe context. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">context</td><td>The same <code>context</code> value that you passed when adding the listener. </td></tr>
@@ -294,8 +300,8 @@ Database Indexes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ga2ee9cab177b48e23cc014a7352845fe3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga2ee9cab177b48e23cc014a7352845fe3">&#9670;&nbsp;</a></span>CBLDatabase_CreateIndex()</h2>
+<a id="ga303add478e33be51bfc2b7a14eece722"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga303add478e33be51bfc2b7a14eece722">&#9670;&nbsp;</a></span>CBLDatabase_CreateIndex()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -309,14 +315,14 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a>&#160;</td>
           <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="struct_c_b_l_index_spec.html">CBLIndexSpec</a>&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>spec</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -337,8 +343,8 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga422db1db49ee8f1b8eabfb309690bed1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga422db1db49ee8f1b8eabfb309690bed1">&#9670;&nbsp;</a></span>CBLDatabase_DeleteIndex()</h2>
+<a id="gad62586f0d90e0be74ef67d0a3653e6b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad62586f0d90e0be74ef67d0a3653e6b4">&#9670;&nbsp;</a></span>CBLDatabase_DeleteIndex()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -352,7 +358,7 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a>&#160;</td>
           <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
@@ -373,14 +379,14 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="gaff42f742e1571e29975ca2c619602893"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaff42f742e1571e29975ca2c619602893">&#9670;&nbsp;</a></span>CBLDatabase_IndexNames()</h2>
+<a id="ga3d652b932c1ecf735ae9632af79edd98"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3d652b932c1ecf735ae9632af79edd98">&#9670;&nbsp;</a></span>CBLDatabase_IndexNames()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a> CBLDatabase_IndexNames </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__types.html#ga384f95fe181d6050d5757ff85bb8bc82">FLMutableArray</a> CBLDatabase_IndexNames </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__database.html#ga2eef6f33d930c0cee23013f845dc77e0">CBLDatabase</a> *&#160;</td>
           <td class="paramname"><em>db</em></td><td>)</td>
@@ -389,7 +395,7 @@ Database Indexes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the names of the indexes on this database, as an array of strings. </p>
+<p>Returns the names of the indexes on this database, as a Fleece array of strings. </p>
 <dl class="section note"><dt>Note</dt><dd>You are responsible for releasing the returned Fleece array. </dd></dl>
 
 </div>
@@ -439,8 +445,8 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="gaf173d3368558a02792319a0044b83c63"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf173d3368558a02792319a0044b83c63">&#9670;&nbsp;</a></span>CBLQuery_ColumnCount()</h2>
+<a id="gadef5a733ba8ad85acc107aca0de196ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadef5a733ba8ad85acc107aca0de196ea">&#9670;&nbsp;</a></span>CBLQuery_ColumnCount()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -448,7 +454,7 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="memname">unsigned CBLQuery_ColumnCount </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -459,8 +465,8 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga4463d6260952ab1dab155410315a0c8d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4463d6260952ab1dab155410315a0c8d">&#9670;&nbsp;</a></span>CBLQuery_ColumnName()</h2>
+<a id="ga50ec9db5507921022bc0a1947da9d5eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga50ec9db5507921022bc0a1947da9d5eb">&#9670;&nbsp;</a></span>CBLQuery_ColumnName()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -468,7 +474,7 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="struct_f_l_slice.html">FLSlice</a> CBLQuery_ColumnName </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname">, </td>
         </tr>
         <tr>
@@ -486,20 +492,20 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the name of a column in the result. </p>
-<p>The column name is based on its expression in the <code>SELECT...</code> or <code>WHAT:</code> section of the query. A column that returns a property or property path will be named after that property. A column that returns an expression will have an automatically-generated name like <code>$1</code>. To give a column a custom name, use the <code>AS</code> syntax in the query. </p>
+<p>The column name is based on its expression in the <code>SELECT...</code> or <code>WHAT:</code> section of the query. A column that returns a property or property path will be named after that property. A column that returns an expression will have an automatically-generated name like <code>$1</code>. To give a column a custom name, use the <code>AS</code> syntax in the query. Every column is guaranteed to have a unique name. </p>
 
 </div>
 </div>
-<a id="ga5ff23d5a5138f74ac0efafbe3b23f521"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5ff23d5a5138f74ac0efafbe3b23f521">&#9670;&nbsp;</a></span>CBLQuery_CurrentResults()</h2>
+<a id="ga60d15fdcf9e070fb9ed8f4d4c7cf9963"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga60d15fdcf9e070fb9ed8f4d4c7cf9963">&#9670;&nbsp;</a></span>CBLQuery_CopyCurrentResults()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a>* CBLQuery_CurrentResults </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a>* CBLQuery_CopyCurrentResults </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"><em>query</em>, </td>
         </tr>
         <tr>
@@ -523,7 +529,8 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the query's <em>entire</em> current result set, after it's been announced via a call to the listener's callback. </p>
-<p>The returned object is valid until the next call to <a class="el" href="group__queries.html#ga5ff23d5a5138f74ac0efafbe3b23f521">CBLQuery_CurrentResults</a> (with the same query and listener) or until you free the listener. If you need to keep it alive longer, retain it yourself. </p><dl class="params"><dt>Parameters</dt><dd>
+<dl class="section note"><dt>Note</dt><dd>You must release the result set when you're finished with it. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>The query being listened to. </td></tr>
     <tr><td class="paramname">listener</td><td>The query listener that was notified. </td></tr>
@@ -531,7 +538,7 @@ Database Indexes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The query's current result set, or NULL if the query failed to run. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A new object containing the query's current results, or NULL if the query failed to run. </dd></dl>
 
 </div>
 </div>
@@ -562,20 +569,20 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Runs the query, returning the results. </p>
-<p>To obtain the results you'll typically call <a class="el" href="group__queries.html#gaba853a70756d12151e7c34df2c8fb1ad">CBLResultSet_Next</a> in a <code>while</code> loop, examining the values in the <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> each time around. </p><dl class="section note"><dt>Note</dt><dd>You must release the result set when you're finished with it. </dd></dl>
+<p>To obtain the results you'll typically call <a class="el" href="group__queries.html#ga7a908902f5f46ff71ae73e5747b4df94">CBLResultSet_Next</a> in a <code>while</code> loop, examining the values in the <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> each time around. </p><dl class="section note"><dt>Note</dt><dd>You must release the result set when you're finished with it. </dd></dl>
 
 </div>
 </div>
-<a id="ga2ce033701d68ef4a20bba8a162a8f069"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga2ce033701d68ef4a20bba8a162a8f069">&#9670;&nbsp;</a></span>CBLQuery_Explain()</h2>
+<a id="ga4c6f1b2adc39570525ef32c2df7edead"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4c6f1b2adc39570525ef32c2df7edead">&#9670;&nbsp;</a></span>CBLQuery_Explain()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a> CBLQuery_Explain </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> <a class="el" href="struct_f_l_slice_result.html">FLSliceResult</a> CBLQuery_Explain </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -583,12 +590,12 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns information about the query, including the translated SQLite form, and the search strategy. </p>
-<p>You can use this to help optimize the query: the word <code>SCAN</code> in the strategy indicates a linear scan of the entire database, which should be avoided by adding an index. The strategy will also show which index(es), if any, are used. </p>
+<p>You can use this to help optimize the query: the word <code>SCAN</code> in the strategy indicates a linear scan of the entire database, which should be avoided by adding an index. The strategy will also show which index(es), if any, are used. </p><dl class="section note"><dt>Note</dt><dd>You are responsible for releasing the result by calling <a class="el" href="group___f_l_slice.html#ga254cef250e1fb2b3cc8668c30373af04">FLSliceResult_Release</a>. </dd></dl>
 
 </div>
 </div>
-<a id="ga108d9804e49143f5a50a87d1ccc27d3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga108d9804e49143f5a50a87d1ccc27d3c">&#9670;&nbsp;</a></span>CBLQuery_New()</h2>
+<a id="ga1df03c28b75a8b8860265f2c007966f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1df03c28b75a8b8860265f2c007966f6">&#9670;&nbsp;</a></span>CBLQuery_New()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -608,7 +615,7 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a>&#160;</td>
           <td class="paramname"><em>queryString</em>, </td>
         </tr>
         <tr>
@@ -647,8 +654,8 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga6ea36ae2b985b71892c1c515e033e773"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga6ea36ae2b985b71892c1c515e033e773">&#9670;&nbsp;</a></span>CBLQuery_Parameters()</h2>
+<a id="ga817928d138b287462e088a15e4d713cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga817928d138b287462e088a15e4d713cf">&#9670;&nbsp;</a></span>CBLQuery_Parameters()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -656,7 +663,7 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> CBLQuery_Parameters </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
           <td class="paramname"><em>query</em></td><td>)</td>
           <td></td>
         </tr>
@@ -757,51 +764,34 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="gaa681edd999abac721fc4db7c12b5193a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaa681edd999abac721fc4db7c12b5193a">&#9670;&nbsp;</a></span>CBLQuery_SetParametersAsJSON()</h2>
+<a id="ga0067d5f5028310d26e6c4aa7c413a848"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0067d5f5028310d26e6c4aa7c413a848">&#9670;&nbsp;</a></span>CBLResultSet_GetQuery()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool CBLQuery_SetParametersAsJSON </td>
+          <td class="memname"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a>* CBLResultSet_GetQuery </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__queries.html#ga9c80e113b863821f9f82778dc0650f22">CBLQuery</a> *&#160;</td>
-          <td class="paramname"><em>query</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
+          <td class="paramname"><em>rs</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>json</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Assigns values to the query's parameters, from JSON data. </p>
-<p>See <a class="el" href="group__queries.html#ga3423414402261bfc1a8d66080b09ec96">CBLQuery_SetParameters</a> for details. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">query</td><td>The query. </td></tr>
-    <tr><td class="paramname">json</td><td>The parameters in the form of a JSON-encoded object whose keys are the parameter names. (You may use JSON5 syntax.) </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Returns the Query that created this ResultSet. </p>
 
 </div>
 </div>
-<a id="gaba853a70756d12151e7c34df2c8fb1ad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaba853a70756d12151e7c34df2c8fb1ad">&#9670;&nbsp;</a></span>CBLResultSet_Next()</h2>
+<a id="ga7a908902f5f46ff71ae73e5747b4df94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7a908902f5f46ff71ae73e5747b4df94">&#9670;&nbsp;</a></span>CBLResultSet_Next()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool CBLResultSet_Next </td>
+          <td class="memname"><a class="el" href="_c_b_l___compat_8h.html#aeb687d63109ee195bdc9e16c21d4dc9b">_cbl_warn_unused</a> bool CBLResultSet_Next </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -841,6 +831,48 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
+<a id="ga57fdd6216578112e0ec7b5073f910983"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga57fdd6216578112e0ec7b5073f910983">&#9670;&nbsp;</a></span>CBLResultSet_ResultArray()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga7ea954b03aea4f33ec0f55f13aba5f90">FLArray</a> CBLResultSet_ResultArray </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the current result as an array of column values. </p>
+<dl class="section warning"><dt>Warning</dt><dd>The array reference is only valid until the result-set is advanced or released. If you want to keep it for longer, call <a class="el" href="group___f_l_value.html#gaa5c46cdbf9d49a49b9fbd52becf2bf78">FLArray_Retain</a> (and release it when done.) </dd></dl>
+
+</div>
+</div>
+<a id="ga639f61bd8cb0b231b5d54c49389f6a4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga639f61bd8cb0b231b5d54c49389f6a4a">&#9670;&nbsp;</a></span>CBLResultSet_ResultDict()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__types.html#ga20f7b17c87c48ffd2ff6d1cfeddd44e6">FLDict</a> CBLResultSet_ResultDict </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the current result as a dictionary mapping column names to values. </p>
+<dl class="section warning"><dt>Warning</dt><dd>The dict reference is only valid until the result-set is advanced or released. If you want to keep it for longer, call <a class="el" href="group___f_l_value.html#ga6acff14f3e0893c06975a7b64079383f">FLDict_Retain</a> (and release it when done.) </dd></dl>
+
+</div>
+</div>
 <a id="ga3a20876309e1c7f9dadce80636662f06"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga3a20876309e1c7f9dadce80636662f06">&#9670;&nbsp;</a></span>CBLResultSet_Retain()</h2>
 
@@ -867,8 +899,8 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga6298e2a65b725dd5f5edc4296f5687aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga6298e2a65b725dd5f5edc4296f5687aa">&#9670;&nbsp;</a></span>CBLResultSet_ValueAtIndex()</h2>
+<a id="gae5ce9eb45abb997951a8fda71b309d35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae5ce9eb45abb997951a8fda71b309d35">&#9670;&nbsp;</a></span>CBLResultSet_ValueAtIndex()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -876,7 +908,7 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> CBLResultSet_ValueAtIndex </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
           <td class="paramname">, </td>
         </tr>
         <tr>
@@ -898,8 +930,8 @@ Database Indexes</h2></td></tr>
 
 </div>
 </div>
-<a id="ga8e012b431aa192f2064fde2136bfbf5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga8e012b431aa192f2064fde2136bfbf5a">&#9670;&nbsp;</a></span>CBLResultSet_ValueForKey()</h2>
+<a id="ga1e4443df45a4e56714a1790b841f0b0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1e4443df45a4e56714a1790b841f0b0e">&#9670;&nbsp;</a></span>CBLResultSet_ValueForKey()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -907,13 +939,13 @@ Database Indexes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="group__types.html#gae0bde7a426f944395dbe59e3d52ba2c7">FLValue</a> CBLResultSet_ValueForKey </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="group__queries.html#ga9ebc8432e036873fc95f9d575cc42ebd">CBLResultSet</a> *&#160;</td>
           <td class="paramname">, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype"><a class="el" href="group___f_l_slice.html#gabab0e7979cf6c99ffe836e84e55b6c76">FLString</a>&#160;</td>
           <td class="paramname"><em>key</em>&#160;</td>
         </tr>
         <tr>
@@ -925,7 +957,7 @@ Database Indexes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the value of a column of the current result, given its name. </p>
-<p>This may return a NULL pointer, indicating <code>MISSING</code>, if the value doesn't exist, e.g. if the column is a property that doesn't exist in the document. (Or, of course, if the key is not a column name in this query.) </p><dl class="section note"><dt>Note</dt><dd>See <a class="el" href="group__queries.html#ga4463d6260952ab1dab155410315a0c8d">CBLQuery_ColumnName</a> for a discussion of column names. </dd></dl>
+<p>This may return a NULL pointer, indicating <code>MISSING</code>, if the value doesn't exist, e.g. if the column is a property that doesn't exist in the document. (Or, of course, if the key is not a column name in this query.) </p><dl class="section note"><dt>Note</dt><dd>See <a class="el" href="group__queries.html#ga50ec9db5507921022bc0a1947da9d5eb">CBLQuery_ColumnName</a> for a discussion of column names. </dd></dl>
 
 </div>
 </div>

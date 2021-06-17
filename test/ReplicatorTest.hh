@@ -5,7 +5,7 @@
 //
 
 #pragma once
-#include "CBLTest.hh"
+#include "CBLTest_Cpp.hh"
 #include "cbl++/CouchbaseLite.hh"
 #include <iostream>
 #include <thread>
@@ -41,18 +41,18 @@ public:
             ((ReplicatorTest*)context)->statusChanged(r, *status);
         }, this);
 
-        auto dtoken = CBLReplicator_AddDocumentListener(repl, [](void *context, CBLReplicator *r, bool isPush,
+        auto dtoken = CBLReplicator_AddDocumentReplicationListener(repl, [](void *context, CBLReplicator *r, bool isPush,
                                                                  unsigned numDocuments,
                                                                  const CBLReplicatedDocument* documents) {
             ((ReplicatorTest*)context)->docProgress(r, isPush, numDocuments, documents);
         }, this);
 
-        CBLReplicator_Start(repl);
+        CBLReplicator_Start(repl, false);
 
         cerr << "Waiting...\n";
         CBLReplicatorStatus status;
         while ((status = CBLReplicator_Status(repl)).activity != kCBLReplicatorStopped) {
-            this_thread::sleep_for(chrono::milliseconds(100));
+            this_thread::sleep_for(100ms);
         }
         cerr << "Finished with activity=" << status.activity
              << ", error=(" << status.error.domain << "/" << status.error.code << ")\n";
@@ -75,7 +75,7 @@ public:
         cerr << "--- " << numDocuments << " docs " << (isPush ? "pushed" : "pulled") << ":";
         if (logEveryDocument) {
             for (unsigned i = 0; i < numDocuments; ++i) {
-                docsNotified.insert(documents[i].ID);
+                docsNotified.insert(string(documents[i].ID));
                 cerr << " " << documents[i].ID;
             }
         }
@@ -93,6 +93,7 @@ public:
     }
 
     ~ReplicatorTest() {
+        CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
         CBLReplicator_Release(repl);
         CBLAuth_Free(config.authenticator);
         CBLEndpoint_Free(config.endpoint);

@@ -21,18 +21,17 @@
 #include "CBLDocument_Internal.hh"
 #include "ConflictResolver.hh"
 #include "Internal.hh"
-#include "Util.hh"
-#include "c4.hh"
-#include "c4Replicator.h"
+#include "c4Replicator.hh"
 #include "c4Private.h"
 #include "StringUtil.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
-#include <atomic>
-#include <mutex>
 #include <algorithm>
+#include <memory>
+#include <mutex>
 #include <vector>
 
+CBL_ASSUME_NONNULL_BEGIN
 
 #define SyncLog(LEVEL, MSG, ...) C4LogToAt(kC4SyncLog, kC4Log ## LEVEL, MSG, ##__VA_ARGS__)
 
@@ -53,19 +52,18 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
 }
 
 
-class CBLReplicator : public CBLRefCounted {
+struct CBLReplicator final : public CBLRefCounted {
 public:
-    CBLReplicator(const CBLReplicatorConfiguration *conf _cbl_nonnull)
-    :_conf(*conf)
-    ,_db(conf->database)
+    CBLReplicator(const CBLReplicatorConfiguration &conf)
+    :_conf(conf)
+    ,_db(conf.database)
     {
         // One-time initialization of network transport:
         static once_flag once;
         call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
 
         // Set up the LiteCore replicator parameters:
-        if (!_conf.validate(external(&_c4status.error)))
-            return;
+        _conf.validate();
         C4ReplicatorParameters params = { };
         auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
         if (_conf.replicatorType != kCBLReplicatorTypePull)
@@ -85,7 +83,8 @@ public:
         };
 
         if (_conf.pushFilter) {
-            params.pushFilter = [](C4String docID,
+            params.pushFilter = [](C4String collectionName,
+                                   C4String docID,
                                    C4String revID,
                                    C4RevisionFlags flags,
                                    FLDict body,
@@ -95,7 +94,8 @@ public:
             };
         }
         if (_conf.pullFilter) {
-            params.validationFunc = [](C4String docID,
+            params.validationFunc = [](C4String collectionName,
+                                       C4String docID,
                                        C4String revID,
                                        C4RevisionFlags flags,
                                        FLDict body,
@@ -110,77 +110,49 @@ public:
         params.optionsDictFleece = options;
 
         // Create the LiteCore replicator:
-        _conf.database->use([&](C4Database *c4db) {
+        _conf.database->useLocked([&](C4Database *c4db) {
 #ifdef COUCHBASE_ENTERPRISE
             if (_conf.endpoint->otherLocalDB()) {
-                _c4repl = c4repl_newLocal(c4db,
-                                          _conf.endpoint->otherLocalDB(),
-                                          params,
-                                          &_c4status.error);
+                _c4repl = c4db->newLocalReplicator(_conf.endpoint->otherLocalDB()->useLocked().get(),
+                                                   params);
             } else
 #endif
             {
-                _c4repl = c4repl_new(c4db,
-                                     _conf.endpoint->remoteAddress(),
-                                     _conf.endpoint->remoteDatabaseName(),
-                                     params,
-                                     &_c4status.error);
+                _c4repl = c4db->newReplicator(_conf.endpoint->remoteAddress(),
+                                              _conf.endpoint->remoteDatabaseName(),
+                                              params);
             }
         });
-        if (_c4repl)
-            _c4status = c4repl_getStatus(_c4repl);
+        _c4status = _c4repl->getStatus();
     }
-
-
-    bool validate(CBLError *err) const {
-        if (!_c4repl) {
-            if (err) *err = external(_c4status.error);
-            return false;
-        }
-        return true;
-    }
-
-
-    // The rest of the implementation can assume that _c4repl is non-null, and fixed,
-    // because CBLReplicator_New will detect a replicator that fails validate() and return NULL.
-
+    
 
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
-    void setHostReachable(bool reachable)           {c4repl_setHostReachable(_c4repl, reachable);}
-    void setSuspended(bool suspended)               {c4repl_setSuspended(_c4repl, suspended);}
-    void stop()                                     {c4repl_stop(_c4repl);}
+    void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}
+    void setSuspended(bool suspended)                       {_c4repl->setSuspended(suspended);}
+    void stop()                                             {_c4repl->stop();}
 
 
-    void resetCheckpoint() {
-        LOCK(_mutex);
-        _resetCheckpoint = true;
-    }
-
-
-    void start() {
+    void start(bool reset) {
         LOCK(_mutex);
         _retainSelf = this;     // keep myself from being freed until the replicator stops
         if (_optionsChanged) {
-            c4repl_setOptions(_c4repl, encodeOptions());
+            _c4repl->setOptions(encodeOptions());
             _optionsChanged = false;
         }
-        c4repl_start(_c4repl, _resetCheckpoint);
-        _resetCheckpoint = false;
+        _c4repl->start(reset);
     }
 
 
 
     CBLReplicatorStatus status() {
-        return effectiveStatus(c4repl_getStatus(_c4repl));
+        return effectiveStatus(_c4repl->getStatus());
     }
 
 
-    MutableDict pendingDocumentIDs(CBLError *outError) {
-        C4Error c4err;
-        alloc_slice arrayData(c4repl_getPendingDocIDs(_c4repl, &c4err));
-        if (outError)
-            *outError = external(c4err);
-        if (!arrayData && c4err.code != 0)
+    MutableDict pendingDocumentIDs() {
+        alloc_slice arrayData(_c4repl->pendingDocIDs());
+        if (!arrayData)
             return nullptr;
 
         MutableDict result = MutableDict::newDict();
@@ -193,8 +165,8 @@ public:
     }
 
 
-    bool isDocumentPending(FLSlice docID, CBLError *outError) {
-        return c4repl_isDocumentPending(_c4repl, docID, internal(outError));
+    bool isDocumentPending(FLSlice docID) {
+        return _c4repl->isDocumentPending(docID);
     }
 
 
@@ -206,7 +178,7 @@ public:
     }
 
 
-    Retained<CBLListenerToken> addDocumentListener(CBLReplicatedDocumentListener listener,
+    Retained<CBLListenerToken> addDocumentListener(CBLDocumentReplicationListener listener,
                                                    void *context)
     {
         LOCK(_mutex);
@@ -267,7 +239,10 @@ private:
     }
 
 
-    void _documentsEnded(bool pushing, size_t numDocs, const C4DocumentEnded* c4Docs[]) {
+    void _documentsEnded(bool pushing,
+                         size_t numDocs,
+                         const C4DocumentEnded* _cbl_nonnull c4Docs[_cbl_nonnull])
+    {
         LOCK(_mutex);
         std::unique_ptr<std::vector<CBLReplicatedDocument>> docs;
         if (!_docListeners.empty()) {
@@ -284,7 +259,7 @@ private:
             } else if (docs) {
                 // Otherwise add to list of changes to notify:
                 CBLReplicatedDocument doc = {};
-                doc.ID = (const char*)src.docID.buf;
+                doc.ID = src.docID;
                 doc.error = external(src.error);
                 doc.flags = 0;
                 if (src.flags & kRevDeleted)
@@ -310,21 +285,29 @@ private:
 
 
     bool _filter(slice docID, slice revID, C4RevisionFlags flags, Dict body, bool pushing) {
-        Retained<CBLDocument> doc = new CBLDocument(_conf.database, string(docID), revID, flags, body);
+        Retained<CBLDocument> doc = new CBLDocument(_conf.database, docID, revID, flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
-        return filter(_conf.context, doc, (flags & kRevDeleted) != 0);
+        
+        CBLDocumentFlags docFlags = 0;
+        if (flags & kRevDeleted)
+            docFlags |= kCBLDocumentFlagsDeleted;
+        if (flags & kRevPurged)
+            docFlags |= kCBLDocumentFlagsAccessRemoved;
+        
+        return filter(_conf.context, doc, docFlags);
     }
 
 
-    recursive_mutex                 _mutex;
-    ReplicatorConfiguration const   _conf;
-    Retained<CBLDatabase>           _db;
-    c4::ref<C4Replicator>           _c4repl;
-    C4ReplicatorStatus              _c4status {kC4Stopped};
-    bool                            _optionsChanged {false};
-    bool                            _resetCheckpoint {false};
-    Retained<CBLReplicator>         _retainSelf;
-    int                             _activeConflictResolvers {0};
-    Listeners<CBLReplicatorChangeListener>    _changeListeners;
-    Listeners<CBLReplicatedDocumentListener>  _docListeners;
+    recursive_mutex                             _mutex;
+    ReplicatorConfiguration const               _conf;
+    Retained<CBLDatabase>                       _db;
+    Retained<C4Replicator>                      _c4repl;
+    C4ReplicatorStatus                          _c4status {kC4Stopped};
+    bool                                        _optionsChanged {false};
+    Retained<CBLReplicator>                     _retainSelf;
+    int                                         _activeConflictResolvers {0};
+    Listeners<CBLReplicatorChangeListener>      _changeListeners;
+    Listeners<CBLDocumentReplicationListener>   _docListeners;
 };
+
+CBL_ASSUME_NONNULL_END

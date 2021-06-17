@@ -1,4 +1,5 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.1)
+cmake_policy(VERSION 3.1)
 project (CBL_C_Tests)
 
 set(TOP ${PROJECT_SOURCE_DIR}/../)
@@ -6,17 +7,18 @@ set(TOP ${PROJECT_SOURCE_DIR}/../)
 add_definitions(
     -DCBL_TESTS
     -DCATCH_CONFIG_CPP11_STREAM_INSERTABLE_CHECK
+    -DNOMINMAX # Get rid of min/max macros that interfere with std::min/std::max
 )
 
 include_directories(
     ${TOP}test/
     ${TOP}include/
-    ${TOP}include/cbl++/
     ${TOP}/src/        # Just for CBLPrivate.h
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/API/
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/catch/
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/libb64/
-    ${PROJECT_BINARY_DIR}/../include/cbl/
+    ${PROJECT_BINARY_DIR}/../generated_headers/private/cbl/ # Real independent projects won't need this
+    ${PROJECT_BINARY_DIR}/../generated_headers/public/cbl/ # or this
 )
 
 set(TEST_SRC
@@ -29,12 +31,8 @@ set(TEST_SRC
     QueryTest.cc
     ReplicatorTest.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/Backtrace.cc
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/API_Impl/FLSlice.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/LibC++Debug.cc
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/betterassert.cc
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/slice.cc
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/libb64/cdecode.c
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/libb64/cencode.c
 )
 add_executable(CBL_C_Tests ${TEST_SRC} )
 
@@ -46,7 +44,6 @@ if(MSVC)
         CBL_C_Tests PRIVATE
         ${TOP}vendor/couchbase-lite-core/vendor/fleece/MSVC/asprintf.c
         ${TOP}vendor/couchbase-lite-core/vendor/fleece/MSVC/vasprintf-msvc.c
-        ${TOP}vendor/couchbase-lite-core/vendor/fleece/MSVC/memmem.cc
     )
     target_include_directories(
         CBL_C_Tests PRIVATE
