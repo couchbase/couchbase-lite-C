@@ -176,7 +176,7 @@ public:
     }
     
     void createValueIndex(slice name, CBLValueIndexConfiguration config) {
-        if (config.expressionLanguage == kCBLStringLanguage) {
+        if (config.expressionLanguage == kCBLN1QLLanguage) {
             // CBL-1734: Support N1QL expressions
             C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
         }
@@ -186,7 +186,7 @@ public:
     }
     
     void createFullTextIndex(slice name, CBLFullTextIndexConfiguration config) {
-        if (config.expressionLanguage == kCBLStringLanguage) {
+        if (config.expressionLanguage == kCBLN1QLLanguage) {
             // CBL-1734: Support N1QL expressions
             C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "N1QL expression is not supported yet.");
         }

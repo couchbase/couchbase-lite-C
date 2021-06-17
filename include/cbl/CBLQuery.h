@@ -42,7 +42,7 @@ CBL_CAPI_BEGIN
 /** Query languages */
 typedef CBL_ENUM(uint32_t, CBLQueryLanguage) {
     kCBLJSONLanguage,       ///< [JSON query schema](https://github.com/couchbase/couchbase-lite-core/wiki/JSON-Query-Schema)
-    kCBLStringLanguage      ///< [N1QL syntax](https://docs.couchbase.com/server/6.0/n1ql/n1ql-language-reference/index.html)
+    kCBLN1QLLanguage        ///< [N1QL syntax](https://docs.couchbase.com/server/6.0/n1ql/n1ql-language-reference/index.html)
 };
 
 
