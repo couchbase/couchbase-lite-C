@@ -149,6 +149,8 @@ typedef struct {
     CBLEndpoint* endpoint;              ///< The address of the other database to replicate with
     CBLReplicatorType replicatorType;   ///< Push, pull or both
     bool continuous;                    ///< Continuous replication?
+    //-- Auto Purge:
+    bool disableAutoPurge;              ///< Disable/Enable auto-purging documents when the user's access to the documents has been revoked.
     //-- Retry Logic:
     unsigned maxAttempts;               ///< Max retry attempts where the initial connect to replicate counts toward the given value.
                                         ///< Specify 0 to use the default value, 10 times for a non-continuous replicator and max-int time for a continuous replicator. Specify 1 means there will be no retry after the first attempt.
