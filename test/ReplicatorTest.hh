@@ -33,7 +33,7 @@ public:
 
     void replicate() {
         CBLError error;
-        repl = CBLReplicator_New(&config, &error);
+        repl = CBLReplicator_Create(&config, &error);
         REQUIRE(repl);
 
         auto ctoken = CBLReplicator_AddChangeListener(repl, [](void *context, CBLReplicator *r,
@@ -63,7 +63,7 @@ public:
 
     void statusChanged(CBLReplicator *r, const CBLReplicatorStatus &status) {
         CHECK(r == repl);
-        cerr << "--- PROGRESS: status=" << status.activity << ", fraction=" << status.progress.fractionComplete << ", err=" << status.error.domain << "/" << status.error.code << "\n";
+        cerr << "--- PROGRESS: status=" << status.activity << ", fraction=" << status.progress.complete << ", err=" << status.error.domain << "/" << status.error.code << "\n";
         if (status.error.code && !replError.code)
             replError = status.error;
     }

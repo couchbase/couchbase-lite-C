@@ -41,15 +41,15 @@ CBL_CAPI_BEGIN
     \ref FLDict_GetBlob on it to create a \ref CBLBlob object you can call.
     The object has accessors for the blob's metadata and for loading the data itself.
 
-    To create a new blob from in-memory data, call \ref CBLBlob_NewWithData, then call
+    To create a new blob from in-memory data, call \ref CBLBlob_CreateWithData, then call
     \ref FLSlot_SetBlob to add the \ref CBLBlob to a mutable array or dictionary in the
     document. For example:
 
         FLSlot_SetBlob(FLMutableDict_Set(properties, key), blob);
 
-    To create a new blob from a stream, call \ref CBLBlobWriter_New to create a
+    To create a new blob from a stream, call \ref CBLBlobWriter_Create to create a
     \ref CBLBlobWriteStream, then make one or more calls to \ref CBLBlobWriter_Write to write
-    data to the blob, then finally call \ref CBLBlob_NewWithStream to create the blob.
+    data to the blob, then finally call \ref CBLBlob_CreateWithStream to create the blob.
     To store the blob into a document, do as in the previous paragraph.
 
  */
@@ -101,7 +101,7 @@ CBL_CAPI_BEGIN
     /** Reads the blob's contents into memory and returns them.
         @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
     _cbl_warn_unused
-    FLSliceResult CBLBlob_Content(const CBLBlob*,
+    FLSliceResult CBLBlob_Content(const CBLBlob* blob,
                                   CBLError* _cbl_nullable outError) CBLAPI;
 
     /** A stream for reading a blob's content. */
@@ -109,7 +109,7 @@ CBL_CAPI_BEGIN
 
     /** Opens a stream for reading a blob's content. */
     _cbl_warn_unused
-    CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob*,
+    CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* blob,
                                                  CBLError* _cbl_nullable outError) CBLAPI;
 
     /** Reads data from a blob.
@@ -136,20 +136,20 @@ CBL_CAPI_BEGIN
         @param contents  The data's address and length.
         @return  A new CBLBlob instance. */
     _cbl_warn_unused
-    CBLBlob* CBLBlob_NewWithData(FLString contentType,
-                                 FLSlice contents) CBLAPI;
+    CBLBlob* CBLBlob_CreateWithData(FLString contentType,
+                                    FLSlice contents) CBLAPI;
 
     /** A stream for writing a new blob to the database. */
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
 
     /** Opens a stream for writing a new blob.
         You should next call \ref CBLBlobWriter_Write one or more times to write the data,
-        then \ref CBLBlob_NewWithStream to create the blob.
+        then \ref CBLBlob_CreateWithStream to create the blob.
 
         If for some reason you need to abort, just call \ref CBLBlobWriter_Close. */
     _cbl_warn_unused
-    CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db,
-                                          CBLError* _cbl_nullable outError) CBLAPI;
+    CBLBlobWriteStream* CBLBlobWriter_Create(CBLDatabase* db,
+                                             CBLError* _cbl_nullable outError) CBLAPI;
 
     /** Closes a blob-writing stream, if you need to give up without creating a \ref CBLBlob. */
     void CBLBlobWriter_Close(CBLBlobWriteStream* _cbl_nullable) CBLAPI;
@@ -174,8 +174,8 @@ CBL_CAPI_BEGIN
         @param writer  The blob-writing stream the data was written to.
         @return  A new CBLBlob instance. */
     _cbl_warn_unused
-    CBLBlob* CBLBlob_NewWithStream(FLString contentType,
-                                   CBLBlobWriteStream* writer) CBLAPI;
+    CBLBlob* CBLBlob_CreateWithStream(FLString contentType,
+                                      CBLBlobWriteStream* writer) CBLAPI;
 
 #pragma mark - FLEECE UTILITIES:
 

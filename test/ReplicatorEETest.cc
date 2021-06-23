@@ -30,7 +30,7 @@ public:
     ReplicatorLocalTest()
     :otherDB(openEmptyDatabaseNamed("otherDB"))
     {
-        config.endpoint = CBLEndpoint_NewWithLocalDB(otherDB.ref());
+        config.endpoint = CBLEndpoint_CreateWithLocalDB(otherDB.ref());
         config.replicatorType = kCBLReplicatorTypePush;
     }
 };

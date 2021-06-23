@@ -173,10 +173,10 @@ namespace cbl {
             check(CBLDatabase_DeleteIndex(ref(), name, &error), error);
         }
 
-        fleece::MutableArray indexNames() {
-            FLMutableArray flNames = CBLDatabase_IndexNames(ref());
-            fleece::MutableArray names(flNames);
-            FLMutableArray_Release(flNames);
+        fleece::Array getIndexNames() {
+            FLArray flNames = CBLDatabase_GetIndexNames(ref());
+            fleece::Array names(flNames);
+            FLArray_Release(flNames);
             return names;
         }
 

@@ -320,7 +320,7 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db,
 }
 
 
-FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db) noexcept {
+FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) noexcept {
     try {
         return FLMutableArray_Retain(db->indexNames());
     } catchAndWarn()

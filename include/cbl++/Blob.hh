@@ -47,7 +47,7 @@ namespace cbl {
         Blob(slice contentType,
              slice contents)
         {
-            _ref = (CBLRefCounted*) CBLBlob_NewWithData(contentType, contents);
+            _ref = (CBLRefCounted*) CBLBlob_CreateWithData(contentType, contents);
         }
 
         /** Creates a new blob from the data written to a \ref CBLBlobWriteStream.
@@ -118,7 +118,7 @@ namespace cbl {
     public:
         BlobWriteStream(Database db) {
             CBLError error;
-            _writer = CBLBlobWriter_New(db.ref(), &error);
+            _writer = CBLBlobWriter_Create(db.ref(), &error);
             if (!_writer) throw error;
         }
 
@@ -143,7 +143,7 @@ namespace cbl {
 
 
     inline Blob::Blob(slice contentType, BlobWriteStream& writer) {
-        _ref = (CBLRefCounted*) CBLBlob_NewWithStream(contentType, writer._writer);
+        _ref = (CBLRefCounted*) CBLBlob_CreateWithStream(contentType, writer._writer);
         writer._writer = nullptr;
     }
 

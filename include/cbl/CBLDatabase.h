@@ -47,7 +47,7 @@ typedef CBL_ENUM(uint64_t, CBLEncryptionKeySize) {
 };
 
 /** Encryption key specified in a \ref CBLDatabaseConfiguration. */
-typedef struct CBLEncryptionKey {
+typedef struct {
     CBLEncryptionAlgorithm algorithm;       ///< Encryption algorithm
     uint8_t bytes[32];                      ///< Raw key data
 } CBLEncryptionKey;

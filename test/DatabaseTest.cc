@@ -250,7 +250,7 @@ TEST_CASE_METHOD(CBLTest, "Maintenance : Compact and Integrity Check") {
     CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
     FLMutableDict dict = CBLDocument_MutableProperties(doc);
     FLSlice blobContent = FLStr("I'm Blob.");
-    CBLBlob *blob1 = CBLBlob_NewWithData("text/plain"_sl, blobContent);
+    CBLBlob *blob1 = CBLBlob_CreateWithData("text/plain"_sl, blobContent);
     FLSlot_SetBlob(FLMutableDict_Set(dict, FLStr("blob")), blob1);
     
     // Save doc:
@@ -298,11 +298,11 @@ TEST_CASE_METHOD(CBLTest, "Maintenance : Reindex") {
     
     CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeReindex, &error));
     
-    FLMutableArray names = CBLDatabase_IndexNames(db);
+    FLArray names = CBLDatabase_GetIndexNames(db);
     REQUIRE(names);
     CHECK(FLArray_Count(names) == 1);
     CHECK(FLValue_AsString(FLArray_Get(names, 0)) == "foo"_sl);
-    FLMutableArray_Release(names);
+    FLArray_Release(names);
 }
 
 
