@@ -42,12 +42,12 @@ typedef struct CBLEndpoint CBLEndpoint;
     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
     For example: `wss://example.org/dbname` */
 _cbl_warn_unused
-CBLEndpoint* CBLEndpoint_NewWithURL(FLString url) CBLAPI;
+CBLEndpoint* CBLEndpoint_CreateWithURL(FLString url) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Creates a new endpoint representing another local database. (Enterprise Edition only.) */
 _cbl_warn_unused
-CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase*) CBLAPI;
+CBLEndpoint* CBLEndpoint_CreateWithLocalDB(CBLDatabase*) CBLAPI;
 #endif
 
 /** Frees a CBLEndpoint object. */
@@ -59,14 +59,12 @@ typedef struct CBLAuthenticator CBLAuthenticator;
 
 /** Creates an authenticator for HTTP Basic (username/password) auth. */
 _cbl_warn_unused
-CBLAuthenticator* CBLAuth_NewPassword(FLString username,
-                                      FLString password) CBLAPI;
+CBLAuthenticator* CBLAuth_CreatePassword(FLString username, FLString password) CBLAPI;
 
 /** Creates an authenticator using a Couchbase Sync Gateway login session identifier,
     and optionally a cookie name (pass NULL for the default.) */
 _cbl_warn_unused
-CBLAuthenticator* CBLAuth_NewSession(FLString sessionID,
-                                     FLString cookieName) CBLAPI;
+CBLAuthenticator* CBLAuth_CreateSession(FLString sessionID, FLString cookieName) CBLAPI;
 
 /** Frees a CBLAuthenticator object. */
 void CBLAuth_Free(CBLAuthenticator* _cbl_nullable) CBLAPI;
@@ -184,8 +182,8 @@ CBL_REFCOUNTED(CBLReplicator*, Replicator);
 
 /** Creates a replicator with the given configuration. */
 _cbl_warn_unused
-CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration*,
-                                 CBLError* _cbl_nullable outError) CBLAPI;
+CBLReplicator* CBLReplicator_Create(const CBLReplicatorConfiguration*,
+                                    CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the configuration of an existing replicator. */
 const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator*) CBLAPI;
@@ -242,7 +240,7 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorActivityLevel) {
     accurate would require slowing down the replicator and incurring more load on the server.
     It's fine to use in a progress bar, though. */
 typedef struct {
-    float fractionComplete;     /// Very-approximate completion, from 0.0 to 1.0
+    float complete;             /// Very-approximate fractional completion, from 0.0 to 1.0
     uint64_t documentCount;     ///< Number of documents transferred so far
 } CBLReplicatorProgress;
 

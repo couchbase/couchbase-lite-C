@@ -32,9 +32,9 @@ namespace cbl {
 
     class Endpoint {
     public:
-        void setURL(slice url)                      {_ref = CBLEndpoint_NewWithURL(url);}
+        void setURL(slice url)                      {_ref = CBLEndpoint_CreateWithURL(url);}
 #ifdef COUCHBASE_ENTERPRISE
-        void setLocalDB(Database db)                {_ref = CBLEndpoint_NewWithLocalDB(db.ref());}
+        void setLocalDB(Database db)                {_ref = CBLEndpoint_CreateWithLocalDB(db.ref());}
 #endif
         ~Endpoint()                                 {CBLEndpoint_Free(_ref);}
         CBLEndpoint* ref() const                    {return _ref;}
@@ -47,10 +47,10 @@ namespace cbl {
     public:
         void setBasic(slice username,
                       slice password)
-                                                    {_ref = CBLAuth_NewPassword(username, password);}
+                                                    {_ref = CBLAuth_CreatePassword(username, password);}
 
         void setSession(slice sessionId, slice cookieName) {
-          _ref = CBLAuth_NewSession(sessionId, cookieName);
+          _ref = CBLAuth_CreateSession(sessionId, cookieName);
         }
         ~Authenticator()                            {CBLAuth_Free(_ref);}
         CBLAuthenticator* ref() const               {return _ref;}
@@ -134,7 +134,7 @@ namespace cbl {
                 };
             }
             c_config.context = this;
-            _ref = (CBLRefCounted*) CBLReplicator_New(&c_config, &error);
+            _ref = (CBLRefCounted*) CBLReplicator_Create(&c_config, &error);
             check(_ref, error);
         }
 

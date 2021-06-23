@@ -263,9 +263,9 @@ CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
           FTS index for the property/expression being matched. Only a single expression is
           currently allowed, and it must evaluate to a string. */
 
-/** Value Index Specification. */
+/** Value Index Configuration. */
 typedef struct {
-    /** The language used in the expressions. Only JSON language is supported now. */
+    /** The language used in the expressions. */
     CBLQueryLanguage expressionLanguage;
     
     /** The expressions describing each coloumn of the index. The expressions could be specified
@@ -279,11 +279,11 @@ typedef struct {
     If a non-identical index with that name already exists, it is deleted and re-created. */
 bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   FLString name,
-                                  CBLValueIndexConfiguration index,
+                                  CBLValueIndexConfiguration config,
                                   CBLError* _cbl_nullable outError) CBLAPI;
 
 
-/** Full-Text Index Specification. */
+/** Full-Text Index Configuration. */
 typedef struct {
     /** The language used in the expressions. */
     CBLQueryLanguage expressionLanguage;
@@ -316,7 +316,7 @@ typedef struct {
     If a non-identical index with that name already exists, it is deleted and re-created. */
 bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      FLString name,
-                                     CBLFullTextIndexConfiguration index,
+                                     CBLFullTextIndexConfiguration config,
                                      CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Deletes an index given its name. */
@@ -327,7 +327,7 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db,
 /** Returns the names of the indexes on this database, as a Fleece array of strings.
     @note  You are responsible for releasing the returned Fleece array. */
 _cbl_warn_unused
-FLMutableArray CBLDatabase_IndexNames(CBLDatabase *db) CBLAPI;
+FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) CBLAPI;
 
 /** @} */
 /** @} */

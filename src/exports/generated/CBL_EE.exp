@@ -2,7 +2,7 @@
 
 _CBLEncryptionKey_FromPassword
 _CBLDatabase_ChangeEncryptionKey
-_CBLEndpoint_NewWithLocalDB
+_CBLEndpoint_CreateWithLocalDB
 _CBL_Retain
 _CBL_Release
 _CBL_InstanceCount
@@ -26,11 +26,11 @@ _CBLBlob_Digest
 _CBLBlob_Properties
 _CBLBlob_Content
 _CBLBlob_OpenContentStream
-_CBLBlob_NewWithData
-_CBLBlob_NewWithStream
+_CBLBlob_CreateWithData
+_CBLBlob_CreateWithStream
 _CBLBlobReader_Read
 _CBLBlobReader_Close
-_CBLBlobWriter_New
+_CBLBlobWriter_Create
 _CBLBlobWriter_Close
 _CBLBlobWriter_Write
 _CBLDatabaseConfiguration_Default
@@ -57,7 +57,7 @@ _CBLDatabase_SendNotifications
 _CBLDatabase_CreateValueIndex
 _CBLDatabase_CreateFullTextIndex
 _CBLDatabase_DeleteIndex
-_CBLDatabase_IndexNames
+_CBLDatabase_GetIndexNames
 _CBLDocument_ID
 _CBLDocument_RevisionID
 _CBLDocument_CanonicalRevisionID
@@ -112,12 +112,12 @@ _CBLResultSet_ResultArray
 _CBLResultSet_ResultDict
 _CBLResultSet_GetQuery
 _kCBLAuthDefaultCookieName
-_CBLEndpoint_NewWithURL
+_CBLEndpoint_CreateWithURL
 _CBLEndpoint_Free
-_CBLAuth_NewPassword
-_CBLAuth_NewSession
+_CBLAuth_CreatePassword
+_CBLAuth_CreateSession
 _CBLAuth_Free
-_CBLReplicator_New
+_CBLReplicator_Create
 _CBLReplicator_Config
 _CBLReplicator_Start
 _CBLReplicator_Stop

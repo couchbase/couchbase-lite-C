@@ -2,7 +2,7 @@ CBL_C {
 	global:
 		CBLEncryptionKey_FromPassword;
 		CBLDatabase_ChangeEncryptionKey;
-		CBLEndpoint_NewWithLocalDB;
+		CBLEndpoint_CreateWithLocalDB;
 		CBL_Retain;
 		CBL_Release;
 		CBL_InstanceCount;
@@ -26,11 +26,11 @@ CBL_C {
 		CBLBlob_Properties;
 		CBLBlob_Content;
 		CBLBlob_OpenContentStream;
-		CBLBlob_NewWithData;
-		CBLBlob_NewWithStream;
+		CBLBlob_CreateWithData;
+		CBLBlob_CreateWithStream;
 		CBLBlobReader_Read;
 		CBLBlobReader_Close;
-		CBLBlobWriter_New;
+		CBLBlobWriter_Create;
 		CBLBlobWriter_Close;
 		CBLBlobWriter_Write;
 		CBLDatabaseConfiguration_Default;
@@ -57,7 +57,7 @@ CBL_C {
 		CBLDatabase_CreateValueIndex;
 		CBLDatabase_CreateFullTextIndex;
 		CBLDatabase_DeleteIndex;
-		CBLDatabase_IndexNames;
+		CBLDatabase_GetIndexNames;
 		CBLDocument_ID;
 		CBLDocument_RevisionID;
 		CBLDocument_CanonicalRevisionID;
@@ -112,12 +112,12 @@ CBL_C {
 		CBLResultSet_ResultDict;
 		CBLResultSet_GetQuery;
 		kCBLAuthDefaultCookieName;
-		CBLEndpoint_NewWithURL;
+		CBLEndpoint_CreateWithURL;
 		CBLEndpoint_Free;
-		CBLAuth_NewPassword;
-		CBLAuth_NewSession;
+		CBLAuth_CreatePassword;
+		CBLAuth_CreateSession;
 		CBLAuth_Free;
-		CBLReplicator_New;
+		CBLReplicator_Create;
 		CBLReplicator_Config;
 		CBLReplicator_Start;
 		CBLReplicator_Stop;

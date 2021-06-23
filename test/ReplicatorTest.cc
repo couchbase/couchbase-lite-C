@@ -32,27 +32,27 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
 
 #ifndef __clang__
         config.database = nullptr;
-        CHECK(!CBLReplicator_New(&config, &error));
+        CHECK(!CBLReplicator_Create(&config, &error));
 #endif
         
         config.database = db.ref();
-        CHECK(!CBLReplicator_New(&config, &error));
+        CHECK(!CBLReplicator_Create(&config, &error));
 
-        config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg:9999/foobar"_sl);
+        config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg:9999/foobar"_sl);
         proxy.type = kCBLProxyHTTP;
         config.proxy = &proxy;
-        CHECK(!CBLReplicator_New(&config, &error));
+        CHECK(!CBLReplicator_Create(&config, &error));
     }
     proxy.hostname = "localhost"_sl;
     proxy.port = 9998;
-    repl = CBLReplicator_New(&config, &error);
+    repl = CBLReplicator_Create(&config, &error);
     CHECK(repl);
 }
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
-    config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg/foobar"_sl);
-    config.authenticator = CBLAuth_NewSession("SyncGatewaySession"_sl, "NOM_NOM_NOM"_sl);
+    config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl);
+    config.authenticator = CBLAuth_CreateSession("SyncGatewaySession"_sl, "NOM_NOM_NOM"_sl);
 
     config.pullFilter = [](void *context, CBLDocument* document, CBLDocumentFlags flags) -> bool {
         return true;
@@ -67,8 +67,8 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replicator]") {
-    config.endpoint = CBLEndpoint_NewWithURL("ws://fsdfds.vzcsg/foobar"_sl);
-    config.authenticator = CBLAuth_NewPassword("username"_sl, "p@ssw0RD"_sl);
+    config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl);
+    config.authenticator = CBLAuth_CreatePassword("username"_sl, "p@ssw0RD"_sl);
 
     CBLProxySettings proxy = {};
     proxy.type = kCBLProxyHTTP;
@@ -119,7 +119,7 @@ public:
                     "Skipping test; server URL not configured");
             return false;
         }
-        config.endpoint = CBLEndpoint_NewWithURL(slice(serverURL + "/" + dbName));
+        config.endpoint = CBLEndpoint_CreateWithURL(slice(serverURL + "/" + dbName));
         return true;
     }
 
@@ -129,7 +129,7 @@ public:
                     "Skipping test; server URL not configured");
             return false;
         }
-        config.endpoint = CBLEndpoint_NewWithURL(slice(tlsServerURL + "/" + dbName));
+        config.endpoint = CBLEndpoint_CreateWithURL(slice(tlsServerURL + "/" + dbName));
         return true;
     }
 
@@ -147,10 +147,10 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "HTTP auth", "[Replicator][.Server]
         auth = nullptr;
     }
     SECTION("Invalid credentials") {
-        auth = CBLAuth_NewPassword("manhog"_sl, "whim"_sl);
+        auth = CBLAuth_CreatePassword("manhog"_sl, "whim"_sl);
     }
     SECTION("Valid credentials") {
-        auth = CBLAuth_NewPassword("pupshaw"_sl, "frank"_sl);
+        auth = CBLAuth_CreatePassword("pupshaw"_sl, "frank"_sl);
         expectedError = {};
     }
     config.authenticator = auth;

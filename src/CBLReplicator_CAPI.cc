@@ -23,14 +23,14 @@
 const FLString kCBLAuthDefaultCookieName = FLSTR("SyncGatewaySession");
 
 
-CBLEndpoint* CBLEndpoint_NewWithURL(FLString url) noexcept {
+CBLEndpoint* CBLEndpoint_CreateWithURL(FLString url) noexcept {
     try {
         return new CBLURLEndpoint(url);
     } catchAndWarn()
 }
 
 #ifdef COUCHBASE_ENTERPRISE
-CBLEndpoint* CBLEndpoint_NewWithLocalDB(CBLDatabase* db) noexcept {
+CBLEndpoint* CBLEndpoint_CreateWithLocalDB(CBLDatabase* db) noexcept {
     try {
         return new CBLLocalEndpoint(db);
     } catchAndWarn()
@@ -41,13 +41,13 @@ void CBLEndpoint_Free(CBLEndpoint *endpoint) noexcept {
     delete endpoint;
 }
 
-CBLAuthenticator* CBLAuth_NewPassword(FLString username, FLString password) noexcept {
+CBLAuthenticator* CBLAuth_CreatePassword(FLString username, FLString password) noexcept {
     try {
         return new BasicAuthenticator(username, password);
     } catchAndWarn()
 }
 
-CBLAuthenticator* CBLAuth_NewSession(FLString sessionID, FLString cookieName) noexcept {
+CBLAuthenticator* CBLAuth_CreateSession(FLString sessionID, FLString cookieName) noexcept {
     try {
         return new SessionAuthenticator(sessionID, cookieName);
     } catchAndWarn()
@@ -57,7 +57,7 @@ void CBLAuth_Free(CBLAuthenticator *auth) noexcept {
     delete auth;
 }
 
-CBLReplicator* CBLReplicator_New(const CBLReplicatorConfiguration* conf, CBLError *outError) noexcept {
+CBLReplicator* CBLReplicator_Create(const CBLReplicatorConfiguration* conf, CBLError *outError) noexcept {
     try {
         return retain(new CBLReplicator(*conf));
     } catchAndBridge(outError)

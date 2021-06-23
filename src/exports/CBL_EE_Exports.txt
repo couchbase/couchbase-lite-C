@@ -8,4 +8,4 @@ CBLEncryptionKey_FromPassword
 
 CBLDatabase_ChangeEncryptionKey
 
-CBLEndpoint_NewWithLocalDB
+CBLEndpoint_CreateWithLocalDB

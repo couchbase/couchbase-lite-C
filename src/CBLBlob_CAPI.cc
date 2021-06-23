@@ -79,23 +79,23 @@ void CBLBlobReader_Close(CBLBlobReadStream* stream) noexcept {
 #pragma mark - CREATING BLOBS:
 
 
-CBLBlob* CBLBlob_NewWithData(FLString contentType,
-                             FLSlice contents) noexcept
+CBLBlob* CBLBlob_CreateWithData(FLString contentType,
+                                FLSlice contents) noexcept
 {
     try {
         return retain(new CBLNewBlob(contentType, contents));
     } catchAndWarn()
 }
 
-CBLBlob* CBLBlob_NewWithStream(FLString contentType,
-                               CBLBlobWriteStream* writer) noexcept
+CBLBlob* CBLBlob_CreateWithStream(FLString contentType,
+                                  CBLBlobWriteStream* writer) noexcept
 {
     try {
         return retain(new CBLNewBlob(contentType, move(*writer)));
     } catchAndWarn()
 }
 
-CBLBlobWriteStream* CBLBlobWriter_New(CBLDatabase *db, CBLError *outError) noexcept {
+CBLBlobWriteStream* CBLBlobWriter_Create(CBLDatabase *db, CBLError *outError) noexcept {
     try {
         return new CBLBlobWriteStream(db);
     } catchAndBridge(outError)
