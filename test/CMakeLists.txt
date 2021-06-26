@@ -66,7 +66,7 @@ elseif(APPLE AND BUILD_ENTERPRISE)
                                           "-framework CoreML"
                                           "-framework Vision")
 elseif(UNIX)
-    target_link_libraries(CBL_C_Tests PUBLIC  "pthread" "${LIBCXX_LIB}" "${LIBCXXABI_LIB}" dl)
+    target_link_libraries(CBL_C_Tests PUBLIC dl)
 endif()
 
 file(COPY names_100.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test)
