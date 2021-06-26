@@ -10,8 +10,8 @@ fi
 pushd $WORKING_DIR
 COMMAND="find . -name \"*.a\" | xargs ${PREFIX}strip --strip-unneeded"
 eval ${COMMAND}
-rm libLiteCore.so
-make -j8 LiteCore
+rm libCouchbaseLiteC.so
+make -j8 CouchbaseLiteC
 COMMAND="${PREFIX}objcopy --only-keep-debug libCouchbaseLiteC.so libCouchbaseLiteC.so.sym"
 eval ${COMMAND}
 COMMAND="${PREFIX}strip --strip-unneeded libCouchbaseLiteC.so"
