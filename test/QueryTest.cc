@@ -198,11 +198,6 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     while (resultCount < 0)
         this_thread::sleep_for(100ms);
     CHECK(resultCount == 2);
-
-    // Sometimes in release mode this test ends with unfreed objects.  Add some delay here to see if that will
-    // give async stuff time to clean up
-    cerr << "Sleeping to ensure async cleanup..." << endl;
-    this_thread::sleep_for(2s);
 }
 
 
