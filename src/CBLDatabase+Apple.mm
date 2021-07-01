@@ -40,6 +40,19 @@ std::string CBLDatabase::defaultDirectory() {
         }
         path = [path stringByAppendingPathComponent: bundleID];
 #endif
+        
+        // It's possible the Application Support Directory might not exist. So attempt to create
+        // the default directory if the path doesn't exist:
+        if (![[NSFileManager defaultManager] fileExistsAtPath: path]) {
+            NSError* error;
+            if (![[NSFileManager defaultManager] createDirectoryAtPath: path
+                                           withIntermediateDirectories: YES
+                                                            attributes: nil
+                                                                 error: &error])
+                C4WarnError("Cannot create the default directory at path `%s` with error %s",
+                            path.fileSystemRepresentation, error.localizedDescription.UTF8String);
+        }
+        
         // Append a "CouchbaseLite" component to the path:
         return [path stringByAppendingPathComponent: @"CouchbaseLite"].fileSystemRepresentation;
     }
