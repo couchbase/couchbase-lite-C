@@ -28,9 +28,14 @@ std::string CBLDatabase::defaultDirectory() {
 #if TARGET_OS_TV
         dirID = NSCachesDirectory; // Apple TV only allows apps to store data in the Caches directory
 #endif
-        NSArray* paths = NSSearchPathForDirectoriesInDomains(dirID, NSUserDomainMask, YES);
-        NSString* path = paths[0];
-
+        NSError* error;
+        NSString* path = [[NSFileManager defaultManager] URLForDirectory: dirID
+                                                                inDomain: NSUserDomainMask
+                                                       appropriateForURL: nil
+                                                                  create: YES
+                                                                   error: &error].path;
+        NSCAssert(path, @"Cannot find or create the default directory with error : %@", error);
+        
 #if !TARGET_OS_IPHONE
         // On macOS, append the application's bundle ID to get a per-app directory:
         NSString* bundleID = [[NSBundle mainBundle] bundleIdentifier];
@@ -40,18 +45,6 @@ std::string CBLDatabase::defaultDirectory() {
         }
         path = [path stringByAppendingPathComponent: bundleID];
 #endif
-        
-        // It's possible the Application Support Directory might not exist. So attempt to create
-        // the default directory if the path doesn't exist:
-        if (![[NSFileManager defaultManager] fileExistsAtPath: path]) {
-            NSError* error;
-            if (![[NSFileManager defaultManager] createDirectoryAtPath: path
-                                           withIntermediateDirectories: YES
-                                                            attributes: nil
-                                                                 error: &error])
-                C4WarnError("Cannot create the default directory at path `%s` with error %s",
-                            path.fileSystemRepresentation, error.localizedDescription.UTF8String);
-        }
         
         // Append a "CouchbaseLite" component to the path:
         return [path stringByAppendingPathComponent: @"CouchbaseLite"].fileSystemRepresentation;
