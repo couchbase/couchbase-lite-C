@@ -23,10 +23,23 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 option(BUILD_ENTERPRISE "Set whether or not to build enterprise edition" OFF)
+option(CODE_COVERAGE_ENABLED "Set whether or not code coverage report should be generated" OFF)
 
 if(CMAKE_COMPILER_IS_GNUCC)
     # Suppress an annoying note about GCC 7 ABI changes
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
+endif()
+
+if(CODE_COVERAGE_ENABLED)
+   message("Code coverage enabled, forcing sanitizers off")
+   if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+   elseif(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+     message(WARN " Code coverage not supported for non-debug builds")
+   else()
+     message(WARN " Code coverage only supported on Clang")
+   endif()
 endif()
 
 if(BUILD_ENTERPRISE)
