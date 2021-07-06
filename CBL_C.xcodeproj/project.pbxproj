@@ -96,20 +96,6 @@
 			remoteGlobalIDString = 2771A097228624C000B18E0A;
 			remoteInfo = LiteCoreWebSocket;
 		};
-		271A98A1243C0858008C032D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 27FC81E71EAAB0D90028E38E;
-			remoteInfo = "LiteCoreREST static";
-		};
-		271A98A4243C0894008C032D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 27FC81E71EAAB0D90028E38E;
-			remoteInfo = "LiteCoreREST static";
-		};
 		271C2A4E21CAD5950045856E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
@@ -767,7 +753,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				271A98A2243C0858008C032D /* PBXTargetDependency */,
 				271A98A0243C0852008C032D /* PBXTargetDependency */,
 				271C2A7B21CC86E10045856E /* PBXTargetDependency */,
 			);
@@ -830,7 +815,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				271A98A5243C0894008C032D /* PBXTargetDependency */,
 				277CC9AD22BC3E2800B245CB /* PBXTargetDependency */,
 				27B61D7C21D6B6680027CCDB /* PBXTargetDependency */,
 				27B61DBE21D707910027CCDB /* PBXTargetDependency */,
@@ -1101,7 +1085,6 @@
 			inputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/libFleeceBase.a",
 				"$(BUILT_PRODUCTS_DIR)/libLiteCore-static.a",
-				"$(BUILT_PRODUCTS_DIR)/libLiteCoreREST-static.a",
 				"$(BUILT_PRODUCTS_DIR)/libLiteCoreWebSocket.a",
 				"$(BUILT_PRODUCTS_DIR)/libmbedcrypto.a",
 				"$(BUILT_PRODUCTS_DIR)/libmbedtls.a",
@@ -1277,16 +1260,6 @@
 			isa = PBXTargetDependency;
 			name = LiteCoreWebSocket;
 			targetProxy = 271A989F243C0852008C032D /* PBXContainerItemProxy */;
-		};
-		271A98A2243C0858008C032D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "LiteCoreREST static";
-			targetProxy = 271A98A1243C0858008C032D /* PBXContainerItemProxy */;
-		};
-		271A98A5243C0894008C032D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "LiteCoreREST static";
-			targetProxy = 271A98A4243C0894008C032D /* PBXContainerItemProxy */;
 		};
 		271C2A7B21CC86E10045856E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
