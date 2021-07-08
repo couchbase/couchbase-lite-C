@@ -162,7 +162,7 @@ TEST_CASE_METHOD(CBLTest, "Save Empty Document") {
 
     doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
-    CHECK(CBLDocument_RevisionID(doc) == "1@*"_sl);
+    CHECK(CBLDocument_RevisionID(doc) == "1-581ad726ee407c8376fc94aad966051d013893c4"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
     CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);
