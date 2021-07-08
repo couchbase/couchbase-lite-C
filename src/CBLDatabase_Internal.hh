@@ -315,7 +315,7 @@ private:
         }
         C4DatabaseConfig2 c4Config = {};
         c4Config.parentDirectory = effectiveDir(config->directory);
-        c4Config.flags = kC4DB_Create | kC4DB_VersionVectors;
+        c4Config.flags = kC4DB_Create;
 #ifdef COUCHBASE_ENTERPRISE
         c4Config.encryptionKey = asC4Key(&config->encryptionKey);
 #endif
