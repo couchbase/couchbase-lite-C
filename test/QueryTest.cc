@@ -151,14 +151,16 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
 }
 
 
+// https://issues.couchbase.com/browse/CBL-2117
+// Disable the test until the issue is fixed
+/*
 static int countResults(CBLResultSet *results) {
-    int n = 0;
-    while (CBLResultSet_Next(results))
-        ++n;
-    return n;
+     int n = 0;
+     while (CBLResultSet_Next(results))
+         ++n;
+     return n;
 }
-
-
+ 
 TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CBLError error;
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
@@ -199,7 +201,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
         this_thread::sleep_for(100ms);
     CHECK(resultCount == 2);
 }
-
+*/
 
 #pragma mark - C++ API:
 
