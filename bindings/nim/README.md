@@ -22,14 +22,14 @@ You first need to build Couchbase Lite For C (the root of this repo) with CMake,
 Symlink or copy the library into this directory.
 
     $ cd bindings/nim
-    $ ln -s ../../build_cmake/libCouchbaseLiteC.dylib .
+    $ ln -s ../../build_cmake/libcblite.dylib .
 
 After that, you can use [Nimble][NIMBLE] to build and run:
 
     $ nimble test
 
 When compiling on Linux system remember to set `LD_LIBRARY_PATH` to point to the
-directory where `libCouchbaseLiteC.so` exists. If you followed the above steps
+directory where `libcblite.so` exists. If you followed the above steps
 this would look like this:
 
     $ LD_LIBRARY_PATH=. nimble test

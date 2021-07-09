@@ -36,7 +36,7 @@ set(TEST_SRC
 )
 add_executable(CBL_C_Tests ${TEST_SRC} )
 
-target_link_libraries(CBL_C_Tests PRIVATE  CouchbaseLiteC)
+target_link_libraries(CBL_C_Tests PRIVATE  cblite)
 
 if(MSVC)
     # For internal fleece dependencies:
@@ -52,7 +52,7 @@ if(MSVC)
     )
 
     set(BIN_TOP "${PROJECT_BINARY_DIR}/..")
-    set(FilesToCopy ${BIN_TOP}/\$\(Configuration\)/CouchbaseLiteC)
+    set(FilesToCopy ${BIN_TOP}/\$\(Configuration\)/cblite)
 
     add_custom_command(TARGET CBL_C_Tests POST_BUILD
         COMMAND ${CMAKE_COMMAND}

@@ -74,7 +74,7 @@ fn main() {
         .write_to_file(out_dir.join("bindings.rs"))
         .expect("Couldn't write bindings!");
 
-    // Tell cargo to tell rustc to link the CouchbaseLiteC shared library.
+    // Tell cargo to tell rustc to link the cblite shared library.
     //TODO: Abort the build now if the library does not exist, and tell the user to run CMake.
     let root = root_dir.to_str().unwrap();
 
@@ -86,7 +86,7 @@ fn main() {
         println!("cargo:rustc-link-search={}/build_cmake/vendor/couchbase-lite-core/vendor/mbedtls/library", root);
         println!("cargo:rustc-link-search={}/build_cmake/vendor/couchbase-lite-core/vendor/sqlite3-unicodesn", root);
 
-        println!("cargo:rustc-link-lib=static=CouchbaseLiteCStatic");
+        println!("cargo:rustc-link-lib=static=cblite-static");
         println!("cargo:rustc-link-lib=static=FleeceStatic");
 
         println!("cargo:rustc-link-lib=static=liteCoreStatic");
@@ -106,13 +106,13 @@ fn main() {
         println!("cargo:rustc-link-lib=framework=SystemConfiguration");
     } else {
         // Copy the CBL dylib:
-        let src = root_dir.join("build_cmake/libCouchbaseLiteC.dylib");
-        let dst = out_dir.join("libCouchbaseLiteC.dylib");
+        let src = root_dir.join("build_cmake/libcblite.dylib");
+        let dst = out_dir.join("libcblite.dylib");
         println!("cargo:rerun-if-changed={}", src.to_str().unwrap());
         fs::copy(src, dst).expect("copy dylib");
         // Tell rustc to link it:
         println!("cargo:rustc-link-search={}", out_dir.to_str().unwrap());
-        println!("cargo:rustc-link-lib=dylib=CouchbaseLiteC");
+        println!("cargo:rustc-link-lib=dylib=cblite");
     }
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes

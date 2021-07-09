@@ -172,7 +172,7 @@ Dependencies:
 3. Run the shellscript `build.sh`
 6. Run the unit tests, with `test.sh`
 
-The library is at `build_cmake/libCouchbaseLiteC.so`. (Or `.DLL` or `.dylib`)
+The library is at `build_cmake/libcblite.so`. (Or `.DLL` or `.dylib`)
 
 ### With CMake on Windows
 

@@ -39,7 +39,7 @@ esac
 
 project_dir=couchbase-lite-c
 strip_dir=${project_dir}
-macosx_lib="libCouchbaseLiteC.dylib"
+macosx_lib="libcblite.dylib"
 
 echo VERSION=${VERSION}
 # Global define end
@@ -54,7 +54,7 @@ if [[ ${OS} == 'linux' ]]; then
     ${WORKSPACE}/couchbase-lite-c/jenkins/strip.sh ${strip_dir}
 else
     pushd ${project_dir}
-    dsymutil ${macosx_lib} -o libCouchbaseLiteC.dylib.dSYM
+    dsymutil ${macosx_lib} -o libcblite.dylib.dSYM
     strip -x ${macosx_lib}
     popd
 fi
@@ -62,10 +62,10 @@ fi
 make install
 if [[ ${OS} == 'macosx' ]]; then
     # package up the strip symbols
-    cp -rp ${strip_dir}/libCouchbaseLiteC.dylib.dSYM  ./install/
+    cp -rp ${strip_dir}/libcblite.dylib.dSYM  ./install/
 else
     # package up the strip symbols
-    cp -rp ${strip_dir}/libCouchbaseLiteC.so.sym  ./install/
+    cp -rp ${strip_dir}/libcblite.so.sym  ./install/
 
     # copy C++ stdlib, etc to output
     libstdcpp=`g++ --print-file-name=libstdc++.so`
@@ -95,11 +95,11 @@ cd ${WORKSPACE}/build_release/install
 if [[ ${OS} == 'macosx' ]]; then
     ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} include lib
     SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}-'symbols'.${PKG_TYPE}
-    ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME}  libCouchbaseLiteC.dylib.dSYM
+    ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME}  libcblite.dylib.dSYM
 else # linux
     ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} include lib
     SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}-'symbols'.${PKG_TYPE}
-    ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libCouchbaseLiteC*.sym
+    ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libcblite*.sym
 fi
 cd ${WORKSPACE}
 

@@ -11,11 +11,11 @@
 
 
 when defined(Linux):
-  {.push dynlib: "libCouchbaseLiteC.so".}
+  {.push dynlib: "libcblite.so".}
 elif defined(MacOS) or defined(MacOSX):
-  {.push dynlib: "libCouchbaseLiteC.dylib".}
+  {.push dynlib: "libcblite.dylib".}
 elif defined(Windows):
-  {.push dynlib: "CouchbaseLiteC.dll".}
+  {.push dynlib: "cblite.dll".}
 
 
 ##   FLSlice.h

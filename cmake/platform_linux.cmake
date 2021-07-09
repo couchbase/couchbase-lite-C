@@ -6,11 +6,11 @@ endfunction()
 function(set_exported_symbols_file)
     if(BUILD_ENTERPRISE)
         set_target_properties(
-            CouchbaseLiteC PROPERTIES LINK_FLAGS
+            cblite PROPERTIES LINK_FLAGS
             "-Wl,--version-script=${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_EE.gnu")
     else()
                 set_target_properties(
-            CouchbaseLiteC PROPERTIES LINK_FLAGS
+            cblite PROPERTIES LINK_FLAGS
             "-Wl,--version-script=${PROJECT_SOURCE_DIR}/src/exports/generated/CBL.gnu")
     endif()
 endfunction()

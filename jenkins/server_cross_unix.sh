@@ -41,7 +41,7 @@ ${WORKSPACE}/couchbase-lite-c/jenkins/strip.sh ${strip_dir} ${STRIP_PREFIX}
 make install
 
 # package up the strip symbols
-cp -rp ${strip_dir}/libCouchbaseLiteC.so.sym  ./install/
+cp -rp ${strip_dir}/libcblite.so.sym  ./install/
 
 cd ${WORKSPACE}
 
@@ -53,7 +53,7 @@ echo
 cd ${WORKSPACE}/build_release/install
 ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} include lib
 SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}-'symbols'.${PKG_TYPE}
-${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libCouchbaseLiteC*.sym
+${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libcblite*.sym
 
 cd ${WORKSPACE}
 
