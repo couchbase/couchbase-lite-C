@@ -247,7 +247,10 @@ bool CBLDatabase_PurgeDocument(CBLDatabase* db,
                                const CBLDocument* doc,
                                CBLError* outError) noexcept
 {
-    return CBLDatabase_PurgeDocumentByID(doc->database(), doc->docID(), outError);
+    try {
+        CBLDocument::checkDBMatches(doc->database(), db);
+        return CBLDatabase_PurgeDocumentByID(db, doc->docID(), outError);
+    } catchAndBridge(outError)
 }
 
 bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
