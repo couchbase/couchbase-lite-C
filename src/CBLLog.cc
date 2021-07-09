@@ -33,6 +33,9 @@ static const C4LogDomain kC4Domains[5] = {
     kC4DefaultLog, kC4DatabaseLog, kC4QueryLog, kC4SyncLog, kC4WebSocketLog
 };
 
+static const size_t kDefaultLogFileConfigMaxSize = 500 * 1024;
+static const int32_t kDefaultLogFileConfigMaxRotateCount = 1;
+
 static atomic<CBLLogCallback> sCallback = nullptr;
 static atomic<CBLLogLevel>    sCallbackLevel = CBLLogInfo;
 
@@ -157,8 +160,8 @@ bool CBLLog_SetFileConfig(CBLLogFileConfiguration config, CBLError *outError) CB
     C4LogFileOptions c4opt = {};
     c4opt.log_level         = C4LogLevel(config.level);
     c4opt.base_path         = config.directory;
-    c4opt.max_size_bytes    = config.maxSize;
-    c4opt.max_rotate_count  = config.maxRotateCount;
+    c4opt.max_size_bytes    = config.maxSize > 0 ? config.maxSize : kDefaultLogFileConfigMaxSize;
+    c4opt.max_rotate_count  = config.maxRotateCount > 0 ? config.maxRotateCount : kDefaultLogFileConfigMaxRotateCount;
     c4opt.use_plaintext     = config.usePlaintext;
     c4opt.header            = slice(header);
 
