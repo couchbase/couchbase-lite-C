@@ -190,7 +190,7 @@ public:
     };
 
     bool save(CBLDatabase* db, const SaveOptions &opt);
-
+    
 
 #pragma mark - Conflict resolution:
 
@@ -230,6 +230,13 @@ public:
     bool resolveConflict(Resolution resolution, const CBLDocument* _cbl_nullable mergeDoc);
 
 
+#pragma mark - Utils:
+    
+    static void checkDBMatches(CBLDatabase* _cbl_nullable myDB, CBLDatabase *dbParam) {
+        if (myDB && myDB != dbParam)
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Use document on a wrong database");
+    }
+
 #pragma mark - Internals:
 
 
@@ -243,11 +250,6 @@ private:
     void checkMutable() const {
         if (!_usuallyTrue(_mutable))
             C4Error::raise(LiteCoreDomain, kC4ErrorNotWriteable, "Document object is immutable");
-    }
-
-    static void checkDBMatches(CBLDatabase* _cbl_nullable myDB, CBLDatabase *dbParam) {
-        if (myDB && myDB != dbParam)
-            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Saving doc to wrong database");
     }
 
     static CBLNewBlob* _cbl_nullable findNewBlob(FLDict dict);

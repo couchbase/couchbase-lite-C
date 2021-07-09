@@ -111,7 +111,7 @@ bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
     @return  True on success, false on failure. */
 bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
                                                  CBLDocument* doc,
-                                                 CBLConflictHandler _cbl_nullable conflictHandler,
+                                                 CBLConflictHandler conflictHandler,
                                                  void* _cbl_nullable context,
                                                  CBLError* _cbl_nullable outError) CBLAPI;
 
