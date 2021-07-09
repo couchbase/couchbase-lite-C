@@ -27,7 +27,13 @@ ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couc
 
 echo "====  Cross Building Release binary using ${TOOLCHAIN_FILE}  ==="
 cd ${WORKSPACE}/build_release
-cmake -DEDITION=${EDITION} -DCMAKE_INSTALL_PREFIX=`pwd`/install -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} ..
+
+if [[ "$OS" = "raspbian9" ]]; then
+    cmake -DEDITION=${EDITION} -DCMAKE_INSTALL_PREFIX=`pwd`/install -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} ..
+else
+    cmake -DEDITION=${EDITION} -DCMAKE_INSTALL_PREFIX=`pwd`/install -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} -D64_BIT=ON ..
+fi
+
 make -j8
 
 echo "==== Stripping binary using ${STRIP-PREFIX}-strip"

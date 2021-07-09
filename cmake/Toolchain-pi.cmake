@@ -30,10 +30,18 @@ else()
     set(RASPBERRY_VERSION $ENV{RASPBERRY_VERSION})
 endif()
 
+if(64_BIT)
+    set(CMAKE_SYSTEM_PROCESSOR "arm64")
+    set(CMAKE_LIBRARY_ARCHITECTURE aarch64-linux-gnu)
+else()
+    set(CMAKE_SYSTEM_PROCESSOR "armv7")
+    set(CMAKE_LIBRARY_ARCHITECTURE arm-linux-gnueabihf)
+endif()
+
 if("$ENV{RASPBIAN_ROOTFS}" STREQUAL "")
 	message(FATAL_ERROR "Define the RASPBIAN_ROOTFS environment variable to point to the raspbian rootfs.")
 else()
-	set(SYSROOT_PATH "$ENV{RASPBIAN_ROOTFS}")
+    set(SYSROOT_PATH "$ENV{RASPBIAN_ROOTFS}")
 endif()
 
 message(STATUS "Using sysroot path: ${SYSROOT_PATH}")
@@ -41,9 +49,7 @@ message(STATUS "Using sysroot path: ${SYSROOT_PATH}")
 set(CMAKE_CROSSCOMPILING TRUE)
 set(CMAKE_SYSROOT "${SYSROOT_PATH}")
 set(CMAKE_FIND_ROOT_PATH "${SYSROOT_PATH}")
-set(CMAKE_LIBRARY_ARCHITECTURE arm-linux-gnueabihf)
 set(CMAKE_SYSTEM_NAME "Linux")
-set(CMAKE_SYSTEM_PROCESSOR "armv7")
 
 set(TOOLCHAIN_CC "${CMAKE_LIBRARY_ARCHITECTURE}-gcc")
 set(TOOLCHAIN_CXX "${CMAKE_LIBRARY_ARCHITECTURE}-g++")
@@ -58,22 +64,27 @@ set(CMAKE_CXX_COMPILER ${TOOLCHAIN_CXX})
 
 set(LIB_DIRS 
     "${SYSROOT_PATH}/lib/${CMAKE_LIBRARY_ARCHITECTURE}"
-	"${SYSROOT_PATH}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}"
+    "${SYSROOT_PATH}/usr/lib/${CMAKE_LIBRARY_ARCHITECTURE}"
 )
 
 set(COMMON_FLAGS "-I${SYSROOT_PATH}/usr/include ")
 FOREACH(LIB ${LIB_DIRS})
-	set(COMMON_FLAGS "${COMMON_FLAGS} -L${LIB} -Wl,-rpath-link,${LIB}")
+    set(COMMON_FLAGS "${COMMON_FLAGS} -L${LIB} -Wl,-rpath-link,${LIB}")
 ENDFOREACH()
 
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${SYSROOT_PATH}/usr/lib/${TOOLCHAIN_HOST}")
 
-if(RASPBERRY_VERSION VERSION_GREATER 2)
-    set(CMAKE_C_FLAGS "-mcpu=cortex-a53 -mfpu=neon-vfpv4 -mfloat-abi=hard ${COMMON_FLAGS}" CACHE STRING "Flags for Raspberry PI 3")
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 3")
+if(NOT 64_BIT)
+    if(RASPBERRY_VERSION VERSION_GREATER 2)
+        set(CMAKE_C_FLAGS "-mcpu=cortex-a53 -mfpu=neon-vfpv4 -mfloat-abi=hard ${COMMON_FLAGS}" CACHE STRING "Flags for Raspberry PI 3")
+        set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 3")
+    else()
+        set(CMAKE_C_FLAGS "-mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard ${COMMON_FLAGS}" CACHE STRING "Flags for Raspberry PI 2")
+        set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 2")
+    endif()
 else()
-    set(CMAKE_C_FLAGS "-mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard ${COMMON_FLAGS}" CACHE STRING "Flags for Raspberry PI 2")
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 2")
+    set(CMAKE_C_FLAGS "${COMMON_FLAGS}" CACHE STRING "Flags for Raspberry PI 64-bit")
+    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 64-bit")
 endif()
 
 set(CMAKE_FIND_ROOT_PATH "${CMAKE_INSTALL_PREFIX};${CMAKE_PREFIX_PATH};${CMAKE_SYSROOT}")
