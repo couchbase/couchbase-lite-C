@@ -23,15 +23,15 @@ endfunction()
 function(set_dylib_properties)
     if(BUILD_ENTERPRISE)
         set_target_properties(
-            CouchbaseLiteC PROPERTIES LINK_FLAGS
+            cblite PROPERTIES LINK_FLAGS
             "-exported_symbols_list ${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_EE.exp")
     else()
         set_target_properties(
-            CouchbaseLiteC PROPERTIES LINK_FLAGS
+            cblite PROPERTIES LINK_FLAGS
             "-exported_symbols_list ${PROJECT_SOURCE_DIR}/src/exports/generated/CBL.exp")
     endif()
     
-    target_link_libraries(CouchbaseLiteC PUBLIC
+    target_link_libraries(cblite PUBLIC
             "-framework CoreFoundation"
             "-framework Foundation"
             "-framework CFNetwork"
