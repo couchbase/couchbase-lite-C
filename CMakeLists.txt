@@ -11,7 +11,8 @@ project (
     VERSION 3.0.0
 )
 
-set(CBL_LIB_VERSION "3.0.0")
+set(CBL_LIB_VERSION ${CouchbaseLite_C_VERSION})
+set(CBL_API_VERSION ${CouchbaseLite_C_VERSION_MAJOR})
 
 ### BUILD SETTINGS:
 
@@ -179,6 +180,7 @@ endif()
 target_link_libraries(cblite PRIVATE ${CBL_LIBRARIES_PRIVATE})
 
 set_dylib_properties()
+set_target_properties(cblite PROPERTIES VERSION "${CBL_LIB_VERSION}" SOVERSION "${CBL_API_VERSION}")
 
 ## Installation
 
@@ -218,7 +220,7 @@ write_basic_package_version_file(
     VERSION ${CBL_LIBRARY_VERSION} COMPATIBILITY SameMajorVersion
 )
 
-install(FILES ${CMAKE_BINARY_DIR}/cbliteonfig.cmake
+install(FILES ${CMAKE_BINARY_DIR}/CouchbaseLiteConfig.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite)
 
 ### TESTS:

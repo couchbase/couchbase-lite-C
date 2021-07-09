@@ -70,4 +70,11 @@ function(set_dylib_properties)
     
     target_link_libraries(cblite PRIVATE zlibstatic Ws2_32)
     target_compile_definitions(cblite-static PRIVATE LITECORE_EXPORTS)
+
+    configure_file(
+        "${PROJECT_SOURCE_DIR}/cmake/cblite.rc.in"
+        "${PROJECT_BINARY_DIR}/cblite.rc"
+    )
+
+    target_sources(cblite PRIVATE "${PROJECT_BINARY_DIR}/cblite.rc")
 endfunction()

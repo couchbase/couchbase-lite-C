@@ -1,0 +1,34 @@
+#include <winresrc.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION
+@CouchbaseLite_C_VERSION_MAJOR@,@CouchbaseLite_C_VERSION_MINOR@,@CouchbaseLite_C_VERSION_PATCH@,0
+PRODUCTVERSION @CouchbaseLite_C_VERSION_MAJOR@,@CouchbaseLite_C_VERSION_MINOR@,@CouchbaseLite_C_VERSION_PATCH@,0
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+#ifndef NDEBUG
+FILEFLAGS 0
+#else
+FILEFLAGS VER_DEBUG
+#endif
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_DLL
+FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "04090000"
+BEGIN
+VALUE "FileDescription", "Couchbase Lite for C"
+VALUE "FileVersion", "@CouchbaseLite_C_VERSION@"
+VALUE "InternalName", "cblite"
+VALUE "LegalCopyright", "Copyright 2021 Couchbase"
+VALUE "OriginalFilename", "cblite.dll"
+VALUE "ProductName", "Couchbase Lite"
+VALUE "ProductVersion", "@CouchbaseLite_C_VERSION@"
+END
+END
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0x409, 1200
+END
+END

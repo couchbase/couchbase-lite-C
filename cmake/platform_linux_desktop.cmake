@@ -50,6 +50,4 @@ function(set_dylib_properties)
         $<INSTALL_INTERFACE:icudata>
         $<INSTALL_INTERFACE:icui18n>
     )
-
-    set_target_properties(cblite PROPERTIES SOVERSION "${CBL_LIB_VERSION}")
 endfunction()
