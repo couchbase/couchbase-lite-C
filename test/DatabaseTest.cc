@@ -942,6 +942,32 @@ TEST_CASE_METHOD(DatabaseTest, "Maintenance : Reindex") {
 }
 
 
+TEST_CASE_METHOD(DatabaseTest, "Maintenance : Optimize") {
+    CBLValueIndexConfiguration index1 = {};
+    index1.expressionLanguage = kCBLN1QLLanguage;
+    index1.expressions = "name.first"_sl;
+    CBLError error;
+    CHECK(CBLDatabase_CreateValueIndex(db, "index1"_sl, index1, &error));
+    
+    ImportJSONLines(GetTestFilePath("names_100.json"), db);
+    
+    CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeOptimize, &error));
+}
+
+
+TEST_CASE_METHOD(DatabaseTest, "Maintenance : FullOptimize") {
+    CBLValueIndexConfiguration index1 = {};
+    index1.expressionLanguage = kCBLN1QLLanguage;
+    index1.expressions = "name.first"_sl;
+    CBLError error;
+    CHECK(CBLDatabase_CreateValueIndex(db, "index1"_sl, index1, &error));
+    
+    ImportJSONLines(GetTestFilePath("names_100.json"), db);
+    
+    CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeFullOptimize, &error));
+}
+
+
 #pragma mark - Transaction:
 
 

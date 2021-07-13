@@ -174,9 +174,23 @@ bool CBLDatabase_ChangeEncryptionKey(CBLDatabase*,
 
 /** Maintenance Type used when performing database maintenance. */
 typedef CBL_ENUM(uint32_t, CBLMaintenanceType) {
-    kCBLMaintenanceTypeCompact = 0,     ///< Compact the database file and delete unused attachments
-    kCBLMaintenanceTypeReindex,         ///< Rebuild the entire database's indexes.
-    kCBLMaintenanceTypeIntegrityCheck   ///< Check for the database’s corruption. If found, an error will be returned.
+    /// Compact the database file and delete unused attachments
+    kCBLMaintenanceTypeCompact = 0,
+    
+    /// Rebuild the entire database's indexes.
+    kCBLMaintenanceTypeReindex,
+    
+    /// Check for the database’s corruption. If found, an error will be returned
+    kCBLMaintenanceTypeIntegrityCheck,
+    
+    /// Partially scan indexes to gather database statistics that help optimize queries.
+    /// This operation is also performed automatically when closing the database.
+    kCBLMaintenanceTypeOptimize,
+    
+    /// Fully scans all indexes to gather database statistics that help optimize queries.
+    /// This may take some time, depending on the size of the indexes, but it doesn't have to
+    /// be redone unless the database changes drastically, or new indexes are created.
+    kCBLMaintenanceTypeFullOptimize
 };
 
 /**  Performs database maintenance. */
