@@ -318,9 +318,7 @@ TEST_CASE_METHOD(QueryTest, "Query Result As Array", "[Query]") {
     CHECK(n == 3);
 }
 
-// https://issues.couchbase.com/browse/CBL-2117
-// Disable the test until the issue is fixed
-/*
+
 static int countResults(CBLResultSet *results) {
      int n = 0;
      while (CBLResultSet_Next(results))
@@ -367,8 +365,16 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     while (resultCount < 0)
         this_thread::sleep_for(100ms);
     CHECK(resultCount == 2);
+    
+    // https://issues.couchbase.com/browse/CBL-2117
+    // Remove listener token and sleep to ensure async cleanup in LiteCore's LiveQuerier's _stop()
+    // functions is done before checking instance leaking in CBLTest's destructor:
+    CBLListener_Remove(listenerToken);
+    listenerToken = nullptr;
+    cerr << "Sleeping to ensure async cleanup ..." << endl;
+    this_thread::sleep_for(500ms);
 }
-*/
+
 
 #pragma mark - C++ API:
 
