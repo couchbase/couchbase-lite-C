@@ -84,6 +84,8 @@ TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     int n = 0;
     results = CBLQuery_Execute(query, &error);
     REQUIRE(results);
+    CHECK(CBLResultSet_GetQuery(results) == query);
+    
     while (CBLResultSet_Next(results)) {
         FLValue name = CBLResultSet_ValueAtIndex(results, 0);
         CHECK(CBLResultSet_ValueForKey(results, "name"_sl) == name);
@@ -150,6 +152,171 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
     }
 }
 
+
+TEST_CASE_METHOD(QueryTest, "Create and Delete Value Index", "[Query]") {
+    CBLError error;
+    int errPos;
+    
+    CBLValueIndexConfiguration index1 = {};
+    index1.expressionLanguage = kCBLN1QLLanguage;
+    index1.expressions = "name.first"_sl;
+    CHECK(CBLDatabase_CreateValueIndex(db, "index1"_sl, index1, &error));
+    
+    CBLValueIndexConfiguration index2 = {};
+    index2.expressionLanguage = kCBLJSONLanguage;
+    index2.expressions = R"([[".name.last"]])"_sl;
+    CHECK(CBLDatabase_CreateValueIndex(db, "index2"_sl, index2, &error));
+    
+    FLArray indexNames = CBLDatabase_GetIndexNames(db);
+    CHECK(FLArray_Count(indexNames) == 2);
+    CHECK(Array(indexNames).toJSONString() == R"(["index1","index2"])");
+    
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name.first FROM _ ORDER BY name.first"_sl,
+                                    &errPos, &error);
+    
+    alloc_slice explanation1(CBLQuery_Explain(query));
+    CHECK(explanation1.find("SCAN TABLE kv_default AS _ USING INDEX index1"_sl));
+    CBLQuery_Release(query);
+    
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name.last FROM _ ORDER BY name.last"_sl,
+                                    &errPos, &error);
+    
+    alloc_slice explanation2(CBLQuery_Explain(query));
+    CHECK(explanation2.find("SCAN TABLE kv_default AS _ USING INDEX index2"_sl));
+    CBLQuery_Release(query);
+    query = nullptr;
+    
+    CHECK(CBLDatabase_DeleteIndex(db, "index1"_sl, &error));
+    CHECK(CBLDatabase_DeleteIndex(db, "index2"_sl, &error));
+    
+    indexNames = CBLDatabase_GetIndexNames(db);
+    CHECK(FLArray_Count(indexNames) == 0);
+    CHECK(Array(indexNames).toJSONString() == R"([])");
+}
+
+
+TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
+    CBLError error;
+    int errPos;
+
+    CBLFullTextIndexConfiguration index1 = {};
+    index1.expressionLanguage = kCBLN1QLLanguage;
+    index1.expressions = "product.description"_sl;
+    index1.ignoreAccents = true;
+    CHECK(CBLDatabase_CreateFullTextIndex(db, "index1"_sl, index1, &error));
+    
+    CBLFullTextIndexConfiguration index2 = {};
+    index2.expressionLanguage = kCBLJSONLanguage;
+    index2.expressions = R"([[".product.summary"]])"_sl;
+    index2.ignoreAccents = false;
+    index2.language = "en/english"_sl;
+    CHECK(CBLDatabase_CreateFullTextIndex(db, "index2"_sl, index2, &error));
+    
+    FLArray indexNames = CBLDatabase_GetIndexNames(db);
+    CHECK(FLArray_Count(indexNames) == 2);
+    CHECK(Array(indexNames).toJSONString() == R"(["index1","index2"])");
+    
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT product.name FROM _ WHERE match('index1', 'avocado')"_sl,
+                                    &errPos, &error);
+    
+    alloc_slice explanation1(CBLQuery_Explain(query));
+    CHECK(explanation1.find("SCAN TABLE kv_default::index1 AS fts1"_sl));
+    CBLQuery_Release(query);
+    
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT product.name FROM _ WHERE match('index2', 'chilli')"_sl,
+                                    &errPos, &error);
+    
+    alloc_slice explanation2(CBLQuery_Explain(query));
+    CHECK(explanation2.find("SCAN TABLE kv_default::index2 AS fts1"_sl));
+    CBLQuery_Release(query);
+    query = nullptr;
+    
+    CHECK(CBLDatabase_DeleteIndex(db, "index1"_sl, &error));
+    CHECK(CBLDatabase_DeleteIndex(db, "index2"_sl, &error));
+    
+    indexNames = CBLDatabase_GetIndexNames(db);
+    CHECK(FLArray_Count(indexNames) == 0);
+    CHECK(Array(indexNames).toJSONString() == R"([])");
+}
+
+
+TEST_CASE_METHOD(QueryTest, "Query Result As Dict", "[Query]") {
+    CBLError error;
+    int errPos;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    &errPos, &error);
+    REQUIRE(query);
+
+    CHECK(CBLQuery_ColumnCount(query) == 1);
+    CHECK(CBLQuery_ColumnName(query, 0) == "name"_sl);
+
+    alloc_slice explanation(CBLQuery_Explain(query));
+    cerr << string(explanation);
+
+    static const slice kExpectedFirst[3] = {"Tyesha",  "Eddie",     "Diedre"};
+    static const slice kExpectedLast [3] = {"Loehrer", "Colangelo", "Clinton"};
+
+    int n = 0;
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+    while (CBLResultSet_Next(results)) {
+        FLDict result = CBLResultSet_ResultDict(results);
+        FLValue name = FLDict_Get(result, "name"_sl);
+        FLDict dict = FLValue_AsDict(name);
+        CHECK(dict);
+        slice first  = FLValue_AsString(FLDict_Get(dict, "first"_sl));
+        slice last   = FLValue_AsString(FLDict_Get(dict, "last"_sl));
+        REQUIRE(n < 3);
+        CHECK(first == kExpectedFirst[n]);
+        CHECK(last == kExpectedLast[n]);
+        ++n;
+        cerr << first << " " << last << "\n";
+    }
+    CHECK(n == 3);
+}
+
+
+TEST_CASE_METHOD(QueryTest, "Query Result As Array", "[Query]") {
+    CBLError error;
+    int errPos;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    &errPos, &error);
+    REQUIRE(query);
+
+    CHECK(CBLQuery_ColumnCount(query) == 1);
+    CHECK(CBLQuery_ColumnName(query, 0) == "name"_sl);
+
+    alloc_slice explanation(CBLQuery_Explain(query));
+    cerr << string(explanation);
+
+    static const slice kExpectedFirst[3] = {"Tyesha",  "Eddie",     "Diedre"};
+    static const slice kExpectedLast [3] = {"Loehrer", "Colangelo", "Clinton"};
+
+    int n = 0;
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+    while (CBLResultSet_Next(results)) {
+        FLArray result = CBLResultSet_ResultArray(results);
+        REQUIRE(FLArray_Count(result) == 1);
+        FLValue name = FLArray_Get(result, 0);
+        FLDict dict = FLValue_AsDict(name);
+        CHECK(dict);
+        slice first  = FLValue_AsString(FLDict_Get(dict, "first"_sl));
+        slice last   = FLValue_AsString(FLDict_Get(dict, "last"_sl));
+        REQUIRE(n < 3);
+        CHECK(first == kExpectedFirst[n]);
+        CHECK(last == kExpectedLast[n]);
+        ++n;
+        cerr << first << " " << last << "\n";
+    }
+    CHECK(n == 3);
+}
 
 // https://issues.couchbase.com/browse/CBL-2117
 // Disable the test until the issue is fixed
