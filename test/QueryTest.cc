@@ -422,14 +422,14 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
     CHECK(n == 3);
 }
 
-
+/**
+ * CBL-2147 : Disable the test until the issue is fixed:
 static int countResults(ResultSet &results) {
     int n = 0;
     for (CBL_UNUSED auto &result : results)
         ++n;
     return n;
 }
-
 
 TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
     Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
@@ -461,3 +461,4 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
         this_thread::sleep_for(100ms);
     CHECK(resultCount == 2);
 }
+*/
