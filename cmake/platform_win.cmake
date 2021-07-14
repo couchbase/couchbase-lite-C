@@ -46,12 +46,12 @@ endfunction()
 
 function(set_dylib_properties)
     if(WINDOWS_STORE)
-        target_compile_definitions(CouchbaseLiteCStatic PRIVATE -DMBEDTLS_NO_PLATFORM_ENTROPY)
-        set_target_properties(CouchbaseLiteC PROPERTIES COMPILE_FLAGS /ZW)
+        target_compile_definitions(cblite-static PRIVATE -DMBEDTLS_NO_PLATFORM_ENTROPY)
+        set_target_properties(cblite PROPERTIES COMPILE_FLAGS /ZW)
 
         # Not that happy about this, but I'm too lazy right now to rework LiteCore
         target_sources(
-            CouchbaseLiteC PRIVATE
+            cblite PRIVATE
             vendor/couchbase-lite-core/MSVC/SQLiteTempDirectory.cc
         )
         
@@ -60,14 +60,21 @@ function(set_dylib_properties)
     
     if(BUILD_ENTERPRISE)
         set_target_properties(
-            CouchbaseLiteC PROPERTIES LINK_FLAGS
+            cblite PROPERTIES LINK_FLAGS
             "/def:${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_EE.def")
     else()
         set_target_properties(
-            CouchbaseLiteC PROPERTIES LINK_FLAGS
+            cblite PROPERTIES LINK_FLAGS
             "/def:${PROJECT_SOURCE_DIR}/src/exports/generated/CBL.def")
     endif()
     
-    target_link_libraries(CouchbaseLiteC PRIVATE zlibstatic Ws2_32)
-    target_compile_definitions(CouchbaseLiteCStatic PRIVATE LITECORE_EXPORTS)
+    target_link_libraries(cblite PRIVATE zlibstatic Ws2_32)
+    target_compile_definitions(cblite-static PRIVATE LITECORE_EXPORTS)
+
+    configure_file(
+        "${PROJECT_SOURCE_DIR}/cmake/cblite.rc.in"
+        "${PROJECT_BINARY_DIR}/cblite.rc"
+    )
+
+    target_sources(cblite PRIVATE "${PROJECT_BINARY_DIR}/cblite.rc")
 endfunction()

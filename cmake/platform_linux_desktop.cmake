@@ -40,11 +40,11 @@ function(set_dylib_properties)
     set_exported_symbols_file()
    
     foreach(LIB ${ICU_LIBS})
-        target_link_libraries(CouchbaseLiteC PUBLIC $<BUILD_INTERFACE:${LIB}>)
+        target_link_libraries(cblite PUBLIC $<BUILD_INTERFACE:${LIB}>)
     endforeach()
  
     target_link_libraries(
-        CouchbaseLiteC PUBLIC
+        cblite PUBLIC
         z
         $<INSTALL_INTERFACE:icuuc>
         $<INSTALL_INTERFACE:icudata>

@@ -11,11 +11,11 @@
 
 
 when defined(Linux):
-  {.push dynlib: "libCouchbaseLiteC.so".}
+  {.push dynlib: "libcblite.so".}
 elif defined(MacOS) or defined(MacOSX):
-  {.push dynlib: "libCouchbaseLiteC.dylib".}
+  {.push dynlib: "libcblite.dylib".}
 elif defined(Windows):
-  {.push dynlib: "libCouchbaseLiteC.dll".}
+  {.push dynlib: "cblite.dll".}
 
 
 ##

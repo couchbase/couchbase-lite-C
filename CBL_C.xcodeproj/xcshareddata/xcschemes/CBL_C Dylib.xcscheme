@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "27B61D6F21D6B64A0027CCDB"
-               BuildableName = "libCouchbaseLiteC.dylib"
+               BuildableName = "libcblite.dylib"
                BlueprintName = "CBL_C Dylib"
                ReferencedContainer = "container:CBL_C.xcodeproj">
             </BuildableReference>
@@ -70,7 +70,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "271C2A2221CAC8920045856E"
-            BuildableName = "libCouchbaseLiteC-static.a"
+            BuildableName = "libcblite-static.a"
             BlueprintName = "CBL_C"
             ReferencedContainer = "container:CBL_C.xcodeproj">
          </BuildableReference>

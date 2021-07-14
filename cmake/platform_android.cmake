@@ -15,6 +15,6 @@ endfunction()
 function(set_dylib_properties)
     set_exported_symbols_file()
     
-    target_compile_definitions(CouchbaseLiteCStatic PRIVATE -D_CRYPTO_MBEDTLS)
-    target_link_libraries(CouchbaseLiteC PRIVATE atomic log zlibstatic)
+    target_compile_definitions(cblite-static PRIVATE -D_CRYPTO_MBEDTLS)
+    target_link_libraries(cblite PRIVATE atomic log zlibstatic)
 endfunction()

@@ -40,7 +40,7 @@ pushd test > /dev/null
 ./CBL_C_Tests -r list
 popd > /dev/null
 
-lcov -d CMakeFiles/CouchbaseLiteCStatic.dir -c -o CBL_C_Tests.info
+lcov -d CMakeFiles/cblite-static.dir -c -o CBL_C_Tests.info
 find . -type f -name '*.gcda' -delete
 
 lcov --remove CBL_C_Tests.info '/Applications/*' -o CBL_C_Tests_Filtered.info

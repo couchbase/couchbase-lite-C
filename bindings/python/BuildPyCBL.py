@@ -36,7 +36,7 @@ CBL_INCLUDE_DIR    = "/include"
 FLEECE_INCLUDE_DIR = "/vendor/couchbase-lite-core/vendor/fleece/API"
 
 # CMake settings are defaults, but overrideable on command-line
-DEFAULT_LIBRARIES = "CouchbaseLiteC z"
+DEFAULT_LIBRARIES = "cblite z"
 DEFAULT_LIBRARY_DIR  = DEFAULT_SRC_DIR + "build_cmake/"
 
 # Extra linker arguments -- platform-specific
@@ -56,7 +56,7 @@ def BuildLibrary(sourceDir, python_includedir, libdir, libraries, extra_link_arg
     libdir = os.path.relpath(libdir)
 
     # Copy the CBL library here:
-    libpath = libdir + "/libCouchbaseLiteC"
+    libpath = libdir + "/libcblite"
     if platform.system() == "Darwin":
         libpath += ".dylib"
     else:

@@ -11,8 +11,8 @@ project (
     VERSION 3.0.0
 )
 
-set(CBL_LIB_VERSION "3.0.0")
-set(CBL_LIB_SOVERSION "6")
+set(CBL_LIB_VERSION ${CouchbaseLite_C_VERSION})
+set(CBL_API_VERSION ${CouchbaseLite_C_VERSION_MAJOR})
 
 ### BUILD SETTINGS:
 
@@ -121,9 +121,9 @@ set(
     ${PLATFORM_SRC}
 )
 
-add_library(CouchbaseLiteCStatic STATIC ${ALL_SRC_FILES})
+add_library(cblite-static STATIC ${ALL_SRC_FILES})
 target_include_directories(
-    CouchbaseLiteCStatic PUBLIC
+    cblite-static PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated_headers/public/cbl/>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/>
@@ -131,7 +131,7 @@ target_include_directories(
 )
 set_platform_include_directories(RESULT PLATFORM_INCLUDE)
 target_include_directories(
-    CouchbaseLiteCStatic
+    cblite-static
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cbl
     src
@@ -141,14 +141,14 @@ target_include_directories(
 )
 
 target_link_libraries(
-    CouchbaseLiteCStatic INTERFACE
+    cblite-static INTERFACE
     LiteCoreStatic
 )
 
 file(WRITE empty.cpp)
-add_library(CouchbaseLiteC SHARED empty.cpp)
+add_library(cblite SHARED empty.cpp)
 target_include_directories(
-    CouchbaseLiteC PUBLIC
+    cblite PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated_headers/public/cbl/>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/>
@@ -156,7 +156,7 @@ target_include_directories(
 )
 
 target_include_directories(
-    CouchbaseLiteC
+    cblite
     PRIVATE
     src
     vendor/couchbase-lite-core/C
@@ -166,7 +166,7 @@ target_include_directories(
 
 set(CBL_LIBRARIES_PRIVATE
     ${WHOLE_LIBRARY_FLAG}
-    CouchbaseLiteCStatic
+    cblite-static
     ${NO_WHOLE_LIBRARY_FLAG}
     LiteCoreWebSocket
 )
@@ -177,9 +177,10 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
                               atomic)
 endif()
 
-target_link_libraries(CouchbaseLiteC PRIVATE ${CBL_LIBRARIES_PRIVATE})
+target_link_libraries(cblite PRIVATE ${CBL_LIBRARIES_PRIVATE})
 
 set_dylib_properties()
+set_target_properties(cblite PROPERTIES VERSION "${CBL_LIB_VERSION}" SOVERSION "${CBL_API_VERSION}")
 
 ## Installation
 
@@ -190,7 +191,7 @@ else()
 endif()
 
 install(
-    TARGETS CouchbaseLiteC
+    TARGETS cblite
     EXPORT CouchbaseLiteTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
@@ -204,8 +205,8 @@ install(FILES ${C_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
 install(FILES ${PROJECT_BINARY_DIR}/generated_headers/public/cbl/CBL_Edition.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
 install(FILES ${FLEECE_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fleece)
 
-configure_file(CouchbaseLiteC.pc.in CouchbaseLiteC.pc @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CouchbaseLiteC.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+configure_file(cblite.pc.in cblite.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cblite.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 include(CMakePackageConfigHelpers)
 set(TARGETS_EXPORT_NAME "CouchbaseLiteTargets")
