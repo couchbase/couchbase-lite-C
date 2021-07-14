@@ -43,7 +43,10 @@ if(CODE_COVERAGE_ENABLED)
 endif()
 
 if(BUILD_ENTERPRISE)
+    message("Building Enterprise Edition")
     set(COUCHBASE_ENTERPRISE 1)                     # For generating CBL_Edition.h
+else()
+    message("Building Community Edition")
 endif()
 
 configure_file(

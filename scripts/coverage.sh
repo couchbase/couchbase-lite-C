@@ -43,7 +43,7 @@ popd > /dev/null
 lcov -d CMakeFiles/cblite-static.dir -c -o CBL_C_Tests.info
 find . -type f -name '*.gcda' -delete
 
-lcov --remove CBL_C_Tests.info '/Applications/*' -o CBL_C_Tests_Filtered.info
+lcov --remove CBL_C_Tests.info '/Applications/*' '*/vendor/*' -o CBL_C_Tests_Filtered.info
 
 mkdir -p coverage_reports
 genhtml CBL_C_Tests_Filtered.info -o coverage_reports
