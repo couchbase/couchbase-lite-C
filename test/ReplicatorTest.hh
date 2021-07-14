@@ -7,6 +7,7 @@
 #pragma once
 #include "CBLTest_Cpp.hh"
 #include "cbl++/CouchbaseLite.hh"
+#include <chrono>
 #include <iostream>
 #include <thread>
 #include <set>
@@ -16,14 +17,19 @@ using namespace std;
 using namespace fleece;
 using namespace cbl;
 
-
 class ReplicatorTest : public CBLTest_Cpp {
 public:
+    using clock    = std::chrono::high_resolution_clock;
+    using time     = clock::time_point;
+    using seconds  = std::chrono::duration<double, std::ratio<1,1>>;
+    
     CBLReplicatorConfiguration config = {};
     CBLReplicator *repl = nullptr;
     set<string> docsNotified;
     CBLError replError = {};
     bool logEveryDocument = true;
+    bool stopWhenIdle = true;
+    double timeoutSeconds = 30.0;
 
     ReplicatorTest() {
         config.database = db.ref();
@@ -33,7 +39,8 @@ public:
 
     void replicate() {
         CBLError error;
-        repl = CBLReplicator_Create(&config, &error);
+        if (!repl)
+            repl = CBLReplicator_Create(&config, &error);
         REQUIRE(repl);
 
         auto ctoken = CBLReplicator_AddChangeListener(repl, [](void *context, CBLReplicator *r,
@@ -49,16 +56,41 @@ public:
 
         CBLReplicator_Start(repl, false);
 
-        cerr << "Waiting...\n";
+        time start = clock::now();
         CBLReplicatorStatus status;
-        while ((status = CBLReplicator_Status(repl)).activity != kCBLReplicatorStopped) {
+        cerr << "Waiting...\n";
+        while (std::chrono::duration_cast<seconds>(clock::now() - start).count() < timeoutSeconds) {
+            status = CBLReplicator_Status(repl);
+            if (config.continuous && status.activity == kCBLReplicatorIdle) {
+                if (stopWhenIdle) {
+                    cerr << "Stop the continuous replicator...\n";
+                    CBLReplicator_Stop(repl);
+                } else
+                    break;
+            } else if (status.activity == kCBLReplicatorStopped)
+                break;
             this_thread::sleep_for(100ms);
         }
         cerr << "Finished with activity=" << status.activity
              << ", error=(" << status.error.domain << "/" << status.error.code << ")\n";
-
+        
+        if (config.continuous && !stopWhenIdle)
+            CHECK(status.activity == kCBLReplicatorIdle);
+        else
+            CHECK(status.activity == kCBLReplicatorStopped);
+        
         CBLListener_Remove(ctoken);
         CBLListener_Remove(dtoken);
+    }
+    
+    bool waitForActivityLevel(CBLReplicatorActivityLevel level, double timeout) {
+        time start = clock::now();
+        while (std::chrono::duration_cast<seconds>(clock::now() - start).count() < timeout) {
+            if (CBLReplicator_Status(repl).activity == level)
+                return true;
+            this_thread::sleep_for(100ms);
+        }
+        return false;
     }
 
     void statusChanged(CBLReplicator *r, const CBLReplicatorStatus &status) {

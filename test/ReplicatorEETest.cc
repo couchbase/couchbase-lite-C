@@ -31,12 +31,13 @@ public:
     :otherDB(openEmptyDatabaseNamed("otherDB"))
     {
         config.endpoint = CBLEndpoint_CreateWithLocalDB(otherDB.ref());
-        config.replicatorType = kCBLReplicatorTypePush;
     }
 };
 
 
 TEST_CASE_METHOD(ReplicatorLocalTest, "Push to local db", "[Replicator]") {
+    config.replicatorType = kCBLReplicatorTypePush;
+    
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
     db.saveDocument(doc);
@@ -48,6 +49,87 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Push to local db", "[Replicator]") {
     Document copiedDoc = otherDB.getDocument("foo");
     REQUIRE(copiedDoc);
     CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
+}
+
+
+TEST_CASE_METHOD(ReplicatorLocalTest, "Continuous Push to local db", "[Replicator]") {
+    config.replicatorType = kCBLReplicatorTypePush;
+    config.continuous = true;
+    
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+
+    replicate();
+
+    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+
+    Document copiedDoc = otherDB.getDocument("foo");
+    REQUIRE(copiedDoc);
+    CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
+}
+
+
+TEST_CASE_METHOD(ReplicatorLocalTest, "Set Suspended", "[Replicator]") {
+    config.replicatorType = kCBLReplicatorTypePush;
+    config.continuous = true;
+    stopWhenIdle = false;
+    
+    replicate();
+    
+    REQUIRE(CBLReplicator_Status(repl).activity == kCBLReplicatorIdle);
+    CBLReplicator_SetSuspended(repl, true);
+    REQUIRE(waitForActivityLevel(kCBLReplicatorOffline, 10.0));
+    
+    CBLReplicator_SetSuspended(repl, false);
+    REQUIRE(waitForActivityLevel(kCBLReplicatorIdle, 10.0));
+    
+    CBLReplicator_Stop(repl);
+    REQUIRE(waitForActivityLevel(kCBLReplicatorStopped, 10.0));
+}
+
+
+TEST_CASE_METHOD(ReplicatorLocalTest, "Pending Documents", "[Replicator]") {
+    config.replicatorType = kCBLReplicatorTypePush;
+    
+    replicate();
+    CHECK(asVector(docsNotified) == vector<string>{});
+    
+    CBLError error;
+    FLDict ids = CBLReplicator_PendingDocumentIDs(repl, &error);
+    CHECK(FLDict_Count(ids) == 0);
+    FLDict_Release(ids);
+    
+    MutableDocument doc1("foo1");
+    doc1["greeting"] = "Howdy!";
+    db.saveDocument(doc1);
+    
+    MutableDocument doc2("foo2");
+    doc2["greeting"] = "Hello!";
+    db.saveDocument(doc2);
+    
+    ids = CBLReplicator_PendingDocumentIDs(repl, &error);
+    CHECK(FLDict_Count(ids) == 2);
+    CHECK(FLDict_Get(ids, "foo1"_sl));
+    CHECK(FLDict_Get(ids, "foo2"_sl));
+    FLDict_Release(ids);
+    
+    CHECK(CBLReplicator_IsDocumentPending(repl, "foo1"_sl, &error));
+    CHECK(CBLReplicator_IsDocumentPending(repl, "foo2"_sl, &error));
+    
+    replicate();
+    
+    CHECK(asVector(docsNotified) == vector<string>{"foo1", "foo2"});
+    
+    ids = CBLReplicator_PendingDocumentIDs(repl, &error);
+    CHECK(FLDict_Count(ids) == 0);
+    FLDict_Release(ids);
+    
+    CHECK(!CBLReplicator_IsDocumentPending(repl, "foo1"_sl, &error));
+    CHECK(error.code == 0);
+    
+    CHECK(!CBLReplicator_IsDocumentPending(repl, "foo2"_sl, &error));
+    CHECK(error.code == 0);
 }
 
 
