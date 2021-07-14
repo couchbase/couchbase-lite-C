@@ -10,12 +10,12 @@ fi
 pushd $WORKING_DIR
 COMMAND="find . -name \"*.a\" | xargs ${PREFIX}strip --strip-unneeded"
 eval ${COMMAND}
-rm libCouchbaseLiteC.so
-make -j8 CouchbaseLiteC
-COMMAND="${PREFIX}objcopy --only-keep-debug libCouchbaseLiteC.so libCouchbaseLiteC.so.sym"
+rm libcblite.so*
+make -j8 cblite
+COMMAND="${PREFIX}objcopy --only-keep-debug libcblite.so libcblite.so.sym"
 eval ${COMMAND}
-COMMAND="${PREFIX}strip --strip-unneeded libCouchbaseLiteC.so"
+COMMAND="${PREFIX}strip --strip-unneeded libcblite.so"
 eval ${COMMAND}
-COMMAND="${PREFIX}objcopy --add-gnu-debuglink=libCouchbaseLiteC.so.sym libCouchbaseLiteC.so"
+COMMAND="${PREFIX}objcopy --add-gnu-debuglink=libcblite.so.sym libcblite.so"
 eval ${COMMAND}
 popd

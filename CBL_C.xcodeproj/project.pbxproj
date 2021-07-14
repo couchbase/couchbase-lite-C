@@ -28,7 +28,7 @@
 		275B358C23481D0C00FE9CF0 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
 		275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277CC99422BC23DE00B245CB /* ReplicatorTest.cc */; };
 		275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
-		275B3591234BCF7500FE9CF0 /* libCouchbaseLiteC.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */; };
+		275B3591234BCF7500FE9CF0 /* libcblite.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D7021D6B64A0027CCDB /* libcblite.dylib */; };
 		275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */; };
 		275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */; };
 		275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
@@ -48,7 +48,7 @@
 		27886C8D21F64C1400069BEA /* Listener.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27886C8B21F64C1400069BEA /* Listener.hh */; };
 		27886C8E21F64C1400069BEA /* Listener.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27886C8C21F64C1400069BEA /* Listener.cc */; };
 		27984E212249A189000FE777 /* dylib_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D7E21D6B6900027CCDB /* dylib_main.cc */; };
-		27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
+		27984E262249A1BE000FE777 /* libcblite-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libcblite-static.a */; };
 		27984E282249A1EE000FE777 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D8121D6B8230027CCDB /* libz.tbd */; };
 		27984E292249A240000FE777 /* CouchbaseLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B61DA321D6E40D0027CCDB /* CouchbaseLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E2A2249A240000FE777 /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -68,11 +68,11 @@
 		27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27984E3F2249A85E000FE777 /* CouchbaseLite_Umbrella.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		27B61D5621D5ABA60027CCDB /* CBLQuery_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */; };
 		27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61D6821D6B60D0027CCDB /* CBLTest.hh */; };
-		27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */; };
+		27B61D7D21D6B66F0027CCDB /* libcblite-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libcblite-static.a */; };
 		27B61D7F21D6B6900027CCDB /* dylib_main.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D7E21D6B6900027CCDB /* dylib_main.cc */; };
 		27B61D8221D6B8230027CCDB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D8121D6B8230027CCDB /* libz.tbd */; };
 		27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D6921D6B60D0027CCDB /* CBLTest.cc */; };
-		27B61DB521D6EBDD0027CCDB /* libCouchbaseLiteC.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */; };
+		27B61DB521D6EBDD0027CCDB /* libcblite.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61D7021D6B64A0027CCDB /* libcblite.dylib */; };
 		27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */; };
 		27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
 		27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
@@ -274,7 +274,7 @@
 /* Begin PBXFileReference section */
 		2716F8F5247D9D6700BE21D9 /* exports */ = {isa = PBXFileReference; lastKnownFileType = folder; path = exports; sourceTree = "<group>"; };
 		271A98AF243FDF55008C032D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libCouchbaseLiteC-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		271C2A2321CAC8920045856E /* libcblite-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libcblite-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		271C2A2C21CAC98F0045856E /* CBLReplicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLReplicator.h; sourceTree = "<group>"; };
 		271C2A2D21CAC98F0045856E /* CBLBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLBase.h; sourceTree = "<group>"; };
 		271C2A2E21CAC98F0045856E /* CBLDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLDocument.h; sourceTree = "<group>"; };
@@ -335,7 +335,7 @@
 		27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery_CAPI.cc; sourceTree = "<group>"; };
 		27B61D6821D6B60D0027CCDB /* CBLTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTest.hh; sourceTree = "<group>"; };
 		27B61D6921D6B60D0027CCDB /* CBLTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTest.cc; sourceTree = "<group>"; };
-		27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCouchbaseLiteC.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		27B61D7021D6B64A0027CCDB /* libcblite.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcblite.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		27B61D7E21D6B6900027CCDB /* dylib_main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dylib_main.cc; sourceTree = "<group>"; };
 		27B61D8121D6B8230027CCDB /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		27B61D8521D6BA2A0027CCDB /* Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
@@ -380,7 +380,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				275B3591234BCF7500FE9CF0 /* libCouchbaseLiteC.dylib in Frameworks */,
+				275B3591234BCF7500FE9CF0 /* libcblite.dylib in Frameworks */,
 				273CE7E22452123400D01CA2 /* libfleeceBase.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -389,7 +389,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27984E262249A1BE000FE777 /* libCouchbaseLiteC-static.a in Frameworks */,
+				27984E262249A1BE000FE777 /* libcblite-static.a in Frameworks */,
 				275B358723481AE700FE9CF0 /* Foundation.framework in Frameworks */,
 				6938073022DE96C200727053 /* Security.framework in Frameworks */,
 				27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */,
@@ -401,7 +401,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27B61D7D21D6B66F0027CCDB /* libCouchbaseLiteC-static.a in Frameworks */,
+				27B61D7D21D6B66F0027CCDB /* libcblite-static.a in Frameworks */,
 				275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */,
 				277CC9C022BC4E2E00B245CB /* Security.framework in Frameworks */,
 				271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */,
@@ -414,7 +414,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */,
-				27B61DB521D6EBDD0027CCDB /* libCouchbaseLiteC.dylib in Frameworks */,
+				27B61DB521D6EBDD0027CCDB /* libcblite.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,8 +442,8 @@
 		271C2A2421CAC8920045856E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */,
-				27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */,
+				271C2A2321CAC8920045856E /* libcblite-static.a */,
+				27B61D7021D6B64A0027CCDB /* libcblite.dylib */,
 				27B61DA821D6E49D0027CCDB /* CBL_Tests */,
 				27984E0A2249A126000FE777 /* CouchbaseLite.framework */,
 				275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */,
@@ -758,7 +758,7 @@
 			);
 			name = CBL_C;
 			productName = CBL_C;
-			productReference = 271C2A2321CAC8920045856E /* libCouchbaseLiteC-static.a */;
+			productReference = 271C2A2321CAC8920045856E /* libcblite-static.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		275B357B234812C700FE9CF0 /* CouchbaseLiteTests */ = {
@@ -821,7 +821,7 @@
 			);
 			name = "CBL_C Dylib";
 			productName = "CBL_C Dylib";
-			productReference = 27B61D7021D6B64A0027CCDB /* libCouchbaseLiteC.dylib */;
+			productReference = 27B61D7021D6B64A0027CCDB /* libcblite.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 		27B61DA721D6E49D0027CCDB /* CBL_Tests */ = {

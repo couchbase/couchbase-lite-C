@@ -8,5 +8,5 @@
 
 #include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib.xcconfig"
 
-PRODUCT_NAME            = CouchbaseLiteC
+PRODUCT_NAME            = cblite
 EXPORTED_SYMBOLS_FILE   = $(DERIVED_FILE_DIR)/CBL.exp  // output of src/exports/generate_exports.sh
