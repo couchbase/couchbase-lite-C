@@ -46,7 +46,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
     proxy.hostname = "localhost"_sl;
     proxy.port = 9998;
     repl = CBLReplicator_Create(&config, &error);
-    CHECK(repl);
+    CHECK(CBLReplicator_Config(repl) != nullptr);
 }
 
 
