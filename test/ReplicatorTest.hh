@@ -37,10 +37,17 @@ public:
         config.context = this;
     }
 
-    void replicate() {
+    void replicate(CBLError expectedError = {}) {
         CBLError error;
-        if (!repl)
+        CBLReplicatorStatus status;
+        if (!repl) {
             repl = CBLReplicator_Create(&config, &error);
+            status = CBLReplicator_Status(repl);
+            CHECK(status.activity == kCBLReplicatorStopped);
+            CHECK(status.progress.complete == 0.0);
+            CHECK(status.progress.documentCount == 0);
+            CHECK(status.error.code == 0);
+        }
         REQUIRE(repl);
 
         auto ctoken = CBLReplicator_AddChangeListener(repl, [](void *context, CBLReplicator *r,
@@ -57,7 +64,6 @@ public:
         CBLReplicator_Start(repl, false);
 
         time start = clock::now();
-        CBLReplicatorStatus status;
         cerr << "Waiting...\n";
         while (std::chrono::duration_cast<seconds>(clock::now() - start).count() < timeoutSeconds) {
             status = CBLReplicator_Status(repl);
@@ -71,13 +77,23 @@ public:
                 break;
             this_thread::sleep_for(100ms);
         }
-        cerr << "Finished with activity=" << status.activity
+        cerr << "Finished with activity=" << static_cast<int>(status.activity)
+             << ", complete=" << status.progress.complete
+             << ", documentCount=" << status.progress.documentCount
              << ", error=(" << status.error.domain << "/" << status.error.code << ")\n";
         
         if (config.continuous && !stopWhenIdle)
             CHECK(status.activity == kCBLReplicatorIdle);
         else
             CHECK(status.activity == kCBLReplicatorStopped);
+        
+        if (expectedError.code > 0) {
+            CHECK(status.error.code == expectedError.code);
+            CHECK(status.progress.complete < 1.0);
+        } else {
+            CHECK(status.error.code == 0);
+            CHECK(status.progress.complete == 1.0);
+        }
         
         CBLListener_Remove(ctoken);
         CBLListener_Remove(dtoken);
