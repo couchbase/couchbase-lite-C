@@ -326,6 +326,11 @@ public:
         
         replicate();
         
+        CBLReplicatorStatus status = CBLReplicator_Status(repl);
+        CHECK(status.error.code == 0);
+        CHECK(status.progress.complete == 1.0);
+        CHECK(status.progress.documentCount == 2);
+        
         CHECK(count == 3);
         CHECK(deletedCount == 1);
         CHECK(deletedDocID == "doc3"_sl);

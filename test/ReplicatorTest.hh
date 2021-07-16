@@ -95,7 +95,9 @@ public:
 
     void statusChanged(CBLReplicator *r, const CBLReplicatorStatus &status) {
         CHECK(r == repl);
-        cerr << "--- PROGRESS: status=" << status.activity << ", fraction=" << status.progress.complete << ", err=" << status.error.domain << "/" << status.error.code << "\n";
+        cerr << "--- PROGRESS: status=" << static_cast<int>(status.activity)
+             << ", fraction=" << status.progress.complete
+             << ", err=" << status.error.domain << "/" << status.error.code << "\n";
         if (status.error.code && !replError.code)
             replError = status.error;
     }
