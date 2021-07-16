@@ -35,6 +35,34 @@ public:
 };
 
 
+TEST_CASE_METHOD(ReplicatorLocalTest, "Replicate empty db", "[Replicator]") {
+    config.replicatorType = kCBLReplicatorTypePush;
+    replicate();
+    CBLReplicatorStatus status = CBLReplicator_Status(repl);
+    CHECK(status.error.code == 0);
+    CHECK(status.progress.complete == 1.0);
+    CHECK(status.progress.documentCount == 0);
+    
+    config.replicatorType = kCBLReplicatorTypePull;
+    CBLReplicator_Release(repl);
+    repl = nullptr;
+    replicate();
+    status = CBLReplicator_Status(repl);
+    CHECK(status.error.code == 0);
+    CHECK(status.progress.complete == 1.0);
+    CHECK(status.progress.documentCount == 0);
+    
+    config.replicatorType = kCBLReplicatorTypePushAndPull;
+    CBLReplicator_Release(repl);
+    repl = nullptr;
+    replicate();
+    status = CBLReplicator_Status(repl);
+    CHECK(status.error.code == 0);
+    CHECK(status.progress.complete == 1.0);
+    CHECK(status.progress.documentCount == 0);
+}
+
+
 TEST_CASE_METHOD(ReplicatorLocalTest, "Push to local db", "[Replicator]") {
     config.replicatorType = kCBLReplicatorTypePush;
     
@@ -290,8 +318,9 @@ public:
     int count = 0;
     int deletedCount = 0;
     alloc_slice deletedDocID;
+    bool rejectAll = false;
     
-    void testFilter(bool isPush) {
+    void testFilter(bool isPush, bool rejectAllChanges) {
         cbl::Database theDB;
         
         if (isPush) {
@@ -324,12 +353,20 @@ public:
         theDB.saveDocument(doc3);
         theDB.deleteDocument(doc3);
         
+        count = 0;
+        deletedCount = 0;
+        deletedDocID = nullptr;
+        rejectAll = rejectAllChanges;
+        
+        CBLReplicator_Release(repl);
+        repl = nullptr;
+        
         replicate();
         
         CBLReplicatorStatus status = CBLReplicator_Status(repl);
         CHECK(status.error.code == 0);
         CHECK(status.progress.complete == 1.0);
-        CHECK(status.progress.documentCount == 2);
+        CHECK(status.progress.documentCount == (rejectAllChanges ? 0 : 2));
         
         CHECK(count == 3);
         CHECK(deletedCount == 1);
@@ -344,7 +381,7 @@ public:
             deletedDocID = CBLDocument_ID(doc);
         }
         
-        if (FLSlice_Equal(CBLDocument_ID(doc), "doc2"_sl))
+        if (rejectAll || FLSlice_Equal(CBLDocument_ID(doc), "doc2"_sl))
             return false;
         
         return true;
@@ -353,12 +390,14 @@ public:
 
 
 TEST_CASE_METHOD(ReplicatorFilterTest, "Push Filter", "[Replicator][Filter]") {
-    testFilter(true);
+    testFilter(true, true);
+    testFilter(true, false);
 }
 
 
 TEST_CASE_METHOD(ReplicatorFilterTest, "Pull Filter", "[Replicator][Filter]") {
-    testFilter(false);
+    testFilter(false, true);
+    testFilter(false, false);
 }
 
 

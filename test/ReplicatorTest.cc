@@ -62,7 +62,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
         return true;
     };
 
-    replicate();
+    replicate({CBLNetworkDomain, CBLNetErrUnknownHost});
 }
 
 
@@ -77,8 +77,8 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replica
     proxy.username = "User Name"_sl;
     proxy.password = "123456"_sl;
     config.proxy = &proxy;
-
-    replicate();
+    
+    replicate({ CBLNetworkDomain, CBLNetErrUnknownHost });
 }
 
 

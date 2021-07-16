@@ -41,10 +41,18 @@ extern "C" {
 }
 
 static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
+    float complete;
+    if (c4status.progress.unitsTotal == 0 &&
+        (c4status.level == kC4Idle || c4status.level == kC4Stopped) && c4status.error.code == 0) {
+        complete = 1.0; // When the replicator is idle or stopped, return as completed if having no changes to replicate
+    } else {
+        complete = c4status.progress.unitsCompleted / std::max(float(c4status.progress.unitsTotal), 1.0f);
+    }
+    
     return {
         CBLReplicatorActivityLevel(min(c4status.level, (C4ReplicatorActivityLevel)kC4Busy)),   // don't expose kC4Stopping
         {
-            c4status.progress.unitsCompleted / std::max(float(c4status.progress.unitsTotal), 1.0f),
+            complete,
             c4status.progress.documentCount
         },
         external(c4status.error)
@@ -124,6 +132,7 @@ public:
             }
         });
         _c4status = _c4repl->getStatus();
+        _useInitialStatus = true;
     }
     
 
@@ -140,12 +149,15 @@ public:
             _c4repl->setOptions(encodeOptions());
             _optionsChanged = false;
         }
+        _useInitialStatus = false;
         _c4repl->start(reset);
     }
 
 
-
     CBLReplicatorStatus status() {
+        LOCK(_mutex);
+        if (_useInitialStatus)
+            return {}; // Allow to return initial status with zero progress.complete
         return effectiveStatus(_c4repl->getStatus());
     }
 
@@ -302,6 +314,7 @@ private:
     ReplicatorConfiguration const               _conf;
     Retained<CBLDatabase>                       _db;
     Retained<C4Replicator>                      _c4repl;
+    bool                                        _useInitialStatus;  // For returning status before first start
     C4ReplicatorStatus                          _c4status {kC4Stopped};
     bool                                        _optionsChanged {false};
     Retained<CBLReplicator>                     _retainSelf;
