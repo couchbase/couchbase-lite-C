@@ -189,12 +189,14 @@ set_target_properties(cblite PROPERTIES VERSION "${CBL_LIB_VERSION}" SOVERSION "
 
 ## Setting up LTO
 
-check_ipo_supported(RESULT CBLITE_HAS_LTO OUTPUT CBLITE_LTO_ERROR LANGUAGES C CXX)
-if(CBLITE_HAS_LTO)
-    set_property(TARGET cblite-static PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-    set_property(TARGET cblite PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-else()
-    message(WARNING "Link time optimization not supported on this platform: ${CBLITE_LTO_ERROR}")
+if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    check_ipo_supported(RESULT CBLITE_HAS_LTO OUTPUT CBLITE_LTO_ERROR LANGUAGES C CXX)
+    if(CBLITE_HAS_LTO)
+        set_property(TARGET cblite-static PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+        set_property(TARGET cblite PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(WARNING "Link time optimization not supported on this platform: ${CBLITE_LTO_ERROR}")
+    endif()
 endif()
 
 ## Installation
