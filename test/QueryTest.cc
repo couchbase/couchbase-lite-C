@@ -68,7 +68,7 @@ TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     CBLError error;
     int errPos;
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
-                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
                                     &errPos, &error);
     REQUIRE(query);
 
@@ -116,7 +116,7 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
 
         int errPos;
         query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
-                                        "SELECT count(*) AS n WHERE contact.address.zip BETWEEN $zip0 AND $zip1"_sl,
+                                        "SELECT count(*) AS n FROM _ WHERE contact.address.zip BETWEEN $zip0 AND $zip1"_sl,
                                         &errPos, &error);
         REQUIRE(query);
 
@@ -248,7 +248,7 @@ TEST_CASE_METHOD(QueryTest, "Query Result As Dict", "[Query]") {
     CBLError error;
     int errPos;
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
-                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
                                     &errPos, &error);
     REQUIRE(query);
 
@@ -285,7 +285,7 @@ TEST_CASE_METHOD(QueryTest, "Query Result As Array", "[Query]") {
     CBLError error;
     int errPos;
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
-                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
                                     &errPos, &error);
     REQUIRE(query);
 
@@ -329,7 +329,7 @@ static int countResults(CBLResultSet *results) {
 TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CBLError error;
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
-                                    "SELECT name WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
                                     nullptr, &error);
     REQUIRE(query);
 
@@ -393,7 +393,7 @@ public:
 
 
 TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
-    Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
+    Query query(db, kCBLN1QLLanguage, "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday");
 
     CHECK(query.columnNames() == vector<string>({"name"}));
 
