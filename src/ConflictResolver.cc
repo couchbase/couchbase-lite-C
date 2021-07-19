@@ -107,8 +107,13 @@ namespace cbl_internal {
                 // Now resolve the conflict:
                 if (_clientResolver)
                     ok = customResolve(conflict);
-                else
-                    ok = conflict->resolveConflict(CBLDocument::Resolution::useLocal, nullptr);
+                else {
+                    // FIXME: CBL-2144:
+                    auto resolved = _db->getDocument(_docID, true);
+                    if (resolved && resolved->revisionFlags() & kRevDeleted)
+                        resolved = nullptr;
+                    ok = conflict->resolveConflict(CBLDocument::Resolution::useLocal, resolved);
+                }
 
                 if (ok) {
                     _revID = conflict->revisionID();
@@ -148,12 +153,12 @@ namespace cbl_internal {
 
     // Performs custom conflict resolution.
     bool ConflictResolver::customResolve(CBLDocument *conflict) {
-        CBLDocument *otherDoc = conflict;
-        if (otherDoc->revisionFlags() & kRevDeleted)
-            otherDoc = nullptr;
-        auto myDoc = _db->getDocument(_docID, true);
-        if (myDoc && myDoc->revisionFlags() & kRevDeleted)
-            myDoc = nullptr;
+        CBLDocument *remoteDoc = conflict;
+        if (remoteDoc->revisionFlags() & kRevDeleted)
+            remoteDoc = nullptr;
+        auto localDoc = _db->getDocument(_docID, true);
+        if (localDoc && localDoc->revisionFlags() & kRevDeleted)
+            localDoc = nullptr;
 
         // Call the custom resolver (this could take a long time to return)
         SyncLog(Verbose, "Calling custom conflict resolver for doc '%.*s' ...",
@@ -161,7 +166,8 @@ namespace cbl_internal {
         Stopwatch st;
         RetainedConst<CBLDocument> resolved;
         try {
-            resolved = adopt(_clientResolver(_clientResolverContext, _docID, myDoc, otherDoc));
+            // Note: Adopt will not increase the retained count
+            resolved = adopt(_clientResolver(_clientResolverContext, _docID, localDoc, remoteDoc));
         } catch (...) {
             C4Error::raise(LiteCoreDomain, kC4ErrorUnexpectedError,
                            "Custom conflict handler threw an exception");
@@ -171,12 +177,12 @@ namespace cbl_internal {
 
         // Determine the resolution type:
         CBLDocument::Resolution resolution;
-        if (resolved == myDoc) {
+        if (resolved == localDoc) {
             resolution = CBLDocument::Resolution::useLocal;
-            resolved = nullptr;
+            CBLDocument_Retain(localDoc); // Match number of objects (localDoc and resolved)
         } else if (resolved == conflict) {
             resolution = CBLDocument::Resolution::useRemote;
-            resolved = nullptr;
+            CBLDocument_Retain(remoteDoc); // Match number of objects (remoteDoc and resolved)
         } else {
             if (resolved) {
                 // Sanity check the resolved document:
@@ -198,7 +204,6 @@ namespace cbl_internal {
         // Actually resolve the conflict & save the document:
         return conflict->resolveConflict(resolution, resolved);
     }
-
 
     CBLReplicatedDocument ConflictResolver::result() const {
         CBLReplicatedDocument doc = {};

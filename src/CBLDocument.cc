@@ -165,7 +165,7 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase* db,
 #pragma mark - CONFLICT RESOLUTION:
 
 
-bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cbl_nullable mergeDoc) {
+bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cbl_nullable resolveDoc) {
     auto c4doc = _c4doc.useLocked();
 
     if (!c4doc)
@@ -174,24 +174,21 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cb
     _properties = nullptr;
     _fromJSON = nullptr;
 
+    // Remote Revision always win so that the resolved revision will not conflict with the remote:
     slice winner(c4doc->selectedRev().revID), loser(c4doc->revID());
-    if (resolution != Resolution::useRemote)
-        std::swap(winner, loser);
-
+    
     return _db->useLocked<bool>([&](C4Database *c4db) {
         C4Database::Transaction t(c4db);
 
         alloc_slice mergeBody;
         C4RevisionFlags mergeFlags = 0;
-        if (resolution == Resolution::useMerge) {
-            if (mergeDoc) {
-                mergeBody = mergeDoc->encodeBody(_db, c4db, mergeFlags);
+        if (resolution != Resolution::useRemote) {
+            if (resolveDoc) {
+                mergeBody = resolveDoc->encodeBody(_db, c4db, mergeFlags);
             } else {
                 mergeBody = alloc_slice(size_t(0));
                 mergeFlags = kRevDeleted;
             }
-        } else {
-            assert(!mergeDoc);
         }
 
         try {

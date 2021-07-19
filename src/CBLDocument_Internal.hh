@@ -227,7 +227,12 @@ public:
         useMerge
     };
 
-    bool resolveConflict(Resolution resolution, const CBLDocument* _cbl_nullable mergeDoc);
+    
+    // Resolve conflict for pull replication; The document itself is the conflict (remote) doc.
+    // When saving the resolution, the remote branch will always win so that the saved doc
+    // will not be conflicted when it is push to the remote server. When the resolution is
+    // useRemote, the resolveDoc will be ignore.
+    bool resolveConflict(Resolution resolution, const CBLDocument* _cbl_nullable resolveDoc);
 
 
 #pragma mark - Utils:
