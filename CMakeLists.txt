@@ -1,5 +1,5 @@
-cmake_minimum_required (VERSION 3.1)
-cmake_policy(VERSION 3.1)
+cmake_minimum_required (VERSION 3.9)
+cmake_policy(VERSION 3.9)
 
 if(NOT DEFINED CMAKE_OSX_SYSROOT)
     # Tells Mac builds to use the current SDK's headers & libs, not what's in the OS.
@@ -10,6 +10,8 @@ project (
     CouchbaseLite_C
     VERSION 3.0.0
 )
+
+include(CheckIPOSupported)
 
 set(CBL_LIB_VERSION ${CouchbaseLite_C_VERSION})
 set(CBL_API_VERSION ${CouchbaseLite_C_VERSION_MAJOR})
@@ -184,6 +186,18 @@ target_link_libraries(cblite PRIVATE ${CBL_LIBRARIES_PRIVATE})
 
 set_dylib_properties()
 set_target_properties(cblite PROPERTIES VERSION "${CBL_LIB_VERSION}" SOVERSION "${CBL_API_VERSION}")
+
+## Setting up LTO
+
+if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    check_ipo_supported(RESULT CBLITE_HAS_LTO OUTPUT CBLITE_LTO_ERROR LANGUAGES C CXX)
+    if(CBLITE_HAS_LTO)
+        set_property(TARGET cblite-static PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+        set_property(TARGET cblite PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(WARNING "Link time optimization not supported on this platform: ${CBLITE_LTO_ERROR}")
+    endif()
+endif()
 
 ## Installation
 

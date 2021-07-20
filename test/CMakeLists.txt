@@ -1,5 +1,5 @@
-cmake_minimum_required (VERSION 3.1)
-cmake_policy(VERSION 3.1)
+cmake_minimum_required (VERSION 3.9)
+cmake_policy(VERSION 3.9)
 project (CBL_C_Tests)
 
 set(TOP ${PROJECT_SOURCE_DIR}/../)
@@ -68,6 +68,10 @@ elseif(APPLE AND BUILD_ENTERPRISE)
                                           "-framework Vision")
 elseif(UNIX)
     target_link_libraries(CBL_C_Tests PUBLIC dl)
+endif()
+
+if(CBLITE_HAS_LTO)
+    set_property(TARGET CBL_C_Tests PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
 file(COPY names_100.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test)
