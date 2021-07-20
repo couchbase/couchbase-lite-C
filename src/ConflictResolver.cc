@@ -164,7 +164,7 @@ namespace cbl_internal {
         SyncLog(Verbose, "Calling custom conflict resolver for doc '%.*s' ...",
                 FMTSLICE(_docID));
         Stopwatch st;
-        RetainedConst<CBLDocument> resolved;
+        const CBLDocument* resolved;
         try {
             resolved = _clientResolver(_clientResolverContext, _docID, localDoc, remoteDoc);
         } catch (...) {
@@ -182,10 +182,6 @@ namespace cbl_internal {
             resolution = CBLDocument::Resolution::useRemote;
         else {
             if (resolved) {
-                // Need to explicitly release here because the resolved doc (merged doc) is created
-                // by the custom conflict resolver.
-                CBLDocument_Release(resolved);
-                
                 // Sanity check the resolved document:
                 if (resolved->database() && resolved->database() != _db) {
                     C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
@@ -203,7 +199,15 @@ namespace cbl_internal {
         }
 
         // Actually resolve the conflict & save the document:
-        return conflict->resolveConflict(resolution, resolved);
+        bool result = conflict->resolveConflict(resolution, resolved);
+        
+        // The remoteDoc (conflict) and localDoc are backed by the RetainedConst and will be
+        // released by the RetainedConst destructor. For the merged doc created and returned by
+        // the custom conflict resolver, an explicit release is needed here.
+        if (resolved != localDoc && resolved != remoteDoc)
+            CBLDocument_Release(resolved);
+        
+        return result;
     }
 
     CBLReplicatedDocument ConflictResolver::result() const {
