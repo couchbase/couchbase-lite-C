@@ -166,8 +166,7 @@ namespace cbl_internal {
         Stopwatch st;
         RetainedConst<CBLDocument> resolved;
         try {
-            // Note: Adopt will not increase the retained count
-            resolved = adopt(_clientResolver(_clientResolverContext, _docID, localDoc, remoteDoc));
+            resolved = _clientResolver(_clientResolverContext, _docID, localDoc, remoteDoc);
         } catch (...) {
             C4Error::raise(LiteCoreDomain, kC4ErrorUnexpectedError,
                            "Custom conflict handler threw an exception");
@@ -177,14 +176,16 @@ namespace cbl_internal {
 
         // Determine the resolution type:
         CBLDocument::Resolution resolution;
-        if (resolved == localDoc) {
+        if (resolved == localDoc)
             resolution = CBLDocument::Resolution::useLocal;
-            CBLDocument_Retain(localDoc); // Match number of objects (localDoc and resolved)
-        } else if (resolved == conflict) {
+        else if (resolved == conflict)
             resolution = CBLDocument::Resolution::useRemote;
-            CBLDocument_Retain(remoteDoc); // Match number of objects (remoteDoc and resolved)
-        } else {
+        else {
             if (resolved) {
+                // Need to explicitly release here because the resolved doc (merged doc) is created
+                // by the custom conflict resolver.
+                CBLDocument_Release(resolved);
+                
                 // Sanity check the resolved document:
                 if (resolved->database() && resolved->database() != _db) {
                     C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,

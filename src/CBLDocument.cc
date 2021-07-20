@@ -182,6 +182,9 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cb
 
         alloc_slice mergeBody;
         C4RevisionFlags mergeFlags = 0;
+        // When useLocal (local wins) or useMerge is true, the new revision will be created
+        // under the remote branch which is the winning branch. When useRemote (remote wins)
+        // is true, the remote revision will be kept as is and the losing branch will be pruned.
         if (resolution != Resolution::useRemote) {
             if (resolveDoc) {
                 mergeBody = resolveDoc->encodeBody(_db, c4db, mergeFlags);
