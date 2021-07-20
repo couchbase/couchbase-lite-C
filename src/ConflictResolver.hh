@@ -47,6 +47,7 @@ namespace cbl_internal {
 
     private:
         bool _runNow();
+        bool defaultResolve(CBLDocument *conflict);
         bool customResolve(CBLDocument *conflict);
 
         Retained<CBLDatabase>   _db;

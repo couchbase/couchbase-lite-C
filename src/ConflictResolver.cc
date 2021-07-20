@@ -107,13 +107,8 @@ namespace cbl_internal {
                 // Now resolve the conflict:
                 if (_clientResolver)
                     ok = customResolve(conflict);
-                else {
-                    // FIXME: CBL-2144:
-                    auto resolved = _db->getDocument(_docID, true);
-                    if (resolved && resolved->revisionFlags() & kRevDeleted)
-                        resolved = nullptr;
-                    ok = conflict->resolveConflict(CBLDocument::Resolution::useLocal, resolved);
-                }
+                else
+                    ok = defaultResolve(conflict);
 
                 if (ok) {
                     _revID = conflict->revisionID();
@@ -148,6 +143,41 @@ namespace cbl_internal {
         if (_completionHandler)
             _completionHandler(this);       // the handler will most likely delete me
         return ok;
+    }
+
+
+    // Performs default conflict resolution.
+    // 1. Deleted wins
+    // 2. Higher generation wins
+    // 3. Higher revisionID wins
+    bool ConflictResolver::defaultResolve(CBLDocument *conflict) {
+        CBLDocument *remoteDoc = conflict;
+        if (remoteDoc->revisionFlags() & kRevDeleted)
+            remoteDoc = nullptr;
+        
+        auto localDoc = _db->getDocument(_docID, true);
+        if (localDoc && localDoc->revisionFlags() & kRevDeleted)
+            localDoc = nullptr;
+        
+        const CBLDocument* resolved;
+        if (remoteDoc == nullptr || localDoc == nullptr)
+            resolved = nullptr;
+        else if (remoteDoc->generation() > localDoc->generation())
+            resolved = remoteDoc;
+        else if (localDoc->generation() > remoteDoc->generation())
+            resolved = localDoc;
+        else if (FLSlice_Compare(localDoc->revisionID(), remoteDoc->revisionID()) > 0)
+            resolved = localDoc;
+        else
+            resolved = remoteDoc;
+        
+        CBLDocument::Resolution resolution;
+        if (resolved == remoteDoc)
+            resolution = CBLDocument::Resolution::useRemote;
+        else
+            resolution = CBLDocument::Resolution::useLocal;
+        
+        return conflict->resolveConflict(resolution, resolved);
     }
 
 

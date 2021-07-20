@@ -61,6 +61,7 @@ _CBLDatabase_GetIndexNames
 _CBLDocument_ID
 _CBLDocument_RevisionID
 _CBLDocument_CanonicalRevisionID
+_CBLDocument_Generation
 _CBLDocument_Sequence
 _CBLDocument_Create
 _CBLDocument_CreateWithID
