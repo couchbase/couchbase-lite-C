@@ -46,11 +46,8 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
         (c4status.level == kC4Idle || c4status.level == kC4Stopped) && c4status.error.code == 0) {
         complete = 1.0; // When the replicator is idle or stopped, return as completed if having no changes to replicate
     } else {
-        auto total = c4status.progress.unitsTotal > 0 ? c4status.progress.unitsTotal : 1;
-        if (c4status.progress.unitsCompleted < total)
-            complete = c4status.progress.unitsCompleted / float(total);
-        else
-            complete = 1.0;
+        complete = c4status.progress.unitsCompleted / std::max(float(c4status.progress.unitsTotal), 1.0f);
+        complete = std::min(complete, 1.0f); // CBL-2610 : Workaround for unitsCompleted > unitsTotal
     }
     
     return {
