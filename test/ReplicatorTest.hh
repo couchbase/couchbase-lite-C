@@ -99,6 +99,15 @@ public:
         CBLListener_Remove(dtoken);
     }
     
+    void resetReplicator() {
+        if (!repl)
+            return;
+        
+        REQUIRE(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
+        CBLReplicator_Release(repl);
+        repl = nullptr;
+    }
+    
     bool waitForActivityLevel(CBLReplicatorActivityLevel level, double timeout) {
         time start = clock::now();
         while (std::chrono::duration_cast<seconds>(clock::now() - start).count() < timeout) {

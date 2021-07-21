@@ -18,6 +18,7 @@
 
 #include "ReplicatorTest.hh"
 #include "CBLPrivate.h"
+#include <string>
 
 
 #ifdef COUCHBASE_ENTERPRISE     // Local-to-local replication is an EE feature
@@ -44,8 +45,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Replicate empty db", "[Replicator]") {
     CHECK(status.progress.documentCount == 0);
     
     config.replicatorType = kCBLReplicatorTypePull;
-    CBLReplicator_Release(repl);
-    repl = nullptr;
+    resetReplicator();
     replicate();
     status = CBLReplicator_Status(repl);
     CHECK(status.error.code == 0);
@@ -53,8 +53,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Replicate empty db", "[Replicator]") {
     CHECK(status.progress.documentCount == 0);
     
     config.replicatorType = kCBLReplicatorTypePushAndPull;
-    CBLReplicator_Release(repl);
-    repl = nullptr;
+    resetReplicator();
     replicate();
     status = CBLReplicator_Status(repl);
     CHECK(status.error.code == 0);
@@ -181,24 +180,33 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Pull conflict (default resolver)", "[Repl
     CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
 }
 
-
 class ReplicatorConflictTest : public ReplicatorLocalTest {
 public:
-
+    enum class ResolverMode { kLocalWins, kRemoteWins, kMerge };
+    
     bool deleteLocal {false}, deleteRemote {false}, deleteMerged {false};
+    ResolverMode resolverMode = {ResolverMode::kLocalWins};
+    
     bool resolverCalled {false};
-
     alloc_slice expectedLocalRevID, expectedRemoteRevID;
-
-    void testConflict(bool delLocal, bool delRemote, bool delMerged) {
+    
+    string docID;
+    unsigned count {0};
+    
+    // Can be called multiple times; different document id will be used each time.
+    void testConflict(bool delLocal, bool delRemote, bool delMerged, ResolverMode resMode) {
         deleteLocal = delLocal;
         deleteRemote = delRemote;
         deleteMerged = delMerged;
-
-        config.replicatorType = kCBLReplicatorTypePull;
-
+        resolverMode = resMode;
+        
+        expectedLocalRevID = nullptr;
+        expectedRemoteRevID = nullptr;
+        
+        docID = "doc" + to_string(++count);
+        
         // Save the same doc to each db (will have the same revision),
-        MutableDocument doc("foo");
+        MutableDocument doc(docID);
         doc["greeting"] = "Howdy!";
         db.saveDocument(doc);
         if (deleteLocal) {
@@ -209,7 +217,7 @@ public:
             expectedLocalRevID = doc.revisionID();
         }
 
-        doc = MutableDocument("foo");
+        doc = MutableDocument(docID);
         doc["greeting"] = "Howdy!";
         otherDB.saveDocument(doc);
         if (deleteRemote) {
@@ -220,28 +228,85 @@ public:
             expectedRemoteRevID = CBLDocument_CanonicalRevisionID(doc.ref());
         }
 
+        docsNotified.clear();
+        resolverCalled = false;
+        
         config.conflictResolver = [](void *context,
                                      FLString documentID,
                                      const CBLDocument *localDocument,
                                      const CBLDocument *remoteDocument) -> const CBLDocument* {
             cerr << "--- Entering custom conflict resolver! (local=" << localDocument <<
                     ", remote=" << remoteDocument << ")\n";
-            auto merged = ((ReplicatorConflictTest*)context)->conflictResolver(documentID, localDocument, remoteDocument);
-            cerr << "--- Returning " << merged << " from custom conflict resolver\n";
-            return merged;
+            auto resolved = ((ReplicatorConflictTest*)context)->conflictResolver(documentID, localDocument, remoteDocument);
+            cerr << "--- Returning " << resolved << " from custom conflict resolver\n";
+            return resolved;
         };
-
+        
+        // Pull and Resolve Conflict:
+        config.replicatorType = kCBLReplicatorTypePull;
+        resetReplicator();
         replicate();
 
-        CHECK(resolverCalled);
-        CHECK(asVector(docsNotified) == vector<string>{"foo"});
-
-        Document copiedDoc = db.getDocument("foo");
-        if (deleteMerged) {
-            REQUIRE(!copiedDoc);
+        // Check:
+        CHECK(asVector(docsNotified) == vector<string>{docID});
+        
+        Document localDoc = db.getDocument(docID);
+        if (resolverMode == ResolverMode::kLocalWins) {
+            if (deleteLocal) {
+                REQUIRE(!localDoc);
+            } else {
+                REQUIRE(localDoc);
+                CHECK(localDoc["greeting"].asString() == "Howdy!"_sl);
+                CHECK(localDoc["expletive"].asString() == "Shazbatt!"_sl);
+            }
+        } else if (resolverMode == ResolverMode::kRemoteWins) {
+            if (deleteRemote) {
+                REQUIRE(!localDoc);
+            } else {
+                REQUIRE(localDoc);
+                CHECK(localDoc["greeting"].asString() == "Howdy!"_sl);
+                CHECK(localDoc["expletive"].asString() == "Frak!"_sl);
+            }
         } else {
-            REQUIRE(copiedDoc);
-            CHECK(copiedDoc["greeting"].asString() == "¡Hola!"_sl);
+            if (deleteMerged) {
+                REQUIRE(!localDoc);
+            } else {
+                REQUIRE(localDoc);
+                CHECK(localDoc["greeting"].asString() == "¡Hola!"_sl);
+                CHECK(localDoc["expletive"] == nullptr);
+            }
+        }
+        
+        // Push Resolved Doc to Remote Server:
+        config.replicatorType = kCBLReplicatorTypePush;
+        resetReplicator();
+        replicate();
+        
+        Document remoteDoc = otherDB.getDocument(docID);
+        if (resolverMode == ResolverMode::kLocalWins) {
+            if (deleteLocal) {
+                REQUIRE(!remoteDoc);
+            } else {
+                REQUIRE(remoteDoc);
+                CHECK(remoteDoc["greeting"].asString() == "Howdy!"_sl);
+                CHECK(remoteDoc["expletive"].asString() == "Shazbatt!"_sl);
+            }
+        } else if (resolverMode == ResolverMode::kRemoteWins) {
+            if (deleteRemote) {
+                REQUIRE(!remoteDoc);
+            } else {
+                REQUIRE(remoteDoc);
+                CHECK(remoteDoc["greeting"].asString() == "Howdy!"_sl);
+                CHECK(remoteDoc["expletive"].asString() == "Frak!"_sl);
+            }
+        } else {
+            if (deleteMerged) {
+                REQUIRE(!remoteDoc);
+            } else {
+                REQUIRE(remoteDoc);
+                CHECK(remoteDoc["greeting"].asString() == "¡Hola!"_sl);
+                CHECK(remoteDoc["expletive"] == nullptr);
+            }
         }
     }
 
@@ -253,13 +318,13 @@ public:
         CHECK(!resolverCalled);
         resolverCalled = true;
 
-        CHECK(string(documentID) == "foo");
+        CHECK(string(documentID) == docID);
         if (deleteLocal) {
             REQUIRE(!localDocument);
             REQUIRE(!expectedLocalRevID);
         } else {
             REQUIRE(localDocument);
-            CHECK(CBLDocument_ID(localDocument) == "foo"_sl);
+            CHECK(string(CBLDocument_ID(localDocument)) == docID);
             CHECK(slice(CBLDocument_RevisionID(localDocument)) == expectedLocalRevID);
             Dict localProps(CBLDocument_Properties(localDocument));
             CHECK(localProps["greeting"].asString() == "Howdy!"_sl);
@@ -270,46 +335,53 @@ public:
             REQUIRE(!expectedRemoteRevID);
         } else {
             REQUIRE(remoteDocument);
-            CHECK(CBLDocument_ID(remoteDocument) == "foo"_sl);
+            CHECK(string(CBLDocument_ID(remoteDocument)) == docID);
             CHECK(slice(CBLDocument_RevisionID(remoteDocument)) == expectedRemoteRevID);
             Dict remoteProps(CBLDocument_Properties(remoteDocument));
             CHECK(remoteProps["greeting"].asString() == "Howdy!"_sl);
             CHECK(remoteProps["expletive"].asString() == "Frak!"_sl);
         }
+        
         if (deleteMerged) {
+            REQUIRE(resolverMode == ResolverMode::kMerge);
             return nullptr;
         } else {
-            CBLDocument *merged = CBLDocument_CreateWithID(documentID);
-            MutableDict mergedProps(CBLDocument_MutableProperties(merged));
-            mergedProps.set("greeting"_sl, "¡Hola!");
-            // do not release `merged`, otherwise it would be freed before returning!
-            return merged;
+            switch (resolverMode) {
+                case ResolverMode::kLocalWins:
+                    return localDocument;
+                case ResolverMode::kRemoteWins:
+                    return remoteDocument;
+                default:
+                    CBLDocument *merged = CBLDocument_CreateWithID(documentID);
+                    MutableDict mergedProps(CBLDocument_MutableProperties(merged));
+                    mergedProps.set("greeting"_sl, "¡Hola!");
+                    // do not release `merged`, otherwise it would be freed before returning!
+                    return merged;
+            }
         }
     }
 };
 
 
-TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict (custom resolver)",
-                 "[Replicator][Conflict]") {
-    testConflict(false, false, false);
+TEST_CASE_METHOD(ReplicatorConflictTest, "Custom resolver : local wins", "[Replicator][Conflict]") {
+    testConflict(false, false, false, ResolverMode::kLocalWins);
+    testConflict(false, true, false, ResolverMode::kLocalWins); // Remote deletion
+    testConflict(true, false, false, ResolverMode::kLocalWins); // Local deletion
 }
 
 
-TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict with remote deletion (custom resolver)",
-                 "[Replicator][Conflict]") {
-    testConflict(false, true, false);
+TEST_CASE_METHOD(ReplicatorConflictTest, "Custom resolver : remote wins", "[Replicator][Conflict]") {
+    testConflict(false, false, false, ResolverMode::kRemoteWins);
+    testConflict(false, true, false, ResolverMode::kRemoteWins); // Remote deletion
+    testConflict(true, false, false, ResolverMode::kRemoteWins); // Local deletion
 }
 
 
-TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict with local deletion (custom resolver)",
-                 "[Replicator][Conflict]") {
-    testConflict(true, false, false);
-}
-
-
-TEST_CASE_METHOD(ReplicatorConflictTest, "Pull conflict deleting merge (custom resolver)",
-                 "[Replicator][Conflict]") {
-    testConflict(false, true, true);
+TEST_CASE_METHOD(ReplicatorConflictTest, "Custom resolver : merge", "[Replicator][Conflict]") {
+    testConflict(false, false, false, ResolverMode::kMerge);
+    testConflict(false, true, false, ResolverMode::kMerge); // Remote deletion
+    testConflict(true, false, false, ResolverMode::kMerge); // Local deletion
+    testConflict(false, false, true, ResolverMode::kMerge); // Merge deletion
 }
 
 
@@ -358,9 +430,7 @@ public:
         deletedDocID = nullptr;
         rejectAll = rejectAllChanges;
         
-        CBLReplicator_Release(repl);
-        repl = nullptr;
-        
+        resetReplicator();
         replicate();
         
         CBLReplicatorStatus status = CBLReplicator_Status(repl);
