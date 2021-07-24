@@ -90,8 +90,6 @@ CBL_C {
 		CBLLog_SetCallbackLevel;
 		CBLLog_ConsoleLevel;
 		CBLLog_SetConsoleLevel;
-		CBLLog_ConsoleLevelOfDomain;
-		CBLLog_SetConsoleLevelOfDomain;
 		CBLLog_FileConfig;
 		CBLLog_SetFileConfig;
 		CBLLog_BeginExpectingExceptions;

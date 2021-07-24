@@ -21,99 +21,147 @@
 #include "c4Base.hh"
 #include "Internal.hh"
 #include "fleece/slice.hh"
+#include "betterassert.hh"
+#include "LogDecoder.hh"
+#include "ParseDate.hh"
 #include <atomic>
 #include <cstdlib>
-#include "betterassert.hh"
+#include <iostream>
 
 using namespace std;
 using namespace fleece;
+using namespace litecore;
 
+static const C4LogDomain kC4Domains[] = { kC4DatabaseLog, kC4QueryLog, kC4SyncLog, kC4WebSocketLog };
 
-static const C4LogDomain kC4Domains[5] = {
-    kC4DefaultLog, kC4DatabaseLog, kC4QueryLog, kC4SyncLog, kC4WebSocketLog
-};
+static const char* const kLogLevelNames[] = {"debug", "verbose", "info", "warning", "error"};
 
 static const size_t kDefaultLogFileConfigMaxSize = 500 * 1024;
 static const int32_t kDefaultLogFileConfigMaxRotateCount = 1;
 
-static atomic<CBLLogCallback> sCallback = nullptr;
-static atomic<CBLLogLevel>    sCallbackLevel = CBLLogInfo;
+static atomic<CBLLogLevel> sConsoleLogLevel = CBLLogWarning;
 
+static atomic<CBLLogCallback> sCustomCallback = nullptr;
+static atomic<CBLLogLevel> sCustomLogLevel = CBLLogWarning;
 
-static void updateCallback();
+static CBLLogFileConfiguration sLogFileConfig;
+static alloc_slice sLogFileDir;
 
+static void c4LogCallback(C4LogDomain domain, C4LogLevel level, const char *fmt, va_list args);
 
-CBLLogLevel CBLLog_ConsoleLevelOfDomain(CBLLogDomain domain) CBLAPI {
-    precondition((domain <= kCBLLogDomainNetwork));
-    return CBLLogLevel(c4log_getLevel(kC4Domains[domain]));
-}
+static void init();
 
+static C4LogLevel effectiveC4CallbackLogLevel();
 
-void CBLLog_SetConsoleLevelOfDomain(CBLLogDomain domain, CBLLogLevel level) CBLAPI {
-    precondition((domain <= kCBLLogDomainNetwork));
-    precondition((level <= CBLLogNone));
-    if (domain == kCBLLogDomainAll) {
-        c4log_setCallbackLevel(C4LogLevel(level));
-        for (int i = 0; i < 5; ++i)
-            c4log_setLevel(kC4Domains[i], C4LogLevel(level));
-    } else {
-        c4log_setLevel(kC4Domains[domain], C4LogLevel(level));
+static void updateC4CallbackLogLevel();
+
+static CBLLogDomain getCBLLogDomain(C4LogDomain domain);
+
+// Note: Cannot use static initializing here as the order of initializing static C4LogDomain
+// constants such as kC4DatabaseLog cannot be guaranteed to be done prior.
+static void init() {
+    static bool initialized = false;
+    if (!initialized) {
+        // Initialize log level of each domain to debug (lowest level):
+        for (int i = 0; i < sizeof(kC4Domains)/sizeof(kC4Domains[0]); ++i) {
+            C4LogDomain domain = kC4Domains[i];
+            c4log_setLevel(domain, kC4LogDebug);
+        }
+        
+        // Register log callback:
+        c4log_writeToCallback(effectiveC4CallbackLogLevel(), &c4LogCallback, true /*preformatted*/);
+        
+        initialized = true;
     }
 }
 
 
 CBLLogLevel CBLLog_ConsoleLevel() CBLAPI {
-    return CBLLog_ConsoleLevelOfDomain(kCBLLogDomainAll);
+    return sConsoleLogLevel;
 }
 
 
 void CBLLog_SetConsoleLevel(CBLLogLevel level) CBLAPI {
-    CBLLog_SetConsoleLevelOfDomain(kCBLLogDomainAll, level);
+    init();
+    if (sConsoleLogLevel.exchange(level) != level)
+        updateC4CallbackLogLevel();
 }
 
 
 CBLLogLevel CBLLog_CallbackLevel() CBLAPI {
-    return sCallbackLevel;
+    return sCustomLogLevel;
 }
 
 
 void CBLLog_SetCallbackLevel(CBLLogLevel level) CBLAPI {
-    if (sCallbackLevel.exchange(level) != level)
-        updateCallback();
+    init();
+    if (sCustomLogLevel.exchange(level) != level)
+        updateC4CallbackLogLevel();
 }
 
 
 CBLLogCallback CBLLog_Callback() CBLAPI {
-    return sCallback;
+    return sCustomCallback;
 }
 
 
 void CBLLog_SetCallback(CBLLogCallback callback) CBLAPI {
-    auto oldCallback = sCallback.exchange(callback);
-    if ((callback != nullptr) != (oldCallback != nullptr))
-        updateCallback();
+    init();
+    if (sCustomCallback.exchange(callback) != callback)
+        updateC4CallbackLogLevel();
 }
 
 
-static void updateCallback() {
-    C4LogCallback c4Callback = nullptr;
-    if (sCallback) {
-        c4Callback = [](C4LogDomain domain, C4LogLevel level, const char *msg, va_list) noexcept {
-            // Map C4LogDomain to CBLLogDomain:
-            CBLLogCallback callback = sCallback;
-            if (!callback)
-                return;
-            CBLLogDomain cblDomain = kCBLLogDomainAll;
-            for (int d = 0; d < 5; ++d) {
-                if (kC4Domains[d] == domain) {
-                    cblDomain = CBLLogDomain(d);
-                    break;
-                }
-            }
-            callback(cblDomain, CBLLogLevel(level), slice(msg));
-        };
+static C4LogLevel effectiveC4CallbackLogLevel() {
+    CBLLogLevel customLogLevel = sCustomCallback != nullptr ? sCustomLogLevel.load() : CBLLogNone;
+    return C4LogLevel(std::min(sConsoleLogLevel.load(), customLogLevel));
+}
+
+
+static void updateC4CallbackLogLevel() {
+    C4LogLevel level = effectiveC4CallbackLogLevel();
+    if (c4log_callbackLevel() != level)
+        c4log_setCallbackLevel(level);
+}
+
+
+static void c4LogCallback(C4LogDomain domain, C4LogLevel level, const char *msg, va_list args) {
+    CBLLogLevel msgLevel = CBLLogLevel(level);
+    
+    // Log to console:
+    CBLLogLevel consoleLogLevel = sConsoleLogLevel;
+    if (msgLevel >= consoleLogLevel) {
+        auto domainName = c4log_getDomainName(domain);
+        auto levelName = kLogLevelNames[(int)level];
+        
+        ostream& os = msgLevel < CBLLogWarning ? cout : cerr;
+        LogDecoder::writeTimestamp(LogDecoder::now(), os);
+        LogDecoder::writeHeader(levelName, domainName, os);
+        os << msg << '\n';
     }
-    c4log_writeToCallback(C4LogLevel(sCallbackLevel.load()), c4Callback, true);
+    
+    // Log to custom callback if available:
+    CBLLogCallback callback = sCustomCallback;
+    if (!callback)
+        return;
+    
+    CBLLogLevel customLogLevel = sCustomLogLevel;
+    if (msgLevel >= customLogLevel) {
+        // msg is preformatted
+        callback(getCBLLogDomain(domain), msgLevel, slice(msg));
+    }
+}
+
+
+static CBLLogDomain getCBLLogDomain(C4LogDomain domain) {
+    CBLLogDomain cblDomain = kCBLLogDomainDatabase;
+    for (int i = 0; i < sizeof(kC4Domains)/sizeof(kC4Domains[0]); i++) {
+        if (kC4Domains[i] == domain) {
+            cblDomain = CBLLogDomain(i);
+            break;
+        }
+    }
+    return cblDomain;
 }
 
 
@@ -133,12 +181,10 @@ void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format, ...) CB
 void CBL_LogMessage(CBLLogDomain domain, CBLLogLevel level, FLString message) CBLAPI {
     precondition((domain <= kCBLLogDomainNetwork));
     precondition((level <= CBLLogNone));
-    c4slog(kC4Domains[domain], C4LogLevel(level), message);
+    if (message.buf == nullptr)
+        return;
+    CBL_Log(domain, level, "%.*s", (int) message.size, (char *) message.buf);
 }
-
-
-static CBLLogFileConfiguration sLogFileConfig;
-static alloc_slice sLogFileDir;
 
 
 const CBLLogFileConfiguration* CBLLog_FileConfig() CBLAPI {
@@ -150,6 +196,8 @@ const CBLLogFileConfiguration* CBLLog_FileConfig() CBLAPI {
 
 
 bool CBLLog_SetFileConfig(CBLLogFileConfiguration config, CBLError *outError) CBLAPI {
+    init();
+    
     sLogFileDir = config.directory;     // copy string to the heap
     config.directory = sLogFileDir;     // and put the heap copy in the struct
     sLogFileConfig = config;
@@ -164,7 +212,7 @@ bool CBLLog_SetFileConfig(CBLLogFileConfiguration config, CBLError *outError) CB
     c4opt.max_rotate_count  = config.maxRotateCount > 0 ? config.maxRotateCount : kDefaultLogFileConfigMaxRotateCount;
     c4opt.use_plaintext     = config.usePlaintext;
     c4opt.header            = slice(header);
-
+    
     return c4log_writeToBinaryFile(c4opt, internal(outError));
 }
 
@@ -180,4 +228,3 @@ void CBLLog_EndExpectingExceptions() CBLAPI {
     if (--gC4ExpectExceptions == 0)
         c4log_warnOnErrors(true);
 }
-

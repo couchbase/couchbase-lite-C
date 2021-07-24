@@ -80,7 +80,7 @@ namespace cbl {
             if (!ok) {
 #if DEBUG
                 alloc_slice message = CBLError_Message(&error);
-                CBL_Log(kCBLLogDomainAll, CBLLogError, "API returning error %d/%d: %.*s",
+                CBL_Log(kCBLLogDomainDatabase, CBLLogError, "API returning error %d/%d: %.*s",
                         error.domain, error.code, (int)message.size, (char*)message.buf);
 #endif
                 throw error;

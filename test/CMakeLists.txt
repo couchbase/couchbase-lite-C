@@ -28,6 +28,7 @@ set(TEST_SRC
     CBLTestsMain.cpp
     DatabaseTest.cc
     DatabaseTest_Cpp.cc
+    LogTest.cc
     QueryTest.cc
     ReplicatorTest.cc
     ReplicatorEETest.cc
