@@ -27,6 +27,7 @@
 #include <atomic>
 #include <cstdlib>
 #include <iostream>
+#include <mutex>
 
 using namespace std;
 using namespace fleece;
@@ -59,9 +60,9 @@ static CBLLogDomain getCBLLogDomain(C4LogDomain domain);
 
 // Note: Cannot use static initializing here as the order of initializing static C4LogDomain
 // constants such as kC4DatabaseLog cannot be guaranteed to be done prior.
+static once_flag initFlag;
 static void init() {
-    static bool initialized = false;
-    if (!initialized) {
+    call_once(initFlag, [](){
         // Initialize log level of each domain to debug (lowest level):
         for (int i = 0; i < sizeof(kC4Domains)/sizeof(kC4Domains[0]); ++i) {
             C4LogDomain domain = kC4Domains[i];
@@ -70,9 +71,7 @@ static void init() {
         
         // Register log callback:
         c4log_writeToCallback(effectiveC4CallbackLogLevel(), &c4LogCallback, true /*preformatted*/);
-        
-        initialized = true;
-    }
+    });
 }
 
 
