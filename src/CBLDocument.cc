@@ -63,30 +63,29 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
     if (opt.deleting) {
         if (!c4doc)
             C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document is not in any database");
-        // Deleting doesn't have conflict handler option:
-        assert(!opt.conflictHandler);
     } else {
         checkMutable();
     }
     checkDBMatches(_db, db);
-    
-    bool retrying;
-    Retained<C4Document> savingDoc = c4doc.get();
+
     Retained<C4Document> newDoc = nullptr;
-    RetainedConst<CBLDocument> conflictingDoc = nullptr;
-    
-    do {
-        db->useLocked([&](C4Database *c4db) {
-            C4Database::Transaction t(c4db);
-            
-            alloc_slice body;
-            C4RevisionFlags revFlags;
-            if (!opt.deleting) {
-                body = encodeBody(db, c4db, revFlags);
-            } else {
-                revFlags = kRevDeleted;
-            }
-            
+    db->useLocked([&](C4Database *c4db) {
+        C4Database::Transaction t(c4db);
+
+        // Encode properties: 
+        alloc_slice body;
+        C4RevisionFlags revFlags;
+        if (!opt.deleting) {
+            body = encodeBody(db, c4db, revFlags);
+        } else {
+            revFlags = kRevDeleted;
+        }
+
+        // Save:
+        Retained<C4Document> savingDoc = c4doc.get();
+
+        bool retrying;
+        do {
             retrying = false;
             if (savingDoc) {
                 // Update existing doc:
@@ -103,39 +102,35 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
                 if (!newDoc && c4err != C4Error{LiteCoreDomain, kC4ErrorConflict})
                     C4Error::raise(c4err);
             }
-            
-            if (newDoc) {
-                // Success:
-                t.commit();
-            } else {
-                // Conflict:
-                if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
+
+            if (!newDoc) {
+                // Conflict!
+                if (opt.conflictHandler) {
+                    // Custom conflict resolution:
+                    auto conflictingDoc = db->getDocument(_docID, true);
+                    if (conflictingDoc && conflictingDoc->revisionFlags() & kRevDeleted)
+                        conflictingDoc = nullptr;
+                    if (!opt.conflictHandler(opt.context, this, conflictingDoc))
+                        break;
+                    body = encodeBody(db, c4db, revFlags);
+                    if (conflictingDoc) {
+                        savingDoc = const_cast<C4Document*>(conflictingDoc->_c4doc.useLocked().get());
+                    } else {
+                        savingDoc = nullptr;
+                    }
+                    retrying = true;
+                } else if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
                     // Last-write-wins; load current revision and retry:
                     savingDoc = c4db->getDocument(_docID, true, kDocGetCurrentRev);
                     retrying = true;
-                } else if (opt.conflictHandler) {
-                    // Get the conflicting doc used when calling the conflict handler.
-                    // The call to the conflict handler will be done outside the database's lock.
-                    conflictingDoc = db->getDocument(_docID, true);
                 }
             }
-        });
-        
-        if (!newDoc && !retrying && opt.conflictHandler) {
-            // Use conflict handler to solve the conflict:
-            if (conflictingDoc && conflictingDoc->revisionFlags() & kRevDeleted)
-                conflictingDoc = nullptr;
-            if (opt.conflictHandler(opt.context, this, conflictingDoc)) {
-                if (conflictingDoc) {
-                    savingDoc = const_cast<C4Document*>(conflictingDoc->_c4doc.useLocked().get());
-                    conflictingDoc = nullptr;
-                } else
-                    savingDoc = nullptr;
-                retrying = true;
-            }
-        }
-    } while (retrying);
-    
+        } while (retrying);
+
+        if (newDoc)
+            t.commit();
+    });
+
     if (!newDoc)
         return false;
 

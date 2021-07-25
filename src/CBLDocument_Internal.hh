@@ -181,10 +181,7 @@ public:
 
     struct SaveOptions {
         SaveOptions(CBLConcurrencyControl c)         :concurrency(c) { }
-        SaveOptions(CBLConflictHandler h, void* _cbl_nullable ctx)
-        : conflictHandler(h)
-        ,context(ctx)
-        ,concurrency(kCBLConcurrencyControlFailOnConflict) { }
+        SaveOptions(CBLConflictHandler h, void* _cbl_nullable ctx) :conflictHandler(h), context(ctx) { }
 
         CBLConcurrencyControl concurrency;
         CBLConflictHandler _cbl_nullable conflictHandler = nullptr;

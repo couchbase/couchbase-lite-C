@@ -428,15 +428,10 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler") {
     FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
     
     CBLConflictHandler failConflict = [](void *c, CBLDocument *mine, const CBLDocument *existing) -> bool {
-        CHECK(!c);
         return false;
     };
     
     CBLConflictHandler mergeConflict = [](void *c, CBLDocument *mine, const CBLDocument *existing) -> bool {
-        // CBL-2187 : Ensure that there is no deadlock when getting database's last sequence which
-        // will lock the database:
-        CHECK(c != nullptr);
-        CHECK(CBLDatabase_LastSequence((CBLDatabase*)c) > 0);
         FLMutableDict mergedProps = CBLDocument_MutableProperties(mine);
         FLValue anotherName = FLDict_Get(CBLDocument_Properties(existing),"name"_sl);
         FLMutableDict_SetValue(mergedProps, "anotherName"_sl, anotherName);
@@ -472,7 +467,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler") {
     CHECK(error.code == CBLErrorConflict);
     
     error = {};
-    CHECK(CBLDatabase_SaveDocumentWithConflictHandler(db, doc2, mergeConflict, db, &error));
+    CHECK(CBLDatabase_SaveDocumentWithConflictHandler(db, doc2, mergeConflict, nullptr, &error));
     CBLDocument_Release(doc2);
     
     doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
@@ -480,72 +475,6 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler") {
     CHECK(CBLDocument_Sequence(doc) == 3);
     CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\",\"name\":\"sally\",\"anotherName\":\"bob\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\",\"name\":\"sally\",\"anotherName\":\"bob\"}");
-    CBLDocument_Release(doc);
-}
-
-
-TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler : called twice") {
-    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
-    FLMutableDict props = CBLDocument_MutableProperties(doc);
-    FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
-    
-    CBLConflictHandler mergeConflict = [](void *c, CBLDocument *mine, const CBLDocument *existing) -> bool {
-        CHECK(c != nullptr);
-        CBLDatabase *theDB = (CBLDatabase*)c;
-        Dict dict = (CBLDocument_Properties(existing));
-        if (dict["name"].asString() == "bob"_sl) {
-            // Update the doc to cause a new conflict after first merge; the handler will be
-            // called again:
-            CHECK(CBLDatabase_LastSequence(theDB) == 2);
-            CBLError e;
-            CBLDocument* doc3 = CBLDatabase_GetMutableDocument(theDB, "foo"_sl, &e);
-            FLMutableDict props3 = CBLDocument_MutableProperties(doc3);
-            FLMutableDict_SetString(props3, "name"_sl, "max"_sl);
-            REQUIRE(CBLDatabase_SaveDocument(theDB, doc3, &e));
-            CBLDocument_Release(doc3);
-            CHECK(CBLDatabase_LastSequence(theDB) == 3);
-        } else {
-            CHECK(CBLDatabase_LastSequence(theDB) == 3);
-            CHECK(dict["name"].asString() == "max"_sl);
-        }
-        
-        FLMutableDict mergedProps = CBLDocument_MutableProperties(mine);
-        FLMutableDict_SetValue(mergedProps, "anotherName"_sl, dict["name"]);
-        return true;
-    };
-    
-    CBLError error;
-    REQUIRE(CBLDatabase_SaveDocument(db, doc, &error));
-    CHECK(CBLDocument_ID(doc) == "foo"_sl);
-    CHECK(CBLDocument_Sequence(doc) == 1);
-    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
-    CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
-    CBLDocument_Release(doc);
-
-    CBLDocument* doc1 = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
-    CHECK(CBLDocument_ID(doc1) == "foo"_sl);
-    CHECK(CBLDocument_Sequence(doc1) == 1);
-    
-    CBLDocument* doc2 = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
-    CHECK(CBLDocument_ID(doc2) == "foo"_sl);
-    CHECK(CBLDocument_Sequence(doc2) == 1);
-    
-    FLMutableDict props1 = CBLDocument_MutableProperties(doc1);
-    FLMutableDict_SetString(props1, "name"_sl, "bob"_sl);
-    REQUIRE(CBLDatabase_SaveDocument(db, doc1, &error));
-    CHECK(CBLDocument_Sequence(doc1) == 2);
-    CBLDocument_Release(doc1);
-    
-    FLMutableDict props2 = CBLDocument_MutableProperties(doc2);
-    FLMutableDict_SetString(props2, "name"_sl, "sally"_sl);
-    CHECK(CBLDatabase_SaveDocumentWithConflictHandler(db, doc2, mergeConflict, db, &error));
-    CBLDocument_Release(doc2);
-    
-    doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
-    CHECK(CBLDocument_ID(doc) == "foo"_sl);
-    CHECK(CBLDocument_Sequence(doc) == 4);
-    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\",\"name\":\"sally\",\"anotherName\":\"max\"}"_sl);
-    CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\",\"name\":\"sally\",\"anotherName\":\"max\"}");
     CBLDocument_Release(doc);
 }
 
