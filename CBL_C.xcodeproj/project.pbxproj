@@ -86,6 +86,8 @@
 		27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
+		93965A6326A7CD50008728EE /* LogTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93965A6226A7CD50008728EE /* LogTest.cc */; };
+		93965A6426A7CD50008728EE /* LogTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93965A6226A7CD50008728EE /* LogTest.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -372,6 +374,7 @@
 		27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "LibC++Debug.cc"; sourceTree = "<group>"; };
 		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
 		27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+Apple.mm"; sourceTree = "<group>"; };
+		93965A6226A7CD50008728EE /* LogTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogTest.cc; sourceTree = "<group>"; };
 		93D0AFF1262619B800777AFC /* generate_edition_header.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_edition_header.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -580,6 +583,7 @@
 				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
+				93965A6226A7CD50008728EE /* LogTest.cc */,
 				275B359D234D064600FE9CF0 /* QueryTest.cc */,
 				2736A625242E5A07002B9D65 /* ReplicatorTest.hh */,
 				277CC99422BC23DE00B245CB /* ReplicatorTest.cc */,
@@ -1206,6 +1210,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93965A6426A7CD50008728EE /* LogTest.cc in Sources */,
 				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
 				275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */,
 				2736A635242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,
@@ -1245,6 +1250,7 @@
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,
+				93965A6326A7CD50008728EE /* LogTest.cc in Sources */,
 				275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */,
 				277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */,
 				2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,

@@ -28,11 +28,10 @@ CBL_CAPI_BEGIN
 
 /** Subsystems that log information. */
 typedef CBL_ENUM(uint8_t, CBLLogDomain) {
-    kCBLLogDomainAll,
     kCBLLogDomainDatabase,
     kCBLLogDomainQuery,
     kCBLLogDomainReplicator,
-    kCBLLogDomainNetwork,
+    kCBLLogDomainNetwork
 };
 
 /** Levels of log messages. Higher values are more important/severe. Each level includes the lower ones. */
@@ -103,7 +102,7 @@ void CBLLog_SetCallbackLevel(CBLLogLevel) CBLAPI;
 CBLLogCallback CBLLog_Callback(void) CBLAPI;
 
 /** Sets the callback for receiving log messages. If set to NULL, no messages are logged to the console. */
-void CBLLog_SetCallback(CBLLogCallback) CBLAPI;
+void CBLLog_SetCallback(CBLLogCallback _cbl_nullable callback) CBLAPI;
 
 /** @} */
 

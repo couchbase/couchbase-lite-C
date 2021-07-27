@@ -28,10 +28,6 @@ CBL_CAPI_BEGIN
     void CBLLog_BeginExpectingExceptions() CBLAPI;
     void CBLLog_EndExpectingExceptions() CBLAPI;
 
-    void CBLLog_SetConsoleLevelOfDomain(CBLLogDomain domain, CBLLogLevel level) CBLAPI;
-
-    CBLLogLevel CBLLog_ConsoleLevelOfDomain(CBLLogDomain domain) CBLAPI;
-
     /** Returns the last sequence number assigned in the database.
         This starts at zero and increments every time a document is saved or deleted. */
     uint64_t CBLDatabase_LastSequence(const CBLDatabase*) CBLAPI;
