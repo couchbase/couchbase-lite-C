@@ -58,24 +58,37 @@ CBLDocument::~CBLDocument() {
 
 
 bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
-    Retained<C4Document> savingDoc = _c4doc.useLocked().get();
-    if (opt.deleting) {
-        if (!savingDoc)
-            C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document is not in any database");
-        // Deleting doesn't have conflict handler option:
-        assert(!opt.conflictHandler);
-    } else {
-        checkMutable();
-    }
-    checkDBMatches(_db, db);
-    
-    bool retrying;
-    Retained<C4Document> newDoc = nullptr;
-    RetainedConst<CBLDocument> conflictingDoc = nullptr;
+    Retained<C4Document> orignalDoc = nullptr, savingDoc = nullptr;
+    bool success = false, retrying = false;
     
     do {
+        bool handleConflictNeeded = false;
+        RetainedConst<CBLDocument> conflictingDoc = nullptr;
+        
         db->useLocked([&](C4Database *c4db) {
             C4Database::Transaction t(c4db);
+            
+            auto c4doc = _c4doc.useLocked();
+            
+            if (!retrying) {
+                // validate the precondition :
+                // 1. The document should be in the same database it was passed to the method.
+                // 2. The document should be mutable.
+                // 3. The document should exist when deleting.
+                if (opt.deleting) {
+                    if (!c4doc)
+                        C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document is not in any database");
+                } else {
+                    checkMutable();
+                }
+                checkDBMatches(_db, db);
+                
+                orignalDoc = c4doc.get();
+                savingDoc = orignalDoc;
+            } else {
+                // Make sure that the doc hasn't been changed during the save process:
+                precondition(c4doc.get() == orignalDoc);
+            }
             
             alloc_slice body;
             C4RevisionFlags revFlags;
@@ -86,6 +99,9 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
             }
             
             retrying = false;
+            Retained<C4Document> newDoc = nullptr;
+            conflictingDoc = nullptr;
+            
             if (savingDoc) {
                 // Update existing doc:
                 newDoc = savingDoc->update(body, revFlags);
@@ -105,6 +121,11 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
             if (newDoc) {
                 // Success:
                 t.commit();
+                _db = db;
+                // HACK: Replace the inner reference of the c4doc with the one from newDoc.
+                c4doc.get() = move(newDoc);
+                _revID = c4doc->selectedRev().revID;
+                success = true;
             } else {
                 // Conflict:
                 if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
@@ -115,34 +136,32 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
                     // Get the conflicting doc used when calling the conflict handler.
                     // The call to the conflict handler will be done outside the database's lock.
                     conflictingDoc = db->getDocument(_docID, true);
+                    handleConflictNeeded = true;
                 }
             }
         });
         
-        if (!newDoc && !retrying && opt.conflictHandler) {
-            // Use conflict handler to solve the conflict:
-            if (conflictingDoc && conflictingDoc->revisionFlags() & kRevDeleted)
+        // Conflict will be handled outside document and database lock:
+        if (handleConflictNeeded) {
+            // Use conflict handler to solve the conflict; conflictingDoc should be non-null
+            // here and we are checking here just for precuation.
+            if (_usuallyTrue(conflictingDoc != nullptr) && conflictingDoc->revisionFlags() & kRevDeleted) {
                 conflictingDoc = nullptr;
+            }
+            
             if (opt.conflictHandler(opt.context, this, conflictingDoc)) {
-                if (conflictingDoc) {
+                if (_usuallyTrue(conflictingDoc != nullptr)) {
                     savingDoc = const_cast<C4Document*>(conflictingDoc->_c4doc.useLocked().get());
                     conflictingDoc = nullptr;
-                } else
+                } else {
                     savingDoc = nullptr;
+                }
                 retrying = true;
             }
         }
     } while (retrying);
     
-    if (!newDoc)
-        return false;
-
-    // Update my C4Document:
-    _db = db;
-    auto c4doc = _c4doc.useLocked();
-    c4doc.get() = move(newDoc);
-    _revID = c4doc->selectedRev().revID;
-    return true;
+    return success;
 }
 
 
