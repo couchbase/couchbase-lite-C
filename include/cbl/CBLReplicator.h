@@ -39,10 +39,14 @@ typedef struct CBLEndpoint CBLEndpoint;
 /** Creates a new endpoint representing a server-based database at the given URL.
     The URL's scheme must be `ws` or `wss`, it must of course have a valid hostname,
     and its path must be the name of the database on that server.
+    
     The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
-    For example: `wss://example.org/dbname` */
+    For example: `wss://example.org/dbname`.
+ 
+    If an invalid endpoint URL is specified, an error will be returned.
+    */
 _cbl_warn_unused
-CBLEndpoint* CBLEndpoint_CreateWithURL(FLString url) CBLAPI;
+CBLEndpoint* CBLEndpoint_CreateWithURL(FLString url, CBLError* _cbl_nullable outError) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Creates a new endpoint representing another local database. (Enterprise Edition only.) */

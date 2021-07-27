@@ -152,8 +152,10 @@ public:
     }
 
     ~ReplicatorTest() {
-        CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
-        CBLReplicator_Release(repl);
+        if (repl) {
+            CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
+            CBLReplicator_Release(repl);
+        }
         CBLAuth_Free(config.authenticator);
         CBLEndpoint_Free(config.endpoint);
     }

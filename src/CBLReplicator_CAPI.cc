@@ -23,10 +23,10 @@
 const FLString kCBLAuthDefaultCookieName = FLSTR("SyncGatewaySession");
 
 
-CBLEndpoint* CBLEndpoint_CreateWithURL(FLString url) noexcept {
+CBLEndpoint* CBLEndpoint_CreateWithURL(FLString url, CBLError* _cbl_nullable outError) noexcept {
     try {
         return new CBLURLEndpoint(url);
-    } catchAndWarn()
+    } catchAndBridge(outError)
 }
 
 #ifdef COUCHBASE_ENTERPRISE
