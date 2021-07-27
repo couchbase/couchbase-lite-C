@@ -55,8 +55,15 @@ namespace cbl_internal {
         CBLURLEndpoint(fleece::slice url)
         :_url(url)
         {
-            if (!C4Address::fromURL(_url, &_address, (fleece::slice*)&_dbName))
-                _dbName = fleece::nullslice; // mark as invalid
+            if (!C4Address::fromURL(_url, &_address, (fleece::slice*)&_dbName)) {
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                               "Invalid URLEndpoint url '%.*s'", FMTSLICE(_url));
+            } else if (_address.scheme != kC4Replicator2Scheme &&
+                       _address.scheme != kC4Replicator2TLSScheme) {
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                               "Invalid scheme for URLEndpoint url '%.*s'. It must be either 'ws:' or 'wss:'.",
+                               FMTSLICE(_url));
+            }
         }
 
         bool valid() const override                             {return _dbName != fleece::nullslice;}

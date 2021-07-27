@@ -32,7 +32,12 @@ namespace cbl {
 
     class Endpoint {
     public:
-        void setURL(slice url)                      {_ref = CBLEndpoint_CreateWithURL(url);}
+        void setURL(slice url) {
+            CBLError error;
+            _ref = CBLEndpoint_CreateWithURL(url, &error);
+            if (!_ref)
+                throw error;
+        }
 #ifdef COUCHBASE_ENTERPRISE
         void setLocalDB(Database db)                {_ref = CBLEndpoint_CreateWithLocalDB(db.ref());}
 #endif

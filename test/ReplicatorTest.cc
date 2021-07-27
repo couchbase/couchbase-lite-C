@@ -37,8 +37,10 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
         
         config.database = db.ref();
         CHECK(!CBLReplicator_Create(&config, &error));
-
-        config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg:9999/foobar"_sl);
+        
+        config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg:9999/foobar"_sl, &error);
+        CHECK(config.endpoint);
+        
         proxy.type = kCBLProxyHTTP;
         config.proxy = &proxy;
         CHECK(!CBLReplicator_Create(&config, &error));
@@ -50,8 +52,29 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
 }
 
 
+TEST_CASE_METHOD(ReplicatorTest, "Bad url", "[Replicator]") {
+    ExpectingExceptions x;
+    
+    // No db:
+    CBLError error;
+    auto endpoint = CBLEndpoint_CreateWithURL("ws://localhost:4984"_sl, &error);
+    CHECK(!endpoint);
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorInvalidParameter);
+    
+    // Invalid scheme:
+    endpoint = CBLEndpoint_CreateWithURL("https://localhost:4984/db"_sl, &error);
+    CHECK(!endpoint);
+    CHECK(error.domain == CBLDomain);
+    CHECK(error.code == CBLErrorInvalidParameter);
+}
+
+
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
-    config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl);
+    CBLError error;
+    config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
+    CHECK(config.endpoint);
+    
     config.authenticator = CBLAuth_CreateSession("SyncGatewaySession"_sl, "NOM_NOM_NOM"_sl);
 
     config.pullFilter = [](void *context, CBLDocument* document, CBLDocumentFlags flags) -> bool {
@@ -67,7 +90,10 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replicator]") {
-    config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl);
+    CBLError error;
+    config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
+    CHECK(config.endpoint);
+    
     config.authenticator = CBLAuth_CreatePassword("username"_sl, "p@ssw0RD"_sl);
 
     CBLProxySettings proxy = {};
@@ -119,7 +145,10 @@ public:
                     "Skipping test; server URL not configured");
             return false;
         }
-        config.endpoint = CBLEndpoint_CreateWithURL(slice(serverURL + "/" + dbName));
+        
+        CBLError error;
+        config.endpoint = CBLEndpoint_CreateWithURL(slice(serverURL + "/" + dbName), &error);
+        CHECK(config.endpoint);
         return true;
     }
 
@@ -129,7 +158,10 @@ public:
                     "Skipping test; server URL not configured");
             return false;
         }
-        config.endpoint = CBLEndpoint_CreateWithURL(slice(tlsServerURL + "/" + dbName));
+        
+        CBLError error;
+        config.endpoint = CBLEndpoint_CreateWithURL(slice(tlsServerURL + "/" + dbName), &error);
+        CHECK(config.endpoint);
         return true;
     }
 
