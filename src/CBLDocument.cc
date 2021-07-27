@@ -58,35 +58,50 @@ CBLDocument::~CBLDocument() {
 
 
 bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
-    auto c4doc = _c4doc.useLocked();
-
-    if (opt.deleting) {
-        if (!c4doc)
-            C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document is not in any database");
-    } else {
-        checkMutable();
-    }
-    checkDBMatches(_db, db);
-
-    Retained<C4Document> newDoc = nullptr;
-    db->useLocked([&](C4Database *c4db) {
-        C4Database::Transaction t(c4db);
-
-        // Encode properties: 
-        alloc_slice body;
-        C4RevisionFlags revFlags;
-        if (!opt.deleting) {
-            body = encodeBody(db, c4db, revFlags);
-        } else {
-            revFlags = kRevDeleted;
-        }
-
-        // Save:
-        Retained<C4Document> savingDoc = c4doc.get();
-
-        bool retrying;
-        do {
+    Retained<C4Document> orignalDoc = nullptr, savingDoc = nullptr;
+    bool success = false, retrying = false;
+    
+    do {
+        bool handleConflictNeeded = false;
+        RetainedConst<CBLDocument> conflictingDoc = nullptr;
+        
+        db->useLocked([&](C4Database *c4db) {
+            C4Database::Transaction t(c4db);
+            
+            auto c4doc = _c4doc.useLocked();
+            
+            if (!retrying) {
+                // validate the precondition :
+                // 1. The document should be in the same database it was passed to the method.
+                // 2. The document should be mutable.
+                // 3. The document should exist when deleting.
+                if (opt.deleting) {
+                    if (!c4doc)
+                        C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document is not in any database");
+                } else {
+                    checkMutable();
+                }
+                checkDBMatches(_db, db);
+                
+                orignalDoc = c4doc.get();
+                savingDoc = orignalDoc;
+            } else {
+                // Make sure that the doc hasn't been changed during the save process:
+                precondition(c4doc.get() == orignalDoc);
+            }
+            
+            alloc_slice body;
+            C4RevisionFlags revFlags;
+            if (!opt.deleting) {
+                body = encodeBody(db, c4db, revFlags);
+            } else {
+                revFlags = kRevDeleted;
+            }
+            
             retrying = false;
+            Retained<C4Document> newDoc = nullptr;
+            conflictingDoc = nullptr;
+            
             if (savingDoc) {
                 // Update existing doc:
                 newDoc = savingDoc->update(body, revFlags);
@@ -102,43 +117,51 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
                 if (!newDoc && c4err != C4Error{LiteCoreDomain, kC4ErrorConflict})
                     C4Error::raise(c4err);
             }
-
-            if (!newDoc) {
-                // Conflict!
-                if (opt.conflictHandler) {
-                    // Custom conflict resolution:
-                    auto conflictingDoc = db->getDocument(_docID, true);
-                    if (conflictingDoc && conflictingDoc->revisionFlags() & kRevDeleted)
-                        conflictingDoc = nullptr;
-                    if (!opt.conflictHandler(opt.context, this, conflictingDoc))
-                        break;
-                    body = encodeBody(db, c4db, revFlags);
-                    if (conflictingDoc) {
-                        savingDoc = const_cast<C4Document*>(conflictingDoc->_c4doc.useLocked().get());
-                    } else {
-                        savingDoc = nullptr;
-                    }
-                    retrying = true;
-                } else if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
+            
+            if (newDoc) {
+                // Success:
+                t.commit();
+                _db = db;
+                // HACK: Replace the inner reference of the c4doc with the one from newDoc.
+                c4doc.get() = move(newDoc);
+                _revID = c4doc->selectedRev().revID;
+                success = true;
+            } else {
+                // Conflict:
+                if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
                     // Last-write-wins; load current revision and retry:
                     savingDoc = c4db->getDocument(_docID, true, kDocGetCurrentRev);
                     retrying = true;
+                } else if (opt.conflictHandler) {
+                    // Get the conflicting doc used when calling the conflict handler.
+                    // The call to the conflict handler will be done outside the database's lock.
+                    conflictingDoc = db->getDocument(_docID, true);
+                    handleConflictNeeded = true;
                 }
             }
-        } while (retrying);
-
-        if (newDoc)
-            t.commit();
-    });
-
-    if (!newDoc)
-        return false;
-
-    // Update my C4Document:
-    _db = db;
-    c4doc.get() = move(newDoc);
-    _revID = c4doc->selectedRev().revID;
-    return true;
+        });
+        
+        // Conflict will be handled outside document and database lock:
+        if (handleConflictNeeded) {
+            // Use conflict handler to solve the conflict; conflictingDoc should be non-null
+            // here and we are checking here just for precuation.
+            if (_usuallyTrue(conflictingDoc != nullptr) && conflictingDoc->revisionFlags() & kRevDeleted) {
+                conflictingDoc = nullptr;
+            }
+            
+            if (opt.conflictHandler(opt.context, this, conflictingDoc)) {
+                if (_usuallyTrue(conflictingDoc != nullptr)) {
+                    savingDoc = const_cast<C4Document*>(conflictingDoc->_c4doc.useLocked().get());
+                    conflictingDoc = nullptr;
+                } else {
+                    savingDoc = nullptr;
+                }
+                retrying = true;
+            }
+        }
+    } while (retrying);
+    
+    return success;
 }
 
 
