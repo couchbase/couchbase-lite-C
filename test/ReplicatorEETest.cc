@@ -160,25 +160,130 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Pending Documents", "[Replicator]") {
 }
 
 
-TEST_CASE_METHOD(ReplicatorLocalTest, "Pull conflict (default resolver)", "[Replicator][Conflict]") {
+TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Replicator][Conflict]") {
     config.replicatorType = kCBLReplicatorTypePull;
 
+    // Delete Doc:
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
     db.saveDocument(doc);
+    db.deleteDocument(doc);
 
+    // Update multiple times:
     MutableDocument doc2("foo");
     doc2["greeting"] = "Salaam Alaykum";
     otherDB.saveDocument(doc2);
 
+    doc2["greeting"] = "Hello";
+    otherDB.saveDocument(doc2);
+    
+    doc2["greeting"] = "Konichiwa";
+    otherDB.saveDocument(doc2);
+    
+    // Pull:
     replicate();
 
+    // Deleted doc should win:
     CHECK(asVector(docsNotified) == vector<string>{"foo"});
-
-    Document copiedDoc = db.getDocument("foo");
-    REQUIRE(copiedDoc);
-    CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
+    Document localDoc = db.getDocument("foo");
+    REQUIRE(!localDoc);
+    
+    // Push
+    config.replicatorType = kCBLReplicatorTypePush;
+    docsNotified.clear();
+    resetReplicator();
+    replicate();
+    
+    // Resolved doc should be pushed:
+    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+    Document remoteDoc = otherDB.getDocument("foo");
+    REQUIRE(!remoteDoc);
 }
+
+
+TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Replicator][Conflict]") {
+    config.replicatorType = kCBLReplicatorTypePull;
+
+    // Create:
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+    
+    // Create and Update:
+    MutableDocument doc2("foo");
+    doc2["greeting"] = "Salaam Alaykum";
+    otherDB.saveDocument(doc2);
+    
+    doc2["greeting"] = "Konichiwa";
+    otherDB.saveDocument(doc2);
+    
+    REQUIRE(CBLDocument_Generation(doc2.ref()) > CBLDocument_Generation(doc.ref()));
+
+    // Pull
+    replicate();
+
+    // Higher generation should win:
+    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+    Document localDoc = db.getDocument("foo");
+    REQUIRE(localDoc);
+    CHECK(localDoc["greeting"].asString() == "Konichiwa"_sl);
+    CHECK(localDoc.revisionID() == doc2.revisionID());
+    
+    // Push
+    config.replicatorType = kCBLReplicatorTypePush;
+    docsNotified.clear();
+    resetReplicator();
+    replicate();
+    
+    // Resolved doc, same as remote doc, should not be pushed.
+    CHECK(asVector(docsNotified) == vector<string>{});
+    Document remoteDoc = db.getDocument("foo");
+    REQUIRE(remoteDoc);
+    CHECK(remoteDoc["greeting"].asString() == "Konichiwa"_sl);
+    CHECK(remoteDoc.revisionID() == doc2.revisionID());
+}
+
+
+TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[Replicator][Conflict]") {
+    config.replicatorType = kCBLReplicatorTypePull;
+
+    // Create:
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+
+    // Create:
+    MutableDocument doc2("foo");
+    doc2["greeting"] = "Salaam Alaykum";
+    otherDB.saveDocument(doc2);
+    
+    REQUIRE(doc2.revisionID().compare(doc.revisionID()) > 0);
+    
+    // Pull
+    replicate();
+
+    // Higher revOD should win:
+    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+    Document localDoc = db.getDocument("foo");
+    REQUIRE(localDoc);
+    CHECK(localDoc["greeting"].asString() == "Salaam Alaykum"_sl);
+    CHECK(localDoc.revisionID() == doc2.revisionID());
+    
+    // Push
+    config.replicatorType = kCBLReplicatorTypePush;
+    docsNotified.clear();
+    resetReplicator();
+    replicate();
+    
+    // Resolved doc should be the same:
+    // Resolved doc, same as remote doc, should not be pushed.
+    CHECK(asVector(docsNotified) == vector<string>{});
+    Document remoteDoc = db.getDocument("foo");
+    REQUIRE(remoteDoc);
+    CHECK(remoteDoc["greeting"].asString() == "Salaam Alaykum"_sl);
+    CHECK(remoteDoc.revisionID() == doc2.revisionID());
+}
+
 
 class ReplicatorConflictTest : public ReplicatorLocalTest {
 public:

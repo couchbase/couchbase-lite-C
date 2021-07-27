@@ -43,6 +43,10 @@ FLSliceResult CBLDocument_CanonicalRevisionID(const CBLDocument* doc) noexcept {
     return FLSliceResult(doc->canonicalRevisionID());
 }
 
+unsigned CBLDocument_Generation(const CBLDocument* doc) noexcept {
+    return doc->generation();
+}
+
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) noexcept {
     return doc->mutableProperties();
 }

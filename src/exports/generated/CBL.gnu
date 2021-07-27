@@ -58,6 +58,7 @@ CBL_C {
 		CBLDocument_ID;
 		CBLDocument_RevisionID;
 		CBLDocument_CanonicalRevisionID;
+		CBLDocument_Generation;
 		CBLDocument_Sequence;
 		CBLDocument_Create;
 		CBLDocument_CreateWithID;
