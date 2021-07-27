@@ -106,8 +106,10 @@ namespace cbl {
             conf.proxy = proxy;
             if (!headers.empty())
                 conf.headers = headers;
-            conf.pinnedServerCertificate = slice(pinnedServerCertificate);
-            conf.trustedRootCertificates = slice(trustedRootCertificates);
+            if (!pinnedServerCertificate.empty())
+                conf.pinnedServerCertificate = slice(pinnedServerCertificate);
+            if (!trustedRootCertificates.empty())
+                conf.trustedRootCertificates = slice(trustedRootCertificates);
             if (!channels.empty())
                 conf.channels = channels;
             if (!documentIDs.empty())
