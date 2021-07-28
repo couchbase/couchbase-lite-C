@@ -262,9 +262,26 @@ private:
     }
 
     static CBLNewBlob* _cbl_nullable findNewBlob(FLDict dict);
-    bool saveBlobs(CBLDatabase *db) const;  // returns true if there are blobs
+    
+    // Walk through the Fleece object tree, find new mutable blob Dicts to install.
+    //
+    // The releaseNewBlob flag allows to release the matched CBLNewBlob objects after being
+    // installed. The flag is set to true only when saving new blobs while encoding the document
+    // returned by the replicator's conflict resolved. The new blobs set to the resolved doc needs
+    // to be retained until they are installed here.
+    bool saveBlobs(CBLDatabase *db, bool releaseNewBlob) const;  // returns true if there are blobs
+    
+    // Encode the document body and install new blobs if found into the database.
+    //
+    // The releaseNewBlob option tells whether the new blob object should be released after
+    // being install or not. This option is set to true only when encoding the document
+    // returned by the replicator's conflict resolved.
+    //
+    // The outRevFlags will be updated with kRevHasAttachments if there is a blob found while
+    // encoding the document body.
     alloc_slice encodeBody(CBLDatabase* db,
                            C4Database* c4db,
+                           bool releaseNewBlob,
                            C4RevisionFlags &outRevFlags) const;
 
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
