@@ -59,14 +59,14 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad url", "[Replicator]") {
     CBLError error;
     auto endpoint = CBLEndpoint_CreateWithURL("ws://localhost:4984"_sl, &error);
     CHECK(!endpoint);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorInvalidParameter);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
     
     // Invalid scheme:
     endpoint = CBLEndpoint_CreateWithURL("https://localhost:4984/db"_sl, &error);
     CHECK(!endpoint);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorInvalidParameter);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
 }
 
 
@@ -85,7 +85,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
         return true;
     };
 
-    replicate({CBLNetworkDomain, CBLNetErrUnknownHost});
+    replicate({kCBLNetworkDomain, kCBLNetErrUnknownHost});
 }
 
 
@@ -104,7 +104,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replica
     proxy.password = "123456"_sl;
     config.proxy = &proxy;
     
-    replicate({ CBLNetworkDomain, CBLNetErrUnknownHost });
+    replicate({ kCBLNetworkDomain, kCBLNetErrUnknownHost });
 }
 
 
@@ -141,7 +141,7 @@ public:
 
     bool setConfigRemoteDBName(const char *dbName) {
         if (serverURL.empty()) {
-            CBL_Log(kCBLLogDomainReplicator, CBLLogWarning,
+            CBL_Log(kCBLLogDomainReplicator, kCBLLogWarning,
                     "Skipping test; server URL not configured");
             return false;
         }
@@ -154,7 +154,7 @@ public:
 
     bool setConfigRemoteDBNameTLS(const char *dbName) {
         if (tlsServerURL.empty()) {
-            CBL_Log(kCBLLogDomainReplicator, CBLLogWarning,
+            CBL_Log(kCBLLogDomainReplicator, kCBLLogWarning,
                     "Skipping test; server URL not configured");
             return false;
         }
@@ -174,7 +174,7 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "HTTP auth", "[Replicator][.Server]
         return;
     config.replicatorType = kCBLReplicatorTypePull;
     CBLAuthenticator* auth = nullptr;
-    CBLError expectedError = CBLError{CBLWebSocketDomain, 401};
+    CBLError expectedError = CBLError{kCBLWebSocketDomain, 401};
     SECTION("No credentials") {
         auth = nullptr;
     }
@@ -209,7 +209,7 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG w/TLS", "[Repl
     config.replicatorType = kCBLReplicatorTypePull;
     SECTION("Without cert pinning (fails)") {
         replicate();
-        CHECK(replError == (CBLError{CBLNetworkDomain, CBLNetErrTLSCertUnknownRoot}));
+        CHECK(replError == (CBLError{kCBLNetworkDomain, kCBLNetErrTLSCertUnknownRoot}));
     }
     SECTION("With cert pinning") {
         alloc_slice serverCert = getServerCert();

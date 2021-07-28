@@ -35,65 +35,65 @@ CBL_CAPI_BEGIN
 
 /** Error domains, serving as namespaces for numeric error codes. */
 typedef CBL_ENUM(uint8_t, CBLErrorDomain) {
-    CBLDomain = 1,         ///< code is a Couchbase Lite error code; see \ref CBLErrorCode
-    CBLPOSIXDomain,        ///< code is a POSIX `errno`; see "errno.h"
-    CBLSQLiteDomain,       ///< code is a SQLite error; see "sqlite3.h"
-    CBLFleeceDomain,       ///< code is a Fleece error; see "FleeceException.h"
-    CBLNetworkDomain,      ///< code is a network error; see \ref CBLNetworkErrorCode
-    CBLWebSocketDomain,    ///< code is a WebSocket close code (1000...1015) or HTTP error (300..599)
+    kCBLDomain = 1,         ///< code is a Couchbase Lite error code; see \ref CBLErrorCode
+    kCBLPOSIXDomain,        ///< code is a POSIX `errno`; see "errno.h"
+    kCBLSQLiteDomain,       ///< code is a SQLite error; see "sqlite3.h"
+    kCBLFleeceDomain,       ///< code is a Fleece error; see "FleeceException.h"
+    kCBLNetworkDomain,      ///< code is a network error; see \ref CBLNetworkErrorCode
+    kCBLWebSocketDomain,    ///< code is a WebSocket close code (1000...1015) or HTTP error (300..599)
 };
 
 /** Couchbase Lite error codes, in the CBLDomain. */
 typedef CBL_ENUM(int32_t, CBLErrorCode) {
-    CBLErrorAssertionFailed = 1,    ///< Internal assertion failure
-    CBLErrorUnimplemented,          ///< Oops, an unimplemented API call
-    CBLErrorUnsupportedEncryption,  ///< Unsupported encryption algorithm
-    CBLErrorBadRevisionID,          ///< Invalid revision ID syntax
-    CBLErrorCorruptRevisionData,    ///< Revision contains corrupted/unreadable data
-    CBLErrorNotOpen,                ///< Database/KeyStore/index is not open
-    CBLErrorNotFound,               ///< Document not found
-    CBLErrorConflict,               ///< Document update conflict
-    CBLErrorInvalidParameter,       ///< Invalid function parameter or struct value
-    CBLErrorUnexpectedError, /*10*/ ///< Internal unexpected C++ exception
-    CBLErrorCantOpenFile,           ///< Database file can't be opened; may not exist
-    CBLErrorIOError,                ///< File I/O error
-    CBLErrorMemoryError,            ///< Memory allocation failed (out of memory?)
-    CBLErrorNotWriteable,           ///< File is not writeable
-    CBLErrorCorruptData,            ///< Data is corrupted
-    CBLErrorBusy,                   ///< Database is busy/locked
-    CBLErrorNotInTransaction,       ///< Function must be called while in a transaction
-    CBLErrorTransactionNotClosed,   ///< Database can't be closed while a transaction is open
-    CBLErrorUnsupported,            ///< Operation not supported in this database
-    CBLErrorNotADatabaseFile,/*20*/ ///< File is not a database, or encryption key is wrong
-    CBLErrorWrongFormat,            ///< Database exists but not in the format/storage requested
-    CBLErrorCrypto,                 ///< Encryption/decryption error
-    CBLErrorInvalidQuery,           ///< Invalid query
-    CBLErrorMissingIndex,           ///< No such index, or query requires a nonexistent index
-    CBLErrorInvalidQueryParam,      ///< Unknown query param name, or param number out of range
-    CBLErrorRemoteError,            ///< Unknown error from remote server
-    CBLErrorDatabaseTooOld,         ///< Database file format is older than what I can open
-    CBLErrorDatabaseTooNew,         ///< Database file format is newer than what I can open
-    CBLErrorBadDocID,               ///< Invalid document ID
-    CBLErrorCantUpgradeDatabase,/*30*/ ///< DB can't be upgraded (might be unsupported dev version)
+    kCBLErrorAssertionFailed = 1,    ///< Internal assertion failure
+    kCBLErrorUnimplemented,          ///< Oops, an unimplemented API call
+    kCBLErrorUnsupportedEncryption,  ///< Unsupported encryption algorithm
+    kCBLErrorBadRevisionID,          ///< Invalid revision ID syntax
+    kCBLErrorCorruptRevisionData,    ///< Revision contains corrupted/unreadable data
+    kCBLErrorNotOpen,                ///< Database/KeyStore/index is not open
+    kCBLErrorNotFound,               ///< Document not found
+    kCBLErrorConflict,               ///< Document update conflict
+    kCBLErrorInvalidParameter,       ///< Invalid function parameter or struct value
+    kCBLErrorUnexpectedError, /*10*/ ///< Internal unexpected C++ exception
+    kCBLErrorCantOpenFile,           ///< Database file can't be opened; may not exist
+    kCBLErrorIOError,                ///< File I/O error
+    kCBLErrorMemoryError,            ///< Memory allocation failed (out of memory?)
+    kCBLErrorNotWriteable,           ///< File is not writeable
+    kCBLErrorCorruptData,            ///< Data is corrupted
+    kCBLErrorBusy,                   ///< Database is busy/locked
+    kCBLErrorNotInTransaction,       ///< Function must be called while in a transaction
+    kCBLErrorTransactionNotClosed,   ///< Database can't be closed while a transaction is open
+    kCBLErrorUnsupported,            ///< Operation not supported in this database
+    kCBLErrorNotADatabaseFile,/*20*/ ///< File is not a database, or encryption key is wrong
+    kCBLErrorWrongFormat,            ///< Database exists but not in the format/storage requested
+    kCBLErrorCrypto,                 ///< Encryption/decryption error
+    kCBLErrorInvalidQuery,           ///< Invalid query
+    kCBLErrorMissingIndex,           ///< No such index, or query requires a nonexistent index
+    kCBLErrorInvalidQueryParam,      ///< Unknown query param name, or param number out of range
+    kCBLErrorRemoteError,            ///< Unknown error from remote server
+    kCBLErrorDatabaseTooOld,         ///< Database file format is older than what I can open
+    kCBLErrorDatabaseTooNew,         ///< Database file format is newer than what I can open
+    kCBLErrorBadDocID,               ///< Invalid document ID
+    kCBLErrorCantUpgradeDatabase,/*30*/ ///< DB can't be upgraded (might be unsupported dev version)
 };
 
 /** Network error codes, in the CBLNetworkDomain. */
 typedef CBL_ENUM(int32_t,  CBLNetworkErrorCode) {
-    CBLNetErrDNSFailure = 1,            ///< DNS lookup failed
-    CBLNetErrUnknownHost,               ///< DNS server doesn't know the hostname
-    CBLNetErrTimeout,                   ///< No response received before timeout
-    CBLNetErrInvalidURL,                ///< Invalid URL
-    CBLNetErrTooManyRedirects,          ///< HTTP redirect loop
-    CBLNetErrTLSHandshakeFailed,        ///< Low-level error establishing TLS
-    CBLNetErrTLSCertExpired,            ///< Server's TLS certificate has expired
-    CBLNetErrTLSCertUntrusted,          ///< Cert isn't trusted for other reason
-    CBLNetErrTLSClientCertRequired,     ///< Server requires client to have a TLS certificate
-    CBLNetErrTLSClientCertRejected,     ///< Server rejected my TLS client certificate
-    CBLNetErrTLSCertUnknownRoot,        ///< Self-signed cert, or unknown anchor cert
-    CBLNetErrInvalidRedirect,           ///< Attempted redirect to invalid URL
-    CBLNetErrUnknown,                   ///< Unknown networking error
-    CBLNetErrTLSCertRevoked,            ///< Server's cert has been revoked
-    CBLNetErrTLSCertNameMismatch,       ///< Server cert's name does not match DNS name
+    kCBLNetErrDNSFailure = 1,            ///< DNS lookup failed
+    kCBLNetErrUnknownHost,               ///< DNS server doesn't know the hostname
+    kCBLNetErrTimeout,                   ///< No response received before timeout
+    kCBLNetErrInvalidURL,                ///< Invalid URL
+    kCBLNetErrTooManyRedirects,          ///< HTTP redirect loop
+    kCBLNetErrTLSHandshakeFailed,        ///< Low-level error establishing TLS
+    kCBLNetErrTLSCertExpired,            ///< Server's TLS certificate has expired
+    kCBLNetErrTLSCertUntrusted,          ///< Cert isn't trusted for other reason
+    kCBLNetErrTLSClientCertRequired,     ///< Server requires client to have a TLS certificate
+    kCBLNetErrTLSClientCertRejected,     ///< Server rejected my TLS client certificate
+    kCBLNetErrTLSCertUnknownRoot,        ///< Self-signed cert, or unknown anchor cert
+    kCBLNetErrInvalidRedirect,           ///< Attempted redirect to invalid URL
+    kCBLNetErrUnknown,                   ///< Unknown networking error
+    kCBLNetErrTLSCertRevoked,            ///< Server's cert has been revoked
+    kCBLNetErrTLSCertNameMismatch,       ///< Server cert's name does not match DNS name
 };
 
 

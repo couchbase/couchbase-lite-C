@@ -100,8 +100,8 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Delete Unsaved Doc") {
     ExpectingExceptions x;
     CBLError error;
     REQUIRE(!CBLDatabase_DeleteDocumentWithConcurrencyControl(db.ref(), doc.ref(), kCBLConcurrencyControlLastWriteWins, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorNotFound);
 }
 
 
@@ -159,7 +159,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction With Exception", "[!throws]") {
 
         if (sqrt(2) > 1.0) {
             ExpectingExceptions x;
-            CBL_Log(kCBLLogDomainDatabase, CBLLogWarning, "INTENTIONALLY THROWING EXCEPTION!");
+            CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning, "INTENTIONALLY THROWING EXCEPTION!");
             throw runtime_error("intentional");
         }
 

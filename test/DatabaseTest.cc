@@ -122,8 +122,8 @@ TEST_CASE_METHOD(DatabaseTest, "Database Encryption") {
         ExpectingExceptions x;
         CBLDatabase *nokeydb = CBLDatabase_Open("encdb"_sl, nullptr, &error);
         REQUIRE(nokeydb == nullptr);
-        CHECK(error.domain == CBLDomain);
-        CHECK(error.code == CBLErrorNotADatabaseFile);
+        CHECK(error.domain == kCBLDomain);
+        CHECK(error.code == kCBLErrorNotADatabaseFile);
     }
     
     // Wrong key:
@@ -134,8 +134,8 @@ TEST_CASE_METHOD(DatabaseTest, "Database Encryption") {
         CBLDatabaseConfiguration config2 = {nullslice, key2};
         CBLDatabase *wrongkeydb = CBLDatabase_Open("encdb"_sl, &config2, &error);
         REQUIRE(wrongkeydb == nullptr);
-        CHECK(error.domain == CBLDomain);
-        CHECK(error.code == CBLErrorNotADatabaseFile);
+        CHECK(error.domain == kCBLDomain);
+        CHECK(error.code == kCBLErrorNotADatabaseFile);
     }
 
     CHECK(CBLDatabase_Delete(defaultdb, &error));
@@ -160,8 +160,8 @@ TEST_CASE_METHOD(DatabaseTest, "Missing Document") {
     CHECK(error.code == 0);
 
     CHECK(!CBLDatabase_PurgeDocumentByID(db, "foo"_sl, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorNotFound);
 }
 
 
@@ -409,8 +409,8 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with FailOnConflict") {
     FLMutableDict_SetString(props2, "name"_sl, "sally"_sl);
     CHECK(!CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc2, kCBLConcurrencyControlFailOnConflict, &error));
     CBLDocument_Release(doc2);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorConflict);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorConflict);
     
     error = {};
     doc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
@@ -464,8 +464,8 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler") {
     FLMutableDict props2 = CBLDocument_MutableProperties(doc2);
     FLMutableDict_SetString(props2, "name"_sl, "sally"_sl);
     CHECK(!CBLDatabase_SaveDocumentWithConflictHandler(db, doc2, failConflict, nullptr, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorConflict);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorConflict);
     
     error = {};
     CHECK(CBLDatabase_SaveDocumentWithConflictHandler(db, doc2, mergeConflict, nullptr, &error));
@@ -619,8 +619,8 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document into Different DB") {
     
     ExpectingExceptions x;
     CHECK(!CBLDatabase_SaveDocument(otherDB, doc, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorInvalidParameter);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
     CBLDocument_Release(doc);
 }
 
@@ -638,8 +638,8 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document into Different DB Instance") {
     
     ExpectingExceptions x;
     CHECK(!CBLDatabase_SaveDocument(db2, doc, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorInvalidParameter);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
     CBLDocument_Release(doc);
     
     error = {};
@@ -659,13 +659,13 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Non Existing Document") {
     CHECK(!CBLDatabase_DeleteDocument(db, doc, &error));
     CBLDocument_Release(doc);
     
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorNotFound);
     
     error = {};
     CHECK(!CBLDatabase_DeleteDocumentByID(db, "foo"_sl, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorNotFound);
 }
 
 
@@ -776,8 +776,8 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Document with FailOnConflict") {
     
     REQUIRE(!CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc2, kCBLConcurrencyControlFailOnConflict, &error));
     CBLDocument_Release(doc2);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorConflict);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorConflict);
     
     error = {};
     doc1 = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
@@ -801,8 +801,8 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Document from Different DB") {
     
     ExpectingExceptions x;
     CHECK(!CBLDatabase_DeleteDocument(otherDB, doc, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorInvalidParameter);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
     CBLDocument_Release(doc);
 }
 
@@ -819,8 +819,8 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Document from Different DB Instance") {
     
     ExpectingExceptions x;
     CHECK(!CBLDatabase_DeleteDocument(db2, doc, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorInvalidParameter);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
     CBLDocument_Release(doc);
     
     error = {};
@@ -839,13 +839,13 @@ TEST_CASE_METHOD(DatabaseTest, "Purge Non Existing Document") {
     CBLError error;
     CHECK(!CBLDatabase_PurgeDocument(db, doc, &error));
     CBLDocument_Release(doc);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorNotFound);
     
     error = {};
     CHECK(!CBLDatabase_PurgeDocumentByID(db, "foo"_sl, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorNotFound);
 }
 
 
@@ -879,13 +879,13 @@ TEST_CASE_METHOD(DatabaseTest, "Purge Already Purged Document") {
     
     CHECK(!CBLDatabase_PurgeDocument(db, doc, &error));
     CBLDocument_Release(doc);
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorNotFound);
     
     error = {};
     CHECK(!CBLDatabase_PurgeDocumentByID(db, "doc1"_sl, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorNotFound);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorNotFound);
 }
 
 
@@ -901,8 +901,8 @@ TEST_CASE_METHOD(DatabaseTest, "Purge Document from Different DB") {
     
     ExpectingExceptions x;
     CHECK(!CBLDatabase_PurgeDocument(otherDB, doc, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorInvalidParameter);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
     CBLDocument_Release(doc);
 }
 
@@ -919,8 +919,8 @@ TEST_CASE_METHOD(DatabaseTest, "Purge Document from Different DB Instance") {
     
     ExpectingExceptions x;
     CHECK(!CBLDatabase_PurgeDocument(db2, doc, &error));
-    CHECK(error.domain == CBLDomain);
-    CHECK(error.code == CBLErrorInvalidParameter);
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
     CBLDocument_Release(doc);
     
     error = {};

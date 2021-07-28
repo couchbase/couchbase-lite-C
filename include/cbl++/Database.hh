@@ -271,7 +271,7 @@ namespace cbl {
                     // call end(). If I'm in this situation I cannot throw another exception or
                     // the C++ runtime will abort the process. Detect this and just warn instead.
                     if (std::current_exception())
-                        CBL_Log(kCBLLogDomainDatabase, CBLLogWarning,
+                        CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
                                 "Transaction::end failed, while handling an exception");
                     else
                         RefCounted::check(false, error);

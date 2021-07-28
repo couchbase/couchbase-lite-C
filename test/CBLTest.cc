@@ -168,7 +168,7 @@ bool ReadFileByLines(const string &path, const function<bool(FLSlice)> &callback
 
 // Read a file that contains a JSON document per line. Every line becomes a document.
 unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
-    CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Reading %s ...  ", path.c_str());
+    CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Reading %s ...  ", path.c_str());
     CBLError error;
     unsigned numDocs = 0;
 
@@ -183,7 +183,7 @@ unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
         ++numDocs;
         return true;
     });
-    CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Committing %u docs...", numDocs);
+    CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Committing %u docs...", numDocs);
     t.commit();
     return numDocs;
 }

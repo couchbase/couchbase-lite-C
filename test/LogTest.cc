@@ -41,7 +41,7 @@ using namespace fleece;
 #endif
 
 static const array<CBLLogLevel, 6> kLogLevels = {{
-    CBLLogDebug, CBLLogVerbose, CBLLogInfo, CBLLogWarning, CBLLogError, CBLLogNone
+    kCBLLogDebug, kCBLLogVerbose, kCBLLogInfo, kCBLLogWarning, kCBLLogError, kCBLLogNone
 }};
 
 static const array<string, 6> kLogLevelNames = {{
@@ -72,13 +72,13 @@ public:
         const CBLLogFileConfiguration* oldConfig = CBLLog_FileConfig();
         if (oldConfig != nullptr) {
             CBLLogFileConfiguration config = *oldConfig;
-            config.level = CBLLogNone;
+            config.level = kCBLLogNone;
             REQUIRE(CBLLog_SetFileConfig(config, nullptr));
         }
         
         // Reset log callback:
         CBLLog_SetCallback(nullptr);
-        CBLLog_SetCallbackLevel(CBLLogNone);
+        CBLLog_SetCallbackLevel(kCBLLogNone);
     }
     
     void prepareLogDir() {
@@ -163,11 +163,11 @@ public:
     }
     
     void writeLogs() {
-        CBL_Log(kCBLLogDomainDatabase, CBLLogDebug, "%s ...", kLogLevelNames[CBLLogDebug].c_str());
-        CBL_Log(kCBLLogDomainDatabase, CBLLogVerbose, "%s ...", kLogLevelNames[CBLLogVerbose].c_str());
-        CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "%s ...", kLogLevelNames[CBLLogInfo].c_str());
-        CBL_Log(kCBLLogDomainDatabase, CBLLogWarning, "%s ...", kLogLevelNames[CBLLogWarning].c_str());
-        CBL_Log(kCBLLogDomainDatabase, CBLLogError, "%s ...", kLogLevelNames[CBLLogError].c_str());
+        CBL_Log(kCBLLogDomainDatabase, kCBLLogDebug, "%s ...", kLogLevelNames[kCBLLogDebug].c_str());
+        CBL_Log(kCBLLogDomainDatabase, kCBLLogVerbose, "%s ...", kLogLevelNames[kCBLLogVerbose].c_str());
+        CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "%s ...", kLogLevelNames[kCBLLogInfo].c_str());
+        CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning, "%s ...", kLogLevelNames[kCBLLogWarning].c_str());
+        CBL_Log(kCBLLogDomainDatabase, kCBLLogError, "%s ...", kLogLevelNames[kCBLLogError].c_str());
     }
     
     // File Utils:
@@ -224,7 +224,7 @@ TEST_CASE_METHOD(LogTest, "File Logging : Config", "[Log][FileLog]") {
     
     CBLLogFileConfiguration config = {};
     config.directory = slice(logDir);
-    config.level = CBLLogVerbose;
+    config.level = kCBLLogVerbose;
     config.maxRotateCount = 5;
     config.maxSize = 10;
     config.usePlaintext = true;
@@ -262,7 +262,7 @@ TEST_CASE_METHOD(LogTest, "File Logging : Set Log Level", "[Log][FileLog]") {
     // Verify:
     int lineCount = 1; // Header:
     for (CBLLogLevel level : kLogLevels) {
-        if (level == CBLLogNone)
+        if (level == kCBLLogNone)
             continue;
         
         vector<string> lines = readLogFile(level);
@@ -292,7 +292,7 @@ TEST_CASE_METHOD(LogTest, "Custom Logging", "[Log][CustomLog]") {
         
         // Verify:
         for (CBLLogLevel level : kLogLevels) {
-            if (level == CBLLogNone)
+            if (level == kCBLLogNone)
                 continue;
             if (level >= callbackLevel)
                 CHECK(find(recs.begin(), recs.end(), level) != recs.end());
@@ -302,13 +302,13 @@ TEST_CASE_METHOD(LogTest, "Custom Logging", "[Log][CustomLog]") {
     }
     
     // Reset log callback:
-    CBLLog_SetCallbackLevel(CBLLogDebug);
+    CBLLog_SetCallbackLevel(kCBLLogDebug);
     CBLLog_SetCallback(nullptr);
     REQUIRE(CBLLog_Callback() == nullptr);
     recs.clear();
     writeLogs();
     CHECK(recs.empty());
-    CBLLog_SetCallbackLevel(CBLLogNone);
+    CBLLog_SetCallbackLevel(kCBLLogNone);
 }
 
 
@@ -317,13 +317,13 @@ TEST_CASE_METHOD(LogTest, "Log Message", "[Log]") {
     CBLLog_SetCallback([](CBLLogDomain domain, CBLLogLevel level, FLString msg) {
         recs.push_back(string(msg));
     });
-    CBLLog_SetCallbackLevel(CBLLogDebug);
+    CBLLog_SetCallbackLevel(kCBLLogDebug);
     
     // Use CBL_Log:
-    CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "foo %s", "bar");
+    CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "foo %s", "bar");
     
     // Use CBL_LogMessage:
-    CBL_LogMessage(kCBLLogDomainDatabase, CBLLogInfo, "hello world"_sl);
+    CBL_LogMessage(kCBLLogDomainDatabase, kCBLLogInfo, "hello world"_sl);
     
     REQUIRE(recs.size() == 2);
     CHECK(recs[0] == "foo bar");
