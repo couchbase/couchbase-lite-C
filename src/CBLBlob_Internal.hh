@@ -145,7 +145,7 @@ public:
     bool install(CBLDatabase *db) {
         {
             LOCK(_mutex);
-            CBL_Log(kCBLLogDomainDatabase, CBLLogInfo, "Saving new blob '%.*s'", FMTSLICE(digest()));
+            CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Saving new blob '%.*s'", FMTSLICE(digest()));
             C4BlobKey expectedKey = key();
             if (_content) {
                 db->blobStore()->createBlob(_content, &expectedKey);

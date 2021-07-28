@@ -66,7 +66,7 @@ namespace cbl {
         static bool checkSave(bool saveResult, CBLError &error) {
             if (saveResult)
                 return true;
-            else if (error.code == CBLErrorConflict && error.domain == CBLDomain)
+            else if (error.code == kCBLErrorConflict && error.domain == kCBLDomain)
                 return false;
             else
                 throw error;

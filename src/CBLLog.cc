@@ -40,10 +40,10 @@ static const char* const kLogLevelNames[] = {"debug", "verbose", "info", "warnin
 static const size_t kDefaultLogFileConfigMaxSize = 500 * 1024;
 static const int32_t kDefaultLogFileConfigMaxRotateCount = 1;
 
-static atomic<CBLLogLevel> sConsoleLogLevel = CBLLogWarning;
+static atomic<CBLLogLevel> sConsoleLogLevel = kCBLLogWarning;
 
 static atomic<CBLLogCallback> sCustomCallback = nullptr;
-static atomic<CBLLogLevel> sCustomLogLevel = CBLLogWarning;
+static atomic<CBLLogLevel> sCustomLogLevel = kCBLLogWarning;
 
 static CBLLogFileConfiguration sLogFileConfig;
 static alloc_slice sLogFileDir;
@@ -112,7 +112,7 @@ void CBLLog_SetCallback(CBLLogCallback callback) CBLAPI {
 
 
 static C4LogLevel effectiveC4CallbackLogLevel() {
-    CBLLogLevel customLogLevel = sCustomCallback != nullptr ? sCustomLogLevel.load() : CBLLogNone;
+    CBLLogLevel customLogLevel = sCustomCallback != nullptr ? sCustomLogLevel.load() : kCBLLogNone;
     return C4LogLevel(std::min(sConsoleLogLevel.load(), customLogLevel));
 }
 
@@ -133,7 +133,7 @@ static void c4LogCallback(C4LogDomain domain, C4LogLevel level, const char *msg,
         auto domainName = c4log_getDomainName(domain);
         auto levelName = kLogLevelNames[(int)level];
         
-        ostream& os = msgLevel < CBLLogWarning ? cout : cerr;
+        ostream& os = msgLevel < kCBLLogWarning ? cout : cerr;
         LogDecoder::writeTimestamp(LogDecoder::now(), os);
         LogDecoder::writeHeader(levelName, domainName, os);
         os << msg << '\n';
@@ -166,7 +166,7 @@ static CBLLogDomain getCBLLogDomain(C4LogDomain domain) {
 
 void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format, ...) CBLAPI {
     precondition((domain <= kCBLLogDomainNetwork));
-    precondition((level <= CBLLogNone));
+    precondition((level <= kCBLLogNone));
     char *message = nullptr;
     va_list args;
     va_start(args, format);
@@ -179,7 +179,7 @@ void CBL_Log(CBLLogDomain domain, CBLLogLevel level, const char *format, ...) CB
 
 void CBL_LogMessage(CBLLogDomain domain, CBLLogLevel level, FLString message) CBLAPI {
     precondition((domain <= kCBLLogDomainNetwork));
-    precondition((level <= CBLLogNone));
+    precondition((level <= kCBLLogNone));
     if (message.buf == nullptr)
         return;
     CBL_Log(domain, level, "%.*s", (int) message.size, (char *) message.buf);

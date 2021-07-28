@@ -36,12 +36,12 @@ typedef CBL_ENUM(uint8_t, CBLLogDomain) {
 
 /** Levels of log messages. Higher values are more important/severe. Each level includes the lower ones. */
 typedef CBL_ENUM(uint8_t, CBLLogLevel) {
-    CBLLogDebug,        ///< Extremely detailed messages, only written by debug builds of CBL.
-    CBLLogVerbose,      ///< Detailed messages about normally-unimportant stuff.
-    CBLLogInfo,         ///< Messages about ordinary behavior.
-    CBLLogWarning,      ///< Messages warning about unlikely and possibly bad stuff.
-    CBLLogError,        ///< Messages about errors
-    CBLLogNone          ///< Disables logging entirely.
+    kCBLLogDebug,        ///< Extremely detailed messages, only written by debug builds of CBL.
+    kCBLLogVerbose,      ///< Detailed messages about normally-unimportant stuff.
+    kCBLLogInfo,         ///< Messages about ordinary behavior.
+    kCBLLogWarning,      ///< Messages warning about unlikely and possibly bad stuff.
+    kCBLLogError,        ///< Messages about errors
+    kCBLLogNone          ///< Disables logging entirely.
 };
 
 
