@@ -12,11 +12,13 @@ import os
 import shutil
 import subprocess
 
+SCRIPT_DIR=os.path.dirname(os.path.realpath(__file__))
+
 json_data={}
 def read_manifest():
     global json_data
     if len(json_data) == 0:
-        with open('cross_manifest.json', 'r') as fin:
+        with open(str(Path(SCRIPT_DIR) / 'cross_manifest.json'), 'r') as fin:
             data=fin.read()
         
         json_data=json.loads(data)
