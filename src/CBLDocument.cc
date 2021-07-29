@@ -297,14 +297,15 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
     // Once we've found at least one blob, we can skip immutable collections, because
     // they can't contain new blobs.
     //
-    // If the releaseNewBlob is enabled, gather the new blobs to be released at the end
-    // of the function; This will prevent double releasing if the same blobs are used in
-    // multiple places (edge case).
+    // If the releaseNewBlob is enabled, the new blob will be released after it is installed.
+    //
+    // Note: If the same new blob is used in multiple places inside the object tree, the
+    // blob will be installed only once as it will be unregistered from global sNewBlobs
+    // HashTable.
     auto c4doc = _c4doc.useLocked();
     if (!isMutable())
         return C4Blob::dictContainsBlobs(properties());
     
-    set<CBLNewBlob*> toReleaseBlobs;
     bool foundBlobs = false;
     for (DeepIterator i(properties()); i; ++i) {
         Dict dict = i.value().asDict();
@@ -320,7 +321,7 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
                 if (newBlob) {
                     newBlob->install(db);
                     if (releaseNewBlob) {
-                        toReleaseBlobs.insert(newBlob);
+                        CBLBlob_Release(newBlob);
                     }
                 }
                 i.skipChildren();
@@ -330,10 +331,5 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
                 i.skipChildren();
         }
     }
-    
-    for (auto blob : toReleaseBlobs) {
-        CBLBlob_Release(blob);
-    }
-    
     return foundBlobs;
 }
