@@ -1,0 +1,14 @@
+{
+    "raspbian9": {
+        "toolchain": "https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Stretch/GCC%209.3.0/Raspberry%20Pi%202%2C%203/cross-gcc-9.3.0-pi_2-3.tar.gz/download",
+        "sysroot": "sysroot-raspbian-stretch.zip"
+    },
+    "raspios10_armhf": {
+        "toolchain": "https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Buster/GCC%208.3.0/Raspberry%20Pi%202%2C%203/cross-gcc-8.3.0-pi_2-3.tar.gz/download",
+        "sysroot": "sysroot-raspios-buster.zip"
+    },
+    "raspios10_arm64": {
+        "toolchain": "https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Bonus%20Raspberry%20Pi%20GCC%2064-Bit%20Toolchains/Raspberry%20Pi%20GCC%2064-Bit%20Cross-Compiler%20Toolchains/Buster/GCC%208.3.0/cross-gcc-8.3.0-pi_64.tar.gz/download",
+        "sysroot": "sysroot-raspios-buster64.zip"
+    }
+}
