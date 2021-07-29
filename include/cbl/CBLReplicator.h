@@ -105,6 +105,10 @@ typedef bool (*CBLReplicationFilter)(void* _cbl_nullable context,
     when the replicator finds a newer server-side revision of a document that also has local
     changes. The local and remote changes must be resolved before the document can be pushed
     to the server.
+    @note  Any new CBLBlob objects set to the resolved document returned by the callback must
+            not be released. They need to be retained for installation while the resolved document
+            is being saved into the database, and the replicator will be responsible for
+            releasing them after they are installed.
     @warning  This callback will be called on a background thread managed by the replicator.
                 It must pay attention to thread-safety. However, unlike a filter callback,
                 it does not need to return quickly. If it needs to prompt for user input,

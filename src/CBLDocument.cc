@@ -93,7 +93,7 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
             alloc_slice body;
             C4RevisionFlags revFlags;
             if (!opt.deleting) {
-                body = encodeBody(db, c4db, revFlags);
+                body = encodeBody(db, c4db, false, revFlags);
             } else {
                 revFlags = kRevDeleted;
             }
@@ -167,11 +167,12 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
 
 alloc_slice CBLDocument::encodeBody(CBLDatabase* db,
                                     C4Database* c4db,
+                                    bool releaseNewBlob,
                                     C4RevisionFlags &outRevFlags) const
 {
     auto c4doc = _c4doc.useLocked();
     // Save new blobs:
-    bool hasBlobs = saveBlobs(db);
+    bool hasBlobs = saveBlobs(db, releaseNewBlob);
     outRevFlags = hasBlobs ? kRevHasAttachments : 0;
 
     // Now encode the properties to Fleece:
@@ -185,7 +186,7 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase* db,
 }
 
 
-#pragma mark - CONFLICT RESOLUTION:
+#pragma mark - REPLICATOR CONFLICT RESOLUTION:
 
 
 bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cbl_nullable resolveDoc) {
@@ -210,7 +211,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cb
         // is true, the remote revision will be kept as is and the losing branch will be pruned.
         if (resolution != Resolution::useRemote) {
             if (resolveDoc) {
-                mergeBody = resolveDoc->encodeBody(_db, c4db, mergeFlags);
+                mergeBody = resolveDoc->encodeBody(_db, c4db, true, mergeFlags);
             } else {
                 mergeBody = alloc_slice(size_t(0));
                 mergeFlags = kRevDeleted;
@@ -256,6 +257,8 @@ void CBLDocument::unregisterNewBlob(CBLNewBlob* blob) {
 
 CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
     return newBlobs().useLocked<CBLNewBlob*>([dict](auto &newBlobs) -> CBLNewBlob* {
+        auto j = string(alloc_slice(FLValue_ToJSON((FLValue)dict)));
+        if (j.empty()) {}
         auto i = newBlobs.find(dict);
         if (i == newBlobs.end())
             return nullptr;
@@ -288,15 +291,21 @@ CBLBlob* CBLDocument::getBlob(FLDict dict) {
 }
 
 
-bool CBLDocument::saveBlobs(CBLDatabase *db) const {
+bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
     // Walk through the Fleece object tree, looking for new mutable blob Dicts to install,
     // and also checking if there are any blobs at all (mutable or not.)
     // Once we've found at least one blob, we can skip immutable collections, because
     // they can't contain new blobs.
+    //
+    // If the releaseNewBlob is enabled, the new blob will be released after it is installed.
+    //
+    // Note: If the same new blob is used in multiple places inside the object tree, the
+    // blob will be installed only once as it will be unregistered from global sNewBlobs
+    // HashTable.
     auto c4doc = _c4doc.useLocked();
     if (!isMutable())
         return C4Blob::dictContainsBlobs(properties());
-
+    
     bool foundBlobs = false;
     for (DeepIterator i(properties()); i; ++i) {
         Dict dict = i.value().asDict();
@@ -309,8 +318,12 @@ bool CBLDocument::saveBlobs(CBLDatabase *db) const {
             } else if (FLDict_IsBlob(dict)) {
                 foundBlobs = true;
                 CBLNewBlob *newBlob = findNewBlob(dict);
-                if (newBlob)
+                if (newBlob) {
                     newBlob->install(db);
+                    if (releaseNewBlob) {
+                        CBLBlob_Release(newBlob);
+                    }
+                }
                 i.skipChildren();
             }
         } else if (!i.value().asArray().asMutable()) {

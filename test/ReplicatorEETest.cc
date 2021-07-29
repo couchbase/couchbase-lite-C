@@ -318,6 +318,8 @@ public:
             db.deleteDocument(doc);
         } else {
             doc["expletive"] = "Shazbatt!";
+            auto blob = Blob("text/plain"_sl, "Blob!"_sl);
+            doc["signature"] = blob.properties();
             db.saveDocument(doc);
             expectedLocalRevID = doc.revisionID();
         }
@@ -329,6 +331,8 @@ public:
             otherDB.deleteDocument(doc);
         } else {
             doc["expletive"] = "Frak!";
+            auto blob = Blob("text/plain"_sl, "Pop!"_sl);
+            doc["signature"] = blob.properties();
             otherDB.saveDocument(doc);
             expectedRemoteRevID = CBLDocument_CanonicalRevisionID(doc.ref());
         }
@@ -363,6 +367,8 @@ public:
                 REQUIRE(localDoc);
                 CHECK(localDoc["greeting"].asString() == "Howdy!"_sl);
                 CHECK(localDoc["expletive"].asString() == "Shazbatt!"_sl);
+                Blob blob(localDoc["signature"].asDict());
+                CHECK(blob.loadContent() == "Blob!"_sl);
             }
         } else if (resolverMode == ResolverMode::kRemoteWins) {
             if (deleteRemote) {
@@ -371,6 +377,8 @@ public:
                 REQUIRE(localDoc);
                 CHECK(localDoc["greeting"].asString() == "Howdy!"_sl);
                 CHECK(localDoc["expletive"].asString() == "Frak!"_sl);
+                Blob blob(localDoc["signature"].asDict());
+                CHECK(blob.loadContent() == "Pop!"_sl);
             }
         } else {
             if (deleteMerged) {
@@ -379,6 +387,10 @@ public:
                 REQUIRE(localDoc);
                 CHECK(localDoc["greeting"].asString() == "¡Hola!"_sl);
                 CHECK(localDoc["expletive"] == nullptr);
+                Blob blob(localDoc["signature"].asDict());
+                CHECK(blob.loadContent() == "Bob!"_sl);
+                Blob blob2(localDoc["signature2"].asDict());
+                CHECK(blob2.loadContent() == "Bob!"_sl);
             }
         }
         
@@ -395,6 +407,8 @@ public:
                 REQUIRE(remoteDoc);
                 CHECK(remoteDoc["greeting"].asString() == "Howdy!"_sl);
                 CHECK(remoteDoc["expletive"].asString() == "Shazbatt!"_sl);
+                Blob blob(localDoc["signature"].asDict());
+                CHECK(blob.loadContent() == "Blob!"_sl);
             }
         } else if (resolverMode == ResolverMode::kRemoteWins) {
             if (deleteRemote) {
@@ -403,6 +417,8 @@ public:
                 REQUIRE(remoteDoc);
                 CHECK(remoteDoc["greeting"].asString() == "Howdy!"_sl);
                 CHECK(remoteDoc["expletive"].asString() == "Frak!"_sl);
+                Blob blob(localDoc["signature"].asDict());
+                CHECK(blob.loadContent() == "Pop!"_sl);
             }
         } else {
             if (deleteMerged) {
@@ -411,6 +427,10 @@ public:
                 REQUIRE(remoteDoc);
                 CHECK(remoteDoc["greeting"].asString() == "¡Hola!"_sl);
                 CHECK(remoteDoc["expletive"] == nullptr);
+                Blob blob(localDoc["signature"].asDict());
+                CHECK(blob.loadContent() == "Bob!"_sl);
+                Blob blob2(localDoc["signature2"].asDict());
+                CHECK(blob2.loadContent() == "Bob!"_sl);
             }
         }
     }
@@ -459,8 +479,17 @@ public:
                 default:
                     CBLDocument *merged = CBLDocument_CreateWithID(documentID);
                     MutableDict mergedProps(CBLDocument_MutableProperties(merged));
-                    mergedProps.set("greeting"_sl, "¡Hola!");
-                    // do not release `merged`, otherwise it would be freed before returning!
+                    mergedProps["greeting"] = "¡Hola!";
+                    
+                    auto blob = Blob("text/plain"_sl, "Bob!"_sl); // C++ Blob (RefCounted)
+                    mergedProps["signature"] = blob.properties();
+                    mergedProps["signature2"] = blob.properties();
+                    // Prevent blob from being released after returning, blob will be released
+                    // after the blob is installed when the merged document body is encoded
+                    // to save.
+                    CBLBlob_Retain(blob.ref());
+                    
+                    // Do not release `merged`, otherwise it would be freed before returning!
                     return merged;
             }
         }
