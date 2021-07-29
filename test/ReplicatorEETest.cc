@@ -513,9 +513,9 @@ TEST_CASE_METHOD(ReplicatorConflictTest, "Custom resolver : remote wins", "[Repl
 
 TEST_CASE_METHOD(ReplicatorConflictTest, "Custom resolver : merge", "[Replicator][Conflict]") {
     testConflict(false, false, false, ResolverMode::kMerge);
-    // testConflict(false, true, false, ResolverMode::kMerge); // Remote deletion
-    // testConflict(true, false, false, ResolverMode::kMerge); // Local deletion
-    // testConflict(false, false, true, ResolverMode::kMerge); // Merge deletion
+    testConflict(false, true, false, ResolverMode::kMerge); // Remote deletion
+    testConflict(true, false, false, ResolverMode::kMerge); // Local deletion
+    testConflict(false, false, true, ResolverMode::kMerge); // Merge deletion
 }
 
 
