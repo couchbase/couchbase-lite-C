@@ -30,6 +30,8 @@ CBL_C {
 		CBLBlobWriter_Create;
 		CBLBlobWriter_Close;
 		CBLBlobWriter_Write;
+		CBLDatabase_GetBlob;
+		CBLDatabase_SaveBlob;
 		CBLDatabaseConfiguration_Default;
 		CBL_DatabaseExists;
 		CBL_CopyDatabase;

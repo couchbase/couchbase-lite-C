@@ -33,6 +33,8 @@ _CBLBlobReader_Close
 _CBLBlobWriter_Create
 _CBLBlobWriter_Close
 _CBLBlobWriter_Write
+_CBLDatabase_GetBlob
+_CBLDatabase_SaveBlob
 _CBLDatabaseConfiguration_Default
 _CBL_DatabaseExists
 _CBL_CopyDatabase

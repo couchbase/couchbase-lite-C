@@ -48,6 +48,10 @@ public:
 
     virtual alloc_slice content() const                     {return blobStore()->getContents(_key);}
 
+    virtual void install(CBLDatabase *db) {
+        C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "Not support re-installing blob getting from database.");
+    }
+    
     inline std::unique_ptr<CBLBlobReadStream> openContentStream() const;
 
     alloc_slice toJSON() const {
@@ -77,6 +81,7 @@ public:
 
 protected:
     friend struct CBLDocument;
+    friend struct CBLDatabase;
 
     // Constructor for existing blobs -- called by CBLDocument::getBlob()
     CBLBlob(CBLDocument *doc, Dict properties, const C4BlobKey &key)
@@ -86,6 +91,28 @@ protected:
     {
         assert_precondition(_db);
         assert_precondition(properties);
+    }
+    
+    // Constructor for getting existing blobs in the database by blob's dictionary
+    CBLBlob(CBLDatabase *db, FLDict properties)
+    :_db(db)
+    ,_properties(Dict(properties))
+    {
+        if (!isBlob(properties)) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                           "The properties doesn't contain valid @type key and value.");
+        }
+        
+        auto key = C4Blob::keyFromDigestProperty(properties);
+        if (!key) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                           "The properties doesn't contain digest key.");
+        }
+        
+        if (blobStore()->getSize(*key) < 0) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Blob doesn't exist in the database.");
+        }
+        _key = *key;
     }
 
     // constructor for subclass CBLNewBlob to call.
@@ -142,7 +169,7 @@ public:
         return CBLBlob::content();
     }
 
-    bool install(CBLDatabase *db) {
+    virtual void install(CBLDatabase *db) override {
         {
             LOCK(_mutex);
             CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Saving new blob '%.*s'", FMTSLICE(digest()));
@@ -162,12 +189,11 @@ public:
                     C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
                                    "Trying to save an already-saved blob to a different db");
                 }
-                return true;
+                return;
             }
             setDatabase(db);
         }
         CBLDocument::unregisterNewBlob(this);
-        return true;
     }
 
 protected:

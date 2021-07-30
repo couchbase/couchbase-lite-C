@@ -17,6 +17,7 @@
 //
 
 #include "CBLDatabase_Internal.hh"
+#include "CBLBlob_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "CBLQuery_Internal.hh"
 #include "CBLPrivate.h"
@@ -128,4 +129,24 @@ Retained<CBLListenerToken> CBLDatabase::addDocListener(slice docID,
     auto token = new ListenerToken<CBLDocumentChangeListener>(this, docID, listener, context);
     _docListeners.add(token);
     return token;
+}
+
+
+#pragma mark - BINDING DEV SUPPORT FOR BLOB
+
+
+Retained<CBLBlob> CBLDatabase::getBlob(FLDict properties) {
+    try {
+        return new CBLBlob(this, properties);
+    } catch (...) {
+        C4Error err = C4Error::fromCurrentException();
+        if (err == C4Error{LiteCoreDomain, kC4ErrorNotFound})
+            return nullptr;
+        throw;
+    }
+}
+
+
+void CBLDatabase::saveBlob(CBLBlob* blob) {
+    blob->install(this);
 }

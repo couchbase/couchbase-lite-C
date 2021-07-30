@@ -47,6 +47,9 @@ CBLBlobWriter_Create
 CBLBlobWriter_Close
 CBLBlobWriter_Write
 
+CBLDatabase_GetBlob
+CBLDatabase_SaveBlob
+
 ### DATABASE
 
 CBLDatabaseConfiguration_Default

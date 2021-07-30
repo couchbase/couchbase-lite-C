@@ -18,6 +18,7 @@
 
 #include "CBLDatabase_Internal.hh"
 #include "CBLDocument_Internal.hh"
+#include "CBLBlob_Internal.hh"
 #include "CBLDatabase.h"
 
 using namespace std;
@@ -364,4 +365,29 @@ CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db,
                                                         void *context) noexcept
 {
     return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context).detach();
+}
+
+
+#pragma mark - BINDING DEV SUPPORT FOR BLOB:
+
+
+const CBLBlob* CBLDatabase_GetBlob(CBLDatabase* db, FLDict properties,
+                                   CBLError* _cbl_nullable outError) noexcept
+{
+    try {
+        auto blob = db->getBlob(properties).detach();
+        if (!blob && outError)
+            outError->code = 0;
+        return blob;
+    } catchAndBridge(outError)
+}
+
+
+bool CBLDatabase_SaveBlob(CBLDatabase* db, CBLBlob* blob,
+                          CBLError* _cbl_nullable outError) noexcept
+{
+    try {
+        db->saveBlob(blob);
+        return true;
+    } catchAndBridge(outError)
 }

@@ -1285,3 +1285,115 @@ TEST_CASE_METHOD(DatabaseTest, "Scheduled database notifications") {
     CBLListener_Remove(fooToken);
     CBLListener_Remove(barToken);
 }
+
+
+TEST_CASE_METHOD(DatabaseTest, "Save Blob", "[Blob]") {
+    // Create and Save blob:
+    CBLError error;
+    FLSlice blobContent = FLStr("I'm Blob.");
+    CBLBlob* blob = CBLBlob_CreateWithData("text/plain"_sl, blobContent);
+    CHECK(CBLDatabase_SaveBlob(db, blob, &error));
+    
+    // Copy blob properties and release blob:
+    FLMutableDict blobProps = FLDict_MutableCopy(CBLBlob_Properties(blob), kFLDefaultCopy);
+    CBLBlob_Release(blob);
+    
+    // Use the blob properties in a document:
+    CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
+    FLMutableDict docProps = CBLDocument_MutableProperties(doc);
+    FLSlot_SetDict(FLMutableDict_Set(docProps, FLStr("blob")), blobProps);
+    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    CBLDocument_Release(doc);
+    FLMutableDict_Release(blobProps);
+    
+    // Get blob from the saved doc and check:
+    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    CHECK(doc);
+    docProps = CBLDocument_MutableProperties(doc);
+    const CBLBlob* blob2 = FLValue_GetBlob(FLDict_Get(docProps, "blob"_sl));
+    FLSliceResult content = CBLBlob_Content(blob2, &error);
+    CHECK((slice)content == blobContent);
+    FLSliceResult_Release(content);
+    CBLDocument_Release(doc);
+}
+
+
+TEST_CASE_METHOD(DatabaseTest, "Save Blob read from database", "[Blob]") {
+    // Create blob:
+    CBLError error;
+    FLSlice blobContent = FLStr("I'm Blob.");
+    CBLBlob* blob = CBLBlob_CreateWithData("text/plain"_sl, blobContent);
+    CHECK(CBLDatabase_SaveBlob(db, blob, &error));
+    
+    // Save doc with blob:
+    CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
+    FLMutableDict docProps = CBLDocument_MutableProperties(doc);
+    FLSlot_SetDict(FLMutableDict_Set(docProps, FLStr("blob")), CBLBlob_Properties(blob));
+    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    CBLDocument_Release(doc);
+    CBLBlob_Release(blob);
+    
+    // Get blob from the saved doc:
+    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    CHECK(doc);
+    docProps = CBLDocument_MutableProperties(doc);
+    const CBLBlob* blob2 = FLValue_GetBlob(FLDict_Get(docProps, "blob"_sl));
+    FLSliceResult content = CBLBlob_Content(blob2, &error);
+    CHECK((slice)content == blobContent);
+    
+    // Try to save blob from the saved doc:
+    ExpectingExceptions x;
+    CHECK(!CBLDatabase_SaveBlob(db, const_cast<CBLBlob*>(blob2), &error));
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorUnsupported);
+    FLSliceResult_Release(content);
+    CBLDocument_Release(doc);
+}
+
+
+TEST_CASE_METHOD(DatabaseTest, "Get non-existing Blob", "[Blob]") {
+    CBLError error;
+    FLMutableDict blobProps = FLMutableDict_New();
+    FLMutableDict_SetString(blobProps, kCBLTypeProperty, kCBLBlobType);
+    FLMutableDict_SetString(blobProps, kCBLBlobDigestProperty, "sha1-VVVVVVVVVVVVVVVVVVVVVVVVVVU="_sl);
+    ExpectingExceptions x;
+    CHECK(!CBLDatabase_GetBlob(db, blobProps, &error));
+    CHECK(error.code == 0);
+    FLMutableDict_Release(blobProps);
+}
+
+
+TEST_CASE_METHOD(DatabaseTest, "Get Blob using invalid properties", "[blob]") {
+    CBLError error;
+    FLMutableDict blobProps = FLMutableDict_New();
+    FLMutableDict_SetString(blobProps, kCBLTypeProperty, kCBLBlobType);
+    ExpectingExceptions x;
+    CHECK(!CBLDatabase_GetBlob(db, blobProps, &error));
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
+    FLMutableDict_Release(blobProps);
+}
+
+
+TEST_CASE_METHOD(DatabaseTest, "Get Blob", "[Blob]") {
+    // Create and Save blob:
+    CBLError error;
+    FLSlice blobContent = FLStr("I'm Blob.");
+    CBLBlob* blob = CBLBlob_CreateWithData("text/plain"_sl, blobContent);
+    CHECK(CBLDatabase_SaveBlob(db, blob, &error));
+    
+    // Copy blob properties and release blob:
+    FLMutableDict blobProps = FLDict_MutableCopy(CBLBlob_Properties(blob), kFLDefaultCopy);
+    CBLBlob_Release(blob);
+    
+    const CBLBlob* blob2 = CBLDatabase_GetBlob(db, blobProps, &error);
+    FLSliceResult content = CBLBlob_Content(blob2, &error);
+    CHECK((slice)content == blobContent);
+    CBLBlob_Release(blob2);
+    
+    // Compact; blob should be deleted as it is not associated with any docs:
+    CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeCompact, &error));
+    ExpectingExceptions x;
+    CHECK(!CBLDatabase_GetBlob(db, blobProps, &error));
+    CHECK(error.code == 0);
+}

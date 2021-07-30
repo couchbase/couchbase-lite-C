@@ -76,8 +76,9 @@ CBL_CAPI_BEGIN
         @return  A CBLBlob instance for this blob, or NULL if the dictionary is not a blob. */
     const CBLBlob* FLDict_GetBlob(FLDict _cbl_nullable blobDict) CBLAPI;
 
-
+#ifdef __APPLE__
 #pragma mark - BLOB METADATA:
+#endif
 
     /** Returns the length in bytes of a blob's content (from its `length` property). */
     uint64_t CBLBlob_Length(const CBLBlob*) CBLAPI;
@@ -96,7 +97,9 @@ CBL_CAPI_BEGIN
     _cbl_warn_unused
     FLStringResult CBLBlob_ToJSON(const CBLBlob* blob) CBLAPI;
 
+#ifdef __APPLE__
 #pragma mark - READING:
+#endif
 
     /** Reads the blob's contents into memory and returns them.
         @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
@@ -126,8 +129,9 @@ CBL_CAPI_BEGIN
     /** Closes a CBLBlobReadStream. */
     void CBLBlobReader_Close(CBLBlobReadStream* _cbl_nullable) CBLAPI;
 
-
+#ifdef __APPLE__
 #pragma mark - CREATING:
+#endif
 
     /** Creates a new blob given its contents as a single block of data.
         @note  You are responsible for releasing the \ref CBLBlob, but not until after its document
@@ -177,7 +181,9 @@ CBL_CAPI_BEGIN
     CBLBlob* CBLBlob_CreateWithStream(FLString contentType,
                                       CBLBlobWriteStream* writer) CBLAPI;
 
+#ifdef __APPLE__
 #pragma mark - FLEECE UTILITIES:
+#endif
 
     /** Returns true if a value in a document is a blob reference.
         If so, you can call \ref FLValue_GetBlob to access it. */
@@ -200,6 +206,36 @@ CBL_CAPI_BEGIN
     void FLSlot_SetBlob(FLSlot slot,
                         CBLBlob* blob) CBLAPI;
 
+#ifdef __APPLE__
+#pragma mark - BINDING DEV SUPPORT FOR BLOB:
+#endif
+
+/** Get a \ref CBLBlob object from the database using the \ref CBLBlob properties.
+    @note  You must release the \ref CBLBlob when you're finished with it.
+    @param db   The database.
+    @param properties   The properties for getting the \ref CBLBlob object.
+    @param outError On failure, error info will be written here if specified. A nonexistent blob
+                    is not considered a failure; in that event the error code will be zero.
+    @return A \ref CBLBlob instance, or NULL if the doc doesn't exist or an error occurred. */
+    const CBLBlob* CBLDatabase_GetBlob(CBLDatabase* db, FLDict properties,
+                                       CBLError* _cbl_nullable outError) CBLAPI;
+
+    /** Save a new \ref CBLBlob object into the database without associating it with
+        any documents. The properties of the saved \ref CBLBlob object will include
+        information necessary for referencing the \ref CBLBlob object in the properties
+        of the document to be saved into the database.
+        
+        Normally you do not need to use this function unless you are in the situation
+        (e.g. developing javascript binding) that you cannot retain the \ref CBLBlob
+        object until the document containing the \ref CBLBlob object is successfully
+        saved into the database.
+        @Note The saved \ref CBLBlob objects that are not associated with any documents
+              will be removed from the database when compacting the database.
+        @param db   The database.
+        @param blob The The CBLBlob to save.
+        @param outError On failure, error info will be written here. */
+    bool CBLDatabase_SaveBlob(CBLDatabase* db, CBLBlob* blob,
+                              CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 
