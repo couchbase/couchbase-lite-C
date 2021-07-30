@@ -141,7 +141,7 @@ if __name__ == '__main__':
     print(f'VERSION={args.version}')
 
     if args.edition == "enterprise":
-        os.link(str(workspace_path / 'couchbase-lite-c-ee' / 'couchbase-lite-core-EE'), 
+        os.symlink(str(workspace_path / 'couchbase-lite-c-ee' / 'couchbase-lite-core-EE'), 
             str(workspace_path / 'couchbase-lite-c' /'vendor' / 'couchbase-lite-core-EE'))
     
     print(f"====  Cross Building Release binary using {args.toolchain}  ===")
