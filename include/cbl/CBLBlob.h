@@ -210,13 +210,13 @@ CBL_CAPI_BEGIN
 #pragma mark - BINDING DEV SUPPORT FOR BLOB:
 #endif
 
-/** Get a \ref CBLBlob object from the database using the \ref CBLBlob properties.
-    @note  You must release the \ref CBLBlob when you're finished with it.
-    @param db   The database.
-    @param properties   The properties for getting the \ref CBLBlob object.
-    @param outError On failure, error info will be written here if specified. A nonexistent blob
-                    is not considered a failure; in that event the error code will be zero.
-    @return A \ref CBLBlob instance, or NULL if the doc doesn't exist or an error occurred. */
+    /** Get a \ref CBLBlob object from the database using the \ref CBLBlob properties.
+        @note   You must release the \ref CBLBlob when you're finished with it.
+        @param db   The database.
+        @param properties   The properties for getting the \ref CBLBlob object.
+        @param outError On failure, error info will be written here if specified. A nonexistent blob
+                        is not considered a failure; in that event the error code will be zero.
+        @return A \ref CBLBlob instance, or NULL if the doc doesn't exist or an error occurred. */
     const CBLBlob* CBLDatabase_GetBlob(CBLDatabase* db, FLDict properties,
                                        CBLError* _cbl_nullable outError) CBLAPI;
 
