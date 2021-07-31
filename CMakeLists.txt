@@ -184,6 +184,8 @@ set_target_properties(cblite PROPERTIES VERSION "${CBL_LIB_VERSION}" SOVERSION "
 
 if(ANDROID)
     set(CMAKE_INSTALL_LIBDIR "lib/${CMAKE_LIBRARY_ARCHITECTURE}")
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    set(CMAKE_INSTALL_LIBDIR "lib/${CMAKE_LIBRARY_C_ARCHITECTURE}")
 else()
     set(CMAKE_INSTALL_LIBDIR "lib") # No lib64, stop!
 endif()
@@ -202,9 +204,6 @@ install(EXPORT CouchbaseLiteTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Co
 install(FILES ${C_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
 install(FILES ${PROJECT_BINARY_DIR}/generated_headers/public/cbl/CBL_Edition.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
 install(FILES ${FLEECE_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/fleece)
-
-configure_file(cblite.pc.in cblite.pc @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cblite.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 include(CMakePackageConfigHelpers)
 set(TARGETS_EXPORT_NAME "CouchbaseLiteTargets")
