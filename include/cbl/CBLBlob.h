@@ -211,6 +211,13 @@ CBL_CAPI_BEGIN
 #endif
 
     /** Get a \ref CBLBlob object from the database using the \ref CBLBlob properties.
+        
+        The \ref CBLBlob properties is a blob's metadata containing two required fields
+        which are a special marker property `"@type":"blob"`, and property `digest` whose value
+        is a hex SHA-1 digest of the blob's data. The other optional properties are `length` and
+        `content_type`. To obtain the \ref CBLBlob properties from a \ref CBLBlob,
+        call \ref CBLBlob_Properties function.
+        
         @note   You must release the \ref CBLBlob when you're finished with it.
         @param db   The database.
         @param properties   The properties for getting the \ref CBLBlob object.

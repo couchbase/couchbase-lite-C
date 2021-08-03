@@ -49,7 +49,7 @@ public:
     virtual alloc_slice content() const                     {return blobStore()->getContents(_key);}
 
     virtual void install(CBLDatabase *db) {
-        C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "Not support re-installing blob getting from database.");
+        C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "No support for re-installing blob getting from database.");
     }
     
     inline std::unique_ptr<CBLBlobReadStream> openContentStream() const;

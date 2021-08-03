@@ -1287,7 +1287,34 @@ TEST_CASE_METHOD(DatabaseTest, "Scheduled database notifications") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Blob", "[Blob]") {
+TEST_CASE_METHOD(DatabaseTest, "Save blob and set blob in document", "[Blob]") {
+    // Create and Save blob:
+    CBLError error;
+    FLSlice blobContent = FLStr("I'm Blob.");
+    CBLBlob* blob = CBLBlob_CreateWithData("text/plain"_sl, blobContent);
+    CHECK(CBLDatabase_SaveBlob(db, blob, &error));
+    
+    // Set blob in document
+    CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
+    FLMutableDict docProps = CBLDocument_MutableProperties(doc);
+    FLSlot_SetBlob(FLMutableDict_Set(docProps, FLStr("blob")), blob);
+    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    CBLDocument_Release(doc);
+    CBLBlob_Release(blob);
+    
+    // Get blob from the saved doc and check:
+    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    CHECK(doc);
+    docProps = CBLDocument_MutableProperties(doc);
+    const CBLBlob* blob2 = FLValue_GetBlob(FLDict_Get(docProps, "blob"_sl));
+    FLSliceResult content = CBLBlob_Content(blob2, &error);
+    CHECK((slice)content == blobContent);
+    FLSliceResult_Release(content);
+    CBLDocument_Release(doc);
+}
+
+
+TEST_CASE_METHOD(DatabaseTest, "Save blob and set blob properties in document", "[Blob]") {
     // Create and Save blob:
     CBLError error;
     FLSlice blobContent = FLStr("I'm Blob.");
@@ -1318,7 +1345,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Blob", "[Blob]") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Blob read from database", "[Blob]") {
+TEST_CASE_METHOD(DatabaseTest, "Save blob read from database", "[Blob]") {
     // Create blob:
     CBLError error;
     FLSlice blobContent = FLStr("I'm Blob.");
@@ -1351,7 +1378,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Blob read from database", "[Blob]") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Get non-existing Blob", "[Blob]") {
+TEST_CASE_METHOD(DatabaseTest, "Get non-existing blob", "[Blob]") {
     CBLError error;
     FLMutableDict blobProps = FLMutableDict_New();
     FLMutableDict_SetString(blobProps, kCBLTypeProperty, kCBLBlobType);
@@ -1363,7 +1390,7 @@ TEST_CASE_METHOD(DatabaseTest, "Get non-existing Blob", "[Blob]") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Get Blob using invalid properties", "[blob]") {
+TEST_CASE_METHOD(DatabaseTest, "Get blob using invalid properties", "[blob]") {
     CBLError error;
     FLMutableDict blobProps = FLMutableDict_New();
     FLMutableDict_SetString(blobProps, kCBLTypeProperty, kCBLBlobType);
@@ -1375,7 +1402,7 @@ TEST_CASE_METHOD(DatabaseTest, "Get Blob using invalid properties", "[blob]") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Get Blob", "[Blob]") {
+TEST_CASE_METHOD(DatabaseTest, "Get blob", "[Blob]") {
     // Create and Save blob:
     CBLError error;
     FLSlice blobContent = FLStr("I'm Blob.");
