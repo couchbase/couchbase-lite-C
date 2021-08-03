@@ -44,11 +44,11 @@ protected:
 
 namespace cbl_internal {
     // Converting C4Error <--> CBLError
-    static inline       C4Error* internal(      CBLError* _cbl_nullable error) {return (C4Error*)error;}
-    static inline const C4Error& internal(const CBLError &error) {return (const C4Error&)error;}
+    static inline       C4Error* _cbl_nullable internal(CBLError* _cbl_nullable error) {return (C4Error*)error;}
+    static inline const C4Error& internal(        const CBLError &error) {return (const C4Error&)error;}
 
-    static inline       CBLError* external(      C4Error* _cbl_nullable error) {return (CBLError*)error;}
-    static inline const CBLError& external(const C4Error &error) {return (const CBLError&)error;}
+    static inline       CBLError* _cbl_nullable external(C4Error* _cbl_nullable error) {return (CBLError*)error;}
+    static inline const CBLError& external(        const C4Error &error) {return (const CBLError&)error;}
 
     template <typename T>
     static inline void writeOptionalKey(fleece::Encoder &enc, const char *propName, T value) {
