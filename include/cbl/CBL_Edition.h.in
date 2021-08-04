@@ -19,3 +19,8 @@
 #ifndef COUCHBASE_ENTERPRISE
 #cmakedefine COUCHBASE_ENTERPRISE
 #endif
+
+#define CBLITE_VERSION "@CouchbaseLite_C_VERSION@"
+#define CBLITE_VERSION_NUMBER @CouchbaseLite_C_VERNUM@
+#define CBLITE_BUILD_NUMBER @CouchbaseLite_C_BUILD@
+#define CBLITE_SOURCE_ID "@CouchbaseLite_C_SOURCE_ID@"
