@@ -237,6 +237,14 @@ public:
     }
 
 
+#pragma mark - Binding Dev Support for Blob:
+    
+    
+    Retained<CBLBlob> getBlob(FLDict properties);
+    
+    void saveBlob(CBLBlob* blob);
+    
+
 #pragma mark - Internals:
 
 
