@@ -257,8 +257,6 @@ void CBLDocument::unregisterNewBlob(CBLNewBlob* blob) {
 
 CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
     return newBlobs().useLocked<CBLNewBlob*>([dict](auto &newBlobs) -> CBLNewBlob* {
-        auto j = string(alloc_slice(FLValue_ToJSON((FLValue)dict)));
-        if (j.empty()) {}
         auto i = newBlobs.find(dict);
         if (i == newBlobs.end())
             return nullptr;
