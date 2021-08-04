@@ -44,10 +44,8 @@ else()
     message("Building Community Edition")
 endif()
 
-configure_file(
-    "${PROJECT_SOURCE_DIR}/include/cbl/CBL_Edition.h.in"
-    "${PROJECT_BINARY_DIR}/generated_headers/public/cbl/CBL_Edition.h"
-)
+include(cmake/generate_edition.cmake)
+generate_edition()
 
 add_definitions("-DCMAKE")
 include(CheckIncludeFile)
