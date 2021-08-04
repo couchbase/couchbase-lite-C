@@ -1,6 +1,6 @@
 macro(generate_edition)
     if(CMAKE_SCRIPT_MODE_FILE STREQUAL CMAKE_CURRENT_LIST_FILE)
-        # Script mode, use environment
+        # Script mode, use passed values
         set(CBLITE_CE_DIR "${CMAKE_CURRENT_LIST_FILE}/../..")
         if(NOT DEFINED VERSION)
             message(
@@ -8,8 +8,8 @@ macro(generate_edition)
                 "No version information passed (use -DVERSION=X.Y.Z)"
             )
         endif()
-
         set(CouchbaseLite_C_VERSION ${VERSION})
+
         if(NOT DEFINED OUTPUT_DIR)
             message(
                 FATAL_ERROR 
@@ -35,6 +35,7 @@ macro(generate_edition)
         list(GET TMP 1 CouchbaseLite_C_VERSION_MINOR)
         list(GET TMP 2 CouchbaseLite_C_VERSION_PATCH)
     else()
+        # CMakeLists.txt mode, use already available values or environment
         set(CBLITE_CE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
         set(OUTPUT_DIR ${PROJECT_BINARY_DIR})
         if(NOT DEFINED CouchbaseLite_C_VERSION OR
