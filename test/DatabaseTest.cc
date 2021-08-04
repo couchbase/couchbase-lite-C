@@ -1287,6 +1287,61 @@ TEST_CASE_METHOD(DatabaseTest, "Scheduled database notifications") {
 }
 
 
+TEST_CASE_METHOD(DatabaseTest, "Set blob in document", "[Blob]") {
+    // Create and Save blob:
+    CBLError error;
+    FLSlice blobContent = FLStr("I'm Blob.");
+    CBLBlob* blob = CBLBlob_CreateWithData("text/plain"_sl, blobContent);
+    
+    // Set blob in document
+    CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
+    FLMutableDict docProps = CBLDocument_MutableProperties(doc);
+    FLSlot_SetBlob(FLMutableDict_Set(docProps, FLStr("blob")), blob);
+    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    CBLDocument_Release(doc);
+    CBLBlob_Release(blob);
+    
+    // Get blob from the saved doc and check:
+    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    docProps = CBLDocument_MutableProperties(doc);
+    const CBLBlob* blob2 = FLValue_GetBlob(FLDict_Get(docProps, "blob"_sl));
+    FLSliceResult content = CBLBlob_Content(blob2, &error);
+    CHECK((slice)content == blobContent);
+    FLSliceResult_Release(content);
+    CBLDocument_Release(doc);
+}
+
+
+TEST_CASE_METHOD(DatabaseTest, "Set blob in document using indirect properties", "[Blob]") {
+    // Create and Save blob:
+    CBLError error;
+    FLSlice blobContent = FLStr("I'm Blob.");
+    CBLBlob* blob = CBLBlob_CreateWithData("text/plain"_sl, blobContent);
+    FLMutableDict copiedBlobProps = FLDict_MutableCopy(CBLBlob_Properties(blob), kFLDefaultCopy);
+    CHECK(copiedBlobProps);
+    
+    // Set blob in document using indirect (copied) properties
+    CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
+    FLMutableDict docProps = CBLDocument_MutableProperties(doc);
+    FLSlot_SetDict(FLMutableDict_Set(docProps, FLStr("blob")), copiedBlobProps);
+    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    CBLDocument_Release(doc);
+    
+    // Get blob from the saved doc and check:
+    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    docProps = CBLDocument_MutableProperties(doc);
+    const CBLBlob* blob3 = FLValue_GetBlob(FLDict_Get(docProps, "blob"_sl));
+    FLSliceResult content = CBLBlob_Content(blob3, &error);
+    CHECK((slice)content == blobContent);
+    FLSliceResult_Release(content);
+    CBLDocument_Release(doc);
+    
+    // Release original blob and copied of blob properties:
+    CBLBlob_Release(blob);
+    FLMutableDict_Release(copiedBlobProps);
+}
+
+
 TEST_CASE_METHOD(DatabaseTest, "Save blob and set blob in document", "[Blob]") {
     // Create and Save blob:
     CBLError error;
@@ -1424,3 +1479,4 @@ TEST_CASE_METHOD(DatabaseTest, "Get blob", "[Blob]") {
     CHECK(!CBLDatabase_GetBlob(db, blobProps, &error));
     CHECK(error.code == 0);
 }
+

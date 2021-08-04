@@ -237,7 +237,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cb
 #pragma mark - BLOBS:
 
 
-using UnretainedValueToBlobMap = litecore::access_lock<std::unordered_map<FLDict, CBLNewBlob*>>;
+using UnretainedValueToBlobMap = litecore::access_lock<std::unordered_map<slice, CBLNewBlob*>>;
 
 static UnretainedValueToBlobMap& newBlobs() {
     static UnretainedValueToBlobMap sNewBlobs;
@@ -246,20 +246,25 @@ static UnretainedValueToBlobMap& newBlobs() {
 
 
 void CBLDocument::registerNewBlob(CBLNewBlob* blob) {
-    newBlobs().useLocked()->insert({blob->properties(), blob});
+    newBlobs().useLocked()->insert({blob->digest(), blob});
 }
 
 
 void CBLDocument::unregisterNewBlob(CBLNewBlob* blob) {
-    newBlobs().useLocked().get().erase(blob->properties());
+    newBlobs().useLocked().get().erase(blob->digest());
 }
 
 
 CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
     return newBlobs().useLocked<CBLNewBlob*>([dict](auto &newBlobs) -> CBLNewBlob* {
-        auto i = newBlobs.find(dict);
-        if (i == newBlobs.end())
+        auto digest = Dict(dict)[kCBLBlobDigestProperty].asString();
+        assert(digest);
+        auto i = newBlobs.find(digest);
+        if (i == newBlobs.end()) {
+            CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
+                    "Couldn't find a registered new blob with digest '%.*s'", FMTSLICE(digest));
             return nullptr;
+        } 
         return i->second;
     });
 }
