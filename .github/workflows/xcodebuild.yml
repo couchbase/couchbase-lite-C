@@ -34,4 +34,3 @@ jobs:
         destination: platform=macOS
         configuration: $CONFIGURATION
         action: build
-        use-xcpretty: false
