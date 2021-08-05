@@ -260,8 +260,12 @@ CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
         auto digest = Dict(dict)[kCBLBlobDigestProperty].asString();
         assert(digest);
         auto i = newBlobs.find(digest);
-        if (i == newBlobs.end())
+        if (i == newBlobs.end()) {
+            CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
+                    "New blob instance looked up with digest '%.*s' was not found; the blob might have already been installed.",
+                    FMTSLICE(digest));
             return nullptr;
+        }
         return i->second;
     });
 }
