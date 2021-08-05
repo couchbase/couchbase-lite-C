@@ -1,7 +1,7 @@
 macro(generate_edition)
     if(CMAKE_SCRIPT_MODE_FILE STREQUAL CMAKE_CURRENT_LIST_FILE)
         # Script mode, use passed values
-        set(CBLITE_CE_DIR "${CMAKE_CURRENT_LIST_FILE}/../..")
+        set(CBLITE_CE_DIR "${CMAKE_CURRENT_LIST_DIR}/..")
         if(NOT DEFINED VERSION)
             message(
                 FATAL_ERROR 

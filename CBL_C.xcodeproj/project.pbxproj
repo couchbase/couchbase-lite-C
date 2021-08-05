@@ -1130,7 +1130,6 @@
 			);
 			inputPaths = (
 				"$(SRCROOT)/Xcode/generate_edition_header.sh",
-				"$(SRCROOT)/include/cbl/CBL_Edition.h.in",
 			);
 			name = "Generate CBL_Edition.h";
 			outputFileListPaths = (
@@ -1140,7 +1139,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "source \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
+			shellScript = "source \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
 		93D0AF98262559ED00777AFC /* Generate CBL_Edition.h */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1151,7 +1150,6 @@
 			);
 			inputPaths = (
 				"$(SRCROOT)/Xcode/generate_edition_header.sh",
-				"$(SRCROOT)/include/cbl/CBL_Edition.h.in",
 			);
 			name = "Generate CBL_Edition.h";
 			outputFileListPaths = (
@@ -1161,7 +1159,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "source \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
+			shellScript = "source \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
 		93D0AFB626255E7300777AFC /* Copy CBL_Editionh */ = {
 			isa = PBXShellScriptBuildPhase;
