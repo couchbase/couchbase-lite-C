@@ -2,23 +2,17 @@
 #
 # Xcode build script to generate CBL_Edition.h
 
-# Input and Output file:
-INPUT_FILE="$1"
-OUTPUT_FILE="$2"
+OUTPUT_FILE="$1"
 
-# Generated headers directory:
-GEN_HEADERS_DIR="$SRCROOT/Xcode/generated_headers"
-mkdir -p "$GEN_HEADERS_DIR"
-
-# Generated header file:
-GEN_HEADER_FILE="$GEN_HEADERS_DIR/CBL_Edition.h"
-
-# Generate:
 if [ "$CONFIGURATION" == "Debug_EE" ] || [ "$CONFIGURATION" == "Release_EE" ]; then
-  cat "$INPUT_FILE" | sed 's/#cmakedefine/#define/g' > "$GEN_HEADER_FILE"
+    BUILD_ENTERPRISE="ON"
 else
-  cat "$INPUT_FILE" | sed 's/#cmakedefine\(.*\)/\/\* #undef\1 \*\//g' > "$GEN_HEADER_FILE"
+    BUILD_ENTERPRISE="OFF"
 fi
 
+# Run cmake to generate CBL_Edition.h:
+GEN_OUTPUT_DIR="${SRCROOT}/Xcode"
+cmake -DVERSION="${CBL_VERSION_STRING}" -DOUTPUT_DIR="${GEN_OUTPUT_DIR}" -DBLD_NUM="${CBL_BUILD_NUMBER}" -DBUILD_ENTERPRISE="${BUILD_ENTERPRISE}" -P "${SRCROOT}/cmake/generate_edition.cmake"
+
 # Copy the generated header to the derived file directory:
-cp "$GEN_HEADER_FILE" "$OUTPUT_FILE"
+cp "${GEN_OUTPUT_DIR}/generated_headers/public/cbl/CBL_Edition.h" "${OUTPUT_FILE}"
