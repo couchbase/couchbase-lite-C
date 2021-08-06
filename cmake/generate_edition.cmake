@@ -72,6 +72,7 @@ macro(generate_edition)
         endif()
         
         if(BUILD_ENTERPRISE)
+            set(COUCHBASE_ENTERPRISE TRUE) # This will be unset in script mode
             set(EE_PATH ${CBLITE_CE_DIR}/../couchbase-lite-c-ee)
             execute_process(
                 COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
