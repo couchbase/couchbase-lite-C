@@ -77,7 +77,7 @@ def check_toolchain(name: str):
     if not name in json_data:
         raise ValueError(f'Unknown target {name}')
 
-    if not json_data[name]['toolchain']:
+    if json_data[name]['toolchain']:
         # For now, assume that the toolchain is tar.gz
         print(f'Downloading {name} toolchain...')
         urllib.request.urlretrieve(json_data[name]['toolchain'], "toolchain.tar.gz", show_download_progress)
