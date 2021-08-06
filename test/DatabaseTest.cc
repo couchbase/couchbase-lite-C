@@ -1480,3 +1480,128 @@ TEST_CASE_METHOD(DatabaseTest, "Get blob", "[Blob]") {
     CHECK(error.code == 0);
 }
 
+
+#pragma mark - CLOSE AND DELETE DATABASE:
+
+
+#ifdef COUCHBASE_ENTERPRISE
+
+TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator") {
+    CBLError error;
+    otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
+    REQUIRE(otherDB);
+    
+    // Start Replicator:
+    auto endpoint = CBLEndpoint_CreateWithLocalDB(otherDB);
+    CBLReplicatorConfiguration config = {};
+    config.database = db;
+    config.endpoint = endpoint;
+    config.continuous = true;
+    auto repl = CBLReplicator_Create(&config, &error);
+    REQUIRE(repl);
+    CBLReplicator_Start(repl, false);
+    
+    // Wait util the replicator starts to run:
+    int count = 0;
+    while (CBLReplicator_Status(repl).activity == kCBLReplicatorStopped && count++ < 100) {
+        this_thread::sleep_for(100ms);
+    }
+    CHECK(CBLReplicator_Status(repl).activity != kCBLReplicatorStopped);
+    
+    // Close Database:
+    CHECK(CBLDatabase_Close(db, &error));
+    
+    // Check if the replicator is stopped:
+    CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
+    
+    CBLEndpoint_Free(endpoint);
+    CBLReplicator_Release(repl);
+}
+
+TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator") {
+    CBLError error;
+    otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
+    REQUIRE(otherDB);
+    
+    // Start Replicator:
+    auto endpoint = CBLEndpoint_CreateWithLocalDB(otherDB);
+    CBLReplicatorConfiguration config = {};
+    config.database = db;
+    config.endpoint = endpoint;
+    config.continuous = true;
+    auto repl = CBLReplicator_Create(&config, &error);
+    REQUIRE(repl);
+    CBLReplicator_Start(repl, false);
+    
+    // Wait util the replicator starts to run:
+    int count = 0;
+    while (CBLReplicator_Status(repl).activity == kCBLReplicatorStopped && count++ < 100) {
+        this_thread::sleep_for(100ms);
+    }
+    CHECK(CBLReplicator_Status(repl).activity != kCBLReplicatorStopped);
+    
+    // Delete Database:
+    CHECK(CBLDatabase_Delete(db, &error));
+    
+    // Check if the replicator is stopped:
+    CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
+    
+    CBLEndpoint_Free(endpoint);
+    CBLReplicator_Release(repl);
+}
+
+#endif
+
+
+TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Live Query") {
+    ImportJSONLines(GetTestFilePath("names_100.json"), db);
+    
+    CBLError error;
+    auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                         "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                         nullptr, &error);
+    REQUIRE(query);
+    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+        auto newResults = CBLQuery_CopyCurrentResults(query, token, nullptr);
+        CHECK(newResults);
+        CBLResultSet_Release(newResults);
+    }, this);
+    REQUIRE(listenerToken);
+    
+    // Close database:
+    CHECK(CBLDatabase_Close(db, &error));
+    
+    // Cleanup:
+    CBLQuery_Release(query);
+    CBLListener_Remove(listenerToken);
+    
+    // Sleeping to ensure async cleanup
+    this_thread::sleep_for(200ms);
+}
+
+
+TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Live Query") {
+    ImportJSONLines(GetTestFilePath("names_100.json"), db);
+    
+    CBLError error;
+    auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                         "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                         nullptr, &error);
+    REQUIRE(query);
+    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+        auto newResults = CBLQuery_CopyCurrentResults(query, token, nullptr);
+        CHECK(newResults);
+        CBLResultSet_Release(newResults);
+    }, this);
+    REQUIRE(listenerToken);
+    
+    // Delete database:
+    CHECK(CBLDatabase_Delete(db, &error));
+    
+    // Cleanup:
+    CBLQuery_Release(query);
+    CBLListener_Remove(listenerToken);
+    
+    // Sleeping to ensure async cleanup
+    this_thread::sleep_for(200ms);
+}

@@ -61,7 +61,7 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
 }
 
 
-struct CBLReplicator final : public CBLRefCounted {
+struct CBLReplicator final : public CBLRefCounted, public CBLStoppable {
 public:
     CBLReplicator(const CBLReplicatorConfiguration &conf)
     :_conf(conf)
@@ -140,7 +140,7 @@ public:
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
     void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}
     void setSuspended(bool suspended)                       {_c4repl->setSuspended(suspended);}
-    void stop()                                             {_c4repl->stop();}
+    void stop() override                                    {_c4repl->stop();}
 
 
     void start(bool reset) {
@@ -151,7 +151,12 @@ public:
             _optionsChanged = false;
         }
         _useInitialStatus = false;
-        _c4repl->start(reset);
+        
+        if (_db->registerStoppable(this))
+            _c4repl->start(reset);
+        else
+            CBL_Log(kCBLLogDomainReplicator, kCBLLogWarning,
+                    "Couldn't start the replicator as the database is closing or closed.");
     }
 
 
@@ -247,8 +252,10 @@ private:
                     this, c4error_getDescriptionC(c4status.error, buf, sizeof(buf)));
         }
 
-        if (cblStatus.activity == kCBLReplicatorStopped)
+        if (cblStatus.activity == kCBLReplicatorStopped) {
+            _db->unregisterStoppable(this);
             _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
+        }
     }
 
 

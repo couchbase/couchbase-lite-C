@@ -109,6 +109,7 @@ set(
     src/CBLDocument.cc
     src/CBLDocument_CAPI.cc
     src/CBLLog.cc
+    src/CBLQuery.cc
     src/CBLQuery_CAPI.cc
     src/CBLReplicator_CAPI.cc
     src/ConflictResolver.cc

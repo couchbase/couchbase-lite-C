@@ -29,6 +29,7 @@
 #include "access_lock.hh"
 #include "function_ref.hh"
 #include "fleece/Mutable.hh"
+#include <condition_variable>
 #include <string>
 #include <utility>
 
@@ -88,9 +89,16 @@ public:
 
     void beginTransaction()                          {_c4db.useLocked()->beginTransaction();}
     void endTransaction(bool commit)                 {_c4db.useLocked()->endTransaction(commit);}
-
-    void close()                                     {_c4db.useLocked()->close();}
-    void closeAndDelete()                            {_c4db.useLocked()->closeAndDeleteFile();}
+    
+    void close() {
+        stopActiveStoppables();
+        _c4db.useLocked()->close();
+    }
+    
+    void closeAndDelete() {
+        stopActiveStoppables();
+        _c4db.useLocked()->closeAndDeleteFile();
+    }
 
 
 #pragma mark - Accessors:
@@ -382,6 +390,46 @@ private:
     }
 
     void callDocListeners();
+    
+    void stopActiveStoppables() {
+        std::unordered_set<CBLStoppable*> stoppables;
+        {
+            std::unique_lock<std::mutex> lock(_stopMutex);
+            if (_stopping)
+                return;
+            _stopping = true;
+            stoppables = _stoppables;
+        }
+        
+        // Call stop outside lock to prevent deadlock:
+        for (auto s : stoppables) {
+            s->stop();
+        }
+        
+        {
+            std::unique_lock<std::mutex> lock(_stopMutex);
+            if (!_stoppables.empty()) {
+                CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo,
+                        "Waiting for %zu active replicators and live queries to stop ...",
+                        _stoppables.size());
+                _stopCond.wait(lock, [this] {return _stoppables.empty();});
+            }
+        }
+    }
+    
+    bool registerStoppable(CBLStoppable* stoppable) {
+        LOCK(_stopMutex);
+        if (_stopping)
+            return false;
+        _stoppables.insert(stoppable);
+        return true;
+    }
+    
+    void unregisterStoppable(CBLStoppable* stoppable) {
+        LOCK(_stopMutex);
+        _stoppables.erase(stoppable);
+        _stopCond.notify_one();
+    }
 
     template <class T> using Listeners = cbl_internal::Listeners<T>;
 
@@ -392,6 +440,12 @@ private:
     Listeners<CBLDatabaseChangeDetailListener>  _detailListeners;
     Listeners<CBLDocumentChangeListener>        _docListeners;
     NotificationQueue                           _notificationQueue;
+    
+    // For Active Stoppables:
+    bool                                        _stopping {false};
+    mutable std::mutex                          _stopMutex;
+    std::condition_variable                     _stopCond;
+    std::unordered_set<CBLStoppable*>           _stoppables;
 };
 
 CBL_ASSUME_NONNULL_END
