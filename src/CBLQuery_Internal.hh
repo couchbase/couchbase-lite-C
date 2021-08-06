@@ -192,7 +192,7 @@ namespace cbl_internal {
     // Custom subclass of CBLListenerToken for query listeners.
     // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
     template<>
-    struct ListenerToken<CBLQueryChangeListener> : public CBLListenerToken {
+    struct ListenerToken<CBLQueryChangeListener> : public CBLListenerToken, public CBLStoppable {
     public:
         ListenerToken(CBLQuery *query,
                       CBLQueryChangeListener callback,
@@ -204,12 +204,21 @@ namespace cbl_internal {
                 _c4obs = c4query->observe([this](C4QueryObserver*) { this->queryChanged(); });
             });
         }
-
-        void setEnabled(bool enabled) {
-            _query->_c4query.useLocked([&](C4Query *c4query) {
-                _c4obs->setEnabled(enabled);
-            });
+        
+        ~ListenerToken() {
+            // Note:
+            // When calling CBLListener_Remove(CBLListenerToken*), the ListenerToken object
+            // will be released. Hence its `_c4obs` will be freed, which will result in
+            // disabing and freed its LiveQuerier object.
+            //
+            // Explicity disabling here to unregister iteself (CBLStoppable) from the database
+            // so that the database can be safely closed. This would mean that the `_c4obs` will
+            // try to disabling itself again when it's free, however, that when disabing second
+            // time, the disabing logic will be mostly no ops.
+            setEnabled(false);
         }
+
+        void setEnabled(bool enabled);
 
         CBLQueryChangeListener callback() const {
             return (CBLQueryChangeListener)_callback.load();
@@ -224,7 +233,13 @@ namespace cbl_internal {
         Retained<CBLResultSet> resultSet() {
             return new CBLResultSet(_query, _c4obs->getEnumerator(false));
         }
-
+        
+        // CBLStoppable :
+        
+        void stop() override {
+            setEnabled(false);
+        }
+        
     private:
         void queryChanged();    // defn is in CBLDatabase.cc, to prevent circular hdr dependency
 

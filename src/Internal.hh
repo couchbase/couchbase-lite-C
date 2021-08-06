@@ -42,6 +42,12 @@ protected:
 };
 
 
+struct CBLStoppable {
+    virtual ~CBLStoppable() = default;
+    virtual void stop() = 0;
+};
+
+
 namespace cbl_internal {
     // Converting C4Error <--> CBLError
     static inline       C4Error* _cbl_nullable internal(CBLError* _cbl_nullable error) {return (C4Error*)error;}
