@@ -10,5 +10,9 @@
     "raspios10_arm64": {
         "toolchain": "https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Bonus%20Raspberry%20Pi%20GCC%2064-Bit%20Toolchains/Raspberry%20Pi%20GCC%2064-Bit%20Cross-Compiler%20Toolchains/Buster/GCC%208.3.0/cross-gcc-8.3.0-pi_64.tar.gz/download",
         "sysroot": "sysroot-raspios-buster64.zip"
+    },
+    "focal_armhf": {
+        "toolchain": "",
+        "sysroot": "ubuntu-focal-armhf.zip"
     }
 }

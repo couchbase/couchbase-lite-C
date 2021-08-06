@@ -71,29 +71,35 @@ def check_toolchain(name: str):
     toolchain_path = Path.home() / '.cbl_cross' / f'{name}-toolchain'
     if toolchain_path.exists() and toolchain_path.is_dir() and len(os.listdir(toolchain_path)) > 0:
         print(f'{toolchain_path} found, not downloading...')
-        return
+        return toolchain_path
 
     json_data=read_manifest()
     if not name in json_data:
         raise ValueError(f'Unknown target {name}')
 
-    # For now, assume that the toolchain is tar.gz
-    print(f'Downloading {name} toolchain...')
-    urllib.request.urlretrieve(json_data[name]['toolchain'], "toolchain.tar.gz", show_download_progress)
-    os.makedirs(toolchain_path, 0o755, True)
-    print(f'Extracting {name} toolchain to {toolchain_path}...')
-    with tarfile.open('toolchain.tar.gz', 'r:gz') as tar:
-        tar.extractall(toolchain_path, members=tar_extract_callback(tar))
+    if json_data[name]['toolchain']:
+        # For now, assume that the toolchain is tar.gz
+        print(f'Downloading {name} toolchain...')
+        urllib.request.urlretrieve(json_data[name]['toolchain'], "toolchain.tar.gz", show_download_progress)
+        os.makedirs(toolchain_path, 0o755, True)
+        print(f'Extracting {name} toolchain to {toolchain_path}...')
+        with tarfile.open('toolchain.tar.gz', 'r:gz') as tar:
+            tar.extractall(toolchain_path, members=tar_extract_callback(tar))
         
-    outer_dir = toolchain_path / os.listdir(toolchain_path)[0]
-    files_to_move = outer_dir.glob("**/*")
-    for file in files_to_move:
-        relative = file.relative_to(outer_dir)
-        os.makedirs(toolchain_path / relative.parent, 0o755, True)
-        shutil.move(str(file), toolchain_path / relative.parent)
+        outer_dir = toolchain_path / os.listdir(toolchain_path)[0]
+        files_to_move = outer_dir.glob("**/*")
+        for file in files_to_move:
+            relative = file.relative_to(outer_dir)
+            os.makedirs(toolchain_path / relative.parent, 0o755, True)
+            shutil.move(str(file), toolchain_path / relative.parent)
 
-    os.rmdir(outer_dir)
-    os.remove("toolchain.tar.gz")
+        os.rmdir(outer_dir)
+        os.remove("toolchain.tar.gz")
+        return toolchain_path
+    else:
+        print("No toolchain specified, using generic installed...")
+        return ""
+
 
 def check_sysroot(name: str):
     sysroot_path = Path.home() / '.cbl_cross' / f'{name}-sysroot'
@@ -126,7 +132,7 @@ if __name__ == '__main__':
     parser.add_argument('toolchain', type=str, help='The CMake toolchain file to use for building')
     args = parser.parse_args()
     
-    check_toolchain(args.os)
+    toolchain_path = check_toolchain(args.os)
     check_sysroot(args.os)
 
     if 'WORKSPACE' in os.environ:
@@ -147,16 +153,18 @@ if __name__ == '__main__':
     print(f"====  Cross Building Release binary using {args.toolchain}  ===")
     os.chdir(str(workspace_path / 'build_release'))
 
-    toolchain_path = Path.home() / '.cbl_cross' / f'{args.os}-toolchain' / 'bin'
     sysroot_path = Path.home() / '.cbl_cross' / f'{args.os}-sysroot'
-
     existing_path = os.environ['PATH']
-    os.environ['PATH'] = f'{str(toolchain_path)}:{existing_path}'
-    os.environ['RASPBIAN_ROOTFS'] = str(sysroot_path)
+    if toolchain_path:
+        os.environ['PATH'] = f'{str(toolchain_path)}:{existing_path}'
+
+    os.environ['ROOTFS'] = str(sysroot_path)
     cmake_args=['cmake', '..', f'-DEDITION={args.edition}', f'-DCMAKE_INSTALL_PREFIX={os.getcwd()}/install',
         '-DCMAKE_BUILD_TYPE=MinSizeRel', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}']
     if args.os == "raspbian9":
         cmake_args.append('-DCBL_STATIC_CXX=ON')
+    elif args.os == "raspios10_arm64":
+        cmake_args.append('-D64_BIT=ON')
 
     subprocess.run(cmake_args)
     subprocess.run(['make', '-j8'])
