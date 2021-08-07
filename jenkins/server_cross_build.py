@@ -156,7 +156,7 @@ if __name__ == '__main__':
     sysroot_path = Path.home() / '.cbl_cross' / f'{args.os}-sysroot'
     existing_path = os.environ['PATH']
     if toolchain_path:
-        os.environ['PATH'] = f'{str(toolchain_path)}:{existing_path}'
+        os.environ['PATH'] = f'{str(toolchain_path)}/bin:{existing_path}'
 
     os.environ['ROOTFS'] = str(sysroot_path)
     cmake_args=['cmake', '..', f'-DEDITION={args.edition}', f'-DCMAKE_INSTALL_PREFIX={os.getcwd()}/install',
@@ -166,13 +166,13 @@ if __name__ == '__main__':
     elif args.os == "raspios10_arm64":
         cmake_args.append('-D64_BIT=ON')
 
-    subprocess.run(cmake_args)
-    subprocess.run(['make', '-j8'])
+    subprocess.run(cmake_args, check=True)
+    subprocess.run(['make', '-j8'], check=True)
 
     print(f"==== Stripping binary using {args.strip_prefix}strip")
     subprocess.run([str(workspace_path / 'couchbase-lite-c' / 'jenkins' / 'strip.sh'), project_dir, 
-        str(args.strip_prefix)])
-    subprocess.run(['make', 'install'])
+        str(args.strip_prefix)], check=True)
+    subprocess.run(['make', 'install'], check=True)
 
     shutil.copy2(Path(project_dir) / 'libcblite.so.sym', './install')
     os.chdir(workspace)
