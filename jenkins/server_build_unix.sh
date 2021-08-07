@@ -14,7 +14,7 @@ mkdir -p ${WORKSPACE}/build_release
 
 case "${OSTYPE}" in
     darwin*)  OS="macosx"
-              PKG_CMD='zip -r'
+              PKG_CMD='zip -r --symlinks'
               PKG_TYPE='zip'
               PROP_FILE=${WORKSPACE}/publish.prop
               ;;
