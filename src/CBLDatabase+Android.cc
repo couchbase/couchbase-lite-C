@@ -1,7 +1,7 @@
 //
-//  CouchbaseLite.h
+// CBLDatabase+Android.cc
 //
-// Copyright (c) 2018 Couchbase, Inc All rights reserved.
+// Copyright © 2021 Couchbase. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,17 @@
 // limitations under the License.
 //
 
-#pragma once
-#include "CBLBase.h"
-#include "CBLBlob.h"
-#include "CBLDatabase.h"
-#include "CBLDocument.h"
-#include "CBLLog.h"
-#include "CBLPlatform.h"
-#include "CBLQuery.h"
-#include "CBLReplicator.h"
+#include "CBLDatabase_Internal.hh"
+#include "betterassert.hh"
+#include "FilePath.hh"
+
+std::string CBLDatabase::defaultDirectory() {
+    auto context = getInitContext();
+    if (!context) {
+        C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
+                       "The context hasn't been initialized. Call CBL_Init(CBLInitContext*) to initialize the context.");
+    }
+    
+    litecore::FilePath dir(context->filesDir, "");
+    return dir["CouchbaseLite"].path();
+}

@@ -18,6 +18,7 @@
 
 #pragma once
 #include "CBLBase.h"
+#include "CBLPlatform.h"
 #include "c4Base.hh"
 #include "fleece/slice.hh"
 #include "fleece/Fleece.hh"
@@ -67,6 +68,15 @@ namespace cbl_internal {
     void BridgeExceptionWarning(const char *fnName) noexcept;
 
     fleece::alloc_slice convertJSON5(fleece::slice json5);
+
+#ifdef __ANDROID__
+
+    void initContext(CBLInitContext* context);
+
+    const CBLInitContext* _cbl_nullable getInitContext() noexcept;
+
+#endif
+
 }
 
 using namespace cbl_internal;
