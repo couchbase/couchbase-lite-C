@@ -19,6 +19,10 @@
 #include "Internal.hh"
 #include "c4Base.hh"
 #include "fleece/Fleece.h"
+#include "betterassert.hh"
+#include "FilePath.hh"
+#include <mutex>
+
 
 using namespace fleece;
 
@@ -51,4 +55,39 @@ namespace cbl_internal {
         return json;
     }
 
+#ifdef __ANDROID__
+
+    static CBLInitContext sInitContext;
+
+    void initContext(CBLInitContext context) {
+        if (sInitContext.filesDir != nullptr) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "Context cannot be initialized more than once!");
+        }
+        precondition(context.filesDir != nullptr);
+        precondition(context.tempDir != nullptr);
+        
+        litecore::FilePath filesDir(context.filesDir, "");
+        filesDir.mustExistAsDir();
+        
+        litecore::FilePath tempDir(context.tempDir, "");
+        tempDir.mustExistAsDir();
+        
+        C4Error c4err;
+        if (!c4_setTempDir(FLStr(context.filesDir), &c4err)) {
+            C4Error::raise(c4err);
+        }
+        
+        sInitContext = context;
+        sInitContext.filesDir = strdup(context.filesDir);
+        sInitContext.tempDir = strdup(context.tempDir);
+    }
+
+    const CBLInitContext* getInitContext() noexcept {
+        if (!sInitContext.filesDir) {
+            return nullptr;
+        }
+        return &sInitContext;
+    }
+        
+#endif
 }

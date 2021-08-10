@@ -71,6 +71,12 @@ public:
     static Retained<CBLDatabase> open(slice name,
                                       const CBLDatabaseConfiguration* _cbl_nullable config =nullptr)
     {
+#ifdef __ANDROID__
+        if (!getInitContext()) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
+                           "The context hasn't been initialized. Call CBL_Init(CBLInitContext*) to initialize the context");
+        }
+#endif
         C4DatabaseConfig2 c4config = asC4Config(config);
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
         return new CBLDatabase(c4db, name, c4config.parentDirectory);

@@ -41,8 +41,9 @@ using namespace cbl_internal;
 
 
 // Default location for databases. This is platform-dependent.
-// (The implementation for Apple platforms is in CBLDatabase+Apple.mm)
-#ifndef __APPLE__
+// * Apple : CBLDatabase+Apple.mm
+// * Android : CBLDatabase+Android.cc
+#if !defined(__APPLE__) && !defined(__ANDROID__)
 std::string CBLDatabase::defaultDirectory() {
     return cbl_getcwd(nullptr, 0);
 }

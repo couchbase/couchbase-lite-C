@@ -27,7 +27,9 @@ using namespace cbl_internal;
 
 
 CBLDatabaseConfiguration CBLDatabaseConfiguration_Default() noexcept {
-    return CBLDatabase::defaultConfiguration();
+    try {
+        return CBLDatabase::defaultConfiguration();
+    } catchAndWarn();
 }
 
 

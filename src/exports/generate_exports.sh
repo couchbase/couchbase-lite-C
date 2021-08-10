@@ -8,15 +8,20 @@
 SCRIPT_DIR=`dirname $0`
 cd "$SCRIPT_DIR/generated"
 
-cat ../CBL_Exports.txt ../Fleece_Exports.txt >exports.txt
-cat ../CBL_EE_Exports.txt exports.txt        >exports_ee.txt
+cat ../CBL_Exports.txt ../Fleece_Exports.txt    >exports.txt
+cat ../CBL_EE_Exports.txt exports.txt           >exports_ee.txt
 
-../format_apple.awk   <exports.txt    >CBL.exp
-../format_linux.awk   <exports.txt    >CBL.gnu
-../format_windows.awk <exports.txt    >CBL.def
+cat ../CBL_Android_Exports.txt exports.txt      >android_exports.txt
+cat ../CBL_Android_Exports.txt exports_ee.txt   >android_exports_ee.txt
 
-../format_apple.awk   <exports_ee.txt >CBL_EE.exp
-../format_linux.awk   <exports_ee.txt >CBL_EE.gnu
-../format_windows.awk <exports_ee.txt >CBL_EE.def
+../format_apple.awk   <exports.txt              >CBL.exp
+../format_linux.awk   <exports.txt              >CBL.gnu
+../format_linux.awk   <android_exports.txt      >CBL_Android.gnu
+../format_windows.awk <exports.txt              >CBL.def
 
-rm exports.txt exports_ee.txt
+../format_apple.awk   <exports_ee.txt           >CBL_EE.exp
+../format_linux.awk   <exports_ee.txt           >CBL_EE.gnu
+../format_linux.awk   <android_exports_ee.txt   >CBL_EE_Android.gnu
+../format_windows.awk <exports_ee.txt           >CBL_EE.def
+
+rm exports.txt exports_ee.txt android_exports.txt android_exports_ee.txt

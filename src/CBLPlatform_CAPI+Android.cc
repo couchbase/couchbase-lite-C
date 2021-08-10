@@ -1,7 +1,7 @@
 //
-//  CouchbaseLite.h
+// CBLPlatform_CAPI.cc
 //
-// Copyright (c) 2018 Couchbase, Inc All rights reserved.
+// Copyright (C) 2020 Jens Alfke. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 // limitations under the License.
 //
 
-#pragma once
-#include "CBLBase.h"
-#include "CBLBlob.h"
-#include "CBLDatabase.h"
-#include "CBLDocument.h"
-#include "CBLLog.h"
 #include "CBLPlatform.h"
-#include "CBLQuery.h"
-#include "CBLReplicator.h"
+#include "Internal.hh"
+#include <mutex>
+
+bool CBL_Init(CBLInitContext context, CBLError* _cbl_nullable outError) noexcept {
+    try {
+        initContext(context);
+        return true;
+    } catchAndBridge(outError);
+}

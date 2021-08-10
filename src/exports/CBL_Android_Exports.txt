@@ -1,0 +1,7 @@
+# CBL_Android_Exports.txt
+#
+# Copyright (c) 2021 Couchbase, Inc All rights reserved.
+#
+# This is the list of symbols that CBL-C for Android Platform exports.
+
+CBL_Init
