@@ -58,11 +58,8 @@ namespace cbl_internal {
 #ifdef __ANDROID__
 
     static CBLInitContext sInitContext;
-    static std::mutex sInitMutex;
 
     void initContext(CBLInitContext context) {
-        std::lock_guard<std::mutex> lock(sInitMutex);
-        
         if (sInitContext.filesDir != nullptr) {
             C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "Context cannot be initialized more than once!");
         }
@@ -86,7 +83,6 @@ namespace cbl_internal {
     }
 
     const CBLInitContext* getInitContext() noexcept {
-        std::lock_guard<std::mutex> lock(sInitMutex);
         if (!sInitContext.filesDir) {
             return nullptr;
         }
