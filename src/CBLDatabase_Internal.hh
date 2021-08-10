@@ -400,7 +400,7 @@ private:
     void stopActiveStoppables() {
         std::unordered_set<CBLStoppable*> stoppables;
         {
-            std::unique_lock<std::mutex> lock(_stopMutex);
+            std::lock_guard<std::mutex> lock(_stopMutex);
             if (_stopping)
                 return;
             _stopping = true;
@@ -412,14 +412,12 @@ private:
             s->stop();
         }
         
-        {
-            std::unique_lock<std::mutex> lock(_stopMutex);
-            if (!_stoppables.empty()) {
-                CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo,
-                        "Waiting for %zu active replicators and live queries to stop ...",
-                        _stoppables.size());
-                _stopCond.wait(lock, [this] {return _stoppables.empty();});
-            }
+        std::unique_lock<std::mutex> lock(_stopMutex);
+        if (!_stoppables.empty()) {
+            CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo,
+                    "Waiting for %zu active replicators and live queries to stop ...",
+                    _stoppables.size());
+            _stopCond.wait(lock, [this] {return _stoppables.empty();});
         }
     }
     
