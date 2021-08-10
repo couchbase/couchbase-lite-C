@@ -243,7 +243,14 @@ private:
         LOCK(_mutex);
         _c4status = c4status;
         auto cblStatus = effectiveStatus(c4status);
-
+        
+        SyncLog(Info, "CBLReplicator status: %s, progress=%llu/%llu, flag=%d, error=%d/%d (effective status=%s, completed=%.2f%%, docs=%llu)",
+                kC4ReplicatorActivityLevelNames[c4status.level],
+                c4status.progress.unitsCompleted, c4status.progress.unitsTotal,
+                c4status.flags, c4status.error.domain, c4status.error.code,
+                kC4ReplicatorActivityLevelNames[cblStatus.activity],
+                cblStatus.progress.complete, cblStatus.progress.documentCount);
+        
         if (!_changeListeners.empty()) {
             _changeListeners.call(this, &cblStatus);
         } else if (cblStatus.error.code) {
