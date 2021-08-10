@@ -57,31 +57,40 @@ namespace cbl_internal {
 
 #ifdef __ANDROID__
 
-    static std::atomic<const CBLInitContext*> sInitContext;
+    static CBLInitContext sInitContext;
+    static std::mutex sInitMutex;
 
-    void initContext(CBLInitContext* context) {
-        if (sInitContext != nullptr) {
+    void initContext(CBLInitContext context) {
+        std::lock_guard<std::mutex> lock(sInitMutex);
+        
+        if (sInitContext.filesDir != nullptr) {
             C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported, "Context cannot be initialized more than once!");
         }
-        precondition(context->filesDir != nullptr);
-        precondition(context->tempDir != nullptr);
+        precondition(context.filesDir != nullptr);
+        precondition(context.tempDir != nullptr);
         
-        litecore::FilePath filesDir(context->filesDir, "");
+        litecore::FilePath filesDir(context.filesDir, "");
         filesDir.mustExistAsDir();
         
-        litecore::FilePath tempDir(context->tempDir, "");
+        litecore::FilePath tempDir(context.tempDir, "");
         tempDir.mustExistAsDir();
         
         C4Error c4err;
-        if (!c4_setTempDir(FLStr(context->filesDir), &c4err)) {
+        if (!c4_setTempDir(FLStr(context.filesDir), &c4err)) {
             C4Error::raise(c4err);
         }
         
         sInitContext = context;
+        sInitContext.filesDir = strdup(context.filesDir);
+        sInitContext.tempDir = strdup(context.tempDir);
     }
 
     const CBLInitContext* getInitContext() noexcept {
-        return sInitContext;
+        std::lock_guard<std::mutex> lock(sInitMutex);
+        if (!sInitContext.filesDir) {
+            return nullptr;
+        }
+        return &sInitContext;
     }
         
 #endif

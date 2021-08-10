@@ -20,7 +20,7 @@
 #include "Internal.hh"
 #include <mutex>
 
-bool CBL_Init(CBLInitContext* context, CBLError* _cbl_nullable outError) noexcept {
+bool CBL_Init(CBLInitContext context, CBLError* _cbl_nullable outError) noexcept {
     try {
         initContext(context);
         return true;

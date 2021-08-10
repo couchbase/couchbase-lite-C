@@ -24,7 +24,7 @@ std::string CBLDatabase::defaultDirectory() {
     auto context = getInitContext();
     if (!context) {
         C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
-                       "The context hasn't been initialized. Call CBL_Init(CBLInitContext*) to initialize the context.");
+                       "The default directory is not found as the context hasn't been initialized. Call \r CBL_Init to initialize the context.");
     }
     
     litecore::FilePath dir(context->filesDir, "");

@@ -87,11 +87,16 @@ slice const AndroidTest::kDatabaseName = "CBLAndroidTest";
 
 TEST_CASE_METHOD(AndroidTest, "Not init context", "[Android]") {
     ExpectingExceptions x;
-    auto config = CBLDatabaseConfiguration_Default();
-    config.directory = FLStr(dbDir.c_str());
-    
     CBLError error;
+    
+    auto config = CBLDatabaseConfiguration_Default();
+    CHECK(config.directory == nullslice);
     CBLDatabase *db = CBLDatabase_Open(kDatabaseName, &config, &error);
+    CHECK(!db);
+    CHECK(error.code == kCBLErrorUnsupported);
+    
+    config.directory = FLStr(dbDir.c_str());
+    db = CBLDatabase_Open(kDatabaseName, &config, &error);
     CHECK(!db);
     CHECK(error.code == kCBLErrorUnsupported);
 }
@@ -101,38 +106,48 @@ TEST_CASE_METHOD(AndroidTest, "Invalid context", "[Android]") {
     
     ExpectingExceptions x;
     CBLError error;
-    CHECK(!CBL_Init(&context, &error));
+    CHECK(!CBL_Init(context, &error));
     CHECK(error.code == kCBLErrorInvalidParameter);
 }
 
-TEST_CASE_METHOD(AndroidTest, "Context File Directory Not Exists", "[Android]") {
+TEST_CASE_METHOD(AndroidTest, "Context File Directory Not Exist", "[Android]") {
     CBLInitContext context = {};
     context.filesDir = "/tmp/CBL_C_tests_Not_Exists";
     context.tempDir = "/tmp/CBL_C_tests_Not_Exists";
     
     ExpectingExceptions x;
     CBLError error;
-    CHECK(!CBL_Init(&context, &error));
+    CHECK(!CBL_Init(context, &error));
     CHECK(error.code == kCBLErrorNotFound);
 }
 
-TEST_CASE_METHOD(AndroidTest, "Context Temp Directory Not Exists", "[Android]") {
+TEST_CASE_METHOD(AndroidTest, "Context Temp Directory Not Exist", "[Android]") {
     CBLInitContext context = {};
     context.filesDir = "/tmp/CBL_C_tests";
     context.tempDir = "/tmp/CBL_C_tests_Not_Exists";
     
     ExpectingExceptions x;
     CBLError error;
-    CHECK(!CBL_Init(&context, &error));
+    CHECK(!CBL_Init(context, &error));
     CHECK(error.code == kCBLErrorNotFound);
 }
 
 TEST_CASE_METHOD(AndroidTest, "Valid Context", "[Android]") {
     CBLError error;
-    CBLInitContext context = {};
-    context.filesDir = dbDir.c_str();
-    context.tempDir = tmpDir.c_str();
-    CHECK(CBL_Init(&context, &error));
+    {
+        // Create context and call init in scope to make sure that the context is copied properly
+        CBLInitContext context;
+        string filesDir = string(dbDir.c_str()); // copy
+        string tempDir = string(tmpDir.c_str()); // copy
+        context.filesDir = filesDir.c_str();
+        context.tempDir = tempDir.c_str();
+        CHECK(CBL_Init(context, &error));
+        
+        // Init twice is not allowed:
+        ExpectingExceptions x;
+        CHECK(!CBL_Init(context, &error));
+        CHECK(error.code == kCBLErrorUnsupported);
+    }
     
     auto config = CBLDatabaseConfiguration_Default();
     string defaultDir = dbDir + kPathSeparator + "CouchbaseLite";

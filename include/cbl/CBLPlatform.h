@@ -40,11 +40,12 @@ typedef struct {
 
 /** Initialize application context information for Android application. This function is required
     to be called the first time before using the CouchbaseLite library otherwise an error will be
-    returned when calling CBLDatabase_Open to open a database.
+    returned when calling CBLDatabase_Open to open a database. Call \r CBL_Init more than once will
+    return an error.
     @param context  The application context information.
     @param outError  On failure, the error will be written here.
  */
-bool CBL_Init(CBLInitContext* context, CBLError* _cbl_nullable outError) CBLAPI;
+bool CBL_Init(CBLInitContext context, CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 

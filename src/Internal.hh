@@ -71,7 +71,7 @@ namespace cbl_internal {
 
 #ifdef __ANDROID__
 
-    void initContext(CBLInitContext* context);
+    void initContext(CBLInitContext context);
 
     const CBLInitContext* _cbl_nullable getInitContext() noexcept;
 
