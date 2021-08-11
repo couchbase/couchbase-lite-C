@@ -88,7 +88,7 @@
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 		932062DB26BC6B43006917A5 /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 932062DA26BC6B43006917A5 /* CBLQuery.cc */; };
 		9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 9320630126BDB340006917A5 /* CBLPlatform.h */; };
-		9320631026BDB409006917A5 /* CBLPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 9320630126BDB340006917A5 /* CBLPlatform.h */; };
+		9320631026BDB409006917A5 /* CBLPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 9320630126BDB340006917A5 /* CBLPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93965A6326A7CD50008728EE /* LogTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93965A6226A7CD50008728EE /* LogTest.cc */; };
 		93965A6426A7CD50008728EE /* LogTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93965A6226A7CD50008728EE /* LogTest.cc */; };
 /* End PBXBuildFile section */
@@ -706,10 +706,10 @@
 				27984E2E2249A240000FE777 /* CBLQuery.h in Headers */,
 				27984E2F2249A240000FE777 /* CBLReplicator.h in Headers */,
 				27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */,
+				9320631026BDB409006917A5 /* CBLPlatform.h in Headers */,
 				27984E322249A247000FE777 /* Base.hh in Headers */,
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
 				27984E342249A247000FE777 /* Database.hh in Headers */,
-				9320631026BDB409006917A5 /* CBLPlatform.h in Headers */,
 				27984E352249A247000FE777 /* Document.hh in Headers */,
 				27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */,
 				27984E362249A247000FE777 /* Query.hh in Headers */,
