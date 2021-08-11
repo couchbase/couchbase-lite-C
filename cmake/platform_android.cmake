@@ -27,7 +27,7 @@ function(set_android_exported_symbols_file)
     if(BUILD_ENTERPRISE)
         set_target_properties(
             cblite PROPERTIES LINK_FLAGS
-            "-Wl,--version-script=${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_Android_EE.gnu")
+            "-Wl,--version-script=${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_EE_Android.gnu")
     else()
                 set_target_properties(
             cblite PROPERTIES LINK_FLAGS
