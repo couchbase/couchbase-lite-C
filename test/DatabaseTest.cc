@@ -1516,6 +1516,9 @@ TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator") {
     
     CBLEndpoint_Free(endpoint);
     CBLReplicator_Release(repl);
+    
+    // For async clean up in Replicator:
+    this_thread::sleep_for(200ms);
 }
 
 TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator") {
@@ -1548,6 +1551,9 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator") {
     
     CBLEndpoint_Free(endpoint);
     CBLReplicator_Release(repl);
+    
+    // For async clean up in Replicator:
+    this_thread::sleep_for(200ms);
 }
 
 #endif

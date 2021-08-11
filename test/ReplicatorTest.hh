@@ -158,6 +158,9 @@ public:
         }
         CBLAuth_Free(config.authenticator);
         CBLEndpoint_Free(config.endpoint);
+        
+        // For async clean up in Replicator:
+        this_thread::sleep_for(200ms);
     }
 
     static vector<string> asVector(const set<string> strings) {
