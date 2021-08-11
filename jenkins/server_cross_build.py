@@ -53,20 +53,6 @@ def tar_extract_callback(archive : tarfile.TarFile):
     pbar.finish()
     pbar = None
 
-def zip_extract_callback(archive: zipfile.ZipFile):
-    global pbar
-    count=0
-    pbar = ProgressBar(maxval=len(archive.namelist()))
-    pbar.start()
-
-    for member in archive.namelist():
-        count += 1
-        pbar.update(count)
-        yield member
-
-    pbar.finish()
-    pbar = None
-
 def check_toolchain(name: str):
     toolchain_path = Path.home() / '.cbl_cross' / f'{name}-toolchain'
     if toolchain_path.exists() and toolchain_path.is_dir() and len(os.listdir(toolchain_path)) > 0:
@@ -117,7 +103,22 @@ def check_sysroot(name: str):
     os.makedirs(sysroot_path, 0o755, True)
     print(f'Extracting {name} sysroot to {sysroot_path}...')
     with zipfile.ZipFile('sysroot.zip', 'r') as zip:
-        zip.extractall(sysroot_path, members=zip_extract_callback(zip))
+        # Python doesn't have support for zipped symlinks?!
+        SYMLINK_TYPE  = 0xA
+        zip_total = len(zip.infolist())
+        zip_done = 0
+        pbar = ProgressBar(maxval=zip_total)
+        pbar.start()
+        for zipinfo in zip.infolist():
+            if (zipinfo.external_attr >> 28) == SYMLINK_TYPE:
+                linkpath = zip.read(zipinfo.filename).decode('utf-8')
+                destpath = os.path.join(sysroot_path, zipinfo.filename)
+                os.symlink(linkpath, destpath)
+            else:
+                zip.extract(zipinfo, sysroot_path)
+            
+            zip_done += 1
+            pbar.update(zip_done)
 
     os.remove("sysroot.zip")
 
