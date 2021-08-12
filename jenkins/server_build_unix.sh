@@ -18,10 +18,16 @@ case "${OSTYPE}" in
               PKG_TYPE='zip'
               PROP_FILE=${WORKSPACE}/publish.prop
               ;;
-    linux*)   OS="linux"
-              PKG_CMD='tar czf'
+    linux*)   PKG_CMD='tar czf'
               PKG_TYPE='tar.gz'
               PROP_FILE=${WORKSPACE}/publish.prop
+              OS_NAME=`lsb_release -is`
+              OS_VERSION=`lsb_release -rs`
+              OS_ARCH=`uname -m`
+              if [ $OS_ARCH == "x86_64" ]; then
+                  OS_ARCH="x64"
+              fi
+              OS=${OS_NAME,,}${OS_VERSION}_${OS_ARCH}
               ;;
     *)        echo "unknown: $OSTYPE"
               exit 1;;
