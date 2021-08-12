@@ -22,17 +22,7 @@ case "${OSTYPE}" in
               PKG_CMD='tar czf'
               PKG_TYPE='tar.gz'
               PROP_FILE=${WORKSPACE}/publish.prop
-              OS_NAME=`lsb_release -is`
-              if [[ "$OS_NAME" != "CentOS" ]]; then
-                  echo "Error: Unsupported Linux distro $OS_NAME"
-                  exit 2
-              fi
-
-              OS_VERSION=`lsb_release -rs`
-              if [[ ! $OS_VERSION =~ ^7.* ]]; then
-                  echo "Error: Unsupported CentOS version $OS_VERSION"
-                  exit 3
-              fi;;
+              ;;
     *)        echo "unknown: $OSTYPE"
               exit 1;;
 esac
@@ -66,16 +56,6 @@ if [[ ${OS} == 'macosx' ]]; then
 else
     # package up the strip symbols
     cp -rp ${strip_dir}/libcblite.so.sym  ./install/
-
-    # copy C++ stdlib, etc to output
-    libstdcpp=`g++ --print-file-name=libstdc++.so`
-    libstdcppname=`basename "$libstdcpp"`
-    libgcc_s=`gcc --print-file-name=libgcc_s.so`
-    libgcc_sname=`basename "$libgcc_s"`
-
-    cp -p "$libstdcpp" "./install/lib/$libstdcppname"
-    ln -s "$libstdcppname" "./install/lib/${libstdcppname}.6"
-    cp -p "${libgcc_s}" "./install/lib"
 fi
 
 if [[ -z ${SKIP_TESTS} ]] && [[ ${EDITION} == 'enterprise' ]]; then
