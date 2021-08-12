@@ -99,28 +99,35 @@ def check_sysroot(name: str):
 
     print(f'Downloading {name} sysroot...')
     sysroot_name=json_data[name]['sysroot']
-    urllib.request.urlretrieve(f'http://downloads.build.couchbase.com/mobile/sysroot/{sysroot_name}', 'sysroot.zip', show_download_progress)
+    urllib.request.urlretrieve(f'http://downloads.build.couchbase.com/mobile/sysroot/{sysroot_name}', f'{sysroot_name}', show_download_progress)
     os.makedirs(sysroot_path, 0o755, True)
     print(f'Extracting {name} sysroot to {sysroot_path}...')
-    with zipfile.ZipFile('sysroot.zip', 'r') as zip:
-        # Python doesn't have support for zipped symlinks?!
-        SYMLINK_TYPE  = 0xA
-        zip_total = len(zip.infolist())
-        zip_done = 0
-        pbar = ProgressBar(maxval=zip_total)
-        pbar.start()
-        for zipinfo in zip.infolist():
-            if (zipinfo.external_attr >> 28) == SYMLINK_TYPE:
-                linkpath = zip.read(zipinfo.filename).decode('utf-8')
-                destpath = os.path.join(sysroot_path, zipinfo.filename)
-                os.symlink(linkpath, destpath)
-            else:
-                zip.extract(zipinfo, sysroot_path)
-            
-            zip_done += 1
-            pbar.update(zip_done)
+    if sysroot_name.endswith("zip"):
+        with zipfile.ZipFile('sysroot.zip', 'r') as zip:
+            # Python doesn't have support for zipped symlinks?!
+            SYMLINK_TYPE  = 0xA
+            zip_total = len(zip.infolist())
+            zip_done = 0
+            pbar = ProgressBar(maxval=zip_total)
+            pbar.start()
+            for zipinfo in zip.infolist():
+                if (zipinfo.external_attr >> 28) == SYMLINK_TYPE:
+                    linkpath = zip.read(zipinfo.filename).decode('utf-8')
+                    destpath = os.path.join(sysroot_path, zipinfo.filename)
+                    os.symlink(linkpath, destpath)
+                else:
+                    zip.extract(zipinfo, sysroot_path)
+                
+                zip_done += 1
+                pbar.update(zip_done)
+    elif sysroot_name.endswith("tar.gz"):
+        # Eventually let's make them all tarball
+        with tarfile.open(sysroot_name, 'r:gz') as tar:
+            tar.extractall(sysroot_path, members=tar_extract_callback(tar))
+    else:
+        raise NotImplementedError("Unknown file type for sysroot")
 
-    os.remove("sysroot.zip")
+    os.remove(sysroot_name)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Perform a cross compilation of Couchbase Lite C')
