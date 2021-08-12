@@ -169,7 +169,7 @@ if __name__ == '__main__':
     os.environ['ROOTFS'] = str(sysroot_path)
     cmake_args=['cmake', '..', f'-DEDITION={args.edition}', f'-DCMAKE_INSTALL_PREFIX={os.getcwd()}/install',
         '-DCMAKE_BUILD_TYPE=MinSizeRel', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}']
-    if args.os == "raspbian9":
+    if args.os == "raspbian9" or args.os == "debian9_x64":
         cmake_args.append('-DCBL_STATIC_CXX=ON')
     elif args.os == "raspios10_arm64":
         cmake_args.append('-D64_BIT=ON')
