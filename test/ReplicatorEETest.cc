@@ -161,8 +161,16 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Pending Documents", "[Replicator]") {
 
 
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Replicator][Conflict]") {
+    SECTION("No conflict resolved specified") {
+        config.conflictResolver = nullptr;
+    }
+    
+    SECTION("Specify default conflict resolver") {
+        config.conflictResolver = CBLDefaultConflictResolver;
+    }
+    
     config.replicatorType = kCBLReplicatorTypePull;
-
+    
     // Delete Doc:
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
@@ -181,6 +189,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
     otherDB.saveDocument(doc2);
     
     // Pull:
+    resetReplicator();
     replicate();
 
     // Deleted doc should win:
@@ -202,6 +211,14 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
 
 
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Replicator][Conflict]") {
+    SECTION("No conflict resolved specified") {
+        config.conflictResolver = nullptr;
+    }
+    
+    SECTION("Specify default conflict resolver") {
+        config.conflictResolver = CBLDefaultConflictResolver;
+    }
+    
     config.replicatorType = kCBLReplicatorTypePull;
 
     // Create:
@@ -220,6 +237,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
     REQUIRE(CBLDocument_Generation(doc2.ref()) > CBLDocument_Generation(doc.ref()));
 
     // Pull
+    resetReplicator();
     replicate();
 
     // Higher generation should win:
@@ -245,6 +263,14 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
 
 
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[Replicator][Conflict]") {
+    SECTION("No conflict resolved specified") {
+        config.conflictResolver = nullptr;
+    }
+    
+    SECTION("Specify default conflict resolver") {
+        config.conflictResolver = CBLDefaultConflictResolver;
+    }
+    
     config.replicatorType = kCBLReplicatorTypePull;
 
     // Create:
@@ -260,6 +286,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
     REQUIRE(doc2.revisionID().compare(doc.revisionID()) > 0);
     
     // Pull
+    resetReplicator();
     replicate();
 
     // Higher revOD should win:
@@ -283,7 +310,6 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
     CHECK(remoteDoc["greeting"].asString() == "Salaam Alaykum"_sl);
     CHECK(remoteDoc.revisionID() == doc2.revisionID());
 }
-
 
 class ReplicatorConflictTest : public ReplicatorLocalTest {
 public:
