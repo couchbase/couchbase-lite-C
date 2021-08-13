@@ -23,12 +23,18 @@ public:
     using time     = clock::time_point;
     using seconds  = std::chrono::duration<double, std::ratio<1,1>>;
     
+    enum class IdleAction {
+        kStopReplicator,    ///< Stop Replicator
+        kContinueMonitor,   ///< Continue checking status
+        kFinishMonitor      ///< Finish checking status
+    };
+
     CBLReplicatorConfiguration config = {};
     CBLReplicator *repl = nullptr;
     set<string> docsNotified;
     CBLError replError = {};
     bool logEveryDocument = true;
-    bool stopWhenIdle = true;
+    IdleAction idleAction = IdleAction::kStopReplicator;
     double timeoutSeconds = 30.0;
 
     ReplicatorTest() {
@@ -68,11 +74,12 @@ public:
         while (std::chrono::duration_cast<seconds>(clock::now() - start).count() < timeoutSeconds) {
             status = CBLReplicator_Status(repl);
             if (config.continuous && status.activity == kCBLReplicatorIdle) {
-                if (stopWhenIdle) {
+                if (idleAction == IdleAction::kStopReplicator) {
                     cerr << "Stop the continuous replicator...\n";
                     CBLReplicator_Stop(repl);
-                } else
+                } else if (idleAction == IdleAction::kFinishMonitor) {
                     break;
+                }
             } else if (status.activity == kCBLReplicatorStopped)
                 break;
             this_thread::sleep_for(100ms);
@@ -82,7 +89,7 @@ public:
              << ", documentCount=" << status.progress.documentCount
              << ", error=(" << status.error.domain << "/" << status.error.code << ")\n";
         
-        if (config.continuous && !stopWhenIdle)
+        if (config.continuous && idleAction == IdleAction::kFinishMonitor)
             CHECK(status.activity == kCBLReplicatorIdle);
         else
             CHECK(status.activity == kCBLReplicatorStopped);

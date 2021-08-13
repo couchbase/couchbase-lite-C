@@ -100,7 +100,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Continuous Push to local db", "[Replicato
 TEST_CASE_METHOD(ReplicatorLocalTest, "Set Suspended", "[Replicator]") {
     config.replicatorType = kCBLReplicatorTypePush;
     config.continuous = true;
-    stopWhenIdle = false;
+    idleAction = IdleAction::kFinishMonitor;
     
     replicate();
     
