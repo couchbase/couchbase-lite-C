@@ -29,13 +29,24 @@
 
 static const CBLDocument* defaultConflictResolver(void *context,
                                                   FLString documentID,
-                                                  const CBLDocument *localDocument,
-                                                  const CBLDocument *remoteDocument)
+                                                  const CBLDocument *localDoc,
+                                                  const CBLDocument *remoteDoc)
 {
-    return localDocument;
+    const CBLDocument* resolved;
+    if (remoteDoc == nullptr || localDoc == nullptr)
+        resolved = nullptr;
+    else if (remoteDoc->generation() > localDoc->generation())
+        resolved = remoteDoc;
+    else if (localDoc->generation() > remoteDoc->generation())
+        resolved = localDoc;
+    else if (FLSlice_Compare(localDoc->revisionID(), remoteDoc->revisionID()) > 0)
+        resolved = localDoc;
+    else
+        resolved = remoteDoc;
+    return resolved;
 }
 
-const CBLConflictResolver CBLDefaultConflictResolver = &defaultConflictResolver;
+CBL_CORE_API const CBLConflictResolver CBLDefaultConflictResolver = &defaultConflictResolver;
 
 
 namespace cbl_internal {
@@ -159,17 +170,7 @@ namespace cbl_internal {
         if (localDoc && localDoc->revisionFlags() & kRevDeleted)
             localDoc = nullptr;
         
-        const CBLDocument* resolved;
-        if (remoteDoc == nullptr || localDoc == nullptr)
-            resolved = nullptr;
-        else if (remoteDoc->generation() > localDoc->generation())
-            resolved = remoteDoc;
-        else if (localDoc->generation() > remoteDoc->generation())
-            resolved = localDoc;
-        else if (FLSlice_Compare(localDoc->revisionID(), remoteDoc->revisionID()) > 0)
-            resolved = localDoc;
-        else
-            resolved = remoteDoc;
+        auto resolved = defaultConflictResolver(_clientResolverContext, _docID, localDoc, remoteDoc);
         
         CBLDocument::Resolution resolution;
         if (resolved == remoteDoc)
