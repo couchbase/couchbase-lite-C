@@ -32,9 +32,6 @@ static const CBLDocument* defaultConflictResolver(void *context,
                                                   const CBLDocument *localDoc,
                                                   const CBLDocument *remoteDoc)
 {
-    if (remoteDoc->revisionFlags() & kRevDeleted)
-        remoteDoc = nullptr;
-    
     const CBLDocument* resolved;
     if (remoteDoc == nullptr || localDoc == nullptr)
         resolved = nullptr;
@@ -46,7 +43,6 @@ static const CBLDocument* defaultConflictResolver(void *context,
         resolved = localDoc;
     else
         resolved = remoteDoc;
-    
     return resolved;
 }
 
@@ -175,18 +171,6 @@ namespace cbl_internal {
             localDoc = nullptr;
         
         auto resolved = defaultConflictResolver(_clientResolverContext, _docID, localDoc, remoteDoc);
-        
-//        const CBLDocument* resolved;
-//        if (remoteDoc == nullptr || localDoc == nullptr)
-//            resolved = nullptr;
-//        else if (remoteDoc->generation() > localDoc->generation())
-//            resolved = remoteDoc;
-//        else if (localDoc->generation() > remoteDoc->generation())
-//            resolved = localDoc;
-//        else if (FLSlice_Compare(localDoc->revisionID(), remoteDoc->revisionID()) > 0)
-//            resolved = localDoc;
-//        else
-//            resolved = remoteDoc;
         
         CBLDocument::Resolution resolution;
         if (resolved == remoteDoc)
