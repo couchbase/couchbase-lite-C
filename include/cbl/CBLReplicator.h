@@ -129,7 +129,7 @@ typedef const CBLDocument* _cbl_nullable (*CBLConflictResolver)(void* _cbl_nulla
                                                   const CBLDocument* _cbl_nullable remoteDocument);
 
 /** Default conflict resolver. This always returns `localDocument`. */
-extern const CBLConflictResolver CBLDefaultConflictResolver;
+CBL_CORE_API extern const CBLConflictResolver CBLDefaultConflictResolver;
 
 
 /** Types of proxy servers, for CBLProxySettings. */
