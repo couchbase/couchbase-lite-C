@@ -34,7 +34,8 @@ echo  "=== Creating ${WORKSPACE}/${PACKAGE_NAME} package ==="
 echo
 
 pushd ${WORKSPACE}/couchbase-lite-c/build_apple_out/
-${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} CouchbaseLite.xcframework
+cp ${WORKSPACE}/product-texts/mobile/couchbase-lite/license/LICENSE_${EDITION}.txt LICENSE.txt
+${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} CouchbaseLite.xcframework LICENSE.txt
 RELEASE_IOS_PKG_NAME=${PACKAGE_NAME}
 popd
 
