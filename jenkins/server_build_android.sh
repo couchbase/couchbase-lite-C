@@ -87,6 +87,7 @@ echo "=== Creating ${WORKSPACE}/${PACKAGE_NAME}"
 echo
 
 cd $(pwd)/..
+cp ${WORKSPACE}/product-texts/mobile/couchbase-lite/license/LICENSE_$EDITION.txt libcblite-$VERSION/LICENSE.txt
 ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION
 
 cd ${WORKSPACE}

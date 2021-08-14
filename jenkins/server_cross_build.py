@@ -167,7 +167,7 @@ if __name__ == '__main__':
         os.environ['PATH'] = f'{str(toolchain_path)}/bin:{existing_path}'
 
     os.environ['ROOTFS'] = str(sysroot_path)
-    cmake_args=['cmake', '..', f'-DEDITION={args.edition}', f'-DCMAKE_INSTALL_PREFIX={os.getcwd()}/install',
+    cmake_args=['cmake', '..', f'-DEDITION={args.edition}', f'-DCMAKE_INSTALL_PREFIX={os.getcwd()}/libcblite-{args.version}',
         '-DCMAKE_BUILD_TYPE=MinSizeRel', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}']
     if args.os == "raspbian9" or args.os == "debian9_x64":
         cmake_args.append('-DCBL_STATIC_CXX=ON')
@@ -182,7 +182,7 @@ if __name__ == '__main__':
         str(args.strip_prefix)], check=True)
     subprocess.run(['make', 'install'], check=True)
 
-    shutil.copy2(Path(project_dir) / 'libcblite.so.sym', './install')
+    shutil.copy2(Path(project_dir) / 'libcblite.so.sym', f'./libcblite-{args.version}')
     os.chdir(workspace)
 
     package_name = f'{args.product}-{args.os}-{args.version}-{args.bld_num}-{args.edition}.tar.gz'
@@ -190,19 +190,26 @@ if __name__ == '__main__':
     print(f"=== Creating {workspace}/{package_name} package ===")
     print()
 
-    os.chdir(str(workspace_path / 'build_release' / 'install'))
-    pbar = ProgressBar(maxval=2)
+    os.chdir(str(workspace_path / 'build_release'))
+    shutil.copy2(workspace_path / 'product-texts' / 'mobile' / 'couchbase-lite' / 'license' / f'LICENSE_{args.edition}.txt',
+        f'libcblite-{args.version}/LICENSE.txt')
+
+    pbar = ProgressBar(maxval=3)
     pbar.start()
     with tarfile.open(f'{workspace}/{package_name}', 'w:gz') as tar:
-        tar.add('include', recursive=True)
+        tar.add(f'libcblite-{args.version}/include', recursive=True)
         pbar.update(1)
-        tar.add('lib', recursive=True)
+        tar.add(f'libcblite-{args.version}/lib', recursive=True)
         pbar.update(2)
+        tar.add(f'libcblite-{args.version}/LICENSE.txt')
+        pbar.update(3)
         pbar.finish()
 
     symbols_package_name = f'{args.product}-{args.os}-{args.version}-{args.bld_num}-{args.edition}-symbols.tar.gz'
     with tarfile.open(f'{workspace}/{symbols_package_name}', 'w:gz') as tar:
-        tar.add("libcblite.so.sym")
+        tar.add(f'libcblite-{args.version}/libcblite.so.sym')
+
+    
 
     os.chdir(workspace)
     with open(prop_file, 'w') as fout:

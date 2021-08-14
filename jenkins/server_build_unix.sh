@@ -77,6 +77,7 @@ echo  "=== Creating ${WORKSPACE}/${PACKAGE_NAME} package ==="
 echo
 
 cd ${WORKSPACE}/build_release/
+cp ${WORKSPACE}/product-texts/mobile/couchbase-lite/license/LICENSE_$EDITION.txt libcblite-$VERSION/LICENSE.txt
 # Create separate symbols pkg
 if [[ ${OS} == 'macosx' ]]; then
     ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/include libcblite-$VERSION/lib
