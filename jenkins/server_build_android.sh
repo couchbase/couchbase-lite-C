@@ -55,7 +55,7 @@ function build_variant {
 	    -DCMAKE_MAKE_PROGRAM=${CMAKE_PATH}/ninja \
 	    -DANDROID_NATIVE_API_LEVEL=22 \
 	    -DANDROID_ABI=$1 \
-	    -DCMAKE_INSTALL_PREFIX=$(pwd)/../build_android_out \
+	    -DCMAKE_INSTALL_PREFIX=$(pwd)/../libcblite-$VERSION \
         -DEDITION=$EDITION \
 	    ..
 
@@ -86,8 +86,8 @@ echo
 echo "=== Creating ${WORKSPACE}/${PACKAGE_NAME}"
 echo
 
-cd $(pwd)/../build_android_out
-${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} *
+cd $(pwd)/..
+${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION
 
 cd ${WORKSPACE}
 PROP_FILE="${WORKSPACE}/publish_android.prop"

@@ -14,26 +14,29 @@ function(init_vars)
     set (CMAKE_INSTALL_RPATH "\$ORIGIN" PARENT_SCOPE)
 
     set (_icu_libs)
-        foreach (_lib icuuc icui18n icudata)
-            unset (_iculib CACHE)
-            find_library(_iculib ${_lib})
-            if (NOT _iculib)
-                message(FATAL_ERROR "${_lib} not found")
-            endif()
-            list(APPEND _icu_libs ${_iculib})
-        endforeach()
-        set (ICU_LIBS ${_icu_libs} CACHE STRING "ICU libraries" FORCE)
-        message("Found ICU libs at ${ICU_LIBS}")
-
-        find_path(LIBICU_INCLUDE unicode/ucol.h
-            HINTS "${CMAKE_BINARY_DIR}/tlm/deps/icu4c.exploded"
-            PATH_SUFFIXES include)
-        if (NOT LIBICU_INCLUDE)
-            message(FATAL_ERROR "libicu header files not found")
+    foreach (_lib icuuc icui18n icudata)
+        unset (_iculib CACHE)
+        find_library(_iculib ${_lib})
+        if (NOT _iculib)
+            message(FATAL_ERROR "${_lib} not found")
         endif()
-        message("Using libicu header files in ${LIBICU_INCLUDE}")
-        include_directories("${LIBICU_INCLUDE}")
-        mark_as_advanced(ICU_LIBS LIBICU_INCLUDE)
+        list(APPEND _icu_libs ${_iculib})
+    endforeach()
+    set (ICU_LIBS ${_icu_libs} CACHE STRING "ICU libraries" FORCE)
+    message("Found ICU libs at ${ICU_LIBS}")
+
+    find_path(LIBICU_INCLUDE unicode/ucol.h
+        HINTS "${CMAKE_BINARY_DIR}/tlm/deps/icu4c.exploded"
+        PATH_SUFFIXES include)
+    if (NOT LIBICU_INCLUDE)
+        message(FATAL_ERROR "libicu header files not found")
+    endif()
+    message("Using libicu header files in ${LIBICU_INCLUDE}")
+    include_directories("${LIBICU_INCLUDE}")
+    mark_as_advanced(ICU_LIBS LIBICU_INCLUDE)
+
+    
+    set(CBL_CXX_FLAGS "-Wno-psabi" CACHE INTERNAL "")
 endfunction()
 
 function(set_dylib_properties)

@@ -27,7 +27,7 @@ function Make-Package() {
     )
 
     Push-Location $directory
-    & 7za a -tzip -mx9 $env:WORKSPACE\$filename include lib bin
+    & 7za a -tzip -mx9 $env:WORKSPACE\$filename libcblite-$VERSION\include libcblite-$VERSION\lib libcblite-$VERSION\bin
     if($LASTEXITCODE -ne 0) {
         throw "Zip failed"
     }
@@ -49,8 +49,7 @@ function Build() {
     New-Item -ItemType Directory -ErrorAction Ignore $directory
     Push-Location $directory
 
-    Write-Host $Edition
-    & "C:\Program Files\CMake\bin\cmake.exe" -G "Visual Studio 15 2017" -A x64 -DEDITION="$Edition" -DCMAKE_INSTALL_PREFIX="$pwd/out" ..
+    & "C:\Program Files\CMake\bin\cmake.exe" -G "Visual Studio 15 2017" -A x64 -DEDITION="$Edition" -DCMAKE_INSTALL_PREFIX="$pwd/libcblite-${Version}" ..
     if($LASTEXITCODE -ne 0) {
         throw "CMake failed"
     }
@@ -78,11 +77,11 @@ function Run-UnitTest() {
     Pop-Location
 }
 
-Remove-Item -Recurse -Force -ErrorAction Ignore "${env:WORKSPACE}\build_x64\out"
+Remove-Item -Recurse -Force -ErrorAction Ignore "${env:WORKSPACE}\build_x64\libcblite-${Version}"
 New-Item -Type Junction -Target ${env:WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE -Path ${env:WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
 Build "${env:WORKSPACE}\build_x64"
 if("${Edition}" -eq "enterprise") {
     Run-UnitTest "${env:WORKSPACE}\build_x64"
 }
 
-Make-Package "${env:WORKSPACE}\build_x64\out" "couchbase-lite-c-windows-x64-$Version-$BuildNum-$Edition.zip"
+Make-Package "${env:WORKSPACE}\build_x64" "couchbase-lite-c-windows-x64-$Version-$BuildNum-$Edition.zip"

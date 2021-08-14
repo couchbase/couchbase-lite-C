@@ -44,7 +44,7 @@ ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couc
 
 echo "====  Building macosx/linux Release binary  ==="
 cd ${WORKSPACE}/build_release
-cmake -DEDITION=${EDITION} -DCMAKE_INSTALL_PREFIX=`pwd`/install -DCMAKE_BUILD_TYPE=MinSizeRel ..
+cmake -DEDITION=${EDITION} -DCMAKE_INSTALL_PREFIX=`pwd`/libcblite-$VERSION -DCMAKE_BUILD_TYPE=MinSizeRel ..
 make -j8
 if [[ ${OS} != 'macosx' ]]; then
     ${WORKSPACE}/couchbase-lite-c/jenkins/strip.sh ${strip_dir}
@@ -58,10 +58,10 @@ fi
 make install
 if [[ ${OS} == 'macosx' ]]; then
     # package up the strip symbols
-    cp -rp ${strip_dir}/libcblite.dylib.dSYM  ./install/
+    cp -rp ${strip_dir}/libcblite.dylib.dSYM  ./libcblite-$VERSION/
 else
     # package up the strip symbols
-    cp -rp ${strip_dir}/libcblite.so.sym  ./install/
+    cp -rp ${strip_dir}/libcblite.so.sym  ./libcblite-$VERSION/
 fi
 
 if [[ -z ${SKIP_TESTS} ]] && [[ ${EDITION} == 'enterprise' ]]; then
@@ -76,16 +76,16 @@ echo
 echo  "=== Creating ${WORKSPACE}/${PACKAGE_NAME} package ==="
 echo
 
-cd ${WORKSPACE}/build_release/install
+cd ${WORKSPACE}/build_release/
 # Create separate symbols pkg
 if [[ ${OS} == 'macosx' ]]; then
-    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} include lib
+    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/include libcblite-$VERSION/lib
     SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}-'symbols'.${PKG_TYPE}
-    ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME}  libcblite.dylib.dSYM
+    ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME}  libcblite-$VERSION/libcblite.dylib.dSYM
 else # linux
-    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} include lib
+    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/include libcblite-$VERSION/lib
     SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}-'symbols'.${PKG_TYPE}
-    ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libcblite*.sym
+    ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libcblite-$VERSION/libcblite*.sym
 fi
 cd ${WORKSPACE}
 
