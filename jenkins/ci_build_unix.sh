@@ -47,17 +47,17 @@ echo "====  Building macosx/linux Release binary  ==="
 cd ${WORKSPACE}/build_release
 cmake -DEDITION=${EDITION} -DCMAKE_INSTALL_PREFIX=`pwd`/libcblite-$VERSION -DCMAKE_BUILD_TYPE=MinSizeRel ..
 make -j8
-if [[ ${OS} != 'macosx' ]]; then
-    ${WORKSPACE}/couchbase-lite-c/jenkins/strip.sh ${strip_dir}
-else
+if [[ "${OS}" =~ macosx* ]]; then
     pushd ${project_dir}
     dsymutil ${macosx_lib} -o libcblite.dylib.dSYM
     strip -x ${macosx_lib}
     popd
+else
+    ${WORKSPACE}/couchbase-lite-c/jenkins/strip.sh ${strip_dir}
 fi
 
 make install
-if [[ ${OS} == 'macosx' ]]; then
+if [[ "${OS}" =~ macosx* ]]; then
     # package up the strip symbols
     cp -rp ${strip_dir}/libcblite.dylib.dSYM  ./libcblite-$VERSION/
 else
