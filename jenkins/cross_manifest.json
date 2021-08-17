@@ -3,23 +3,23 @@
         "toolchain": "https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Stretch/GCC%209.3.0/Raspberry%20Pi%202%2C%203/cross-gcc-9.3.0-pi_2-3.tar.gz/download",
         "sysroot": "debian-stretch-armhf.tar.gz"
     },
-    "debian9_x64": {
+    "debian9-x86_64": {
         "toolchain": "",
         "sysroot": "debian-stretch-x64.tar.gz"
     },
-    "raspios10_armhf": {
+    "raspios10-armhf": {
         "toolchain": "https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Raspberry%20Pi%20GCC%20Cross-Compiler%20Toolchains/Buster/GCC%208.3.0/Raspberry%20Pi%202%2C%203/cross-gcc-8.3.0-pi_2-3.tar.gz/download",
         "sysroot": "debian-buster-armhf.tar.gz"
     },
-    "raspios10_arm64": {
+    "raspios10-arm64": {
         "toolchain": "https://sourceforge.net/projects/raspberry-pi-cross-compilers/files/Bonus%20Raspberry%20Pi%20GCC%2064-Bit%20Toolchains/Raspberry%20Pi%20GCC%2064-Bit%20Cross-Compiler%20Toolchains/Buster/GCC%208.3.0/cross-gcc-8.3.0-pi_64.tar.gz/download",
         "sysroot": "debian-buster-arm64.tar.gz"
     },
-    "focal_armhf": {
+    "ubuntu20.04-armhf": {
         "toolchain": "",
         "sysroot": "ubuntu-focal-armhf.tar.gz"
     },
-    "focal_x64": {
+    "ubuntu20.04-x86_64": {
         "toolchain": "",
         "sysroot": "ubuntu-focal-x64.tar.gz"
     }
