@@ -209,7 +209,7 @@ if __name__ == '__main__':
         pbar.update(3)
         pbar.finish()
 
-    symbols_package_name = f'{args.product}-{args.os}-{args.version}-{args.bld_num}-{args.edition}-symbols.tar.gz'
+    symbols_package_name = f'{args.product}-{args.edition}-{args.version}-{args.bld_num}-{args.os}-symbols.tar.gz'
     with tarfile.open(f'{workspace}/{symbols_package_name}', 'w:gz') as tar:
         tar.add(f'libcblite-{args.version}/libcblite.so.sym')
 
