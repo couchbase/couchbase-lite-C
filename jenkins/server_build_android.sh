@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# NOTE: This is for Couchbase internal CI usage.  
+# This room is full of dragons, so you *will* get confused.  
+# You have been warned.
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 ANDROID_NDK_VERSION="21.4.7075529"
@@ -81,7 +85,7 @@ mkdir -p ../build_android_arm64
 cd ../build_android_arm64
 build_variant arm64-v8a
 
-PACKAGE_NAME="couchbase-lite-c-android-${VERSION}-${BLD_NUM}-${EDITION}.${PKG_TYPE}"
+PACKAGE_NAME="couchbase-lite-c-${EDITION}-${VERSION}-${BLD_NUM}-android.${PKG_TYPE}"
 echo
 echo "=== Creating ${WORKSPACE}/${PACKAGE_NAME}"
 echo

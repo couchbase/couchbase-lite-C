@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# NOTE: This is for Couchbase internal CI usage.  
+# This room is full of dragons, so you *will* get confused.  
+# You have been warned.
+
 from genericpath import isdir
 from pathlib import Path
 from progressbar import ProgressBar
@@ -185,7 +189,7 @@ if __name__ == '__main__':
     shutil.copy2(Path(project_dir) / 'libcblite.so.sym', f'./libcblite-{args.version}')
     os.chdir(workspace)
 
-    package_name = f'{args.product}-{args.os}-{args.version}-{args.bld_num}-{args.edition}.tar.gz'
+    package_name = f'{args.product}-{args.edition}-{args.version}-{args.bld_num}-{args.os}.tar.gz'
     print()
     print(f"=== Creating {workspace}/{package_name} package ===")
     print()

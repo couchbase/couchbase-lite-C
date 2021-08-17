@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 
-# This is the script for the official Couchbase build server.  Do not try to use it, it will only confuse you.
+# NOTE: This is for Couchbase internal CI usage.  
+# This room is full of dragons, so you *will* get confused.  
 # You have been warned.
 
 # Global define (export 2 so they get used in the subscript as well)
@@ -28,7 +29,7 @@ else
     $SCRIPT_DIR/../scripts/build_apple.sh
 fi
 
-PACKAGE_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}.${PKG_TYPE}
+PACKAGE_NAME=${PRODUCT}-${EDITION}-${VERSION}-${BLD_NUM}-${OS}.${PKG_TYPE}
 echo
 echo  "=== Creating ${WORKSPACE}/${PACKAGE_NAME} package ==="
 echo

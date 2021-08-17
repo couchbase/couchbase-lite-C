@@ -1,5 +1,9 @@
 #!/bin/bash -ex
 
+# NOTE: This is for Couchbase internal CI usage.  
+# This room is full of dragons, so you *will* get confused.  
+# You have been warned.
+
 # Global define
 PRODUCT=${1}
 BLD_NUM=${2}
@@ -13,7 +17,7 @@ fi
 mkdir -p ${WORKSPACE}/build_release
 
 case "${OSTYPE}" in
-    darwin*)  OS="macosx"
+    darwin*)  OS="macosx-x86_64"
               PKG_CMD='zip -r --symlinks'
               PKG_TYPE='zip'
               PROP_FILE=${WORKSPACE}/publish.prop
@@ -24,10 +28,7 @@ case "${OSTYPE}" in
               OS_NAME=`lsb_release -is`
               OS_VERSION=`lsb_release -rs`
               OS_ARCH=`uname -m`
-              if [ $OS_ARCH == "x86_64" ]; then
-                  OS_ARCH="x64"
-              fi
-              OS=${OS_NAME,,}${OS_VERSION}_${OS_ARCH}
+              OS=${OS_NAME,,}${OS_VERSION}-${OS_ARCH}
               ;;
     *)        echo "unknown: $OSTYPE"
               exit 1;;
@@ -71,7 +72,7 @@ fi
 
 cd ${WORKSPACE}
 
-PACKAGE_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}.${PKG_TYPE}
+PACKAGE_NAME=${PRODUCT}-${EDITION}-${VERSION}-${BLD_NUM}-${OS}.${PKG_TYPE}
 echo
 echo  "=== Creating ${WORKSPACE}/${PACKAGE_NAME} package ==="
 echo
@@ -81,11 +82,11 @@ cp ${WORKSPACE}/product-texts/mobile/couchbase-lite/license/LICENSE_$EDITION.txt
 # Create separate symbols pkg
 if [[ ${OS} == 'macosx' ]]; then
     ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/LICENSE.txt libcblite-$VERSION/include libcblite-$VERSION/lib
-    SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}-'symbols'.${PKG_TYPE}
+    SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${EDITION}-${VERSION}-${BLD_NUM}-${OS}-'symbols'.${PKG_TYPE}
     ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME}  libcblite-$VERSION/libcblite.dylib.dSYM
 else # linux
     ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/LICENSE.txt libcblite-$VERSION/include libcblite-$VERSION/lib
-    SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${OS}-${VERSION}-${BLD_NUM}-${EDITION}-'symbols'.${PKG_TYPE}
+    SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${EDITION}-${VERSION}-${BLD_NUM}-${OS}-'symbols'.${PKG_TYPE}
     ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libcblite-$VERSION/libcblite*.sym
 fi
 cd ${WORKSPACE}

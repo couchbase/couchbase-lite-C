@@ -18,6 +18,10 @@ param(
     [Parameter(Mandatory=$true, HelpMessage="The edition to build (community vs enterprise)")][string]$Edition
 )
 
+# NOTE: This is for Couchbase internal CI usage.  
+# This room is full of dragons, so you *will* get confused.  
+# You have been warned.
+
 $RelPkgDir = "MinSizeRel"
 
 function Make-Package() {
@@ -85,4 +89,4 @@ if("${Edition}" -eq "enterprise") {
     Run-UnitTest "${env:WORKSPACE}\build_x64"
 }
 
-Make-Package "${env:WORKSPACE}\build_x64" "couchbase-lite-c-windows-x64-$Version-$BuildNum-$Edition.zip"
+Make-Package "${env:WORKSPACE}\build_x64" "couchbase-lite-c-windows-$Edition-$Version-$BuildNum-x86_64.zip"
