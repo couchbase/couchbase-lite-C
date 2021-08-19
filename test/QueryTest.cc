@@ -219,7 +219,7 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
     CHECK(Array(indexNames).toJSONString() == R"(["index1","index2"])");
     
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
-                                    "SELECT product.name FROM _ WHERE match('index1', 'avocado')"_sl,
+                                    "SELECT product.name FROM _ WHERE match(index1, 'avocado')"_sl,
                                     &errPos, &error);
     
     alloc_slice explanation1(CBLQuery_Explain(query));
@@ -227,7 +227,7 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
     CBLQuery_Release(query);
     
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
-                                    "SELECT product.name FROM _ WHERE match('index2', 'chilli')"_sl,
+                                    "SELECT product.name FROM _ WHERE match(index2, 'chilli')"_sl,
                                     &errPos, &error);
     
     alloc_slice explanation2(CBLQuery_Explain(query));
