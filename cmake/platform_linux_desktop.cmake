@@ -36,7 +36,7 @@ function(init_vars)
     mark_as_advanced(ICU_LIBS LIBICU_INCLUDE)
 
     
-    set(CBL_CXX_FLAGS "-Wno-psabi" CACHE INTERNAL "")
+    set(CBL_CXX_FLAGS "${CBL_CXX_FLAGS} -Wno-psabi" CACHE INTERNAL "")
 endfunction()
 
 function(set_dylib_properties)
