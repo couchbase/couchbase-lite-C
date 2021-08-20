@@ -26,6 +26,7 @@ include_directories(
 )
 
 set(TEST_SRC
+    BlobTest.cc
     BlobTest_Cpp.cc
     CBLTest.c
     CBLTest.cc
