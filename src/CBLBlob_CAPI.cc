@@ -33,8 +33,8 @@ FLDict CBLBlob_Properties(const CBLBlob* blob) noexcept {
     return blob->properties();
 }
 
-FLStringResult CBLBlob_ToJSON(const CBLBlob* blob) noexcept {
-    return FLStringResult(blob->toJSON());
+FLStringResult CBLBlob_CreateJSON(const CBLBlob* blob) noexcept {
+    return FLStringResult(blob->createJSON());
 }
 
 FLString CBLBlob_ContentType(const CBLBlob* blob) noexcept {

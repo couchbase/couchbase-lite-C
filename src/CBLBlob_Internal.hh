@@ -54,7 +54,7 @@ public:
     
     inline std::unique_ptr<CBLBlobReadStream> openContentStream() const;
 
-    alloc_slice toJSON() const {
+    alloc_slice createJSON() const {
         if (!_properties)
             return fleece::nullslice;
         fleece::JSONEncoder enc;

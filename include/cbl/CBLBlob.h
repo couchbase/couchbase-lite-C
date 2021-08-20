@@ -95,7 +95,7 @@ CBL_CAPI_BEGIN
 
     /** Returns a blob's metadata as JSON. */
     _cbl_warn_unused
-    FLStringResult CBLBlob_ToJSON(const CBLBlob* blob) CBLAPI;
+    FLStringResult CBLBlob_CreateJSON(const CBLBlob* blob) CBLAPI;
 
 #ifdef __APPLE__
 #pragma mark - READING:
