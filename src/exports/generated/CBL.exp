@@ -20,6 +20,7 @@ _FLSlot_SetBlob
 _CBLBlob_ContentType
 _CBLBlob_Length
 _CBLBlob_Digest
+_CBLBlob_Equals
 _CBLBlob_Properties
 _CBLBlob_Content
 _CBLBlob_OpenContentStream
