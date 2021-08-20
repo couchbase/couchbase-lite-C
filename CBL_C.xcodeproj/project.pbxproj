@@ -91,6 +91,8 @@
 		9320631026BDB409006917A5 /* CBLPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 9320630126BDB340006917A5 /* CBLPlatform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93965A6326A7CD50008728EE /* LogTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93965A6226A7CD50008728EE /* LogTest.cc */; };
 		93965A6426A7CD50008728EE /* LogTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93965A6226A7CD50008728EE /* LogTest.cc */; };
+		93C70D3426D01B5A0093E927 /* BlobTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93C70D3326D01B5A0093E927 /* BlobTest.cc */; };
+		93C70D3526D01B5A0093E927 /* BlobTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93C70D3326D01B5A0093E927 /* BlobTest.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -382,6 +384,7 @@
 		9320631126BDB5CA006917A5 /* CBLPlatform_CAPI+Android.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "CBLPlatform_CAPI+Android.cc"; sourceTree = "<group>"; };
 		9320631426BDD059006917A5 /* CBLDatabase+Android.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "CBLDatabase+Android.cc"; sourceTree = "<group>"; };
 		93965A6226A7CD50008728EE /* LogTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogTest.cc; sourceTree = "<group>"; };
+		93C70D3326D01B5A0093E927 /* BlobTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlobTest.cc; sourceTree = "<group>"; };
 		93D0AFF1262619B800777AFC /* generate_edition_header.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_edition_header.sh; sourceTree = "<group>"; };
 		93E490C326BDE10F0091B587 /* DatabaseTest_Android.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DatabaseTest_Android.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -592,6 +595,7 @@
 				27A63F252633408000634F7B /* CBLTest_Cpp.hh */,
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
 				275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */,
+				93C70D3326D01B5A0093E927 /* BlobTest.cc */,
 				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				93E490C326BDE10F0091B587 /* DatabaseTest_Android.cc */,
@@ -1228,6 +1232,7 @@
 				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
 				275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */,
 				2736A635242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,
+				93C70D3526D01B5A0093E927 /* BlobTest.cc in Sources */,
 				275B358923481D0C00FE9CF0 /* CBLTest.cc in Sources */,
 				275B358A23481D0C00FE9CF0 /* DatabaseTest.cc in Sources */,
 				275B358B23481D0C00FE9CF0 /* DatabaseTest_Cpp.cc in Sources */,
@@ -1261,6 +1266,7 @@
 				275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */,
 				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
+				93C70D3426D01B5A0093E927 /* BlobTest.cc in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,

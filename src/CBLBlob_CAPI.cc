@@ -75,6 +75,10 @@ void CBLBlobReader_Close(CBLBlobReadStream* stream) noexcept {
     delete stream;
 }
 
+bool CBLBlob_Equals(CBLBlob* blob, CBLBlob* anotherBlob) noexcept {
+    return FLSlice_Equal(blob->digest(), anotherBlob->digest());
+}
+
 
 #pragma mark - CREATING BLOBS:
 

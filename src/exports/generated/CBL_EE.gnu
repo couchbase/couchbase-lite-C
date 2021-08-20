@@ -23,6 +23,7 @@ CBL_C {
 		CBLBlob_ContentType;
 		CBLBlob_Length;
 		CBLBlob_Digest;
+		CBLBlob_Equals;
 		CBLBlob_Properties;
 		CBLBlob_Content;
 		CBLBlob_OpenContentStream;

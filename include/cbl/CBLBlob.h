@@ -129,6 +129,9 @@ CBL_CAPI_BEGIN
     /** Closes a CBLBlobReadStream. */
     void CBLBlobReader_Close(CBLBlobReadStream* _cbl_nullable) CBLAPI;
 
+    /** Compares whether the two given blobs are equal based on their content. */
+    bool CBLBlob_Equals(CBLBlob* blob, CBLBlob* anotherBlob) CBLAPI;
+
 #ifdef __APPLE__
 #pragma mark - CREATING:
 #endif
