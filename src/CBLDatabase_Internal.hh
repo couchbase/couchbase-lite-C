@@ -20,7 +20,6 @@
 #include "CBLDatabase.h"
 #include "CBLDocument_Internal.hh"
 #include "CBLPrivate.h"
-#include "CBLQuery_Internal.hh"
 #include "c4Collection.hh"
 #include "c4Database.hh"
 #include "c4Observer.hh"
@@ -150,7 +149,7 @@ public:
         C4Database::Transaction t(c4db);
         Retained<C4Document> c4doc = c4db->getDocument(docID, false, kDocGetCurrentRev);
         if (c4doc)
-            c4doc = c4doc->update(nullslice, kRevDeleted);
+            c4doc = c4doc->update(fleece::nullslice, kRevDeleted);
         if (!c4doc)
             return false;
         t.commit();
@@ -176,18 +175,7 @@ public:
 
     Retained<CBLQuery> createQuery(CBLQueryLanguage language,
                                    slice queryString,
-                                   int* _cbl_nullable outErrPos) const
-    {
-        alloc_slice json;
-        if (language == kCBLJSONLanguage) {
-            json = convertJSON5(queryString); // allow JSON5 as a convenience
-            queryString = json;
-        }
-        auto c4query = _c4db.useLocked()->newQuery((C4QueryLanguage)language, queryString, outErrPos);
-        if (!c4query)
-            return nullptr;
-        return new CBLQuery(this, std::move(c4query), _c4db);
-    }
+                                   int* _cbl_nullable outErrPos) const;
     
     void createValueIndex(slice name, CBLValueIndexConfiguration config) {
         C4IndexOptions options = {};
@@ -349,7 +337,7 @@ private:
         if (inDirectory) {
             return inDirectory;
         } else {
-            static const string kDir = defaultDirectory();
+            static const std::string kDir = defaultDirectory();
             return slice(kDir);
         }
     }
@@ -371,7 +359,7 @@ private:
     }
 
     void databaseChanged() {
-        notify(bind(&CBLDatabase::callDBListeners, this));
+        notify(std::bind(&CBLDatabase::callDBListeners, this));
     }
 
     void callDBListeners() {

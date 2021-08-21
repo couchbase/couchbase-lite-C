@@ -105,7 +105,7 @@ public: \
     explicit operator bool() const                {return valid();} \
     bool operator==(const CLASS &other) const     {return _ref == other._ref;} \
     bool operator!=(const CLASS &other) const     {return _ref != other._ref;} \
-    C_TYPE* ref() const                           {return (C_TYPE*)_ref;}\
+    C_TYPE* _cbl_nullable ref() const             {return (C_TYPE*)_ref;}\
 protected: \
     explicit CLASS(C_TYPE* ref)                   :SUPER((CBLRefCounted*)ref) { }
 

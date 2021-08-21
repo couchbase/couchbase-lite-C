@@ -16,8 +16,6 @@
 #include <optional>
 #include <unordered_map>
 
-using namespace std;
-using namespace fleece;
 
 CBL_ASSUME_NONNULL_BEGIN
 
@@ -68,7 +66,7 @@ public:
 
     inline Retained<CBLResultSet> execute();
 
-    using ColumnNamesMap = unordered_map<slice, uint32_t>;
+    using ColumnNamesMap = std::unordered_map<slice, uint32_t>;
 
     int columnNamed(slice name) const {
         call_once(_onceColumnNames, [this]{
@@ -112,8 +110,8 @@ private:
     litecore::shared_access_lock<Retained<C4Query>> _c4query;// Thread-safe access to C4Query
     RetainedConst<CBLDatabase>          _database;          // Owning database
     alloc_slice                         _parameters;        // Fleece-encoded param values
-    mutable optional<ColumnNamesMap>    _columnNames;       // Maps colum name to index
-    mutable once_flag                   _onceColumnNames;   // For lazy init of _columnNames
+    mutable std::optional<ColumnNamesMap>    _columnNames;       // Maps colum name to index
+    mutable std::once_flag                   _onceColumnNames;   // For lazy init of _columnNames
     Listeners<CBLQueryChangeListener>   _listeners;         // Query listeners
 };
 
@@ -123,64 +121,35 @@ private:
 
 struct CBLResultSet final : public CBLRefCounted {
 public:
-    CBLResultSet(CBLQuery* query, C4Query::Enumerator qe)
-    :_query(query)
-    ,_enum(move(qe))
-    { }
+    CBLResultSet(CBLQuery* query, C4Query::Enumerator qe);
+    
+    ~CBLResultSet();
 
-    bool next() {
-        _asArray = nullptr;
-        _asDict = nullptr;
-        return _enum.next();
-    }
+    bool next();
 
-    Value property(slice prop) const {
-        int col = _query->columnNamed(prop);
-        return (col >= 0) ? column(col) : nullptr;
-    }
+    Value property(slice prop) const;
 
-    Value column(unsigned col) const {
-        return _enum.column(col);
-    }
+    Value column(unsigned col) const    {return _enum.column(col);}
 
-    Array asArray() const {
-        if (!_asArray) {
-            auto array = MutableArray::newArray();
-            unsigned nCols = _query->columnCount();
-            array.resize(uint32_t(nCols));
-            for (unsigned i = 0; i < nCols; ++i) {
-                Value val = column(i);
-                array[i] = val ? val : Value::null();
-            }
-            _asArray = array;
-        }
-        return _asArray;
-    }
+    Array asArray() const;
 
-    Dict asDict() const {
-        if (!_asDict) {
-            auto dict = MutableDict::newDict();
-            unsigned nCols = _query->columnCount();
-            for (unsigned i = 0; i < nCols; ++i) {
-                if (Value val = column(i); val) {
-                    slice key = _query->columnName(i);
-                    dict[key] = val;
-                }
-            }
-            _asDict = dict;
-        }
-        return _asDict;
-    }
+    Dict asDict() const;
 
-    CBLQuery* query() const {
-        return _query;
-    }
+    CBLQuery* query() const             {return _query;}
+
+    static Retained<CBLResultSet> containing(Value v);
+
+    CBLBlob* getBlob(Dict blobDict, const C4BlobKey&);
 
 private:
-    Retained<CBLQuery> const    _query;    // The query
-    C4Query::Enumerator         _enum;     // The query enumerator
-    mutable MutableArray        _asArray;  // Column values as a Fleece Array
-    mutable MutableDict         _asDict;   // Column names/values as a Fleece Dict
+    using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
+
+    Retained<CBLQuery> const     _query;    // The query
+    C4Query::Enumerator          _enum;     // The query enumerator
+    fleece::MutableArray mutable _asArray;  // Column values as a Fleece Array
+    fleece::MutableDict  mutable _asDict;   // Column names/values as a Fleece Dict
+    Doc                          _fleeceDoc;// Fleece Doc that owns the column values
+    ValueToBlobMap               _blobs;    // Cached CBLBLobs, keyed by FLDict
 };
 
 
@@ -250,15 +219,14 @@ namespace cbl_internal {
 }
 
 
-inline Retained<CBLResultSet> CBLQuery::execute() {
+inline fleece::Retained<CBLResultSet> CBLQuery::execute() {
     auto qe = _c4query.useLocked()->run();
-    return retained(new CBLResultSet(this, move(qe)));
+    return retained(new CBLResultSet(this, std::move(qe)));
 }
 
 
-inline Retained<CBLListenerToken> CBLQuery::addChangeListener(CBLQueryChangeListener listener,
-                                                              void* _cbl_nullable context)
-{
+inline fleece::Retained<CBLListenerToken>
+CBLQuery::addChangeListener(CBLQueryChangeListener listener, void* _cbl_nullable context) {
     auto token = retained(new ListenerToken<CBLQueryChangeListener>(this, listener, context));
     _listeners.add(token);
     token->setEnabled(true);

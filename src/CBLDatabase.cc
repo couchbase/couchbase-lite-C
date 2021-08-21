@@ -66,6 +66,22 @@ bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBL
 #pragma mark - QUERY:
 
 
+Retained<CBLQuery> CBLDatabase::createQuery(CBLQueryLanguage language,
+                                            slice queryString,
+                                            int* _cbl_nullable outErrPos) const
+{
+    alloc_slice json;
+    if (language == kCBLJSONLanguage) {
+        json = convertJSON5(queryString); // allow JSON5 as a convenience
+        queryString = json;
+    }
+    auto c4query = _c4db.useLocked()->newQuery((C4QueryLanguage)language, queryString, outErrPos);
+    if (!c4query)
+        return nullptr;
+    return new CBLQuery(this, std::move(c4query), _c4db);
+}
+
+
 namespace cbl_internal {
 
     void ListenerToken<CBLQueryChangeListener>::queryChanged() {

@@ -39,7 +39,7 @@ namespace cbl {
     public:
         static bool isBlob(fleece::Dict d)  {return FLDict_IsBlob(d);}
 
-        /* Creates a new blobgiven its contents as a single block of data.
+        /** Creates a new blob, given its contents as a single block of data.
             @note  The memory pointed to by `contents` is no longer needed after this call completes
                     (it will have been written to the database.)
             @param contentType  The MIME type (optional).
@@ -56,8 +56,11 @@ namespace cbl {
         inline Blob(slice contentType,
                     BlobWriteStream& writer);
 
-        /** Constructs a Blob instance on an existing blob reference in a document. */
-        Blob(fleece::Dict d)
+        /** Constructs a Blob instance on an existing blob reference in a document or query result.
+            @note If the dict argument is not actually a blob reference, this Blob object will be
+            invalid; you can check that by calling its `valid` method or testing it with its
+            `operator bool`. */
+        Blob(fleece::Dict d) 
         :RefCounted((CBLRefCounted*) FLDict_GetBlob(d))
         { }
 

@@ -1,7 +1,7 @@
 //
 // CBLQuery.cc
 //
-// Copyright © 2018 Couchbase. All rights reserved.
+// Copyright © 2021 Couchbase. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,13 @@
 //
 
 #include "CBLDatabase_Internal.hh"
+#include "CBLBlob_Internal.hh"
 #include "CBLQuery_Internal.hh"
+
+
+using namespace std;
+using namespace fleece;
+
 
 void ListenerToken<CBLQueryChangeListener>::setEnabled(bool enabled) {
     auto c4query = _query->_c4query.useLocked();
@@ -32,4 +38,95 @@ void ListenerToken<CBLQueryChangeListener>::setEnabled(bool enabled) {
     _c4obs->setEnabled(enabled);
     if (!enabled)
         db->unregisterStoppable(this);
+}
+
+
+CBLResultSet::CBLResultSet(CBLQuery* query, C4Query::Enumerator qe)
+:_query(query)
+,_enum(std::move(qe))
+{ }
+
+
+CBLResultSet::~CBLResultSet() {
+    if (_fleeceDoc)
+        _fleeceDoc.setAssociated(nullptr, "CBLResultSet");
+}
+
+
+bool CBLResultSet::next() {
+    _asArray = nullptr;
+    _asDict = nullptr;
+    _blobs.clear();
+    
+    if (_enum.next()) {
+        if (!_fleeceDoc) {
+            // As soon as I read the first row, associate myself with the `Doc` backing the Fleece
+            // data, so that the `getBlob()` method can find me.
+            if (Value v = column(0); v) {
+                _fleeceDoc = Doc::containing(v);
+                if (!_fleeceDoc.setAssociated(this, "CBLResultSet"))
+                    C4Warn("Couldn't associate CBLResultSet with FLDoc %p", FLDoc(_fleeceDoc));
+            }
+        }
+        return true;
+    } else {
+        _fleeceDoc = nullptr;
+        return false;
+    }
+}
+
+
+Value CBLResultSet::property(slice prop) const {
+    int col = _query->columnNamed(prop);
+    return (col >= 0) ? column(col) : nullptr;
+}
+
+
+Array CBLResultSet::asArray() const {
+    if (!_asArray) {
+        auto array = fleece::MutableArray::newArray();
+        unsigned nCols = _query->columnCount();
+        array.resize(uint32_t(nCols));
+        for (unsigned i = 0; i < nCols; ++i) {
+            Value val = column(i);
+            array[i] = val ? val : Value::null();
+        }
+        _asArray = array;
+    }
+    return _asArray;
+}
+
+
+Dict CBLResultSet::asDict() const {
+    if (!_asDict) {
+        auto dict = MutableDict::newDict();
+        unsigned nCols = _query->columnCount();
+        for (unsigned i = 0; i < nCols; ++i) {
+            if (Value val = column(i); val) {
+                slice key = _query->columnName(i);
+                dict[key] = val;
+            }
+        }
+        _asDict = dict;
+    }
+    return _asDict;
+}
+
+
+Retained<CBLResultSet> CBLResultSet::containing(Value v) {
+    return (CBLResultSet*) Doc::containing(v).associated("CBLResultSet");
+}
+
+
+CBLBlob* CBLResultSet::getBlob(Dict blobDict, const C4BlobKey &key) {
+    // OK, let's find or create a CBLBlob, then cache it.
+    // (It's not really necessary to cache the CBLBlobs -- they're lightweight objects --
+    // but otherwise we'd have to return a `Retained<CBLBlob>`, which would complicate
+    // the public C API by making the caller release it afterwards.)
+    auto i = _blobs.find(blobDict);
+    if (i == _blobs.end()) {
+        auto db = const_cast<CBLDatabase*>(query()->database());
+        i = _blobs.emplace(blobDict, new CBLBlob(db, blobDict, key)).first;
+    }
+    return i->second;
 }
