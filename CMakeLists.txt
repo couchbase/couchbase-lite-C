@@ -6,6 +6,8 @@ if(NOT DEFINED CMAKE_OSX_SYSROOT)
     set(CMAKE_OSX_SYSROOT macosx)      # this line MUST be above the 1st "project()" line!
 endif()
 
+set(CMAKE_OSX_ARCHITECTURES x86_64 arm64)
+
 project (
     CouchbaseLite_C
     VERSION 3.0.0

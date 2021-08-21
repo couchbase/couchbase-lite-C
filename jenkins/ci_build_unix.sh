@@ -17,7 +17,7 @@ fi
 mkdir -p ${WORKSPACE}/build_release
 
 case "${OSTYPE}" in
-    darwin*)  OS="macosx-x86_64"
+    darwin*)  OS="macos"
               PKG_CMD='zip -r --symlinks'
               PKG_TYPE='zip'
               PROP_FILE=${WORKSPACE}/publish.prop
@@ -36,28 +36,28 @@ esac
 
 project_dir=couchbase-lite-c
 strip_dir=${project_dir}
-macosx_lib="libcblite.dylib"
+macos_lib="libcblite.dylib"
 
 echo VERSION=${VERSION}
 # Global define end
 
 ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
 
-echo "====  Building macosx/linux Release binary  ==="
+echo "====  Building macos/linux Release binary  ==="
 cd ${WORKSPACE}/build_release
 cmake -DEDITION=${EDITION} -DCMAKE_INSTALL_PREFIX=`pwd`/libcblite-$VERSION -DCMAKE_BUILD_TYPE=MinSizeRel ..
 make -j8
-if [[ "${OS}" =~ macosx* ]]; then
+if [[ "${OS}" == "macos" ]]; then
     pushd ${project_dir}
-    dsymutil ${macosx_lib} -o libcblite.dylib.dSYM
-    strip -x ${macosx_lib}
+    dsymutil ${macos_lib} -o libcblite.dylib.dSYM
+    strip -x ${macos_lib}
     popd
 else
     ${WORKSPACE}/couchbase-lite-c/jenkins/strip.sh ${strip_dir}
 fi
 
 make install
-if [[ "${OS}" =~ macosx* ]]; then
+if [[ "${OS}" == "macos" ]]; then
     # package up the strip symbols
     cp -rp ${strip_dir}/libcblite.dylib.dSYM  ./libcblite-$VERSION/
 else
@@ -80,7 +80,7 @@ echo
 cd ${WORKSPACE}/build_release/
 cp ${WORKSPACE}/product-texts/mobile/couchbase-lite/license/LICENSE_$EDITION.txt libcblite-$VERSION/LICENSE.txt
 # Create separate symbols pkg
-if [[ "${OS}" =~ macosx* ]]; then
+if [[ "${OS}" == "macos" ]]; then
     ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/LICENSE.txt libcblite-$VERSION/include libcblite-$VERSION/lib
     SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${EDITION}-${VERSION}-${BLD_NUM}-${OS}-'symbols'.${PKG_TYPE}
     ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME}  libcblite-$VERSION/libcblite.dylib.dSYM
