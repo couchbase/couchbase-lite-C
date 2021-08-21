@@ -46,7 +46,7 @@ static const CBLDocument* defaultConflictResolver(void *context,
     return resolved;
 }
 
-CBL_CORE_API const CBLConflictResolver CBLDefaultConflictResolver = &defaultConflictResolver;
+CBL_PUBLIC const CBLConflictResolver CBLDefaultConflictResolver = &defaultConflictResolver;
 
 
 namespace cbl_internal {

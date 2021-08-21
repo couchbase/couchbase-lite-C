@@ -105,15 +105,20 @@
 #endif
 
 
-// Export/import stuff:
+// On Windows, CBL_PUBLIC marks symbols as being exported from the shared library.
+// However, this is not the whole list of things that are exported.  The API methods
+// are exported using a definition list, but it is not possible to correctly include
+// initialized global variables, so those need to be marked (both in the header and 
+// implementation) with CBL_PUBLIC.  See kCBLTypeProperty in CBLBlob.h and CBLBlob_CPI.cc
+// for an example.
 #ifdef _MSC_VER
-    #ifdef LITECORE_EXPORTS
-        #define CBL_CORE_API __declspec(dllexport)
+    #ifdef CBL_EXPORTS
+        #define CBL_PUBLIC __declspec(dllexport)
     #else
-        #define CBL_CORE_API __declspec(dllimport)
+        #define CBL_PUBLIC __declspec(dllimport)
     #endif
 #else // _MSC_VER
-    #define CBL_CORE_API
+    #define CBL_PUBLIC
 #endif
 
 // Type-checking for printf-style vararg functions:

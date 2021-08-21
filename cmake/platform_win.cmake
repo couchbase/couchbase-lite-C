@@ -69,7 +69,7 @@ function(set_dylib_properties)
     endif()
     
     target_link_libraries(cblite PRIVATE zlibstatic Ws2_32)
-    target_compile_definitions(cblite-static PRIVATE LITECORE_EXPORTS)
+    target_compile_definitions(cblite-static PRIVATE CBL_EXPORTS)
 
     configure_file(
         "${PROJECT_SOURCE_DIR}/cmake/cblite.rc.in"
