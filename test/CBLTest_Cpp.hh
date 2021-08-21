@@ -21,6 +21,22 @@
 #include "CBLTest.hh"
 
 
+namespace cbl {
+    // Make Catch write something better than "{?}" when it logs a CBL object:
+    #define DEFINE_WRITE_OP(CLASS) \
+        static inline std::ostream& operator<< (std::ostream &out, const cbl::CLASS &rc) { \
+            return out << "cbl::" #CLASS "[@" << (void*)rc.ref() << "]"; \
+        }
+    DEFINE_WRITE_OP(Blob)
+    DEFINE_WRITE_OP(Database)
+    DEFINE_WRITE_OP(Document)
+    DEFINE_WRITE_OP(MutableDocument)
+    DEFINE_WRITE_OP(Query)
+    DEFINE_WRITE_OP(Replicator)
+    DEFINE_WRITE_OP(ResultSet)
+}
+
+
 class CBLTest_Cpp {
 public:
     static const fleece::alloc_slice kDatabaseDir;

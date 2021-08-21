@@ -578,10 +578,10 @@
 			isa = PBXGroup;
 			children = (
 				277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */,
-				27B61DD821DEEC540027CCDB /* Database.hh */,
-				277FEE4E21DEF54D00B60E3C /* Document.hh */,
 				277FEE3D21DEF0C700B60E3C /* Base.hh */,
 				275BC4E22204E6A800DBE7D2 /* Blob.hh */,
+				27B61DD821DEEC540027CCDB /* Database.hh */,
+				277FEE4E21DEF54D00B60E3C /* Document.hh */,
 				277FEE4F21E6AB1100B60E3C /* Query.hh */,
 				27C9B5F121F7D74A0040BC45 /* Replicator.hh */,
 			);

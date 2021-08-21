@@ -431,7 +431,7 @@ static int countResults(ResultSet &results) {
     return n;
 }
 
-TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener, C++ API", "[Query]") {
+TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ API", "[Query]") {
     Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
     {
         auto rs = query.execute();

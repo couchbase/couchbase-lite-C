@@ -72,6 +72,8 @@ namespace cbl {
         }
 
         void clear()                                    {CBL_Release(_ref); _ref = nullptr;}
+        bool valid() const                              {return _ref != nullptr;} \
+        explicit operator bool() const                  {return valid();} \
 
         static std::string asString(FLSlice s)          {return slice(s).asString();}
         static std::string asString(FLSliceResult &&s)  {return alloc_slice(s).asString();}
@@ -101,7 +103,7 @@ public: \
     CLASS& operator=(const CLASS &other) noexcept {SUPER::operator=(other); return *this;} \
     CLASS& operator=(CLASS &&other) noexcept      {SUPER::operator=((SUPER&&)other); return *this;}\
     CLASS& operator=(std::nullptr_t)              {clear(); return *this;} \
-    bool valid() const                            {return _ref != nullptr;} \
+    bool valid() const                            {return RefCounted::valid();} \
     explicit operator bool() const                {return valid();} \
     bool operator==(const CLASS &other) const     {return _ref == other._ref;} \
     bool operator!=(const CLASS &other) const     {return _ref != other._ref;} \
