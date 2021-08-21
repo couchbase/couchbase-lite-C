@@ -49,6 +49,7 @@ CBL_CAPI_BEGIN
         FLHeapSlice revID;          ///< The latest revision ID (or null if doc was purged)
         uint64_t sequence;          ///< The latest sequence number (or 0 if doc was purged)
         uint32_t bodySize;          ///< The size of the revision body in bytes
+        uint8_t flags;
     } CBLDatabaseChange;    // Note: This must remain identical in layout to C4DatabaseChange
 
     typedef void (*CBLDatabaseChangeDetailListener)(void* _cbl_nullable context,
