@@ -170,11 +170,13 @@ public:
 #pragma mark - Blobs:
 
 
-    CBLBlob*  _cbl_nullable getBlob(FLDict dict);
+    CBLBlob*  _cbl_nullable getBlob(FLDict dict, const C4BlobKey&);
 
     static void registerNewBlob(CBLNewBlob* blob);
 
     static void unregisterNewBlob(CBLNewBlob* blob);
+
+    static CBLNewBlob* _cbl_nullable findNewBlob(FLDict dict);
 
 
 #pragma mark - Save/delete:
@@ -261,8 +263,6 @@ private:
             C4Error::raise(LiteCoreDomain, kC4ErrorNotWriteable, "Document object is immutable");
     }
 
-    static CBLNewBlob* _cbl_nullable findNewBlob(FLDict dict);
-    
     // Walk through the Fleece object tree, find new mutable blob Dicts to install.
     //
     // The releaseNewBlob flag allows to release the matched CBLNewBlob objects after being

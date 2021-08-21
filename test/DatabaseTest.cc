@@ -1305,6 +1305,7 @@ TEST_CASE_METHOD(DatabaseTest, "Set blob in document", "[Blob]") {
     doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
     docProps = CBLDocument_MutableProperties(doc);
     const CBLBlob* blob2 = FLValue_GetBlob(FLDict_Get(docProps, "blob"_sl));
+    REQUIRE(blob2);
     FLSliceResult content = CBLBlob_Content(blob2, &error);
     CHECK((slice)content == blobContent);
     FLSliceResult_Release(content);

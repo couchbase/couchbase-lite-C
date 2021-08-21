@@ -256,6 +256,8 @@ void CBLDocument::unregisterNewBlob(CBLNewBlob* blob) {
 
 
 CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
+    if (!Dict(dict).asMutable())
+        return nullptr;
     return newBlobs().useLocked<CBLNewBlob*>([dict](auto &newBlobs) -> CBLNewBlob* {
         auto digest = Dict(dict)[kCBLBlobDigestProperty].asString();
         assert(digest);
@@ -271,25 +273,18 @@ CBLNewBlob* CBLDocument::findNewBlob(FLDict dict) {
 }
 
 
-CBLBlob* CBLDocument::getBlob(FLDict dict) {
+CBLBlob* CBLDocument::getBlob(FLDict dict, const C4BlobKey &key) {
     auto c4doc = _c4doc.useLocked();
     // Is it already registered by a previous call to getBlob?
     if (auto i = _blobs.find(dict); i != _blobs.end())
         return i->second;
-    // Is it a NewBlob?
-    if (Dict(dict).asMutable()) {
-        CBLNewBlob *newBlob = findNewBlob(dict);
-        if (newBlob)
-            return newBlob;
-    }
 
-    // Not found; is it a blob or attachment at all?
-    auto key = C4Blob::keyFromDigestProperty(dict);
-    if (!key || !(C4Blob::isBlob(dict) || C4Blob::isAttachmentIn(dict, properties())))
+    // Verify it's either a blob or an old-style attachment:
+    if (!C4Blob::isBlob(dict) && !C4Blob::isAttachmentIn(dict, properties()))
         return nullptr;
 
     // Create a new CBLBlob and remember it:
-    auto blob = retained(new CBLBlob(this, dict, *key));
+    auto blob = retained(new CBLBlob(database(), dict, key));
     _blobs.insert({dict, blob});
     return blob;
 }

@@ -21,6 +21,7 @@
 #include "CBLLog.h"
 #include "CBLDatabase_Internal.hh"
 #include "CBLDocument_Internal.hh"
+#include "CBLQuery_Internal.hh"
 #include "Internal.hh"
 #include "c4BlobStore.hh"
 #include "c4Document.hh"
@@ -37,12 +38,7 @@ public:
         return C4Blob::isBlob(dict);
     }
 
-    static const CBLBlob* _cbl_nullable getBlob(FLDict blobDict) noexcept {
-        auto doc = CBLDocument::containing(Dict(blobDict));
-        if (!doc)
-            return nullptr;
-        return doc->getBlob(blobDict);
-    }
+    static inline const CBLBlob* _cbl_nullable getBlob(Dict blobDict) noexcept;
 
     Dict properties() const                                 {return _properties.asDict();}
 
@@ -82,10 +78,11 @@ public:
 protected:
     friend struct CBLDocument;
     friend struct CBLDatabase;
+    friend struct CBLResultSet;
 
     // Constructor for existing blobs -- called by CBLDocument::getBlob()
-    CBLBlob(CBLDocument *doc, Dict properties, const C4BlobKey &key)
-    :_db(doc->database())
+    CBLBlob(const CBLDatabase *db, Dict properties, const C4BlobKey &key)
+    :_db(db)
     ,_key(key)
     ,_properties(properties)
     {
@@ -130,7 +127,7 @@ protected:
     }
 
     const C4BlobKey& key() const                        {return _key;}
-    CBLDatabase* _cbl_nullable database() const         {return _db;}
+    const CBLDatabase* _cbl_nullable database() const   {return _db;}
     void setDatabase(CBLDatabase *db)                   {precondition(!_db); _db = db;}
 
     C4BlobStore* blobStore() const {
@@ -141,9 +138,9 @@ protected:
 private:
     friend struct CBLBlobReadStream;
 
-    RetainedValue const         _properties;
-    C4BlobKey                   _key;
-    CBLDatabase* _cbl_nullable  _db {nullptr};
+    fleece::RetainedValue const       _properties;
+    C4BlobKey                         _key;
+    const CBLDatabase* _cbl_nullable  _db {nullptr};
 };
 
 
@@ -222,11 +219,35 @@ private:
 
 struct CBLBlobWriteStream {
     CBLBlobWriteStream(CBLDatabase *db)         :_c4stream(*db->blobStore()) { }
-    void write(slice data)                      {return _c4stream.write(data);}
+    void write(fleece::slice data)              {return _c4stream.write(data);}
 private:
     friend struct CBLNewBlob;
     C4WriteStream _c4stream;
 };
+
+
+inline const CBLBlob* _cbl_nullable CBLBlob::getBlob(Dict blobDict) noexcept {
+    auto key = C4Blob::keyFromDigestProperty(blobDict);
+    if (!key)
+        return nullptr;
+
+    // Check if it's a blob or old-style attachment in a saved document:
+    if (auto doc = CBLDocument::containing(blobDict); doc)
+        return doc->getBlob(blobDict, *key);
+
+    if (!C4Blob::isBlob(blobDict))
+        return nullptr;
+
+    // Check if it's a new unsaved blob:
+    if (auto newBlob = CBLDocument::findNewBlob(blobDict); newBlob)
+        return newBlob;
+
+    // Check if it's a blob in a query result set:
+    if (auto rs = CBLResultSet::containing(blobDict); rs)
+        return rs->getBlob(blobDict, *key);
+    return nullptr;
+}
+
 
 
 inline std::unique_ptr<CBLBlobReadStream> CBLBlob::openContentStream() const {

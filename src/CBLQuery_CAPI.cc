@@ -21,6 +21,7 @@
 #include "CBLQuery_Internal.hh"
 #include <string>
 
+using namespace std;
 
 CBLQuery* CBLDatabase_CreateQuery(const CBLDatabase* db,
                                   CBLQueryLanguage language,

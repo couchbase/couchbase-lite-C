@@ -74,7 +74,7 @@ CBL_CAPI_BEGIN
     /** Returns a CBLBlob object corresponding to a blob dictionary in a document.
         @param blobDict  A dictionary in a document.
         @return  A CBLBlob instance for this blob, or NULL if the dictionary is not a blob. */
-    const CBLBlob* FLDict_GetBlob(FLDict _cbl_nullable blobDict) CBLAPI;
+    const CBLBlob* _cbl_nullable FLDict_GetBlob(FLDict _cbl_nullable blobDict) CBLAPI;
 
 #ifdef __APPLE__
 #pragma mark - BLOB METADATA:
@@ -112,8 +112,8 @@ CBL_CAPI_BEGIN
 
     /** Opens a stream for reading a blob's content. */
     _cbl_warn_unused
-    CBLBlobReadStream* CBLBlob_OpenContentStream(const CBLBlob* blob,
-                                                 CBLError* _cbl_nullable outError) CBLAPI;
+    CBLBlobReadStream* _cbl_nullable CBLBlob_OpenContentStream(const CBLBlob* blob,
+                                                               CBLError* _cbl_nullable) CBLAPI;
 
     /** Reads data from a blob.
         @param stream  The stream to read from.
@@ -155,8 +155,8 @@ CBL_CAPI_BEGIN
 
         If for some reason you need to abort, just call \ref CBLBlobWriter_Close. */
     _cbl_warn_unused
-    CBLBlobWriteStream* CBLBlobWriter_Create(CBLDatabase* db,
-                                             CBLError* _cbl_nullable outError) CBLAPI;
+    CBLBlobWriteStream* _cbl_nullable CBLBlobWriter_Create(CBLDatabase* db,
+                                                           CBLError* _cbl_nullable) CBLAPI;
 
     /** Closes a blob-writing stream, if you need to give up without creating a \ref CBLBlob. */
     void CBLBlobWriter_Close(CBLBlobWriteStream* _cbl_nullable) CBLAPI;
@@ -198,7 +198,7 @@ CBL_CAPI_BEGIN
         @param value  The value (dictionary) in the document.
         @return  A \ref CBLBlob instance for this blob, or `NULL` if the value is not a blob.
         @note You are responsible for releasing the \ref CBLBlob object.  */
-    static inline const CBLBlob* FLValue_GetBlob(FLValue _cbl_nullable value) {
+    static inline const CBLBlob* _cbl_nullable FLValue_GetBlob(FLValue _cbl_nullable value) {
         return FLDict_GetBlob(FLValue_AsDict(value));
     }
 

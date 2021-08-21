@@ -38,6 +38,7 @@ static void checkBlob(Dict props) {
     CHECK(props[kCBLBlobDigestProperty].asString() == kBlobDigest);
     CHECK(props[kCBLBlobLengthProperty].asInt() == kBlobContents.size);
     CHECK(props[kCBLBlobContentTypeProperty].asString() == kBlobContentType);
+    CHECK(FLDict_IsBlob(props));
 }
 
 
@@ -61,10 +62,17 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
         Dict props = blob.properties();
         checkBlob(props);
 
-        CHECK(FLDict_GetBlob(props) == nullptr);
+        CHECK(FLDict_GetBlob(props) == blob.ref());
+        Blob gotBlob(props);
+        CHECK(gotBlob == blob);
 
         // Add blob to document:
         doc["picture"] = props;
+
+        CHECK(FLDict_IsBlob(props));
+        Blob cachedBlob(props);
+        CHECK(cachedBlob == blob);
+
         db.saveDocument(doc);
     }
     {
@@ -164,4 +172,29 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in arrays/dicts", "[Blob]") {
 
     checkBlob(FLValue_AsDict(FLArray_Get(array, 0)));
     checkBlob(FLValue_AsDict(FLDict_Get(dict, "b"_sl)));
+}
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in ResultSet", "[Blob]") {
+    for (int i = 0; i < 10; ++i) {
+        char docID[20];
+        sprintf(docID, "doc-%d", i);
+        MutableDocument doc(docID);
+        Blob blob(kBlobContentType, kBlobContents);
+        doc["picture"] = blob.properties();
+        db.saveDocument(doc);
+    }
+
+    Query q(db, kCBLN1QLLanguage, "SELECT picture FROM _default");
+    int rowCount = 0;
+    for (Result row : q.execute()) {
+        Dict picture = row[0].asDict();
+        checkBlob(picture);
+        Blob blob(picture);
+        CHECK(blob.contentType() == kBlobContentType);
+        CHECK(blob.loadContent() == kBlobContents);
+        CHECK(blob.length() == kBlobContents.size);
+        ++rowCount;
+    }
+    CHECK(rowCount == 10);
 }
