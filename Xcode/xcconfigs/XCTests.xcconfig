@@ -13,3 +13,5 @@ LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/.. @loader_path/..
 INFOPLIST_FILE          = Xcode/Tests-Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = com.couchbase.CouchbaseLiteTests
 PRODUCT_NAME            = $(TARGET_NAME)
+
+LLVM_LTO                    = NO    // LTO makes tests very slow to link and confuses Instruments
