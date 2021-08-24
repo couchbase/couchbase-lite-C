@@ -356,7 +356,18 @@ private:
 
     Retained<CBLDocument> _getDocument(slice docID, bool isMutable, bool allRevisions) const {
         C4DocContentLevel content = (allRevisions ? kDocGetAll : kDocGetCurrentRev);
-        Retained<C4Document> c4doc = _c4db.useLocked()->getDocument(docID, true, content);
+        Retained<C4Document> c4doc = nullptr;
+        try {
+            c4doc = _c4db.useLocked()->getDocument(docID, true, content);
+        } catch (...) {
+            C4Error err = C4Error::fromCurrentException();
+            if (err == C4Error{LiteCoreDomain, kC4ErrorBadDocID}) {
+                CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
+                        "Use an invalid document ID '%.*s' to get a document", FMTSLICE(docID));
+                return nullptr;
+            }
+            throw;
+        }
         if (!c4doc || (!allRevisions && (c4doc->flags() & kDocDeleted)))
             return nullptr;
         return new CBLDocument(docID, const_cast<CBLDatabase*>(this), c4doc, isMutable);
