@@ -216,7 +216,7 @@ bool CBLLog_SetFileConfig(CBLLogFileConfiguration config, CBLError *outError) CB
 }
 
 
-extern "C" CBL_CORE_API std::atomic_int gC4ExpectExceptions;
+extern "C" CBL_PUBLIC std::atomic_int gC4ExpectExceptions;
 
 void CBLLog_BeginExpectingExceptions() CBLAPI {
     ++gC4ExpectExceptions;

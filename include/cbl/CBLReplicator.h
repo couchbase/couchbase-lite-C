@@ -31,7 +31,7 @@ CBL_CAPI_BEGIN
     @{ */
 
 /** The name of the HTTP cookie used by Sync Gateway to store session keys. */
-CBL_CORE_API extern const FLString kCBLAuthDefaultCookieName;
+CBL_PUBLIC extern const FLString kCBLAuthDefaultCookieName;
 
 /** An opaque object representing the location of a database to replicate with. */
 typedef struct CBLEndpoint CBLEndpoint;
@@ -129,7 +129,7 @@ typedef const CBLDocument* _cbl_nullable (*CBLConflictResolver)(void* _cbl_nulla
                                                   const CBLDocument* _cbl_nullable remoteDocument);
 
 /** Default conflict resolver. This always returns `localDocument`. */
-CBL_CORE_API extern const CBLConflictResolver CBLDefaultConflictResolver;
+CBL_PUBLIC extern const CBLConflictResolver CBLDefaultConflictResolver;
 
 
 /** Types of proxy servers, for CBLProxySettings. */

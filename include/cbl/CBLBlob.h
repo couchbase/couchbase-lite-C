@@ -54,12 +54,12 @@ CBL_CAPI_BEGIN
 
  */
 
-    CBL_CORE_API extern const FLSlice kCBLTypeProperty;             ///< `"@type"`
-    CBL_CORE_API extern const FLSlice kCBLBlobType;                 ///< `"blob"`
+    CBL_PUBLIC extern const FLSlice kCBLTypeProperty;             ///< `"@type"`
+    CBL_PUBLIC extern const FLSlice kCBLBlobType;                 ///< `"blob"`
 
-    CBL_CORE_API extern const FLSlice kCBLBlobDigestProperty;       ///< `"digest"`
-    CBL_CORE_API extern const FLSlice kCBLBlobLengthProperty;       ///< `"length"`
-    CBL_CORE_API extern const FLSlice kCBLBlobContentTypeProperty;  ///< `"content_type"`
+    CBL_PUBLIC extern const FLSlice kCBLBlobDigestProperty;       ///< `"digest"`
+    CBL_PUBLIC extern const FLSlice kCBLBlobLengthProperty;       ///< `"length"`
+    CBL_PUBLIC extern const FLSlice kCBLBlobContentTypeProperty;  ///< `"content_type"`
 
 
     CBL_REFCOUNTED(CBLBlob*, Blob);
