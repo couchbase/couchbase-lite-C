@@ -7,6 +7,7 @@ if(NOT DEFINED CMAKE_OSX_SYSROOT)
 endif()
 
 set(CMAKE_OSX_ARCHITECTURES x86_64 arm64)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
 
 project (
     CouchbaseLite_C

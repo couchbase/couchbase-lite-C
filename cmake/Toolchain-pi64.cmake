@@ -24,18 +24,6 @@
 # https://gitlab.linphone.org/BC/public/linphone-cmake-builder/blob/master/toolchains/toolchain-raspberry.cmake
 # https://github.com/Pro/raspi-toolchain/blob/master/Toolchain-rpi.cmake
 
-if("$ENV{RASPBERRY_VERSION}" STREQUAL "")
-    set(RASPBERRY_VERSION 2)
-else()
-    set(RASPBERRY_VERSION $ENV{RASPBERRY_VERSION})
-endif()
-
-include("${CMAKE_CURRENT_LIST_DIR}/Toolchain-cross-armhf.cmake")
-
-if(RASPBERRY_VERSION VERSION_GREATER 2)
-    set(CMAKE_C_FLAGS "-mcpu=cortex-a53 -mfpu=neon-vfpv4 -mfloat-abi=hard ${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 3")
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 3+")
-else()
-    set(CMAKE_C_FLAGS "-mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard ${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 2")
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 2+")
-endif()
+include("${CMAKE_CURRENT_LIST_DIR}/Toolchain-cross-arm64.cmake")
+set(CMAKE_C_FLAGS "-mcpu=cortex-a53 -mfpu=neon-vfpv4 -mfloat-abi=hard ${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 3")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Flags for Raspberry PI 3+")
