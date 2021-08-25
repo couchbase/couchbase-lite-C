@@ -55,3 +55,39 @@ TEST_CASE_METHOD(BlobTest, "Check blob are equals", "[Blob]") {
     CBLBlob_Release(blob3);
     CBLBlob_Release(blob4);
 }
+
+
+TEST_CASE_METHOD(BlobTest, "Create blob stream and close", "[Blob]") {
+    alloc_slice content("This is the content of the blob 1.");
+    CBLError error;
+    CBLBlobWriteStream* ws = CBLBlobWriter_Create(db, &error);
+    CBLBlobWriter_Write(ws, content.buf, content.size, &error);
+    CBLBlobWriter_Close(ws);
+}
+
+
+TEST_CASE_METHOD(BlobTest, "Create blob with stream", "[Blob]") {
+    alloc_slice content("This is the content of the blob 1.");
+    
+    // Create and close stream with out creating blob:
+    CBLError error;
+    CBLBlobWriteStream* ws = CBLBlobWriter_Create(db, &error);
+    CBLBlobWriter_Write(ws, content.buf, content.size, &error);
+    CBLBlob* blob = CBLBlob_CreateWithStream("text/plain"_sl, ws);
+    
+    // Set blob in a document and save:
+    auto doc = CBLDocument_CreateWithID("doc1"_sl);
+    auto props = CBLDocument_MutableProperties(doc);
+    FLSlot_SetBlob(FLMutableDict_Set(props, "blob"_sl), blob);
+    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    
+    // Check content:
+    FLSliceResult gotContent = CBLBlob_Content(blob, &error);
+    CHECK(gotContent == content);
+    FLSliceResult_Release(gotContent);
+    
+    // Note: After creating a blob with the stream, the created blob will take
+    // the ownership of the stream so do not close the stream.
+    CBLBlob_Release(blob);
+    CBLDocument_Release(doc);
+}

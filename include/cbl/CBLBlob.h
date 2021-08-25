@@ -196,7 +196,7 @@ CBL_CAPI_BEGIN
     /** Instantiates a \ref CBLBlob object corresponding to a blob dictionary in a document.
         @param value  The value (dictionary) in the document.
         @return  A \ref CBLBlob instance for this blob, or `NULL` if the value is not a blob.
-        @note You are responsible for releasing the \ref CBLBlob object.  */
+        @Note  The returned CBLBlob object will be released when its document is released. */
     static inline const CBLBlob* _cbl_nullable FLValue_GetBlob(FLValue _cbl_nullable value) {
         return FLDict_GetBlob(FLValue_AsDict(value));
     }
