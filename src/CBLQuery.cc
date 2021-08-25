@@ -19,6 +19,7 @@
 #include "CBLDatabase_Internal.hh"
 #include "CBLBlob_Internal.hh"
 #include "CBLQuery_Internal.hh"
+#include "CBLEncryptable_Internal.hh"
 
 
 using namespace std;
@@ -57,6 +58,9 @@ bool CBLResultSet::next() {
     _asArray = nullptr;
     _asDict = nullptr;
     _blobs.clear();
+#ifdef COUCHBASE_ENTERPRISE
+    _encryptables.clear();
+#endif
     
     if (_enum.next()) {
         if (!_fleeceDoc) {
@@ -130,3 +134,17 @@ CBLBlob* CBLResultSet::getBlob(Dict blobDict, const C4BlobKey &key) {
     }
     return i->second;
 }
+
+
+#ifdef COUCHBASE_ENTERPRISE
+
+CBLEncryptable* CBLResultSet::getEncryptableValue(Dict encDict) {
+    // Find or create a CBLEncryptable, then cache it.
+    auto i = _encryptables.find(encDict);
+    if (i == _encryptables.end()) {
+        i = _encryptables.emplace(encDict, new CBLEncryptable(encDict)).first;
+    }
+    return i->second;
+}
+
+#endif

@@ -376,6 +376,67 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
 }
 
 
+#ifdef COUCHBASE_ENTERPRISE
+
+TEST_CASE_METHOD(QueryTest, "Query Encryptable", "[Query]") {
+    auto doc = CBLDocument_CreateWithID("doc1"_sl);
+    auto props = CBLDocument_MutableProperties(doc);
+    
+    FLSlot_SetString(FLMutableDict_Set(props, "nosecret"_sl), "No Secret"_sl);
+    
+    auto secret1 = CBLEncryptable_CreateWithString("Secret 1"_sl);
+    FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret"_sl), secret1);
+    
+    auto nestedDict = FLMutableDict_New();
+    auto secret2 = CBLEncryptable_CreateWithString("Secret 2"_sl);
+    FLSlot_SetEncryptableValue(FLMutableDict_Set(nestedDict, "secret2"_sl), secret2);
+    FLSlot_SetDict(FLMutableDict_Set(props, "nested"_sl), nestedDict);
+    
+    CBLError error;
+    REQUIRE(CBLDatabase_SaveDocument(db, doc, &error));
+    CBLEncryptable_Release(secret1);
+    CBLEncryptable_Release(secret2);
+    FLMutableDict_Release(nestedDict);
+    CBLDocument_Release(doc);
+    
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT nosecret, secret, secret.value, nested FROM _ WHERE meta().id = 'doc1'"_sl,
+                                    nullptr, &error);
+    REQUIRE(query);
+
+    results = CBLQuery_Execute(query, &error);
+    int n = 0;
+    while (CBLResultSet_Next(results)) {
+        FLValue value = CBLResultSet_ValueAtIndex(results, 0);
+        CHECK(value);
+        CHECK(!FLValue_GetEncryptableValue(value));
+        CHECK(FLValue_AsString(value) == "No Secret"_sl);
+        
+        value = CBLResultSet_ValueAtIndex(results, 1);
+        CHECK(value);
+        auto encValue = FLValue_GetEncryptableValue(value);
+        CHECK(encValue);
+        CHECK(FLValue_AsString(CBLEncryptable_Value(encValue)) == "Secret 1"_sl);
+        
+        value = CBLResultSet_ValueAtIndex(results, 2);
+        CHECK(value);
+        CHECK(!FLValue_GetEncryptableValue(value));
+        CHECK(FLValue_AsString(value) == "Secret 1"_sl);
+        
+        value = FLDict_Get(FLValue_AsDict(CBLResultSet_ValueAtIndex(results, 3)), "secret2"_sl);
+        CHECK(value);
+        encValue = FLValue_GetEncryptableValue(value);
+        CHECK(encValue);
+        CHECK(FLValue_AsString(CBLEncryptable_Value(encValue)) == "Secret 2"_sl);
+        
+        ++n;
+    }
+    CHECK(n == 1);
+}
+
+#endif
+
+
 #pragma mark - C++ API:
 
 
