@@ -366,6 +366,7 @@ private:
                         "Invalid document ID '%.*s' used", FMTSLICE(docID));
                 return nullptr;
             }
+            throw;
         }
         if (!c4doc || (!allRevisions && (c4doc->flags() & kDocDeleted)))
             return nullptr;
