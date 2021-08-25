@@ -220,10 +220,9 @@ namespace cbl_internal {
                                    " wrong database");
                 }
                 if (resolved->docID() != _docID) {
-                    C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
-                                   "CBLDocument returned from custom conflict resolver has wrong"
-                                   " docID `%.*s` (should be %.*s)",
-                                   FMTSLICE(resolved->docID()), FMTSLICE(_docID));
+                    SyncLog(Warning, "The document ID '%.*s' of the resolved document is not matching "
+                                     "with the document ID '%.*s' of the conflicting document.",
+                                     FMTSLICE(resolved->docID()), FMTSLICE(_docID));
                 }
             }
             resolution = CBLDocument::Resolution::useMerge;

@@ -313,7 +313,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
 
 class ReplicatorConflictTest : public ReplicatorLocalTest {
 public:
-    enum class ResolverMode { kLocalWins, kRemoteWins, kMerge };
+    enum class ResolverMode { kLocalWins, kRemoteWins, kMerge, kMergeAutoID };
     
     bool deleteLocal {false}, deleteRemote {false}, deleteMerged {false};
     ResolverMode resolverMode = {ResolverMode::kLocalWins};
@@ -503,7 +503,11 @@ public:
                 case ResolverMode::kRemoteWins:
                     return remoteDocument;
                 default:
-                    CBLDocument *merged = CBLDocument_CreateWithID(documentID);
+                    CBLDocument *merged;
+                    if (resolverMode == ResolverMode::kMergeAutoID)
+                        merged = CBLDocument_Create(); // Allowed but there will be a warning message
+                    else
+                        merged = CBLDocument_CreateWithID(documentID);
                     MutableDict mergedProps(CBLDocument_MutableProperties(merged));
                     mergedProps["greeting"] = "¡Hola!";
                     
@@ -539,6 +543,7 @@ TEST_CASE_METHOD(ReplicatorConflictTest, "Custom resolver : remote wins", "[Repl
 
 TEST_CASE_METHOD(ReplicatorConflictTest, "Custom resolver : merge", "[Replicator][Conflict]") {
     testConflict(false, false, false, ResolverMode::kMerge);
+    testConflict(false, false, false, ResolverMode::kMergeAutoID);
     testConflict(false, true, false, ResolverMode::kMerge); // Remote deletion
     testConflict(true, false, false, ResolverMode::kMerge); // Local deletion
     testConflict(false, false, true, ResolverMode::kMerge); // Merge deletion
