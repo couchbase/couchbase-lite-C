@@ -250,6 +250,14 @@ TEST_CASE_METHOD(DatabaseTest, "Get Non Existing Document") {
     CHECK(error.code == 0);
 }
 
+TEST_CASE_METHOD(DatabaseTest, "Get Document with Empty ID") {
+    CBLError error;
+    ExpectingExceptions x;
+    const CBLDocument* doc = CBLDatabase_GetDocument(db, ""_sl, &error);
+    REQUIRE(doc == nullptr);
+    CHECK(error.code == 0);
+}
+
 
 #pragma mark - Save Document:
 

@@ -24,6 +24,7 @@
 #include "c4Collection.hh"
 #include "c4Database.hh"
 #include "c4Observer.hh"
+#include "Error.hh"
 #include "Internal.hh"
 #include "Listener.hh"
 #include "access_lock.hh"
@@ -359,14 +360,12 @@ private:
         Retained<C4Document> c4doc = nullptr;
         try {
             c4doc = _c4db.useLocked()->getDocument(docID, true, content);
-        } catch (...) {
-            C4Error err = C4Error::fromCurrentException();
-            if (err == C4Error{LiteCoreDomain, kC4ErrorBadDocID}) {
+        } catch (litecore::error& e) {
+            if (e == litecore::error::BadDocID) {
                 CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
-                        "Use an invalid document ID '%.*s' to get a document", FMTSLICE(docID));
+                        "Invalid document ID '%.*s' used", FMTSLICE(docID));
                 return nullptr;
             }
-            throw;
         }
         if (!c4doc || (!allRevisions && (c4doc->flags() & kDocDeleted)))
             return nullptr;
