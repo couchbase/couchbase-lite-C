@@ -363,7 +363,7 @@ private:
     C4SliceResult _encrypt(C4String documentID, FLDict properties, C4String keyPath, C4Slice input,
                            C4String* outAlgorithm, C4String* outKeyID, C4Error* outError)
     {
-        CBLError error;
+        CBLError error = {};
         auto encryptor = _conf.propertyEncryptor;
         auto result = encryptor(_conf.context, documentID, properties, keyPath, input,
                                 outAlgorithm, outKeyID, &error);
@@ -374,7 +374,7 @@ private:
     C4SliceResult _decrypt(C4String documentID, FLDict properties, C4String keyPath, C4Slice input,
                            C4String algorithm, C4String keyID, C4Error* outError)
     {
-        CBLError error;
+        CBLError error = {};
         auto decryptor = _conf.propertyDecryptor;
         auto result = decryptor(_conf.context, documentID, properties, keyPath, input,
                                 algorithm, keyID, &error);
