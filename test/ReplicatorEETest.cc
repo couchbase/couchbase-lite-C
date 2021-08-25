@@ -71,7 +71,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Push to local db", "[Replicator]") {
 
     replicate();
 
-    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
 
     Document copiedDoc = otherDB.getDocument("foo");
     REQUIRE(copiedDoc);
@@ -89,7 +89,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Continuous Push to local db", "[Replicato
 
     replicate();
 
-    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
 
     Document copiedDoc = otherDB.getDocument("foo");
     REQUIRE(copiedDoc);
@@ -120,7 +120,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Pending Documents", "[Replicator]") {
     config.replicatorType = kCBLReplicatorTypePush;
     
     replicate();
-    CHECK(asVector(docsNotified) == vector<string>{});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{});
     
     CBLError error;
     FLDict ids = CBLReplicator_PendingDocumentIDs(repl, &error);
@@ -146,7 +146,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Pending Documents", "[Replicator]") {
     
     replicate();
     
-    CHECK(asVector(docsNotified) == vector<string>{"foo1", "foo2"});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo1", "foo2"});
     
     ids = CBLReplicator_PendingDocumentIDs(repl, &error);
     CHECK(FLDict_Count(ids) == 0);
@@ -193,18 +193,18 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
     replicate();
 
     // Deleted doc should win:
-    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
     Document localDoc = db.getDocument("foo");
     REQUIRE(!localDoc);
     
     // Push
     config.replicatorType = kCBLReplicatorTypePush;
-    docsNotified.clear();
+    replicatedDocIDs.clear();
     resetReplicator();
     replicate();
     
     // Resolved doc should be pushed:
-    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
     Document remoteDoc = otherDB.getDocument("foo");
     REQUIRE(!remoteDoc);
 }
@@ -241,7 +241,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
     replicate();
 
     // Higher generation should win:
-    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
     Document localDoc = db.getDocument("foo");
     REQUIRE(localDoc);
     CHECK(localDoc["greeting"].asString() == "Konichiwa"_sl);
@@ -249,12 +249,12 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
     
     // Push
     config.replicatorType = kCBLReplicatorTypePush;
-    docsNotified.clear();
+    replicatedDocIDs.clear();
     resetReplicator();
     replicate();
     
     // Resolved doc, same as remote doc, should not be pushed.
-    CHECK(asVector(docsNotified) == vector<string>{});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{});
     Document remoteDoc = db.getDocument("foo");
     REQUIRE(remoteDoc);
     CHECK(remoteDoc["greeting"].asString() == "Konichiwa"_sl);
@@ -290,7 +290,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
     replicate();
 
     // Higher revOD should win:
-    CHECK(asVector(docsNotified) == vector<string>{"foo"});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
     Document localDoc = db.getDocument("foo");
     REQUIRE(localDoc);
     CHECK(localDoc["greeting"].asString() == "Salaam Alaykum"_sl);
@@ -298,13 +298,13 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
     
     // Push
     config.replicatorType = kCBLReplicatorTypePush;
-    docsNotified.clear();
+    replicatedDocIDs.clear();
     resetReplicator();
     replicate();
     
     // Resolved doc should be the same:
     // Resolved doc, same as remote doc, should not be pushed.
-    CHECK(asVector(docsNotified) == vector<string>{});
+    CHECK(asVector(replicatedDocIDs) == vector<string>{});
     Document remoteDoc = db.getDocument("foo");
     REQUIRE(remoteDoc);
     CHECK(remoteDoc["greeting"].asString() == "Salaam Alaykum"_sl);
@@ -363,7 +363,7 @@ public:
             expectedRemoteRevID = CBLDocument_CanonicalRevisionID(doc.ref());
         }
 
-        docsNotified.clear();
+        replicatedDocIDs.clear();
         resolverCalled = false;
         
         config.conflictResolver = [](void *context,
@@ -383,7 +383,7 @@ public:
         replicate();
 
         // Check:
-        CHECK(asVector(docsNotified) == vector<string>{docID});
+        CHECK(asVector(replicatedDocIDs) == vector<string>{docID});
         
         Document localDoc = db.getDocument(docID);
         if (resolverMode == ResolverMode::kLocalWins) {

@@ -54,9 +54,8 @@ CBL_CAPI_BEGIN
 
  */
 
-    CBL_PUBLIC extern const FLSlice kCBLTypeProperty;             ///< `"@type"`
-    CBL_PUBLIC extern const FLSlice kCBLBlobType;                 ///< `"blob"`
 
+    CBL_PUBLIC extern const FLSlice kCBLBlobType;                 ///< `"blob"`
     CBL_PUBLIC extern const FLSlice kCBLBlobDigestProperty;       ///< `"digest"`
     CBL_PUBLIC extern const FLSlice kCBLBlobLengthProperty;       ///< `"length"`
     CBL_PUBLIC extern const FLSlice kCBLBlobContentTypeProperty;  ///< `"content_type"`

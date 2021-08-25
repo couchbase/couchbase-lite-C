@@ -212,7 +212,17 @@ typedef struct CBLResultSet  CBLResultSet;
 typedef struct CBLReplicator CBLReplicator;
 /** @} */
 
+#ifdef COUCHBASE_ENTERPRISE
 
+/** \defgroup encryptables Encryptables
+     @{ */
+/** An encryptable value. The encryptable values will be encrypted by a push replicator via the
+    specified property encryptor callback when the document is push to the remote server.
+    Likewise, the encryptable values will be decrypted by a pull replicator via the specified
+    property decryptor callback when the document is pulled from the remote server. */
+typedef struct CBLEncryptable CBLEncryptable;
+/** @} */
+#endif
 
 /** \defgroup listeners   Listeners
      @{

@@ -111,6 +111,7 @@ set(
     src/CBLDatabase_CAPI.cc
     src/CBLDocument.cc
     src/CBLDocument_CAPI.cc
+    src/CBLEncryptable_CAPI.cc
     src/CBLLog.cc
     src/CBLQuery.cc
     src/CBLQuery_CAPI.cc
