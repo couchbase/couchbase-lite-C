@@ -148,6 +148,39 @@ typedef struct {
     FLString password;               ///< Password for proxy auth
 } CBLProxySettings;
 
+#ifdef COUCHBASE_ENTERPRISE
+
+/** Callback that encrypts \ref CBLEncryptable properties in documents pushed by the replicator.
+    @Note   If a null \ref FLSliceResult or an error is returned, the document will be failed to
+            replicate with the \ref kCBLErrorCrypto error when. For security reason, the encryption
+            cannot be skipped. */
+typedef FLSliceResult (*CBLPropertyEncryptor) (
+    void* context,              ///< Replicator’s context
+    FLString documentID,        ///< Document ID
+    FLDict properties,          ///< Document properties
+    FLString keyPath,           ///< Key path of the property to be encrypted
+    FLSlice input,              ///< Property data to be encrypted
+    FLString* algorithm,        ///< On return: algorithm name (Optional: Default Value is 'CB_MOBILE_CUSTOM')
+    FLString* kid,              ///< On return: encryption key identifier (Optional)
+    CBLError* error             ///< On return: error (Optional)
+);
+
+/** Callback that decrypts encrypted \ref CBLEncryptable properties in documents pulled by the replicator.
+    @Note   The decryption will be skipped (the encrypted data will be kept) when a null \ref FLSliceResult
+            without an error is returned. If an error is returned, the document will be failed to replicate
+            with the \ref kCBLErrorCrypto error. */
+typedef FLSliceResult (*CBLPropertyDecryptor) (
+    void* context,              ///< Replicator’s context
+    FLString documentID,        ///< Document ID
+    FLDict properties,          ///< Document properties
+    FLString keyPath,           ///< Key path of the property to be decrypted
+    FLSlice input,              ///< Property data to be decrypted
+    FLString algorithm,         ///< Algorithm name
+    FLString kid,               ///< Encryption key identifier specified when encryting the value
+    CBLError* error             ///< On return: error (Optional)
+);
+
+#endif
 
 /** The configuration of a replicator. */
 typedef struct {
@@ -177,6 +210,13 @@ typedef struct {
     CBLReplicationFilter _cbl_nullable pullFilter;    ///< Optional callback to validate incoming docs
     CBLConflictResolver _cbl_nullable conflictResolver;///< Optional conflict-resolver callback
     void* _cbl_nullable context;                      ///< Arbitrary value that will be passed to callbacks
+    
+#ifdef COUCHBASE_ENTERPRISE
+    //-- Property Encryption
+    CBLPropertyEncryptor propertyEncryptor;           ///< Optional callback to encrypt \ref CBLEncryptable values.
+    CBLPropertyDecryptor propertyDecryptor;           ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
+#endif
+
 } CBLReplicatorConfiguration;
 
 

@@ -22,7 +22,6 @@ using namespace std;
 using namespace fleece;
 
 
-CBL_PUBLIC const FLSlice kCBLTypeProperty              = C4Document::kObjectTypeProperty;
 CBL_PUBLIC const FLSlice kCBLBlobType                  = C4Blob::kObjectType_Blob;
 CBL_PUBLIC const FLSlice kCBLBlobDigestProperty        = C4Blob::kDigestProperty;
 CBL_PUBLIC const FLSlice kCBLBlobLengthProperty        = C4Blob::kLengthProperty;

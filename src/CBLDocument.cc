@@ -22,8 +22,13 @@
 #include "CBLBlob_Internal.hh"
 #include "c4BlobStore.hh"
 #include "c4Private.h"
-#include <mutex>
 #include "betterassert.hh"
+#include <mutex>
+
+#ifdef COUCHBASE_ENTERPRISE
+#include "CBLEncryptable_Internal.hh"
+#endif
+
 
 using namespace std;
 using namespace fleece;
@@ -288,6 +293,27 @@ CBLBlob* CBLDocument::getBlob(FLDict dict, const C4BlobKey &key) {
     _blobs.insert({dict, blob});
     return blob;
 }
+
+
+#ifdef COUCHBASE_ENTERPRISE
+
+CBLEncryptable* CBLDocument::getEncryptableValue(FLDict dict) {
+    if (!CBLEncryptable::isEncryptableValue(dict))
+          return nullptr;
+          
+    auto c4doc = _c4doc.useLocked();
+    
+    // Is it already registered by a previous call to getEncryptableValue?
+    if (auto i = _encryptables.find(dict); i != _encryptables.end())
+        return i->second;
+    
+    // Create a new CBLEncryptable and remember it:
+    auto prop = retained(new CBLEncryptable(dict));
+    _encryptables.insert({dict, prop});
+    return prop;
+}
+
+#endif
 
 
 bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {

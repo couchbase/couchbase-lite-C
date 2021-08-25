@@ -30,6 +30,9 @@ CBL_ASSUME_NONNULL_BEGIN
 struct CBLBlob;
 struct CBLNewBlob;
 
+#ifdef COUCHBASE_ENTERPRISE
+struct CBLEncryptable;
+#endif
 
 struct CBLDocument final : public CBLRefCounted {
 public:
@@ -177,7 +180,16 @@ public:
     static void unregisterNewBlob(CBLNewBlob* blob);
 
     static CBLNewBlob* _cbl_nullable findNewBlob(FLDict dict);
-
+    
+    
+#ifdef COUCHBASE_ENTERPRISE
+    
+#pragma mark - EncryptedProperties:
+    
+    CBLEncryptable*  _cbl_nullable getEncryptableValue(FLDict dict);
+    
+#endif
+    
 
 #pragma mark - Save/delete:
 
@@ -284,7 +296,11 @@ private:
                            bool releaseNewBlob,
                            C4RevisionFlags &outRevFlags) const;
 
+    // Custom object cache:
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
+#ifdef COUCHBASE_ENTERPRISE
+    using ValueToEncryptableMap = std::unordered_map<FLDict, Retained<CBLEncryptable>>;
+#endif
 
     Retained<CBLDatabase>         _db;              // Database (null for new doc)
     litecore::access_lock<Retained<C4Document>>  _c4doc;           // LiteCore doc (null for new doc)
@@ -293,6 +309,9 @@ private:
     fleece::Doc                   _fromJSON;        // Properties read from JSON
     mutable fleece::RetainedValue _properties;      // Properties, initialized lazily
     ValueToBlobMap                _blobs;           // Maps Dicts in _properties to CBLBlobs
+#ifdef COUCHBASE_ENTERPRISE
+    ValueToEncryptableMap         _encryptables;    // Maps Dicts in _properties to CBLEncryptables
+#endif
     bool const                    _mutable {false}; // True iff I am mutable
 };
 

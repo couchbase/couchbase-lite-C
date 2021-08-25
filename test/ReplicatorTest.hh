@@ -31,7 +31,9 @@ public:
 
     CBLReplicatorConfiguration config = {};
     CBLReplicator *repl = nullptr;
-    set<string> docsNotified;
+    set<string> replicatedDocIDs;
+    vector<CBLReplicatedDocument> replicatedDocs;
+    
     CBLError replError = {};
     bool logEveryDocument = true;
     IdleAction idleAction = IdleAction::kStopReplicator;
@@ -141,7 +143,8 @@ public:
         cerr << "--- " << numDocuments << " docs " << (isPush ? "pushed" : "pulled") << ":";
         if (logEveryDocument) {
             for (unsigned i = 0; i < numDocuments; ++i) {
-                docsNotified.insert(string(documents[i].ID));
+                replicatedDocIDs.insert(string(documents[i].ID));
+                replicatedDocs.push_back(documents[i]);
                 cerr << " " << documents[i].ID;
             }
         }

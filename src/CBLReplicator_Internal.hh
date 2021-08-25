@@ -113,6 +113,40 @@ public:
                 return ((CBLReplicator*)ctx)->_filter(docID, revID, flags, body, false);
             };
         }
+        
+#ifdef COUCHBASE_ENTERPRISE
+        
+        if (_conf.propertyEncryptor) {
+            params.propertyEncryptor = [](void* ctx,
+                                          C4String documentID,
+                                          FLDict properties,
+                                          C4String keyPath,
+                                          C4Slice input,
+                                          C4String* outAlgorithm,
+                                          C4String* outKeyID,
+                                          C4Error* outError)
+            {
+                return ((CBLReplicator*)ctx)->_encrypt(documentID, properties, keyPath, input,
+                                                       outAlgorithm, outKeyID, outError);
+            };
+        }
+        
+        if (_conf.propertyDecryptor) {
+            params.propertyDecryptor = [](void* ctx,
+                                          C4String documentID,
+                                          FLDict properties,
+                                          C4String keyPath,
+                                          C4Slice input,
+                                          C4String algorithm,
+                                          C4String keyID,
+                                          C4Error* outError)
+            {
+                return ((CBLReplicator*)ctx)->_decrypt(documentID, properties, keyPath, input,
+                                                       algorithm, keyID, outError);
+            };
+        }
+        
+#endif
 
         // Encode replicator options dict:
         alloc_slice options = encodeOptions();
@@ -324,6 +358,31 @@ private:
         return filter(_conf.context, doc, docFlags);
     }
 
+#ifdef COUCHBASE_ENTERPRISE
+    
+    C4SliceResult _encrypt(C4String documentID, FLDict properties, C4String keyPath, C4Slice input,
+                           C4String* outAlgorithm, C4String* outKeyID, C4Error* outError)
+    {
+        CBLError error;
+        auto encryptor = _conf.propertyEncryptor;
+        auto result = encryptor(_conf.context, documentID, properties, keyPath, input,
+                                outAlgorithm, outKeyID, &error);
+        *outError = internal(error);
+        return result;
+    }
+    
+    C4SliceResult _decrypt(C4String documentID, FLDict properties, C4String keyPath, C4Slice input,
+                           C4String algorithm, C4String keyID, C4Error* outError)
+    {
+        CBLError error;
+        auto decryptor = _conf.propertyDecryptor;
+        auto result = decryptor(_conf.context, documentID, properties, keyPath, input,
+                                algorithm, keyID, &error);
+        *outError = internal(error);
+        return result;
+    }
+    
+#endif
 
     recursive_mutex                             _mutex;
     ReplicatorConfiguration const               _conf;

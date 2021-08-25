@@ -21,6 +21,7 @@
 #include "CBLBlob.h"
 #include "CBLDatabase.h"
 #include "CBLDocument.h"
+#include "CBLEncryptable.h"
 #include "CBLLog.h"
 #include "CBLPlatform.h"
 #include "CBLQuery.h"
