@@ -23,6 +23,7 @@
 #include "c4Collection.hh"
 #include "c4Database.hh"
 #include "c4Observer.hh"
+#include "Error.hh"
 #include "Internal.hh"
 #include "Listener.hh"
 #include "access_lock.hh"
@@ -344,7 +345,17 @@ private:
 
     Retained<CBLDocument> _getDocument(slice docID, bool isMutable, bool allRevisions) const {
         C4DocContentLevel content = (allRevisions ? kDocGetAll : kDocGetCurrentRev);
-        Retained<C4Document> c4doc = _c4db.useLocked()->getDocument(docID, true, content);
+        Retained<C4Document> c4doc = nullptr;
+        try {
+            c4doc = _c4db.useLocked()->getDocument(docID, true, content);
+        } catch (litecore::error& e) {
+            if (e == litecore::error::BadDocID) {
+                CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
+                        "Invalid document ID '%.*s' used", FMTSLICE(docID));
+                return nullptr;
+            }
+            throw;
+        }
         if (!c4doc || (!allRevisions && (c4doc->flags() & kDocDeleted)))
             return nullptr;
         return new CBLDocument(docID, const_cast<CBLDatabase*>(this), c4doc, isMutable);
