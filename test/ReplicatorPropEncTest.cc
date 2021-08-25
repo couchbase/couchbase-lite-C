@@ -430,9 +430,6 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No decryptor : ok", "[Replic
     }
 }
 
-/**
- * CBL-2272 : Skip Property Encryption doesn't set error domain and code correctly
- *
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip encryption : crypto error", "[Replicator][Encryptable]") {
     auto doc = CBLDocument_CreateWithID("doc1"_sl);
     auto props = CBLDocument_MutableProperties(doc);
@@ -461,11 +458,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip encryption : crypto err
     CHECK(replicatedDocs[0].error.domain == kCBLDomain);
     CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
 }
-*/
 
-/**
- * CBL-2263 : Property Decryption Callback doesn't allow to skip decrypting
- *
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Replicator][Encryptable]") {
     {
         auto doc = CBLDocument_CreateWithID("doc1"_sl);
@@ -501,12 +494,12 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Rep
         auto doc = CBLDatabase_GetMutableDocument(db.ref(), "doc1"_sl, &error);
         CHECK(doc);
         CHECK(Dict(CBLDocument_Properties(doc)).toJSON(false, true) ==
-              "{\"secret1\":{\"@type\":\"encryptable\",\"ciphertext\":\"aRguKDkuP2t6aQ==\"}}");
+              "{\"encrypted$secret1\":{\"alg\":\"CB_MOBILE_CUSTOM\",\"ciphertext\":\"aRguKDkuP2t6aQ==\"}}");
         CHECK(encryptCount == 1);
         CBLDocument_Release(doc);
     }
 }
-*/
+
 
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encryption error", "[Replicator][Encryptable]") {
     auto doc = CBLDocument_CreateWithID("doc1"_sl);
