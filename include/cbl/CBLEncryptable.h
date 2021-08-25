@@ -60,14 +60,15 @@ CBL_CAPI_BEGIN
     including removing the 'encrypted$' prefix.
  
     The \ref CBLPropertyDecryptor callback can intentionally skip the decryption by returnning a
-    null result. When a decryption is skipped, the 'ciphertext' property and its encrypted
-    value in base-64 string will be kept as-is the CBLEncryptable dictionary format. If
-    an error is returned from the callback call, the document will be failed to pull with
+    null result. When a decryption is skipped, the encrypted property in the form of
+    Couchbase Server SDK's encrypted field format will be kept as it was received from the remote
+    server. If an error is returned from the callback call, the document will be failed to pull with
     the \ref kCBLErrorCrypto error.
  
-    If a \ref CBLPropertyEncryptor callback is not specified, the replicator will not attempt
-    to detect any encrypted properties. As a result, the encrypted property in the form of
-    Couchbase Server SDK's encrypted field format will be kept.
+    If a \ref CBLPropertyDecryptor callback is not specified, the replicator will not attempt to
+    detect any encrypted properties. As a result, all encrypted properties in the form of
+    Couchbase Server SDK's encrypted field format will be kept as they was received from the remote
+    server.
     
     To create a new \ref CBLEncryptable, call CBLEncryptable_CreateWith<Value Type>
     function such as \ref CBLEncryptable_CreateWithString. Then call \ref FLSlot_SetEncryptableValue
@@ -83,8 +84,8 @@ CBL_CAPI_BEGIN
     \ref Encryptable dictionary value to obtain a \ref CBLEncryptable object.
  */
 
-CBL_CORE_API extern const FLSlice kCBLEncryptableType;                ///< `"encryptable"`
-CBL_CORE_API extern const FLSlice kCBLEncryptableValueProperty;       ///< `"value"`
+CBL_PUBLIC extern const FLSlice kCBLEncryptableType;                ///< `"encryptable"`
+CBL_PUBLIC extern const FLSlice kCBLEncryptableValueProperty;       ///< `"value"`
 
 CBL_REFCOUNTED(CBLEncryptable*, Encryptable);
 
@@ -147,12 +148,12 @@ static inline bool FLValue_IsEncryptableValue(FLValue _cbl_nullable value) {
 /** Returns a \ref CBLEncryptable object corresponding to the given encryptable dictionary
     in a document or NULL if the dictionary is not a \ref CBLEncryptable.
     @Note  The returned CBLEncryptable object will be released when its document is released. */
-const CBLEncryptable* FLDict_GetEncryptableValue(FLDict _cbl_nullable encryptableDict) CBLAPI;
+const CBLEncryptable* _cbl_nullable FLDict_GetEncryptableValue(FLDict _cbl_nullable encryptableDict) CBLAPI;
 
 /** Returns a \ref CBLEncryptable object corresponding to the given \ref FLValue in a document
     or NULL if the value is not a \ref CBLEncryptable.
     @Note  The returned CBLEncryptable object will be released when its document is released. */
-static inline const CBLEncryptable* FLValue_GetEncryptableValue(FLValue _cbl_nullable value) {
+static inline const CBLEncryptable* _cbl_nullable FLValue_GetEncryptableValue(FLValue _cbl_nullable value) {
     return FLDict_GetEncryptableValue(FLValue_AsDict(value));
 }
 

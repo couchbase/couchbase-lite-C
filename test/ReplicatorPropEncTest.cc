@@ -582,23 +582,16 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt already encrypted va
         auto doc = CBLDocument_CreateWithID("doc1"_sl);
         auto props = CBLDocument_MutableProperties(doc);
         
-        auto secret1 = FLMutableDict_New();
-        FLSlot_SetString(FLMutableDict_Set(secret1, kCBLTypeProperty), kCBLEncryptableType);
-        FLSlot_SetString(FLMutableDict_Set(secret1, "alg"_sl), "CB_MOBILE_CUSTOM"_sl);
-        FLSlot_SetString(FLMutableDict_Set(secret1, "ciphertext"_sl), "aRguKDkuP2t6aQ=="_sl);
-        FLSlot_SetDict(FLMutableDict_Set(props, "secret1"_sl), secret1);
-        
-        auto secret2 = FLMutableDict_New();
-        FLSlot_SetString(FLMutableDict_Set(secret2, "alg"_sl), "CB_MOBILE_CUSTOM"_sl);
-        FLSlot_SetString(FLMutableDict_Set(secret2, "ciphertext"_sl), "aRguKDkuP2t6aQ=="_sl);
-        FLSlot_SetDict(FLMutableDict_Set(props, "encrypted$secret2"_sl), secret2);
+        auto secret = FLMutableDict_New();
+        FLSlot_SetString(FLMutableDict_Set(secret, "alg"_sl), "CB_MOBILE_CUSTOM"_sl);
+        FLSlot_SetString(FLMutableDict_Set(secret, "ciphertext"_sl), "aRguKDkuP2t6aQ=="_sl);
+        FLSlot_SetDict(FLMutableDict_Set(props, "encrypted$secret"_sl), secret);
         
         CBLError error;
         CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
         
         CBLDocument_Release(doc);
-        FLMutableDict_Release(secret1);
-        FLMutableDict_Release(secret2);
+        FLMutableDict_Release(secret);
         
         config.replicatorType = kCBLReplicatorTypePushAndPull;
         setupEncryptionCallback();
@@ -607,10 +600,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt already encrypted va
         doc = CBLDatabase_GetMutableDocument(otherDB.ref(), "doc1"_sl, &error);
         props = CBLDocument_MutableProperties(doc);
         
-        CHECK(Dict(FLValue_AsDict(FLDict_Get(props, "encrypted$secret1"_sl))).toJSON(false, true) ==
-              "{\"alg\":\"CB_MOBILE_CUSTOM\",\"ciphertext\":\"aRguKDkuP2t6aQ==\"}");
-        
-        CHECK(Dict(FLValue_AsDict(FLDict_Get(props, "encrypted$secret2"_sl))).toJSON(false, true) ==
+        CHECK(Dict(FLValue_AsDict(FLDict_Get(props, "encrypted$secret"_sl))).toJSON(false, true) ==
               "{\"alg\":\"CB_MOBILE_CUSTOM\",\"ciphertext\":\"aRguKDkuP2t6aQ==\"}");
         
         CHECK(encryptCount == 0);

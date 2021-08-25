@@ -22,8 +22,8 @@
 
 using namespace fleece;
 
-CBL_CORE_API const FLSlice kCBLEncryptableType            = C4Document::kObjectType_Encryptable;
-CBL_CORE_API const FLSlice kCBLEncryptableValueProperty   = C4Document::kValueToEncryptProperty;
+CBL_PUBLIC const FLSlice kCBLEncryptableType            = C4Document::kObjectType_Encryptable;
+CBL_PUBLIC const FLSlice kCBLEncryptableValueProperty   = C4Document::kValueToEncryptProperty;
 
 CBLEncryptable* CBLEncryptable_CreateWithNull() noexcept {
     return CBLEncryptable::createWithNull().detach();

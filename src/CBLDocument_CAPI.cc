@@ -21,7 +21,7 @@
 
 using namespace fleece;
 
-CBL_CORE_API const FLSlice kCBLTypeProperty              = C4Document::kObjectTypeProperty;
+CBL_PUBLIC const FLSlice kCBLTypeProperty              = C4Document::kObjectTypeProperty;
 
 CBLDocument* CBLDocument_Create() noexcept {
     return CBLDocument_CreateWithID(nullslice);

@@ -27,7 +27,7 @@ CBL_CAPI_BEGIN
     A \ref CBLDocument is essentially a JSON object with an ID string that's unique in its database.
  */
 
-CBL_CORE_API extern const FLSlice kCBLTypeProperty;             ///< `"@type"`
+CBL_PUBLIC extern const FLSlice kCBLTypeProperty;             ///< `"@type"`
 
 /** \name  Document lifecycle
     @{ */

@@ -22,10 +22,10 @@ using namespace std;
 using namespace fleece;
 
 
-CBL_CORE_API const FLSlice kCBLBlobType                  = C4Blob::kObjectType_Blob;
-CBL_CORE_API const FLSlice kCBLBlobDigestProperty        = C4Blob::kDigestProperty;
-CBL_CORE_API const FLSlice kCBLBlobLengthProperty        = C4Blob::kLengthProperty;
-CBL_CORE_API const FLSlice kCBLBlobContentTypeProperty   = C4Blob::kContentTypeProperty;
+CBL_PUBLIC const FLSlice kCBLBlobType                  = C4Blob::kObjectType_Blob;
+CBL_PUBLIC const FLSlice kCBLBlobDigestProperty        = C4Blob::kDigestProperty;
+CBL_PUBLIC const FLSlice kCBLBlobLengthProperty        = C4Blob::kLengthProperty;
+CBL_PUBLIC const FLSlice kCBLBlobContentTypeProperty   = C4Blob::kContentTypeProperty;
 
 
 FLDict CBLBlob_Properties(const CBLBlob* blob) noexcept {
