@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 # NOTE: This is for Couchbase internal CI usage.  
 # This room is full of dragons, so you *will* get confused.  
@@ -45,7 +45,7 @@ if [ -z "$EDITION" ]; then
     usage
 fi
 
-SDK_MGR="${SDK_HOME}/cmdline-tools/latest/bin/sdkmanager"
+SDK_MGR="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
 CMAKE_PATH="${ANDROID_HOME}/cmake/${ANDROID_CMAKE_VERSION}/bin"
 
 echo " ======== Installing toolchain with CMake ${ANDROID_CMAKE_VERSION} and NDK ${ANDROID_NDK_VERSION} (this will accept the licenses!)"
