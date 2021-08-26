@@ -123,7 +123,7 @@ typedef struct {
 } CBLLogFileConfiguration;
 
 /** Gets the current file logging configuration, or NULL if none is configured. */
-const CBLLogFileConfiguration* CBLLog_FileConfig(void) CBLAPI;
+const CBLLogFileConfiguration* _cbl_nullable CBLLog_FileConfig(void) CBLAPI;
 
 /** Sets the file logging configuration, and begins logging to files. */
 bool CBLLog_SetFileConfig(CBLLogFileConfiguration, CBLError* _cbl_nullable outError) CBLAPI;

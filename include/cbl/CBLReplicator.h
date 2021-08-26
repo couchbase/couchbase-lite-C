@@ -46,7 +46,8 @@ typedef struct CBLEndpoint CBLEndpoint;
     If an invalid endpoint URL is specified, an error will be returned.
     */
 _cbl_warn_unused
-CBLEndpoint* CBLEndpoint_CreateWithURL(FLString url, CBLError* _cbl_nullable outError) CBLAPI;
+CBLEndpoint* _cbl_nullable CBLEndpoint_CreateWithURL(FLString url,
+                                                     CBLError* _cbl_nullable outError) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 /** Creates a new endpoint representing another local database. (Enterprise Edition only.) */
@@ -230,8 +231,8 @@ CBL_REFCOUNTED(CBLReplicator*, Replicator);
 
 /** Creates a replicator with the given configuration. */
 _cbl_warn_unused
-CBLReplicator* CBLReplicator_Create(const CBLReplicatorConfiguration*,
-                                    CBLError* _cbl_nullable outError) CBLAPI;
+CBLReplicator* _cbl_nullable CBLReplicator_Create(const CBLReplicatorConfiguration*,
+                                                  CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the configuration of an existing replicator. */
 const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator*) CBLAPI;
@@ -316,8 +317,8 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator*) CBLAPI;
            `pushFilter` or `docIDs`, are ignored.
     \warning  You are responsible for releasing the returned array via \ref FLValue_Release. */
 _cbl_warn_unused
-FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator*,
-                                        CBLError* _cbl_nullable outError) CBLAPI;
+FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs(CBLReplicator*,
+                                                      CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Indicates whether the document with the given ID has local changes that have not yet been
     pushed to the server by this replicator.

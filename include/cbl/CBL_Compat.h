@@ -34,12 +34,10 @@
     #include <sal.h>
     #define CBLINLINE               __forceinline
     #define _cbl_nonnull            _In_
-    #define _cbl_returns_nonnull    _Ret_notnull_
     #define _cbl_warn_unused        _Check_return_
     #define _cbl_deprecated
 #else
     #define CBLINLINE               inline
-    #define _cbl_returns_nonnull    __attribute__((returns_nonnull))
     #define _cbl_warn_unused        __attribute__((warn_unused_result))
     #define _cbl_deprecated         __attribute__((deprecated()))
 #endif
@@ -76,8 +74,6 @@
 // In between CBL_ASSUME_NONNULL_BEGIN and CBL_ASSUME_NONNULL_END, all pointer declarations implicitly
 // disallow NULL values, unless annotated with _cbl_nullable (which must come after the `*`.)
 // (_cbl_nonnull is occasionally necessary when there are C arrays or multiple levels of pointers.)
-// NOTE: Does not apply to function return values, for some reason. Those may still be null,
-//       unless annotated with _cbl_returns_nonnull.
 // NOTE: Only supported in Clang, so far.
 #if __has_feature(nullability)
 #  define CBL_ASSUME_NONNULL_BEGIN  _Pragma("clang assume_nonnull begin")

@@ -132,9 +132,9 @@ bool CBL_DeleteDatabase(FLString name,
     @param outError  On failure, the error will be written here.
     @return  The new database object, or NULL on failure. */
 _cbl_warn_unused
-CBLDatabase* CBLDatabase_Open(FLSlice name,
-                              const CBLDatabaseConfiguration* _cbl_nullable config,
-                              CBLError* _cbl_nullable outError) CBLAPI;
+CBLDatabase* _cbl_nullable CBLDatabase_Open(FLSlice name,
+                                            const CBLDatabaseConfiguration* _cbl_nullable config,
+                                            CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Closes an open database. */
 bool CBLDatabase_Close(CBLDatabase*,
