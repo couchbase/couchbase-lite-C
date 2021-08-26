@@ -409,24 +409,24 @@ TEST_CASE_METHOD(QueryTest, "Query Encryptable", "[Query]") {
     while (CBLResultSet_Next(results)) {
         FLValue value = CBLResultSet_ValueAtIndex(results, 0);
         REQUIRE(value);
-        CHECK(!FLValue_GetEncryptableValue(value));
+        REQUIRE(!FLValue_GetEncryptableValue(value));
         CHECK(FLValue_AsString(value) == "No Secret"_sl);
         
         value = CBLResultSet_ValueAtIndex(results, 1);
         REQUIRE(value);
         auto encValue = FLValue_GetEncryptableValue(value);
-        CHECK(encValue);
+        REQUIRE(encValue);
         CHECK(FLValue_AsString(CBLEncryptable_Value(encValue)) == "Secret 1"_sl);
         
         value = CBLResultSet_ValueAtIndex(results, 2);
         REQUIRE(value);
-        CHECK(!FLValue_GetEncryptableValue(value));
+        REQUIRE(!FLValue_GetEncryptableValue(value));
         CHECK(FLValue_AsString(value) == "Secret 1"_sl);
         
         value = FLDict_Get(FLValue_AsDict(CBLResultSet_ValueAtIndex(results, 3)), "secret2"_sl);
         REQUIRE(value);
         encValue = FLValue_GetEncryptableValue(value);
-        CHECK(encValue);
+        REQUIRE(encValue);
         CHECK(FLValue_AsString(CBLEncryptable_Value(encValue)) == "Secret 2"_sl);
         
         ++n;
