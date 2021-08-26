@@ -65,11 +65,11 @@ typedef CBL_ENUM(uint32_t, CBLQueryLanguage) {
     @param outError  On failure, the error will be written here.
     @return  The new query object. */
 _cbl_warn_unused
-CBLQuery* CBLDatabase_CreateQuery(const CBLDatabase* db,
-                                  CBLQueryLanguage language,
-                                  FLString queryString,
-                                  int* _cbl_nullable outErrorPos,
-                                  CBLError* _cbl_nullable outError) CBLAPI;
+CBLQuery* _cbl_nullable CBLDatabase_CreateQuery(const CBLDatabase* db,
+                                                CBLQueryLanguage language,
+                                                FLString queryString,
+                                                int* _cbl_nullable outErrorPos,
+                                                CBLError* _cbl_nullable outError) CBLAPI;
 
 CBL_REFCOUNTED(CBLQuery*, Query);
 
@@ -88,15 +88,15 @@ void CBLQuery_SetParameters(CBLQuery* query,
                             FLDict parameters) CBLAPI;
 
 /** Returns the query's current parameter bindings, if any. */
-FLDict CBLQuery_Parameters(const CBLQuery* query) CBLAPI;
+FLDict _cbl_nullable CBLQuery_Parameters(const CBLQuery* query) CBLAPI;
 
 /** Runs the query, returning the results.
     To obtain the results you'll typically call \ref CBLResultSet_Next in a `while` loop,
     examining the values in the \ref CBLResultSet each time around.
     @note  You must release the result set when you're finished with it. */
 _cbl_warn_unused
-CBLResultSet* CBLQuery_Execute(CBLQuery*,
-                               CBLError* _cbl_nullable outError) CBLAPI;
+CBLResultSet* _cbl_nullable CBLQuery_Execute(CBLQuery*,
+                                             CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns information about the query, including the translated SQLite form, and the search
     strategy. You can use this to help optimize the query: the word `SCAN` in the strategy
@@ -229,9 +229,9 @@ CBLListenerToken* CBLQuery_AddChangeListener(CBLQuery* query,
     @param outError  If the query failed to run, the error will be stored here.
     @return  A new object containing the query's current results, or NULL if the query failed to run. */
 _cbl_warn_unused
-CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
-                                          CBLListenerToken *listener,
-                                          CBLError* _cbl_nullable outError) CBLAPI;
+CBLResultSet* _cbl_nullable CBLQuery_CopyCurrentResults(const CBLQuery* query,
+                                                        CBLListenerToken *listener,
+                                                        CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 

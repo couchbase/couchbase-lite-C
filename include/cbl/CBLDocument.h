@@ -69,9 +69,9 @@ typedef bool (*CBLConflictHandler)(void* _cbl_nullable context,
                     considered a failure; in that event the error code will be zero.)
     @return  A new \ref CBLDocument instance, or NULL if the doc doesn't exist or an error occurred. */
 _cbl_warn_unused
-const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* database,
-                                           FLString docID,
-                                           CBLError* _cbl_nullable outError) CBLAPI;
+const CBLDocument* _cbl_nullable CBLDatabase_GetDocument(const CBLDatabase* database,
+                                                         FLString docID,
+                                                         CBLError* _cbl_nullable outError) CBLAPI;
 
 CBL_REFCOUNTED(CBLDocument*, Document);
 
@@ -185,15 +185,15 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* database,
                     considered a failure; in that event the error code will be zero.)
     @return  A new \ref CBLDocument instance, or NULL if the doc doesn't exist or an error occurred. */
 _cbl_warn_unused
-CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* database,
-                                            FLString docID,
-                                            CBLError* _cbl_nullable outError) CBLAPI;
+CBLDocument* _cbl_nullable CBLDatabase_GetMutableDocument(CBLDatabase* database,
+                                                          FLString docID,
+                                                          CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Creates a new, empty document in memory, with a randomly-generated unique ID.
     It will not be added to a database until saved.
     @return  The new mutable document instance. */
 _cbl_warn_unused
-CBLDocument* CBLDocument_Create(void) CBLAPI _cbl_returns_nonnull;
+CBLDocument* CBLDocument_Create(void) CBLAPI;
 
 /** Creates a new, empty document in memory, with the given ID.
     It will not be added to a database until saved.
@@ -203,7 +203,7 @@ CBLDocument* CBLDocument_Create(void) CBLAPI _cbl_returns_nonnull;
     @param docID  The ID of the new document, or NULL to assign a new unique ID.
     @return  The new mutable document instance. */
 _cbl_warn_unused
-CBLDocument* CBLDocument_CreateWithID(FLString docID) CBLAPI _cbl_returns_nonnull;
+CBLDocument* CBLDocument_CreateWithID(FLString docID) CBLAPI;
 
 /** Creates a new mutable CBLDocument instance that refers to the same document as the original.
     If the original document has unsaved changes, the new one will also start out with the same
@@ -211,8 +211,7 @@ CBLDocument* CBLDocument_CreateWithID(FLString docID) CBLAPI _cbl_returns_nonnul
     @note  You must release the new reference when you're done with it. Similarly, the original
            document still exists and must also be released when you're done with it.*/
 _cbl_warn_unused
-CBLDocument* CBLDocument_MutableCopy(const CBLDocument* original) CBLAPI
-    _cbl_returns_nonnull;
+CBLDocument* CBLDocument_MutableCopy(const CBLDocument* original) CBLAPI;
 
 /** @} */
 
@@ -257,7 +256,7 @@ FLDict CBLDocument_Properties(const CBLDocument*) CBLAPI;
     @warning  When the document is released, this reference to the properties becomes invalid.
             If you need to use any properties after releasing the document, you must retain them
             by calling \ref FLValue_Retain (and of course later release them.) */
-FLMutableDict CBLDocument_MutableProperties(CBLDocument*) CBLAPI _cbl_returns_nonnull;
+FLMutableDict CBLDocument_MutableProperties(CBLDocument*) CBLAPI;
 
 /** Sets a mutable document's properties.
     Call \ref CBLDatabase_SaveDocument to persist the changes.

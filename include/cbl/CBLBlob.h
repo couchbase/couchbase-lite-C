@@ -142,8 +142,7 @@ CBL_CAPI_BEGIN
         @param contents  The data's address and length.
         @return  A new CBLBlob instance. */
     _cbl_warn_unused
-    CBLBlob* CBLBlob_CreateWithData(FLString contentType,
-                                    FLSlice contents) CBLAPI;
+    CBLBlob* CBLBlob_CreateWithData(FLString contentType, FLSlice contents) CBLAPI;
 
     /** A stream for writing a new blob to the database. */
     typedef struct CBLBlobWriteStream CBLBlobWriteStream;
@@ -205,8 +204,7 @@ CBL_CAPI_BEGIN
         @param slot  The position in the collection, as returned by functions like
                     \ref FLMutableArray_Set or \ref FLMutableDict_Set.
         @param blob  The CBLBlob to store (as a Dict) in the collection. */
-    void FLSlot_SetBlob(FLSlot slot,
-                        CBLBlob* blob) CBLAPI;
+    void FLSlot_SetBlob(FLSlot slot, CBLBlob* blob) CBLAPI;
 
 #ifdef __APPLE__
 #pragma mark - BINDING DEV SUPPORT FOR BLOB:
@@ -226,8 +224,8 @@ CBL_CAPI_BEGIN
         @param outError On failure, error info will be written here if specified. A nonexistent blob
                         is not considered a failure; in that event the error code will be zero.
         @return A \ref CBLBlob instance, or NULL if the doc doesn't exist or an error occurred. */
-    const CBLBlob* CBLDatabase_GetBlob(CBLDatabase* db, FLDict properties,
-                                       CBLError* _cbl_nullable outError) CBLAPI;
+    const CBLBlob* _cbl_nullable CBLDatabase_GetBlob(CBLDatabase* db, FLDict properties,
+                                                     CBLError* _cbl_nullable outError) CBLAPI;
 
     /** Save a new \ref CBLBlob object into the database without associating it with
         any documents. The properties of the saved \ref CBLBlob object will include
