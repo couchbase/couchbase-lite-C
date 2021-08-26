@@ -161,8 +161,8 @@ typedef FLSliceResult (*CBLPropertyEncryptor) (
     FLDict properties,          ///< Document properties
     FLString keyPath,           ///< Key path of the property to be encrypted
     FLSlice input,              ///< Property data to be encrypted
-    FLString* algorithm,        ///< On return: algorithm name (Optional: Default Value is 'CB_MOBILE_CUSTOM')
-    FLString* kid,              ///< On return: encryption key identifier (Optional)
+    FLStringResult* algorithm,  ///< On return: algorithm name (Optional: Default Value is 'CB_MOBILE_CUSTOM')
+    FLStringResult* kid,        ///< On return: encryption key identifier (Optional)
     CBLError* error             ///< On return: error (Optional)
 );
 

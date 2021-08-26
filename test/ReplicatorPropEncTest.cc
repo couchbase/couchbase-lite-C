@@ -29,8 +29,8 @@ public:
     int encryptCount = 0;
     int decryptCount = 0;
     
-    alloc_slice keyID = nullptr;
-    alloc_slice algorithm = nullptr;
+    slice keyID = nullptr;
+    slice algorithm = nullptr;
     
     bool skipEncryption = false;
     bool skipDecryption = false;
@@ -60,20 +60,36 @@ public:
     
     void setupEncryptionCallback(bool encryptor = true, bool decryptor = true) {
         if (encryptor) {
-            config.propertyEncryptor = [](void* context, FLString docID, FLDict props, FLString path, FLSlice input, FLString* alg, FLString* kid, CBLError* error) -> FLSliceResult {
+            config.propertyEncryptor = [](void* context,
+                                          FLString docID,
+                                          FLDict props,
+                                          FLString path,
+                                          FLSlice input,
+                                          FLStringResult* alg,
+                                          FLStringResult* kid,
+                                          CBLError* error) -> FLSliceResult
+            {
                 return ((ReplicatorPropertyEncryptionTest*)context) -> encrypt(context, docID, props, path, input, alg, kid, error);
             };
         }
         
         if (decryptor) {
-            config.propertyDecryptor = [](void* context, FLString docID, FLDict props, FLString path, FLSlice input, FLString alg, FLString kid, CBLError* error) -> FLSliceResult {
+            config.propertyDecryptor = [](void* context,
+                                          FLString docID,
+                                          FLDict props,
+                                          FLString path,
+                                          FLSlice input,
+                                          FLString alg,
+                                          FLString kid,
+                                          CBLError* error) -> FLSliceResult
+            {
                 return ((ReplicatorPropertyEncryptionTest*)context) -> decrypt(context, docID, props, path, input, alg, kid, error);
             };
         }
     }
     
     FLSliceResult encrypt(void* context, FLString documentID, FLDict properties, FLString keyPath,
-                          FLSlice input, FLString* alg, FLString* kid, CBLError* error)
+                          FLSlice input, FLStringResult* alg, FLStringResult* kid, CBLError* error)
     {
         encryptCount++;
         
@@ -93,10 +109,10 @@ public:
         }
         
         if (algorithm)
-            *alg = algorithm;
+            *alg = FLStringResult(algorithm);
         
         if (keyID)
-            *kid = keyID;
+            *kid = FLStringResult(keyID);
         
         return FLSliceResult(encrypted);
     }

@@ -122,8 +122,8 @@ public:
                                           FLDict properties,
                                           C4String keyPath,
                                           C4Slice input,
-                                          C4String* outAlgorithm,
-                                          C4String* outKeyID,
+                                          C4StringResult* outAlgorithm,
+                                          C4StringResult* outKeyID,
                                           C4Error* outError)
             {
                 return ((CBLReplicator*)ctx)->_encrypt(documentID, properties, keyPath, input,
@@ -361,7 +361,7 @@ private:
 #ifdef COUCHBASE_ENTERPRISE
     
     C4SliceResult _encrypt(C4String documentID, FLDict properties, C4String keyPath, C4Slice input,
-                           C4String* outAlgorithm, C4String* outKeyID, C4Error* outError)
+                           C4StringResult* outAlgorithm, C4StringResult* outKeyID, C4Error* outError)
     {
         CBLError error = {};
         auto encryptor = _conf.propertyEncryptor;
