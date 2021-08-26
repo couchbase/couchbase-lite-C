@@ -19,6 +19,10 @@
         "toolchain": "",
         "sysroot": "ubuntu-focal-armhf.tar.gz"
     },
+    "ubuntu20.04-arm64": {
+        "toolchain": "",
+        "sysroot": "ubuntu-focal-arm64.tar.gz"
+    },
     "ubuntu20.04-x86_64": {
         "toolchain": "",
         "sysroot": "ubuntu-focal-x64.tar.gz"
