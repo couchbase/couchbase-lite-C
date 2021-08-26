@@ -140,16 +140,26 @@ public:
     static Retained<CBLResultSet> containing(Value v);
 
     CBLBlob* getBlob(Dict blobDict, const C4BlobKey&);
+    
+#ifdef COUCHBASE_ENTERPRISE
+    CBLEncryptable* getEncryptableValue(Dict encDict);
+#endif
 
 private:
     using ValueToBlobMap = std::unordered_map<FLDict, Retained<CBLBlob>>;
+#ifdef COUCHBASE_ENTERPRISE
+    using ValueToEncryptableMap = std::unordered_map<FLDict, Retained<CBLEncryptable>>;
+#endif
 
-    Retained<CBLQuery> const     _query;    // The query
-    C4Query::Enumerator          _enum;     // The query enumerator
-    fleece::MutableArray mutable _asArray;  // Column values as a Fleece Array
-    fleece::MutableDict  mutable _asDict;   // Column names/values as a Fleece Dict
-    Doc                          _fleeceDoc;// Fleece Doc that owns the column values
-    ValueToBlobMap               _blobs;    // Cached CBLBLobs, keyed by FLDict
+    Retained<CBLQuery> const     _query;        // The query
+    C4Query::Enumerator          _enum;         // The query enumerator
+    fleece::MutableArray mutable _asArray;      // Column values as a Fleece Array
+    fleece::MutableDict  mutable _asDict;       // Column names/values as a Fleece Dict
+    Doc                          _fleeceDoc;    // Fleece Doc that owns the column values
+    ValueToBlobMap               _blobs;        // Cached CBLBLobs, keyed by FLDict
+#ifdef COUCHBASE_ENTERPRISE
+    ValueToEncryptableMap        _encryptables; // Cached CBLEncryptables, keyed by FLDict
+#endif
 };
 
 

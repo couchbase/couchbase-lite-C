@@ -19,6 +19,7 @@
 #pragma once
 #include "CBLEncryptable.h"
 #include "CBLDocument_Internal.hh"
+#include "CBLQuery_Internal.hh"
 
 #ifdef COUCHBASE_ENTERPRISE
 
@@ -44,14 +45,18 @@ public:
         return cbltype && slice(FLValue_AsString(cbltype)) == C4Document::kObjectType_Encryptable;
     }
     
-    static CBLEncryptable* _cbl_nullable getEncryptableValue(FLDict _cbl_nullable dict) {
-        if (!dict)
+    static CBLEncryptable* _cbl_nullable getEncryptableValue(Dict dict) {
+        if (!isEncryptableValue(dict))
             return nullptr;
         
-        auto doc = CBLDocument::containing(Dict(dict));
-        if (!doc)
-            return nullptr;
-        return doc->getEncryptableValue(dict);
+        if (auto doc = CBLDocument::containing(dict); doc)
+            return doc->getEncryptableValue(dict);
+        
+        if (auto rs = CBLResultSet::containing(dict); rs)
+            return rs->getEncryptableValue(dict);
+        
+        return nullptr;
+        
     }
     
     static Retained<CBLEncryptable> createWithNull() {
