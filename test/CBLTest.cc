@@ -62,6 +62,11 @@ const CBLDatabaseConfiguration CBLTest::kDatabaseConfiguration = []{
 
 
 CBLTest::CBLTest() {
+    // Check that these have been correctly exported
+    CHECK(FLValue_GetType(kFLNullValue) == kFLNull);
+    CHECK(FLValue_GetType((FLValue)kFLEmptyArray) == kFLArray);
+    CHECK(FLValue_GetType((FLValue)kFLEmptyDict) == kFLDict);
+
     CBLError error;
     if (!CBL_DeleteDatabase(kDatabaseName, kDatabaseConfiguration.directory, &error) && error.code != 0)
         FAIL("Can't delete temp database: " << error.domain << "/" << error.code);
