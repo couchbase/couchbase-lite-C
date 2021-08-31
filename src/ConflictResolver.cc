@@ -112,6 +112,10 @@ namespace cbl_internal {
                     // Revision is gone or not a leaf: Conflict must be resolved, so stop
                     SyncLog(Info, "Conflict in doc '%.*s' already resolved, nothing to do",
                             FMTSLICE(_docID));
+                    if (_completionHandler) {
+                        _completionHandler(this);       // the handler will most likely delete me
+                    }
+
                     return true;
                 }
 
