@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['readonly',['readOnly',['../struct_c_b_l_u_r_l_endpoint_listener_configuration.html#a48f15a9f8cc24476b4f8d81d145a1d55',1,'CBLURLEndpointListenerConfiguration']]],
-  ['replicatortype',['replicatorType',['../struct_c_b_l_replicator_configuration.html#a40f3195389ab0578aa17e63dd832a390',1,'CBLReplicatorConfiguration']]]
+  ['size_0',['size',['../struct_f_l_slice.html#a8fb4c8187bdd5a8d645809d5d0a72c90',1,'FLSlice::size()'],['../struct_f_l_slice_result.html#a622d35e8c1031bb88d0fe89cfaca12e1',1,'FLSliceResult::size()']]]
 ];

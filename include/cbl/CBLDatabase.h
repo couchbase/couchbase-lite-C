@@ -95,7 +95,8 @@ bool CBL_DatabaseExists(FLString name, FLString inDirectory) CBLAPI;
     it from the original database when replicating.
     @param fromPath  The full filesystem path to the original database (including extension).
     @param toName  The new database name (without the ".cblite2" extension.)
-    @param config  The database configuration (directory and encryption option.) */
+    @param config  The database configuration (directory and encryption option.)
+    @param outError  On return, will be set to the error that occurred, if applicable.*/
 bool CBL_CopyDatabase(FLString fromPath,
                       FLString toName,
                       const CBLDatabaseConfiguration* _cbl_nullable config,

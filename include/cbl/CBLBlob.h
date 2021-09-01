@@ -195,7 +195,7 @@ CBL_CAPI_BEGIN
     /** Instantiates a \ref CBLBlob object corresponding to a blob dictionary in a document.
         @param value  The value (dictionary) in the document.
         @return  A \ref CBLBlob instance for this blob, or `NULL` if the value is not a blob.
-        @Note  The returned CBLBlob object will be released when its document is released. */
+        \note  The returned CBLBlob object will be released when its document is released. */
     static inline const CBLBlob* _cbl_nullable FLValue_GetBlob(FLValue _cbl_nullable value) {
         return FLDict_GetBlob(FLValue_AsDict(value));
     }
@@ -236,7 +236,7 @@ CBL_CAPI_BEGIN
         (e.g. developing javascript binding) that you cannot retain the \ref CBLBlob
         object until the document containing the \ref CBLBlob object is successfully
         saved into the database.
-        @Note The saved \ref CBLBlob objects that are not associated with any documents
+        \note The saved \ref CBLBlob objects that are not associated with any documents
               will be removed from the database when compacting the database.
         @param db   The database.
         @param blob The The CBLBlob to save.

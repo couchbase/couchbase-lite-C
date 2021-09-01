@@ -152,7 +152,7 @@ typedef struct {
 #ifdef COUCHBASE_ENTERPRISE
 
 /** Callback that encrypts \ref CBLEncryptable properties in documents pushed by the replicator.
-    @Note   If a null \ref FLSliceResult or an error is returned, the document will be failed to
+    \note   If a null \ref FLSliceResult or an error is returned, the document will be failed to
             replicate with the \ref kCBLErrorCrypto error when. For security reason, the encryption
             cannot be skipped. */
 typedef FLSliceResult (*CBLPropertyEncryptor) (
@@ -167,7 +167,7 @@ typedef FLSliceResult (*CBLPropertyEncryptor) (
 );
 
 /** Callback that decrypts encrypted \ref CBLEncryptable properties in documents pulled by the replicator.
-    @Note   The decryption will be skipped (the encrypted data will be kept) when a null \ref FLSliceResult
+    \note   The decryption will be skipped (the encrypted data will be kept) when a null \ref FLSliceResult
             without an error is returned. If an error is returned, the document will be failed to replicate
             with the \ref kCBLErrorCrypto error. */
 typedef FLSliceResult (*CBLPropertyDecryptor) (
