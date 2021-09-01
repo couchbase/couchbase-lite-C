@@ -81,7 +81,7 @@ CBL_CAPI_BEGIN
     \ref CBLEncryptable object but not until its document is saved into the database.
  
     When a document is loaded from the database, call \ref FLDict_GetEncryptableValue on an
-    \ref Encryptable dictionary value to obtain a \ref CBLEncryptable object.
+    Encryptable dictionary value to obtain a \ref CBLEncryptable object.
  */
 
 CBL_PUBLIC extern const FLSlice kCBLEncryptableType;                ///< `"encryptable"`
@@ -147,12 +147,12 @@ static inline bool FLValue_IsEncryptableValue(FLValue _cbl_nullable value) {
 
 /** Returns a \ref CBLEncryptable object corresponding to the given encryptable dictionary
     in a document or NULL if the dictionary is not a \ref CBLEncryptable.
-    @Note  The returned CBLEncryptable object will be released when its document is released. */
+    \note  The returned CBLEncryptable object will be released when its document is released. */
 const CBLEncryptable* _cbl_nullable FLDict_GetEncryptableValue(FLDict _cbl_nullable encryptableDict) CBLAPI;
 
 /** Returns a \ref CBLEncryptable object corresponding to the given \ref FLValue in a document
     or NULL if the value is not a \ref CBLEncryptable.
-    @Note  The returned CBLEncryptable object will be released when its document is released. */
+    \note  The returned CBLEncryptable object will be released when its document is released. */
 static inline const CBLEncryptable* _cbl_nullable FLValue_GetEncryptableValue(FLValue _cbl_nullable value) {
     return FLDict_GetEncryptableValue(FLValue_AsDict(value));
 }

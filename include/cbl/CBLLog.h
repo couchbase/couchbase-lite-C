@@ -75,7 +75,7 @@ void CBL_LogMessage(CBLLogDomain domain,
     @{ */
 
 /** A logging callback that the application can register.
-    @param domain  The domain of the message; \ref kCBLLogDomainAll if it doesn't fall into a specific domain.
+    @param domain  The domain of the message
     @param level  The severity level of the message.
     @param message  The actual formatted message. */
 typedef void (*CBLLogCallback)(CBLLogDomain domain,
