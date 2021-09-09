@@ -550,6 +550,34 @@ TEST_CASE_METHOD(ReplicatorConflictTest, "Custom resolver : merge", "[Replicator
 }
 
 
+TEST_CASE_METHOD(ReplicatorLocalTest, "Document Replication Listener", "[Replicator]") {
+    // No listener:
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+    
+    config.replicatorType = kCBLReplicatorTypePush;
+    enableDocReplicationListener = false;
+    replicate();
+    CHECK(replicatedDocIDs.empty());
+    
+    // Add listener:
+    doc["greeting"] = "Hello!";
+    db.saveDocument(doc);
+    enableDocReplicationListener = true;
+    replicate();
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
+    
+    // Remove listener:
+    doc["greeting"] = "Hi!";
+    db.saveDocument(doc);
+    enableDocReplicationListener = false;
+    replicatedDocIDs.clear();
+    replicate();
+    CHECK(replicatedDocIDs.empty());
+}
+
+
 class ReplicatorFilterTest : public ReplicatorLocalTest {
 public:
     int count = 0;

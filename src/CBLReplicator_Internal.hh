@@ -180,10 +180,6 @@ public:
     void start(bool reset) {
         LOCK(_mutex);
         _retainSelf = this;     // keep myself from being freed until the replicator stops
-        if (_optionsChanged) {
-            _c4repl->setOptions(encodeOptions());
-            _optionsChanged = false;
-        }
         _useInitialStatus = false;
         
         if (_db->registerStoppable(this))
@@ -234,8 +230,10 @@ public:
                                                    void *context)
     {
         LOCK(_mutex);
-        if (_docListeners.empty())
-            _optionsChanged = true;
+        if (_docListeners.empty()) {
+            _c4repl->setProgressLevel(kC4ReplProgressPerDocument);
+            _progressLevel = kC4ReplProgressPerDocument;
+        }
         return _docListeners.add(listener, context);
     }
 
@@ -245,8 +243,6 @@ private:
         Encoder enc;
         enc.beginDict();
         _conf.writeOptions(enc);
-        if (!_docListeners.empty())
-            enc[slice(kC4ReplicatorOptionProgressLevel)] = 1;
         enc.endDict();
         return enc.finish();
     }
@@ -309,7 +305,11 @@ private:
         if (!_docListeners.empty()) {
             docs = std::make_unique<std::vector<CBLReplicatedDocument>>();
             docs->reserve(numDocs);
+        } else if (_progressLevel != kC4ReplProgressOverall) {
+            _c4repl->setProgressLevel(kC4ReplProgressOverall);
+            _progressLevel = kC4ReplProgressOverall;
         }
+        
         for (size_t i = 0; i < numDocs; ++i) {
             auto src = *c4Docs[i];
             if (!pushing && src.flags & kRevIsConflict) {
@@ -333,7 +333,7 @@ private:
         if (docs)
             _docListeners.call(this, pushing, unsigned(docs->size()), docs->data());
     }
-
+    
 
     void _conflictResolverFinished(ConflictResolver *resolver) {
         CBLReplicatedDocument doc = resolver->result();
@@ -390,11 +390,11 @@ private:
     Retained<C4Replicator>                      _c4repl;
     bool                                        _useInitialStatus;  // For returning status before first start
     C4ReplicatorStatus                          _c4status {kC4Stopped};
-    bool                                        _optionsChanged {false};
     Retained<CBLReplicator>                     _retainSelf;
     int                                         _activeConflictResolvers {0};
     Listeners<CBLReplicatorChangeListener>      _changeListeners;
     Listeners<CBLDocumentReplicationListener>   _docListeners;
+    C4ReplicatorProgressLevel                   _progressLevel {kC4ReplProgressOverall};
 };
 
 CBL_ASSUME_NONNULL_END

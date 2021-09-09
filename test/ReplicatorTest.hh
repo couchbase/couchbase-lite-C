@@ -31,11 +31,13 @@ public:
 
     CBLReplicatorConfiguration config = {};
     CBLReplicator *repl = nullptr;
+    
+    bool enableDocReplicationListener = true;
+    bool logEveryDocument = true;
     set<string> replicatedDocIDs;
     vector<CBLReplicatedDocument> replicatedDocs;
     
     CBLError replError = {};
-    bool logEveryDocument = true;
     IdleAction idleAction = IdleAction::kStopReplicator;
     double timeoutSeconds = 30.0;
 
@@ -59,16 +61,21 @@ public:
         REQUIRE(repl);
 
         auto ctoken = CBLReplicator_AddChangeListener(repl, [](void *context, CBLReplicator *r,
-                                                 const CBLReplicatorStatus *status) {
+                                                               const CBLReplicatorStatus *status) {
             ((ReplicatorTest*)context)->statusChanged(r, *status);
         }, this);
 
-        auto dtoken = CBLReplicator_AddDocumentReplicationListener(repl, [](void *context, CBLReplicator *r, bool isPush,
-                                                                 unsigned numDocuments,
-                                                                 const CBLReplicatedDocument* documents) {
-            ((ReplicatorTest*)context)->docProgress(r, isPush, numDocuments, documents);
-        }, this);
-
+        
+        CBLListenerToken* dtoken = nullptr;
+        if (enableDocReplicationListener) {
+            dtoken = CBLReplicator_AddDocumentReplicationListener(repl, [](void *context, CBLReplicator *r,
+                                                                           bool isPush,
+                                                                           unsigned numDocuments,
+                                                                           const CBLReplicatedDocument* documents) {
+                ((ReplicatorTest*)context)->docProgress(r, isPush, numDocuments, documents);
+            }, this);
+        }
+        
         CBLReplicator_Start(repl, false);
 
         time start = clock::now();
