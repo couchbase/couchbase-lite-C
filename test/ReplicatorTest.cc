@@ -108,6 +108,27 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replica
 }
 
 
+// CBL-2337
+TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with freed auth and doc listener", "[Replicator]") {
+    CBLError error;
+    config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
+    
+    CBLAuthenticator* auth = CBLAuth_CreatePassword("username"_sl, "p@ssw0RD"_sl);
+    config.authenticator = auth;
+    
+    repl = CBLReplicator_Create(&config, &error);
+    
+    // Free the authenticator after creating the replicator
+    CBLAuth_Free(auth);
+    
+    // Note: replicate() will add a document listener
+    replicate({ kCBLNetworkDomain, kCBLNetErrUnknownHost });
+    
+    // Clean up
+    config.authenticator = nullptr;
+}
+
+
 #pragma mark - ACTUAL-NETWORK TESTS:
 
 
