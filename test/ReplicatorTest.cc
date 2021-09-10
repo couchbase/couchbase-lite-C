@@ -129,6 +129,94 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with freed auth and doc listene
 }
 
 
+TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs", "[Replicator]") {
+    CBLReplicatorConfiguration config = {};
+    config.database = db.ref();
+    
+    CBLError error;
+    CBLEndpoint* endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
+    config.endpoint = endpoint;
+    
+    CBLAuthenticator* auth = nullptr;
+    SECTION("Password Auth") {
+        auth = CBLAuth_CreatePassword("username"_sl, "p@ssw0RD"_sl);
+    }
+    SECTION("Session Auth") {
+        auth = CBLAuth_CreateSession("abc123"_sl, "mycookie"_sl);
+    }
+    config.authenticator = auth;
+    
+    CBLProxySettings* proxy = new CBLProxySettings();
+    proxy->type = kCBLProxyHTTP;
+    proxy->hostname = "jxnbgotn.dvmwk"_sl;
+    proxy->port = 9998;
+    proxy->username = "User Name"_sl;
+    proxy->password = "123456"_sl;
+    config.proxy = proxy;
+    
+    auto headers = FLMutableDict_New();
+    FLMutableDict_SetString(headers, "sessionid"_sl, "abc"_sl);
+    config.headers = headers;
+    
+    auto repl1 = CBLReplicator_Create(&config, &error);
+    REQUIRE(repl1);
+    
+    CBLEndpoint_Free(endpoint);
+    CBLAuth_Free(auth);
+    delete(proxy);
+    FLMutableDict_Release(headers);
+    
+    auto copiedConfig = CBLReplicator_Config(repl1);
+    REQUIRE(copiedConfig);
+    CHECK(copiedConfig->endpoint);
+    CHECK(copiedConfig->authenticator);
+    
+    REQUIRE(copiedConfig->proxy);
+    CHECK(copiedConfig->proxy->type == kCBLProxyHTTP);
+    CHECK(copiedConfig->proxy->hostname == "jxnbgotn.dvmwk"_sl);
+    CHECK(copiedConfig->proxy->port == 9998);
+    CHECK(copiedConfig->proxy->username == "User Name"_sl);
+    CHECK(copiedConfig->proxy->password == "123456"_sl);
+    
+    REQUIRE(copiedConfig->headers);
+    FLValue sessionid = FLDict_Get(copiedConfig->headers, "sessionid"_sl);
+    REQUIRE(sessionid);
+    CHECK(FLValue_AsString(sessionid) == "abc"_sl);
+
+    auto repl2 = CBLReplicator_Create(copiedConfig, &error);
+    CHECK(repl2);
+    
+    CBLReplicator_Release(repl1);
+    CBLReplicator_Release(repl2);
+}
+
+
+TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs with nullptr value", "[Replicator]") {
+    CBLReplicatorConfiguration config = {};
+    config.database = db.ref();
+    
+    CBLError error;
+    CBLEndpoint* endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
+    config.endpoint = endpoint;
+    
+    auto repl1 = CBLReplicator_Create(&config, &error);
+    REQUIRE(repl1);
+    
+    auto copiedConfig = CBLReplicator_Config(repl1);
+    REQUIRE(copiedConfig);
+    CHECK(copiedConfig->endpoint);
+    CHECK(!copiedConfig->authenticator);
+    CHECK(!copiedConfig->proxy);
+    CHECK(!copiedConfig->headers);
+    
+    auto repl2 = CBLReplicator_Create(copiedConfig, &error);
+    CHECK(repl2);
+    
+    CBLReplicator_Release(repl1);
+    CBLReplicator_Release(repl2);
+}
+
+
 #pragma mark - ACTUAL-NETWORK TESTS:
 
 
