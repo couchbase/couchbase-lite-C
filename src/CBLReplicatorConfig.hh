@@ -282,13 +282,10 @@ namespace cbl_internal {
             allocated = alloc_slice(str);
             return allocated;
         }
-
-
-        CBLEndpoint*        _endpoint;
-        CBLAuthenticator*   _authenticator;
-        alloc_slice         _pinnedServerCert, _trustedRootCerts;
-        CBLProxySettings    _proxy;
-        alloc_slice         _proxyHostname, _proxyUsername, _proxyPassword;
+        
+        alloc_slice      _pinnedServerCert, _trustedRootCerts;
+        CBLProxySettings _proxy;
+        alloc_slice      _proxyHostname, _proxyUsername, _proxyPassword;
     };
 }
 
