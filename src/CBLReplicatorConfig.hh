@@ -40,6 +40,7 @@ struct CBLEndpoint {
     virtual bool valid() const =0;
     const C4Address& remoteAddress() const                      {return _address;}
     virtual C4String remoteDatabaseName() const =0;
+    virtual CBLEndpoint* clone() const =0;
 #ifdef COUCHBASE_ENTERPRISE
     virtual CBLDatabase* _cbl_nullable otherLocalDB() const     {return nullptr;}
 #endif
@@ -68,6 +69,7 @@ namespace cbl_internal {
 
         bool valid() const override                             {return _dbName != fleece::nullslice;}
         C4String remoteDatabaseName() const override            {return _dbName;}
+        virtual CBLEndpoint* clone() const override             {return new CBLURLEndpoint(_url);}
 
     private:
         fleece::alloc_slice _url;
@@ -84,6 +86,7 @@ namespace cbl_internal {
         bool valid() const override                             {return true;}
         virtual C4String remoteDatabaseName() const override    {return fleece::nullslice;}
         virtual CBLDatabase* otherLocalDB() const override      {return _db;}
+        virtual CBLEndpoint* clone() const override             {return new CBLLocalEndpoint(_db);}
 
     private:
         fleece::Retained<CBLDatabase> _db;
@@ -104,6 +107,7 @@ protected:
 public:
     virtual ~CBLAuthenticator()                                 =default;
     virtual void writeOptions(Encoder&) =0;
+    virtual CBLAuthenticator* clone() const =0;
 };
 
 
@@ -123,6 +127,10 @@ namespace cbl_internal {
             enc[slice(kC4ReplicatorAuthPassword)] = _password;
             enc.endDict();
         }
+        
+        virtual CBLAuthenticator* clone() const override {
+            return new BasicAuthenticator(_username, _password);
+        }
 
     private:
         alloc_slice _username, _password;
@@ -140,6 +148,10 @@ namespace cbl_internal {
         virtual void writeOptions(Encoder &enc) override {
             enc.writeKey(slice(kC4ReplicatorOptionCookies));
             enc.writeString(_cookieName + "=" + _sessionID);
+        }
+        
+        virtual CBLAuthenticator* clone() const override {
+            return new SessionAuthenticator(slice(_sessionID), slice(_cookieName));
         }
 
     private:
@@ -163,6 +175,8 @@ namespace cbl_internal {
         ReplicatorConfiguration(const CBLReplicatorConfiguration &conf) {
             *(CBLReplicatorConfiguration*)this = conf;
             retain(database);
+            endpoint = endpoint ? endpoint->clone() : nullptr;
+            authenticator = authenticator ? authenticator->clone() : nullptr;
             headers = FLDict_MutableCopy(headers, kFLDeepCopyImmutables);
             channels = FLArray_MutableCopy(channels, kFLDeepCopyImmutables);
             documentIDs = FLArray_MutableCopy(documentIDs, kFLDeepCopyImmutables);
@@ -180,6 +194,8 @@ namespace cbl_internal {
 
         ~ReplicatorConfiguration() {
             release(database);
+            CBLEndpoint_Free(endpoint);
+            CBLAuth_Free(authenticator);
             FLDict_Release(headers);
             FLArray_Release(channels);
             FLArray_Release(documentIDs);
@@ -266,8 +282,7 @@ namespace cbl_internal {
             allocated = alloc_slice(str);
             return allocated;
         }
-
-
+        
         alloc_slice      _pinnedServerCert, _trustedRootCerts;
         CBLProxySettings _proxy;
         alloc_slice      _proxyHostname, _proxyUsername, _proxyPassword;
