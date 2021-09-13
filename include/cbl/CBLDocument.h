@@ -253,6 +253,8 @@ FLDict CBLDocument_Properties(const CBLDocument*) CBLAPI;
     @note  The dictionary object is owned by the document; you do not need to release it.
     @note  Every call to this function returns the same mutable collection. This is the
            same collection returned by \ref CBLDocument_Properties.
+    @note  When accessing nested collections inside the properties as a mutable collection
+           for modification, use \ref FLMutableDict_GetMutableDict or \ref FLMutableDict_GetMutableArray.
     @warning  When the document is released, this reference to the properties becomes invalid.
             If you need to use any properties after releasing the document, you must retain them
             by calling \ref FLValue_Retain (and of course later release them.) */
