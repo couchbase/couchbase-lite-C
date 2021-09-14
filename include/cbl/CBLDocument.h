@@ -337,7 +337,7 @@ _cbl_warn_unused
 CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db,
                                                         FLString docID,
                                                         CBLDocumentChangeListener listener,
-                                                        void *context) CBLAPI;
+                                                        void* _cbl_nullable context) CBLAPI;
 
 /** @} */
 /** @} */
