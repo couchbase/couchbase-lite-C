@@ -243,6 +243,135 @@ TEST_CASE_METHOD(DatabaseTest, "Mutable Copy Immutable Document") {
 }
 
 
+TEST_CASE_METHOD(DatabaseTest, "Access nested collections from mutable props") {
+    CBLError error;
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+    REQUIRE(doc);
+    REQUIRE(CBLDocument_SetJSON(doc, "{\"name\":{\"first\": \"Jane\"}, \"phones\": [\"650-123-4567\"]}"_sl, &error));
+    REQUIRE(CBLDatabase_SaveDocument(db, doc, &error));
+    
+    CBLDocument* mDoc = nullptr;
+    FLMutableDict mProps = nullptr;
+    
+    // Note: When a mutable properties of a document is created, the shallow copy from
+    // the original properties will be made.
+    
+    SECTION("A mutable doc") {
+        mDoc = doc;
+        CBLDocument_Retain(doc);
+    }
+    
+    SECTION("A mutable doc read from database") {
+        mDoc = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
+    }
+    
+    SECTION("Mutable copy from an immutable doc") {
+        const CBLDocument* doc1 = CBLDatabase_GetDocument(db, "foo"_sl, &error);
+        mDoc = CBLDocument_MutableCopy(doc1);
+        CBLDocument_Release(doc1);
+    }
+
+    SECTION("Mutable copy from a mutable doc") {
+        CBLDocument* mDoc1 = CBLDatabase_GetMutableDocument(db, "foo"_sl, &error);
+        mDoc = CBLDocument_MutableCopy(mDoc1);
+        CBLDocument_Release(mDoc1);
+    }
+    
+    mProps = CBLDocument_MutableProperties(mDoc);
+    
+    // Dict:
+    FLDict dict = FLValue_AsDict(FLDict_Get(mProps, "name"_sl));
+    REQUIRE(dict);
+    CHECK(FLDict_Count(dict) == 1);
+    CHECK(FLValue_AsString(FLDict_Get(dict, "first"_sl)) == "Jane"_sl);
+    FLMutableDict mDict = FLDict_AsMutable(dict); // Immutable
+    CHECK(!mDict);
+    
+    mDict = FLMutableDict_GetMutableDict(mProps, "name"_sl);
+    REQUIRE(mDict);
+    CHECK(FLDict_Count(mDict) == 1);
+    CHECK(FLValue_AsString(FLDict_Get(mDict, "first"_sl)) == "Jane"_sl);
+    
+    // Array:
+    FLArray array = FLValue_AsArray(FLDict_Get(mProps, "phones"_sl));
+    REQUIRE(array);
+    REQUIRE(FLArray_Count(array) == 1);
+    CHECK(FLValue_AsString(FLArray_Get(array, 0)) == "650-123-4567"_sl);
+    FLMutableArray mArray = FLArray_AsMutable(array); // Immutable
+    CHECK(!mArray);
+    
+    mArray = FLMutableDict_GetMutableArray(mProps, "phones"_sl);
+    REQUIRE(mArray);
+    REQUIRE(FLArray_Count(mArray) == 1);
+    CHECK(FLValue_AsString(FLArray_Get(mArray, 0)) == "650-123-4567"_sl);
+    
+    CBLDocument_Release(mDoc);
+    CBLDocument_Release(doc);
+}
+
+
+TEST_CASE_METHOD(DatabaseTest, "Access nested collections from a copy of modified mutable doc") {
+    CBLError error;
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+    REQUIRE(doc);
+    REQUIRE(CBLDocument_SetJSON(doc, "{\"name\":{\"first\": \"Jane\"}, \"phones\": [\"650-123-4567\"]}"_sl, &error));
+    REQUIRE(CBLDatabase_SaveDocument(db, doc, &error));
+    
+    FLMutableDict mProps = CBLDocument_MutableProperties(doc);
+    
+    // Modify Dict:
+    FLMutableDict mDict = FLMutableDict_GetMutableDict(mProps, "name"_sl);
+    REQUIRE(mDict);
+    CHECK(FLDict_Count(mDict) == 1);
+    CHECK(FLValue_AsString(FLDict_Get(mDict, "first"_sl)) == "Jane"_sl);
+    FLMutableDict_SetString(mDict, "first"_sl, "Julie"_sl);
+    CHECK(FLValue_AsString(FLDict_Get(mDict, "first"_sl)) == "Julie"_sl);
+    
+    // Modify Array:
+    FLMutableArray mArray = FLMutableDict_GetMutableArray(mProps, "phones"_sl);
+    REQUIRE(mArray);
+    REQUIRE(FLArray_Count(mArray) == 1);
+    CHECK(FLValue_AsString(FLArray_Get(mArray, 0)) == "650-123-4567"_sl);
+    FLMutableArray_SetString(mArray, 0, "415-123-4567"_sl);
+    CHECK(FLValue_AsString(FLArray_Get(mArray, 0)) == "415-123-4567"_sl);
+    
+    // Copy:
+    CBLDocument* mDoc = CBLDocument_MutableCopy(doc);
+    mProps = CBLDocument_MutableProperties(mDoc);
+    
+    // Check Dict:
+    FLDict dict = FLValue_AsDict(FLDict_Get(mProps, "name"_sl));
+    REQUIRE(dict);
+    CHECK(FLDict_Count(dict) == 1);
+    CHECK(FLValue_AsString(FLDict_Get(dict, "first"_sl)) == "Julie"_sl);
+    FLMutableDict mDict2 = FLDict_AsMutable(dict); // Already mutable
+    CHECK(mDict2);
+    
+    mDict2 = FLMutableDict_GetMutableDict(mProps, "name"_sl);
+    REQUIRE(mDict2);
+    CHECK(FLDict_Count(mDict2) == 1);
+    CHECK(FLValue_AsString(FLDict_Get(mDict2, "first"_sl)) == "Julie"_sl);
+    CHECK(mDict2 != mDict);
+    
+    // Check Array:
+    FLArray array = FLValue_AsArray(FLDict_Get(mProps, "phones"_sl));
+    REQUIRE(array);
+    REQUIRE(FLArray_Count(array) == 1);
+    CHECK(FLValue_AsString(FLArray_Get(array, 0)) == "415-123-4567"_sl);
+    FLArray mArray2 = FLArray_AsMutable(array);
+    CHECK(mArray2); // Already mutable
+    
+    mArray2 = FLMutableDict_GetMutableArray(mProps, "phones"_sl);
+    REQUIRE(mArray2);
+    REQUIRE(FLArray_Count(mArray2) == 1);
+    CHECK(FLValue_AsString(FLArray_Get(mArray2, 0)) == "415-123-4567"_sl);
+    CHECK(mArray2 != mArray);
+    
+    CBLDocument_Release(mDoc);
+    CBLDocument_Release(doc);
+}
+
+
 TEST_CASE_METHOD(DatabaseTest, "Get Non Existing Document") {
     CBLError error;
     const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo"_sl, &error);
