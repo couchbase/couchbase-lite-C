@@ -6,6 +6,8 @@ framework module CouchbaseLite {
     header "CBLBlob.h"
     header "CBLDatabase.h"
     header "CBLDocument.h"
+    header "CBLEncryptable.h"
+    header "CBLPlatform.h"
     header "CBLLog.h"
     header "CBLQuery.h"
     header "CBLReplicator.h"
