@@ -175,7 +175,8 @@ namespace cbl_internal {
         ReplicatorConfiguration(const CBLReplicatorConfiguration &conf) {
             *(CBLReplicatorConfiguration*)this = conf;
             retain(database);
-            endpoint = endpoint ? endpoint->clone() : nullptr;
+            if (endpoint)
+                endpoint = endpoint->clone();
             authenticator = authenticator ? authenticator->clone() : nullptr;
             headers = FLDict_MutableCopy(headers, kFLDeepCopyImmutables);
             channels = FLArray_MutableCopy(channels, kFLDeepCopyImmutables);
