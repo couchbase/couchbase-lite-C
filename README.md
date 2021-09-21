@@ -68,11 +68,11 @@ CBLDocument_Release(readDoc);
 
 ### Others
 
-**NOTE**: The C++ API is not part of the official release, and so this sample is not up to date.
+**NOTE**: The C++ API is not part of the official release.
 
 ```cpp
 // Open a database:
-cbl::Database db(kDatabaseName, {"/tmp", kCBLDatabase_Create});
+cbl::Database db(FLSTR("my-db"), {FLSTR("/tmp")});
 
 // Create a document:
 cbl::MutableDocument doc("foo");
@@ -80,8 +80,8 @@ doc["greeting"] = "Howdy!";
 db.saveDocument(doc);
 
 // Read it back:
-cbl::Document doc = db.getMutableDocument("foo");
-fleece::Dict readProps = doc->properties();
+cbl::Document readDoc = db.getMutableDocument("foo");
+fleece::Dict readProps = readDoc.properties();
 fleece::slice greeting = readProps["greeting"].asString();
 ```
 
