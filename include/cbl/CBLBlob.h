@@ -200,11 +200,31 @@ CBL_CAPI_BEGIN
         return FLDict_GetBlob(FLValue_AsDict(value));
     }
 
-    /** Stores a blob reference in a Fleece mutable Array or Dict.
-        @param slot  The position in the collection, as returned by functions like
-                    \ref FLMutableArray_Set or \ref FLMutableDict_Set.
-        @param blob  The CBLBlob to store (as a Dict) in the collection. */
     void FLSlot_SetBlob(FLSlot slot, CBLBlob* blob) CBLAPI;
+
+    /** Stores a blob reference into an array.
+        @param array  The array to store into.
+        @param index  The position in the array at which to store the blob reference.
+        @param blob  The blob reference to be stored. */
+    static inline void FLMutableArray_SetBlob(FLMutableArray array, uint32_t index, CBLBlob *blob) {
+        FLSlot_SetBlob(FLMutableArray_Set(array, index), blob);
+    }
+
+    /** Appends a blob reference to an array.
+        @param array  The array to store into.
+        @param blob  The blob reference to be stored. */
+    static inline void FLMutableArray_AppendBlob(FLMutableArray array, CBLBlob *blob) {
+        FLSlot_SetBlob(FLMutableArray_Append(array), blob);
+    }
+
+    /** Stores a blob reference into a Dict.
+        @param dict  The Dict to store into.
+        @param key  The key to associate the blob reference with.
+        @param blob  The blob reference to be stored. */
+    static inline void FLMutableDict_SetBlob(FLMutableDict dict, FLString key, CBLBlob *blob) {
+        FLSlot_SetBlob(FLMutableDict_Set(dict, key), blob);
+    }
+
 
 #ifdef __APPLE__
 #pragma mark - BINDING DEV SUPPORT FOR BLOB:

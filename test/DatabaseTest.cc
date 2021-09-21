@@ -1151,7 +1151,7 @@ TEST_CASE_METHOD(DatabaseTest, "Maintenance : Compact and Integrity Check") {
     FLMutableDict dict = CBLDocument_MutableProperties(doc);
     FLSlice blobContent = FLStr("I'm Blob.");
     CBLBlob *blob1 = CBLBlob_CreateWithData("text/plain"_sl, blobContent);
-    FLSlot_SetBlob(FLMutableDict_Set(dict, FLStr("blob")), blob1);
+    FLMutableDict_SetBlob(dict, FLStr("blob"), blob1);
     
     // Save doc:
     CBLError error;
@@ -1433,7 +1433,7 @@ TEST_CASE_METHOD(DatabaseTest, "Set blob in document", "[Blob]") {
     // Set blob in document
     CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
     FLMutableDict docProps = CBLDocument_MutableProperties(doc);
-    FLSlot_SetBlob(FLMutableDict_Set(docProps, FLStr("blob")), blob);
+    FLMutableDict_SetBlob(docProps, FLSTR("blob"), blob);
     CHECK(CBLDatabase_SaveDocument(db, doc, &error));
     CBLDocument_Release(doc);
     CBLBlob_Release(blob);
@@ -1490,7 +1490,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save blob and set blob in document", "[Blob]") {
     // Set blob in document
     CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
     FLMutableDict docProps = CBLDocument_MutableProperties(doc);
-    FLSlot_SetBlob(FLMutableDict_Set(docProps, FLStr("blob")), blob);
+    FLMutableDict_SetBlob(docProps, FLSTR("blob"), blob);
     CHECK(CBLDatabase_SaveDocument(db, doc, &error));
     CBLDocument_Release(doc);
     CBLBlob_Release(blob);
