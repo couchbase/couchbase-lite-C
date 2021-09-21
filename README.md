@@ -85,66 +85,6 @@ fleece::Dict readProps = readDoc.properties();
 fleece::slice greeting = readProps["greeting"].asString();
 ```
 
-### Nim
-
-**NOTE**: The Nim API is not part of the official release, and so this sample is not up to date.
-
-```nim
-# Open a database:
-let config = DatabaseConfiguration(directory: "/tmp", flags: {DatabaseFlag.create})
-var db = openDatabase("nim_db", config)
-
-# Create a document:
-var doc = newDocument("foo")
-doc["greeting"] = "Howdy!"
-db.saveDocument(doc)
-
-# Read it back:
-let readDoc = db.getDocument("foo")
-let readProps = readDoc.properties
-let greeting = readProps["greeting"]
-```
-
-### Python
-
-**NOTE**: The Python API is not part of the official release, and so this sample is not up to date.
-
-```python
-# Open a database:
-db = Database("python_db", DatabaseConfiguration("/tmp"));
-
-# Create a document:
-doc = MutableDocument("foo")
-doc["greeting"] = "Howdy!"
-db.saveDocument(doc)
-
-# Read it back:
-readDoc = db.getDocument("foo")
-readProps = readDoc.properties
-greeting = readProps["greeting"]
-```
-
-### Rust
-
-**NOTE**: The Rust API is not part of the official release, and so this sample is not up to date.
-
-```rust
-// Open a database:
-let cfg = DatabaseConfiguration{directory: tmp_dir.path(), flags: CREATE};
-let mut db = Database::open("rust_db, Some(cfg)).expect("opening db");
-
-// Create a document:
-let mut doc = Document::new_with_id("foo");
-let mut props = doc.mutable_properties();
-props.at("greeting").put_string("Howdy!");
-db.save_document(&mut doc, ConcurrencyControl::FailOnConflict).expect("saving");
-
-// Read it back:
-let doc = db.get_document("foo").expect("reload document");
-let props = doc.properties();
-let greeting = props.get("greeting");
-```
-
 ## Documentation
 
 * [Couchbase Lite documentation](https://docs.couchbase.com/couchbase-lite/current/introduction.html) is a must-read to learn the architecture and the API concepts, even though the API details are different here.
