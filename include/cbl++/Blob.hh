@@ -69,6 +69,9 @@ namespace cbl {
         std::string digest() const                  {return asString(CBLBlob_Digest(ref()));}
         fleece::Dict properties() const             {return CBLBlob_Properties(ref());}
 
+        // Allows Blob to be assigned to mutable Dict/Array item, e.g. `dict["foo"] = blob`
+        operator fleece::Dict() const               {return properties();}
+
         alloc_slice loadContent() {
             CBLError error;
             fleece::alloc_slice content = CBLBlob_Content(ref(), &error);

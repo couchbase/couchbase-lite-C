@@ -78,7 +78,7 @@ TEST_CASE_METHOD(BlobTest, "Create blob with stream", "[Blob]") {
     // Set blob in a document and save:
     auto doc = CBLDocument_CreateWithID("doc1"_sl);
     auto props = CBLDocument_MutableProperties(doc);
-    FLSlot_SetBlob(FLMutableDict_Set(props, "blob"_sl), blob);
+    FLMutableDict_SetBlob(props, "blob"_sl, blob);
     CHECK(CBLDatabase_SaveDocument(db, doc, &error));
     
     // Check content:

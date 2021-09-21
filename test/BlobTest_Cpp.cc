@@ -151,19 +151,15 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in arrays/dicts", "[Blob]") {
         MutableDocument doc("blobbo");
         MutableArray array = MutableArray::newArray();
         array.insertNulls(0, 1);
-        CBLBlob *blob1 = CBLBlob_CreateWithData(slice(kBlobContentType), kBlobContents);
-        FLSlot_SetBlob(array[0], blob1);
+        Blob blob1(kBlobContentType, kBlobContents);
+        array[0] = blob1;
 
         MutableDict dict = MutableDict::newDict();
-        CBLBlob *blob2 = CBLBlob_CreateWithData(slice(kBlobContentType), kBlobContents);
-        FLSlot_SetBlob(dict["b"], blob2);
+        dict["b"] = Blob(kBlobContentType, kBlobContents);
 
         doc["array"] = array;
         doc["dict"] = dict;
         db.saveDocument(doc);
-
-        CBLBlob_Release(blob1);
-        CBLBlob_Release(blob2);
     }
 
     Document doc = db.getDocument("blobbo");
