@@ -8,9 +8,8 @@ This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syn
   - [x] Similar to to other Couchbase Lite platforms (Java, C#, Swift, Objective-C)
   - [x] Clean and regular design
   - [x] Comes with a C++ wrapper API, implemented as inline calls to C
-  - [x] Experimental Python binding (made using `cffi`)
-  - [x] Can be bound to [other languages](#other-language-bindings) like Go or JavaScript
-- [ ] Same feature set as other Couchbase Lite platforms
+  - [x] Can be bound to [other languages](#other-language-bindings) like Python, Go, or JavaScript
+- [x] Same feature set as other Couchbase Lite platforms
   - [x] Schemaless JSON data model
       - [x] Standard CRUD operations
       - [x] Efficient binary blob support
@@ -38,7 +37,6 @@ This is a cross-platform version of the [Couchbase Lite][CBL] embedded NoSQL syn
   - ARM or x86
   - Hundreds of MB RAM, hundreds of MHz CPU, tens of MB storage
   - Linux-based OS
-  - Stretch goal: Simpler embedded kernels like mbedOS or ESP-IDF.
 
 ## Examples
 
@@ -72,7 +70,7 @@ CBLDocument_Release(readDoc);
 
 ```cpp
 // Open a database:
-cbl::Database db(FLSTR("my-db"), {FLSTR("/tmp")});
+cbl::Database db(kDatabaseName, {"/tmp"});
 
 // Create a document:
 cbl::MutableDocument doc("foo");
@@ -198,8 +196,12 @@ To run the unit tests:
 
 ## Other Language Bindings
 
-* **C++**: Already included; see [`include/cbl++`](https://github.com/couchbase/couchbase-lite-C/tree/master/include/cbl%2B%2B), but not supported
-* **Python**: [Included](bindings/python/README.md) but unsupported
-* **Nim**: [Included](bindings/nim/README.md) but unsupported
-* **Rust**: [Included](bindings/rust/README.md) but unsupported
-* **Go** (Golang): [Third-party, in progress](https://github.com/svr4/couchbase-lite-cgo).
+All of these (even C++) have no official support by Couchbase.
+
+If you've created a language binding, please let us know by filing an issue, or a PR that updates the list below.
+
+* **C++**: Already included; see [`include/cbl++`](https://github.com/couchbase/couchbase-lite-C/tree/master/include/cbl%2B%2B)
+* **Go** (Golang): [Third-party, in progress](https://github.com/svr4/couchbase-lite-cgo)
+* **Nim**: [couchbase-lite-nim](https://github.com/couchbaselabs/couchbase-lite-nim)
+* **Python**: [couchbase-lite-python](https://github.com/couchbaselabs/couchbase-lite-python)
+* **Rust**: [couchbase-lite-rust](https://github.com/couchbaselabs/couchbase-lite-rust)
