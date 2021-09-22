@@ -176,8 +176,8 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase* db,
                                     C4RevisionFlags &outRevFlags) const
 {
     auto c4doc = _c4doc.useLocked();
-    // Save new blobs:
-    bool hasBlobs = saveBlobs(db, releaseNewBlob);
+    // Save new blobs and check encryptables in arrays:
+    bool hasBlobs = saveBlobsAndCheckEncryptables(db, releaseNewBlob);
     outRevFlags = hasBlobs ? kRevHasAttachments : 0;
 
     // Now encode the properties to Fleece:
@@ -316,13 +316,16 @@ CBLEncryptable* CBLDocument::getEncryptableValue(FLDict dict) {
 #endif
 
 
-bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
+bool CBLDocument::saveBlobsAndCheckEncryptables(CBLDatabase *db, bool releaseNewBlob) const {
     // Walk through the Fleece object tree, looking for new mutable blob Dicts to install,
     // and also checking if there are any blobs at all (mutable or not.)
-    // Once we've found at least one blob, we can skip immutable collections, because
-    // they can't contain new blobs.
+    // Once we've found at least one blob, we can skip checking blobs in immutable collections,
+    // because they can't contain new blobs.
     //
     // If the releaseNewBlob is enabled, the new blob will be released after it is installed.
+    //
+    // While walking through the object tree, check if there are any encryptables in an array and
+    // throw an unsupported error if that occurs.
     //
     // Note: If the same new blob is used in multiple places inside the object tree, the
     // blob will be installed only once as it will be unregistered from global sNewBlobs
@@ -336,10 +339,13 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
         Dict dict = i.value().asDict();
         if (dict) {
             if (!dict.asMutable()) {
-                if (!foundBlobs)
+                if (!foundBlobs) {
                     foundBlobs = FLDict_IsBlob(dict);
-                if (foundBlobs)
-                    i.skipChildren();
+                    if (foundBlobs) {
+                        i.skipChildren();
+                        continue;
+                    }
+                }
             } else if (FLDict_IsBlob(dict)) {
                 foundBlobs = true;
                 CBLNewBlob *newBlob = findNewBlob(dict);
@@ -350,10 +356,16 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
                     }
                 }
                 i.skipChildren();
+                continue;
             }
-        } else if (!i.value().asArray().asMutable()) {
-            if (foundBlobs)
+            
+            if (FLDict_IsEncryptableValue(dict)) {
+                if (i.parent().asArray()) {
+                    C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
+                                   "No support for encryptables in an array");
+                }
                 i.skipChildren();
+            }
         }
     }
     return foundBlobs;
