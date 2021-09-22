@@ -279,6 +279,113 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Save and Get document with E
     CBLDocument_Release(doc);
 }
 
+TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Unsupport : Encryptables in array", "[Encryptable]") {
+    CBLError error;
+    auto doc = CBLDocument_CreateWithID("doc1"_sl);
+    auto array = FLMutableArray_New();
+    auto enc1 = CBLEncryptable_CreateWithString("foo1"_sl);
+    auto enc2 = CBLEncryptable_CreateWithString("foo2"_sl);
+    FLMutableArray_AppendDict(array, CBLEncryptable_Properties(enc1));
+    FLMutableArray_AppendDict(array, CBLEncryptable_Properties(enc2));
+    
+    SECTION("Update mutable properties") {
+        FLMutableDict props = CBLDocument_MutableProperties(doc);
+        FLMutableDict_SetArray(props, "array"_sl, array);
+    }
+    
+    SECTION("Set doc with JSON") { // Doc with have shallow mutable properties
+        FLMutableDict props = FLMutableDict_New();
+        FLMutableDict_SetArray(props, "array"_sl, array);
+        FLStringResult json = FLValue_ToJSON((FLValue)props);
+        REQUIRE(CBLDocument_SetJSON(doc, FLSliceResult_AsSlice(json), &error));
+        FLMutableDict_Release(props);
+    }
+ 
+    // Save doc:
+    ExpectingExceptions x;
+    REQUIRE(!CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorUnsupported);
+    CBLDocument_Release(doc);
+    CBLEncryptable_Release(enc1);
+    CBLEncryptable_Release(enc2);
+    FLMutableArray_Release(array);
+}
+
+TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Unsupport : Encryptables in nested array in dict", "[Encryptable]") {
+    CBLError error;
+    auto doc = CBLDocument_CreateWithID("doc1"_sl);
+    FLMutableDict dict = FLMutableDict_New();
+    auto array = FLMutableArray_New();
+    auto enc1 = CBLEncryptable_CreateWithString("foo1"_sl);
+    auto enc2 = CBLEncryptable_CreateWithString("foo2"_sl);
+    FLMutableArray_AppendDict(array, CBLEncryptable_Properties(enc1));
+    FLMutableArray_AppendDict(array, CBLEncryptable_Properties(enc2));
+    FLMutableDict_SetArray(dict, "array"_sl, array);
+    
+    SECTION("Update mutable properties") {
+        FLMutableDict props = CBLDocument_MutableProperties(doc);
+        FLMutableDict_SetDict(props, "dict"_sl, dict);
+    }
+    
+    SECTION("Set doc with JSON") { // Doc with have shallow mutable properties
+        FLMutableDict props = FLMutableDict_New();
+        FLMutableDict_SetDict(props, "dict"_sl, dict);
+        FLStringResult json = FLValue_ToJSON((FLValue)props);
+        REQUIRE(CBLDocument_SetJSON(doc, FLSliceResult_AsSlice(json), &error));
+        FLMutableDict_Release(dict);
+    }
+ 
+    // Save doc:
+    ExpectingExceptions x;
+    REQUIRE(!CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorUnsupported);
+    CBLDocument_Release(doc);
+    CBLEncryptable_Release(enc1);
+    CBLEncryptable_Release(enc2);
+    FLMutableArray_Release(array);
+    FLMutableDict_Release(dict);
+}
+
+TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Unsupport : Encryptables in nested array in array", "[Encryptable]") {
+    CBLError error;
+    auto doc = CBLDocument_CreateWithID("doc1"_sl);
+    
+    FLMutableArray outerArray = FLMutableArray_New();
+    FLMutableDict dict = FLMutableDict_New();
+    auto array = FLMutableArray_New();
+    auto enc1 = CBLEncryptable_CreateWithString("foo1"_sl);
+    auto enc2 = CBLEncryptable_CreateWithString("foo2"_sl);
+    FLMutableArray_AppendDict(array, CBLEncryptable_Properties(enc1));
+    FLMutableArray_AppendDict(array, CBLEncryptable_Properties(enc2));
+    FLMutableArray_AppendArray(outerArray, array);
+    
+    SECTION("Update mutable properties") {
+        FLMutableDict props = CBLDocument_MutableProperties(doc);
+        FLMutableDict_SetArray(props, "array"_sl, outerArray);
+    }
+    
+    SECTION("Set doc with JSON") { // Doc with have shallow mutable properties
+        FLMutableDict props = FLMutableDict_New();
+        FLMutableDict_SetArray(props, "array"_sl, outerArray);
+        FLStringResult json = FLValue_ToJSON((FLValue)props);
+        REQUIRE(CBLDocument_SetJSON(doc, FLSliceResult_AsSlice(json), &error));
+        FLMutableDict_Release(dict);
+    }
+ 
+    // Save doc:
+    ExpectingExceptions x;
+    REQUIRE(!CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorUnsupported);
+    CBLDocument_Release(doc);
+    CBLEncryptable_Release(enc1);
+    CBLEncryptable_Release(enc2);
+    FLMutableArray_Release(array);
+    FLMutableArray_Release(outerArray);
+}
+
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt one property", "[Replicator][Encryptable]") {
     {
         auto doc = CBLDocument_CreateWithID("doc1"_sl);
