@@ -44,6 +44,7 @@ CBL_C {
 		CBLBlob_Properties;
 		CBLBlob_Content;
 		CBLBlob_OpenContentStream;
+		CBLBlob_CreateJSON;
 		CBLBlob_CreateWithData;
 		CBLBlob_CreateWithStream;
 		CBLBlobReader_Read;
