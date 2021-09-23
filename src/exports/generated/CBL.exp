@@ -24,6 +24,7 @@ _CBLBlob_Equals
 _CBLBlob_Properties
 _CBLBlob_Content
 _CBLBlob_OpenContentStream
+_CBLBlob_CreateJSON
 _CBLBlob_CreateWithData
 _CBLBlob_CreateWithStream
 _CBLBlobReader_Read
