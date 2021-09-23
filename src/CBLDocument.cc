@@ -27,6 +27,10 @@
 
 #ifdef COUCHBASE_ENTERPRISE
 #include "CBLEncryptable_Internal.hh"
+#else
+// Used in saveBlobsAndCheckEncryptables(). As FLDict_IsEncryptableValue() is not available
+// in CE, define a function macro to allow the function to compile in CE.
+#define FLDict_IsEncryptableValue(d) false
 #endif
 
 
@@ -335,22 +339,44 @@ bool CBLDocument::saveBlobsAndCheckEncryptables(CBLDatabase *db, bool releaseNew
         return C4Blob::dictContainsBlobs(properties());
     
     bool foundBlobs = false;
+    
+    // In EE, encryptables need to be checked, but this adds a lot of overhead so in CE this will be
+    // skipped. By defining a constant bool like this, the compiler should optimize out all of the
+    // branches that have a constant `false` inside, and the source can maintain a bit more readability.
+#ifdef COUCHBASE_ENTERPRISE
+    const bool validateEncryptables = true;
+#else
+    const bool validateEncryptables = false;
+#endif
+
     for (DeepIterator i(properties()); i; ++i) {
         Dict dict = i.value().asDict();
         if (dict) {
-            if (!dict.asMutable()) {
+            if (validateEncryptables && FLDict_IsEncryptableValue(dict)) {
+                // Encryptables inside of an array are not supported!
+                if (i.parent().asArray()) {
+                    C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
+                                   "No support for encryptables in an array");
+                }
+                i.skipChildren();
+            } else if (!dict.asMutable()) {
+                // This is an immutable dictionary, so it cannot be a new blob. It might be
+                // the first existing blob detected though.
                 if (!foundBlobs) {
                     foundBlobs = FLDict_IsBlob(dict);
                     if (foundBlobs) {
                         i.skipChildren();
-                        continue;
                     }
                 }
-                #ifndef COUCHBASE_ENTERPRISE
-                if (foundBlobs)
+                if (foundBlobs && !validateEncryptables) {
+                    // Found at least one blob, and the current dictionary is immutable
+                    // Since encryptable validation is disabled, the rest of the keys
+                    // are not relevant.
                     i.skipChildren();
-                #endif
+                }
             } else if (FLDict_IsBlob(dict)) {
+                // This is a mutable dictionary. Check if it's a new blob, so install it
+                // if it hasn't been already.
                 foundBlobs = true;
                 CBLNewBlob *newBlob = findNewBlob(dict);
                 if (newBlob) {
@@ -360,25 +386,14 @@ bool CBLDocument::saveBlobsAndCheckEncryptables(CBLDatabase *db, bool releaseNew
                     }
                 }
                 i.skipChildren();
-                continue;
             }
-            
-            #ifdef COUCHBASE_ENTERPRISE
-            if (FLDict_IsEncryptableValue(dict)) {
-                if (i.parent().asArray()) {
-                    C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
-                                   "No support for encryptables in an array");
-                }
+        } else if (!validateEncryptables && !i.value().asArray().asMutable()) {
+            // If one blob has been found already, there is nothing interesting inside of
+            // an immutable array. It will only contain previously saved information.
+            if (foundBlobs) {
                 i.skipChildren();
             }
-            #endif
         }
-        #ifndef COUCHBASE_ENTERPRISE
-        else if (auto array = i.value().asArray(); array && !array.asMutable()) {
-            if (foundBlobs)
-                i.skipChildren();
-        }
-        #endif
     }
     return foundBlobs;
 }
