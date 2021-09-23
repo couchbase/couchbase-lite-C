@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 #include "CBLDatabase_Internal.hh"
+#include "c4Error.h"
 
 
 std::string CBLDatabase::defaultDirectory() {
@@ -34,8 +35,17 @@ std::string CBLDatabase::defaultDirectory() {
                                                        appropriateForURL: nil
                                                                   create: YES
                                                                    error: &error].path;
-        NSCAssert(path, @"Cannot find or create the default directory with error : %@", error);
-        
+        if (!path) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnexpectedError,
+#if TARGET_OS_TV
+                           "Could not create Caches directory: %s",
+#else
+                           "Could not create Application Support directory: %s",
+#endif
+                           error.localizedDescription.UTF8String);
+
+        }
+
 #if !TARGET_OS_IPHONE
         // On macOS, append the application's bundle ID to get a per-app directory:
         NSString* bundleID = [[NSBundle mainBundle] bundleIdentifier];
@@ -47,6 +57,17 @@ std::string CBLDatabase::defaultDirectory() {
 #endif
         
         // Append a "CouchbaseLite" component to the path:
-        return [path stringByAppendingPathComponent: @"CouchbaseLite"].fileSystemRepresentation;
+        path = [path stringByAppendingPathComponent: @"CouchbaseLite"];
+
+        // Create the directory if necessary:
+        if (![NSFileManager.defaultManager createDirectoryAtPath: path
+                                     withIntermediateDirectories: YES
+                                                      attributes: nil
+                                                           error: &error]) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnexpectedError,
+                           "Could not create database directory %s : %s",
+                           path.fileSystemRepresentation, error.localizedDescription.UTF8String);
+        }
+        return path.fileSystemRepresentation;
     }
 }
