@@ -27,6 +27,10 @@
 
 #ifdef COUCHBASE_ENTERPRISE
 #include "CBLEncryptable_Internal.hh"
+#else
+// Used in saveBlobsAndCheckEncryptables(). As FLDict_IsEncryptableValue() is not available
+// in CE, define a function macro to allow the function to compile in CE.
+#define FLDict_IsEncryptableValue(d) false
 #endif
 
 
@@ -176,8 +180,8 @@ alloc_slice CBLDocument::encodeBody(CBLDatabase* db,
                                     C4RevisionFlags &outRevFlags) const
 {
     auto c4doc = _c4doc.useLocked();
-    // Save new blobs:
-    bool hasBlobs = saveBlobs(db, releaseNewBlob);
+    // Save new blobs and check encryptables in arrays:
+    bool hasBlobs = saveBlobsAndCheckEncryptables(db, releaseNewBlob);
     outRevFlags = hasBlobs ? kRevHasAttachments : 0;
 
     // Now encode the properties to Fleece:
@@ -316,13 +320,16 @@ CBLEncryptable* CBLDocument::getEncryptableValue(FLDict dict) {
 #endif
 
 
-bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
+bool CBLDocument::saveBlobsAndCheckEncryptables(CBLDatabase *db, bool releaseNewBlob) const {
     // Walk through the Fleece object tree, looking for new mutable blob Dicts to install,
     // and also checking if there are any blobs at all (mutable or not.)
-    // Once we've found at least one blob, we can skip immutable collections, because
-    // they can't contain new blobs.
+    // Once we've found at least one blob, we can skip checking blobs in immutable collections,
+    // because they can't contain new blobs.
     //
     // If the releaseNewBlob is enabled, the new blob will be released after it is installed.
+    //
+    // (EE Only) While walking through the object tree, check if there are any encryptables in
+    // an array and throw an unsupported error if that occurs.
     //
     // Note: If the same new blob is used in multiple places inside the object tree, the
     // blob will be installed only once as it will be unregistered from global sNewBlobs
@@ -332,15 +339,44 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
         return C4Blob::dictContainsBlobs(properties());
     
     bool foundBlobs = false;
+    
+    // In EE, encryptables need to be checked, but this adds a lot of overhead so in CE this will be
+    // skipped. By defining a constant bool like this, the compiler should optimize out all of the
+    // branches that have a constant `false` inside, and the source can maintain a bit more readability.
+#ifdef COUCHBASE_ENTERPRISE
+    const bool validateEncryptables = true;
+#else
+    const bool validateEncryptables = false;
+#endif
+
     for (DeepIterator i(properties()); i; ++i) {
         Dict dict = i.value().asDict();
         if (dict) {
-            if (!dict.asMutable()) {
-                if (!foundBlobs)
+            if (validateEncryptables && FLDict_IsEncryptableValue(dict)) {
+                // Encryptables inside of an array are not supported!
+                if (i.parent().asArray()) {
+                    C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
+                                   "No support for encryptables in an array");
+                }
+                i.skipChildren();
+            } else if (!dict.asMutable()) {
+                // This is an immutable dictionary, so it cannot be a new blob. It might be
+                // the first existing blob detected though.
+                if (!foundBlobs) {
                     foundBlobs = FLDict_IsBlob(dict);
-                if (foundBlobs)
+                    if (foundBlobs) {
+                        i.skipChildren();
+                    }
+                }
+                if (foundBlobs && !validateEncryptables) {
+                    // Found at least one blob, and the current dictionary is immutable
+                    // Since encryptable validation is disabled, the rest of the keys
+                    // are not relevant.
                     i.skipChildren();
+                }
             } else if (FLDict_IsBlob(dict)) {
+                // This is a mutable dictionary. Check if it's a new blob, so install it
+                // if it hasn't been already.
                 foundBlobs = true;
                 CBLNewBlob *newBlob = findNewBlob(dict);
                 if (newBlob) {
@@ -351,9 +387,12 @@ bool CBLDocument::saveBlobs(CBLDatabase *db, bool releaseNewBlob) const {
                 }
                 i.skipChildren();
             }
-        } else if (!i.value().asArray().asMutable()) {
-            if (foundBlobs)
+        } else if (!validateEncryptables && !i.value().asArray().asMutable()) {
+            // If one blob has been found already, there is nothing interesting inside of
+            // an immutable array. It will only contain previously saved information.
+            if (foundBlobs) {
                 i.skipChildren();
+            }
         }
     }
     return foundBlobs;

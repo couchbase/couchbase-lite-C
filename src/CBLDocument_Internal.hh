@@ -281,7 +281,13 @@ private:
     // installed. The flag is set to true only when saving new blobs while encoding the document
     // returned by the replicator's conflict resolved. The new blobs set to the resolved doc needs
     // to be retained until they are installed here.
-    bool saveBlobs(CBLDatabase *db, bool releaseNewBlob) const;  // returns true if there are blobs
+    //
+    // The method will returns true if there are blobs.
+    //
+    // (EE Only) Furthermore, while walking through the object tree, check if there are
+    // any encryptables in an array and throw an unsupported error if that occurs.
+    //
+    bool saveBlobsAndCheckEncryptables(CBLDatabase *db, bool releaseNewBlob) const;
     
     // Encode the document body and install new blobs if found into the database.
     //
