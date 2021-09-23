@@ -245,7 +245,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Save and Get document with E
     // Set encryptable:
     FLMutableDict props = CBLDocument_MutableProperties(doc);
     auto encryptable = CBLEncryptable_CreateWithString("foo"_sl);
-    FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "encryptable"_sl), encryptable);
+    FLMutableDict_SetEncryptableValue(props, "encryptable"_sl, encryptable);
     
     // Set non encryptable dict:
     auto nonencryptable = FLMutableDict_New();
@@ -392,7 +392,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt one prop
         FLMutableDict props = CBLDocument_MutableProperties(doc);
         
         auto secret = CBLEncryptable_CreateWithString("Secret 1"_sl);
-        FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret1"_sl), secret);
+        FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret);
         
         CBLError error;
         CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
@@ -430,14 +430,15 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt multiple
         auto props = CBLDocument_MutableProperties(doc);
         
         auto secret1 = CBLEncryptable_CreateWithString("Secret 1"_sl);
-        FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret1"_sl), secret1);
+        FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
         
         auto secret2 = CBLEncryptable_CreateWithInt(10);
-        FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret2"_sl), secret2);
+        FLMutableDict_SetEncryptableValue(props, "secret2"_sl, secret2);
         
         auto nestedDict = FLMutableDict_New();
         auto secret3 = CBLEncryptable_CreateWithBool(true);
-        FLSlot_SetEncryptableValue(FLMutableDict_Set(nestedDict, "secret3"_sl), secret3);
+        FLMutableDict_SetEncryptableValue(nestedDict, "secret3"_sl, secret3);
+        
         FLSlot_SetDict(FLMutableDict_Set(props, "nested"_sl), nestedDict);
         
         CBLError error;
@@ -498,7 +499,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No encryptor : crypto error"
     auto props = CBLDocument_MutableProperties(doc);
     
     auto secret1 = CBLEncryptable_CreateWithString("Secret 1"_sl);
-    FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret1"_sl), secret1);
+    FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
     
     CBLError error;
     CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
@@ -524,7 +525,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No decryptor : ok", "[Replic
         auto props = CBLDocument_MutableProperties(doc);
         
         auto secret1 = CBLEncryptable_CreateWithString("Secret 1"_sl);
-        FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret1"_sl), secret1);
+        FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
         
         CBLError error;
         CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
@@ -558,7 +559,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip encryption : crypto err
     auto props = CBLDocument_MutableProperties(doc);
     
     auto secret1 = CBLEncryptable_CreateWithString("Secret 1"_sl);
-    FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret1"_sl), secret1);
+    FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
     
     CBLError error;
     CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
@@ -588,7 +589,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Rep
         auto props = CBLDocument_MutableProperties(doc);
         
         auto secret1 = CBLEncryptable_CreateWithString("Secret 1"_sl);
-        FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret1"_sl), secret1);
+        FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
         
         CBLError error;
         CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
@@ -629,7 +630,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encryption error", "[Replica
     auto props = CBLDocument_MutableProperties(doc);
     
     auto secret1 = CBLEncryptable_CreateWithString("Secret 1"_sl);
-    FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret1"_sl), secret1);
+    FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
     
     CBLError error;
     CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
@@ -657,7 +658,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Decryption error", "[Replica
         auto props = CBLDocument_MutableProperties(doc);
         
         auto secret1 = CBLEncryptable_CreateWithString("Secret 1"_sl);
-        FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret1"_sl), secret1);
+        FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
         
         CBLError error;
         CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
@@ -731,7 +732,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Key ID and Algorithm", "[Rep
         FLMutableDict props = CBLDocument_MutableProperties(doc);
         
         auto secret = CBLEncryptable_CreateWithString("Secret 1"_sl);
-        FLSlot_SetEncryptableValue(FLMutableDict_Set(props, "secret1"_sl), secret);
+        FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret);
         
         CBLError error;
         CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));

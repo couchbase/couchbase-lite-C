@@ -157,8 +157,13 @@ static inline const CBLEncryptable* _cbl_nullable FLValue_GetEncryptableValue(FL
     return FLDict_GetEncryptableValue(FLValue_AsDict(value));
 }
 
-/** Set a \ref CBLEncryptable's dictionary in a Fleece mutable Dict. */
+/** Set a \ref CBLEncryptable's dictionary into a mutable dictionary's slot. */
 void FLSlot_SetEncryptableValue(FLSlot slot, const CBLEncryptable* encryptable) CBLAPI;
+
+/** Set a \ref CBLEncryptable's dictionary into a mutable dictionary. */
+static inline void FLMutableDict_SetEncryptableValue(FLMutableDict dict, FLString key, CBLEncryptable* encryptable) {
+    FLSlot_SetEncryptableValue(FLMutableDict_Set(dict, key), encryptable);
+}
 
 /** @} */
 
