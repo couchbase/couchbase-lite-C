@@ -371,6 +371,21 @@ TEST_CASE_METHOD(DatabaseTest, "Access nested collections from a copy of modifie
     CBLDocument_Release(doc);
 }
 
+TEST_CASE_METHOD(DatabaseTest, "Set MutableProperties") {
+    CBLDocument* doc1 = CBLDocument_Create();
+    FLMutableDict prop1 = CBLDocument_MutableProperties(doc1);
+    FLMutableDict_SetString(prop1, "greeting"_sl, "hello"_sl);
+    
+    CBLDocument* doc2 = CBLDocument_Create();
+    CBLDocument_SetProperties(doc2, prop1);
+    FLMutableDict prop2 = CBLDocument_MutableProperties(doc2);
+    CHECK(FLValue_AsString(FLDict_Get(prop2, "greeting"_sl)) == "hello"_sl );
+    CHECK(prop1 == prop2);
+    
+    CBLDocument_Release(doc1);
+    CHECK(FLValue_AsString(FLDict_Get(prop2, "greeting"_sl)) == "hello"_sl );
+    CBLDocument_Release(doc2);
+}
 
 TEST_CASE_METHOD(DatabaseTest, "Get Non Existing Document") {
     CBLError error;
