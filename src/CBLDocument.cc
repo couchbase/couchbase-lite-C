@@ -367,8 +367,7 @@ bool CBLDocument::saveBlobsAndCheckEncryptables(CBLDatabase *db, bool releaseNew
                     if (foundBlobs) {
                         i.skipChildren();
                     }
-                }
-                if (foundBlobs && !validateEncryptables) {
+                } else if (!validateEncryptables) {
                     // Found at least one blob, and the current dictionary is immutable
                     // Since encryptable validation is disabled, the rest of the keys
                     // are not relevant.
