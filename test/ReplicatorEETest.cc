@@ -411,8 +411,8 @@ public:
                 REQUIRE(!localDoc);
             } else {
                 REQUIRE(localDoc);
-                CHECK(localDoc["greeting"].asString() == "¡Hola!"_sl);
-                CHECK(localDoc["expletive"] == nullptr);
+                CHECK(localDoc["greeting"].asString() == "Howdy!"_sl);
+                CHECK(localDoc["expletive"].asString() == "Frak!"_sl);
                 Blob blob(localDoc["signature"].asDict());
                 CHECK(blob.loadContent() == "Bob!"_sl);
                 Blob blob2(localDoc["signature2"].asDict());
@@ -451,8 +451,8 @@ public:
                 REQUIRE(!remoteDoc);
             } else {
                 REQUIRE(remoteDoc);
-                CHECK(remoteDoc["greeting"].asString() == "¡Hola!"_sl);
-                CHECK(remoteDoc["expletive"] == nullptr);
+                CHECK(remoteDoc["greeting"].asString() == "Howdy!"_sl);
+                CHECK(remoteDoc["expletive"].asString() == "Frak!"_sl);
                 Blob blob(localDoc["signature"].asDict());
                 CHECK(blob.loadContent() == "Bob!"_sl);
                 Blob blob2(localDoc["signature2"].asDict());
@@ -503,24 +503,48 @@ public:
                 case ResolverMode::kRemoteWins:
                     return remoteDocument;
                 default:
-                    CBLDocument *merged;
+                    // NOTE: The merged doc will be:
+                    // {'greeting': 'Howdy!', 'expletive': 'Frak!', 'signature': blob, 'signature2': blob}
+                    // ** signature and signature2 have the same blob
+                    
+                    CBLDocument *mergedDoc;
                     if (resolverMode == ResolverMode::kMergeAutoID)
-                        merged = CBLDocument_Create(); // Allowed but there will be a warning message
+                        mergedDoc = CBLDocument_Create(); // Allowed but there will be a warning message
                     else
-                        merged = CBLDocument_CreateWithID(documentID);
-                    MutableDict mergedProps(CBLDocument_MutableProperties(merged));
-                    mergedProps["greeting"] = "¡Hola!";
+                        mergedDoc = CBLDocument_CreateWithID(documentID);
+       
+                    FLMutableDict mergedProps;
+                    if (localDocument) {
+                        FLDict props = CBLDocument_Properties(localDocument);
+                        FLMutableDict mProps = FLDict_MutableCopy(props, kFLDefaultCopy);
+                        CBLDocument_SetProperties(mergedDoc, mProps);
+                        FLMutableDict_Release(mProps);
+                        mergedProps = CBLDocument_MutableProperties(mergedDoc);
+                    } else if (remoteDocument) {
+                        FLDict props = CBLDocument_Properties(remoteDocument);
+                        FLMutableDict mProps = FLDict_MutableCopy(props, kFLDefaultCopy);
+                        CBLDocument_SetProperties(mergedDoc, mProps);
+                        FLMutableDict_Release(mProps);
+                        mergedProps = CBLDocument_MutableProperties(mergedDoc);
+                    } else {
+                        mergedProps = CBLDocument_MutableProperties(mergedDoc);
+                        FLMutableDict_SetString(mergedProps, "greeting"_sl, "Howdy!"_sl);
+                    }
                     
-                    auto blob = Blob("text/plain"_sl, "Bob!"_sl); // C++ Blob (RefCounted)
-                    mergedProps["signature"] = blob.properties();
-                    mergedProps["signature2"] = blob.properties();
-                    // Prevent blob from being released after returning, blob will be released
-                    // after the blob is installed when the merged document body is encoded
-                    // to save.
-                    CBLBlob_Retain(blob.ref());
+                    if (remoteDocument) {
+                        FLDict props = CBLDocument_Properties(remoteDocument);
+                        FLValue expletive = FLDict_Get(props, "expletive"_sl);
+                        FLMutableDict_SetValue(mergedProps, "expletive"_sl, expletive);
+                    } else {
+                        FLMutableDict_SetString(mergedProps, "expletive"_sl, "Frak!"_sl);
+                    }
                     
-                    // Do not release `merged`, otherwise it would be freed before returning!
-                    return merged;
+                    CBLBlob* blob = CBLBlob_CreateWithData("text/plain"_sl, "Bob!"_sl);
+                    FLMutableDict_SetBlob(mergedProps, "signature"_sl, blob);
+                    FLMutableDict_SetBlob(mergedProps, "signature2"_sl, blob); // Use same blob
+                    
+                    // Do not release `mergedDoc`, otherwise it would be freed before returning!
+                    return mergedDoc;
             }
         }
     }
