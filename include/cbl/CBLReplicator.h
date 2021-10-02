@@ -190,7 +190,16 @@ typedef struct {
     CBLReplicatorType replicatorType;   ///< Push, pull or both
     bool continuous;                    ///< Continuous replication?
     //-- Auto Purge:
-    bool disableAutoPurge;              ///< Disable/Enable auto-purging documents when the user's access to the documents has been revoked.
+    /**
+    If auto purge is active, then the library will automatically purge any documents that the replicating
+    user loses access to via the Sync Function on Sync Gateway.  If disableAutoPurge is true, this behavior
+    is disabled and an access removed event will be sent to any document listeners that are active on the
+    replicator.
+
+    IMPORTANT: For performance reasons, the document listeners must be added *before* the replicator is started
+    or they will not receive the events.
+    */
+    bool disableAutoPurge;              
     //-- Retry Logic:
     unsigned maxAttempts;               ///< Max retry attempts where the initial connect to replicate counts toward the given value.
                                         ///< Specify 0 to use the default value, 10 times for a non-continuous replicator and max-int time for a continuous replicator. Specify 1 means there will be no retry after the first attempt.
