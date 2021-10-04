@@ -130,6 +130,7 @@ _CBLReplicator_AddChangeListener
 _CBLReplicator_AddDocumentReplicationListener
 _CBLDefaultConflictResolver
 _kFLNullValue
+_kFLUndefinedValue
 _kFLEmptyArray
 _kFLEmptyDict
 _FLSlice_Equal

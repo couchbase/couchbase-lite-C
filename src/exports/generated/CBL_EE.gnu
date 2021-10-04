@@ -150,6 +150,7 @@ CBL_C {
 		CBLReplicator_AddDocumentReplicationListener;
 		CBLDefaultConflictResolver;
 		kFLNullValue;
+		kFLUndefinedValue;
 		kFLEmptyArray;
 		kFLEmptyDict;
 		FLSlice_Equal;

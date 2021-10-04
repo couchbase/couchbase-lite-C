@@ -285,12 +285,13 @@ TEST_CASE_METHOD(QueryTest, "Query Result As Array", "[Query]") {
     CBLError error;
     int errPos;
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
-                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    "SELECT name, foo FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
                                     &errPos, &error);
     REQUIRE(query);
 
-    CHECK(CBLQuery_ColumnCount(query) == 1);
+    REQUIRE(CBLQuery_ColumnCount(query) == 2);
     CHECK(CBLQuery_ColumnName(query, 0) == "name"_sl);
+    CHECK(CBLQuery_ColumnName(query, 1) == "foo"_sl);
 
     alloc_slice explanation(CBLQuery_Explain(query));
     cerr << string(explanation);
@@ -303,7 +304,7 @@ TEST_CASE_METHOD(QueryTest, "Query Result As Array", "[Query]") {
     REQUIRE(results);
     while (CBLResultSet_Next(results)) {
         FLArray result = CBLResultSet_ResultArray(results);
-        REQUIRE(FLArray_Count(result) == 1);
+        REQUIRE(FLArray_Count(result) == 2);
         FLValue name = FLArray_Get(result, 0);
         FLDict dict = FLValue_AsDict(name);
         CHECK(dict);
@@ -312,8 +313,10 @@ TEST_CASE_METHOD(QueryTest, "Query Result As Array", "[Query]") {
         REQUIRE(n < 3);
         CHECK(first == kExpectedFirst[n]);
         CHECK(last == kExpectedLast[n]);
-        ++n;
         cerr << first << " " << last << "\n";
+        FLValue foo = FLArray_Get(result, 1);
+        CHECK(FLValue_GetType(foo) == kFLUndefined);
+        ++n;
     }
     CHECK(n == 3);
 }
