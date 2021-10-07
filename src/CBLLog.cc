@@ -17,6 +17,7 @@
 //
 
 #include "CBLLog.h"
+#include "CBLLog_Internal.hh"
 #include "CBLPrivate.h"
 #include "c4Base.hh"
 #include "Internal.hh"
@@ -50,8 +51,6 @@ static alloc_slice sLogFileDir;
 
 static void c4LogCallback(C4LogDomain domain, C4LogLevel level, const char *fmt, va_list args);
 
-static void init();
-
 static C4LogLevel effectiveC4CallbackLogLevel();
 
 static void updateC4CallbackLogLevel();
@@ -61,7 +60,7 @@ static CBLLogDomain getCBLLogDomain(C4LogDomain domain);
 // Note: Cannot use static initializing here as the order of initializing static C4LogDomain
 // constants such as kC4DatabaseLog cannot be guaranteed to be done prior.
 static once_flag initFlag;
-static void init() {
+void CBLLog_Init() {
     call_once(initFlag, [](){
         // Initialize log level of each domain to debug (lowest level):
         for (int i = 0; i < sizeof(kC4Domains)/sizeof(kC4Domains[0]); ++i) {
@@ -81,7 +80,7 @@ CBLLogLevel CBLLog_ConsoleLevel() CBLAPI {
 
 
 void CBLLog_SetConsoleLevel(CBLLogLevel level) CBLAPI {
-    init();
+    CBLLog_Init();
     if (sConsoleLogLevel.exchange(level) != level)
         updateC4CallbackLogLevel();
 }
@@ -93,7 +92,7 @@ CBLLogLevel CBLLog_CallbackLevel() CBLAPI {
 
 
 void CBLLog_SetCallbackLevel(CBLLogLevel level) CBLAPI {
-    init();
+    CBLLog_Init();
     if (sCustomLogLevel.exchange(level) != level)
         updateC4CallbackLogLevel();
 }
@@ -105,7 +104,7 @@ CBLLogCallback CBLLog_Callback() CBLAPI {
 
 
 void CBLLog_SetCallback(CBLLogCallback callback) CBLAPI {
-    init();
+    CBLLog_Init();
     if (sCustomCallback.exchange(callback) != callback)
         updateC4CallbackLogLevel();
 }
@@ -195,7 +194,7 @@ const CBLLogFileConfiguration* CBLLog_FileConfig() CBLAPI {
 
 
 bool CBLLog_SetFileConfig(CBLLogFileConfiguration config, CBLError *outError) CBLAPI {
-    init();
+    CBLLog_Init();
     
     sLogFileDir = config.directory;     // copy string to the heap
     config.directory = sLogFileDir;     // and put the heap copy in the struct
