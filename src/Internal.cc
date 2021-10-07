@@ -17,6 +17,7 @@
 //
 
 #include "Internal.hh"
+#include "CBLLog_Internal.hh"
 #include "c4Base.hh"
 #include "fleece/Fleece.h"
 #include "betterassert.hh"
@@ -65,6 +66,8 @@ namespace cbl_internal {
         }
         precondition(context.filesDir != nullptr);
         precondition(context.tempDir != nullptr);
+        
+        CBLLog_Init();
         
         litecore::FilePath filesDir(context.filesDir, "");
         filesDir.mustExistAsDir();
