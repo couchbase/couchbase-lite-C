@@ -19,6 +19,7 @@
 #pragma once
 #include "CBLDatabase.h"
 #include "CBLDocument_Internal.hh"
+#include "CBLLog_Internal.hh"
 #include "CBLPrivate.h"
 #include "c4Collection.hh"
 #include "c4Database.hh"
@@ -60,11 +61,13 @@ public:
                              slice toName,
                              const CBLDatabaseConfiguration* _cbl_nullable config)
     {
+        CBLLog_Init();
         C4DatabaseConfig2 c4config = asC4Config(config);
         C4Database::copyNamed(fromPath, toName, c4config);
     }
 
     static void deleteDatabase(slice name, slice inDirectory) {
+        CBLLog_Init();
         C4Database::deleteNamed(name, effectiveDir(inDirectory));
     }
 
@@ -77,6 +80,7 @@ public:
                            "The context hasn't been initialized. Call CBL_Init(CBLInitContext*) to initialize the context");
         }
 #endif
+        CBLLog_Init();
         C4DatabaseConfig2 c4config = asC4Config(config);
         Retained<C4Database> c4db = C4Database::openNamed(name, c4config);
         return new CBLDatabase(c4db, name, c4config.parentDirectory);
