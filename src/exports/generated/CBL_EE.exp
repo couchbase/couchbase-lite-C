@@ -207,6 +207,7 @@ _FLArrayIterator_GetValue
 _FLArrayIterator_GetValueAt
 _FLArrayIterator_Next
 _FLMutableArray_New
+_FLMutableArray_NewFromJSON
 _FLMutableArray_GetSource
 _FLMutableArray_IsChanged
 _FLMutableArray_Append
@@ -271,6 +272,7 @@ _FLEncodeJSONDelta
 _FLApplyJSONDelta
 _FLEncodeApplyingJSONDelta
 _FLMutableDict_New
+_FLMutableDict_NewFromJSON
 _FLMutableDict_GetSource
 _FLMutableDict_IsChanged
 _FLMutableDict_Set
