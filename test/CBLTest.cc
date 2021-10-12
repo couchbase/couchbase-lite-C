@@ -64,6 +64,7 @@ const CBLDatabaseConfiguration CBLTest::kDatabaseConfiguration = []{
 CBLTest::CBLTest() {
     // Check that these have been correctly exported
     CHECK(FLValue_GetType(kFLNullValue) == kFLNull);
+    CHECK(FLValue_GetType(kFLUndefinedValue) == kFLUndefined);
     CHECK(FLValue_GetType((FLValue)kFLEmptyArray) == kFLArray);
     CHECK(FLValue_GetType((FLValue)kFLEmptyDict) == kFLDict);
 

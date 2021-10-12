@@ -6,6 +6,7 @@
 # (See the master list at vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/Fleece.exp)
 
 kFLNullValue
+kFLUndefinedValue
 kFLEmptyArray
 kFLEmptyDict
 
