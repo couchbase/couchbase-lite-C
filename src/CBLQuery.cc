@@ -88,12 +88,12 @@ Value CBLResultSet::property(slice prop) const {
 
 Array CBLResultSet::asArray() const {
     if (!_asArray) {
-        auto array = fleece::MutableArray::newArray();
+        auto array = MutableArray::newArray();
         unsigned nCols = _query->columnCount();
         array.resize(uint32_t(nCols));
         for (unsigned i = 0; i < nCols; ++i) {
             Value val = column(i);
-            array[i] = val ? val : Value::null();
+            array[i] = val ? val : Value(kFLUndefinedValue);
         }
         _asArray = array;
     }
