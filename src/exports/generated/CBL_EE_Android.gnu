@@ -208,6 +208,7 @@ CBL_C {
 		FLArrayIterator_GetValueAt;
 		FLArrayIterator_Next;
 		FLMutableArray_New;
+		FLMutableArray_NewFromJSON;
 		FLMutableArray_GetSource;
 		FLMutableArray_IsChanged;
 		FLMutableArray_Append;
@@ -272,6 +273,7 @@ CBL_C {
 		FLApplyJSONDelta;
 		FLEncodeApplyingJSONDelta;
 		FLMutableDict_New;
+		FLMutableDict_NewFromJSON;
 		FLMutableDict_GetSource;
 		FLMutableDict_IsChanged;
 		FLMutableDict_Set;
