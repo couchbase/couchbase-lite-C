@@ -238,14 +238,15 @@ inline const CBLBlob* _cbl_nullable CBLBlob::getBlob(Dict blobDict) noexcept {
     if (!C4Blob::isBlob(blobDict))
         return nullptr;
 
-    // Check if it's a new unsaved blob:
-    if (auto newBlob = CBLDocument::findNewBlob(blobDict); newBlob)
-        return newBlob;
-
     // Check if it's a blob in a query result set:
     if (auto rs = CBLResultSet::containing(blobDict); rs)
         return rs->getBlob(blobDict, *key);
-    return nullptr;
+
+    // CBL-2261: Keep this condition last because if this returns null it
+    // often logs a warning (so before, every time CBLResultSet::containing
+    // was true a benign warning would be logged)
+    // Check if it's a new unsaved blob:
+    return CBLDocument::findNewBlob(blobDict);
 }
 
 
