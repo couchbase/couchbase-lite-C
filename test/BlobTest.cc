@@ -91,3 +91,25 @@ TEST_CASE_METHOD(BlobTest, "Create blob with stream", "[Blob]") {
     CBLBlob_Release(blob);
     CBLDocument_Release(doc);
 }
+
+
+TEST_CASE_METHOD(BlobTest, "Create JSON from Blob", "[Blob]") {
+    alloc_slice content1("This is the content of the blob 1.");
+    CBLBlob* blob = CBLBlob_CreateWithData("text/plain"_sl, content1);
+    CHECK(alloc_slice(CBLBlob_CreateJSON(blob)) == "{\"@type\":\"blob\",\"content_type\":\"text/plain\",\"digest\":\"sha1-dXNgUcxC3n7lxfrYkbLUG4gOKRw=\",\"length\":34}"_sl);
+    
+    CBLError error;
+    auto doc = CBLDocument_CreateWithID("doc1"_sl);
+    auto props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetBlob(props, "blob"_sl, blob);
+    REQUIRE(CBLDatabase_SaveDocument(db, doc, &error));
+    CBLBlob_Release(blob);
+    CBLDocument_Release(doc);
+    
+    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    REQUIRE(doc);
+    FLValue value = FLDict_Get(CBLDocument_Properties(doc), "blob"_sl);
+    const CBLBlob* gotBlob = FLValue_GetBlob(value);
+    CHECK(alloc_slice(CBLBlob_CreateJSON(gotBlob)) == "{\"content_type\":\"text/plain\",\"digest\":\"sha1-dXNgUcxC3n7lxfrYkbLUG4gOKRw=\",\"length\":34,\"@type\":\"blob\"}"_sl);
+    CBLDocument_Release(doc);
+}
