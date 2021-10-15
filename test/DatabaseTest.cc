@@ -171,7 +171,7 @@ TEST_CASE_METHOD(DatabaseTest, "New Document") {
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_RevisionID(doc) == nullslice);
     CHECK(CBLDocument_Sequence(doc) == 0);
-    CHECK(CBLDocument_CreateJSON(doc) == "{}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CHECK(CBLDocument_MutableProperties(doc) == CBLDocument_Properties(doc));
     CBLDocument_Release(doc);
 }
@@ -183,7 +183,7 @@ TEST_CASE_METHOD(DatabaseTest, "New Document With Auto ID") {
     CHECK(CBLDocument_ID(doc) != nullslice);
     CHECK(CBLDocument_RevisionID(doc) == nullslice);
     CHECK(CBLDocument_Sequence(doc) == 0);
-    CHECK(CBLDocument_CreateJSON(doc) == "{}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CHECK(CBLDocument_MutableProperties(doc) == CBLDocument_Properties(doc));
     CBLDocument_Release(doc);
 }
@@ -198,14 +198,14 @@ TEST_CASE_METHOD(DatabaseTest, "Mutable Copy New Document") {
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_RevisionID(doc) == nullslice);
     CHECK(CBLDocument_Sequence(doc) == 0);
-    CHECK(CBLDocument_CreateJSON(doc) == "{\"greeting\":\"Howdy!\"}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     
     CBLDocument* mDoc = CBLDocument_MutableCopy(doc);
     CHECK(mDoc != doc);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_Sequence(mDoc) == 0);
-    CHECK(CBLDocument_CreateJSON(doc) == "{\"greeting\":\"Howdy!\"}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     
     CBLDocument_Release(doc);
@@ -226,7 +226,7 @@ TEST_CASE_METHOD(DatabaseTest, "Mutable Copy Immutable Document") {
     CHECK(CBLDocument_ID(rDoc) == "foo"_sl);
     CHECK(CBLDocument_RevisionID(rDoc) != nullslice);
     CHECK(CBLDocument_Sequence(rDoc) == 1);
-    CHECK(CBLDocument_CreateJSON(rDoc) == "{\"greeting\":\"Howdy!\"}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(rDoc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(rDoc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
     CBLDocument* mDoc = CBLDocument_MutableCopy(rDoc);
@@ -234,7 +234,7 @@ TEST_CASE_METHOD(DatabaseTest, "Mutable Copy Immutable Document") {
     CHECK(CBLDocument_ID(mDoc) == "foo"_sl);
     CHECK(CBLDocument_RevisionID(mDoc) == CBLDocument_RevisionID(rDoc));
     CHECK(CBLDocument_Sequence(mDoc) == 1);
-    CHECK(CBLDocument_CreateJSON(doc) == "{\"greeting\":\"Howdy!\"}"_sl);
+    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     
     CBLDocument_Release(doc);
