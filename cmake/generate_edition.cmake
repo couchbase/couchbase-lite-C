@@ -46,6 +46,7 @@ macro(generate_edition)
         endif()
 
         if(DEFINED ENV{BLD_NUM})
+            message(VERBOSE "Using BLD_NUM:$ENV{BLD_NUM} from environment variable")
             set(CouchbaseLite_C_BUILD $ENV{BLD_NUM})
         else()
             message(WARNING "No BLD_NUM set, defaulting to 0...")
