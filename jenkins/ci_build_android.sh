@@ -63,7 +63,7 @@ function build_variant {
         -DEDITION=$EDITION \
 	    ..
 
-    ${CMAKE_PATH}/ninja install/strip
+    ${CMAKE_PATH}/ninja install
 }
 
 ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
