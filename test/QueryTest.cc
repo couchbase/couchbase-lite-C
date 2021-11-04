@@ -703,8 +703,7 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
     CHECK(n == 3);
 }
 
-/**
- * CBL-2147 : Disable the test until the issue is fixed:
+
 static int countResults(ResultSet &results) {
     int n = 0;
     for (CBL_UNUSED auto &result : results)
@@ -713,33 +712,41 @@ static int countResults(ResultSet &results) {
 }
 
 TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ API", "[Query]") {
-    Query query(db, kCBLN1QLLanguage, "SELECT name WHERE birthday like '1959-%' ORDER BY birthday");
+    Query query(db, kCBLN1QLLanguage, "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday");
     {
         auto rs = query.execute();
         CHECK(countResults(rs) == 3);
     }
 
-    cerr << "Adding listener\n";
-    std::atomic_int resultCount{-1};
-    Query::ChangeListener listenerToken = query.addChangeListener([&](Query::Change change) {
-        ResultSet rs = change.results();
-        resultCount = countResults(rs);
-    });
+    {
+        cerr << "Adding listener\n";
+        std::atomic_int resultCount{-1};
+        Query::ChangeListener listenerToken = query.addChangeListener([&](Query::Change change) {
+            ResultSet rs = change.results();
+            resultCount = countResults(rs);
+        });
 
-    cerr << "Waiting for listener...\n";
-    while (resultCount < 0)
-        this_thread::sleep_for(100ms);
-    CHECK(resultCount == 3);
-    resultCount = -1;
+        cerr << "Waiting for listener...\n";
+        while (resultCount < 0)
+            this_thread::sleep_for(100ms);
+        CHECK(resultCount == 3);
+        resultCount = -1;
 
-    cerr << "Deleting a doc...\n";
-    Document doc = db.getDocument("0000012");
-    REQUIRE(doc);
-    REQUIRE(db.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
+        cerr << "Deleting a doc...\n";
+        Document doc = db.getDocument("0000012");
+        REQUIRE(doc);
+        REQUIRE(db.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
 
-    cerr << "Waiting for listener again...\n";
-    while (resultCount < 0)
-        this_thread::sleep_for(100ms);
-    CHECK(resultCount == 2);
+        cerr << "Waiting for listener again...\n";
+        while (resultCount < 0)
+            this_thread::sleep_for(100ms);
+        CHECK(resultCount == 2);
+    }
+    
+    // https://issues.couchbase.com/browse/CBL-2147
+    // Add a small sleep to ensure async cleanup in LiteCore's LiveQuerier's _stop() when the
+    // listenerToken is destructed is done bfore before checking instance leaking in
+    // CBLTest_Cpp's destructor:
+    cerr << "Sleeping to ensure async cleanup ..." << endl;
+    this_thread::sleep_for(500ms);
 }
-*/
