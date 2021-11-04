@@ -15,7 +15,7 @@ CBL_VERSION_STRING                                 = 3.0.0
 CBL_BUILD_NUMBER                                   = 0
 
 IPHONEOS_DEPLOYMENT_TARGET                         = 10.0
-MACOSX_DEPLOYMENT_TARGET                           = 10.12
+MACOSX_DEPLOYMENT_TARGET                           = 10.14
 TVOS_DEPLOYMENT_TARGET                             = 10.0
 SUPPORTED_PLATFORMS                                = macosx iphoneos iphonesimulator appletvos appletvsimulator
 VALID_ARCHS                                        = arm64 x86_64
