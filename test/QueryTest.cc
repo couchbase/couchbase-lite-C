@@ -21,6 +21,7 @@
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <iostream>
+#include <mutex>
 #include <thread>
 #include <atomic>
 
@@ -36,14 +37,67 @@ public:
 
     ~QueryTest() {
         CBLResultSet_Release(results);
-        CBLListener_Remove(listenerToken);
         CBLQuery_Release(query);
     }
 
     CBLQuery *query =nullptr;
     CBLResultSet *results =nullptr;
-    CBLListenerToken *listenerToken =nullptr;
-    int resultCount =-1;
+};
+
+
+static int countResults(CBLResultSet *results) {
+     int n = 0;
+     while (CBLResultSet_Next(results))
+         ++n;
+     return n;
+}
+
+/** For keeping track of listener callback result in LiveQuery tests. */
+struct ListenerState {
+    int count() {
+        lock_guard<mutex> lock(_mutex);
+        return _count;
+    }
+    
+    int resultCount() {
+        lock_guard<mutex> lock(_mutex);
+        return _resultCount;
+    }
+    
+    void reset() {
+        lock_guard<mutex> lock(_mutex);
+        _count = 0;
+        _resultCount = -1;
+    }
+    
+    void receivedCallback(void *context, CBLQuery* query, CBLListenerToken* token) {
+        lock_guard<mutex> lock(_mutex);
+        ++_count;
+        
+        CBLError error;
+        auto newResults = CBLQuery_CopyCurrentResults(query, token, &error);
+        REQUIRE(newResults);
+        _resultCount = countResults(newResults);
+        CBLResultSet_Release(newResults);
+    }
+    
+    bool waitForCount(int target) {
+        int timeoutCount = 0;
+        while (timeoutCount++ < 50) {
+            {
+                lock_guard<mutex> lock(_mutex);
+                if (_count == target)
+                    return true;
+            }
+            this_thread::sleep_for(100ms);
+        }
+        return false;
+    }
+    
+private:
+    std::mutex _mutex;
+    int _count {0};
+    int _resultCount {-1};
 };
 
 
@@ -322,14 +376,7 @@ TEST_CASE_METHOD(QueryTest, "Query Result As Array", "[Query]") {
 }
 
 
-static int countResults(CBLResultSet *results) {
-     int n = 0;
-     while (CBLResultSet_Next(results))
-         ++n;
-     return n;
-}
- 
-TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
+TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query][LiveQuery]") {
     CBLError error;
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
                                     "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
@@ -339,35 +386,205 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query]") {
     CBLResultSet *results = CBLQuery_Execute(query, &error);
     CHECK(countResults(results) == 3);
     CBLResultSet_Release(results);
-
-    resultCount = -1;
     
     cerr << "Adding listener\n";
-    listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
-        auto self = (QueryTest*)context;
-        CBLError error;
-        auto newResults = CBLQuery_CopyCurrentResults(query, token, &error);
-        CHECK(newResults);
-        self->resultCount = countResults(newResults);
-        CBLResultSet_Release(newResults);
-    }, this);
+    ListenerState state;
+    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+        ((ListenerState*)context)->receivedCallback(context, query, token);
+    }, &state);
 
     cerr << "Waiting for listener...\n";
-    while (resultCount < 0)
-        this_thread::sleep_for(100ms);
-    CHECK(resultCount == 3);
-    resultCount = -1;
-
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 3);
+    
     cerr << "Deleting a doc...\n";
+    state.reset();
     const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
     REQUIRE(doc);
-    CHECK(CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
+    CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
     CBLDocument_Release(doc);
 
     cerr << "Waiting for listener again...\n";
-    while (resultCount < 0)
-        this_thread::sleep_for(100ms);
-    CHECK(resultCount == 2);
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 2);
+    
+    // https://issues.couchbase.com/browse/CBL-2117
+    // Remove listener token and sleep to ensure async cleanup in LiteCore's LiveQuerier's _stop()
+    // functions is done before checking instance leaking in CBLTest's destructor:
+    CBLListener_Remove(listenerToken);
+    listenerToken = nullptr;
+    cerr << "Sleeping to ensure async cleanup ..." << endl;
+    this_thread::sleep_for(500ms);
+}
+
+
+TEST_CASE_METHOD(QueryTest, "Remove Query Listener", "[Query][LiveQuery]") {
+    CBLError error;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    nullptr, &error);
+    REQUIRE(query);
+    
+    cerr << "Adding listener\n";
+    ListenerState state;
+    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+        ((ListenerState*)context)->receivedCallback(context, query, token);
+    }, &state);
+
+    cerr << "Waiting for listener...\n";
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 3);
+    
+    cerr << "Removing the listener...\n";
+    CBLListener_Remove(listenerToken);
+    
+    cerr << "Deleting a doc...\n";
+    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
+    REQUIRE(doc);
+    CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
+    CBLDocument_Release(doc);
+    
+    cerr << "Sleeping to ensure that the listener callback is not called..." << endl;
+    this_thread::sleep_for(1000ms); // Max delay before refreshing result in LiteCore is 500ms
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 3);
+    
+    // Cleanup:
+    listenerToken = nullptr;
+    cerr << "Sleeping to ensure async cleanup ..." << endl;
+    this_thread::sleep_for(500ms);
+}
+
+
+TEST_CASE_METHOD(QueryTest, "Query Listener and Changing parameters", "[Query][LiveQuery]") {
+    CBLError error;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name FROM _ WHERE birthday like $dob ORDER BY birthday"_sl,
+                                    nullptr, &error);
+    REQUIRE(query);
+    
+    auto params = MutableDict::newDict();
+    params["dob"] = "1959-%";
+    CBLQuery_SetParameters(query, params);
+
+    cerr << "Adding listener\n";
+    ListenerState state;
+    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+        ((ListenerState*)context)->receivedCallback(context, query, token);
+    }, &state);
+
+    cerr << "Waiting for listener...\n";
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 3);
+    
+    cerr << "Changing parameters\n";
+    state.reset();
+    params = MutableDict::newDict();
+    params["dob"] = "1977-%";
+    CBLQuery_SetParameters(query, params);
+
+    cerr << "Waiting for listener again...\n";
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 2);
+    
+    CBLListener_Remove(listenerToken);
+    listenerToken = nullptr;
+    cerr << "Sleeping to ensure async cleanup ..." << endl;
+    this_thread::sleep_for(500ms);
+}
+
+
+TEST_CASE_METHOD(QueryTest, "Multiple Query Listeners", "[Query][LiveQuery]") {
+    CBLError error;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    nullptr, &error);
+    REQUIRE(query);
+    
+    auto callback = [](void *context, CBLQuery* query, CBLListenerToken* token) {
+        ((ListenerState*)context)->receivedCallback(context, query, token);
+    };
+    
+    cerr << "Adding listener\n";
+    ListenerState state1;
+    auto token1 = CBLQuery_AddChangeListener(query, callback, &state1);
+    
+    ListenerState state2;
+    auto token2 = CBLQuery_AddChangeListener(query, callback, &state2);
+
+    cerr << "Waiting for listener 1...\n";
+    state1.waitForCount(1);
+    CHECK(state1.resultCount() == 3);
+    
+    cerr << "Waiting for listener 2...\n";
+    state2.waitForCount(1);
+    CHECK(state2.resultCount() == 3);
+
+    cerr << "Deleting a doc...\n";
+    state1.reset();
+    state2.reset();
+    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
+    REQUIRE(doc);
+    CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
+    CBLDocument_Release(doc);
+
+    cerr << "Waiting for listener 1 again...\n";
+    state1.waitForCount(1);
+    CHECK(state1.resultCount() == 2);
+    
+    cerr << "Waiting for listener 2 again...\n";
+    state2.waitForCount(1);
+    CHECK(state2.resultCount() == 2);
+    
+    cerr << "Adding another listener\n";
+    ListenerState state3;
+    auto token3 = CBLQuery_AddChangeListener(query, callback, &state3);
+    
+    cerr << "Waiting for the listener 3...\n";
+    state3.waitForCount(1);
+    CHECK(state3.resultCount() == 2);
+    CHECK(state1.count() == 1);
+    CHECK(state2.count() == 1);
+    
+    CBLListener_Remove(token1);
+    CBLListener_Remove(token2);
+    CBLListener_Remove(token3);
+    
+    token1 = nullptr;
+    token2 = nullptr;
+    token3 = nullptr;
+    
+    cerr << "Sleeping to ensure async cleanup ..." << endl;
+    this_thread::sleep_for(500ms);
+}
+
+
+TEST_CASE_METHOD(QueryTest, "Query Listener and Coalescing notification", "[Query][LiveQuery]") {
+    CBLError error;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    nullptr, &error);
+    REQUIRE(query);
+    
+    cerr << "Adding listener\n";
+    ListenerState state;
+    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+        ((ListenerState*)context)->receivedCallback(context, query, token);
+    }, &state);
+
+    cerr << "Waiting for listener...\n";
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 3);
+    
+    cerr << "Deleting a doc...\n";
+    state.reset();
+    REQUIRE(CBLDatabase_DeleteDocumentByID(db, "0000012"_sl, &error));
+    REQUIRE(CBLDatabase_DeleteDocumentByID(db, "0000046"_sl, &error));
+
+    cerr << "Sleeping to see if the notification is coalesced ...\n";
+    this_thread::sleep_for(1000ms); // Max delay before refreshing result in LiteCore is 500ms
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 1);
     
     // https://issues.couchbase.com/browse/CBL-2117
     // Remove listener token and sleep to ensure async cleanup in LiteCore's LiveQuerier's _stop()
