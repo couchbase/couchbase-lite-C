@@ -92,6 +92,6 @@ if("${Edition}" -eq "enterprise") {
 Make-Package "${env:WORKSPACE}\build_x64" "couchbase-lite-c-$Edition-$Version-$BuildNum-windows-x86_64.zip"
 
 # Windows symbols into a separate archive since they are not included in the "install" anyway
-Push-Location "${env:WORKSPACE}\build_x64\MinSizeRel"
+Push-Location "${env:WORKSPACE}\build_x64\couchbase-lite-c\MinSizeRel"
 & 7za a -tzip -mx9 "${env:WORKSPACE}\couchbase-lite-c-$Edition-$Version-$BuildNum-windows-x86_64-symbols.zip" cblite.pdb
 Pop-Location
