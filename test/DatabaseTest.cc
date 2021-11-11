@@ -1373,6 +1373,30 @@ TEST_CASE_METHOD(DatabaseTest, "Database notifications") {
 }
 
 
+TEST_CASE_METHOD(DatabaseTest, "Remove Database Listener after releasing database") {
+    // Add a listener:
+    dbListenerCalls = fooListenerCalls = 0;
+    auto token = CBLDatabase_AddChangeListener(db, dbListener, this);
+    auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
+
+    // Create a doc, check that the listener was called:
+    createDocument(db, "foo", "greeting", "Howdy!");
+    CHECK(dbListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+
+    // Close and release the database:
+    CBLError error;
+    if (!CBLDatabase_Close(db, &error))
+        WARN("Failed to close database: " << error.domain << "/" << error.code);
+    CBLDatabase_Release(db);
+    db = nullptr;
+
+    // Remove and release the token:
+    CBLListener_Remove(token);
+    CBLListener_Remove(docToken);
+}
+
+
 static int notificationsReadyCalls = 0;
 
 static void notificationsReady(void *context, CBLDatabase* db) {

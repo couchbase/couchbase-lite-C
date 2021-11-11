@@ -131,7 +131,7 @@ namespace cbl_internal {
             _db->notify(this, _db, _docID);
         }
 
-        CBLDatabase* _db;
+        Retained<CBLDatabase> _db;
         alloc_slice _docID;
         unique_ptr<C4DocumentObserver> _c4obs;
     };
