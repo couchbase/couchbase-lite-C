@@ -224,11 +224,12 @@ configure_package_config_file(
   INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite"
 )
 write_basic_package_version_file(
-    ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite/CouchbaseLiteConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/CouchbaseLiteConfigVersion.cmake
     VERSION ${CBL_LIBRARY_VERSION} COMPATIBILITY SameMajorVersion
 )
 
 install(FILES ${CMAKE_BINARY_DIR}/CouchbaseLiteConfig.cmake
+              ${CMAKE_BINARY_DIR}/CouchbaseLiteConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite)
 
 ### TESTS:
