@@ -48,6 +48,8 @@ CBL_C {
 		CBLBlob_CreateWithData;
 		CBLBlob_CreateWithStream;
 		CBLBlobReader_Read;
+		CBLBlobReader_Position;
+		CBLBlobReader_Seek;
 		CBLBlobReader_Close;
 		CBLBlobWriter_Create;
 		CBLBlobWriter_Close;
