@@ -17,6 +17,7 @@
 //
 
 #include "CBLTest.hh"
+#include "CBLBlob+File.h"
 #include "CBLPrivate.h"
 #include <string>
 
@@ -137,9 +138,103 @@ TEST_CASE_METHOD(BlobTest, "Create blob with stream", "[Blob]") {
         CBLBlobReader_Close(in);
     }
 
+#ifndef _MSC_VER
+    // Read content as stdio FILE stream:
+    {
+        static_assert(kBlobContent.size == 34, "the checks below assume the blob is 34 bytes long");
+        char buf[20];
+        FILE *f = CBLBlob_OpenAsFILE(blob, &error);
+        REQUIRE(f);
+        CHECK(fileno(f) < 0);
+
+        CHECK(ftell(f) == 0);
+        CHECK(fread(buf, 1, 20, f) == 20);
+        CHECK(memcmp(buf, &kBlobContent[0], 20) == 0);
+        CHECK(!feof(f));
+
+        CHECK(ftell(f) == 20);
+        CHECK(fread(buf, 1, 20, f) == 14);
+        CHECK(memcmp(buf, &kBlobContent[20], 14) == 0);
+        CHECK(feof(f));
+        CHECK(!ferror(f));
+
+        CHECK(ftell(f) == 34);
+        CHECK(fread(buf, 1, 20, f) == 0);
+
+        CHECK(fseek(f, 12, SEEK_SET) == 0);
+        CHECK(ftell(f) == 12);
+        CHECK(!feof(f));
+        CHECK(fread(buf, 1, 7, f) == 7);
+        CHECK(memcmp(buf, &kBlobContent[12], 7) == 0);
+        CHECK(ftell(f) == 12 + 7);
+
+        CHECK(fseek(f, 1, SEEK_CUR) == 0);
+        CHECK(ftell(f) == 20);
+
+        CHECK(fseek(f, -5, SEEK_END) == 0);
+        CHECK(ftell(f) == kBlobContent.size - 5);
+
+        CHECK(fseek(f, 9999, SEEK_SET) == 0);           // fseek past EOF is not error
+        CHECK(ftell(f) == kBlobContent.size);           // but pos is pinned to the EOF
+
+        ExpectingExceptions x;
+        CHECK(fseek(f, -9999, SEEK_SET) < 0);           // but fseek to negative pos is an error
+        CHECK(errno == EINVAL);
+        CHECK(ftell(f) == kBlobContent.size);           // but pos is pinned to the EOF
+
+        fclose(f);
+    }
+#endif
+
     CBLBlob_Release(blob);
     CBLDocument_Release(doc);
 }
+
+
+#ifndef _MSC_VER
+TEST_CASE_METHOD(BlobTest, "Create blob with FILE stream", "[Blob]") {
+    CBLError error;
+    CBLBlob *blob;
+    {
+        FILE *f = CBLBlobWriter_CreateFILE(db, &error);
+        REQUIRE(f);
+        CHECK(fileno(f) < 0);
+
+        CHECK(fprintf(f, "Pi is about %.5f", M_PI) == 19);
+        CHECK(fputc('.', f) == '.');
+        CHECK(fwrite("TESTING", 1, 7, f) == 7);
+
+        // seek and read will fail with errors:
+        CHECK(fseek(f, 2, SEEK_SET) < 0);
+        char buf[10];
+        CHECK(fread(buf, 1, 10, f) == 0);
+        CHECK(ferror(f) != 0);
+        CHECK(feof(f) == 0);
+        clearerr(f);
+
+        blob = CBLBlob_CreateWithFILE("text/plain"_sl, f);
+        REQUIRE(blob);
+        // Note: After creating a blob with the stream, the created blob will take
+        // ownership of the stream so do not close the stream.
+    }
+
+    // Set blob in a document and save:
+    auto doc = CBLDocument_CreateWithID("doc1"_sl);
+    auto props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetBlob(props, "blob"_sl, blob);
+    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+
+    // Read content as a slice:
+    {
+        FLSliceResult gotContent = CBLBlob_Content(blob, &error);
+        CHECK(gotContent == "Pi is about 3.14159.TESTING"_sl);
+        FLSliceResult_Release(gotContent);
+    }
+
+    CBLBlob_Release(blob);
+    CBLDocument_Release(doc);
+}
+#endif
 
 
 TEST_CASE_METHOD(BlobTest, "Create JSON from Blob", "[Blob]") {
