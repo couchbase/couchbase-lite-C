@@ -140,6 +140,8 @@ The resulting (debug by default) library is `Debug\cblite.dll`.
 
 ### With Xcode on macOS
 
+:warning: Do not use Xcode 13 because of a [downstream issue](https://github.com/ARMmbed/mbedtls/issues/5052) :warning:
+
 1. Clone the repo
 2. Check out submodules (recursively), i.e. `git submodule update --init --recursive`
 3. Open the Xcode project in the `Xcode` subfolder
