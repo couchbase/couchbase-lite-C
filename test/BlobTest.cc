@@ -67,27 +67,76 @@ TEST_CASE_METHOD(BlobTest, "Create blob stream and close", "[Blob]") {
 
 
 TEST_CASE_METHOD(BlobTest, "Create blob with stream", "[Blob]") {
-    alloc_slice content("This is the content of the blob 1.");
-    
-    // Create and close stream with out creating blob:
+    static constexpr slice kBlobContent = "This is the content of the blob 1.";
     CBLError error;
-    CBLBlobWriteStream* ws = CBLBlobWriter_Create(db, &error);
-    CBLBlobWriter_Write(ws, content.buf, content.size, &error);
-    CBLBlob* blob = CBLBlob_CreateWithStream("text/plain"_sl, ws);
-    
+    CBLBlob *blob;
+    {
+        CBLBlobWriteStream* ws = CBLBlobWriter_Create(db, &error);
+        REQUIRE(ws);
+        REQUIRE(CBLBlobWriter_Write(ws, &kBlobContent[0], 10, &error));
+        REQUIRE(CBLBlobWriter_Write(ws, &kBlobContent[10], kBlobContent.size - 10, &error));
+        blob = CBLBlob_CreateWithStream("text/plain"_sl, ws);
+        REQUIRE(blob);
+        // Note: After creating a blob with the stream, the created blob will take
+        // ownership of the stream so do not close the stream.
+    }
+
     // Set blob in a document and save:
     auto doc = CBLDocument_CreateWithID("doc1"_sl);
     auto props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetBlob(props, "blob"_sl, blob);
     CHECK(CBLDatabase_SaveDocument(db, doc, &error));
     
-    // Check content:
-    FLSliceResult gotContent = CBLBlob_Content(blob, &error);
-    CHECK(gotContent == content);
-    FLSliceResult_Release(gotContent);
-    
-    // Note: After creating a blob with the stream, the created blob will take
-    // the ownership of the stream so do not close the stream.
+    // Read content as a slice:
+    {
+        FLSliceResult gotContent = CBLBlob_Content(blob, &error);
+        CHECK(gotContent == kBlobContent);
+        FLSliceResult_Release(gotContent);
+    }
+
+    // Read content as stream:
+    {
+        static_assert(kBlobContent.size == 34, "the checks below assume the blob is 34 bytes long");
+        char buf[20];
+        CBLBlobReadStream *in = CBLBlob_OpenContentStream(blob, &error);
+        REQUIRE(in);
+        CHECK(CBLBlobReader_Position(in) == 0);
+        CHECK(CBLBlobReader_Read(in, buf, 20, &error) == 20);
+        CHECK(memcmp(buf, &kBlobContent[0], 20) == 0);
+
+        CHECK(CBLBlobReader_Position(in) == 20);
+        CHECK(CBLBlobReader_Read(in, buf, 20, &error) == 14);
+        CHECK(memcmp(buf, &kBlobContent[20], 14) == 0);
+
+        CHECK(CBLBlobReader_Position(in) == 34);
+        CHECK(CBLBlobReader_Read(in, buf, 20, &error) == 0);
+
+        CHECK(CBLBlobReader_Seek(in, 12, kCBLSeekModeFromStart, &error) == 12);
+        CHECK(CBLBlobReader_Position(in) == 12);
+        CHECK(CBLBlobReader_Read(in, buf, 7, &error) == 7);
+        CHECK(memcmp(buf, &kBlobContent[12], 7) == 0);
+        CHECK(CBLBlobReader_Position(in) == 12 + 7);
+
+        CHECK(CBLBlobReader_Seek(in, 1, kCBLSeekModeRelative, &error) == 20);
+        CHECK(CBLBlobReader_Position(in) == 20);
+
+        CHECK(CBLBlobReader_Seek(in, -5, kCBLSeekModeFromEnd, &error) == kBlobContent.size - 5);
+        CHECK(CBLBlobReader_Position(in) == kBlobContent.size - 5);
+
+        // seek past EOF is not error, but pos is pinned to the EOF
+        CHECK(CBLBlobReader_Seek(in, 9999, kCBLSeekModeFromStart, &error) == kBlobContent.size);
+        CHECK(CBLBlobReader_Position(in) == kBlobContent.size);
+
+        // but seek to a negative position is an error
+        ExpectingExceptions x;
+        CHECK(CBLBlobReader_Seek(in, -999, kCBLSeekModeFromEnd, &error) < 0);
+        CHECK(error.domain == kCBLDomain);
+        CHECK(error.code == kCBLErrorInvalidParameter);
+        CHECK(CBLBlobReader_Position(in) == kBlobContent.size);
+
+        CBLBlobReader_Close(in);
+    }
+
     CBLBlob_Release(blob);
     CBLDocument_Release(doc);
 }

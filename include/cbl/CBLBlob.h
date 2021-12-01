@@ -125,6 +125,27 @@ CBL_CAPI_BEGIN
                            size_t maxLength,
                            CBLError* _cbl_nullable outError) CBLAPI;
 
+    /** Defines the interpretation of `offset` in \ref CBLBlobReader_Seek. */
+    typedef CBL_ENUM(uint8_t, CBLSeekBase) {
+        kCBLSeekModeFromStart,  ///< Offset is an absolute position starting from 0
+        kCBLSeekModeRelative,   ///< Offset is relative to the current stream position
+        kCBLSeekModeFromEnd     ///< Offset is relative to the end of the blob
+    };
+
+    /** Sets the position of a CBLBlobReadStream.
+        @param stream  The stream to reposition.
+        @param offset  The byte offset in the stream (relative to the `mode`).
+        @param base    The base position from which the offset is calculated.
+        @param outError  On failure, an error will be stored here if non-NULL.
+        @return  The new absolute position, or -1 on failure. */
+    int64_t CBLBlobReader_Seek(CBLBlobReadStream* stream,
+                               int64_t offset,
+                               CBLSeekBase base,
+                               CBLError* _cbl_nullable outError) CBLAPI;
+
+    /** Returns the current position of a CBLBlobReadStream. */
+    uint64_t CBLBlobReader_Position(CBLBlobReadStream* stream) CBLAPI;
+
     /** Closes a CBLBlobReadStream. */
     void CBLBlobReader_Close(CBLBlobReadStream* _cbl_nullable) CBLAPI;
 

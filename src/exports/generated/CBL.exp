@@ -28,6 +28,8 @@ _CBLBlob_CreateJSON
 _CBLBlob_CreateWithData
 _CBLBlob_CreateWithStream
 _CBLBlobReader_Read
+_CBLBlobReader_Position
+_CBLBlobReader_Seek
 _CBLBlobReader_Close
 _CBLBlobWriter_Create
 _CBLBlobWriter_Close
