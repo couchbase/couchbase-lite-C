@@ -76,7 +76,7 @@ namespace cbl_internal {
         tempDir.mustExistAsDir();
         
         C4Error c4err;
-        if (!c4_setTempDir(FLStr(context.filesDir), &c4err)) {
+        if (!c4_setTempDir(FLStr(context.tempDir), &c4err)) {
             C4Error::raise(c4err);
         }
         
