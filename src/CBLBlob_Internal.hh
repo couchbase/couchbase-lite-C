@@ -207,12 +207,37 @@ private:
 
 
 struct CBLBlobReadStream {
-    CBLBlobReadStream(const CBLBlob &blob)      :_c4stream(*blob.blobStore(), blob.key()) { }
-    size_t read(void *buffer, size_t maxBytes)  {return _c4stream.read(buffer, maxBytes);}
-    int64_t getLength() const                   {return _c4stream.getLength();}
-    void seek(int64_t pos)                      {return _c4stream.seek(pos);}
+    CBLBlobReadStream(const CBLBlob &blob)
+    :_c4stream(*blob.blobStore(), blob.key())
+    { }
+
+    size_t read(void *buffer, size_t maxBytes)  {
+        size_t n = _c4stream.read(buffer, maxBytes);
+        _pos += n;
+        return n;
+    }
+
+    int64_t seek(int64_t pos, CBLSeekBase base) {
+        switch (base) {
+            case kCBLSeekModeFromStart: break;
+            case kCBLSeekModeRelative:  pos += _pos; break;
+            case kCBLSeekModeFromEnd:   pos += _c4stream.getLength(); break;
+        }
+        if (pos < 0)
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Seek to negative position");
+        pos = std::min(pos, _c4stream.getLength());
+        _c4stream.seek(pos);
+        _pos = pos;
+        return pos;
+    }
+
+    uint64_t position() const noexcept          {return _pos;}
+
+    int64_t length() const                      {return _c4stream.getLength();}
+
 private:
     C4ReadStream _c4stream;
+    uint64_t     _pos = 0;
 };
 
 

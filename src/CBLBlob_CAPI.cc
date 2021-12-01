@@ -70,6 +70,20 @@ int CBLBlobReader_Read(CBLBlobReadStream* stream,
     } catchAndBridgeReturning(outError, -1)
 }
 
+int64_t CBLBlobReader_Seek(CBLBlobReadStream* stream,
+                           int64_t position,
+                           CBLSeekBase base,
+                           CBLError *outError) noexcept
+{
+    try {
+        return stream->seek(position, base);
+    } catchAndBridgeReturning(outError, -1);
+}
+
+uint64_t CBLBlobReader_Position(CBLBlobReadStream* stream) noexcept {
+    return stream->position();
+}
+
 void CBLBlobReader_Close(CBLBlobReadStream* stream) noexcept {
     delete stream;
 }
