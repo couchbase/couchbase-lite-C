@@ -251,7 +251,10 @@ CBL_CAPI_BEGIN
 #pragma mark - BINDING DEV SUPPORT FOR BLOB:
 #endif
 
-    /** Get a \ref CBLBlob object from the database using the \ref CBLBlob properties.
+    /** (UNCOMMITTED) Use this API if you are developing Javascript language bindings.
+        If you are developing a native app, you must use the CBLBlob API.
+     
+        Get a \ref CBLBlob object from the database using the \ref CBLBlob properties.
         
         The \ref CBLBlob properties is a blob's metadata containing two required fields
         which are a special marker property `"@type":"blob"`, and property `digest` whose value
@@ -268,7 +271,10 @@ CBL_CAPI_BEGIN
     const CBLBlob* _cbl_nullable CBLDatabase_GetBlob(CBLDatabase* db, FLDict properties,
                                                      CBLError* _cbl_nullable outError) CBLAPI;
 
-    /** Save a new \ref CBLBlob object into the database without associating it with
+    /** (UNCOMMITTED) Use this API if you are developing Javascript language bindings.
+        If you are developing a native app, you must use the CBLBlob API.
+        
+        Save a new \ref CBLBlob object into the database without associating it with
         any documents. The properties of the saved \ref CBLBlob object will include
         information necessary for referencing the \ref CBLBlob object in the properties
         of the document to be saved into the database.
