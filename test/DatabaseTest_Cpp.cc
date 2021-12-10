@@ -350,3 +350,22 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Retaining immutable Fleece") {
     auto savedDoc = db.getDocument("ubiq");
     CHECK(savedDoc.propertiesAsJSON() == mdoc.propertiesAsJSON());
 }
+
+
+TEST_CASE_METHOD(CBLTest_Cpp, "Get index names") {
+    RetainedArray names = db.getIndexNames();
+    REQUIRE(names);
+    REQUIRE(names.count() == 0);
+    
+    CBLValueIndexConfiguration index1 = {kCBLN1QLLanguage, "id"_sl};
+    db.createValueIndex("index1", index1);
+    
+    CBLValueIndexConfiguration index2 = {kCBLN1QLLanguage, "firstname, lastname"_sl};
+    db.createValueIndex("index2", index2);
+    
+    names = db.getIndexNames();
+    REQUIRE(names);
+    REQUIRE(names.count() == 2);
+    CHECK(names[0].asString() == "index1");
+    CHECK(names[1].asString() == "index2");
+}

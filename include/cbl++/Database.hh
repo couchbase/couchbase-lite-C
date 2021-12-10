@@ -173,9 +173,9 @@ namespace cbl {
             check(CBLDatabase_DeleteIndex(ref(), name, &error), error);
         }
 
-        fleece::Array getIndexNames() {
+        fleece::RetainedArray getIndexNames() {
             FLArray flNames = CBLDatabase_GetIndexNames(ref());
-            fleece::Array names(flNames);
+            fleece::RetainedArray names(flNames);
             FLArray_Release(flNames);
             return names;
         }
