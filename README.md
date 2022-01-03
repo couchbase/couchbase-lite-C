@@ -144,7 +144,7 @@ The resulting (debug by default) library is `Debug\cblite.dll`.
 
 1. Clone the repo
 2. Check out submodules (recursively), i.e. `git submodule update --init --recursive`
-3. Open the Xcode project in the `Xcode` subfolder
+3. Open the Xcode project `CBL_C.xcodeproj`
 4. Select scheme `CBL_C Framework`
 5. Build
 
