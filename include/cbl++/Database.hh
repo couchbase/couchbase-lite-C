@@ -35,10 +35,11 @@ CBL_ASSUME_NONNULL_BEGIN
 namespace cbl {
     class Document;
     class MutableDocument;
+    class Query;
 
 
-    using SaveConflictHandler = std::function<bool(MutableDocument documentBeingSaved,
-                                                   Document conflictingDocument)>;
+    using ConflictHandler = std::function<bool(MutableDocument documentBeingSaved,
+                                               Document conflictingDocument)>;
 
 
     class Database : private RefCounted {
@@ -127,7 +128,7 @@ namespace cbl {
         inline bool saveDocument(MutableDocument &doc, CBLConcurrencyControl c);
 
         _cbl_warn_unused
-        inline bool saveDocument(MutableDocument &doc, SaveConflictHandler conflictHandler);
+        inline bool saveDocument(MutableDocument &doc, ConflictHandler conflictHandler);
 
         inline void deleteDocument(Document &doc);
 
@@ -148,13 +149,17 @@ namespace cbl {
 
         inline void purgeDocument(Document &doc);
 
-        bool purgeDocumentByID(slice docID) {
+        bool purgeDocument(slice docID) {
             CBLError error;
             bool purged = CBLDatabase_PurgeDocumentByID(ref(), docID, &error);
             if (!purged && error.code != 0)
                 throw error;
             return purged;
         }
+        
+        // Query:
+        
+        inline Query createQuery(CBLQueryLanguage language, slice queryString);
 
         // Indexes:
 
@@ -182,21 +187,21 @@ namespace cbl {
 
         // Listeners:
 
-        using Listener = cbl::ListenerToken<Database,const std::vector<slice>&>;
+        using ChangeListener = cbl::ListenerToken<Database,const std::vector<slice>&>;
 
-        [[nodiscard]] Listener addListener(Listener::Callback f) {
-            auto l = Listener(f);
+        [[nodiscard]] ChangeListener addChangeListener(ChangeListener::Callback f) {
+            auto l = ChangeListener(f);
             l.setToken( CBLDatabase_AddChangeListener(ref(), &_callListener, l.context()) );
             return l;
         }
 
 
-        using DocumentListener = cbl::ListenerToken<Database,slice>;
+        using DocumentChangeListener = cbl::ListenerToken<Database,slice>;
 
-        [[nodiscard]] DocumentListener addDocumentListener(slice docID,
-                                                           DocumentListener::Callback f)
+        [[nodiscard]] DocumentChangeListener addDocumentChangeListener(slice docID,
+                                                                       DocumentChangeListener::Callback f)
         {
-            auto l = DocumentListener(f);
+            auto l = DocumentChangeListener(f);
             l.setToken( CBLDatabase_AddDocumentChangeListener(ref(), docID, &_callDocListener, l.context()) );
             return l;
         }
@@ -222,12 +227,12 @@ namespace cbl {
                                   unsigned nDocs, FLString *docIDs)
         {
             std::vector<slice> vec((slice*)&docIDs[0], (slice*)&docIDs[nDocs]);
-            Listener::call(context, Database((CBLDatabase*)db), vec);
+            ChangeListener::call(context, Database((CBLDatabase*)db), vec);
         }
 
         static void _callDocListener(void* _cbl_nullable context,
                                      const CBLDatabase *db, FLString docID) {
-            DocumentListener::call(context, Database((CBLDatabase*)db), docID);
+            DocumentChangeListener::call(context, Database((CBLDatabase*)db), docID);
         }
 
         CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)

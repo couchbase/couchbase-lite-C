@@ -30,50 +30,52 @@ CBL_ASSUME_NONNULL_BEGIN
 
 namespace cbl {
 
-    class Endpoint {
+    class Endpoint : private RefCounted {
     public:
         void setURL(slice url) {
             CBLError error;
-            _ref = CBLEndpoint_CreateWithURL(url, &error);
-            if (!_ref)
-                throw error;
+            _ref = (CBLRefCounted*) CBLEndpoint_CreateWithURL(url, &error);
+            check(_ref, error);
         }
+        
 #ifdef COUCHBASE_ENTERPRISE
-        void setLocalDB(Database db)                {_ref = CBLEndpoint_CreateWithLocalDB(db.ref());}
+        void setLocalDB(Database db) {
+            _ref = (CBLRefCounted*) CBLEndpoint_CreateWithLocalDB(db.ref());
+        }
 #endif
-        ~Endpoint()                                 {CBLEndpoint_Free(_ref);}
-        CBLEndpoint* ref() const                    {return _ref;}
-    private:
-        CBLEndpoint* _cbl_nullable _ref {nullptr};
+        friend class ReplicatorConfiguration;
+        
+        CBL_REFCOUNTED_BOILERPLATE(Endpoint, RefCounted, const CBLEndpoint)
     };
 
-
-    class Authenticator {
+    class Authenticator : private RefCounted {
     public:
-        void setBasic(slice username,
-                      slice password)
-                                                    {_ref = CBLAuth_CreatePassword(username, password);}
+        void setBasic(slice username, slice password) {
+            _ref = (CBLRefCounted*) CBLAuth_CreatePassword(username, password);
+        }
 
         void setSession(slice sessionId, slice cookieName) {
-          _ref = CBLAuth_CreateSession(sessionId, cookieName);
+          _ref = (CBLRefCounted*) CBLAuth_CreateSession(sessionId, cookieName);
         }
-        ~Authenticator()                            {CBLAuth_Free(_ref);}
-        CBLAuthenticator* ref() const               {return _ref;}
-    private:
-        CBLAuthenticator* _cbl_nullable _ref {nullptr};
+        
+        friend class ReplicatorConfiguration;
+        
+        CBL_REFCOUNTED_BOILERPLATE(Authenticator, RefCounted, const CBLAuthenticator)
     };
 
 
     using ReplicationFilter = std::function<bool(Document, CBLDocumentFlags flags)>;
 
 
-    struct ReplicatorConfiguration {
-        ReplicatorConfiguration(Database db)
-        :database(db)
+    class ReplicatorConfiguration {
+    public:
+        ReplicatorConfiguration(Database db, Endpoint target)
+        :database(db),
+        endpoint(target)
         { }
 
         Database const database;
-        Endpoint endpoint;
+        Endpoint const endpoint;
         CBLReplicatorType replicatorType    = kCBLReplicatorTypePushAndPull;
         bool continuous                     = false;
         
@@ -97,17 +99,18 @@ namespace cbl {
         ReplicationFilter pushFilter;
         ReplicationFilter pullFilter;
         
+    private:
         operator CBLReplicatorConfiguration() const {
             CBLReplicatorConfiguration conf = {};
             conf.database = database.ref();
-            conf.endpoint = endpoint.ref();
+            conf.endpoint = const_cast<CBLEndpoint*>(endpoint.ref());
             conf.replicatorType = replicatorType;
             conf.continuous = continuous;
             conf.disableAutoPurge = !enableAutoPurge;
             conf.maxAttempts = maxAttempts;
             conf.maxAttemptWaitTime = maxAttemptWaitTime;
             conf.heartbeat = heartbeat;
-            conf.authenticator = authenticator.ref();
+            conf.authenticator = const_cast<CBLAuthenticator*>(authenticator.ref());
             conf.proxy = proxy;
             if (!headers.empty())
                 conf.headers = headers;
@@ -121,6 +124,8 @@ namespace cbl {
                 conf.documentIDs = documentIDs;
             return conf;
         }
+        
+        friend class Replicator;
     };
 
     class Replicator : private RefCounted {
@@ -169,8 +174,8 @@ namespace cbl {
         }
 
         using ChangeListener = cbl::ListenerToken<Replicator, const CBLReplicatorStatus&>;
-        using DocumentListener = cbl::ListenerToken<Replicator, bool,
-                                                    const std::vector<CBLReplicatedDocument>>;
+        using DocumentReplicationListener = cbl::ListenerToken<Replicator, bool,
+            const std::vector<CBLReplicatedDocument>>;
 
         [[nodiscard]] ChangeListener addChangeListener(ChangeListener::Callback f) {
             auto l = ChangeListener(f);
@@ -178,8 +183,8 @@ namespace cbl {
             return l;
         }
 
-        [[nodiscard]] DocumentListener addDocumentListener(DocumentListener::Callback f) {
-            auto l = DocumentListener(f);
+        [[nodiscard]] DocumentReplicationListener addDocumentReplicationListener(DocumentReplicationListener::Callback f) {
+            auto l = DocumentReplicationListener(f);
             l.setToken( CBLReplicator_AddDocumentReplicationListener(ref(), &_callDocListener, l.context()) );
             return l;
         }
@@ -199,7 +204,7 @@ namespace cbl {
                                      const CBLReplicatedDocument* documents)
         {
             std::vector<CBLReplicatedDocument> docs(&documents[0], &documents[numDocuments]);
-            DocumentListener::call(context, Replicator(repl), isPush, docs);
+            DocumentReplicationListener::call(context, Replicator(repl), isPush, docs);
         }
 
         ReplicationFilter _pushFilter;

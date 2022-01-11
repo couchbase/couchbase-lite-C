@@ -191,13 +191,13 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
     int dbListenerCalls = 0, fooListenerCalls = 0;
     {
         // Add a listener:
-        auto dbListener = db.addListener([&](Database callbackdb, vector<slice> docIDs) {
+        auto dbListener = db.addChangeListener([&](Database callbackdb, vector<slice> docIDs) {
             ++dbListenerCalls;
             CHECK(callbackdb == db);
             CHECK(docIDs.size() == 1);
             CHECK(docIDs[0] == "foo");
         });
-        auto fooListener = db.addDocumentListener("foo", [&](Database callbackdb, slice docID) {
+        auto fooListener = db.addDocumentChangeListener("foo", [&](Database callbackdb, slice docID) {
             ++fooListenerCalls;
             CHECK(callbackdb == db);
             CHECK(docID == "foo");
@@ -218,19 +218,19 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
     // Add a listener:
     int dbListenerCalls = 0, fooListenerCalls = 0, barListenerCalls = 0, notificationsReadyCalls = 0;
-    auto dbListener = db.addListener([&](Database callbackdb, vector<slice> docIDs) {
+    auto dbListener = db.addChangeListener([&](Database callbackdb, vector<slice> docIDs) {
         ++dbListenerCalls;
         CHECK(callbackdb == db);
         CHECK(docIDs.size() == 2);
         CHECK(docIDs[0] == "foo");
         CHECK(docIDs[1] == "bar");
     });
-    auto fooListener = db.addDocumentListener("foo", [&](Database callbackdb, slice docID) {
+    auto fooListener = db.addDocumentChangeListener("foo", [&](Database callbackdb, slice docID) {
         ++fooListenerCalls;
         CHECK(callbackdb == db);
         CHECK(docID == "foo");
     });
-    auto barListener = db.addDocumentListener("bar", [&](Database callbackdb, slice docID) {
+    auto barListener = db.addDocumentChangeListener("bar", [&](Database callbackdb, slice docID) {
         ++barListenerCalls;
         CHECK(callbackdb == db);
         CHECK(docID == "bar");
