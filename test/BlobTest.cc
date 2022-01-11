@@ -17,7 +17,7 @@
 //
 
 #include "CBLTest.hh"
-#include "CBLBlob+File.h"
+#include "CBLBlob+FILE.h"
 #include "CBLPrivate.h"
 #include <string>
 
