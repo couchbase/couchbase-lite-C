@@ -82,7 +82,7 @@ namespace cbl {
     class MutableDocument : public Document {
     public:
         explicit MutableDocument(nullptr_t)             {_ref = (CBLRefCounted*)CBLDocument_CreateWithID(fleece::nullslice);}
-        explicit MutableDocument(slice docID)     {_ref = (CBLRefCounted*)CBLDocument_CreateWithID(docID);}
+        explicit MutableDocument(slice docID)           {_ref = (CBLRefCounted*)CBLDocument_CreateWithID(docID);}
 
         fleece::MutableDict properties()                {return CBLDocument_MutableProperties(ref());}
 
@@ -160,11 +160,11 @@ namespace cbl {
 
 
     inline bool Database::saveDocument(MutableDocument &doc,
-                                       SaveConflictHandler conflictHandler)
+                                       ConflictHandler conflictHandler)
     {
         CBLConflictHandler cHandler = [](void *context, CBLDocument *myDoc,
                                              const CBLDocument *otherDoc) -> bool {
-            return (*(SaveConflictHandler*)context)(MutableDocument(myDoc),
+            return (*(ConflictHandler*)context)(MutableDocument(myDoc),
                                                     Document(otherDoc));
         };
         CBLError error;

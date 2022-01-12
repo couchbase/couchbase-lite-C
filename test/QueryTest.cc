@@ -674,8 +674,8 @@ public:
 
 
 TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
-    Query query(db, kCBLN1QLLanguage, "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday");
-
+    Query query = db.createQuery(kCBLN1QLLanguage, "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday");
+    
     CHECK(query.columnNames() == vector<string>({"name"}));
 
     alloc_slice explanation(query.explain());
@@ -683,10 +683,14 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
 
     static const slice kExpectedFirst[3] = {"Tyesha",  "Eddie",     "Diedre"};
     static const slice kExpectedLast [3] = {"Loehrer", "Colangelo", "Clinton"};
+    static const slice kExpectedJSON [3] = {"{\"name\":{\"first\":\"Tyesha\",\"last\":\"Loehrer\"}}",
+                                            "{\"name\":{\"first\":\"Eddie\",\"last\":\"Colangelo\"}}",
+                                            "{\"name\":{\"first\":\"Diedre\",\"last\":\"Clinton\"}}"};
 
     int n = 0;
     auto results = query.execute();
     for (auto &result : results) {
+        REQUIRE(result.count() == 1);
         Value name = result[0];
         CHECK(result["name"] == name);
         Dict dict = name.asDict();
@@ -697,6 +701,8 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
         cerr << "'" << first << "', '" << last << "'\n";
         CHECK(first == kExpectedFirst[n]);
         CHECK(last == kExpectedLast[n]);
+        CHECK(result.toJSON() == kExpectedJSON[n]);
+        
         ++n;
         cerr << first << " " << last << "\n";
     }

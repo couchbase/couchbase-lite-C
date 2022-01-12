@@ -68,6 +68,15 @@ namespace cbl {
     /** A single query result; ResultSet::iterator iterates over these. */
     class Result {
     public:
+        uint64_t count() const {
+            return CBLQuery_ColumnCount(CBLResultSet_GetQuery(_ref));
+        }
+        
+        alloc_slice toJSON() const {
+            FLDict dict = CBLResultSet_ResultDict(_ref);
+            return alloc_slice(FLValue_ToJSON((FLValue)dict));
+        }
+        
         fleece::Value valueAtIndex(unsigned i) const {
             return CBLResultSet_ValueAtIndex(_ref, i);
         }
@@ -220,6 +229,11 @@ namespace cbl {
         return iterator();
     }
 
+    // Query
+    
+    Query Database::createQuery(CBLQueryLanguage language, slice queryString) {
+        return Query(*this, language, queryString);
+    }
 }
 
 CBL_ASSUME_NONNULL_END
