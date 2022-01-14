@@ -92,68 +92,107 @@ fleece::slice greeting = readProps["greeting"].asString();
 
 ## Building It
 
-### CMake on Unix (normal compile)
+### Source Code
 
-Dependencies:
+This project contains submodules in multiple levels. Please make sure all submodules are checked out before building the project.
+
+```
+git clone https://github.com/couchbase/couchbase-lite-C.git
+cd couchbase-lite-C
+git submodule update --init --recursive
+```
+
+### Unix (Linux / macOS)
+
+**Dependencies:**
+
 * GCC 7+ or Clang
 * CMake 3.10+
 * (Linux) ICU development libraries (`apt-get install icu-dev`)
 * (Linux) ZLIB development libraries (`apt-get install zlib1g-dev`)
 
-1. Clone the repo
-2. Check out submodules (recursively), i.e. `git submodule update --init --recursive`
-3. Prepare the build project with CMake (e.g. `cmake <path/to/root>`)
-4. Build the project: `make cblite`
+**Steps:**
 
-The resulting (debug by default) libraries are
-- Linux: `libcblite.so*` (e.g. libcblite.so.3.0.0 / libcblite.so.3 / libcblite.so)
-- macOS: `libcblite.*.dylib` (e.g. libcblite.3.0.0.dylib / libcblite.3.dylib / libcblite.dylib)
+1. Prepare and build project with CMake. 
 
-### CMake on Linux (cross compile)
+	```
+	# At the project directory, create a build directory:
+	mkdir build && cd build
+	
+	# Prepare project. Specify CMAKE_INSTALL_PREFIX for the installation directory when running `make install`.
+	# Add -DSTRIP_SYMBOLS=ON to generate a separate debug symbol file and strip private symbols from the built shared library.
+	cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_INSTALL_PREFIX=`pwd`/output ..
+	
+	# Build:
+	make
+	```
+	
+2. Install the built library and headers to the location specified by `CMAKE_INSTALL_PREFIX`
+
+	```
+	make install
+	```
+
+	The installation will contain header files in the `include` folder and a shared library file in the `lib` folder.
+
+### Linux (Cross Compile)
 
 **NOTE**: Due to the complexity of cross compiling, these instructions are very high level on purpose.  If you are curious about more fine-grained details you can check out the [cross compilation script](https://raw.githubusercontent.com/couchbase/couchbase-lite-C/master/jenkins/ci_cross_build.py) we use.
 
-Dependencies:
+**Dependencies:**
+
 * Cross compiler based on GCC 7+ or clang
 * CMake 3.10+
 * (in sysroot) ICU development libraries
 * (in sysroot) ZLIB development libraries
 
-1. Clone the repo
-2. Check out submodules (recursively), i.e. `git submodule update --init --recursive`
-3. Create a CMake toolchain file that sets up the cross compiler and sysroot for the cross compilation
-4. Prepare the build project with CMake and the toolchain from 3 (e.g. `cmake -DCMAKE_TOOLCHAIN_FILE=<your/toolchain.cmake> <path/to/project/root>`)
-5. Build the project `make cblite`
+**Steps:**
 
-### With CMake on Windows
+The steps are similar to the steps for building the regular linux library above. The difference is that you will also need
+to prepare the CMake toolchain file that sets up the cross compiler and `sysroot` for the cross compilation. 
 
-Dependencies:
+When running the `cmake` to prepare the build project, add `CMAKE_TOOLCHAIN_FILE` option to specify the CMake toolchain file:
+
+```
+cmake -DCMAKE_TOOLCHAIN_FILE=<YOUR/toolchain.cmake> -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_INSTALL_PREFIX=`pwd`/output ..
+```
+
+### Windows
+
+**Dependencies:**
+
 * Visual Studio Toolset v141+ (Visual Studio 2017+)
 * CMake 3.10+
 
-1. Clone the repo
-2. Check out submodules (recursively), i.e. `git submodule update --init --recursive`
-3. Prepare the build project with CMake (e.g. `cmake <path/to/root> -G <visual studio version> -A x64`).  Note even if you don't want to install, you should set the `CMAKE_INSTALL_PREFIX` (see issue #141).
-4. Build the project: `cmake --build . --target cblite` (or open the resulting Visual Studio project and build from there)
+**Steps:**
 
-The resulting (debug by default) library is `Debug\cblite.dll`.
+1. Prepare project with CMake.
 
-### With Xcode on macOS
+	```
+	# Using powershell, at the project directory, create a build directory:
+	md build
+
+	# Prepare project. Specify CMAKE_INSTALL_PREFIX for the installation directory:
+	cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX="$pwd/output" ..
+
+	```
+2. Build and Install
+
+	```
+	cmake --build . --config MinSizeRel --target install
+	```
+	
+	The installation will contain header files in the `include` folder, a dll file in the `bin` folder and a lib file in the `lib` folder.
+
+### Xcode on macOS
 
 :warning: Do not use Xcode 13 because of a [downstream issue](https://github.com/ARMmbed/mbedtls/issues/5052) :warning:
 
-1. Clone the repo
-2. Check out submodules (recursively), i.e. `git submodule update --init --recursive`
-3. Open the Xcode project `CBL_C.xcodeproj`
-4. Select scheme `CBL_C Framework`
-5. Build
+1. Open the Xcode project `CBL_C.xcodeproj`
+2. Select scheme `CBL_C Framework`
+3. Build
 
 The result is `CouchbaseLite.framework` in your `Xcode Build Products/Debug` directory (the path depends on your Xcode settings.)
-
-To run the unit tests:
-
-4. Select scheme `CBL_Tests`
-5. Run
 
 ## Testing It
 
