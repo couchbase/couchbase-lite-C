@@ -171,6 +171,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=<YOUR/toolchain.cmake> -DCMAKE_BUILD_TYPE=MinSizeRe
 	```
 	# Using powershell, at the project directory, create a build directory:
 	md build
+	cd build
 
 	# Prepare project. Specify CMAKE_INSTALL_PREFIX for the installation directory:
 	cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX="$pwd/output" ..
