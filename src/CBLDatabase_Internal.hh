@@ -127,7 +127,7 @@ public:
     }
 
     uint64_t count() const                           {return _c4db.useLocked()->getDocumentCount();}
-    uint64_t lastSequence() const                    {return _c4db.useLocked()->getLastSequence();}
+    uint64_t lastSequence() const                    {return static_cast<uint64_t>(_c4db.useLocked()->getLastSequence());}
 
 
 #pragma mark - Documents:
@@ -166,12 +166,12 @@ public:
     }
 
     CBLTimestamp getDocumentExpiration(slice docID) {
-        return _c4db.useLocked()->getDefaultCollection()->getExpiration(docID);
+        return static_cast<CBLTimestamp>(_c4db.useLocked()->getDefaultCollection()->getExpiration(docID));
     }
 
     void setDocumentExpiration(slice docID, CBLTimestamp expiration) {
         auto c4db = _c4db.useLocked();
-        c4db->getDefaultCollection()->setExpiration(docID, expiration);
+        c4db->getDefaultCollection()->setExpiration(docID, C4Timestamp(expiration));
     }
 
 

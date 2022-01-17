@@ -88,7 +88,7 @@ public:
 
     uint64_t sequence() const {
         auto c4doc = _c4doc.useLocked();
-        return c4doc ? c4doc->sequence() : 0;
+        return c4doc ? static_cast<uint64_t>(c4doc->sequence()) : 0;
     }
 
 
