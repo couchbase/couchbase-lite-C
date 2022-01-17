@@ -35,6 +35,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 option(BUILD_ENTERPRISE "Set whether or not to build enterprise edition" OFF)
 option(CODE_COVERAGE_ENABLED "Set whether or not code coverage report should be generated" OFF)
+option(STRIP_SYMBOLS "Set whether or not the private symbols will be stripped" OFF)
 
 if(CODE_COVERAGE_ENABLED)
    message("Code coverage enabled, forcing sanitizers off")
@@ -231,6 +232,35 @@ write_basic_package_version_file(
 install(FILES ${CMAKE_BINARY_DIR}/CouchbaseLiteConfig.cmake
               ${CMAKE_BINARY_DIR}/CouchbaseLiteConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite)
+
+## Generate dSYM and strip private symbols (Post Build when STRIP_SYMBOLS is enabled)
+
+if(STRIP_SYMBOLS)
+    message("Stripping symbols enabled")
+    if(APPLE)
+        set(STRIP_SRC_FILE $<TARGET_FILE:cblite>)
+        set(SYM_OUT_FILE $<TARGET_FILE:cblite>.dSYM)
+        add_custom_command(TARGET cblite POST_BUILD VERBATIM
+            COMMAND dsymutil ${STRIP_SRC_FILE} -o ${SYM_OUT_FILE}
+            COMMAND strip -x ${STRIP_SRC_FILE}
+            COMMENT "Generating a dSYM file and stripping private symbols")
+        install(FILES ${SYM_OUT_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+        set(STRIP_SRC_FILE $<TARGET_FILE:cblite>)
+        set(SYM_OUT_FILE $<TARGET_FILE:cblite>.sym)
+        set(STRIP_SYMBOLS_PREFIX "" CACHE STRING "The prefix of objcopy and strip command")
+        set(OBJCOPY ${STRIP_SYMBOLS_PREFIX}objcopy)
+        set(STRIP ${STRIP_SYMBOLS_PREFIX}strip)
+        add_custom_command(TARGET cblite POST_BUILD VERBATIM
+            COMMAND ${OBJCOPY} --only-keep-debug ${STRIP_SRC_FILE} ${SYM_OUT_FILE}
+            COMMAND ${STRIP} --strip-unneeded ${STRIP_SRC_FILE}
+            COMMAND ${OBJCOPY} --add-gnu-debuglink=${SYM_OUT_FILE} ${STRIP_SRC_FILE}
+            COMMENT "Generating a sym file and stripping private symbols")
+        install(FILES ${SYM_OUT_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    else()
+        message(WARNING "Stripping symbols in not supported for ${CMAKE_SYSTEM_NAME}.")
+    endif()
+endif()
 
 ### TESTS:
 
