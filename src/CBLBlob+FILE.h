@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "CBLBlob.h"
+#include "cbl/CBLBlob.h"
 
 CBL_CAPI_BEGIN
 
