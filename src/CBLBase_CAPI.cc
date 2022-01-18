@@ -42,7 +42,7 @@ bool CBLError_GetCaptureBacktraces(void) noexcept {
 
 
 CBLTimestamp CBL_Now(void) noexcept {
-    return c4_now();
+    return static_cast<CBLTimestamp>(c4_now());
 }
 
 
