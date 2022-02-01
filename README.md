@@ -66,7 +66,7 @@ CBLDocument_Release(readDoc);
 
 ### C++
 
-**NOTE**: The C++ API is a [volatile](https://docs.couchbase.com/couchbase-lite/3.0/android/compatibility.html#interface-stability) API which means that the API is not finalized, and may change in future releases.  
+**NOTE**: The C++ API is a [volatile](https://docs.couchbase.com/couchbase-lite/3.0/c/compatibility.html#interface-stability) API which means that the API is not finalized, and may change in future releases.  
 
 ```cpp
 // Open a database:
