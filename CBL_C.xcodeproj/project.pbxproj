@@ -1054,7 +1054,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n# Copy Fleece Headers:\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n\n# Remove C++ Headers (Go to the folder to workaroud rm cmd issue with path including spaces): \npushd \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n\npopd\n";
+			shellScript = "set -e\n# Copy Fleece Headers:\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n";
 		};
 		27DBD088246C94B2002FD7A7 /* Merge static libs */ = {
 			isa = PBXShellScriptBuildPhase;
