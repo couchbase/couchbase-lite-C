@@ -23,8 +23,8 @@
 #include <string>
 #include <vector>
 
-// PLEASE NOTE: This C++ wrapper API is provided as a convenience only.
-// It is not considered part of the official Couchbase Lite API.
+// VOLATILE API: Couchbase Lite C++ API is not finalized, and may change in
+// future releases.
 
 CBL_ASSUME_NONNULL_BEGIN
 

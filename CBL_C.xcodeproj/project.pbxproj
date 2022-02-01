@@ -58,13 +58,13 @@
 		27984E2E2249A240000FE777 /* CBLQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A3021CAC98F0045856E /* CBLQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E2F2249A240000FE777 /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2C21CAC98F0045856E /* CBLReplicator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E302249A240000FE777 /* CBL_Compat.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A7021CAD6440045856E /* CBL_Compat.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */; };
-		27984E322249A247000FE777 /* Base.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE3D21DEF0C700B60E3C /* Base.hh */; };
-		27984E332249A247000FE777 /* Blob.hh in Headers */ = {isa = PBXBuildFile; fileRef = 275BC4E22204E6A800DBE7D2 /* Blob.hh */; };
-		27984E342249A247000FE777 /* Database.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61DD821DEEC540027CCDB /* Database.hh */; };
-		27984E352249A247000FE777 /* Document.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4E21DEF54D00B60E3C /* Document.hh */; };
-		27984E362249A247000FE777 /* Query.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4F21E6AB1100B60E3C /* Query.hh */; };
-		27984E372249A247000FE777 /* Replicator.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27C9B5F121F7D74A0040BC45 /* Replicator.hh */; };
+		27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		27984E322249A247000FE777 /* Base.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE3D21DEF0C700B60E3C /* Base.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		27984E332249A247000FE777 /* Blob.hh in Headers */ = {isa = PBXBuildFile; fileRef = 275BC4E22204E6A800DBE7D2 /* Blob.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		27984E342249A247000FE777 /* Database.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61DD821DEEC540027CCDB /* Database.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		27984E352249A247000FE777 /* Document.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4E21DEF54D00B60E3C /* Document.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		27984E362249A247000FE777 /* Query.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4F21E6AB1100B60E3C /* Query.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		27984E372249A247000FE777 /* Replicator.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27C9B5F121F7D74A0040BC45 /* Replicator.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27984E3F2249A85E000FE777 /* CouchbaseLite_Umbrella.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		27B61D5621D5ABA60027CCDB /* CBLQuery_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */; };
 		27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61D6821D6B60D0027CCDB /* CBLTest.hh */; };
@@ -1054,7 +1054,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n# Copy Fleece Headers:\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n\n# Remove C++ Headers (Go to the folder to workaroud rm cmd issue with path including spaces): \npushd \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\nrm -f *.hh\n\npopd\n";
+			shellScript = "set -e\n# Copy Fleece Headers:\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n";
 		};
 		27DBD088246C94B2002FD7A7 /* Merge static libs */ = {
 			isa = PBXShellScriptBuildPhase;
