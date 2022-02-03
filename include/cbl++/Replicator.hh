@@ -30,37 +30,37 @@ CBL_ASSUME_NONNULL_BEGIN
 
 namespace cbl {
 
-    class Endpoint : private RefCounted {
+    class Endpoint {
     public:
         void setURL(slice url) {
             CBLError error;
-            _ref = (CBLRefCounted*) CBLEndpoint_CreateWithURL(url, &error);
-            check(_ref, error);
+            _ref = CBLEndpoint_CreateWithURL(url, &error);
+            if (!_ref)
+                throw error;
         }
-        
 #ifdef COUCHBASE_ENTERPRISE
-        void setLocalDB(Database db) {
-            _ref = (CBLRefCounted*) CBLEndpoint_CreateWithLocalDB(db.ref());
-        }
+        void setLocalDB(Database db)                {_ref = CBLEndpoint_CreateWithLocalDB(db.ref());}
 #endif
-        friend class ReplicatorConfiguration;
-        
-        CBL_REFCOUNTED_BOILERPLATE(Endpoint, RefCounted, const CBLEndpoint)
+        ~Endpoint()                                 {CBLEndpoint_Free(_ref);}
+        CBLEndpoint* ref() const                    {return _ref;}
+    private:
+        CBLEndpoint* _cbl_nullable _ref {nullptr};
     };
 
-    class Authenticator : private RefCounted {
+
+    class Authenticator {
     public:
-        void setBasic(slice username, slice password) {
-            _ref = (CBLRefCounted*) CBLAuth_CreatePassword(username, password);
-        }
+        void setBasic(slice username,
+                      slice password)
+                                                    {_ref = CBLAuth_CreatePassword(username, password);}
 
         void setSession(slice sessionId, slice cookieName) {
-          _ref = (CBLRefCounted*) CBLAuth_CreateSession(sessionId, cookieName);
+          _ref = CBLAuth_CreateSession(sessionId, cookieName);
         }
-        
-        friend class ReplicatorConfiguration;
-        
-        CBL_REFCOUNTED_BOILERPLATE(Authenticator, RefCounted, const CBLAuthenticator)
+        ~Authenticator()                            {CBLAuth_Free(_ref);}
+        CBLAuthenticator* ref() const               {return _ref;}
+    private:
+        CBLAuthenticator* _cbl_nullable _ref {nullptr};
     };
 
 
