@@ -37,6 +37,7 @@ function(init_vars)
 
     
     set(CBL_CXX_FLAGS "${CBL_CXX_FLAGS} -Wno-psabi" CACHE INTERNAL "")
+    set(LITECORE_DYNAMIC_ICU ON CACHE BOOL "If enabled, search for ICU at runtime so as not to depend on a specific version")
 endfunction()
 
 function(set_dylib_properties)
