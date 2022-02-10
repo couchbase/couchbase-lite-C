@@ -383,10 +383,10 @@ typedef void (*CBLDocumentReplicationListener)(void *context,
                                                const CBLReplicatedDocument* documents);
 
 /** Adds a listener that will be called when documents are replicated. */
-_cbl_warn_unused CBLListenerToken*
-CBLReplicator_AddDocumentReplicationListener(CBLReplicator*,
-                                             CBLDocumentReplicationListener,
-                                             void* _cbl_nullable context) CBLAPI;
+_cbl_warn_unused
+CBLListenerToken* CBLReplicator_AddDocumentReplicationListener(CBLReplicator*,
+                                                               CBLDocumentReplicationListener,
+                                                               void* _cbl_nullable context) CBLAPI;
 
 /** @} */
 /** @} */

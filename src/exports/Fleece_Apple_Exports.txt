@@ -4,9 +4,11 @@
 #
 # Fleece exports for Apple platforms only (interop with Objective-C and CoreFoundation)
 
+FLEncoder_WriteCFObject
 FLValue_CopyCFObject
 FLDict_GetWithCFString
 FLDictIterator_GetKeyAsNSString
+FLCreateSharedStringsTable
 FLValue_GetNSObject
 FLDict_GetWithNSString
 FLErrorDomain
