@@ -44,7 +44,7 @@ namespace cbl {
         ~Endpoint()                                 {CBLEndpoint_Free(_ref);}
         CBLEndpoint* ref() const                    {return _ref;}
     private:
-        CBLEndpoint* _cbl_nullable _ref {nullptr};
+        CBLEndpoint* _cbl_nullable _ref             {nullptr};
     };
 
 
@@ -58,24 +58,22 @@ namespace cbl {
           _ref = CBLAuth_CreateSession(sessionId, cookieName);
         }
         ~Authenticator()                            {CBLAuth_Free(_ref);}
-        CBLAuthenticator* ref() const               {return _ref;}
+        CBLAuthenticator* _cbl_nullable ref() const {return _ref;}
     private:
-        CBLAuthenticator* _cbl_nullable _ref {nullptr};
+        CBLAuthenticator* _cbl_nullable _ref        {nullptr};
     };
 
 
     using ReplicationFilter = std::function<bool(Document, CBLDocumentFlags flags)>;
 
 
-    class ReplicatorConfiguration {
-    public:
-        ReplicatorConfiguration(Database db, Endpoint target)
-        :database(db),
-        endpoint(target)
+    struct ReplicatorConfiguration {
+        ReplicatorConfiguration(Database db)
+        :database(db)
         { }
 
         Database const database;
-        Endpoint const endpoint;
+        Endpoint endpoint;
         CBLReplicatorType replicatorType    = kCBLReplicatorTypePushAndPull;
         bool continuous                     = false;
         
@@ -87,7 +85,7 @@ namespace cbl {
         unsigned heartbeat                  = 0;
 
         Authenticator authenticator;
-        CBLProxySettings* proxy             = nullptr;
+        CBLProxySettings* _cbl_nullable proxy = nullptr;
         fleece::MutableDict headers         = fleece::MutableDict::newDict();
 
         std::string pinnedServerCertificate;
@@ -98,19 +96,17 @@ namespace cbl {
 
         ReplicationFilter pushFilter;
         ReplicationFilter pullFilter;
-        
-    private:
         operator CBLReplicatorConfiguration() const {
             CBLReplicatorConfiguration conf = {};
             conf.database = database.ref();
-            conf.endpoint = const_cast<CBLEndpoint*>(endpoint.ref());
+            conf.endpoint = endpoint.ref();
             conf.replicatorType = replicatorType;
             conf.continuous = continuous;
             conf.disableAutoPurge = !enableAutoPurge;
             conf.maxAttempts = maxAttempts;
             conf.maxAttemptWaitTime = maxAttemptWaitTime;
             conf.heartbeat = heartbeat;
-            conf.authenticator = const_cast<CBLAuthenticator*>(authenticator.ref());
+            conf.authenticator = authenticator.ref();
             conf.proxy = proxy;
             if (!headers.empty())
                 conf.headers = headers;
@@ -124,8 +120,6 @@ namespace cbl {
                 conf.documentIDs = documentIDs;
             return conf;
         }
-        
-        friend class Replicator;
     };
 
     class Replicator : private RefCounted {
