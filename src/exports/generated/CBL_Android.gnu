@@ -152,6 +152,8 @@ CBL_C {
 		FLDoc_GetData;
 		FLDoc_GetRoot;
 		FLDoc_GetSharedKeys;
+		FLDoc_SetAssociated;
+		FLDoc_GetAssociated;
 		FLData_Dump;
 		FLDump;
 		FLDumpData;
@@ -161,6 +163,7 @@ CBL_C {
 		FLValue_IsUnsigned;
 		FLValue_IsDouble;
 		FLValue_IsEqual;
+		FLValue_IsMutable;
 		FLValue_AsBool;
 		FLValue_AsData;
 		FLValue_AsInt;
@@ -178,6 +181,8 @@ CBL_C {
 		FLValue_FindDoc;
 		FLValue_Retain;
 		FLValue_Release;
+		FLValue_NewString;
+		FLValue_NewData;
 		FLData_ConvertJSON;
 		FLJSON5_ToJSON;
 		FLArray_Count;
@@ -194,6 +199,7 @@ CBL_C {
 		FLMutableArray_NewFromJSON;
 		FLMutableArray_GetSource;
 		FLMutableArray_IsChanged;
+		FLMutableArray_SetChanged;
 		FLMutableArray_Append;
 		FLMutableArray_Set;
 		FLMutableArray_Insert;
@@ -221,6 +227,8 @@ CBL_C {
 		FLEncoder_NewWritingToFile;
 		FLEncoder_Free;
 		FLEncoder_SetSharedKeys;
+		FLEncoder_SetExtraInfo;
+		FLEncoder_GetExtraInfo;
 		FLEncoder_GetBase;
 		FLEncoder_SuppressTrailer;
 		FLEncoder_WriteRaw;
@@ -259,6 +267,7 @@ CBL_C {
 		FLMutableDict_NewFromJSON;
 		FLMutableDict_GetSource;
 		FLMutableDict_IsChanged;
+		FLMutableDict_SetChanged;
 		FLMutableDict_Set;
 		FLMutableDict_Remove;
 		FLMutableDict_RemoveAll;
@@ -278,19 +287,25 @@ CBL_C {
 		FLSharedKeys_New;
 		FLSharedKeys_LoadStateData;
 		FLSharedKeys_LoadState;
+		FLSharedKeys_Encode;
+		FLSharedKeys_Decode;
+		FLSharedKeys_NewWithRead;
 		FLSharedKeys_GetStateData;
 		FLSharedKeys_Count;
 		FLSharedKeys_RevertToCount;
 		FLSharedKeys_WriteState;
+		FLSharedKeyScope_WithRange;
 		FLKeyPath_New;
 		FLKeyPath_Free;
 		FLKeyPath_Eval;
 		FLKeyPath_EvalOnce;
 		FLKeyPath_ToString;
 		FLKeyPath_Equals;
+		FLKeyPath_GetElement;
 		FLDeepIterator_New;
 		FLDeepIterator_Free;
 		FLDeepIterator_GetValue;
+		FLDeepIterator_GetParent;
 		FLDeepIterator_GetKey;
 		FLDeepIterator_GetIndex;
 		FLDeepIterator_GetDepth;
@@ -299,6 +314,7 @@ CBL_C {
 		FLDeepIterator_GetPath;
 		FLDeepIterator_GetPathString;
 		FLDeepIterator_GetJSONPointer;
+		FL_WipeMemory;
 	local:
 		*;
 };
