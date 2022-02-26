@@ -72,6 +72,14 @@ CBLDatabaseConfiguration CBLDatabaseConfiguration_Default(void) CBLAPI;
     @param password  The input password, which can be any data.
     @return  True on success, false if there was a problem deriving the key. */
 bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBLAPI;
+
+/** VOLATILE API: Derives an encryption key from a password in a way that is
+    compatible with certain variants of Couchbase Lite in which a slightly different
+    hashing algorithm is used.  The same notes apply as in CBLEncryptionKey_FromPassword
+    @param key  The derived AES key will be stored here.
+    @param password  The input password, which can be any data.
+    @return  True on success, false if there was a problem deriving the key. */
+bool CBLEncryptionKey_FromPasswordOld(CBLEncryptionKey *key, FLString password) CBLAPI;
 #endif
 
 /** @} */

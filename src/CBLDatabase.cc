@@ -60,6 +60,13 @@ bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBL
     memcpy(key->bytes, c4key.bytes, sizeof(key->bytes));
     return true;
 }
+
+bool CBLEncryptionKey_FromPasswordOld(CBLEncryptionKey *key, FLString password) CBLAPI {
+    auto c4key = C4EncryptionKeyFromPasswordSHA1(password, kC4EncryptionAES256);    //FIXME: Catch
+    key->algorithm = CBLEncryptionAlgorithm(c4key.algorithm);
+    memcpy(key->bytes, c4key.bytes, sizeof(key->bytes));
+    return true;
+}
 #endif
 
 
