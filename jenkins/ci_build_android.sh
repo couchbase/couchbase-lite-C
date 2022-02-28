@@ -57,6 +57,7 @@ function build_variant {
     ${CMAKE_PATH}/cmake -G Ninja \
 	    -DCMAKE_TOOLCHAIN_FILE=$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION/build/cmake/android.toolchain.cmake \
 	    -DCMAKE_MAKE_PROGRAM=${CMAKE_PATH}/ninja \
+	    -DANDROID_STL=c++_shared \
 	    -DANDROID_NATIVE_API_LEVEL=22 \
 	    -DANDROID_ABI=$1 \
 	    -DCMAKE_INSTALL_PREFIX=$(pwd)/../libcblite-$VERSION \
