@@ -1,6 +1,7 @@
 CBL_C {
 	global:
 		CBLEncryptionKey_FromPassword;
+		CBLEncryptionKey_FromPasswordOld;
 		CBLDatabase_ChangeEncryptionKey;
 		CBLEndpoint_CreateWithLocalDB;
 		kCBLEncryptableType;
