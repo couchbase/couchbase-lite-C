@@ -5,6 +5,7 @@
 # These are the additional exports for the Enterprise Edition (EE) dynamic library.
 
 CBLEncryptionKey_FromPassword
+CBLEncryptionKey_FromPasswordOld
 
 CBLDatabase_ChangeEncryptionKey
 
