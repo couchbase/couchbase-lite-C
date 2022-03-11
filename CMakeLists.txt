@@ -9,9 +9,17 @@ endif()
 set(CMAKE_OSX_ARCHITECTURES x86_64 arm64)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.14)
 
+if(DEFINED ENV{VERSION})
+    message(VERBOSE "Using VERSION:$ENV{VERSION} from environment variable")
+    set(CBL_VERSION_STRING $ENV{VERSION})
+else()
+    message(WARNING "No VERSION set, defaulting to 0.0.0")
+    set(CBL_VERSION_STRING "0.0.0")
+endif()
+
 project (
     CouchbaseLite_C
-    VERSION 3.0.0
+    VERSION ${CBL_VERSION_STRING}
 )
 
 set(CBL_LIB_VERSION ${CouchbaseLite_C_VERSION})
