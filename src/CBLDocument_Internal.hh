@@ -21,6 +21,7 @@
 #include "Internal.hh"
 #include "c4Document.hh"
 #include "access_lock.hh"
+#include "fleece/Expert.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <unordered_map>
@@ -121,7 +122,7 @@ public:
                 storage = c4doc->getRevisionBody();
 
             if (storage)
-                _properties = Value::fromData(storage);
+                _properties = ValueFromData(storage);
             if (_mutable) {
                 if (_properties)
                     _properties = _properties.asDict().mutableCopy();
