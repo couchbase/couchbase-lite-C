@@ -11,6 +11,7 @@
 #include "Listener.hh"
 #include "c4Query.hh"
 #include "access_lock.hh"
+#include "fleece/Expert.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <optional>
@@ -49,7 +50,7 @@ public:
     Dict parameters() const {
         if (!_parameters)
             return nullptr;
-        return Value::fromData(_parameters, kFLTrusted).asDict();
+        return ValueFromData(_parameters, kFLTrusted).asDict();
     }
 
     void setParameters(Dict parameters) {

@@ -208,13 +208,19 @@ install(
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
+## CBL Headers
 file(GLOB C_HEADERS ${PROJECT_SOURCE_DIR}/include/cbl/*.h)
 file(GLOB CPP_HEADERS ${PROJECT_SOURCE_DIR}/include/cbl++/*.hh)
-file(GLOB FLEECE_HEADERS ${PROJECT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/fleece/*.h
-		        ${PROJECT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/fleece/*.hh)
+
+## Fleece Headers
+set(FLEECE_HEADER_DIR "${PROJECT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/fleece")
+file(GLOB FLEECE_HEADERS ${FLEECE_HEADER_DIR}/*.h ${FLEECE_HEADER_DIR}/*.hh)
+
+## Exclude Fleece Expert Headers
+# file(GLOB FLEECE_EXPERTS ${FLEECE_HEADER_DIR}/*Expert.h*)
+# list(REMOVE_ITEM FLEECE_HEADERS ${FLEECE_EXPERTS})
 
 install(EXPORT CouchbaseLiteTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/CouchbaseLite)
-
 install(FILES ${C_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
 install(FILES ${CPP_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl++)
 install(FILES ${PROJECT_BINARY_DIR}/generated_headers/public/cbl/CBL_Edition.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cbl)
