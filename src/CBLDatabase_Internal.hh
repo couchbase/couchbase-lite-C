@@ -28,11 +28,12 @@
 #include "Internal.hh"
 #include "Listener.hh"
 #include "access_lock.hh"
-#include "function_ref.hh"
+#include "fleece/function_ref.hh"
 #include "fleece/Mutable.hh"
 #include <condition_variable>
 #include <string>
 #include <utility>
+#include <unordered_set>
 
 CBL_ASSUME_NONNULL_BEGIN
 
