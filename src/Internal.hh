@@ -22,8 +22,8 @@
 #include "c4Base.hh"
 #include "fleece/slice.hh"
 #include "fleece/Fleece.hh"
-#include "RefCounted.hh"
-#include "InstanceCounted.hh"
+#include "fleece/RefCounted.hh"
+#include "fleece/InstanceCounted.hh"
 
 CBL_ASSUME_NONNULL_BEGIN
 

@@ -24,8 +24,8 @@
 #include "c4Observer.hh"
 #include "c4Query.hh"
 #include "Internal.hh"
-#include "function_ref.hh"
-#include "PlatformCompat.hh"
+#include "fleece/function_ref.hh"
+#include "fleece/PlatformCompat.hh"
 #include <sys/stat.h>
 
 #ifndef CMAKE

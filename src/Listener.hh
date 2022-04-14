@@ -19,7 +19,7 @@
 #pragma once
 #include "CBLDatabase.h"
 #include "Internal.hh"
-#include "InstanceCounted.hh"
+#include "fleece/InstanceCounted.hh"
 #include <access_lock.hh>
 #include <atomic>
 #include <functional>
