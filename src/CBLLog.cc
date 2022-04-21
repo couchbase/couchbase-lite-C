@@ -67,6 +67,17 @@ void CBLLog_Init() {
             C4LogDomain domain = kC4Domains[i];
             c4log_setLevel(domain, kC4LogDebug);
         }
+
+        const char* extraDomainNames[] = {
+            "SyncBusy", "Changes", "BLIPMessages", "TLS", "Zip"
+        };
+
+        for(const auto* extraName : extraDomainNames) {
+            auto* domain = c4log_getDomain(extraName, false);
+            if(domain) {
+                c4log_setLevel(domain, kC4LogDebug);
+            }
+        }
         
         // Register log callback:
         c4log_writeToCallback(effectiveC4CallbackLogLevel(), &c4LogCallback, true /*preformatted*/);
