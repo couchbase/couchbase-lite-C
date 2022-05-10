@@ -83,6 +83,8 @@ namespace cbl {
         unsigned maxAttemptWaitTime         = 0;
         
         unsigned heartbeat                  = 0;
+        
+        std::string networkInterface;
 
         Authenticator authenticator;
         CBLProxySettings* _cbl_nullable proxy = nullptr;
@@ -110,6 +112,8 @@ namespace cbl {
             conf.proxy = proxy;
             if (!headers.empty())
                 conf.headers = headers;
+            if (!networkInterface.empty())
+                conf.networkInterface = slice(networkInterface);
             if (!pinnedServerCertificate.empty())
                 conf.pinnedServerCertificate = slice(pinnedServerCertificate);
             if (!trustedRootCertificates.empty())
