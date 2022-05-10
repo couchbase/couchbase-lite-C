@@ -179,6 +179,9 @@ set(CBL_LIBRARIES_PRIVATE
     cblite-static
     ${NO_WHOLE_LIBRARY_FLAG}
     LiteCoreWebSocket
+    LiteCoreObjects
+    FleeceObjects
+    BLIPObjects
 )
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
