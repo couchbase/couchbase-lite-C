@@ -36,10 +36,12 @@
     #define _cbl_nonnull            _In_
     #define _cbl_warn_unused        _Check_return_
     #define _cbl_deprecated
+    #define _cbl_unused
 #else
     #define CBLINLINE               inline
     #define _cbl_warn_unused        __attribute__((warn_unused_result))
     #define _cbl_deprecated         __attribute__((deprecated()))
+    #define _cbl_unused             __attribute__((unused()))
 #endif
 
 // Macros for defining typed enumerations and option flags.

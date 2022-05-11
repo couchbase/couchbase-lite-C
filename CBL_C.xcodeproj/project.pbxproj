@@ -20,6 +20,9 @@
 		2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */; };
 		2736A635242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */; };
 		273CE7E22452123400D01CA2 /* libfleeceBase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B61DBA21D6FF2D0027CCDB /* libfleeceBase.a */; };
+		274E22D42742D49A00B7D1AC /* CBLBlob+FILE.h in Headers */ = {isa = PBXBuildFile; fileRef = 274E22D22742D49A00B7D1AC /* CBLBlob+FILE.h */; };
+		274E22D52742D49A00B7D1AC /* CBLBlob+FILE.cc in Sources */ = {isa = PBXBuildFile; fileRef = 274E22D32742D49A00B7D1AC /* CBLBlob+FILE.cc */; };
+		274E22E32742F46900B7D1AC /* CBLBlob+FILE.cc in Sources */ = {isa = PBXBuildFile; fileRef = 274E22D32742D49A00B7D1AC /* CBLBlob+FILE.cc */; };
 		275B3576234810C400FE9CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 275B3567234810C400FE9CF0 /* Foundation.framework */; };
 		275B358723481AE700FE9CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 275B3567234810C400FE9CF0 /* Foundation.framework */; };
 		275B358923481D0C00FE9CF0 /* CBLTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D6921D6B60D0027CCDB /* CBLTest.cc */; };
@@ -298,6 +301,8 @@
 		2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorEETest.cc; sourceTree = "<group>"; };
 		273CD2D025E81C8F00B93C59 /* cmake */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cmake; sourceTree = "<group>"; };
 		274BAB9D24DA2DB900F4F810 /* generate_exports.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_exports.sh; sourceTree = "<group>"; };
+		274E22D22742D49A00B7D1AC /* CBLBlob+FILE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CBLBlob+FILE.h"; sourceTree = "<group>"; };
+		274E22D32742D49A00B7D1AC /* CBLBlob+FILE.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "CBLBlob+FILE.cc"; sourceTree = "<group>"; };
 		275B3567234810C400FE9CF0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		275B357C234812C800FE9CF0 /* CouchbaseLiteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CouchbaseLiteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		275B358823481C5200FE9CF0 /* XCTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = XCTests.xcconfig; sourceTree = "<group>"; };
@@ -490,6 +495,8 @@
 			isa = PBXGroup;
 			children = (
 				275BC4F52209080E00DBE7D2 /* CBLBlob_Internal.hh */,
+				274E22D22742D49A00B7D1AC /* CBLBlob+FILE.h */,
+				274E22D32742D49A00B7D1AC /* CBLBlob+FILE.cc */,
 				271C2A7121CADB170045856E /* CBLDatabase.cc */,
 				27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */,
 				27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */,
@@ -662,6 +669,7 @@
 				93C70CE026C4D3F80093E927 /* CBLEncryptable.h in Headers */,
 				271C2A3321CAC98F0045856E /* CBLDocument.h in Headers */,
 				277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */,
+				274E22D42742D49A00B7D1AC /* CBLBlob+FILE.h in Headers */,
 				27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */,
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
 				271C2A3421CAC98F0045856E /* CBLDatabase.h in Headers */,
@@ -1179,6 +1187,7 @@
 				277FEE7521ED3C4900B60E3C /* CBLReplicator_CAPI.cc in Sources */,
 				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
+				274E22D52742D49A00B7D1AC /* CBLBlob+FILE.cc in Sources */,
 				271C2A7621CC4BD60045856E /* Internal.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1230,6 +1239,7 @@
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				93C70D1826CB535D0093E927 /* ReplicatorPropEncTest.cc in Sources */,
+				274E22E32742F46900B7D1AC /* CBLBlob+FILE.cc in Sources */,
 				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,
 				93965A6326A7CD50008728EE /* LogTest.cc in Sources */,
 				275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */,
