@@ -206,6 +206,9 @@ typedef struct {
     unsigned maxAttemptWaitTime;        ///< Max wait time between retry attempts in seconds. Specify 0 to use the default value of 300 seconds.
     //-- WebSocket:
     unsigned heartbeat;                 ///< The heartbeat interval in seconds. Specify 0 to use the default value of 300 seconds.
+    FLString networkInterface;          ///< The specific network interface to be used by the replicator to connect to the remote server.
+                                        ///< If not specified, an active network interface based on the OS's routing table will be used.
+    
     //-- HTTP settings:
     CBLAuthenticator* _cbl_nullable authenticator;    ///< Authentication credentials, if needed
     const CBLProxySettings* _cbl_nullable proxy;      ///< HTTP client proxy settings
