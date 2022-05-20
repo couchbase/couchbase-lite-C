@@ -116,6 +116,8 @@ set(
     ALL_SRC_FILES
     src/CBLBase_CAPI.cc
     src/CBLBlob_CAPI.cc
+    src/CBLCollection.cc
+    src/CBLCollection_CAPI.cc
     src/CBLDatabase.cc
     src/CBLDatabase_CAPI.cc
     src/CBLDocument.cc
@@ -125,6 +127,7 @@ set(
     src/CBLQuery.cc
     src/CBLQuery_CAPI.cc
     src/CBLReplicator_CAPI.cc
+    src/CBLScope_CAPI.cc
     src/ConflictResolver.cc
     src/Internal.cc
     src/Listener.cc

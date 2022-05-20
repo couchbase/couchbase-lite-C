@@ -19,6 +19,7 @@
 #include "CBLReplicator.h"
 #include "CBLReplicatorConfig.hh"
 #include "CBLDocument_Internal.hh"
+#include "CBLCollection_Internal.hh"
 #include "ConflictResolver.hh"
 #include "Internal.hh"
 #include "c4Replicator.hh"
@@ -92,25 +93,25 @@ public:
         };
 
         if (_conf.pushFilter) {
-            params.pushFilter = [](C4String collectionName,
+            params.pushFilter = [](C4CollectionSpec collectionSpec,
                                    C4String docID,
                                    C4String revID,
                                    C4RevisionFlags flags,
                                    FLDict body,
                                    void* ctx)
             {
-                return ((CBLReplicator*)ctx)->_filter(docID, revID, flags, body, true);
+                return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, true);
             };
         }
         if (_conf.pullFilter) {
-            params.validationFunc = [](C4String collectionName,
+            params.validationFunc = [](C4CollectionSpec collectionSpec,
                                        C4String docID,
                                        C4String revID,
                                        C4RevisionFlags flags,
                                        FLDict body,
                                        void* ctx)
             {
-                return ((CBLReplicator*)ctx)->_filter(docID, revID, flags, body, false);
+                return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, false);
             };
         }
         
@@ -345,8 +346,14 @@ private:
     }
 
 
-    bool _filter(slice docID, slice revID, C4RevisionFlags flags, Dict body, bool pushing) {
-        Retained<CBLDocument> doc = new CBLDocument(_conf.database, docID, revID, flags, body);
+    bool _filter(C4CollectionSpec colSpec, slice docID, slice revID,
+                 C4RevisionFlags flags, Dict body, bool pushing)
+    {
+        // TODO:
+        // As now LiteCore doesn't send the correct colSpec and has no
+        // collections supported, call to get the default collection:
+        CBLCollection *col = _conf.database->getDefaultCollection();
+        Retained<CBLDocument> doc = new CBLDocument(col, docID, revID, flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
         
         CBLDocumentFlags docFlags = 0;

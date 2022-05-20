@@ -46,7 +46,7 @@ public:
     // Mutable copy of another CBLDocument
     CBLDocument(const CBLDocument* otherDoc)
     :CBLDocument(otherDoc->_docID,
-                 otherDoc->_db,
+                 otherDoc->_collection,
                  const_cast<C4Document*>(otherDoc->_c4doc.useLocked().get()),
                  true)
     {
@@ -59,12 +59,12 @@ public:
 
 
     // Document loaded from db without a C4Document (e.g. a replicator validation callback)
-    CBLDocument(CBLDatabase *db,
+    CBLDocument(CBLCollection *col,
                 slice docID,
                 slice revID,
                 C4RevisionFlags revFlags,
                 Dict body)
-    :CBLDocument(docID, db, nullptr, false)
+    :CBLDocument(docID, col, nullptr, false)
     {
         _properties = body;
         _revID = revID;
@@ -79,8 +79,10 @@ public:
 
 #pragma mark - Accessors:
 
-
-    CBLDatabase*  _cbl_nullable database() const{return _db;}
+    /** Return the database of the collection, or throw if the database was released. */
+    CBLDatabase* _cbl_nullable database() const;
+    
+    CBLCollection* _cbl_nullable collection() const {return _collection;}
     bool exists() const                         {return _c4doc.useLocked().get() != nullptr;}
     bool isMutable() const                      {return _mutable;}
     slice docID() const                         {return _docID;}
@@ -207,8 +209,8 @@ public:
         void* _cbl_nullable context;
         bool deleting = false;
     };
-
-    bool save(CBLDatabase* db, const SaveOptions &opt);
+    
+    bool save(CBLCollection* collection, const SaveOptions &opt);
     
 
 #pragma mark - Conflict resolution:
@@ -256,19 +258,24 @@ public:
 
 #pragma mark - Utils:
     
-    static void checkDBMatches(CBLDatabase* _cbl_nullable myDB, CBLDatabase *dbParam) {
-        if (myDB && myDB != dbParam)
-            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Use document on a wrong database");
+    
+    static void checkCollectionMatches(CBLCollection* _cbl_nullable myCol, CBLCollection *colParam) {
+        if (myCol && myCol != colParam) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Use document on a wrong collection");
+        }
     }
+    
 
 #pragma mark - Internals:
 
 
 private:
-    friend struct CBLDatabase;
-
-    CBLDocument(slice docID, CBLDatabase* _cbl_nullable db,
+    
+    friend struct CBLCollection;
+    
+    CBLDocument(slice docID, CBLCollection* _cbl_nullable collection,
                 C4Document* _cbl_nullable c4doc, bool isMutable);
+    
     virtual ~CBLDocument();
 
     void checkMutable() const {
@@ -309,8 +316,8 @@ private:
     using ValueToEncryptableMap = std::unordered_map<FLDict, Retained<CBLEncryptable>>;
 #endif
 
-    Retained<CBLDatabase>         _db;              // Database (null for new doc)
-    litecore::access_lock<Retained<C4Document>>  _c4doc;           // LiteCore doc (null for new doc)
+    Retained<CBLCollection>       _collection;      // Collection (null for new doc)
+    litecore::access_lock<Retained<C4Document>>  _c4doc; // LiteCore doc (null for new doc)
     alloc_slice const             _docID;           // Document ID (never empty)
     mutable alloc_slice           _revID;           // Revision ID
     fleece::Doc                   _fromJSON;        // Properties read from JSON

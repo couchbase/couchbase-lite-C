@@ -38,12 +38,16 @@ namespace cbl_internal {
 /** Abstract base class of listener tokens. (In the public API, as an opaque typeef.) */
 struct CBLListenerToken : public CBLRefCounted {
 public:
-    CBLListenerToken(const void *callback, void* _cbl_nullable context)
+    CBLListenerToken(const void* callback, void* _cbl_nullable context)
     :_callback(callback)
     ,_context(context)
     { }
 
-    virtual ~CBLListenerToken()  =default;
+    virtual ~CBLListenerToken() {
+        if (_extraInfo.destructor) {
+            _extraInfo.destructor(_extraInfo.pointer);
+        }
+    }
 
     void addedTo(cbl_internal::ListenersBase *owner) {
         assert(!_owner);
@@ -52,6 +56,11 @@ public:
 
     /** Called by `CBLListener_Remove` */
     void remove();
+    
+    /** For attaching some extra info. For example, use the extraInfo for keeping a listener
+        and its context when wrapping the to pass the listener to another listner. */
+    C4ExtraInfo& extraInfo()                                {return _extraInfo;}
+    const C4ExtraInfo& extraInfo() const                    {return _extraInfo;}
 
 protected:
     friend class cbl_internal::ListenersBase;
@@ -63,6 +72,8 @@ protected:
 
     std::atomic<const void*>                   _callback;          // Really a C fn pointer
     void* const  _cbl_nullable                 _context;
+    C4ExtraInfo                                _extraInfo = {};
+    
     cbl_internal::ListenersBase* _cbl_nullable _owner {nullptr};
 };
 

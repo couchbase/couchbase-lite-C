@@ -130,51 +130,48 @@ public:
     uint64_t count() const                           {return _c4db.useLocked()->getDocumentCount();}
     uint64_t lastSequence() const                    {return static_cast<uint64_t>(_c4db.useLocked()->getLastSequence());}
 
-
-#pragma mark - Documents:
-
-
-    RetainedConst<CBLDocument> getDocument(slice docID, bool allRevisions =false) const {
-        return _getDocument(docID, false, allRevisions);
+    
+#pragma mark - Collections:
+    
+    
+    fleece::MutableArray scopeNames() const {
+        auto names = FLMutableArray_New();
+        _c4db.useLocked()->forEachScope([&](slice scope) {
+            FLMutableArray_AppendString(names, scope);
+        });
+        return names;
     }
-
-    Retained<CBLDocument> getMutableDocument(slice docID) {
-        return _getDocument(docID, true, true);
+    
+    fleece::MutableArray collectionNames(slice scopeName) const {
+        auto names = FLMutableArray_New();
+        _c4db.useLocked()->forEachCollection(scopeName, [&](C4CollectionSpec spec) {
+            FLMutableArray_AppendString(names, spec.name);
+        });
+        return names;
     }
-
-    bool deleteDocument(const CBLDocument *doc,
-                        CBLConcurrencyControl concurrency)
-    {
-        CBLDocument::SaveOptions opt(concurrency);
-        opt.deleting = true;
-        return const_cast<CBLDocument*>(doc)->save(this, opt);
+    
+    CBLScope* _cbl_nullable getScope(slice scopeName);
+    
+    CBLCollection* _cbl_nullable getCollection(slice collectionName, slice scopeName) const;
+    
+    CBLCollection* createCollection(slice collectionName, slice scopeName);
+    
+    bool deleteCollection(slice collectionName, slice scopeName);
+    
+    CBLScope* getDefaultScope() {
+        auto scope = getScope(kC4DefaultScopeID);
+        assert(scope);
+        return scope;
     }
-
-    bool deleteDocument(slice docID) {
-        auto c4db = _c4db.useLocked();
-        C4Database::Transaction t(c4db);
-        Retained<C4Document> c4doc = c4db->getDocument(docID, false, kDocGetCurrentRev);
-        if (c4doc)
-            c4doc = c4doc->update(fleece::nullslice, kRevDeleted);
-        if (!c4doc)
-            return false;
-        t.commit();
-        return true;
-    }
-
-    bool purgeDocument(slice docID) {
-        return _c4db.useLocked()->purgeDocument(docID);
-    }
-
-    CBLTimestamp getDocumentExpiration(slice docID) {
-        return static_cast<CBLTimestamp>(_c4db.useLocked()->getDefaultCollection()->getExpiration(docID));
-    }
-
-    void setDocumentExpiration(slice docID, CBLTimestamp expiration) {
-        auto c4db = _c4db.useLocked();
-        c4db->getDefaultCollection()->setExpiration(docID, C4Timestamp(expiration));
-    }
-
+    
+    CBLCollection* _cbl_nullable getDefaultCollection() const;
+    
+    /**
+     * Returned the default collection retained by the database. It will be used for any database's operations
+     * that refer to the default collection. If the default collection doesn't exist when getting from the database,
+     * the method will throw kC4ErrorNotOpen exception. */
+    CBLCollection* getDatabaseDefaultCollectionOrThrow();
+    
 
 #pragma mark - Queries & Indexes:
 
@@ -183,58 +180,9 @@ public:
                                    slice queryString,
                                    int* _cbl_nullable outErrPos) const;
     
-    void createValueIndex(slice name, CBLValueIndexConfiguration config) {
-        C4IndexOptions options = {};
-        _c4db.useLocked()->createIndex(name, config.expressions, (C4QueryLanguage)config.expressionLanguage,
-                                       kC4ValueIndex, &options);
-    }
-    
-    void createFullTextIndex(slice name, CBLFullTextIndexConfiguration config) {
-        C4IndexOptions options = {};
-        options.ignoreDiacritics = config.ignoreAccents;
-        
-        std::string languageStr;
-        if (config.language.buf) {
-            languageStr = std::string(config.language);
-            options.language = languageStr.c_str();
-        }
-        _c4db.useLocked()->createIndex(name, config.expressions, (C4QueryLanguage)config.expressionLanguage,
-                                       kC4FullTextIndex, &options);
-    }
-
-    void deleteIndex(slice name) {
-        _c4db.useLocked()->deleteIndex(name);
-    }
-
-    fleece::MutableArray indexNames() {
-        Doc doc(_c4db.useLocked()->getIndexesInfo());
-        auto indexes = fleece::MutableArray::newArray();
-        for (Array::iterator i(doc.root().asArray()); i; ++i) {
-            Dict info = i.value().asDict();
-            indexes.append(info["name"]);
-        }
-        return indexes;
-    }
-
 
 #pragma mark - Listeners:
-
-
-    Retained<CBLListenerToken> addListener(CBLDatabaseChangeListener listener,
-                                           void* _cbl_nullable ctx)
-    {
-        return addListener([&]{ return _listeners.add(listener, ctx); });
-    }
-
-    Retained<CBLListenerToken> addListener(CBLDatabaseChangeDetailListener listener,
-                                           void* _cbl_nullable ctx)
-    {
-        return addListener([&]{ return _detailListeners.add(listener, ctx); });
-    }
-
-    Retained<CBLListenerToken> addDocListener(slice docID,
-                                              CBLDocumentChangeListener,
-                                              void* _cbl_nullable context);
+    
 
     void sendNotifications() {
         _notificationQueue.notifyAll();
@@ -257,9 +205,11 @@ public:
 
 
 protected:
+    
     friend struct CBLBlob;
     friend struct CBLNewBlob;
     friend struct CBLBlobWriteStream;
+    friend struct CBLCollection;
     friend struct CBLDocument;
     friend struct CBLReplicator;
     friend struct CBLURLEndpointListener;
@@ -267,6 +217,7 @@ protected:
     friend struct cbl_internal::CBLLocalEndpoint;
     friend struct cbl_internal::ListenerToken<CBLDocumentChangeListener>;
     friend struct cbl_internal::ListenerToken<CBLQueryChangeListener>;
+    friend struct cbl_internal::ListenerToken<CBLCollectionDocumentChangeListener>;
 
     C4BlobStore* blobStore() const                   {return &_c4db.useLocked()->getBlobStore();}
 
@@ -287,18 +238,10 @@ protected:
     RESULT useLocked(LAMBDA callback) { return _c4db.useLocked<RESULT>(callback); }
 
 private:
-    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
-    :_c4db(std::move(db))
-    ,_dir(dir_)
-    ,_notificationQueue(this)
-    { }
+    
+    CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_);
 
-    virtual ~CBLDatabase() {
-        _c4db.useLocked([&](Retained<C4Database> &c4db) {
-            _docListeners.clear();
-            _observer = nullptr;
-        });
-    }
+    virtual ~CBLDatabase();
 
     // Default location for databases. This is platform-dependent.
     static std::string defaultDirectory();
@@ -347,57 +290,16 @@ private:
             return slice(kDir);
         }
     }
-
-    Retained<CBLDocument> _getDocument(slice docID, bool isMutable, bool allRevisions) const {
-        C4DocContentLevel content = (allRevisions ? kDocGetAll : kDocGetCurrentRev);
-        Retained<C4Document> c4doc = nullptr;
-        try {
-            c4doc = _c4db.useLocked()->getDocument(docID, true, content);
-        } catch (litecore::error& e) {
-            if (e == litecore::error::BadDocID) {
-                CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
-                        "Invalid document ID '%.*s' used", FMTSLICE(docID));
-                return nullptr;
-            }
-            throw;
-        }
-        if (!c4doc || (!allRevisions && (c4doc->flags() & kDocDeleted)))
-            return nullptr;
-        return new CBLDocument(docID, const_cast<CBLDatabase*>(this), c4doc, isMutable);
-    }
-
-    Retained<CBLListenerToken> addListener(fleece::function_ref<Retained<CBLListenerToken>()> cb) {
-        auto c4db = _c4db.useLocked(); // locks DB mutex, so the callback can run thread-safe
-        Retained<CBLListenerToken> token = cb();
-        if (!_observer)
-            _observer = c4db->getDefaultCollection()->observe([this](C4DatabaseObserver*) { this->databaseChanged(); });
-        return token;
-    }
-
-    void databaseChanged() {
-        notify(std::bind(&CBLDatabase::callDBListeners, this));
-    }
-
-    void callDBListeners() {
-        static const uint32_t kMaxChanges = 100;
-        while (true) {
-            C4DatabaseObserver::Change c4changes[kMaxChanges];
-            bool external;
-            uint32_t nChanges = _observer->getChanges(c4changes, kMaxChanges, &external);
-            if (nChanges == 0)
-                break;
-
-            static_assert(sizeof(CBLDatabaseChange) == sizeof(C4DatabaseObserver::Change));
-            _detailListeners.call(this, nChanges, (const CBLDatabaseChange*)c4changes);
-
-            if (!_listeners.empty()) {
-                FLString docIDs[kMaxChanges];
-                for (uint32_t i = 0; i < nChanges; ++i)
-                docIDs[i] = c4changes[i].docID;
-                _listeners.call(this, nChanges, docIDs);
-            }
-        }
-    }
+    
+    CBLCollection* _cbl_nullable getDefaultCollection(bool mustExist) const;
+    
+    /**
+     Get or create a CBLCollection from the C4Collection. The created CBLCollection will be retained
+     and stored in the _collections map. */
+    CBLCollection* getOrCreateCBLCollection(C4Collection* c4col) const;
+    
+    // Remove and release the CBLCollection from the _collections map
+    void removeCBLCollection(C4Database::CollectionSpec spec) const;
 
     void callDocListeners();
     
@@ -441,12 +343,17 @@ private:
 
     template <class T> using Listeners = cbl_internal::Listeners<T>;
 
+    using ScopesMap = std::unordered_map<slice, Retained<CBLScope>>;
+    using CollectionsMap = std::unordered_map<C4Database::CollectionSpec, Retained<CBLCollection>>;
+    
     litecore::access_lock<Retained<C4Database>> _c4db;
     alloc_slice const                           _dir;
-    std::unique_ptr<C4DatabaseObserver>         _observer;
-    Listeners<CBLDatabaseChangeListener>        _listeners;
-    Listeners<CBLDatabaseChangeDetailListener>  _detailListeners;
-    Listeners<CBLDocumentChangeListener>        _docListeners;
+    
+    mutable ScopesMap                           _scopes;
+    mutable CollectionsMap                      _collections;
+    Retained<CBLCollection>                     _defaultCollection;
+    
+    // For sending notifications:
     NotificationQueue                           _notificationQueue;
     
     // For Active Stoppables:

@@ -18,6 +18,7 @@
 
 #include "CBLQuery.h"
 #include "CBLDatabase_Internal.hh"
+#include "CBLCollection_Internal.hh"
 #include "CBLQuery_Internal.hh"
 #include <string>
 
