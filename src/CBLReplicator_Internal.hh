@@ -349,10 +349,10 @@ private:
     bool _filter(C4CollectionSpec colSpec, slice docID, slice revID,
                  C4RevisionFlags flags, Dict body, bool pushing)
     {
-        // TODO:
+        // CBL-3191:
         // As now LiteCore doesn't send the correct colSpec and has no
         // collections supported, call to get the default collection:
-        CBLCollection *col = _conf.database->getDefaultCollection();
+        CBLCollection *col = _conf.database->getDefaultCollection(false);
         Retained<CBLDocument> doc = new CBLDocument(col, docID, revID, flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
         

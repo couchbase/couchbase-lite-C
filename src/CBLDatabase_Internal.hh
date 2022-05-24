@@ -164,13 +164,11 @@ public:
         return scope;
     }
     
-    CBLCollection* _cbl_nullable getDefaultCollection() const;
-    
     /**
      * Returned the default collection retained by the database. It will be used for any database's operations
      * that refer to the default collection. If the default collection doesn't exist when getting from the database,
      * the method will throw kC4ErrorNotOpen exception. */
-    CBLCollection* getDatabaseDefaultCollectionOrThrow();
+    CBLCollection* _cbl_nullable getDefaultCollection(bool mustExist);
     
 
 #pragma mark - Queries & Indexes:
@@ -290,15 +288,13 @@ private:
             return slice(kDir);
         }
     }
-    
-    CBLCollection* _cbl_nullable getDefaultCollection(bool mustExist) const;
-    
+
     /**
-     Get or create a CBLCollection from the C4Collection. The created CBLCollection will be retained
-     and stored in the _collections map. */
-    CBLCollection* getOrCreateCBLCollection(C4Collection* c4col) const;
+     Create a CBLCollection from the C4Collection.
+     The created CBLCollection will be retained and cached in the _collections map. */
+    CBLCollection* createCBLCollection(C4Collection* c4col) const;
     
-    // Remove and release the CBLCollection from the _collections map
+    /** Remove and release the CBLCollection from the _collections map */
     void removeCBLCollection(C4Database::CollectionSpec spec) const;
 
     void callDocListeners();

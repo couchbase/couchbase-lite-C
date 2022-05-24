@@ -82,7 +82,7 @@ CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db) noexcept {
 }
 
 CBLCollection* CBLDatabase_DefaultCollection(const CBLDatabase* db) noexcept {
-    return db->getDefaultCollection();
+    return const_cast<CBLDatabase*>(db)->getDefaultCollection(false);
 }
 
 #pragma mark - ACCESSORS

@@ -82,7 +82,9 @@ CBLDatabase::CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
 :_c4db(std::move(db))
 ,_dir(dir_)
 ,_notificationQueue(this)
-{ }
+{
+    _defaultCollection = getCollection(kC4DefaultCollectionName, kC4DefaultScopeID);
+}
 
 
 CBLDatabase::~CBLDatabase() {
@@ -143,13 +145,28 @@ CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName)
         scopeName = kC4DefaultScopeID;
 
     auto c4db = _c4db.useLocked();
+    
+    CBLCollection* collection = nullptr;
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
+    if (auto i = _collections.find(spec); i != _collections.end()) {
+        collection = i->second.get();
+    }
+    
+    if (collection) {
+        if (c4db->hasCollection(spec)) {
+            return collection;
+        }
+    }
+    
     auto c4col = c4db->getCollection(spec);
     if (!c4col) {
-        removeCBLCollection(spec);
+        if (collection) {
+            removeCBLCollection(spec); // Invalidate cache
+        }
         return nullptr;
     }
-    return getOrCreateCBLCollection(c4col);
+    
+    return createCBLCollection(c4col);
 }
 
 
@@ -158,9 +175,15 @@ CBLCollection* CBLDatabase::createCollection(slice collectionName, slice scopeNa
         scopeName = kC4DefaultScopeID;
     
     auto c4db = _c4db.useLocked();
+    
+    CBLCollection* col = getCollection(collectionName, scopeName);
+    if (col) {
+        return col;
+    }
+    
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
     auto c4col = c4db->createCollection(spec);
-    return getOrCreateCBLCollection(c4col);
+    return createCBLCollection(c4col);
 }
 
 
@@ -169,6 +192,7 @@ bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
         scopeName = kC4DefaultScopeID;
     
     auto c4db = _c4db.useLocked();
+    
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
     c4db->deleteCollection(spec);
     removeCBLCollection(spec);
@@ -176,49 +200,29 @@ bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
 }
 
 
-CBLCollection* CBLDatabase::getDefaultCollection() const {
-    return getDefaultCollection(false);
-}
-
-
-CBLCollection* CBLDatabase::getDatabaseDefaultCollectionOrThrow() {
-    auto c4db = _c4db.useLocked();
-    if (!_defaultCollection)
-        _defaultCollection = getDefaultCollection(true);
+CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) {
+    auto db = _c4db.useLocked();
+    
+    if (_defaultCollection) {
+        if (_defaultCollection &&
+            !db->hasCollection({kC4DefaultCollectionName, kC4DefaultScopeID})) {
+            _defaultCollection = nullptr;
+        }
+    }
+    
+    if (!_defaultCollection && mustExist) {
+        C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
+                       "Invalid collection: either deleted, or db closed");
+    }
+    
     return _defaultCollection;
 }
 
 
-CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) const {
-    auto c4db = _c4db.useLocked();
-    auto c4col = c4db->getDefaultCollection();
-    if (!c4col) {
-        auto spec = C4Database::CollectionSpec(kC4DefaultCollectionName, kC4DefaultScopeID);
-        removeCBLCollection(spec);
-        if (mustExist) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
-                       "Invalid collection: either deleted, or db closed");
-        }
-        return nullptr;
-    }
-    return getOrCreateCBLCollection(c4col);
-}
-
-
-CBLCollection* CBLDatabase::getOrCreateCBLCollection(C4Collection* c4col) const {
-    CBLCollection* collection = nullptr;
-    auto spec = C4Database::CollectionSpec(c4col->getSpec());
-    if (auto i = _collections.find(spec); i != _collections.end()) {
-        collection = i->second.get();
-    }
-    
-    if (collection && collection->c4col() == c4col) {
-        return collection;
-    }
-    
+CBLCollection* CBLDatabase::createCBLCollection(C4Collection* c4col) const {
     auto retainedCollection = make_retained<CBLCollection>(c4col, const_cast<CBLDatabase*>(this));
-    collection = retainedCollection.get();
-    _collections.insert({spec, move(retainedCollection)});
+    auto collection = retainedCollection.get();
+    _collections.insert({C4Database::CollectionSpec(c4col->getSpec()), move(retainedCollection)});
     return collection;
 }
 

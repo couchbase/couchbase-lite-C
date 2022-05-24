@@ -94,7 +94,8 @@ namespace cbl_internal {
         try {
             do {
                 // Create a CBLDocument that reflects the conflict revision:
-                auto conflict = _db->getDatabaseDefaultCollectionOrThrow()->getMutableDocument(_docID);
+                // CBL-3190: Support collections
+                auto conflict = _db->getDefaultCollection(true)->getMutableDocument(_docID);
                 if (!conflict) {
                     SyncLog(Info, "Doc '%.*s' no longer exists, no conflict to resolve",
                             FMTSLICE(_docID));
@@ -171,7 +172,8 @@ namespace cbl_internal {
         if (remoteDoc->revisionFlags() & kRevDeleted)
             remoteDoc = nullptr;
         
-        auto localDoc = _db->getDatabaseDefaultCollectionOrThrow()->getDocument(_docID, true);
+        // CBL-3190: Support collections
+        auto localDoc = _db->getDefaultCollection(true)->getDocument(_docID, true);
         if (localDoc && localDoc->revisionFlags() & kRevDeleted)
             localDoc = nullptr;
         
@@ -192,7 +194,9 @@ namespace cbl_internal {
         CBLDocument *remoteDoc = conflict;
         if (remoteDoc->revisionFlags() & kRevDeleted)
             remoteDoc = nullptr;
-        auto localDoc = _db->getDatabaseDefaultCollectionOrThrow()->getDocument(_docID, true);
+        
+        // CBL-3190: Support collections
+        auto localDoc = _db->getDefaultCollection(true)->getDocument(_docID, true);
         if (localDoc && localDoc->revisionFlags() & kRevDeleted)
             localDoc = nullptr;
 
