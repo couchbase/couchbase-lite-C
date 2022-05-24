@@ -159,6 +159,7 @@ TEST_CASE_METHOD(BlobTest, "Create JSON from Blob", "[Blob]") {
     REQUIRE(doc);
     FLValue value = FLDict_Get(CBLDocument_Properties(doc), "blob"_sl);
     const CBLBlob* gotBlob = FLValue_GetBlob(value);
+    REQUIRE(gotBlob);
     CHECK(alloc_slice(CBLBlob_CreateJSON(gotBlob)) == "{\"content_type\":\"text/plain\",\"digest\":\"sha1-dXNgUcxC3n7lxfrYkbLUG4gOKRw=\",\"length\":34,\"@type\":\"blob\"}"_sl);
     CBLDocument_Release(doc);
 }

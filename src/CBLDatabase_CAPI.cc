@@ -17,9 +17,11 @@
 //
 
 #include "CBLDatabase_Internal.hh"
-#include "CBLDocument_Internal.hh"
 #include "CBLBlob_Internal.hh"
+#include "CBLCollection_Internal.hh"
 #include "CBLDatabase.h"
+#include "CBLDocument_Internal.hh"
+
 
 using namespace std;
 using namespace fleece;
@@ -156,10 +158,8 @@ const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID
                                            CBLError* outError) noexcept
 {
     try {
-        auto doc = db->getDocument(docID).detach();
-        if (!doc && outError)
-            outError->code = 0;
-        return doc;
+        auto col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        return CBLCollection_GetDocument(col, docID, outError);
     } catchAndBridge(outError)
 }
 
@@ -168,10 +168,8 @@ CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID,
                                             CBLError* outError) noexcept
 {
     try {
-        auto doc = db->getMutableDocument(docID).detach();
-        if (!doc && outError)
-            outError->code = 0;
-        return doc;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_GetMutableDocument(col, docID, outError);
     } catchAndBridge(outError)
 }
 
@@ -180,9 +178,8 @@ bool CBLDatabase_SaveDocument(CBLDatabase* db,
                               CBLDocument* doc,
                               CBLError* outError) noexcept
 {
-    return CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc,
-                                                          kCBLConcurrencyControlLastWriteWins,
-                                                          outError);
+    return CBLDatabase_SaveDocumentWithConcurrencyControl
+        (db, doc, kCBLConcurrencyControlLastWriteWins, outError);
 }
 
 bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
@@ -191,10 +188,8 @@ bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
                                                     CBLError* outError) noexcept
 {
     try {
-        if (doc->save(db, {concurrency}))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
-        return false;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, concurrency, outError);
     } catchAndBridge(outError)
 }
 
@@ -205,10 +200,9 @@ bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
                                                  CBLError* outError) noexcept
 {
     try {
-        if (doc->save(db, {conflictHandler, context}))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
-        return false;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_SaveDocumentWithConflictHandler(col, doc, conflictHandler,
+                                                             context, outError);
     } catchAndBridge(outError)
 }
 
@@ -216,9 +210,10 @@ bool CBLDatabase_DeleteDocument(CBLDatabase *db,
                                 const CBLDocument* doc,
                                 CBLError* outError) noexcept
 {
-    return CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc,
-                                                            kCBLConcurrencyControlLastWriteWins,
-                                                            outError);
+    try {
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_DeleteDocument(col, doc, outError);
+    } catchAndBridge(outError)
 }
 
 bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db,
@@ -227,10 +222,8 @@ bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db,
                                                       CBLError* outError) noexcept
 {
     try {
-        if (db->deleteDocument(doc, concurrency))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
-        return false;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_DeleteDocumentWithConcurrencyControl(col, doc, concurrency, outError);
     } catchAndBridge(outError)
 }
 
@@ -239,10 +232,8 @@ bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db,
                                     CBLError* outError) noexcept
 {
     try {
-        if (db->deleteDocument(docID))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
-        return false;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_DeleteDocumentByID(col, docID, outError);
     } catchAndBridge(outError)
 }
 
@@ -251,8 +242,9 @@ bool CBLDatabase_PurgeDocument(CBLDatabase* db,
                                CBLError* outError) noexcept
 {
     try {
-        CBLDocument::checkDBMatches(doc->database(), db);
-        return CBLDatabase_PurgeDocumentByID(db, doc->docID(), outError);
+        auto col = db->getDefaultCollection(true);
+        CBLDocument::checkCollectionMatches(doc->collection(), col);
+        return CBLCollection_PurgeDocumentByID(col, doc->docID(), outError);
     } catchAndBridge(outError)
 }
 
@@ -261,10 +253,8 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
                                    CBLError* outError) noexcept
 {
     try {
-        if (db->purgeDocument(docID))
-            return true;
-        C4Error::set(LiteCoreDomain, kC4ErrorNotFound, {}, internal(outError));
-        return false;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_PurgeDocumentByID(col, docID, outError);
     } catchAndBridge(outError)
 }
 
@@ -273,7 +263,8 @@ CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db,
                                                CBLError* outError) noexcept
 {
     try {
-        return db->getDocumentExpiration(docID);
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_GetDocumentExpiration(col, docID, outError);
     } catchAndBridge(outError)
 }
 
@@ -283,8 +274,8 @@ bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db,
                                        CBLError* outError) noexcept
 {
     try {
-        db->setDocumentExpiration(docID, expiration);
-        return true;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_SetDocumentExpiration(col, docID, expiration, outError);
     } catchAndBridge(outError)
 }
 
@@ -298,10 +289,11 @@ bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   CBLError *outError) noexcept
 {
     try {
-        db->createValueIndex(name, config);
-        return true;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_CreateValueIndex(col, name, config, outError);
     } catchAndBridge(outError)
 }
+
 
 bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      FLString name,
@@ -309,8 +301,8 @@ bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      CBLError *outError) noexcept
 {
     try {
-        db->createFullTextIndex(name, config);
-        return true;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_CreateFullTextIndex(col, name, config, outError);
     } catchAndBridge(outError)
 }
 
@@ -320,34 +312,60 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db,
                              CBLError *outError) noexcept
 {
     try {
-        db->deleteIndex(name);
-        return true;
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_DeleteIndex(col, name, outError);
     } catchAndBridge(outError)
 }
 
 
 FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) noexcept {
     try {
-        return FLMutableArray_Retain(db->indexNames());
-    } catchAndWarn()
+        auto col = db->getDefaultCollection(true);
+        return CBLCollection_GetIndexNames(col);
+    } catchAndBridgeReturning(nullptr, FLMutableArray_New())
 }
 
 
-CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* constdb,
+#pragma mark - CHANGE LISTENERS
+
+
+namespace cbl_internal {
+    struct DatabaseChangeContext {
+        const CBLDatabase* database;
+        CBLDatabaseChangeListener listener;
+        void* context;
+    };
+
+    struct DocumentChangeContext {
+        const CBLDatabase* database;
+        CBLDocumentChangeListener listener;
+        void* context;
+    };
+}
+
+
+CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
                                                 CBLDatabaseChangeListener listener,
                                                 void *context) noexcept
 {
-    return const_cast<CBLDatabase*>(constdb)->addListener(listener, context).detach();
+    auto wrappedContext = new DatabaseChangeContext();
+    wrappedContext->database = db;
+    wrappedContext->listener = listener;
+    wrappedContext->context = context;
+
+    auto wrappedListener = [](void* context, const CBLCollectionChange* change) {
+        DatabaseChangeContext* ctx = static_cast<DatabaseChangeContext*>(context);
+        ctx->listener(ctx->context, ctx->database, change->numDocs, change->docIDs);
+    };
+
+    try {
+        CBLCollection* col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        auto token = CBLCollection_AddChangeListener(col, wrappedListener, wrappedContext);
+        token->extraInfo().pointer = wrappedContext;
+        token->extraInfo().destructor = [](void* ctx) {free(ctx);};
+        return token;
+    } catchAndBridgeReturning(nullptr, make_retained<CBLListenerToken>((const void*)listener, nullptr).detach())
 }
-
-
-CBLListenerToken* CBLDatabase_AddChangeDetailListener(const CBLDatabase* constdb,
-                                                      CBLDatabaseChangeDetailListener listener,
-                                                      void *context) noexcept
-{
-    return const_cast<CBLDatabase*>(constdb)->addListener(listener, context).detach();
-}
-
 
 void CBLDatabase_BufferNotifications(CBLDatabase *db,
                                      CBLNotificationsReadyCallback callback,
@@ -366,7 +384,23 @@ CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db,
                                                         CBLDocumentChangeListener listener,
                                                         void *context) noexcept
 {
-    return const_cast<CBLDatabase*>(db)->addDocListener(docID, listener, context).detach();
+    auto wrappedContext = new DocumentChangeContext();
+    wrappedContext->database = db;
+    wrappedContext->listener = listener;
+    wrappedContext->context = context;
+    
+    auto wrappedListener = [](void* context, const CBLDocumentChange* change) {
+        DocumentChangeContext* ctx = static_cast<DocumentChangeContext*>(context);
+        ctx->listener(ctx->context, ctx->database, change->docID);
+    };
+    
+    try {
+        CBLCollection* col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        auto token = CBLCollection_AddDocumentChangeListener(col, docID, wrappedListener, wrappedContext);
+        token->extraInfo().pointer = wrappedContext;
+        token->extraInfo().destructor = [](void* ctx) {free(ctx);};
+        return token;
+    } catchAndBridgeReturning(nullptr, make_retained<CBLListenerToken>((const void*)listener, nullptr).detach())
 }
 
 

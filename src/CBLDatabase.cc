@@ -18,9 +18,10 @@
 
 #include "CBLDatabase_Internal.hh"
 #include "CBLBlob_Internal.hh"
-#include "CBLDocument_Internal.hh"
+#include "CBLCollection_Internal.hh"
 #include "CBLQuery_Internal.hh"
 #include "CBLPrivate.h"
+#include "CBLScope_Internal.hh"
 #include "c4Observer.hh"
 #include "c4Query.hh"
 #include "Internal.hh"
@@ -70,6 +71,167 @@ bool CBLEncryptionKey_FromPasswordOld(CBLEncryptionKey *key, FLString password) 
 #endif
 
 
+// The methods below cannot be in C4Database_Internal.hh because they depend on
+// CBLCollection_Internal.hh, which would create a circular header dependency.
+
+
+#pragma mark - CONSTRUCTORS:
+
+
+CBLDatabase::CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
+:_c4db(std::move(db))
+,_dir(dir_)
+,_notificationQueue(this)
+{
+    _defaultCollection = getCollection(kC4DefaultCollectionName, kC4DefaultScopeID);
+}
+
+
+CBLDatabase::~CBLDatabase() {
+    _c4db.useLocked([&](Retained<C4Database> &c4db) {
+        // Invalidate the database reference for both scopes and collections:
+        for (auto& i : _scopes) {
+            i.second->close();
+        }
+        
+        for (auto& i : _collections) {
+            i.second->close();
+        }
+    });
+}
+
+
+#pragma mark - SCOPES:
+
+
+CBLScope* CBLDatabase::getScope(slice scopeName) {
+    if (!scopeName)
+        scopeName = kC4DefaultScopeID;
+    
+    auto c4db = _c4db.useLocked();
+    
+    // TODO: change to use hasScope()
+    bool exist = (scopeName == kC4DefaultScopeID); // Default scope always exist.
+    if (!exist) {
+        c4db->forEachScope([&](slice scope) {
+            if (!exist && scopeName == scope)
+                exist = true;
+        });
+    }
+    
+    CBLScope* scope = nullptr;
+    if (auto i = _scopes.find(scopeName); i != _scopes.end()) {
+        if (exist) {
+            scope = i->second.get();
+        } else {
+            _scopes.erase(i);
+        }
+    }
+    
+    if (exist && !scope) {
+        auto retainedScope = make_retained<CBLScope>(scopeName, this);
+        scope = retainedScope.get();
+        _scopes.insert({scope->name(), move(retainedScope)});
+    }
+    return scope;
+}
+
+
+#pragma mark - COLLECTIONS:
+
+
+CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName) const {
+    if (!scopeName)
+        scopeName = kC4DefaultScopeID;
+
+    auto c4db = _c4db.useLocked();
+    
+    CBLCollection* collection = nullptr;
+    auto spec = C4Database::CollectionSpec(collectionName, scopeName);
+    if (auto i = _collections.find(spec); i != _collections.end()) {
+        collection = i->second.get();
+    }
+    
+    if (collection) {
+        if (c4db->hasCollection(spec)) {
+            return collection;
+        }
+    }
+    
+    auto c4col = c4db->getCollection(spec);
+    if (!c4col) {
+        if (collection) {
+            removeCBLCollection(spec); // Invalidate cache
+        }
+        return nullptr;
+    }
+    
+    return createCBLCollection(c4col);
+}
+
+
+CBLCollection* CBLDatabase::createCollection(slice collectionName, slice scopeName) {
+    if (!scopeName)
+        scopeName = kC4DefaultScopeID;
+    
+    auto c4db = _c4db.useLocked();
+    
+    CBLCollection* col = getCollection(collectionName, scopeName);
+    if (col) {
+        return col;
+    }
+    
+    auto spec = C4Database::CollectionSpec(collectionName, scopeName);
+    auto c4col = c4db->createCollection(spec);
+    return createCBLCollection(c4col);
+}
+
+
+bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
+    if (!scopeName)
+        scopeName = kC4DefaultScopeID;
+    
+    auto c4db = _c4db.useLocked();
+    
+    auto spec = C4Database::CollectionSpec(collectionName, scopeName);
+    c4db->deleteCollection(spec);
+    removeCBLCollection(spec);
+    return true;
+}
+
+
+CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) {
+    auto db = _c4db.useLocked();
+    
+    if (_defaultCollection &&
+        !db->hasCollection({kC4DefaultCollectionName, kC4DefaultScopeID})) {
+        _defaultCollection = nullptr;
+    }
+    
+    if (!_defaultCollection && mustExist) {
+        C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
+                       "Invalid collection: either deleted, or db closed");
+    }
+    
+    return _defaultCollection;
+}
+
+
+CBLCollection* CBLDatabase::createCBLCollection(C4Collection* c4col) const {
+    auto retainedCollection = make_retained<CBLCollection>(c4col, const_cast<CBLDatabase*>(this));
+    auto collection = retainedCollection.get();
+    _collections.insert({C4Database::CollectionSpec(c4col->getSpec()), move(retainedCollection)});
+    return collection;
+}
+
+
+void CBLDatabase::removeCBLCollection(C4Database::CollectionSpec spec) const {
+    if (auto i = _collections.find(spec); i != _collections.end()) {
+        _collections.erase(i);
+    }
+}
+
+
 #pragma mark - QUERY:
 
 
@@ -95,64 +257,6 @@ namespace cbl_internal {
         _query->database()->notify(this);
     }
 
-
-#pragma mark - DOCUMENT LISTENERS:
-
-
-    // Custom subclass of CBLListenerToken for document listeners.
-    // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
-    template<>
-    struct ListenerToken<CBLDocumentChangeListener> : public CBLListenerToken {
-    public:
-        ListenerToken(CBLDatabase *db, slice docID, CBLDocumentChangeListener callback, void *context)
-        :CBLListenerToken((const void*)callback, context)
-        ,_db(db)
-        ,_docID(docID)
-        {
-            auto c4db = _db->useLocked(); // locks DB mutex
-            _c4obs = c4db->getDefaultCollection()->observeDocument(docID,
-                                         [this](C4DocumentObserver*, slice docID, C4SequenceNumber)
-                                         {
-                                             this->docChanged();
-                                         });
-        }
-
-        ~ListenerToken() {
-            auto c4db = _db->useLocked(); // locks DB mutex
-            _c4obs = nullptr;
-        }
-
-        CBLDocumentChangeListener callback() const {
-            return (CBLDocumentChangeListener)_callback.load();
-        }
-
-        // this is called indirectly by CBLDatabase::sendNotifications
-        void call(const CBLDatabase*, FLString) {
-            auto cb = callback();
-            if (cb)
-                cb(_context, _db, _docID);
-        }
-
-    private:
-        void docChanged() {
-            _db->notify(this, _db, _docID);
-        }
-
-        Retained<CBLDatabase> _db;
-        alloc_slice _docID;
-        unique_ptr<C4DocumentObserver> _c4obs;
-    };
-
-}
-
-
-Retained<CBLListenerToken> CBLDatabase::addDocListener(slice docID,
-                                                       CBLDocumentChangeListener listener,
-                                                       void *context)
-{
-    auto token = new ListenerToken<CBLDocumentChangeListener>(this, docID, listener, context);
-    _docListeners.add(token);
-    return token;
 }
 
 

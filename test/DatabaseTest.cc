@@ -1392,6 +1392,7 @@ TEST_CASE_METHOD(DatabaseTest, "Remove Database Listener after releasing databas
     db = nullptr;
 
     // Remove and release the token:
+    ExpectingExceptions x;
     CBLListener_Remove(token);
     CBLListener_Remove(docToken);
 }
@@ -1663,7 +1664,7 @@ TEST_CASE_METHOD(DatabaseTest, "Get blob", "[Blob]") {
 
 #ifdef COUCHBASE_ENTERPRISE
 
-TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator") {
+TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator", "[.CBL-3183]") {
     CBLError error;
     otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
     REQUIRE(otherDB);
@@ -1698,7 +1699,7 @@ TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator") {
     this_thread::sleep_for(200ms);
 }
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator") {
+TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator", "[.CBL-3183]") {
     CBLError error;
     otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
     REQUIRE(otherDB);

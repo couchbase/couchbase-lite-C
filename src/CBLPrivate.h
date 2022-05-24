@@ -43,24 +43,16 @@ CBL_CAPI_BEGIN
                                         FLString docID,
                                         CBLError* _cbl_nullable outError) CBLAPI;
 
-    /** A more detailed look at a specific database change. */
-    typedef struct {
-        FLHeapSlice docID;          ///< The document's ID
-        FLHeapSlice revID;          ///< The latest revision ID (or null if doc was purged)
-        uint64_t sequence;          ///< The latest sequence number (or 0 if doc was purged)
-        uint32_t bodySize;          ///< The size of the revision body in bytes
-        uint8_t flags;
-    } CBLDatabaseChange;    // Note: This must remain identical in layout to C4DatabaseChange
-
-    typedef void (*CBLDatabaseChangeDetailListener)(void* _cbl_nullable context,
-                                                    const CBLDatabase* db,
-                                                    unsigned numDocs,
-                                                    const CBLDatabaseChange docs[_cbl_nonnull]);
-
-    /** Registers a listener that gets a detailed look at each database change. */
-    CBLListenerToken* CBLDatabase_AddChangeDetailListener(const CBLDatabase* db,
-                                            CBLDatabaseChangeDetailListener listener,
-                                            void* _cbl_nullable context) CBLAPI;
+/** Deletes a document from the collection, given only its ID.
+    @note  If no document with that ID exists, this function will return false but the error
+            code will be zero.
+    @param collection  The collection.
+    @param docID  The document ID to delete.
+    @param outError  On failure, the error will be written here.
+    @return  True if the document was deleted, false if it doesn't exist or the deletion failed. */
+    bool CBLCollection_DeleteDocumentByID(CBLCollection* collection,
+                                          FLString docID,
+                                          CBLError* _cbl_nullable outError) CBLAPI;
 
     /** Given a list of (docID, revID) pairs, finds which ones are new to this database, i.e. don't
         currently exist and are not older than what currently exists.

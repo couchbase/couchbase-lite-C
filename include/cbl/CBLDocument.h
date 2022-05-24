@@ -237,6 +237,9 @@ FLString CBLDocument_RevisionID(const CBLDocument*) CBLAPI;
     abstract 'clock' to tell relative modification times. */
 uint64_t CBLDocument_Sequence(const CBLDocument*) CBLAPI;
 
+/** Returns a document's collection or NULL for the new document that hasn't been saved. */
+CBLCollection* _cbl_nullable CBLDocument_Collection(const CBLDocument*) CBLAPI;
+
 /** Returns a document's properties as a dictionary.
     @note  The dictionary object is owned by the document; you do not need to release it.
     @warning  When the document is released, this reference to the properties becomes invalid.

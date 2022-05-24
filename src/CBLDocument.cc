@@ -18,6 +18,7 @@
 
 #include "CBLDocument.h"
 #include "CBLPrivate.h"
+#include "CBLCollection_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "CBLBlob_Internal.hh"
 #include "c4BlobStore.hh"
@@ -43,9 +44,9 @@ using namespace cbl_internal;
 // CBLDatabase_Internal.hh, which would create a circular header dependency.
 
 
-CBLDocument::CBLDocument(slice docID, CBLDatabase *db, C4Document *c4doc, bool isMutable)
+CBLDocument::CBLDocument(slice docID, CBLCollection *collection, C4Document *c4doc, bool isMutable)
 :_docID(docID)
-,_db(db)
+,_collection(collection)
 ,_c4doc(c4doc)
 ,_mutable(isMutable)
 {
@@ -63,10 +64,19 @@ CBLDocument::~CBLDocument() {
 }
 
 
+#pragma mark - PROPERTIES:
+
+
+CBLDatabase* _cbl_nullable CBLDocument::database() const {
+    // Could throw kC4ErrorNotOpen if the collection is deleted, or database is closed.
+    return _collection ? _collection->database() : nullptr;
+}
+
+
 #pragma mark - SAVING:
 
 
-bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
+bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt) {
     Retained<C4Document> orignalDoc = nullptr, savingDoc = nullptr;
     bool success = false, retrying = false;
     
@@ -74,14 +84,15 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
         bool handleConflictNeeded = false;
         RetainedConst<CBLDocument> conflictingDoc = nullptr;
         
-        db->useLocked([&](C4Database *c4db) {
+        // Note: shared lock b/w database and collection
+        collection->database()->useLocked([&](C4Database* c4db) {
             C4Database::Transaction t(c4db);
             
             auto c4doc = _c4doc.useLocked();
             
             if (!retrying) {
                 // validate the precondition :
-                // 1. The document should be in the same database it was passed to the method.
+                // 1. The document should be in the same collection it was passed to the method.
                 // 2. The document should be mutable.
                 // 3. The document should exist when deleting.
                 if (opt.deleting) {
@@ -90,7 +101,7 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
                 } else {
                     checkMutable();
                 }
-                checkDBMatches(_db, db);
+                checkCollectionMatches(_collection, collection);
                 
                 orignalDoc = c4doc.get();
                 savingDoc = orignalDoc;
@@ -102,7 +113,7 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
             alloc_slice body;
             C4RevisionFlags revFlags;
             if (!opt.deleting) {
-                body = encodeBody(db, c4db, false, revFlags);
+                body = encodeBody(collection->database(), c4db, false, revFlags);
             } else {
                 revFlags = kRevDeleted;
             }
@@ -122,7 +133,7 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
                 rq.revFlags = revFlags;
                 rq.save = true;
                 C4Error c4err;
-                newDoc = c4db->putDocument(rq, nullptr, &c4err);
+                newDoc = collection->c4col()->putDocument(rq, nullptr, &c4err);
                 if (!newDoc && c4err != C4Error{LiteCoreDomain, kC4ErrorConflict})
                     C4Error::raise(c4err);
             }
@@ -130,7 +141,7 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
             if (newDoc) {
                 // Success:
                 t.commit();
-                _db = db;
+                _collection = collection;
                 // HACK: Replace the inner reference of the c4doc with the one from newDoc.
                 c4doc.get() = move(newDoc);
                 _revID = c4doc->selectedRev().revID;
@@ -139,12 +150,12 @@ bool CBLDocument::save(CBLDatabase* db, const SaveOptions &opt) {
                 // Conflict:
                 if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
                     // Last-write-wins; load current revision and retry:
-                    savingDoc = c4db->getDocument(_docID, true, kDocGetCurrentRev);
+                    savingDoc = collection->c4col()->getDocument(_docID, true, kDocGetCurrentRev);
                     retrying = true;
                 } else if (opt.conflictHandler) {
                     // Get the conflicting doc used when calling the conflict handler.
                     // The call to the conflict handler will be done outside the database's lock.
-                    conflictingDoc = db->getDocument(_docID, true);
+                    conflictingDoc = collection->getDocument(_docID, true);
                     handleConflictNeeded = true;
                 }
             }
@@ -210,7 +221,8 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cb
     // Remote Revision always win so that the resolved revision will not conflict with the remote:
     slice winner(c4doc->selectedRev().revID), loser(c4doc->revID());
     
-    return _db->useLocked<bool>([&](C4Database *c4db) {
+    // Note: shared lock b/w database and collection
+    return _collection->database()->useLocked<bool>([&](C4Database *c4db) {
         C4Database::Transaction t(c4db);
 
         alloc_slice mergeBody;
@@ -220,7 +232,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cb
         // is true, the remote revision will be kept as is and the losing branch will be pruned.
         if (resolution != Resolution::useRemote) {
             if (resolveDoc) {
-                mergeBody = resolveDoc->encodeBody(_db, c4db, true, mergeFlags);
+                mergeBody = resolveDoc->encodeBody(_collection->database(), c4db, true, mergeFlags);
             } else {
                 mergeBody = alloc_slice(size_t(0));
                 mergeFlags = kRevDeleted;
@@ -291,9 +303,14 @@ CBLBlob* CBLDocument::getBlob(FLDict dict, const C4BlobKey &key) {
     // Verify it's either a blob or an old-style attachment:
     if (!C4Blob::isBlob(dict) && !C4Blob::isAttachmentIn(dict, properties()))
         return nullptr;
+    
+    // If database is null, return null:
+    auto db = database();
+    if (!db)
+        return nullptr;
 
     // Create a new CBLBlob and remember it:
-    auto blob = retained(new CBLBlob(database(), dict, key));
+    auto blob = retained(new CBLBlob(db, dict, key));
     _blobs.insert({dict, blob});
     return blob;
 }

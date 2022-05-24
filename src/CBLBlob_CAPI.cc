@@ -142,7 +142,9 @@ bool FLDict_IsBlob(FLDict dict) noexcept {
 }
 
 const CBLBlob* FLDict_GetBlob(FLDict blobDict) noexcept {
-    return CBLBlob::getBlob(blobDict);
+    try {
+        return CBLBlob::getBlob(blobDict);
+    } catchAndWarn();
 }
 
 void FLSlot_SetBlob(FLSlot slot, CBLBlob* blob) noexcept
