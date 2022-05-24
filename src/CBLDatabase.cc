@@ -203,11 +203,9 @@ bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
 CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) {
     auto db = _c4db.useLocked();
     
-    if (_defaultCollection) {
-        if (_defaultCollection &&
-            !db->hasCollection({kC4DefaultCollectionName, kC4DefaultScopeID})) {
-            _defaultCollection = nullptr;
-        }
+    if (_defaultCollection &&
+        !db->hasCollection({kC4DefaultCollectionName, kC4DefaultScopeID})) {
+        _defaultCollection = nullptr;
     }
     
     if (!_defaultCollection && mustExist) {
