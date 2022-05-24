@@ -48,10 +48,6 @@ public:
     
 };
 
-TEST_CASE_METHOD(CollectionTest, "Default Scope and Collection Name Constant", "[Collection]") {
-    CHECK(kCBLDefaultCollectionName == "_default"_sl);
-    CHECK(kCBLDefaultScopeName == "_default"_sl);
-}
 
 TEST_CASE_METHOD(CollectionTest, "Default Collection", "[Collection]") {
     CBLCollection* col = CBLDatabase_DefaultCollection(db);
