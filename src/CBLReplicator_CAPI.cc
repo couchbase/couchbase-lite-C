@@ -94,6 +94,25 @@ bool CBLReplicator_IsDocumentPending(CBLReplicator *repl, FLString docID, CBLErr
     } catchAndBridge(outError)
 }
 
+FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator* repl,
+                                                       const CBLCollection* collection,
+                                                       CBLError* _cbl_nullable outError) noexcept {
+    if (outError) {
+        *outError = {kCBLDomain, kCBLErrorUnimplemented};
+    }
+    return nullptr;
+}
+
+bool CBLReplicator_IsDocumentPending2(CBLReplicator *repl,
+                                      FLString docID,
+                                      const CBLCollection* collection,
+                                      CBLError* _cbl_nullable outError) noexcept {
+    if (outError) {
+        *outError = {kCBLDomain, kCBLErrorUnimplemented};
+    }
+    return false;
+}
+
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* repl,
                                                   CBLReplicatorChangeListener listener,
                                                   void *context) noexcept
