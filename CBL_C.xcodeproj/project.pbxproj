@@ -103,8 +103,8 @@
 		FC5FBBA62821B3450066157F /* CBLCollection_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = FC5FBBA42821B3450066157F /* CBLCollection_Internal.hh */; };
 		FC5FBBB52821CC2E0066157F /* CBLCollection_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */; };
 		FC5FBBB72821E4970066157F /* CBLDatabase_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */; };
-		FCD8298C283591D4004AA814 /* CollectionTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FCD8298B283591D4004AA814 /* CollectionTest.cpp */; };
-		FCD8298D283591D4004AA814 /* CollectionTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FCD8298B283591D4004AA814 /* CollectionTest.cpp */; };
+		FCD8298C283591D4004AA814 /* CollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCD8298B283591D4004AA814 /* CollectionTest.cc */; };
+		FCD8298D283591D4004AA814 /* CollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCD8298B283591D4004AA814 /* CollectionTest.cc */; };
 		FCD8299D2835AC3F004AA814 /* CBLScope_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */; };
 		FCD829B32835EE39004AA814 /* CBLScope_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCD829B22835EE39004AA814 /* CBLScope_CAPI.cc */; };
 		FCD988BB2821B10300512BBD /* CBLCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = FCD988AD2821B0F500512BBD /* CBLCollection.h */; };
@@ -395,7 +395,7 @@
 		FC5FBBA32821B3450066157F /* CBLCollection.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection.cc; sourceTree = "<group>"; };
 		FC5FBBA42821B3450066157F /* CBLCollection_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLCollection_Internal.hh; sourceTree = "<group>"; };
 		FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection_CAPI.cc; sourceTree = "<group>"; };
-		FCD8298B283591D4004AA814 /* CollectionTest.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CollectionTest.cpp; sourceTree = "<group>"; };
+		FCD8298B283591D4004AA814 /* CollectionTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CollectionTest.cc; sourceTree = "<group>"; };
 		FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLScope_Internal.hh; sourceTree = "<group>"; };
 		FCD829B12835ECE0004AA814 /* CBLScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLScope.h; sourceTree = "<group>"; };
 		FCD829B22835EE39004AA814 /* CBLScope_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLScope_CAPI.cc; sourceTree = "<group>"; };
@@ -620,7 +620,7 @@
 				275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */,
 				93C70D3326D01B5A0093E927 /* BlobTest.cc */,
 				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
-				FCD8298B283591D4004AA814 /* CollectionTest.cpp */,
+				FCD8298B283591D4004AA814 /* CollectionTest.cc */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				93E490C326BDE10F0091B587 /* DatabaseTest_Android.cc */,
 				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
@@ -1234,7 +1234,7 @@
 				27DBD095246C9573002FD7A7 /* LibC++Debug.cc in Sources */,
 				275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */,
 				275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */,
-				FCD8298D283591D4004AA814 /* CollectionTest.cpp in Sources */,
+				FCD8298D283591D4004AA814 /* CollectionTest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1261,7 +1261,7 @@
 				275B3594234BDB2700FE9CF0 /* CBLTestsMain.cpp in Sources */,
 				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
-				FCD8298C283591D4004AA814 /* CollectionTest.cpp in Sources */,
+				FCD8298C283591D4004AA814 /* CollectionTest.cc in Sources */,
 				93C70D3426D01B5A0093E927 /* BlobTest.cc in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,

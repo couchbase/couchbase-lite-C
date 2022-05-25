@@ -252,4 +252,3 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[Collection][.CBL-3142]")
     CHECK(CBLCollection_Name(col) == "colA"_sl);
     CHECK(CBLCollection_Count(col) == 0);
 }
-
