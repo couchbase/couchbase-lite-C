@@ -71,6 +71,11 @@ public:
         // One-time initialization of network transport:
         static once_flag once;
         call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
+        
+        if (_conf.collections) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnimplemented,
+                           "The collections configuration has not been implemented yet.");
+        }
 
         // Set up the LiteCore replicator parameters:
         _conf.validate();

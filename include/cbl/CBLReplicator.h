@@ -151,7 +151,8 @@ typedef struct {
 
 #ifdef COUCHBASE_ENTERPRISE
 
-/** Callback that encrypts \ref CBLEncryptable properties in documents pushed by the replicator.
+/** Callback that encrypts \ref CBLEncryptable properties in documents of the default collection,
+    pushed by the replicator.
     \note   If a null \ref FLSliceResult or an error is returned, the document will be failed to
             replicate with the \ref kCBLErrorCrypto error when. For security reason, the encryption
             cannot be skipped. */
@@ -166,7 +167,8 @@ typedef FLSliceResult (*CBLPropertyEncryptor) (
     CBLError* error             ///< On return: error (Optional)
 );
 
-/** Callback that decrypts encrypted \ref CBLEncryptable properties in documents pulled by the replicator.
+/** Callback that decrypts encrypted \ref CBLEncryptable properties in documents of the default collection,
+    pulled by the replicator.
     \note   The decryption will be skipped (the encrypted data will be kept) when a null \ref FLSliceResult
             without an error is returned. If an error is returned, the document will be failed to replicate
             with the \ref kCBLErrorCrypto error. */
@@ -181,14 +183,61 @@ typedef FLSliceResult (*CBLPropertyDecryptor) (
     CBLError* error             ///< On return: error (Optional)
 );
 
+/** Callback that encrypts \ref CBLEncryptable properties in documents pushed by the replicator.
+    \note   If a null \ref FLSliceResult or an error is returned, the document will be failed to
+            replicate with the \ref kCBLErrorCrypto error when. For security reason, the encryption
+            cannot be skipped. */
+typedef FLSliceResult (*CBLDocumentPropertyEncryptor) (
+    void* context,              ///< Replicator’s context
+    FLString scope,             ///<Scope's name of the collection
+    FLString collection,        ///<Collection's name
+    FLString documentID,        ///< Document ID
+    FLDict properties,          ///< Document properties
+    FLString keyPath,           ///< Key path of the property to be encrypted
+    FLSlice input,              ///< Property data to be encrypted
+    FLStringResult* algorithm,  ///< On return: algorithm name (Optional: Default Value is 'CB_MOBILE_CUSTOM')
+    FLStringResult* kid,        ///< On return: encryption key identifier (Optional)
+    CBLError* error             ///< On return: error (Optional)
+);
+
+/** Callback that decrypts encrypted \ref CBLEncryptable properties in documents pulled by the replicator.
+    \note   The decryption will be skipped (the encrypted data will be kept) when a null \ref FLSliceResult
+            without an error is returned. If an error is returned, the document will be failed to replicate
+            with the \ref kCBLErrorCrypto error. */
+typedef FLSliceResult (*CBLDocumentPropertyDecryptor) (
+    void* context,              ///< Replicator’s context
+    FLString scope,             ///<Scope's name of the collection
+    FLString collection,        ///<Collection's name
+    FLString documentID,        ///< Document ID
+    FLDict properties,          ///< Document properties
+    FLString keyPath,           ///< Key path of the property to be decrypted
+    FLSlice input,              ///< Property data to be decrypted
+    FLString algorithm,         ///< Algorithm name
+    FLString kid,               ///< Encryption key identifier specified when encryting the value
+    CBLError* error             ///< On return: error (Optional)
+);
+
 #endif
+
+/** The collection and the configuration that can be configured specifically for the replication. */
+typedef struct {
+    CBLCollection* collection;                          ///< The collection.
+    
+    CBLConflictResolver _cbl_nullable conflictResolver; ///< Optional conflict-resolver callback
+    
+    CBLReplicationFilter _cbl_nullable pushFilter;      ///< Optional callback to filter which docs are pushed
+    CBLReplicationFilter _cbl_nullable pullFilter;      ///< Optional callback to validate incoming docs
+    
+    FLArray _cbl_nullable channels;                     ///< Optional set of channels to pull from
+    FLArray _cbl_nullable documentIDs;                  ///< Optional set of document IDs to replicate
+} CBLReplicationCollection;
 
 /** The configuration of a replicator. */
 typedef struct {
-    CBLDatabase* database;              ///< The database to replicate
-    CBLEndpoint* endpoint;              ///< The address of the other database to replicate with
-    CBLReplicatorType replicatorType;   ///< Push, pull or both
-    bool continuous;                    ///< Continuous replication?
+    CBLDatabase* database;                  ///< The database to replicate
+    CBLEndpoint* endpoint;                  ///< The address of the other database to replicate with
+    CBLReplicatorType replicatorType;       ///< Push, pull or both
+    bool continuous;                        ///< Continuous replication?
     //-- Auto Purge:
     /**
     If auto purge is active, then the library will automatically purge any documents that the replicating
@@ -226,10 +275,15 @@ typedef struct {
     
 #ifdef COUCHBASE_ENTERPRISE
     //-- Property Encryption
-    CBLPropertyEncryptor propertyEncryptor;           ///< Optional callback to encrypt \ref CBLEncryptable values.
-    CBLPropertyDecryptor propertyDecryptor;           ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
+    CBLPropertyEncryptor propertyEncryptor;           ///< Optional callback to encrypt \ref CBLEncryptable values of the documents in the default collection. If the default collection is not part of the replication, the replicator will fail to create with an error.
+    CBLPropertyDecryptor propertyDecryptor;           ///< Optional callback to decrypt encrypted \ref CBLEncryptable values of the documents in the default collection. If the default collection is not part of the replication, the replicator will fail to create with an error.
+    
+    CBLDocumentPropertyEncryptor documentPropertyEncryptor;   ///< Optional callback to encrypt \ref CBLEncryptable values.
+    CBLDocumentPropertyDecryptor documentPropertyDecryptor;   ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
 #endif
-
+    
+    CBLReplicationCollection* collections;  ///< The collections to replicate with the target's endpoint
+    size_t collectionCount;                 ///< The number of collections
 } CBLReplicatorConfiguration;
 
 
@@ -282,7 +336,6 @@ void CBLReplicator_SetSuspended(CBLReplicator* repl, bool suspended) CBLAPI;
 /** @} */
 
 
-
 /** \name  Status and Progress
     @{
  */
@@ -301,7 +354,7 @@ typedef CBL_ENUM(uint8_t, CBLReplicatorActivityLevel) {
     accurate would require slowing down the replicator and incurring more load on the server.
     It's fine to use in a progress bar, though. */
 typedef struct {
-    float complete;             /// Very-approximate fractional completion, from 0.0 to 1.0
+    float complete;             ///<Very-approximate fractional completion, from 0.0 to 1.0
     uint64_t documentCount;     ///< Number of documents transferred so far
 } CBLReplicatorProgress;
 
@@ -315,35 +368,62 @@ typedef struct {
 /** Returns the replicator's current status. */
 CBLReplicatorStatus CBLReplicator_Status(CBLReplicator*) CBLAPI;
 
-/** Indicates which documents have local changes that have not yet been pushed to the server
-    by this replicator. This is of course a snapshot, that will go out of date as the replicator
-    makes progress and/or documents are saved locally.
+/** Indicates which documents in the default collection have local changes that have not yet
+    been pushed to the server by this replicator. This is of course a snapshot, that will
+    go out of date as the replicator makes progress and/or documents are saved locally.
 
     The result is, effectively, a set of document IDs: a dictionary whose keys are the IDs and
     values are `true`.
     If there are no pending documents, the dictionary is empty.
     On error, NULL is returned.
 
-    \note  This function can be called on a stopped or un-started replicator.
-    \note  Documents that would never be pushed by this replicator, due to its configuration's
+    @note  This function can be called on a stopped or un-started replicator.
+    @note  Documents that would never be pushed by this replicator, due to its configuration's
            `pushFilter` or `docIDs`, are ignored.
-    \warning  You are responsible for releasing the returned array via \ref FLValue_Release. */
+    @warning  You are responsible for releasing the returned array via \ref FLValue_Release.
+    @warning  If the default collection is not part of the replication, a NULL with an error will be returned. */
 _cbl_warn_unused
-FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs(CBLReplicator*,
-                                                      CBLError* _cbl_nullable outError) CBLAPI;
+FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs(CBLReplicator*, CBLError* _cbl_nullable outError) CBLAPI;
 
-/** Indicates whether the document with the given ID has local changes that have not yet been
-    pushed to the server by this replicator.
+/** Indicates whether the document in the default with the given ID has local changes that
+    have not yet been pushed to the server by this replicator.
 
     This is equivalent to, but faster than, calling \ref CBLReplicator_PendingDocumentIDs and
     checking whether the result contains \p docID. See that function's documentation for details.
 
-    \note  A `false` result means the document is not pending, _or_ there was an error.
-           To tell the difference, compare the error code to zero. */
+    @note  A `false` result means the document is not pending, _or_ there was an error.
+           To tell the difference, compare the error code to zero.
+    @warning  If the default collection is not part of the replication, a NULL with an error will be returned. */
 bool CBLReplicator_IsDocumentPending(CBLReplicator *repl,
                                      FLString docID,
                                      CBLError* _cbl_nullable outError) CBLAPI;
 
+/** Indicates which documents in the given collection have local changes that have not yet been
+    pushed to the server by this replicator. This is of course a snapshot, that will go out of date
+    as the replicator makes progress and/or documents are saved locally.
+    
+    The result is, effectively, a set of document IDs: a dictionary whose keys are the IDs and
+    values are `true`.
+    If there are no pending documents, the dictionary is empty.
+    On error, NULL is returned.
+    @warning  If the given collection is not part of the replication, a NULL with an error will be returned. */
+FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator*,
+                                                       const CBLCollection* collection,
+                                                       CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Indicates whether the document with the given ID in the given collection has local changes
+    that have not yet been pushed to the server by this replicator.
+ 
+    This is equivalent to, but faster than, calling \ref CBLReplicator_PendingDocumentIDs2 and
+    checking whether the result contains \p docID. See that function's documentation for details.
+
+    @note  A `false` result means the document is not pending, _or_ there was an error.
+        To tell the difference, compare the error code to zero.
+    @warning  If the given collection is not part of the replication, a NULL with an error will be returned. */
+bool CBLReplicator_IsDocumentPending2(CBLReplicator *repl,
+                                      FLString docID,
+                                      const CBLCollection* collection,
+                                      CBLError* _cbl_nullable outError) CBLAPI;
 
 /** A callback that notifies you when the replicator's status changes.
     @warning  This callback will be called on a background thread managed by the replicator.
@@ -365,9 +445,11 @@ CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator*,
 
 /** Information about a document that's been pushed or pulled. */
 typedef struct {
-    FLString ID;                ///< The document ID
-    CBLDocumentFlags flags;     ///< Indicates whether the document was deleted or removed
+    FLString ID;                ///< The document ID.
+    CBLDocumentFlags flags;     ///< Indicates whether the document was deleted or removed.
     CBLError error;             ///< If the code is nonzero, the document failed to replicate.
+    FLString scope;             ///<The scope name of the collection
+    FLString collection;        ///<The collection name.
 } CBLReplicatedDocument;
 
 /** A callback that notifies you when documents are replicated.
