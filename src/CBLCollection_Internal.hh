@@ -32,31 +32,21 @@ public:
 #pragma mark - CONSTRUCTORS:
     
     CBLCollection(C4Collection* c4col, CBLDatabase* database)
-    :_database(database)
-    ,_c4col(c4col)
+    :_c4col(c4col, database)
     {
-        // Note: To avoid the case of not being able to get the scope object when
-        // the collection is invalid. Get the scope right away.
-        _scope = _database->getScope(_c4col->getScope());
+        _name = c4col->getName();
+        _scope = database->getScope(c4col->getScope());
     }
     
 #pragma mark - ACCESSORS:
     
     CBLScope* scope() noexcept              {return _scope;}
-    slice name() const noexcept             {return _c4col->getName();}
-    bool isValid() const noexcept           {return _c4col->isValid();}
-    uint64_t count() const                  {return _c4col->getDocumentCount();}
+    slice name() const noexcept             {return _name;}
+    bool isValid() const                    {return _c4col.useLocked()->isValid();}
+    uint64_t count() const                  {return _c4col.useLocked()->getDocumentCount();}
     
-    // Return the database or throw if the database is released or the collection is invalid
-    CBLDatabase* database() const {
-        // Note: checking isValid() alone is not enough as c4db may not be necessary
-        // to be releaed when the CBLDatabase is release.
-        if (!_database || !isValid()) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
-                           "Invalid collection: either deleted, or db closed");
-        }
-        return _database;
-    }
+    /** Throw NotOpen if the collection or database is invalid */
+    CBLDatabase* database() const           {return _c4col.database();}
     
 #pragma mark - DOCUMENTS:
     
@@ -75,9 +65,9 @@ public:
     }
     
     bool deleteDocument(slice docID) {
-        auto c4db = database()->useLocked();
-        C4Database::Transaction t(c4db);
-        Retained<C4Document> c4doc = _c4col->getDocument(docID, false, kDocGetCurrentRev);
+        auto c4col = _c4col.useLocked();
+        C4Database::Transaction t(c4col->getDatabase());
+        Retained<C4Document> c4doc = c4col->getDocument(docID, false, kDocGetCurrentRev);
         if (c4doc)
             c4doc = c4doc->update(fleece::nullslice, kRevDeleted);
         if (!c4doc)
@@ -87,28 +77,24 @@ public:
     }
     
     bool purgeDocument(slice docID) {
-        auto lock = database()->useLocked();
-        return _c4col->purgeDocument(docID);
+        return _c4col.useLocked()->purgeDocument(docID);
     }
     
     CBLTimestamp getDocumentExpiration(slice docID) {
-        auto lock = database()->useLocked();
-        return static_cast<CBLTimestamp>(_c4col->getExpiration(docID));
+        return static_cast<CBLTimestamp>(_c4col.useLocked()->getExpiration(docID));
     }
 
     void setDocumentExpiration(slice docID, CBLTimestamp expiration) {
-        auto lock = database()->useLocked();
-        _c4col->setExpiration(docID, C4Timestamp(expiration));
+        _c4col.useLocked()->setExpiration(docID, C4Timestamp(expiration));
     }
     
 #pragma mark - INDEXES:
     
     void createValueIndex(slice name, CBLValueIndexConfiguration config) {
         C4IndexOptions options = {};
-        auto lock = database()->useLocked();
-        _c4col->createIndex(name, config.expressions,
-                            (C4QueryLanguage)config.expressionLanguage,
-                            kC4ValueIndex, &options);
+        _c4col.useLocked()->createIndex(name, config.expressions,
+                                        (C4QueryLanguage)config.expressionLanguage,
+                                        kC4ValueIndex, &options);
     }
     
     void createFullTextIndex(slice name, CBLFullTextIndexConfiguration config) {
@@ -121,20 +107,17 @@ public:
             options.language = languageStr.c_str();
         }
         
-        auto lock = database()->useLocked();
-        _c4col->createIndex(name, config.expressions,
-                            (C4QueryLanguage)config.expressionLanguage,
-                            kC4FullTextIndex, &options);
+        _c4col.useLocked()->createIndex(name, config.expressions,
+                                        (C4QueryLanguage)config.expressionLanguage,
+                                        kC4FullTextIndex, &options);
     }
 
     void deleteIndex(slice name) {
-        auto lock = database()->useLocked();
-        _c4col->deleteIndex(name);
+        _c4col.useLocked()->deleteIndex(name);
     }
 
     fleece::MutableArray indexNames() {
-        auto lock = database()->useLocked();
-        Doc doc(_c4col->getIndexesInfo());
+        Doc doc(_c4col.useLocked()->getIndexesInfo());
         auto indexes = fleece::MutableArray::newArray();
         for (Array::iterator i(doc.root().asArray()); i; ++i) {
             Dict info = i.value().asDict();
@@ -162,12 +145,15 @@ protected:
     friend class cbl_internal::AllConflictsResolver;
     friend struct cbl_internal::ListenerToken<CBLCollectionDocumentChangeListener>;
     
-    Retained<C4Collection>& c4col()                 {return _c4col;}
+    auto useLocked()                        { return _c4col.useLocked(); }
+    template <class LAMBDA>
+    void useLocked(LAMBDA callback)         { _c4col.useLocked(callback); }
+    template <class RESULT, class LAMBDA>
+    RESULT useLocked(LAMBDA callback)       { return _c4col.useLocked<RESULT>(callback); }
     
-    /** Called by the database to invalidate the _database pointer when the database is released. */
+    /** Called by the database when the database is released. */
     void close() {
-        auto lock = database()->useLocked();
-        _database = nullptr;
+        _c4col.close(); // This will invalidate the database pointer in the access lock
     }
     
 private:
@@ -176,8 +162,7 @@ private:
         C4DocContentLevel content = (allRevisions ? kDocGetAll : kDocGetCurrentRev);
         Retained<C4Document> c4doc = nullptr;
         try {
-            auto lock = database()->useLocked();
-            c4doc = _c4col->getDocument(docID, true, content);
+            c4doc = _c4col.useLocked()->getDocument(docID, true, content);
         } catch (litecore::error& e) {
             if (e == litecore::error::BadDocID) {
                 CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
@@ -194,17 +179,23 @@ private:
 #pragma mark - LISTENERS:
     
     Retained<CBLListenerToken> addListener(fleece::function_ref<Retained<CBLListenerToken>()> cb) {
-        auto lock = database()->useLocked();
         Retained<CBLListenerToken> token = cb();
         if (!_observer)
-            _observer = _c4col->observe([this](C4CollectionObserver*) { this->collectionChanged(); });
+            _observer = _c4col.useLocked()->observe([this](C4CollectionObserver*) {
+                this->collectionChanged();
+            });
         return token;
     }
     
     void collectionChanged() {
+        Retained<CBLDatabase> db;
         try {
-            database()->notify(std::bind(&CBLCollection::callCollectionChangeListeners, this));
+            db = database();
         } catch (...) { }
+        
+        if (db) {
+            db->notify(std::bind(&CBLCollection::callCollectionChangeListeners, this));
+        }
     }
 
     void callCollectionChangeListeners() {
@@ -230,13 +221,53 @@ private:
         }
     }
     
-    CBLDatabase* _cbl_nullable                          _database; // Not retain to prevent retain cycle
-    Retained<C4Collection>                              _c4col;
-    Retained<CBLScope>                                  _scope;
+#pragma mark - SHARED ACCESS LOCK :
     
-    std::unique_ptr<C4CollectionObserver>               _observer;
-    Listeners<CBLCollectionChangeListener>              _listeners;
-    Listeners<CBLCollectionDocumentChangeListener>      _docListeners;
+    /** For safely accessing the c4collection and CBLDatabase pointer with the shared mutex with CBLDatabase's c4db access lock.
+        @Note  Subclass for setting up the sentry for throwing NotOpen exception when the c4collection becomes invalid.
+        @Note  Retain the shared_ptr of the CBLDatabase's c4db access lock to maintain the life time of the mutex
+     */
+    class C4CollectionAccessLock: public litecore::shared_access_lock<Retained<C4Collection>> {
+    public:
+        C4CollectionAccessLock(C4Collection* c4col, CBLDatabase* database)
+        :shared_access_lock(std::move(c4col), *database->c4db())
+        ,_c4db(database->c4db())
+        ,_db(database)
+        {
+            _sentry = [this](C4Collection* c4col) {
+                if (!_db || !c4col->isValid()) {
+                    C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
+                                   "Invalid collection: either deleted, or db closed");
+                }
+            };
+        }
+        
+        CBLDatabase* database() const {
+            auto lock = useLocked();
+            return _db;
+        }
+        
+        /** Invalidate the database pointer */
+        void close() {
+            auto lock = useLocked();
+            _db = nullptr;
+        }
+        
+    private:
+        CBLDatabase::SharedC4DatabaseAccessLock _c4db;  // For retaining the shared lock
+        CBLDatabase* _cbl_nullable              _db;
+    };
+    
+#pragma mark - VARIABLES :
+    
+    C4CollectionAccessLock                                  _c4col;     // Shared lock with _c4db
+    
+    alloc_slice                                             _name;
+    Retained<CBLScope>                                      _scope;
+    
+    std::unique_ptr<C4CollectionObserver>                   _observer;
+    Listeners<CBLCollectionChangeListener>                  _listeners;
+    Listeners<CBLCollectionDocumentChangeListener>          _docListeners;
 };
 
 CBL_ASSUME_NONNULL_END

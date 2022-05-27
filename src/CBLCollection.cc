@@ -33,20 +33,19 @@ namespace cbl_internal {
         ,_collection(collection)
         ,_docID(docID)
         {
-            auto lock = _collection->database()->useLocked();
-            _c4obs = _collection->c4col()->observeDocument (docID, [this](C4DocumentObserver*,
-                                                                          slice docID,
-                                                                          C4SequenceNumber) {
+            _c4obs = _collection->useLocked()->observeDocument(docID, [this](C4DocumentObserver*,
+                                                                             slice docID,
+                                                                             C4SequenceNumber) {
                 this->docChanged();
             });
         }
         
         ~ListenerToken() {
             try {
-                auto lock = _collection->database()->useLocked();
+                auto lock = _collection->useLocked();
                 _c4obs = nullptr;
             } catch (...) {
-                // Collection is deleted or database is closed:
+                // Collection is deleted or database is released:
                 _c4obs = nullptr;
             }
         }
@@ -68,9 +67,15 @@ namespace cbl_internal {
             CBLDocumentChange change = {};
             change.collection = _collection;
             change.docID = _docID;
+            
+            Retained<CBLDatabase> db;
             try {
-                _collection->database()->notify(this, change);
+                db = _collection->database();
             } catch (...) { }
+            
+            if (db) {
+                db->notify(this, change);
+            }
         }
         
         Retained<CBLCollection> _collection;

@@ -79,16 +79,17 @@ bool CBLEncryptionKey_FromPasswordOld(CBLEncryptionKey *key, FLString password) 
 
 
 CBLDatabase::CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
-:_c4db(std::move(db))
-,_dir(dir_)
+:_dir(dir_)
 ,_notificationQueue(this)
 {
+    _c4db = std::make_shared<litecore::access_lock<Retained<C4Database>>>(std::move(db));
+    
     _defaultCollection = getCollection(kC4DefaultCollectionName, kC4DefaultScopeID);
 }
 
 
 CBLDatabase::~CBLDatabase() {
-    _c4db.useLocked([&](Retained<C4Database> &c4db) {
+    _c4db->useLocked([&](Retained<C4Database> &c4db) {
         // Invalidate the database reference for both scopes and collections:
         for (auto& i : _scopes) {
             i.second->close();
@@ -108,7 +109,7 @@ CBLScope* CBLDatabase::getScope(slice scopeName) {
     if (!scopeName)
         scopeName = kC4DefaultScopeID;
     
-    auto c4db = _c4db.useLocked();
+    auto c4db = _c4db->useLocked();
     
     // TODO: change to use hasScope()
     bool exist = (scopeName == kC4DefaultScopeID); // Default scope always exist.
@@ -144,7 +145,7 @@ CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName)
     if (!scopeName)
         scopeName = kC4DefaultScopeID;
 
-    auto c4db = _c4db.useLocked();
+    auto c4db = _c4db->useLocked();
     
     CBLCollection* collection = nullptr;
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
@@ -174,7 +175,7 @@ CBLCollection* CBLDatabase::createCollection(slice collectionName, slice scopeNa
     if (!scopeName)
         scopeName = kC4DefaultScopeID;
     
-    auto c4db = _c4db.useLocked();
+    auto c4db = _c4db->useLocked();
     
     CBLCollection* col = getCollection(collectionName, scopeName);
     if (col) {
@@ -191,7 +192,7 @@ bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
     if (!scopeName)
         scopeName = kC4DefaultScopeID;
     
-    auto c4db = _c4db.useLocked();
+    auto c4db = _c4db->useLocked();
     
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
     c4db->deleteCollection(spec);
@@ -201,7 +202,7 @@ bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
 
 
 CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) {
-    auto db = _c4db.useLocked();
+    auto db = _c4db->useLocked();
     
     if (_defaultCollection &&
         !db->hasCollection({kC4DefaultCollectionName, kC4DefaultScopeID})) {
@@ -235,6 +236,7 @@ void CBLDatabase::removeCBLCollection(C4Database::CollectionSpec spec) const {
 #pragma mark - QUERY:
 
 
+
 Retained<CBLQuery> CBLDatabase::createQuery(CBLQueryLanguage language,
                                             slice queryString,
                                             int* _cbl_nullable outErrPos) const
@@ -244,10 +246,10 @@ Retained<CBLQuery> CBLDatabase::createQuery(CBLQueryLanguage language,
         json = convertJSON5(queryString); // allow JSON5 as a convenience
         queryString = json;
     }
-    auto c4query = _c4db.useLocked()->newQuery((C4QueryLanguage)language, queryString, outErrPos);
+    auto c4query = _c4db->useLocked()->newQuery((C4QueryLanguage)language, queryString, outErrPos);
     if (!c4query)
         return nullptr;
-    return new CBLQuery(this, std::move(c4query), _c4db);
+    return new CBLQuery(this, std::move(c4query), *_c4db);
 }
 
 

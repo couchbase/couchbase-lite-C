@@ -296,7 +296,7 @@ TEST_CASE_METHOD(CollectionTest, "Get Non Existing Collection", "[Collection]") 
     CHECK(col1 == nullptr);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[Collection][.CBL-3142]") {
+TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[.CBL-3142]") {
     CBLError error;
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
@@ -450,7 +450,7 @@ TEST_CASE_METHOD(CollectionTest, "Overflow Collection and Scope Names", "[Collec
     CHECK(error.code == kCBLErrorInvalidParameter);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Collection Name Case Sensitive", "[Collection][.3195]") {
+TEST_CASE_METHOD(CollectionTest, "Collection Name Case Sensitive", "[.CBL-3195]") {
     CBLError error;
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "COL1"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
@@ -465,7 +465,7 @@ TEST_CASE_METHOD(CollectionTest, "Collection Name Case Sensitive", "[Collection]
     FLMutableArray_Release(colNames);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[Collection][.CBL-3195]") {
+TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[.CBL-3195]") {
     CBLError error;
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "col1"_sl, "SCOPEA"_sl, &error);
     REQUIRE(col1a);
@@ -480,7 +480,7 @@ TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[Collection][.CBL
     FLMutableArray_Release(scopeNames);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB Instances", "[Collection][Current]") {
+TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB Instances", "[Collection]") {
     CBLError error;
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
@@ -524,7 +524,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Create Collection using Different 
     CBLDatabase_Release(db2);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB Instances", "[Collection][.CBL-3196]") {
+TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB Instances", "[.CBL-3196]") {
     CBLError error;
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
@@ -547,7 +547,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB I
     CBLDatabase_Release(db2);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Delete and Recreate then Get Collection from Different DB Instances", "[Collection][.CBL-3142][.CBL-3196]") {
+TEST_CASE_METHOD(CollectionTest, "Delete and Recreate then Get Collection from Different DB Instances", "[.CBL-3142][.CBL-3196]") {
     CBLError error;
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
@@ -608,7 +608,7 @@ TEST_CASE_METHOD(CollectionTest, "Close Database then Use Collection", "[Collect
     CBLCollection_Release(col);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Delete Database then Use Collection", "[Collection][Current]") {
+TEST_CASE_METHOD(CollectionTest, "Delete Database then Use Collection", "[Collection]") {
     CBLError error;
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);

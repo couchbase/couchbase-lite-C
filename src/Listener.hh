@@ -162,7 +162,7 @@ namespace cbl_internal {
     template <class LISTENER>
     class Listeners : private ListenersBase {
     public:
-        fleece::Retained<CBLListenerToken> add(LISTENER listener, void *context) {
+        fleece::Retained<CBLListenerToken> add(LISTENER listener, void* _cbl_nullable context) {
             auto t = new ListenerToken<LISTENER>(listener, context);
             add(t);
             return t;
