@@ -1,4 +1,6 @@
-if($env:CHANGE_TARGET) {
+if ($env:CHANGE_TARGET -eq "master") {
+    $env:BRANCH = "main"
+} else {
     $env:BRANCH = $env:CHANGE_TARGET
 }
 
@@ -6,7 +8,12 @@ Push-Location "$PSScriptRoot\.."
 try {
     & 'C:\Program Files\Git\bin\git.exe' submodule update --init --recursive
     Push-Location vendor
-    & 'C:\Program Files\Git\bin\git.exe' clone ssh://git@github.com/couchbase/couchbase-lite-core-EE --branch $env:BRANCH --recursive --depth 1 couchbase-lite-core-EE
+    & 'C:\Program Files\Git\bin\git.exe' clone ssh://git@github.com/couchbase/couchbase-lite-c-ee --branch $env:BRANCH_NAME --recursive --depth 1 couchbase-lite-c-ee
+    if($LASTEXITCODE -ne 0) {
+        & 'C:\Program Files\Git\bin\git.exe' clone ssh://git@github.com/couchbase/couchbase-lite-c-ee --branch $env:BRANCH --recursive --depth 1 couchbase-lite-c-ee
+    }
+    
+    Move-Item -Path .\couchbase-lite-c-ee\couchbase-lite-core-EE -Destination .
     Pop-Location
 
     New-Item -Type Directory -ErrorAction Ignore build
