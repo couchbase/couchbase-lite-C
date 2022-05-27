@@ -7,19 +7,22 @@ function build_xcode {
     xcodebuild -project CBL_C.xcodeproj -configuration Debug-EE -derivedDataPath ios -scheme "CBL_C Framework" -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO
 }
 
-
-if [ ! -z $CHANGE_TARGET ]; then
-    BRANCH=$CHANGE_TARGET
-fi
-
 if ! [ -x "$(command -v git)" ]; then
   echo 'Error: git is not installed.' >&2
   exit 1
 fi
 
+if [ $CHANGE_TARGET == "master" ]; then
+    BRANCH="main"
+else
+    BRANCH=$CHANGE_TARGET
+fi
+
 git submodule update --init --recursive
 pushd vendor
-git clone ssh://git@github.com/couchbase/couchbase-lite-core-EE --branch $BRANCH --recursive --depth 1 couchbase-lite-core-EE
+git clone ssh://git@github.com/couchbase/couchbase-lite-c-ee --branch $BRANCH_NAME --recursive --depth 1 couchbase-lite-c-ee || \
+    git clone ssh://git@github.com/couchbase/couchbase-lite-c-ee --branch $BRANCH --recursive --depth 1 couchbase-lite-c-ee
+mv couchbase-lite-c-ee/couchbase-lite-core-EE .
 popd
 
 unameOut="$(uname -s)"
