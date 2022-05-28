@@ -88,38 +88,38 @@ public:
     }
 
     void performMaintenance(CBLMaintenanceType type) {
-        _c4db.useLocked()->maintenance((C4MaintenanceType)type);
+        _c4db->useLocked()->maintenance((C4MaintenanceType)type);
     }
 
 #ifdef COUCHBASE_ENTERPRISE
     void changeEncryptionKey(const CBLEncryptionKey* _cbl_nullable newKey) {
         C4EncryptionKey c4key = asC4Key(newKey);
-        _c4db.useLocked()->rekey(&c4key);
+        _c4db->useLocked()->rekey(&c4key);
     }
 #endif
 
-    void beginTransaction()                          {_c4db.useLocked()->beginTransaction();}
-    void endTransaction(bool commit)                 {_c4db.useLocked()->endTransaction(commit);}
+    void beginTransaction()                          {_c4db->useLocked()->beginTransaction();}
+    void endTransaction(bool commit)                 {_c4db->useLocked()->endTransaction(commit);}
     
     void close() {
         stopActiveStoppables();
-        _c4db.useLocked()->close();
+        _c4db->useLocked()->close();
     }
     
     void closeAndDelete() {
         stopActiveStoppables();
-        _c4db.useLocked()->closeAndDeleteFile();
+        _c4db->useLocked()->closeAndDeleteFile();
     }
 
 
 #pragma mark - Accessors:
 
 
-    slice name() const noexcept                      {return _c4db.useLocked()->getName();}
-    alloc_slice path() const                         {return _c4db.useLocked()->getPath();}
+    slice name() const noexcept                      {return _c4db->useLocked()->getName();}
+    alloc_slice path() const                         {return _c4db->useLocked()->getPath();}
     
     CBLDatabaseConfiguration config() const noexcept {
-        auto &c4config = _c4db.useLocked()->getConfiguration();
+        auto &c4config = _c4db->useLocked()->getConfiguration();
 #ifdef COUCHBASE_ENTERPRISE
         return {c4config.parentDirectory, asCBLKey(c4config.encryptionKey)};
 #else
@@ -127,8 +127,8 @@ public:
 #endif
     }
 
-    uint64_t count() const                           {return _c4db.useLocked()->getDocumentCount();}
-    uint64_t lastSequence() const                    {return static_cast<uint64_t>(_c4db.useLocked()->getLastSequence());}
+    uint64_t count() const                           {return _c4db->useLocked()->getDocumentCount();}
+    uint64_t lastSequence() const                    {return static_cast<uint64_t>(_c4db->useLocked()->getLastSequence());}
 
     
 #pragma mark - Collections:
@@ -136,7 +136,7 @@ public:
     
     fleece::MutableArray scopeNames() const {
         auto names = FLMutableArray_New();
-        _c4db.useLocked()->forEachScope([&](slice scope) {
+        _c4db->useLocked()->forEachScope([&](slice scope) {
             FLMutableArray_AppendString(names, scope);
         });
         return names;
@@ -144,7 +144,7 @@ public:
     
     fleece::MutableArray collectionNames(slice scopeName) const {
         auto names = FLMutableArray_New();
-        _c4db.useLocked()->forEachCollection(scopeName, [&](C4CollectionSpec spec) {
+        _c4db->useLocked()->forEachCollection(scopeName, [&](C4CollectionSpec spec) {
             FLMutableArray_AppendString(names, spec.name);
         });
         return names;
@@ -216,8 +216,12 @@ protected:
     friend struct cbl_internal::ListenerToken<CBLDocumentChangeListener>;
     friend struct cbl_internal::ListenerToken<CBLQueryChangeListener>;
     friend struct cbl_internal::ListenerToken<CBLCollectionDocumentChangeListener>;
-
-    C4BlobStore* blobStore() const                   {return &_c4db.useLocked()->getBlobStore();}
+    
+    using SharedC4DatabaseAccessLock = std::shared_ptr<litecore::access_lock<Retained<C4Database>>>;
+    
+    SharedC4DatabaseAccessLock c4db() const         {return _c4db;}
+    
+    C4BlobStore* blobStore() const                   {return &(_c4db->useLocked()->getBlobStore());}
 
     template <class LISTENER, class... Args>
     void notify(ListenerToken<LISTENER>* _cbl_nonnull listener, Args... args) const {
@@ -229,11 +233,11 @@ protected:
 
     void notify(Notification n) const   {const_cast<CBLDatabase*>(this)->_notificationQueue.add(n);}
 
-    auto useLocked()                  { return _c4db.useLocked(); }
+    auto useLocked()                    {return _c4db->useLocked();}
     template <class LAMBDA>
-    void useLocked(LAMBDA callback)   { _c4db.useLocked(callback); }
+    void useLocked(LAMBDA callback)     {_c4db->useLocked(callback);}
     template <class RESULT, class LAMBDA>
-    RESULT useLocked(LAMBDA callback) { return _c4db.useLocked<RESULT>(callback); }
+    RESULT useLocked(LAMBDA callback)   {return _c4db->useLocked<RESULT>(callback);}
 
 private:
     
@@ -342,7 +346,8 @@ private:
     using ScopesMap = std::unordered_map<slice, Retained<CBLScope>>;
     using CollectionsMap = std::unordered_map<C4Database::CollectionSpec, Retained<CBLCollection>>;
     
-    litecore::access_lock<Retained<C4Database>> _c4db;
+    SharedC4DatabaseAccessLock                  _c4db;
+    
     alloc_slice const                           _dir;
     
     mutable ScopesMap                           _scopes;

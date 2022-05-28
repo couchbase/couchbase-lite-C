@@ -68,7 +68,7 @@ CBLDocument::~CBLDocument() {
 
 
 CBLDatabase* _cbl_nullable CBLDocument::database() const {
-    // Could throw kC4ErrorNotOpen if the collection is deleted, or database is closed.
+    // Could throw kC4ErrorNotOpen if the collection is deleted, or database is released.
     return _collection ? _collection->database() : nullptr;
 }
 
@@ -85,7 +85,8 @@ bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt) {
         RetainedConst<CBLDocument> conflictingDoc = nullptr;
         
         // Note: shared lock b/w database and collection
-        collection->database()->useLocked([&](C4Database* c4db) {
+        collection->useLocked([&](C4Collection* c4col) {
+            auto c4db = c4col->getDatabase();
             C4Database::Transaction t(c4db);
             
             auto c4doc = _c4doc.useLocked();
@@ -133,7 +134,7 @@ bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt) {
                 rq.revFlags = revFlags;
                 rq.save = true;
                 C4Error c4err;
-                newDoc = collection->c4col()->putDocument(rq, nullptr, &c4err);
+                newDoc = c4col->putDocument(rq, nullptr, &c4err);
                 if (!newDoc && c4err != C4Error{LiteCoreDomain, kC4ErrorConflict})
                     C4Error::raise(c4err);
             }
@@ -150,7 +151,7 @@ bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt) {
                 // Conflict:
                 if (opt.concurrency == kCBLConcurrencyControlLastWriteWins) {
                     // Last-write-wins; load current revision and retry:
-                    savingDoc = collection->c4col()->getDocument(_docID, true, kDocGetCurrentRev);
+                    savingDoc = c4col->getDocument(_docID, true, kDocGetCurrentRev);
                     retrying = true;
                 } else if (opt.conflictHandler) {
                     // Get the conflicting doc used when calling the conflict handler.
@@ -222,7 +223,8 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cb
     slice winner(c4doc->selectedRev().revID), loser(c4doc->revID());
     
     // Note: shared lock b/w database and collection
-    return _collection->database()->useLocked<bool>([&](C4Database *c4db) {
+    return _collection->useLocked<bool>([&](C4Collection *c4col) {
+        auto c4db = c4col->getDatabase();
         C4Database::Transaction t(c4db);
 
         alloc_slice mergeBody;
