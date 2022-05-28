@@ -191,7 +191,11 @@ private:
         Retained<CBLDatabase> db;
         try {
             db = database();
-        } catch (...) { }
+        } catch (...) {
+            C4Error error = C4Error::fromCurrentException();
+            CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
+                    "Collection changed notification failed: %s", error.description().c_str());
+        }
         
         if (db) {
             db->notify(std::bind(&CBLCollection::callCollectionChangeListeners, this));
