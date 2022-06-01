@@ -124,6 +124,7 @@ public:
         
         if (_conf.propertyEncryptor) {
             params.propertyEncryptor = [](void* ctx,
+                                          C4CollectionSpec spec,
                                           C4String documentID,
                                           FLDict properties,
                                           C4String keyPath,
@@ -139,6 +140,7 @@ public:
         
         if (_conf.propertyDecryptor) {
             params.propertyDecryptor = [](void* ctx,
+                                          C4CollectionSpec spec,
                                           C4String documentID,
                                           FLDict properties,
                                           C4String keyPath,
