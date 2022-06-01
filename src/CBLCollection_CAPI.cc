@@ -51,7 +51,7 @@ CBLCollection* CBLDatabase_Collection(const CBLDatabase* db,
                                       FLString scopeName) noexcept
 {
     try {
-        return db->getCollection(collectionName, scopeName);
+        return const_cast<CBLDatabase*>(db)->getCollection(collectionName, scopeName);
     } catchAndWarn()
 }
 
