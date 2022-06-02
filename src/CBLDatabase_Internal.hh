@@ -152,7 +152,7 @@ public:
     
     CBLScope* _cbl_nullable getScope(slice scopeName);
     
-    CBLCollection* _cbl_nullable getCollection(slice collectionName, slice scopeName) const;
+    CBLCollection* _cbl_nullable getCollection(slice collectionName, slice scopeName);
     
     CBLCollection* createCollection(slice collectionName, slice scopeName);
     
@@ -296,10 +296,10 @@ private:
     /**
      Create a CBLCollection from the C4Collection.
      The created CBLCollection will be retained and cached in the _collections map. */
-    CBLCollection* createCBLCollection(C4Collection* c4col) const;
+    CBLCollection* createCBLCollection(C4Collection* c4col);
     
     /** Remove and release the CBLCollection from the _collections map */
-    void removeCBLCollection(C4Database::CollectionSpec spec) const;
+    void removeCBLCollection(C4Database::CollectionSpec spec);
 
     void callDocListeners();
     

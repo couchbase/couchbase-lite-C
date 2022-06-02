@@ -111,29 +111,23 @@ CBLScope* CBLDatabase::getScope(slice scopeName) {
     
     auto c4db = _c4db->useLocked();
     
-    // TODO: change to use hasScope()
-    bool exist = (scopeName == kC4DefaultScopeID); // Default scope always exist.
-    if (!exist) {
-        c4db->forEachScope([&](slice scope) {
-            if (!exist && scopeName == scope)
-                exist = true;
-        });
-    }
-    
     CBLScope* scope = nullptr;
+    
+    bool exist = c4db->hasScope(scopeName);
     if (auto i = _scopes.find(scopeName); i != _scopes.end()) {
-        if (exist) {
-            scope = i->second.get();
-        } else {
+        if (!exist) {
             _scopes.erase(i);
+            return nullptr;
         }
+        scope = i->second.get();
     }
     
-    if (exist && !scope) {
+    if (!scope && exist) {
         auto retainedScope = make_retained<CBLScope>(scopeName, this);
         scope = retainedScope.get();
         _scopes.insert({scope->name(), move(retainedScope)});
     }
+    
     return scope;
 }
 
@@ -141,7 +135,7 @@ CBLScope* CBLDatabase::getScope(slice scopeName) {
 #pragma mark - COLLECTIONS:
 
 
-CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName) const {
+CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName) {
     if (!scopeName)
         scopeName = kC4DefaultScopeID;
 
@@ -218,7 +212,7 @@ CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) {
 }
 
 
-CBLCollection* CBLDatabase::createCBLCollection(C4Collection* c4col) const {
+CBLCollection* CBLDatabase::createCBLCollection(C4Collection* c4col) {
     auto retainedCollection = make_retained<CBLCollection>(c4col, const_cast<CBLDatabase*>(this));
     auto collection = retainedCollection.get();
     _collections.insert({C4Database::CollectionSpec(c4col->getSpec()), move(retainedCollection)});
@@ -226,7 +220,7 @@ CBLCollection* CBLDatabase::createCBLCollection(C4Collection* c4col) const {
 }
 
 
-void CBLDatabase::removeCBLCollection(C4Database::CollectionSpec spec) const {
+void CBLDatabase::removeCBLCollection(C4Database::CollectionSpec spec) {
     if (auto i = _collections.find(spec); i != _collections.end()) {
         _collections.erase(i);
     }
