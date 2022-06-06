@@ -73,8 +73,10 @@ FLString CBLScope_Name(const CBLScope* scope) CBLAPI;
 /** Returns the names of all collections in the scope.
     @note  You are responsible for releasing the returned array.
     @param scope  The scope.
-    @return  The names of all collections in the scope. */
-FLMutableArray CBLScope_CollectionNames(const CBLScope* scope) CBLAPI;
+    @param outError  On failure, the error will be written here.
+    @return  The names of all collections in the scope, or NULL if an error occurred. */
+FLMutableArray _cbl_nullable CBLScope_CollectionNames(const CBLScope* scope,
+                                                      CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns an existing collection in the scope with the given name.
     @note  CBLCollection is ref-counted and is owned by the database object, and it will remain
@@ -83,8 +85,11 @@ FLMutableArray CBLScope_CollectionNames(const CBLScope* scope) CBLAPI;
            the object needs to be retained, and it will remain valid until it is released.
     @param scope  The scope.
     @param collectionName  The name of the collection.
-    @return A \ref CBLCollection instance, or NULL if the collection doesn't exist. */
-CBLCollection* _cbl_nullable CBLScope_Collection(const CBLScope* scope, FLString collectionName) CBLAPI;
+    @param outError  On failure, the error will be written here.
+    @return A \ref CBLCollection instance, or NULL if the collection doesn't exist or an error occurred. */
+CBLCollection* _cbl_nullable CBLScope_Collection(const CBLScope* scope,
+                                                 FLString collectionName,
+                                                 CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 /** @} */    // end of outer \defgroup

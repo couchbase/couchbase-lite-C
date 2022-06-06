@@ -42,23 +42,27 @@ public:
     
     fleece::MutableArray collectionNames() const {
         LOCK(_mutex);
-        if (!_database) {
-            return fleece::MutableArray();
-        }
+        checkOpen();
         return _database->collectionNames(_name);
     }
     
     CBLCollection* _cbl_nullable getCollection(slice collectionName) const {
         LOCK(_mutex);
-        if (!_database) {
-            return nullptr;
-        }
+        checkOpen();
         return _database->getCollection(collectionName, _name);
     }
     
 protected:
     
     friend struct CBLDatabase;
+    
+    // Need to call under the _mutex lock
+    void checkOpen() const {
+        if (!_database) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
+                           "Invalid scope: db closed or deleted");
+        }
+    }
     
     void close() {
         LOCK(_mutex);

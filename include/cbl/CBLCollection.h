@@ -79,15 +79,20 @@ CBL_PUBLIC extern const FLString kCBLDefaultCollectionName;
     The default scope is exceptional in that it will always exists even there are no collections under it.
     @note  You are responsible for releasing the returned array.
     @param db  The database.
-    @return  The names of all existing scopes in the database */
-FLMutableArray CBLDatabase_ScopeNames(const CBLDatabase* db) CBLAPI;
+    @param outError  On failure, the error will be written here.
+    @return  The names of all existing scopes in the database, or NULL if an error occurred. */
+FLMutableArray _cbl_nullable CBLDatabase_ScopeNames(const CBLDatabase* db,
+                                                    CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the names of all collections in the scope.
     @note  You are responsible for releasing the returned array.
     @param db  The database.
     @param scopeName  The name of the scope.
-    @return  The names of all collections in the scope. */
-FLMutableArray CBLDatabase_CollectionNames(const CBLDatabase* db, FLString scopeName) CBLAPI;
+    @param outError  On failure, the error will be written here.
+    @return  The names of all collections in the scope, or NULL if an error occurred. */
+FLMutableArray _cbl_nullable CBLDatabase_CollectionNames(const CBLDatabase* db,
+                                                         FLString scopeName,
+                                                         CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns an existing scope with the given name.
     The scope exists when there is at least one collection created under the scope.
@@ -99,8 +104,11 @@ FLMutableArray CBLDatabase_CollectionNames(const CBLDatabase* db, FLString scope
            it is released.
     @param db  The database.
     @param scopeName  The name of the scope.
-    @return  A \ref CBLScope instance, or NULL if the scope doesn't exist. */
-CBLScope* _cbl_nullable CBLDatabase_Scope(const CBLDatabase* db, FLString scopeName) CBLAPI;
+    @param outError  On failure, the error will be written here.
+    @return  A \ref CBLScope instance, or NULL if the scope doesn't exist or an error occurred. */
+CBLScope* _cbl_nullable CBLDatabase_Scope(const CBLDatabase* db,
+                                          FLString scopeName,
+                                          CBLError* _cbl_nullable outError) CBLAPI;
 
  /** Returns the existing collection with the given name and scope.
     @note  CBLCollection is ref-counted and is owned by the database object, and it will remain
@@ -110,10 +118,12 @@ CBLScope* _cbl_nullable CBLDatabase_Scope(const CBLDatabase* db, FLString scopeN
     @param db  The database.
     @param collectionName  The name of the collection.
     @param scopeName  The name of the scope.
-    @return A \ref CBLCollection instance, or NULL if the collection doesn't exist. */
+    @param outError  On failure, the error will be written here.
+    @return A \ref CBLCollection instance, or NULL if the collection doesn't exist or an error occurred. */
 CBLCollection* _cbl_nullable CBLDatabase_Collection(const CBLDatabase* db,
                                                     FLString collectionName,
-                                                    FLString scopeName) CBLAPI;
+                                                    FLString scopeName,
+                                                    CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Create a new collection.
     When creating a new collection, the collection name, and the scope name are required.
@@ -131,34 +141,37 @@ CBLCollection* _cbl_nullable CBLDatabase_Collection(const CBLDatabase* db,
     @param collectionName  The name of the collection.
     @param scopeName  The name of the scope.
     @param outError  On failure, the error will be written here.
-    @return  A \ref CBLCollection instance, or NULL if there is an error. */
+    @return  A \ref CBLCollection instance, or NULL if an error occurred. */
 CBLCollection* _cbl_nullable CBLDatabase_CreateCollection(CBLDatabase* db,
                                                           FLString collectionName,
                                                           FLString scopeName,
-                                                          CBLError* outError) CBLAPI;
+                                                          CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Delete the collection.
     @param db  The database.
     @param collectionName  The name of the collection.
     @param scopeName  The name of the scope.
     @param outError  On failure, the error will be written here.
-    @return  True if success, or False if there is an error. */
+    @return  True if success, or False if an error occurred. */
 bool CBLDatabase_DeleteCollection(CBLDatabase* db,
                                   FLString collectionName,
                                   FLString scopeName,
-                                  CBLError* outError) CBLAPI;
+                                  CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the default scope.
     @note  The default scope always exist even there are no collections under it.
     @param db  The database.
-    @return  A \ref CBLScope instance. */
-CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db) CBLAPI;
+    @return  A \ref CBLScope instance, or NULL if an error occurred. */
+CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db,
+                                   CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the default collection.
     @note  The default collection may not exist if it was deleted.
     @param db  The database.
-    @return  A \ref CBLCollection instance, or NULL if the default collection doesn't exist. */
-CBLCollection* _cbl_nullable CBLDatabase_DefaultCollection(const CBLDatabase* db) CBLAPI;
+    @param outError  On failure, the error will be written here.
+    @return  A \ref CBLCollection instance, or NULL if the default collection doesn't exist or an error occurred. */
+CBLCollection* _cbl_nullable CBLDatabase_DefaultCollection(const CBLDatabase* db,
+                                                           CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 
@@ -384,9 +397,11 @@ bool CBLCollection_DeleteIndex(CBLCollection *collection,
 /** Returns the names of the indexes in the collection, as a Fleece array of strings.
     @note  You are responsible for releasing the returned Fleece array.
     @param collection  The collection.
-    @return  The index names in the collection */
+    @param outError  On failure, an error is written here.
+    @return  The index names in the collection, or NULL if an error occurred. */
 _cbl_warn_unused
-FLMutableArray CBLCollection_GetIndexNames(CBLCollection *collection) CBLAPI;
+FLMutableArray _cbl_nullable CBLCollection_GetIndexNames(CBLCollection *collection,
+                                                         CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 

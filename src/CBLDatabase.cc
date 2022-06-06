@@ -111,6 +111,8 @@ CBLScope* CBLDatabase::getScope(slice scopeName) {
     
     auto c4db = _c4db->useLocked();
     
+    checkOpen();
+    
     CBLScope* scope = nullptr;
     
     bool exist = c4db->hasScope(scopeName);
@@ -140,6 +142,8 @@ CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName)
         scopeName = kC4DefaultScopeID;
 
     auto c4db = _c4db->useLocked();
+    
+    checkOpen();
     
     CBLCollection* collection = nullptr;
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
@@ -197,6 +201,8 @@ bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
 
 CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) {
     auto db = _c4db->useLocked();
+    
+    checkOpen();
     
     if (_defaultCollection &&
         !db->hasCollection({kC4DefaultCollectionName, kC4DefaultScopeID})) {
