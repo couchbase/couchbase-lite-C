@@ -28,31 +28,35 @@ const FLString kCBLDefaultCollectionName = FLSTR("_default");
 
 #pragma mark - SCOPE AND COLLECTION MANAGEMENT
 
-FLMutableArray CBLDatabase_ScopeNames(const CBLDatabase* db) noexcept {
+FLMutableArray CBLDatabase_ScopeNames(const CBLDatabase* db, CBLError* outError) noexcept {
     try {
         return db->scopeNames();
-    } catchAndWarn()
+    } catchAndBridge(outError)
 }
 
-FLMutableArray CBLDatabase_CollectionNames(const CBLDatabase* db, FLString scopeName) noexcept {
+FLMutableArray CBLDatabase_CollectionNames(const CBLDatabase* db,
+                                           FLString scopeName,
+                                           CBLError* outError) noexcept
+{
     try {
         return db->collectionNames(scopeName);
-    } catchAndWarn()
+    } catchAndBridge(outError)
 }
 
-CBLScope* CBLDatabase_Scope(const CBLDatabase* db, FLString scopeName) noexcept {
+CBLScope* CBLDatabase_Scope(const CBLDatabase* db, FLString scopeName, CBLError* outError) noexcept {
     try {
         return const_cast<CBLDatabase*>(db)->getScope(scopeName);
-    } catchAndWarn()
+    } catchAndBridge(outError)
 }
 
 CBLCollection* CBLDatabase_Collection(const CBLDatabase* db,
                                       FLString collectionName,
-                                      FLString scopeName) noexcept
+                                      FLString scopeName,
+                                      CBLError* outError) noexcept
 {
     try {
         return const_cast<CBLDatabase*>(db)->getCollection(collectionName, scopeName);
-    } catchAndWarn()
+    } catchAndBridge(outError)
 }
 
 CBLCollection* CBLDatabase_CreateCollection(CBLDatabase* db,
@@ -75,16 +79,16 @@ bool CBLDatabase_DeleteCollection(CBLDatabase* db,
     } catchAndBridge(outError)
 }
 
-CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db) noexcept {
+CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db, CBLError* outError) noexcept {
     try {
         return const_cast<CBLDatabase*>(db)->getDefaultScope();
-    } catchAndWarn()
+    } catchAndBridge(outError)
 }
 
-CBLCollection* CBLDatabase_DefaultCollection(const CBLDatabase* db) noexcept {
+CBLCollection* CBLDatabase_DefaultCollection(const CBLDatabase* db, CBLError* outError) noexcept {
     try {
         return const_cast<CBLDatabase*>(db)->getDefaultCollection(false);
-    } catchAndWarn()
+    } catchAndBridge(outError)
 }
 
 #pragma mark - ACCESSORS
@@ -279,10 +283,10 @@ bool CBLCollection_DeleteIndex(CBLCollection *collection,
     } catchAndBridge(outError)
 }
 
-FLMutableArray CBLCollection_GetIndexNames(CBLCollection *collection) noexcept {
+FLMutableArray CBLCollection_GetIndexNames(CBLCollection *collection, CBLError *outError) noexcept {
     try {
         return FLMutableArray_Retain(collection->indexNames());
-    } catchAndBridgeReturning(nullptr, FLMutableArray_New())
+    } catchAndBridge(outError)
 }
 
 #pragma mark - LISTENERS:

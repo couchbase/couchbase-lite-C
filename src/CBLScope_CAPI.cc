@@ -25,23 +25,24 @@ const FLString kCBLDefaultScopeName = FLSTR("_default");
 #pragma mark - ACCESSORS
 
 FLString CBLScope_Name(const CBLScope* scope) noexcept {
-    try {
-        return scope->name();
-    } catchAndWarn()
+    return scope->name();
 }
 
 #pragma mark - COLLECTIONS
 
-FLMutableArray CBLScope_CollectionNames(const CBLScope* scope) noexcept {
+FLMutableArray CBLScope_CollectionNames(const CBLScope* scope,
+                                        CBLError* outError) noexcept
+{
     try {
         return scope->collectionNames();
-    } catchAndWarn()
+    } catchAndBridge(outError)
 }
 
-CBLCollection* _cbl_nullable CBLScope_Collection(const CBLScope* scope,
-                                                 FLString collectionName) noexcept
+CBLCollection* CBLScope_Collection(const CBLScope* scope,
+                                   FLString collectionName,
+                                   CBLError* outError) noexcept
 {
     try {
         return scope->getCollection(collectionName);
-    } catchAndWarn()
+    } catchAndBridge(outError)
 }

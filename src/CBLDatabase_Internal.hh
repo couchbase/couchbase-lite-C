@@ -103,12 +103,18 @@ public:
     
     void close() {
         stopActiveStoppables();
-        _c4db->useLocked()->close();
+        
+        auto db = _c4db->useLocked();
+        db->close();
+        _closed = true;
     }
     
     void closeAndDelete() {
         stopActiveStoppables();
-        _c4db->useLocked()->closeAndDeleteFile();
+        
+        auto db = _c4db->useLocked();
+        db->closeAndDeleteFile();
+        _closed = true;
     }
 
 
@@ -159,6 +165,10 @@ public:
     bool deleteCollection(slice collectionName, slice scopeName);
     
     CBLScope* getDefaultScope() {
+        _c4db->useLocked();
+        
+        checkOpen();
+        
         auto scope = getScope(kC4DefaultScopeID);
         assert(scope);
         return scope;
@@ -340,6 +350,13 @@ private:
         _stoppables.erase(stoppable);
         _stopCond.notify_one();
     }
+    
+    // Need to called under _c4db lock:
+    void checkOpen() {
+        if (_closed) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen, "db closed or deleted");
+        }
+    }
 
     template <class T> using Listeners = cbl_internal::Listeners<T>;
 
@@ -347,6 +364,7 @@ private:
     using CollectionsMap = std::unordered_map<C4Database::CollectionSpec, Retained<CBLCollection>>;
     
     SharedC4DatabaseAccessLock                  _c4db;
+    bool                                        _closed {false};
     
     alloc_slice const                           _dir;
     

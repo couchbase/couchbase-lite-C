@@ -321,7 +321,16 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db,
 FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) noexcept {
     try {
         auto col = db->getDefaultCollection(true);
-        return CBLCollection_GetIndexNames(col);
+        
+        CBLError error;
+        auto result = CBLCollection_GetIndexNames(col, &error);
+        if (!result && error.code != 0) {
+            alloc_slice message = CBLError_Message(&error);
+            CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
+                    "Getting index names failed: %d/%d: %.*s",
+                    error.domain, error.code, (int)message.size, (char*)message.buf);
+        }
+        return result;
     } catchAndBridgeReturning(nullptr, FLMutableArray_New())
 }
 
