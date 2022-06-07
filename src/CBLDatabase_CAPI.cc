@@ -131,7 +131,9 @@ FLString CBLDatabase_Name(const CBLDatabase* db) noexcept {
 }
 
 FLStringResult CBLDatabase_Path(const CBLDatabase* db) noexcept {
-    return FLStringResult(db->path());
+    try {
+        return FLStringResult(db->path());
+    } catchAndBridgeReturning(nullptr, FLSliceResult_New(0));
 }
 
 const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) noexcept {

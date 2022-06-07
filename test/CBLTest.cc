@@ -78,6 +78,7 @@ CBLTest::CBLTest() {
 
 CBLTest::~CBLTest() {
     if (db) {
+        ExpectingExceptions x; // Database might have been closed by the test:
         CBLError error;
         if (!CBLDatabase_Close(db, &error))
             WARN("Failed to close database: " << error.domain << "/" << error.code);
@@ -86,6 +87,15 @@ CBLTest::~CBLTest() {
     if (CBL_InstanceCount() > 0)
         CBL_DumpInstances();
     CHECK(CBL_InstanceCount() == 0);
+}
+
+void CBLTest::checkError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain) {
+    CHECK(error.domain == expectedDomain);
+    CHECK(error.code == expectedCode);
+}
+
+void CBLTest::checkNotOpenError(CBLError& error) {
+    checkError(error, kCBLErrorNotOpen);
 }
 
 

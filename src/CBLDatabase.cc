@@ -80,25 +80,61 @@ bool CBLEncryptionKey_FromPasswordOld(CBLEncryptionKey *key, FLString password) 
 
 CBLDatabase::CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
 :_dir(dir_)
+,_name(name_)
 ,_notificationQueue(this)
 {
-    _c4db = std::make_shared<litecore::access_lock<Retained<C4Database>>>(std::move(db));
-    
+    _c4db = std::make_shared<C4DatabaseAccessLock>(db);
     _defaultCollection = getCollection(kC4DefaultCollectionName, kC4DefaultScopeID);
 }
 
 
 CBLDatabase::~CBLDatabase() {
-    _c4db->useLocked([&](Retained<C4Database> &c4db) {
-        // Invalidate the database reference for both scopes and collections:
-        for (auto& i : _scopes) {
-            i.second->close();
-        }
-        
-        for (auto& i : _collections) {
-            i.second->close();
-        }
+    _c4db->useLockedIgnoredWhenClosed([&](Retained<C4Database> &c4db) {
+        _closed();
     });
+}
+
+
+#pragma mark - LIFE CYCLE:
+
+
+void CBLDatabase::close() {
+    stopActiveStoppables();
+    
+    try {
+        auto db = _c4db->useLocked();
+        db->close();
+        _closed();
+    } catch (litecore::error& e) {
+        if (e == litecore::error::NotOpen) {
+            return;
+        }
+        throw;
+    }
+}
+
+
+void CBLDatabase::closeAndDelete() {
+    stopActiveStoppables();
+    
+    auto db = _c4db->useLocked();
+    db->closeAndDeleteFile();
+    _closed();
+}
+
+
+/** Must called under _c4db lock. */
+void CBLDatabase::_closed() {
+    // Close scopes:
+    for (auto& i : _scopes) {
+        i.second->close();
+    }
+    // Close collections:
+    for (auto& i : _collections) {
+        i.second->close();
+    }
+    // Close the access lock:
+    _c4db->close();
 }
 
 
@@ -110,8 +146,6 @@ CBLScope* CBLDatabase::getScope(slice scopeName) {
         scopeName = kC4DefaultScopeID;
     
     auto c4db = _c4db->useLocked();
-    
-    checkOpen();
     
     CBLScope* scope = nullptr;
     
@@ -140,10 +174,8 @@ CBLScope* CBLDatabase::getScope(slice scopeName) {
 CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName) {
     if (!scopeName)
         scopeName = kC4DefaultScopeID;
-
-    auto c4db = _c4db->useLocked();
     
-    checkOpen();
+    auto c4db = _c4db->useLocked();
     
     CBLCollection* collection = nullptr;
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
@@ -202,8 +234,6 @@ bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
 CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) {
     auto db = _c4db->useLocked();
     
-    checkOpen();
-    
     if (_defaultCollection &&
         !db->hasCollection({kC4DefaultCollectionName, kC4DefaultScopeID})) {
         _defaultCollection = nullptr;
@@ -236,7 +266,6 @@ void CBLDatabase::removeCBLCollection(C4Database::CollectionSpec spec) {
 #pragma mark - QUERY:
 
 
-
 Retained<CBLQuery> CBLDatabase::createQuery(CBLQueryLanguage language,
                                             slice queryString,
                                             int* _cbl_nullable outErrPos) const
@@ -266,6 +295,7 @@ namespace cbl_internal {
 
 
 Retained<CBLBlob> CBLDatabase::getBlob(FLDict properties) {
+    auto c4db = _c4db->useLocked();
     try {
         return new CBLBlob(this, properties);
     } catch (...) {
@@ -278,5 +308,6 @@ Retained<CBLBlob> CBLDatabase::getBlob(FLDict properties) {
 
 
 void CBLDatabase::saveBlob(CBLBlob* blob) {
+    auto c4db = _c4db->useLocked();
     blob->install(this);
 }
