@@ -71,6 +71,9 @@ public:
 
 
     CBLDatabase *db {nullptr};
+    
+    void checkError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain = kCBLDomain);
+    void checkNotOpenError(CBLError& error);
 };
 
 

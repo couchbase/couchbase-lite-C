@@ -101,27 +101,14 @@ public:
     void beginTransaction()                          {_c4db->useLocked()->beginTransaction();}
     void endTransaction(bool commit)                 {_c4db->useLocked()->endTransaction(commit);}
     
-    void close() {
-        stopActiveStoppables();
-        
-        auto db = _c4db->useLocked();
-        db->close();
-        _closed = true;
-    }
-    
-    void closeAndDelete() {
-        stopActiveStoppables();
-        
-        auto db = _c4db->useLocked();
-        db->closeAndDeleteFile();
-        _closed = true;
-    }
+    void close();
+    void closeAndDelete();
 
 
 #pragma mark - Accessors:
 
 
-    slice name() const noexcept                      {return _c4db->useLocked()->getName();}
+    slice name() const noexcept                      {return _name;}
     alloc_slice path() const                         {return _c4db->useLocked()->getPath();}
     
     CBLDatabaseConfiguration config() const noexcept {
@@ -141,16 +128,18 @@ public:
     
     
     fleece::MutableArray scopeNames() const {
+        auto db = _c4db->useLocked();
         auto names = FLMutableArray_New();
-        _c4db->useLocked()->forEachScope([&](slice scope) {
+        db->forEachScope([&](slice scope) {
             FLMutableArray_AppendString(names, scope);
         });
         return names;
     }
     
     fleece::MutableArray collectionNames(slice scopeName) const {
+        auto db = _c4db->useLocked();
         auto names = FLMutableArray_New();
-        _c4db->useLocked()->forEachCollection(scopeName, [&](C4CollectionSpec spec) {
+        db->forEachCollection(scopeName, [&](C4CollectionSpec spec) {
             FLMutableArray_AppendString(names, spec.name);
         });
         return names;
@@ -166,9 +155,6 @@ public:
     
     CBLScope* getDefaultScope() {
         _c4db->useLocked();
-        
-        checkOpen();
-        
         auto scope = getScope(kC4DefaultScopeID);
         assert(scope);
         return scope;
@@ -227,11 +213,44 @@ protected:
     friend struct cbl_internal::ListenerToken<CBLQueryChangeListener>;
     friend struct cbl_internal::ListenerToken<CBLCollectionDocumentChangeListener>;
     
-    using SharedC4DatabaseAccessLock = std::shared_ptr<litecore::access_lock<Retained<C4Database>>>;
+    /** The C4Database lock that adds a close() function for flagging that the c4database has been closed. It has
+        a sentry guard setup tha will throw NotOpen when useLocked() function is called when the closed has been
+        flagged. */
+    class C4DatabaseAccessLock: public litecore::access_lock<Retained<C4Database>> {
+    public:
+        C4DatabaseAccessLock(C4Database* db)
+        :access_lock(std::move(db))
+        {
+            _sentry = [this](C4Database* db) {
+                if (_closed) {
+                    C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen, "Database is closed or deleted");
+                }
+            };
+        }
+            
+        void close() {
+            LOCK_GUARD lock(getMutex());
+            _closed = true;
+        }
+        
+        template <class CALLBACK>
+        /** If the AccessLock is closed, the call will be ignored instead of letting the sentry throws. */
+        void useLockedIgnoredWhenClosed(CALLBACK callback) {
+            LOCK_GUARD lock(getMutex());
+            if (_closed)
+                return;
+            useLocked(callback);
+        }
+            
+    private:
+        bool _closed {false};
+    };
+    
+    using SharedC4DatabaseAccessLock = std::shared_ptr<C4DatabaseAccessLock>;
     
     SharedC4DatabaseAccessLock c4db() const         {return _c4db;}
     
-    C4BlobStore* blobStore() const                   {return &(_c4db->useLocked()->getBlobStore());}
+    C4BlobStore* blobStore() const                  {return &(_c4db->useLocked()->getBlobStore());}
 
     template <class LISTENER, class... Args>
     void notify(ListenerToken<LISTENER>* _cbl_nonnull listener, Args... args) const {
@@ -350,22 +369,18 @@ private:
         _stoppables.erase(stoppable);
         _stopCond.notify_one();
     }
-    
-    // Need to called under _c4db lock:
-    void checkOpen() {
-        if (_closed) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen, "db closed or deleted");
-        }
-    }
 
+    /** Close the scopes and collections, and access lock. Must call under _c4db lock. */
+    void _closed();
+    
     template <class T> using Listeners = cbl_internal::Listeners<T>;
 
     using ScopesMap = std::unordered_map<slice, Retained<CBLScope>>;
     using CollectionsMap = std::unordered_map<C4Database::CollectionSpec, Retained<CBLCollection>>;
     
     SharedC4DatabaseAccessLock                  _c4db;
-    bool                                        _closed {false};
     
+    alloc_slice const                           _name;
     alloc_slice const                           _dir;
     
     mutable ScopesMap                           _scopes;

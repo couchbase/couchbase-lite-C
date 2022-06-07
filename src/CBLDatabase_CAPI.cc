@@ -131,7 +131,9 @@ FLString CBLDatabase_Name(const CBLDatabase* db) noexcept {
 }
 
 FLStringResult CBLDatabase_Path(const CBLDatabase* db) noexcept {
-    return FLStringResult(db->path());
+    try {
+        return FLStringResult(db->path());
+    } catchAndBridgeReturning(nullptr, FLSliceResult(alloc_slice(kFLSliceNull)));
 }
 
 const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) noexcept {
@@ -324,11 +326,14 @@ FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) noexcept {
         
         CBLError error;
         auto result = CBLCollection_GetIndexNames(col, &error);
-        if (!result && error.code != 0) {
-            alloc_slice message = CBLError_Message(&error);
-            CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
-                    "Getting index names failed: %d/%d: %.*s",
-                    error.domain, error.code, (int)message.size, (char*)message.buf);
+        if (!result) {
+            if (error.code != 0) {
+                alloc_slice message = CBLError_Message(&error);
+                CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
+                        "Getting index names failed: %d/%d: %.*s",
+                        error.domain, error.code, (int)message.size, (char*)message.buf);
+            }
+            result = FLMutableArray_New();
         }
         return result;
     } catchAndBridgeReturning(nullptr, FLMutableArray_New())
