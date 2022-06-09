@@ -36,6 +36,11 @@ public:
     {
         _name = c4col->getName();
         _scope = database->getScope(c4col->getScope());
+        if (!_scope) {
+            // The collection & its scope might be deleted using a different database
+            // on a different thread. For this case, create a detached scope object.
+            _scope = new CBLScope(_name, database, true);
+        }
     }
     
 #pragma mark - ACCESSORS:
@@ -239,7 +244,7 @@ private:
         ,_db(database)
         {
             _sentry = [this](C4Collection* c4col) {
-                if (!_db || !c4col->isValid()) {
+                if (!_db) {
                     C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
                                    "Invalid collection: either deleted, or db closed");
                 }

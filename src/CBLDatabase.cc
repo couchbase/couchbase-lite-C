@@ -151,11 +151,12 @@ CBLScope* CBLDatabase::getScope(slice scopeName) {
     
     bool exist = c4db->hasScope(scopeName);
     if (auto i = _scopes.find(scopeName); i != _scopes.end()) {
+        scope = i->second.get();
         if (!exist) {
+            scope->detach();
             _scopes.erase(i);
             return nullptr;
         }
-        scope = i->second.get();
     }
     
     if (!scope && exist) {
@@ -187,13 +188,11 @@ CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName)
         if (c4db->hasCollection(spec)) {
             return collection;
         }
+        removeCBLCollection(spec); // Invalidate cache
     }
     
     auto c4col = c4db->getCollection(spec);
     if (!c4col) {
-        if (collection) {
-            removeCBLCollection(spec); // Invalidate cache
-        }
         return nullptr;
     }
     
@@ -258,6 +257,7 @@ CBLCollection* CBLDatabase::createCBLCollection(C4Collection* c4col) {
 
 void CBLDatabase::removeCBLCollection(C4Database::CollectionSpec spec) {
     if (auto i = _collections.find(spec); i != _collections.end()) {
+        i->second.get()->close();
         _collections.erase(i);
     }
 }

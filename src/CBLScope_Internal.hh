@@ -29,10 +29,21 @@ public:
     
 #pragma mark - CONSTRUCTORS:
     
-    CBLScope(slice name, CBLDatabase* database)
+    /** Create a CBLScope object with name, database, the detached mode. By default, the scope will
+        cached by the database so the database will not be retained in the CBLScope. However, occasionally
+        a scope can be in a standalone detach mode in which it should retain the database. */
+    CBLScope(slice name, CBLDatabase* database, bool detached= false)
     :_name(name)
     ,_database(database)
-    { }
+    {
+        if (detached) detach();
+    }
+    
+    ~CBLScope() {
+        if (_detached) {
+            release(_database);
+        }
+    }
     
 #pragma mark - ACCESSORS:
     
@@ -64,15 +75,28 @@ protected:
         }
     }
     
+    // Invalidate the database pointer, called by the database when
+    // the database is closed.
     void close() {
         LOCK(_mutex);
+        assert(!_detached);
         _database = nullptr;
+    }
+    
+    // Detach the scope from the database.
+    void detach() {
+        LOCK(_mutex);
+        if (!_detached) {
+            retain(_database);
+            _detached = true;
+        }
     }
     
 private:
     
-    CBLDatabase* _cbl_nullable              _database;  // Not retain to prevent retain cycle
-    alloc_slice const                       _name;      // Name (never empty)
+    CBLDatabase* _cbl_nullable              _database;          // Not retain to prevent retain cycle
+    alloc_slice const                       _name;              // Name (never empty)
+    bool                                    _detached {false};  // Detached from the database
     mutable std::mutex                      _mutex;
 };
 
