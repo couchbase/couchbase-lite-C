@@ -395,6 +395,7 @@
 		FC5FBBA32821B3450066157F /* CBLCollection.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection.cc; sourceTree = "<group>"; };
 		FC5FBBA42821B3450066157F /* CBLCollection_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLCollection_Internal.hh; sourceTree = "<group>"; };
 		FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection_CAPI.cc; sourceTree = "<group>"; };
+		FC8B21272852D3ED008D24F8 /* CBLCompat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLCompat.h; sourceTree = "<group>"; };
 		FCD8298B283591D4004AA814 /* CollectionTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CollectionTest.cc; sourceTree = "<group>"; };
 		FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLScope_Internal.hh; sourceTree = "<group>"; };
 		FCD829B12835ECE0004AA814 /* CBLScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLScope.h; sourceTree = "<group>"; };
@@ -533,6 +534,7 @@
 				27886C8C21F64C1400069BEA /* Listener.cc */,
 				27886C8B21F64C1400069BEA /* Listener.hh */,
 				275FA3342236E54D001C392D /* CBLPrivate.h */,
+				FC8B21272852D3ED008D24F8 /* CBLCompat.h */,
 				27229262260BD3D600A3A41F /* C Glue */,
 				27B61D7E21D6B6900027CCDB /* dylib_main.cc */,
 				2716F8F5247D9D6700BE21D9 /* exports */,

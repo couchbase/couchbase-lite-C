@@ -20,6 +20,8 @@
 
 using namespace fleece;
 
+CBL_START_WARNINGS_SUPPRESSION
+CBL_IGNORE_DEPRECATED_API
 
 #pragma mark - BASIC TESTS:
 
@@ -328,3 +330,5 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG w/TLS", "[Repl
         CHECK(db.count() == 12189);
     }
 }
+
+CBL_STOP_WARNINGS_SUPPRESSION

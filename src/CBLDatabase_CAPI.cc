@@ -19,9 +19,9 @@
 #include "CBLDatabase_Internal.hh"
 #include "CBLBlob_Internal.hh"
 #include "CBLCollection_Internal.hh"
+#include "CBLCompat.h"
 #include "CBLDatabase.h"
 #include "CBLDocument_Internal.hh"
-
 
 using namespace std;
 using namespace fleece;
@@ -337,6 +337,8 @@ FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) noexcept {
 
 #pragma mark - CHANGE LISTENERS
 
+CBL_START_WARNINGS_SUPPRESSION
+CBL_IGNORE_DEPRECATED_API
 
 namespace cbl_internal {
     struct DatabaseChangeContext {
@@ -352,6 +354,7 @@ namespace cbl_internal {
     };
 }
 
+CBL_STOP_WARNINGS_SUPPRESSION
 
 CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
                                                 CBLDatabaseChangeListener listener,

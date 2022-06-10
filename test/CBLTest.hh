@@ -17,7 +17,14 @@
 //
 
 #pragma once
+
+#include "CBLCompat.h"
+
+CBL_START_WARNINGS_SUPPRESSION
+CBL_IGNORE_DEPRECATED_API
 #include "cbl/CouchbaseLite.h"
+CBL_STOP_WARNINGS_SUPPRESSION
+
 #include "CBLPrivate.h"
 #include "fleece/slice.hh"
 #include <functional>

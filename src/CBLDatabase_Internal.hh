@@ -17,6 +17,7 @@
 //
 
 #pragma once
+#include "CBLCompat.h"
 #include "CBLDatabase.h"
 #include "CBLDocument_Internal.hh"
 #include "CBLLog_Internal.hh"
@@ -223,7 +224,12 @@ protected:
     friend struct CBLURLEndpointListener;
     friend class cbl_internal::AllConflictsResolver;
     friend struct cbl_internal::CBLLocalEndpoint;
+    
+    CBL_START_WARNINGS_SUPPRESSION
+    CBL_IGNORE_DEPRECATED_API
     friend struct cbl_internal::ListenerToken<CBLDocumentChangeListener>;
+    CBL_STOP_WARNINGS_SUPPRESSION
+    
     friend struct cbl_internal::ListenerToken<CBLQueryChangeListener>;
     friend struct cbl_internal::ListenerToken<CBLCollectionDocumentChangeListener>;
     

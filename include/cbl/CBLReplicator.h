@@ -156,6 +156,7 @@ typedef struct {
     \note   If a null \ref FLSliceResult or an error is returned, the document will be failed to
             replicate with the \ref kCBLErrorCrypto error when. For security reason, the encryption
             cannot be skipped. */
+_cbl_deprecated("Use CBLDocumentPropertyEncryptor instead.")
 typedef FLSliceResult (*CBLPropertyEncryptor) (
     void* context,              ///< Replicator’s context
     FLString documentID,        ///< Document ID
@@ -172,6 +173,7 @@ typedef FLSliceResult (*CBLPropertyEncryptor) (
     \note   The decryption will be skipped (the encrypted data will be kept) when a null \ref FLSliceResult
             without an error is returned. If an error is returned, the document will be failed to replicate
             with the \ref kCBLErrorCrypto error. */
+_cbl_deprecated("Use CBLDocumentPropertyDecryptor instead.")
 typedef FLSliceResult (*CBLPropertyDecryptor) (
     void* context,              ///< Replicator’s context
     FLString documentID,        ///< Document ID
@@ -234,6 +236,7 @@ typedef struct {
 
 /** The configuration of a replicator. */
 typedef struct {
+    _cbl_deprecated("Use collections instead.")
     CBLDatabase* database;                  ///< The database to replicate
     CBLEndpoint* endpoint;                  ///< The address of the other database to replicate with
     CBLReplicatorType replicatorType;       ///< Push, pull or both
@@ -266,16 +269,23 @@ typedef struct {
     FLSlice pinnedServerCertificate;    ///< An X.509 cert to "pin" TLS connections to (PEM or DER)
     FLSlice trustedRootCertificates;    ///< Set of anchor certs (PEM format)
     //-- Filtering:
+    _cbl_deprecated("Use CBLReplicationCollection.channels instead.")
     FLArray _cbl_nullable channels;                   ///< Optional set of channels to pull from
+    _cbl_deprecated("Use CBLReplicationCollection.documentIDs instead.")
     FLArray _cbl_nullable documentIDs;                ///< Optional set of document IDs to replicate
+    _cbl_deprecated("Use CBLReplicationCollection.pushFilter instead.")
     CBLReplicationFilter _cbl_nullable pushFilter;    ///< Optional callback to filter which docs are pushed
+    _cbl_deprecated("Use CBLReplicationCollection.pullFilter instead.")
     CBLReplicationFilter _cbl_nullable pullFilter;    ///< Optional callback to validate incoming docs
+    _cbl_deprecated("Use CBLReplicationCollection.conflictResolver instead.")
     CBLConflictResolver _cbl_nullable conflictResolver;///< Optional conflict-resolver callback
     void* _cbl_nullable context;                      ///< Arbitrary value that will be passed to callbacks
     
 #ifdef COUCHBASE_ENTERPRISE
     //-- Property Encryption
+    _cbl_deprecated("Use documentPropertyEncryptor instead.")
     CBLPropertyEncryptor propertyEncryptor;           ///< Optional callback to encrypt \ref CBLEncryptable values of the documents in the default collection. If the default collection is not part of the replication, the replicator will fail to create with an error.
+    _cbl_deprecated("Use documentPropertyDecryptor instead.")
     CBLPropertyDecryptor propertyDecryptor;           ///< Optional callback to decrypt encrypted \ref CBLEncryptable values of the documents in the default collection. If the default collection is not part of the replication, the replicator will fail to create with an error.
     
     CBLDocumentPropertyEncryptor documentPropertyEncryptor;   ///< Optional callback to encrypt \ref CBLEncryptable values.
@@ -382,6 +392,7 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator*) CBLAPI;
            `pushFilter` or `docIDs`, are ignored.
     @warning  You are responsible for releasing the returned array via \ref FLValue_Release.
     @warning  If the default collection is not part of the replication, a NULL with an error will be returned. */
+_cbl_deprecated("Use CBLReplicator_PendingDocumentIDs2 instead.")
 _cbl_warn_unused
 FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs(CBLReplicator*, CBLError* _cbl_nullable outError) CBLAPI;
 
@@ -394,6 +405,7 @@ FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs(CBLReplicator*, CBLError* 
     @note  A `false` result means the document is not pending, _or_ there was an error.
            To tell the difference, compare the error code to zero.
     @warning  If the default collection is not part of the replication, a NULL with an error will be returned. */
+_cbl_deprecated("Use CBLReplicator_IsDocumentPending2 instead.")
 bool CBLReplicator_IsDocumentPending(CBLReplicator *repl,
                                      FLString docID,
                                      CBLError* _cbl_nullable outError) CBLAPI;
