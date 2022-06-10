@@ -29,6 +29,9 @@ using namespace fleece;
 
 static constexpr const slice kOtherDBName = "CBLTest_OtherDB";
 
+CBL_START_WARNINGS_SUPPRESSION
+CBL_IGNORE_DEPRECATED_API
+
 class DatabaseTest : public CBLTest {
 public:
     CBLDatabase* otherDB = nullptr;
@@ -1789,3 +1792,5 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Live Query") {
     // Sleeping to ensure async cleanup
     this_thread::sleep_for(200ms);
 }
+
+CBL_STOP_WARNINGS_SUPPRESSION

@@ -226,6 +226,7 @@ _cbl_warn_unused
 FLStringResult CBLDatabase_Path(const CBLDatabase*) CBLAPI;
 
 /** Returns the number of documents in the database. */
+_cbl_deprecated("Use CBLCollection_Count on the default collection instead.")
 uint64_t CBLDatabase_Count(const CBLDatabase*) CBLAPI;
 
 /** Returns the database's configuration, as given when it was opened.
@@ -254,6 +255,7 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*) CBLAPI;
     @param db  The database that changed.
     @param numDocs  The number of documents that changed (size of the `docIDs` array)
     @param docIDs  The IDs of the documents that changed, as a C array of `numDocs` C strings. */
+_cbl_deprecated("Use CBLCollectionChangeListener instead.")
 typedef void (*CBLDatabaseChangeListener)(void* _cbl_nullable context,
                                           const CBLDatabase* db,
                                           unsigned numDocs,
@@ -266,6 +268,7 @@ typedef void (*CBLDatabaseChangeListener)(void* _cbl_nullable context,
     @param context  An opaque value that will be passed to the callback.
     @return  A token to be passed to \ref CBLListener_Remove when it's time to remove the
             listener.*/
+_cbl_deprecated("Use CBLCollection_AddChangeListener on the default collection instead.")
 _cbl_warn_unused
 CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
                                                 CBLDatabaseChangeListener listener,

@@ -18,11 +18,14 @@
 
 #include "CBLTest.hh"
 #include "CBLPrivate.h"
+#include "CBLCompat.h"
 #include <string>
 
 using namespace fleece;
 using namespace std;
 
+CBL_START_WARNINGS_SUPPRESSION
+CBL_IGNORE_DEPRECATED_API
 
 class BlobTest : public CBLTest { };
 
@@ -163,3 +166,5 @@ TEST_CASE_METHOD(BlobTest, "Create JSON from Blob", "[Blob]") {
     CHECK(alloc_slice(CBLBlob_CreateJSON(gotBlob)) == "{\"content_type\":\"text/plain\",\"digest\":\"sha1-dXNgUcxC3n7lxfrYkbLUG4gOKRw=\",\"length\":34,\"@type\":\"blob\"}"_sl);
     CBLDocument_Release(doc);
 }
+
+CBL_STOP_WARNINGS_SUPPRESSION

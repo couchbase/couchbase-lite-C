@@ -16,7 +16,6 @@
 // limitations under the License.
 //
 
-#include "CBLReplicator.h"
 #include "CBLReplicator_Internal.hh"
 
 

@@ -6,7 +6,6 @@
 
 #pragma once
 #include "CBLTest_Cpp.hh"
-#include "cbl++/CouchbaseLite.hh"
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -16,6 +15,9 @@
 using namespace std;
 using namespace fleece;
 using namespace cbl;
+
+CBL_START_WARNINGS_SUPPRESSION
+CBL_IGNORE_DEPRECATED_API
 
 class ReplicatorTest : public CBLTest_Cpp {
 public:
@@ -188,3 +190,5 @@ public:
     }
 
 };
+
+CBL_STOP_WARNINGS_SUPPRESSION

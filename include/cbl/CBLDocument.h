@@ -68,6 +68,7 @@ typedef bool (*CBLConflictHandler)(void* _cbl_nullable context,
     @param outError  On failure, the error will be written here. (A nonexistent document is not
                     considered a failure; in that event the error code will be zero.)
     @return  A new \ref CBLDocument instance, or NULL if the doc doesn't exist or an error occurred. */
+_cbl_deprecated("Use CBLCollection_GetDocument on the default collection instead.")
 _cbl_warn_unused
 const CBLDocument* _cbl_nullable CBLDatabase_GetDocument(const CBLDatabase* database,
                                                          FLString docID,
@@ -84,6 +85,7 @@ CBL_REFCOUNTED(CBLDocument*, Document);
     @param doc  The mutable document to save.
     @param outError  On failure, the error will be written here.
     @return  True on success, false on failure. */
+_cbl_deprecated("Use CBLCollection_SaveDocument on the default collection instead.")
 bool CBLDatabase_SaveDocument(CBLDatabase* db,
                               CBLDocument* doc,
                               CBLError* _cbl_nullable outError) CBLAPI;
@@ -98,6 +100,7 @@ bool CBLDatabase_SaveDocument(CBLDatabase* db,
     @param concurrency  Conflict-handling strategy (fail or overwrite).
     @param outError  On failure, the error will be written here.
     @return  True on success, false on failure. */
+_cbl_deprecated("Use CBLCollection_SaveDocumentWithConcurrencyControl on the default collection instead.")
 bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
                                                     CBLDocument* doc,
                                                     CBLConcurrencyControl concurrency,
@@ -111,6 +114,7 @@ bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
     @param context  An arbitrary value to be passed to the \p conflictHandler.
     @param outError  On failure, the error will be written here.
     @return  True on success, false on failure. */
+_cbl_deprecated("Use CBLCollection_SaveDocumentWithConflictHandler on the default collection instead.")
 bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
                                                  CBLDocument* doc,
                                                  CBLConflictHandler conflictHandler,
@@ -123,6 +127,7 @@ bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
     @param document  The document to delete.
     @param outError  On failure, the error will be written here.
     @return  True if the document was deleted, false if an error occurred. */
+_cbl_deprecated("Use CBLCollection_DeleteDocument on the default collection instead.")
 bool CBLDatabase_DeleteDocument(CBLDatabase *db,
                                 const CBLDocument* document,
                                 CBLError* _cbl_nullable outError) CBLAPI;
@@ -134,6 +139,7 @@ bool CBLDatabase_DeleteDocument(CBLDatabase *db,
     @param concurrency  Conflict-handling strategy.
     @param outError  On failure, the error will be written here.
     @return  True if the document was deleted, false if an error occurred. */
+_cbl_deprecated("Use CBLCollection_DeleteDocumentWithConcurrencyControl on the default collection instead.")
 bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db,
                                                       const CBLDocument* document,
                                                       CBLConcurrencyControl concurrency,
@@ -149,6 +155,7 @@ bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db,
     @param document  The document to delete.
     @param outError  On failure, the error will be written here.
     @return  True if the document was purged, false if it doesn't exist or the purge failed. */
+_cbl_deprecated("Use CBLCollection_PurgeDocument on the default collection instead.")
 bool CBLDatabase_PurgeDocument(CBLDatabase* db,
                                const CBLDocument* document,
                                CBLError* _cbl_nullable outError) CBLAPI;
@@ -159,8 +166,8 @@ bool CBLDatabase_PurgeDocument(CBLDatabase* db,
     @param database  The database.
     @param docID  The document ID to purge.
     @param outError  On failure, the error will be written here.
-    @return  True if the document was purged, false if it doesn't exist or the purge failed.
- */
+    @return  True if the document was purged, false if it doesn't exist or the purge failed. */
+_cbl_deprecated("Use CBLCollection_PurgeDocumentByID on the default collection instead.")
 bool CBLDatabase_PurgeDocumentByID(CBLDatabase* database,
                                    FLString docID,
                                    CBLError* _cbl_nullable outError) CBLAPI;
@@ -184,6 +191,7 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* database,
     @param outError  On failure, the error will be written here. (A nonexistent document is not
                     considered a failure; in that event the error code will be zero.)
     @return  A new \ref CBLDocument instance, or NULL if the doc doesn't exist or an error occurred. */
+_cbl_deprecated("Use CBLCollection_GetMutableDocument on the default collection instead.")
 _cbl_warn_unused
 CBLDocument* _cbl_nullable CBLDatabase_GetMutableDocument(CBLDatabase* database,
                                                           FLString docID,
@@ -289,6 +297,7 @@ bool CBLDocument_SetJSON(CBLDocument*,
     @return  The expiration time as a CBLTimestamp (milliseconds since Unix epoch),
              or 0 if the document does not have an expiration,
              or -1 if the call failed. */
+_cbl_deprecated("Use CBLCollection_GetDocumentExpiration instead.")
 CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db,
                                                FLSlice docID,
                                                CBLError* _cbl_nullable outError) CBLAPI;
@@ -300,6 +309,7 @@ CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db,
                         or 0 if the document should never expire.
     @param outError  On failure, an error is written here.
     @return  True on success, false on failure. */
+_cbl_deprecated("Use CBLCollection_SetDocumentExpiration instead.")
 bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db,
                                        FLSlice docID,
                                        CBLTimestamp expiration,
@@ -324,6 +334,7 @@ bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db,
     @param context  An arbitrary value given when the callback was registered.
     @param db  The database containing the document.
     @param docID  The document's ID. */
+_cbl_deprecated("Use CBLCollectionChangeListener instead.")
 typedef void (*CBLDocumentChangeListener)(void *context,
                                           const CBLDatabase* db,
                                           FLString docID);
@@ -336,6 +347,7 @@ typedef void (*CBLDocumentChangeListener)(void *context,
     @param context  An opaque value that will be passed to the callback.
     @return  A token to be passed to \ref CBLListener_Remove when it's time to remove the
             listener.*/
+_cbl_deprecated("Use CBLCollection_AddDocumentChangeListener on the default collection instead.")
 _cbl_warn_unused
 CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db,
                                                         FLString docID,
