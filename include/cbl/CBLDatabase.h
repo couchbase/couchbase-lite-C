@@ -221,11 +221,11 @@ bool CBLDatabase_PerformMaintenance(CBLDatabase* db,
 /** Returns the database's name. */
 FLString CBLDatabase_Name(const CBLDatabase*) CBLAPI;
 
-/** Returns the database's full filesystem path. */
+/** Returns the database's full filesystem path, or null slice if the database is closed or deleted. */
 _cbl_warn_unused
 FLStringResult CBLDatabase_Path(const CBLDatabase*) CBLAPI;
 
-/** Returns the number of documents in the database. */
+/** Returns the number of documents in the database, or zero if the database is closed or deleted. */
 uint64_t CBLDatabase_Count(const CBLDatabase*) CBLAPI;
 
 /** Returns the database's configuration, as given when it was opened.

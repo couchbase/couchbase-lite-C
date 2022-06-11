@@ -29,6 +29,24 @@ using namespace fleece;
 
 static constexpr const slice kOtherDBName = "CBLTest_OtherDB";
 
+static int dbListenerCalls = 0;
+static int fooListenerCalls = 0;
+
+static void dbListener(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
+    ++dbListenerCalls;
+    auto test = (CBLTest*)context;
+    CHECK(test->db == db);
+    CHECK(nDocs == 1);
+    CHECK(slice(docIDs[0]) == "foo"_sl);
+}
+
+static void fooListener(void *context, const CBLDatabase *db, FLString docID) {
+    ++fooListenerCalls;
+    auto test = (CBLTest*)context;
+    CHECK(test->db == db);
+    CHECK(slice(docID) == "foo"_sl);
+}
+
 class DatabaseTest : public CBLTest {
 public:
     CBLDatabase* otherDB = nullptr;
@@ -46,6 +64,114 @@ public:
                 WARN("Failed to close other database: " << error.domain << "/" << error.code);
             CBLDatabase_Release(otherDB);
         }
+    }
+    
+    void testInvalidDatabase(CBLDatabase* db) {
+        REQUIRE(db);
+        
+        ExpectingExceptions x;
+        
+        // Properties:
+        CHECK(CBLDatabase_Name(db));
+        CHECK(CBLDatabase_Path(db) == kFLSliceNull);
+        CHECK(CBLDatabase_LastSequence(db) == 0);
+        CHECK(CBLDatabase_Count(db) == 0);
+        
+        // Life Cycle:
+        CBLError error = {};
+        CHECK(CBLDatabase_Close(db, &error));
+        CHECK(error.code == 0);
+        
+        error = {};
+        CHECK(!CBLDatabase_Delete(db, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_BeginTransaction(db, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_EndTransaction(db, false, &error));
+        checkNotOpenError(error);
+        
+    #ifdef COUCHBASE_ENTERPRISE
+        error = {};
+        CHECK(!CBLDatabase_ChangeEncryptionKey(db, NULL, &error));
+        checkNotOpenError(error);
+    #endif
+        
+        error = {};
+        CHECK(!CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeIntegrityCheck, &error));
+        checkNotOpenError(error);
+        
+        // Document Functions:
+        error = {};
+        auto doc = CBLDocument_CreateWithID("doc1"_sl);
+        CHECK(!CBLDatabase_SaveDocument(db, doc, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        auto conflictHandler = [](void *c, CBLDocument* d1, const CBLDocument* d2) -> bool { return true; };
+        CHECK(!CBLDatabase_SaveDocumentWithConflictHandler(db, doc, conflictHandler, nullptr, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_GetDocument(db, "doc1"_sl, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_DeleteDocument(db, doc, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_PurgeDocument(db, doc, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_PurgeDocumentByID(db, "doc1"_sl, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(CBLDatabase_GetDocumentExpiration(db, "doc1"_sl, &error) == 0);
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_SetDocumentExpiration(db, "doc1"_sl, CBL_Now(), &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_CreateValueIndex(db, "Value"_sl, {}, &error));
+        checkNotOpenError(error);
+        
+        error = {};
+        CHECK(!CBLDatabase_CreateFullTextIndex(db, "FTS"_sl, {}, &error));
+        checkNotOpenError(error);
+        
+        FLArray names = CBLDatabase_GetIndexNames(db);
+        CHECK(names);
+        CHECK(FLArray_Count(names) == 0);
+        
+        auto token = CBLDatabase_AddChangeListener(db, dbListener, this);
+        CHECK(token);
+        CBLListener_Remove(token);
+        
+        auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
+        CHECK(docToken);
+        CBLListener_Remove(docToken);
+        
+        CBLDocument_Release(doc);
     }
 };
 
@@ -1332,25 +1458,6 @@ TEST_CASE_METHOD(DatabaseTest, "Transaction Abort") {
 #pragma mark - LISTENERS:
 
 
-static int dbListenerCalls = 0;
-static int fooListenerCalls = 0;
-
-static void dbListener(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
-    ++dbListenerCalls;
-    auto test = (CBLTest*)context;
-    CHECK(test->db == db);
-    CHECK(nDocs == 1);
-    CHECK(slice(docIDs[0]) == "foo"_sl);
-}
-
-static void fooListener(void *context, const CBLDatabase *db, FLString docID) {
-    ++fooListenerCalls;
-    auto test = (CBLTest*)context;
-    CHECK(test->db == db);
-    CHECK(slice(docID) == "foo"_sl);
-}
-
-
 TEST_CASE_METHOD(DatabaseTest, "Database notifications") {
     // Add a listener:
     dbListenerCalls = fooListenerCalls = 0;
@@ -1788,4 +1895,24 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Live Query") {
     
     // Sleeping to ensure async cleanup
     this_thread::sleep_for(200ms);
+}
+
+TEST_CASE_METHOD(DatabaseTest, "Use Closed Database") {
+    CBLError error = {};
+    CHECK(CBLDatabase_Close(db, &error));
+    
+    testInvalidDatabase(db);
+    
+    CBLDatabase_Release(db);
+    db = nullptr;
+}
+
+TEST_CASE_METHOD(DatabaseTest, "Use Deleted Database") {
+    CBLError error = {};
+    CHECK(CBLDatabase_Delete(db, &error));
+    
+    testInvalidDatabase(db);
+    
+    CBLDatabase_Release(db);
+    db = nullptr;
 }

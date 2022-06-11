@@ -53,15 +53,6 @@ public:
         return db;
     }
     
-    void checkError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain = kCBLDomain) {
-        CHECK(error.domain == expectedDomain);
-        CHECK(error.code == expectedCode);
-    }
-    
-    void checkNotOpenError(CBLError& error) {
-        checkError(error, kCBLErrorNotOpen);
-    }
-    
     void testInvalidCollection(CBLCollection* col) {
         REQUIRE(col);
         
