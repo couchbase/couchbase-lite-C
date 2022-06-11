@@ -17,13 +17,7 @@
 //
 
 #pragma once
-
-#include "CBLCompat.h"
-CBL_START_WARNINGS_SUPPRESSION
-CBL_IGNORE_DEPRECATED_API
 #include "CBLReplicator.h"
-CBL_STOP_WARNINGS_SUPPRESSION
-
 #include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
 #include "c4ReplicatorTypes.h"
@@ -167,8 +161,6 @@ namespace cbl_internal {
 
 #pragma mark - CONFIGURATION:
 
-CBL_START_WARNINGS_SUPPRESSION
-CBL_IGNORE_DEPRECATED_API
 
 namespace cbl_internal {
     // Managed config object that retains/releases its properties.
@@ -303,7 +295,5 @@ namespace cbl_internal {
         alloc_slice      _networkInterface;
     };
 }
-
-CBL_STOP_WARNINGS_SUPPRESSION
 
 CBL_ASSUME_NONNULL_END

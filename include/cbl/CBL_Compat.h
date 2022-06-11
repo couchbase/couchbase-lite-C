@@ -35,11 +35,9 @@
     #define CBLINLINE               __forceinline
     #define _cbl_nonnull            _In_
     #define _cbl_warn_unused        _Check_return_
-    #define _cbl_deprecated(MSG)    __declspec(deprecated(MSG))
 #else
     #define CBLINLINE               inline
     #define _cbl_warn_unused        __attribute__((warn_unused_result))
-    #define _cbl_deprecated(MSG)    __attribute((deprecated(MSG)))
 #endif
 
 // Macros for defining typed enumerations and option flags.

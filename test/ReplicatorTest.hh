@@ -16,9 +16,6 @@ using namespace std;
 using namespace fleece;
 using namespace cbl;
 
-CBL_START_WARNINGS_SUPPRESSION
-CBL_IGNORE_DEPRECATED_API
-
 class ReplicatorTest : public CBLTest_Cpp {
 public:
     using clock    = std::chrono::high_resolution_clock;
@@ -190,5 +187,3 @@ public:
     }
 
 };
-
-CBL_STOP_WARNINGS_SUPPRESSION

@@ -28,8 +28,6 @@
 using namespace std;
 using namespace fleece;
 
-CBL_START_WARNINGS_SUPPRESSION
-CBL_IGNORE_DEPRECATED_API
 
 class QueryTest : public CBLTest {
 public:
@@ -401,7 +399,6 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query][LiveQuery]") {
     
     cerr << "Deleting a doc...\n";
     state.reset();
-    
     const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
     REQUIRE(doc);
     CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
@@ -526,7 +523,6 @@ TEST_CASE_METHOD(QueryTest, "Multiple Query Listeners", "[Query][LiveQuery]") {
     cerr << "Deleting a doc...\n";
     state1.reset();
     state2.reset();
-    
     const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
     REQUIRE(doc);
     CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
@@ -760,5 +756,3 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ API", "[Query]") {
     cerr << "Sleeping to ensure async cleanup ..." << endl;
     this_thread::sleep_for(500ms);
 }
-
-CBL_STOP_WARNINGS_SUPPRESSION

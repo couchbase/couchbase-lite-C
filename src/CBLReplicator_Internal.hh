@@ -16,12 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBLCompat.h"
-CBL_START_WARNINGS_SUPPRESSION
-CBL_IGNORE_DEPRECATED_API
 #include "CBLReplicator.h"
-CBL_STOP_WARNINGS_SUPPRESSION
-
 #include "CBLReplicatorConfig.hh"
 #include "CBLDocument_Internal.hh"
 #include "CBLCollection_Internal.hh"
@@ -65,9 +60,6 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
         external(c4status.error)
     };
 }
-
-CBL_START_WARNINGS_SUPPRESSION
-CBL_IGNORE_DEPRECATED_API
 
 struct CBLReplicator final : public CBLRefCounted, public CBLStoppable {
 public:
@@ -417,7 +409,5 @@ private:
     Listeners<CBLDocumentReplicationListener>   _docListeners;
     C4ReplicatorProgressLevel                   _progressLevel {kC4ReplProgressOverall};
 };
-
-CBL_STOP_WARNINGS_SUPPRESSION
 
 CBL_ASSUME_NONNULL_END

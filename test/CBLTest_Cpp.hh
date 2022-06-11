@@ -17,13 +17,9 @@
 //
 
 #pragma once
-
+#include "cbl++/CouchbaseLite.hh"
 #include "CBLTest.hh"
 
-CBL_START_WARNINGS_SUPPRESSION
-CBL_IGNORE_DEPRECATED_API
-#include "cbl++/CouchbaseLite.hh"
-CBL_STOP_WARNINGS_SUPPRESSION
 
 namespace cbl {
     // Make Catch write something better than "{?}" when it logs a CBL object:

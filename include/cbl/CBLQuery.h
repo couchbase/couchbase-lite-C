@@ -276,8 +276,8 @@ typedef struct {
 /** Creates a value index.
     Indexes are persistent.
     If an identical index with that name already exists, nothing happens (and no error is returned.)
-    If a non-identical index with that name already exists, it is deleted and re-created. */
-_cbl_deprecated("Use CBLCollection_CreateValueIndex on the default collection instead.")
+    If a non-identical index with that name already exists, it is deleted and re-created.
+    @warning  Deprecated : Use CBLCollection_CreateValueIndex on the default collection instead. */
 bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   FLString name,
                                   CBLValueIndexConfiguration config,
@@ -314,23 +314,23 @@ typedef struct {
 /** Creates a full-text index.
     Indexes are persistent.
     If an identical index with that name already exists, nothing happens (and no error is returned.)
-    If a non-identical index with that name already exists, it is deleted and re-created. */
-_cbl_deprecated("Use CBLCollection_CreateFullTextIndex on the default collection instead.")
+    If a non-identical index with that name already exists, it is deleted and re-created.
+    @warning  Deprecated : Use CBLCollection_CreateFullTextIndex on the default collection instead. */
 bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      FLString name,
                                      CBLFullTextIndexConfiguration config,
                                      CBLError* _cbl_nullable outError) CBLAPI;
 
-/** Deletes an index given its name. */
-_cbl_deprecated("Use CBLCollection_DeleteIndex on the default collection instead.")
+/** Deletes an index given its name.
+    @warning  Deprecated : Use CBLCollection_DeleteIndex on the default collection instead. */
 bool CBLDatabase_DeleteIndex(CBLDatabase *db,
                              FLString name,
                              CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the names of the indexes on this database, as a Fleece array of strings.
-    @note  You are responsible for releasing the returned Fleece array. */
+    @note  You are responsible for releasing the returned Fleece array.
+    @warning  Deprecated : Use CBLCollection_GetIndexNames on the default collection instead. */
 _cbl_warn_unused
-_cbl_deprecated("Use CBLCollection_GetIndexNames on the default collection instead.")
 FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) CBLAPI;
 
 /** @} */
