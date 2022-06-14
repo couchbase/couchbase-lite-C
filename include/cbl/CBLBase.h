@@ -186,6 +186,7 @@ typedef struct CBLDatabase   CBLDatabase;
      @{ */
 /** A  collection's scope. */
 typedef struct CBLScope CBLScope;
+/** @} */
 
 /** \defgroup collection  Collection
      @{ */
@@ -273,7 +274,6 @@ typedef struct CBLListenerToken CBLListenerToken;
 void CBLListener_Remove(CBLListenerToken* _cbl_nullable) CBLAPI;
 
 
-/** @} */
 /** @} */
 
 CBL_CAPI_END
