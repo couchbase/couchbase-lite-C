@@ -225,7 +225,8 @@ FLString CBLDatabase_Name(const CBLDatabase*) CBLAPI;
 _cbl_warn_unused
 FLStringResult CBLDatabase_Path(const CBLDatabase*) CBLAPI;
 
-/** Returns the number of documents in the database, or zero if the database is closed or deleted. */
+/** Returns the number of documents in the database, or zero if the database is closed or deleted.
+    @warning  <b>Deprecated :</b> Use CBLCollection_Count on the default collection instead. */
 uint64_t CBLDatabase_Count(const CBLDatabase*) CBLAPI;
 
 /** Returns the database's configuration, as given when it was opened.
@@ -250,6 +251,7 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*) CBLAPI;
     @warning  By default, this listener may be called on arbitrary threads. If your code isn't
                     prepared for that, you may want to use \ref CBLDatabase_BufferNotifications
                     so that listeners will be called in a safe context.
+    @warning  <b>Deprecated :</b> CBLCollectionChangeListener instead.
     @param context  An arbitrary value given when the callback was registered.
     @param db  The database that changed.
     @param numDocs  The number of documents that changed (size of the `docIDs` array)
@@ -261,11 +263,11 @@ typedef void (*CBLDatabaseChangeListener)(void* _cbl_nullable context,
 
 /** Registers a database change listener callback. It will be called after one or more
     documents are changed on disk.
+    @warning  <b>Deprecated :</b> Use CBLCollection_AddChangeListener on the default collection instead.
     @param db  The database to observe.
     @param listener  The callback to be invoked.
     @param context  An opaque value that will be passed to the callback.
-    @return  A token to be passed to \ref CBLListener_Remove when it's time to remove the
-            listener.*/
+    @return  A token to be passed to \ref CBLListener_Remove when it's time to remove the listener.*/
 _cbl_warn_unused
 CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
                                                 CBLDatabaseChangeListener listener,
