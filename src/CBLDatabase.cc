@@ -141,7 +141,7 @@ void CBLDatabase::_closed() {
 #pragma mark - SCOPES:
 
 
-CBLScope* CBLDatabase::getScope(slice scopeName) {
+Retained<CBLScope> CBLDatabase::getScope(slice scopeName) {
     if (!scopeName)
         scopeName = kC4DefaultScopeID;
     
@@ -171,7 +171,7 @@ CBLScope* CBLDatabase::getScope(slice scopeName) {
 #pragma mark - COLLECTIONS:
 
 
-CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName) {
+Retained<CBLCollection> CBLDatabase::getCollection(slice collectionName, slice scopeName) {
     if (!scopeName)
         scopeName = kC4DefaultScopeID;
     
@@ -201,13 +201,13 @@ CBLCollection* CBLDatabase::getCollection(slice collectionName, slice scopeName)
 }
 
 
-CBLCollection* CBLDatabase::createCollection(slice collectionName, slice scopeName) {
+Retained<CBLCollection> CBLDatabase::createCollection(slice collectionName, slice scopeName) {
     if (!scopeName)
         scopeName = kC4DefaultScopeID;
     
     auto c4db = _c4db->useLocked();
     
-    CBLCollection* col = getCollection(collectionName, scopeName);
+    auto col = getCollection(collectionName, scopeName);
     if (col) {
         return col;
     }
@@ -231,7 +231,13 @@ bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
 }
 
 
-CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) {
+Retained<CBLScope> CBLDatabase::getDefaultScope() {
+    _c4db->useLocked();
+    return getScope(kC4DefaultScopeID);
+}
+
+
+Retained<CBLCollection> CBLDatabase::getDefaultCollection(bool mustExist) {
     auto db = _c4db->useLocked();
     
     if (_defaultCollection &&
@@ -248,7 +254,7 @@ CBLCollection* CBLDatabase::getDefaultCollection(bool mustExist) {
 }
 
 
-CBLCollection* CBLDatabase::createCBLCollection(C4Collection* c4col) {
+Retained<CBLCollection> CBLDatabase::createCBLCollection(C4Collection* c4col) {
     auto retainedCollection = make_retained<CBLCollection>(c4col, const_cast<CBLDatabase*>(this));
     auto collection = retainedCollection.get();
     _collections.insert({C4Database::CollectionSpec(c4col->getSpec()), move(retainedCollection)});

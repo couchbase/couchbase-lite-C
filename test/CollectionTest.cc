@@ -187,6 +187,7 @@ TEST_CASE_METHOD(CollectionTest, "Default Collection", "[Collection]") {
     REQUIRE(col);
     CHECK(CBLCollection_Name(col) == kCBLDefaultCollectionName);
     CHECK(CBLCollection_Count(col) == 0);
+    CBLCollection_Release(col);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Default Collection Exists By Default", "[Collection]") {
@@ -199,6 +200,7 @@ TEST_CASE_METHOD(CollectionTest, "Default Collection Exists By Default", "[Colle
     CBLScope* scope = CBLCollection_Scope(col);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == kCBLDefaultScopeName);
+    CBLCollection_Release(col);
     
     col = CBLDatabase_Collection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error);
     REQUIRE(col);
@@ -208,6 +210,7 @@ TEST_CASE_METHOD(CollectionTest, "Default Collection Exists By Default", "[Colle
     scope = CBLCollection_Scope(col);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == kCBLDefaultScopeName);
+    CBLCollection_Release(col);
     
     FLMutableArray names = CBLDatabase_CollectionNames(db, kCBLDefaultScopeName, &error);
     CHECK(Array(names).toJSONString() == R"(["_default"])");
@@ -219,10 +222,12 @@ TEST_CASE_METHOD(CollectionTest, "Default Scope Exists By Default", "[Collection
     CBLScope* scope = CBLDatabase_DefaultScope(db, &error);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == kCBLDefaultScopeName);
+    CBLScope_Release(scope);
     
     scope = CBLDatabase_Scope(db, kCBLDefaultScopeName, &error);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == kCBLDefaultScopeName);
+    CBLScope_Release(scope);
     
     FLMutableArray names = CBLDatabase_ScopeNames(db, &error);
     CHECK(Array(names).toJSONString() == R"(["_default"])");
@@ -237,6 +242,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Default Collection", "[Collection]") {
     // Add some docs:
     createNumberedDocs(col, 100);
     CHECK(CBLCollection_Count(col) == 100);
+    CBLCollection_Release(col);
     
     // Delete the default collection:
     REQUIRE(CBLDatabase_DeleteCollection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error));
@@ -254,7 +260,9 @@ TEST_CASE_METHOD(CollectionTest, "Delete Default Collection", "[Collection]") {
 
 TEST_CASE_METHOD(CollectionTest, "Get Default Scope After Delete Default Collection", "[Collection]") {
     CBLError error = {};
-    REQUIRE(CBLDatabase_DefaultCollection(db, &error));
+    CBLCollection* col = CBLDatabase_DefaultCollection(db, &error);
+    REQUIRE(col);
+    CBLCollection_Release(col);
     
     // Delete the default collection:
     REQUIRE(CBLDatabase_DeleteCollection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error));
@@ -262,6 +270,7 @@ TEST_CASE_METHOD(CollectionTest, "Get Default Scope After Delete Default Collect
     CBLScope* scope = CBLDatabase_DefaultScope(db, &error);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == kCBLDefaultScopeName);
+    CBLScope_Release(scope);
     
     FLMutableArray names = CBLDatabase_CollectionNames(db, kCBLDefaultScopeName, &error);
     CHECK(FLArray_Count(names) == 0);
@@ -277,10 +286,12 @@ TEST_CASE_METHOD(CollectionTest, "Create And Get Collection In Default Scope", "
     CBLScope* scope = CBLCollection_Scope(col);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == kCBLDefaultScopeName);
+    CBLCollection_Release(col);
     
     col = CBLDatabase_Collection(db, "colA"_sl, kCBLDefaultScopeName, &error);
     REQUIRE(col);
     CHECK(CBLCollection_Name(col) == "colA"_sl);
+    CBLCollection_Release(col);
     
     FLMutableArray names = CBLDatabase_CollectionNames(db, kCBLDefaultScopeName, &error);
     CHECK(Array(names).toJSONString() == R"(["_default","colA"])");
@@ -294,10 +305,12 @@ TEST_CASE_METHOD(CollectionTest, "Create And Get Collection In Default Scope", "
     scope = CBLCollection_Scope(col);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == kCBLDefaultScopeName);
+    CBLCollection_Release(col);
     
     col = CBLDatabase_Collection(db, "colA"_sl, kCBLDefaultScopeName, &error);
     REQUIRE(col);
     CHECK(CBLCollection_Name(col) == "colA"_sl);
+    CBLCollection_Release(col);
     
     names = CBLDatabase_CollectionNames(db, kCBLDefaultScopeName, &error);
     CHECK(Array(names).toJSONString() == R"(["_default","colA","colB"])");
@@ -313,10 +326,12 @@ TEST_CASE_METHOD(CollectionTest, "Create And Get Collection In Named Scope", "[C
     CBLScope* scope = CBLCollection_Scope(col);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == "scopeA"_sl);
+    CBLCollection_Release(col);
     
     col = CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
     CHECK(CBLCollection_Name(col) == "colA"_sl);
+    CBLCollection_Release(col);
     
     FLMutableArray names = CBLDatabase_CollectionNames(db, "scopeA"_sl, &error);
     CHECK(Array(names).toJSONString() == R"(["colA"])");
@@ -326,6 +341,7 @@ TEST_CASE_METHOD(CollectionTest, "Create And Get Collection In Named Scope", "[C
     scope = CBLDatabase_Scope(db, "scopeA"_sl, &error);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == "scopeA"_sl);
+    CBLScope_Release(scope);
     
     FLMutableArray scopeNames = CBLDatabase_ScopeNames(db, &error);
     CHECK(Array(scopeNames).toJSONString() == R"(["_default","scopeA"])");
@@ -343,6 +359,9 @@ TEST_CASE_METHOD(CollectionTest, "Create Existing Collection", "[Collection]") {
     CHECK(CBLCollection_Name(col2) == "colA"_sl);
     
     CHECK(col1 == col2);
+    
+    CBLCollection_Release(col1);
+    CBLCollection_Release(col2);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Get Non Existing Collection", "[Collection]") {
@@ -357,6 +376,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[.CBL-3142]") {
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
     CHECK(CBLCollection_Name(col) == "colA"_sl);
+    CBLCollection_Release(col);
     
     col = CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
@@ -365,6 +385,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[.CBL-3142]") {
     // Add some docs:
     createNumberedDocs(col, 100);
     CHECK(CBLCollection_Count(col) == 100);
+    CBLCollection_Release(col);
     
     // Delete:
     REQUIRE(CBLDatabase_DeleteCollection(db, "colA"_sl, "scopeA"_sl, &error));
@@ -378,11 +399,13 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[.CBL-3142]") {
     REQUIRE(col);
     CHECK(CBLCollection_Name(col) == "colA"_sl);
     CHECK(CBLCollection_Count(col) == 0);
-
+    CBLCollection_Release(col);
+    
     col = CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
     CHECK(CBLCollection_Name(col) == "colA"_sl);
     CHECK(CBLCollection_Count(col) == 0);
+    CBLCollection_Release(col);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Get Collections from Scope", "[Collection]") {
@@ -397,14 +420,24 @@ TEST_CASE_METHOD(CollectionTest, "Get Collections from Scope", "[Collection]") {
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == "scopeA"_sl);
     
-    CHECK(CBLScope_Collection(scope, "colA"_sl, &error) == colA);
-    CHECK(CBLScope_Collection(scope, "colB"_sl, &error) == colB);
+    CBLCollection* colA2 = CBLScope_Collection(scope, "colA"_sl, &error);
+    CHECK(colA == colA2);
+    
+    CBLCollection* colB2 = CBLScope_Collection(scope, "colB"_sl, &error);
+    CHECK(colB == colB2);
+    
     CHECK(!CBLScope_Collection(scope, "colC"_sl, &error));
     CHECK(error.code == 0);
     
     FLMutableArray colNames = CBLScope_CollectionNames(scope, &error);
     CHECK(Array(colNames).toJSONString() == R"(["colA","colB"])");
     FLMutableArray_Release(colNames);
+    
+    CBLScope_Release(scope);
+    CBLCollection_Release(colA);
+    CBLCollection_Release(colB);
+    CBLCollection_Release(colA2);
+    CBLCollection_Release(colB2);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Delete All Collections in Scope", "[Collection]") {
@@ -432,8 +465,10 @@ TEST_CASE_METHOD(CollectionTest, "Delete All Collections in Scope", "[Collection
     // Get collections from the scope object:
     CHECK(!CBLScope_Collection(scope, "colA"_sl, &error));
     CHECK(error.code == 0);
+    
     CHECK(!CBLScope_Collection(scope, "colB"_sl, &error));
     CHECK(error.code == 0);
+    
     colNames = CBLScope_CollectionNames(scope, &error);
     CHECK(Array(colNames).toJSONString() == R"([])");
     FLMutableArray_Release(colNames);
@@ -444,6 +479,10 @@ TEST_CASE_METHOD(CollectionTest, "Delete All Collections in Scope", "[Collection
     scopeNames = CBLDatabase_ScopeNames(db, &error);
     CHECK(Array(scopeNames).toJSONString() == R"(["_default"])");
     FLMutableArray_Release(scopeNames);
+    
+    CBLScope_Release(scope);
+    CBLCollection_Release(colA);
+    CBLCollection_Release(colB);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Valid Collection and Scope Names", "[Collection]") {
@@ -454,10 +493,16 @@ TEST_CASE_METHOD(CollectionTest, "Valid Collection and Scope Names", "[Collectio
 
     for (auto name : names) {
         CBLError error = {};
-        CBLCollection* col = CBLDatabase_CreateCollection(db, slice(name), slice(name), &error);
-        REQUIRE(col);
-        col = CBLDatabase_Collection(db, slice(name), slice(name), &error);
-        CHECK(col == col);
+        CBLCollection* col1 = CBLDatabase_CreateCollection(db, slice(name), slice(name), &error);
+        REQUIRE(col1);
+        
+        CBLCollection* col2 = CBLDatabase_Collection(db, slice(name), slice(name), &error);
+        REQUIRE(col2);
+        
+        CHECK(col1 == col2);
+        
+        CBLCollection_Release(col1);
+        CBLCollection_Release(col2);
     }
 }
 
@@ -479,6 +524,7 @@ TEST_CASE_METHOD(CollectionTest, "Invalid Collection and Scope Names", "[Collect
         REQUIRE(!col);
         CHECK(error.domain == kCBLDomain);
         CHECK(error.code == kCBLErrorInvalidParameter);
+        CBLCollection_Release(col);
         
         col = CBLDatabase_CreateCollection(db, "colA"_sl, slice(name), &error);
         REQUIRE(!col);
@@ -496,6 +542,7 @@ TEST_CASE_METHOD(CollectionTest, "Overflow Collection and Scope Names", "[Collec
     CBLError error = {};
     CBLCollection* col = CBLDatabase_CreateCollection(db, slice(name), slice(name), &error);
     REQUIRE(col);
+    CBLCollection_Release(col);
     
     ExpectingExceptions x;
     
@@ -524,6 +571,9 @@ TEST_CASE_METHOD(CollectionTest, "Collection Name Case Sensitive", "[.CBL-3195]"
     FLMutableArray colNames = CBLDatabase_CollectionNames(db, "scopeA"_sl, &error);
     CHECK(Array(colNames).toJSONString() == R"(["_default",COL1","col1"])");
     FLMutableArray_Release(colNames);
+    
+    CBLCollection_Release(col1a);
+    CBLCollection_Release(col1b);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[.CBL-3195]") {
@@ -539,6 +589,9 @@ TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[.CBL-3195]") {
     FLMutableArray scopeNames = CBLDatabase_ScopeNames(db, &error);
     CHECK(Array(scopeNames).toJSONString() == R"(["_default",SCOPEA","scopea"])");
     FLMutableArray_Release(scopeNames);
+    
+    CBLCollection_Release(col1a);
+    CBLCollection_Release(col1b);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB Instances", "[Collection]") {
@@ -561,6 +614,9 @@ TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB 
     CHECK(CBLCollection_Count(col1a) == 20);
     
     CBLDatabase_Release(db2);
+    
+    CBLCollection_Release(col1a);
+    CBLCollection_Release(col1b);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Create then Create Collection using Different DB Instances", "[Collection]") {
@@ -582,6 +638,8 @@ TEST_CASE_METHOD(CollectionTest, "Create then Create Collection using Different 
     CHECK(CBLCollection_Count(col1b) == 20);
     CHECK(CBLCollection_Count(col1a) == 20);
     
+    CBLCollection_Release(col1a);
+    CBLCollection_Release(col1b);
     CBLDatabase_Release(db2);
 }
 
@@ -607,6 +665,8 @@ TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB I
     CHECK(!CBLDatabase_Collection(db2, "colA"_sl, "scopeA"_sl, &error));
     CHECK(error.code == 0);
     
+    CBLCollection_Release(col1a);
+    CBLCollection_Release(col1b);
     CBLDatabase_Release(db2);
 }
 
@@ -638,6 +698,10 @@ TEST_CASE_METHOD(CollectionTest, "Delete and Recreate then Get Collection from D
     REQUIRE(col1d);
     CHECK(col1d != col1b);
     
+    CBLCollection_Release(col1a);
+    CBLCollection_Release(col1b);
+    CBLCollection_Release(col1c);
+    CBLCollection_Release(col1d);
     CBLDatabase_Release(db2);
 }
 
@@ -645,8 +709,6 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection then Use Collection", "[Coll
     CBLError error = {};
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
-    
-    CBLCollection_Retain(col);
     
     REQUIRE(CBLDatabase_DeleteCollection(db, "colA"_sl, "scopeA"_sl, &error));
     
@@ -659,8 +721,6 @@ TEST_CASE_METHOD(CollectionTest, "Close Database then Use Collection", "[Collect
     CBLError error = {};
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
-    
-    CBLCollection_Retain(col);
     
     REQUIRE(CBLDatabase_Close(db, &error));
     CBLDatabase_Release(db);
@@ -675,8 +735,6 @@ TEST_CASE_METHOD(CollectionTest, "Delete Database then Use Scope", "[Collection]
     CBLError error = {};
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
-    
-    CBLCollection_Retain(col);
     
     REQUIRE(CBLDatabase_Delete(db, &error));
     CBLDatabase_Release(db);
@@ -695,8 +753,6 @@ TEST_CASE_METHOD(CollectionTest, "Close Database then Use Scope", "[Collection]"
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
     
-    CBLCollection_Retain(col);
-    
     REQUIRE(CBLDatabase_Close(db, &error));
     CBLDatabase_Release(db);
     db = nullptr;
@@ -711,12 +767,11 @@ TEST_CASE_METHOD(CollectionTest, "Close Database then Use Scope", "[Collection]"
 
 TEST_CASE_METHOD(CollectionTest, "Close Database then Create Or Get Collections and Scopes", "[Collection]") {
     CBLError error = {};
-    CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col);
+    CBLCollection_Release(col);
     
     REQUIRE(CBLDatabase_Close(db, &error));
     
     testInvalidDatabase(db);
-    
-    CBLDatabase_Release(db);
-    db = nullptr;
 }

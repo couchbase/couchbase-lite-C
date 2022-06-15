@@ -145,26 +145,21 @@ public:
         return names;
     }
     
-    CBLScope* _cbl_nullable getScope(slice scopeName);
+    Retained<CBLScope> getScope(slice scopeName);
     
-    CBLCollection* _cbl_nullable getCollection(slice collectionName, slice scopeName);
+    Retained<CBLCollection> getCollection(slice collectionName, slice scopeName);
     
-    CBLCollection* createCollection(slice collectionName, slice scopeName);
+    Retained<CBLCollection> createCollection(slice collectionName, slice scopeName);
     
     bool deleteCollection(slice collectionName, slice scopeName);
     
-    CBLScope* getDefaultScope() {
-        _c4db->useLocked();
-        auto scope = getScope(kC4DefaultScopeID);
-        assert(scope);
-        return scope;
-    }
+    Retained<CBLScope> getDefaultScope();
     
     /**
      * Returned the default collection retained by the database. It will be used for any database's operations
      * that refer to the default collection. If the default collection doesn't exist when getting from the database,
      * the method will throw kC4ErrorNotOpen exception. */
-    CBLCollection* _cbl_nullable getDefaultCollection(bool mustExist);
+    Retained<CBLCollection> getDefaultCollection(bool mustExist);
     
 
 #pragma mark - Queries & Indexes:
@@ -325,7 +320,7 @@ private:
     /**
      Create a CBLCollection from the C4Collection.
      The created CBLCollection will be retained and cached in the _collections map. */
-    CBLCollection* createCBLCollection(C4Collection* c4col);
+    Retained<CBLCollection> createCBLCollection(C4Collection* c4col);
     
     /** Remove and release the CBLCollection from the _collections map */
     void removeCBLCollection(C4Database::CollectionSpec spec);

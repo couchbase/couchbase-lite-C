@@ -103,6 +103,7 @@
 		FC5FBBA62821B3450066157F /* CBLCollection_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = FC5FBBA42821B3450066157F /* CBLCollection_Internal.hh */; };
 		FC5FBBB52821CC2E0066157F /* CBLCollection_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */; };
 		FC5FBBB72821E4970066157F /* CBLDatabase_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */; };
+		FCC063C928588DA6000C5BD7 /* CBLScope.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063C828588DA6000C5BD7 /* CBLScope.cc */; };
 		FCD8298C283591D4004AA814 /* CollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCD8298B283591D4004AA814 /* CollectionTest.cc */; };
 		FCD8298D283591D4004AA814 /* CollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCD8298B283591D4004AA814 /* CollectionTest.cc */; };
 		FCD8299D2835AC3F004AA814 /* CBLScope_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */; };
@@ -395,6 +396,7 @@
 		FC5FBBA32821B3450066157F /* CBLCollection.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection.cc; sourceTree = "<group>"; };
 		FC5FBBA42821B3450066157F /* CBLCollection_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLCollection_Internal.hh; sourceTree = "<group>"; };
 		FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection_CAPI.cc; sourceTree = "<group>"; };
+		FCC063C828588DA6000C5BD7 /* CBLScope.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLScope.cc; sourceTree = "<group>"; };
 		FCD8298B283591D4004AA814 /* CollectionTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CollectionTest.cc; sourceTree = "<group>"; };
 		FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLScope_Internal.hh; sourceTree = "<group>"; };
 		FCD829B12835ECE0004AA814 /* CBLScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLScope.h; sourceTree = "<group>"; };
@@ -525,6 +527,7 @@
 				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
+				FCC063C828588DA6000C5BD7 /* CBLScope.cc */,
 				FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */,
 				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
 				27D11BED2351043B00C58A70 /* ConflictResolver.hh */,
@@ -1213,6 +1216,7 @@
 				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
 				271C2A7621CC4BD60045856E /* Internal.cc in Sources */,
+				FCC063C928588DA6000C5BD7 /* CBLScope.cc in Sources */,
 				FC5FBBA52821B3450066157F /* CBLCollection.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

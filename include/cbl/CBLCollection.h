@@ -45,14 +45,11 @@ CBL_CAPI_BEGIN
     - Both scope and collection names are case sensitive.
  
     ## `CBLCollection` Lifespan
-    `CBLCollection` is ref-counted and is owned by the database object that creates it. Hence,
-    most of the time there is no need to retain or release it. A `CBLCollection` object and its
-    reference remain valid until either the database is closed or the collection itself is deleted.
- 
-    If the collection reference needs to be kept longer, the collection object should be retained,
-    and the reference will remain valid until it's released. Most operations on the invalid \ref
-    CBLCollection object will fail with either the \ref kCBLErrorNotOpen error or null/zero/empty
-    result.
+    `CBLCollection` is ref-counted. Same as the CBLDocument, the CBLCollection objects
+    created or retrieved from the database must be released after you are done using them.
+    When the database is closed or released, the collection objects will become invalid,
+    most operations on the invalid \ref CBLCollection object will fail with either the
+    \ref kCBLErrorNotOpen error or null/zero/empty result.
  
     ##Legacy Database and API
     When using the legacy database, the existing documents and indexes in the database will be
@@ -97,11 +94,7 @@ FLMutableArray _cbl_nullable CBLDatabase_CollectionNames(const CBLDatabase* db,
 /** Returns an existing scope with the given name.
     The scope exists when there is at least one collection created under the scope.
     The default scope is exception in that it will always exists even there are no collections under it.
-    @note  CBLScope is ref-counted and is owned by the database object, and it will remain
-           valid until the database is closed, or it has been invalidated as all collections in it have
-           been deleted. Therefore, there is no need to retain or release. However, If the reference
-           needs to be kept longer, the object needs to be retained, and it will remain valid until
-           it is released.
+    @note  You are responsible for releasing the returned scope.
     @param db  The database.
     @param scopeName  The name of the scope.
     @param outError  On failure, the error will be written here.
@@ -111,10 +104,7 @@ CBLScope* _cbl_nullable CBLDatabase_Scope(const CBLDatabase* db,
                                           CBLError* _cbl_nullable outError) CBLAPI;
 
  /** Returns the existing collection with the given name and scope.
-    @note  CBLCollection is ref-counted and is owned by the database object, and it will remain
-           valid until the database is closed, or the collection itself is deleted. Therefore,
-           there is no need to retain or release. However, If the reference needs to be kept longer,
-           the object needs to be retained, and it will remain valid until it is released.
+    @note  You are responsible for releasing the returned collection.
     @param db  The database.
     @param collectionName  The name of the collection.
     @param scopeName  The name of the scope.
@@ -133,10 +123,7 @@ CBLCollection* _cbl_nullable CBLDatabase_Collection(const CBLDatabase* db,
         - Cannot start with _ or %.
         - Both scope and collection names are case sensitive.
     @note  If the collection already exists, the existing collection will be returned.
-    @note  CBLCollection is ref-counted and is owned by the database object, and it will remain
-           valid until the database is closed, or the collection itself is deleted. Therefore,
-           there is no need to retain or release. However, If the reference needs to be kept longer,
-           the object needs to be retained, and it will remain valid until it is released.
+    @note  You are responsible for releasing the returned collection.
     @param db  The database.
     @param collectionName  The name of the collection.
     @param scopeName  The name of the scope.
@@ -160,6 +147,7 @@ bool CBLDatabase_DeleteCollection(CBLDatabase* db,
 
 /** Returns the default scope.
     @note  The default scope always exist even there are no collections under it.
+    @note  You are responsible for releasing the returned scope.
     @param db  The database.
     @param outError  On failure, the error will be written here.
     @return  A \ref CBLScope instance, or NULL if an error occurred. */
@@ -168,6 +156,8 @@ CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db,
 
 /** Returns the default collection.
     @note  The default collection may not exist if it was deleted.
+           Also, the default collection cannot be recreated after being deleted.
+    @note  You are responsible for releasing the returned scope.
     @param db  The database.
     @param outError  On failure, the error will be written here.
     @return  A \ref CBLCollection instance, or NULL if the default collection doesn't exist or an error occurred. */
@@ -182,11 +172,11 @@ CBLCollection* _cbl_nullable CBLDatabase_DefaultCollection(const CBLDatabase* db
  */
 
 /** Returns the scope of the collection.
-    @note  CBLScope is ref-counted and is owned by the database object. Therefore,
-           most of the time there is no need to retain or release it. However if the reference
-           needs to be kept longer, the reference needs to be retained, and it will remain
-           valid until it is released. Most operations on the invalid \ref CBLScope object will
-           fail with null/zero/empty result.
+    @note  The returned scope object is a property of the collection object, and therefore
+           its lifetime will depend on the lifetime of the collection object.
+           If the returned scope object needs to keep longer, it needs to be explicitly retain
+           using \ref CBLScope_Retain function, and the object will remain valid until it is
+           explicitly released by using \ref CBLScope_Release function.
     @param collection  The collection.
     @return A \ref CBLScope instance. */
 CBLScope* CBLCollection_Scope(const CBLCollection* collection) CBLAPI;

@@ -359,8 +359,8 @@ private:
         // CBL-3191:
         // As now LiteCore doesn't send the correct colSpec and has no
         // collections supported, call to get the default collection:
-        CBLCollection *col = _conf.database->getDefaultCollection(false);
-        Retained<CBLDocument> doc = new CBLDocument(col, docID, revID, flags, body);
+        auto col = _conf.database->getDefaultCollection(false);
+        Retained<CBLDocument> doc = new CBLDocument(col.get(), docID, revID, flags, body);
         CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
         
         CBLDocumentFlags docFlags = 0;
