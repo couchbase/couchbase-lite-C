@@ -346,12 +346,14 @@ FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) noexcept {
 namespace cbl_internal {
     struct DatabaseChangeContext {
         const CBLDatabase* database;
+        const CBLCollection* collection;
         CBLDatabaseChangeListener listener;
         void* context;
     };
 
     struct DocumentChangeContext {
         const CBLDatabase* database;
+        const CBLCollection* collection;
         CBLDocumentChangeListener listener;
         void* context;
     };
@@ -373,10 +375,15 @@ CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
     };
 
     try {
-        CBLCollection* col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        CBLCollection* col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true).detach();
+        wrappedContext->collection = col;
+        
         auto token = CBLCollection_AddChangeListener(col, wrappedListener, wrappedContext);
         token->extraInfo().pointer = wrappedContext;
-        token->extraInfo().destructor = [](void* ctx) {free(ctx);};
+        token->extraInfo().destructor = [](void* ctx) {
+            CBLCollection_Release(static_cast<DatabaseChangeContext*>(ctx)->collection);
+            free(ctx);
+        };
         return token;
     } catchAndBridgeReturning(nullptr, make_retained<CBLListenerToken>((const void*)listener, nullptr).detach())
 }
@@ -409,10 +416,15 @@ CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db,
     };
     
     try {
-        CBLCollection* col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        CBLCollection* col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true).detach();
+        wrappedContext->collection = col;
+        
         auto token = CBLCollection_AddDocumentChangeListener(col, docID, wrappedListener, wrappedContext);
         token->extraInfo().pointer = wrappedContext;
-        token->extraInfo().destructor = [](void* ctx) {free(ctx);};
+        token->extraInfo().destructor = [](void* ctx) {
+            CBLCollection_Release(static_cast<DatabaseChangeContext*>(ctx)->collection);
+            free(ctx);
+        };
         return token;
     } catchAndBridgeReturning(nullptr, make_retained<CBLListenerToken>((const void*)listener, nullptr).detach())
 }

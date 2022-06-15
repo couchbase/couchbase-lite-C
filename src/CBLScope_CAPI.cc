@@ -17,6 +17,7 @@
 //
 
 #include "CBLScope_Internal.hh"
+#include "CBLCollection_Internal.hh"
 
 #pragma mark - CONSTANTS
 
@@ -43,6 +44,6 @@ CBLCollection* CBLScope_Collection(const CBLScope* scope,
                                    CBLError* outError) noexcept
 {
     try {
-        return scope->getCollection(collectionName);
+        return scope->getCollection(collectionName).detach();
     } catchAndBridge(outError)
 }

@@ -127,6 +127,7 @@ set(
     src/CBLQuery.cc
     src/CBLQuery_CAPI.cc
     src/CBLReplicator_CAPI.cc
+    src/CBLScope.cc
     src/CBLScope_CAPI.cc
     src/ConflictResolver.cc
     src/Internal.cc

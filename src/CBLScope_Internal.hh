@@ -46,11 +46,7 @@ public:
         return _database->collectionNames(_name);
     }
     
-    CBLCollection* _cbl_nullable getCollection(slice collectionName) const {
-        LOCK(_mutex);
-        checkOpen();
-        return _database->getCollection(collectionName, _name);
-    }
+    Retained<CBLCollection> getCollection(slice collectionName) const;
     
 protected:
     

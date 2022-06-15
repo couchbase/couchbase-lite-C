@@ -45,7 +45,7 @@ FLMutableArray CBLDatabase_CollectionNames(const CBLDatabase* db,
 
 CBLScope* CBLDatabase_Scope(const CBLDatabase* db, FLString scopeName, CBLError* outError) noexcept {
     try {
-        return const_cast<CBLDatabase*>(db)->getScope(scopeName);
+        return const_cast<CBLDatabase*>(db)->getScope(scopeName).detach();
     } catchAndBridge(outError)
 }
 
@@ -55,7 +55,7 @@ CBLCollection* CBLDatabase_Collection(const CBLDatabase* db,
                                       CBLError* outError) noexcept
 {
     try {
-        return const_cast<CBLDatabase*>(db)->getCollection(collectionName, scopeName);
+        return const_cast<CBLDatabase*>(db)->getCollection(collectionName, scopeName).detach();
     } catchAndBridge(outError)
 }
 
@@ -65,7 +65,7 @@ CBLCollection* CBLDatabase_CreateCollection(CBLDatabase* db,
                                             CBLError* outError) noexcept
 {
     try {
-        return db->createCollection(collectionName, scopeName);
+        return db->createCollection(collectionName, scopeName).detach();
     } catchAndBridge(outError)
 }
 
@@ -81,13 +81,13 @@ bool CBLDatabase_DeleteCollection(CBLDatabase* db,
 
 CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db, CBLError* outError) noexcept {
     try {
-        return const_cast<CBLDatabase*>(db)->getDefaultScope();
+        return const_cast<CBLDatabase*>(db)->getDefaultScope().detach();
     } catchAndBridge(outError)
 }
 
 CBLCollection* CBLDatabase_DefaultCollection(const CBLDatabase* db, CBLError* outError) noexcept {
     try {
-        return const_cast<CBLDatabase*>(db)->getDefaultCollection(false);
+        return const_cast<CBLDatabase*>(db)->getDefaultCollection(false).detach();
     } catchAndBridge(outError)
 }
 

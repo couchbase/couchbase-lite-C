@@ -31,15 +31,11 @@ CBL_CAPI_BEGIN
     under it.
  
     ## `CBLScope` Lifespan
-    `CBLScope` is ref-counted and is owned by the database object that creates it. Hence,
-    most of the time there is no need to retain or release it. A `CBLScope` object and its
-    reference remain valid until either the database is closed or the scope itself is invalidated
-    as all collections in the scope have been deleted.
-
-    If the scope reference needs to be kept longer, the scope object should be retained,
-    and the reference will remain valid until it's released. Most operations on the invalid
-    CBLScope object will fail with null or empty result.
- */
+    `CBLScope` is ref-counted. Same as the CBLCollection, the CBLScope objects
+    retrieved from the database must be released after you are done using them.
+    When the database is closed or released, the scope objects will become invalid,
+    most operations on the invalid \ref CBLCollection object will fail with
+    \ref kCBLErrorNotOpen error result. */
 
 CBL_REFCOUNTED(CBLScope*, Scope);
 
@@ -79,10 +75,7 @@ FLMutableArray _cbl_nullable CBLScope_CollectionNames(const CBLScope* scope,
                                                       CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns an existing collection in the scope with the given name.
-    @note  CBLCollection is ref-counted and is owned by the database object, and it will remain
-           valid until the database is closed, or the collection itself is deleted. Therefore, there
-           is no need to retain or release it. However if the reference needs to be kept longer,
-           the object needs to be retained, and it will remain valid until it is released.
+    @note  You are responsible for releasing the returned collection.
     @param scope  The scope.
     @param collectionName  The name of the collection.
     @param outError  On failure, the error will be written here.
