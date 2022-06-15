@@ -247,3 +247,4 @@ If you've created a language binding, please let us know by filing an issue, or 
 * **Nim**: [couchbase-lite-nim](https://github.com/couchbaselabs/couchbase-lite-nim)
 * **Python**: [couchbase-lite-python](https://github.com/couchbaselabs/couchbase-lite-python)
 * **Rust**: [couchbase-lite-rust](https://github.com/couchbaselabs/couchbase-lite-rust)
+* **NodeJS**: [vscode-cblite#use-as-nodejs-binding](https://github.com/couchbaselabs/vscode-cblite#use-as-nodejs-binding)
