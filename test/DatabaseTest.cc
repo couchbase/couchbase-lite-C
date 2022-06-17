@@ -275,7 +275,7 @@ TEST_CASE_METHOD(DatabaseTest, "Database Encryption") {
 #pragma mark - Document:
 
 
-TEST_CASE_METHOD(DatabaseTest, "Missing Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Missing Document") {
     CBLError error;
     const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo"_sl, &error);
     CHECK(doc == nullptr);
@@ -290,56 +290,7 @@ TEST_CASE_METHOD(DatabaseTest, "Missing Document") {
     CHECK(error.code == kCBLErrorNotFound);
 }
 
-
-TEST_CASE_METHOD(DatabaseTest, "New Document") {
-    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
-    CHECK(doc != nullptr);
-    CHECK(CBLDocument_ID(doc) == "foo"_sl);
-    CHECK(CBLDocument_RevisionID(doc) == nullslice);
-    CHECK(CBLDocument_Sequence(doc) == 0);
-    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
-    CHECK(CBLDocument_MutableProperties(doc) == CBLDocument_Properties(doc));
-    CBLDocument_Release(doc);
-}
-
-
-TEST_CASE_METHOD(DatabaseTest, "New Document With Auto ID") {
-    CBLDocument* doc = CBLDocument_Create();
-    CHECK(doc != nullptr);
-    CHECK(CBLDocument_ID(doc) != nullslice);
-    CHECK(CBLDocument_RevisionID(doc) == nullslice);
-    CHECK(CBLDocument_Sequence(doc) == 0);
-    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
-    CHECK(CBLDocument_MutableProperties(doc) == CBLDocument_Properties(doc));
-    CBLDocument_Release(doc);
-}
-
-
-TEST_CASE_METHOD(DatabaseTest, "Mutable Copy New Document") {
-    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
-    CHECK(doc != nullptr);
-    MutableDict props = CBLDocument_MutableProperties(doc);
-    props["greeting"_sl] = "Howdy!"_sl;
-    
-    CHECK(CBLDocument_ID(doc) == "foo"_sl);
-    CHECK(CBLDocument_RevisionID(doc) == nullslice);
-    CHECK(CBLDocument_Sequence(doc) == 0);
-    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
-    CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
-    
-    CBLDocument* mDoc = CBLDocument_MutableCopy(doc);
-    CHECK(mDoc != doc);
-    CHECK(CBLDocument_ID(doc) == "foo"_sl);
-    CHECK(CBLDocument_Sequence(mDoc) == 0);
-    CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
-    CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
-    
-    CBLDocument_Release(doc);
-    CBLDocument_Release(mDoc);
-}
-
-
-TEST_CASE_METHOD(DatabaseTest, "Mutable Copy Immutable Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Mutable Copy Immutable Document") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     CHECK(doc != nullptr);
     MutableDict props = CBLDocument_MutableProperties(doc);
@@ -369,7 +320,7 @@ TEST_CASE_METHOD(DatabaseTest, "Mutable Copy Immutable Document") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Access nested collections from mutable props") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Access nested collections from mutable props") {
     CBLError error;
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     REQUIRE(doc);
@@ -436,7 +387,7 @@ TEST_CASE_METHOD(DatabaseTest, "Access nested collections from mutable props") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Access nested collections from a copy of modified mutable doc") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Access nested collections from a copy of modified mutable doc") {
     CBLError error;
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     REQUIRE(doc);
@@ -497,30 +448,14 @@ TEST_CASE_METHOD(DatabaseTest, "Access nested collections from a copy of modifie
     CBLDocument_Release(doc);
 }
 
-TEST_CASE_METHOD(DatabaseTest, "Set MutableProperties") {
-    CBLDocument* doc1 = CBLDocument_Create();
-    FLMutableDict prop1 = CBLDocument_MutableProperties(doc1);
-    FLMutableDict_SetString(prop1, "greeting"_sl, "hello"_sl);
-    
-    CBLDocument* doc2 = CBLDocument_Create();
-    CBLDocument_SetProperties(doc2, prop1);
-    FLMutableDict prop2 = CBLDocument_MutableProperties(doc2);
-    CHECK(FLValue_AsString(FLDict_Get(prop2, "greeting"_sl)) == "hello"_sl );
-    CHECK(prop1 == prop2);
-    
-    CBLDocument_Release(doc1);
-    CHECK(FLValue_AsString(FLDict_Get(prop2, "greeting"_sl)) == "hello"_sl );
-    CBLDocument_Release(doc2);
-}
-
-TEST_CASE_METHOD(DatabaseTest, "Get Non Existing Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Get Non Existing Document") {
     CBLError error;
     const CBLDocument* doc = CBLDatabase_GetDocument(db, "foo"_sl, &error);
     REQUIRE(doc == nullptr);
     CHECK(error.code == 0);
 }
 
-TEST_CASE_METHOD(DatabaseTest, "Get Document with Empty ID") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Get Document with Empty ID") {
     CBLError error;
     ExpectingExceptions x;
     const CBLDocument* doc = CBLDatabase_GetDocument(db, ""_sl, &error);
@@ -528,11 +463,10 @@ TEST_CASE_METHOD(DatabaseTest, "Get Document with Empty ID") {
     CHECK(error.code == 0);
 }
 
-
 #pragma mark - Save Document:
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Empty Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Empty Document") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     CBLError error;
     REQUIRE(CBLDatabase_SaveDocument(db, doc, &error));
@@ -550,7 +484,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Empty Document") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Document With Property") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document With Property") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     MutableDict props = CBLDocument_MutableProperties(doc);
     props["greeting"_sl] = "Howdy!"_sl;
@@ -575,7 +509,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document With Property") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Document Twice") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document Twice") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     MutableDict props = CBLDocument_MutableProperties(doc);
     props["greeting"_sl] = "Howdy!"_sl;
@@ -614,7 +548,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document Twice") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Document with LastWriteWin") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document with LastWriteWin") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     FLMutableDict props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
@@ -656,7 +590,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with LastWriteWin") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Document with FailOnConflict") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document with FailOnConflict") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     FLMutableDict props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
@@ -700,7 +634,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with FailOnConflict") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document with Conflict Handler") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     FLMutableDict props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
@@ -758,7 +692,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler : Called twice") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document with Conflict Handler : Called twice") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     FLMutableDict props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
@@ -824,7 +758,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler : Called twi
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler : On another thread") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document with Conflict Handler : On another thread") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     FLMutableDict props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
@@ -884,7 +818,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document with Conflict Handler : On another
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Document into Different DB") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document into Different DB") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     FLMutableDict props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
@@ -903,7 +837,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document into Different DB") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save Document into Different DB Instance") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document into Different DB Instance") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     FLMutableDict props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
@@ -929,7 +863,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document into Different DB Instance") {
 #pragma mark - Delete Document:
 
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Non Existing Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Non Existing Document") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     
     ExpectingExceptions x;
@@ -947,7 +881,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Non Existing Document") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Document") {
     createDocument(db, "doc1", "foo", "bar");
     createDocument(db, "doc2", "foo", "bar");
     
@@ -966,7 +900,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Document") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Already Deleted Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Already Deleted Document") {
     createDocument(db, "doc1", "foo", "bar");
     
     CBLError error;
@@ -985,7 +919,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Already Deleted Document") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Then Update Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Then Update Document") {
     createDocument(db, "doc1", "foo", "bar");
     
     CBLError error;
@@ -1008,7 +942,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Then Update Document") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Document with LastWriteWin") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Document with LastWriteWin") {
     createDocument(db, "doc1", "foo", "bar");
 
     CBLError error;
@@ -1034,7 +968,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Document with LastWriteWin") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Document with FailOnConflict") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Document with FailOnConflict") {
     createDocument(db, "doc1", "foo", "bar");
 
     CBLError error;
@@ -1067,7 +1001,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Document with FailOnConflict") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Document from Different DB") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Document from Different DB") {
     createDocument(db, "doc1", "foo", "bar");
     
     CBLError error;
@@ -1085,7 +1019,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Document from Different DB") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Document from Different DB Instance") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Document from Different DB Instance") {
     createDocument(db, "doc1", "foo", "bar");
     
     CBLError error;
@@ -1110,7 +1044,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Document from Different DB Instance") {
 #pragma mark - Purge Document:
 
 
-TEST_CASE_METHOD(DatabaseTest, "Purge Non Existing Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Purge Non Existing Document") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     
     ExpectingExceptions x;
@@ -1127,7 +1061,7 @@ TEST_CASE_METHOD(DatabaseTest, "Purge Non Existing Document") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Purge Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Purge Document") {
     createDocument(db, "doc1", "foo", "bar");
     createDocument(db, "doc2", "foo", "bar");
     
@@ -1145,7 +1079,7 @@ TEST_CASE_METHOD(DatabaseTest, "Purge Document") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Purge Already Purged Document") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Purge Already Purged Document") {
     createDocument(db, "doc1", "foo", "bar");
     
     CBLError error;
@@ -1167,7 +1101,7 @@ TEST_CASE_METHOD(DatabaseTest, "Purge Already Purged Document") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Purge Document from Different DB") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Purge Document from Different DB") {
     createDocument(db, "doc1", "foo", "bar");
     
     CBLError error;
@@ -1185,7 +1119,7 @@ TEST_CASE_METHOD(DatabaseTest, "Purge Document from Different DB") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Purge Document from Different DB Instance") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Purge Document from Different DB Instance") {
     createDocument(db, "doc1", "foo", "bar");
     
     CBLError error;
@@ -1241,7 +1175,7 @@ TEST_CASE_METHOD(DatabaseTest, "Copy Database") {
 #pragma mark - Document Expiry:
 
 
-TEST_CASE_METHOD(DatabaseTest, "Expiration") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Expiration") {
     createDocument(db, "doc1", "foo", "bar");
     createDocument(db, "doc2", "foo", "bar");
     createDocument(db, "doc3", "foo", "bar");
@@ -1261,7 +1195,7 @@ TEST_CASE_METHOD(DatabaseTest, "Expiration") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Expiration After Reopen") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Expiration After Reopen") {
     createDocument(db, "doc1", "foo", "bar");
     createDocument(db, "doc2", "foo", "bar");
     createDocument(db, "doc3", "foo", "bar");
@@ -1458,7 +1392,7 @@ TEST_CASE_METHOD(DatabaseTest, "Transaction Abort") {
 #pragma mark - LISTENERS:
 
 
-TEST_CASE_METHOD(DatabaseTest, "Database notifications") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy -Database notifications") {
     // Add a listener:
     dbListenerCalls = fooListenerCalls = 0;
     auto token = CBLDatabase_AddChangeListener(db, dbListener, this);
@@ -1480,7 +1414,7 @@ TEST_CASE_METHOD(DatabaseTest, "Database notifications") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Remove Database Listener after releasing database") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Remove Database Listener after releasing database") {
     // Add a listener:
     dbListenerCalls = fooListenerCalls = 0;
     auto token = CBLDatabase_AddChangeListener(db, dbListener, this);
@@ -1571,7 +1505,10 @@ TEST_CASE_METHOD(DatabaseTest, "Scheduled database notifications") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Set blob in document", "[Blob]") {
+#pragma mark - BLOBS:
+
+
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Set blob in document", "[Blob]") {
     // Create and Save blob:
     CBLError error;
     FLSlice blobContent = FLStr("I'm Blob.");
@@ -1597,7 +1534,7 @@ TEST_CASE_METHOD(DatabaseTest, "Set blob in document", "[Blob]") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Set blob in document using indirect properties", "[Blob]") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Set blob in document using indirect properties", "[Blob]") {
     // Create and Save blob:
     CBLError error;
     FLSlice blobContent = FLStr("I'm Blob.");
@@ -1627,7 +1564,7 @@ TEST_CASE_METHOD(DatabaseTest, "Set blob in document using indirect properties",
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save blob and set blob in document", "[Blob]") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save blob and set blob in document", "[Blob]") {
     // Create and Save blob:
     CBLError error;
     FLSlice blobContent = FLStr("I'm Blob.");
@@ -1654,7 +1591,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save blob and set blob in document", "[Blob]") {
 }
 
 
-TEST_CASE_METHOD(DatabaseTest, "Save blob and set blob properties in document", "[Blob]") {
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Save blob and set blob properties in document", "[Blob]") {
     // Create and Save blob:
     CBLError error;
     FLSlice blobContent = FLStr("I'm Blob.");

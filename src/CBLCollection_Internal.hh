@@ -44,6 +44,7 @@ public:
     slice name() const noexcept             {return _name;}
     bool isValid() const                    {return _c4col.useLocked()->isValid();}
     uint64_t count() const                  {return _c4col.useLocked()->getDocumentCount();}
+    uint64_t lastSequence() const           {return static_cast<uint64_t>(_c4col.useLocked()->getLastSequence());}
     
     /** Throw NotOpen if the collection or database is invalid */
     CBLDatabase* database() const           {return _c4col.database();}
