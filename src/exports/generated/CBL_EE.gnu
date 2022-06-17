@@ -93,11 +93,13 @@ CBL_C {
 		CBLCollection_Name;
 		CBLCollection_Scope;
 		CBLCollection_Count;
+		CBLCollection_LastSequence;
 		CBLCollection_GetDocument;
 		CBLCollection_SaveDocument;
 		CBLCollection_SaveDocumentWithConcurrencyControl;
 		CBLCollection_SaveDocumentWithConflictHandler;
 		CBLCollection_DeleteDocument;
+		CBLCollection_DeleteDocumentByID;
 		CBLCollection_DeleteDocumentWithConcurrencyControl;
 		CBLCollection_PurgeDocument;
 		CBLCollection_PurgeDocumentByID;

@@ -113,6 +113,13 @@ uint64_t CBLCollection_Count(const CBLCollection* collection) noexcept {
     } catchAndWarn()
 }
 
+/** Private API */
+uint64_t CBLCollection_LastSequence(const CBLCollection* collection) noexcept {
+    try {
+        return collection->lastSequence();
+    } catchAndWarn()
+}
+
 #pragma mark - DOCUMENTS
 
 const CBLDocument* CBLCollection_GetDocument(const CBLCollection* collection, FLString docID,

@@ -28,9 +28,13 @@ CBL_CAPI_BEGIN
     void CBLLog_BeginExpectingExceptions() CBLAPI;
     void CBLLog_EndExpectingExceptions() CBLAPI;
 
-    /** Returns the last sequence number assigned in the database.
-        This starts at zero and increments every time a document is saved or deleted. */
+/** Returns the last sequence number assigned in the database (default collection).
+    This starts at zero and increments every time a document is saved or deleted. */
     uint64_t CBLDatabase_LastSequence(const CBLDatabase*) CBLAPI;
+
+/** Returns the last sequence number assigned in the collection.
+    This starts at zero and increments every time a document is saved or deleted. */
+    uint64_t CBLCollection_LastSequence(const CBLCollection*) CBLAPI;
 
 /** Deletes a document from the database, given only its ID.
     @note  If no document with that ID exists, this function will return false but the error
