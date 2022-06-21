@@ -207,8 +207,8 @@ private:
         static const uint32_t kMaxChanges = 100;
         while (true) {
             C4CollectionObserver::Change c4changes[kMaxChanges];
-            bool external;
-            uint32_t nChanges = _observer->getChanges(c4changes, kMaxChanges, &external);
+            auto result = _observer->getChanges(c4changes, kMaxChanges);
+            uint32_t nChanges = result.numChanges;
             if (nChanges == 0)
                 break;
 

@@ -34,7 +34,8 @@ namespace cbl_internal {
         ,_docID(docID)
         {
             _c4obs = _collection->useLocked()->observeDocument(docID, [this](C4DocumentObserver*,
-                                                                             slice docID,
+                                                                             C4Collection*,
+                                                                             slice,
                                                                              C4SequenceNumber) {
                 this->docChanged();
             });
