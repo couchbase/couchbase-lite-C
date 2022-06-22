@@ -42,7 +42,7 @@ public:
     
     CBLScope* scope() noexcept              {return _scope;}
     slice name() const noexcept             {return _name;}
-    bool isValid() const                    {return _c4col.useLocked()->isValid();}
+    bool isValid() const noexcept           {return _c4col.isValid();}
     uint64_t count() const                  {return _c4col.useLocked()->getDocumentCount();}
     uint64_t lastSequence() const           {return static_cast<uint64_t>(_c4col.useLocked()->getLastSequence());}
     
@@ -237,14 +237,20 @@ private:
         C4CollectionAccessLock(C4Collection* c4col, CBLDatabase* database)
         :shared_access_lock(std::move(c4col), *database->c4db())
         ,_c4db(database->c4db())
+        ,_col(c4col)
         ,_db(database)
         {
             _sentry = [this](C4Collection* c4col) {
-                if (!_db || !c4col->isValid()) {
+                if (!_isValid()) {
                     C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
                                    "Invalid collection: either deleted, or db closed");
                 }
             };
+        }
+        
+        bool isValid() const noexcept {
+            LOCK_GUARD lock(getMutex());
+            return _isValid();
         }
         
         CBLDatabase* database() const {
@@ -253,14 +259,17 @@ private:
         }
         
         /** Invalidate the database pointer */
-        void close() {
-            auto lock = useLocked();
+        void close() noexcept {
+            LOCK_GUARD lock(getMutex());
             _db = nullptr;
         }
         
     private:
+        bool _isValid() const noexcept                  { return _db && _col->isValid(); }
+        
         CBLDatabase::SharedC4DatabaseAccessLock _c4db;  // For retaining the shared lock
         CBLDatabase* _cbl_nullable              _db;
+        C4Collection*                           _col;
     };
     
 #pragma mark - VARIABLES :
