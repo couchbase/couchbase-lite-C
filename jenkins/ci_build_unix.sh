@@ -79,16 +79,22 @@ echo
 
 cd ${WORKSPACE}/build_release/
 cp ${WORKSPACE}/product-texts/mobile/couchbase-lite/license/LICENSE_$EDITION.txt libcblite-$VERSION/LICENSE.txt
+#notices.txt is produced by blackduck.
+#It is not part of source tar, it is download to the workspace by a separate curl command by jenkins job.
+if [[ -f ${WORKSPACE}/notices.txt ]]; then
+    cp ${WORKSPACE}/notices.txt libcblite-$VERSION/notices.txt
+fi
 # Create separate symbols pkg
 if [[ "${OS}" == "macos" ]]; then
-    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/LICENSE.txt libcblite-$VERSION/include libcblite-$VERSION/lib
+    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/*.txt libcblite-$VERSION/include libcblite-$VERSION/lib
     SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${EDITION}-${VERSION}-${BLD_NUM}-${OS}-'symbols'.${PKG_TYPE}
     ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME}  libcblite-$VERSION/libcblite.dylib.dSYM
 else # linux
-    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/LICENSE.txt libcblite-$VERSION/include libcblite-$VERSION/lib
+    ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION/*.txt libcblite-$VERSION/include libcblite-$VERSION/lib
     SYMBOLS_RELEASE_PKG_NAME=${PRODUCT}-${EDITION}-${VERSION}-${BLD_NUM}-${OS}-'symbols'.${PKG_TYPE}
     ${PKG_CMD} ${WORKSPACE}/${SYMBOLS_RELEASE_PKG_NAME} libcblite-$VERSION/libcblite*.sym
 fi
+
 cd ${WORKSPACE}
 
 echo "PRODUCT=${PRODUCT}"  >> ${PROP_FILE}

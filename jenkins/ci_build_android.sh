@@ -92,6 +92,11 @@ echo
 
 cd $(pwd)/..
 cp ${WORKSPACE}/product-texts/mobile/couchbase-lite/license/LICENSE_$EDITION.txt libcblite-$VERSION/LICENSE.txt
+#notices.txt is produced by blackduck.
+#It is not part of source tar, it is download to the workspace by a separate curl command by jenkins job.
+if [[ -f ${WORKSPACE}/notices.txt ]]; then
+    cp ${WORKSPACE}/notices.txt libcblite-$VERSION/notices.txt
+fi
 ${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} libcblite-$VERSION
 
 cd ${WORKSPACE}
