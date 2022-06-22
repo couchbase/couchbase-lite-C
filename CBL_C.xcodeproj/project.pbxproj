@@ -106,6 +106,11 @@
 		FCC063C928588DA6000C5BD7 /* CBLScope.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063C828588DA6000C5BD7 /* CBLScope.cc */; };
 		FCC063F3285BA641000C5BD7 /* DocumentTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063F2285BA641000C5BD7 /* DocumentTest.cc */; };
 		FCC06403285BCAC9000C5BD7 /* DocumentTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063F2285BA641000C5BD7 /* DocumentTest.cc */; };
+		FCC064122862B848000C5BD7 /* CBLBlob.h in Headers */ = {isa = PBXBuildFile; fileRef = 275BC4CC22012D8700DBE7D2 /* CBLBlob.h */; };
+		FCC064202862B850000C5BD7 /* CBLScope.h in Headers */ = {isa = PBXBuildFile; fileRef = FCD829B12835ECE0004AA814 /* CBLScope.h */; };
+		FCC064212862B851000C5BD7 /* CBLScope.h in Headers */ = {isa = PBXBuildFile; fileRef = FCD829B12835ECE0004AA814 /* CBLScope.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FCC064222862B859000C5BD7 /* CBL_Compat.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A7021CAD6440045856E /* CBL_Compat.h */; };
+		FCC064232862B869000C5BD7 /* CouchbaseLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 27B61DA321D6E40D0027CCDB /* CouchbaseLite.h */; };
 		FCD8298C283591D4004AA814 /* CollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCD8298B283591D4004AA814 /* CollectionTest.cc */; };
 		FCD8298D283591D4004AA814 /* CollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCD8298B283591D4004AA814 /* CollectionTest.cc */; };
 		FCD8299D2835AC3F004AA814 /* CBLScope_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */; };
@@ -699,9 +704,13 @@
 				FCD8299D2835AC3F004AA814 /* CBLScope_Internal.hh in Headers */,
 				277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */,
 				FC5FBBB72821E4970066157F /* CBLDatabase_Internal.hh in Headers */,
+				FCC064202862B850000C5BD7 /* CBLScope.h in Headers */,
 				27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */,
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
+				FCC064232862B869000C5BD7 /* CouchbaseLite.h in Headers */,
+				FCC064222862B859000C5BD7 /* CBL_Compat.h in Headers */,
 				271C2A3421CAC98F0045856E /* CBLDatabase.h in Headers */,
+				FCC064122862B848000C5BD7 /* CBLBlob.h in Headers */,
 				271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */,
 				271C2A3221CAC98F0045856E /* CBLBase.h in Headers */,
 				27886C8D21F64C1400069BEA /* Listener.hh in Headers */,
@@ -729,6 +738,7 @@
 				93C70CE126C4D3F90093E927 /* CBLEncryptable.h in Headers */,
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
 				27984E342249A247000FE777 /* Database.hh in Headers */,
+				FCC064212862B851000C5BD7 /* CBLScope.h in Headers */,
 				27984E352249A247000FE777 /* Document.hh in Headers */,
 				27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */,
 				27984E362249A247000FE777 /* Query.hh in Headers */,
