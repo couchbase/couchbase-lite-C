@@ -152,7 +152,17 @@ Retained<CBLScope> CBLDatabase::getScope(slice scopeName) {
     bool exist = c4db->hasScope(scopeName);
     if (auto i = _scopes.find(scopeName); i != _scopes.end()) {
         if (!exist) {
+            // Detach instead of close so that the retained scope
+            // object can retain the database and can be valid to use.
+            i->second->detach();
+            
+            // Remove from the _scopes map.
             _scopes.erase(i);
+            
+            // Remove all collections in the scope from the _collections map:
+            // This is techically required to prevent circular reference
+            // (db->collection->scope->db) when the scope is detached.
+            removeCBLCollections(scopeName);
             return nullptr;
         }
         scope = i->second.get();
@@ -195,7 +205,15 @@ Retained<CBLCollection> CBLDatabase::getCollection(slice collectionName, slice s
         return nullptr;
     }
     
-    return createCBLCollection(c4col);
+    auto scope = getScope(scopeName);
+    if (!scope) {
+        // Note (Edge Case):
+        // The scope is NULL because at the same time, its all collections including the
+        // the one just created were deleted on a different thread using another database.
+        return nullptr;
+    }
+    
+    return createCBLCollection(c4col, scope.get());
 }
 
 
@@ -212,7 +230,19 @@ Retained<CBLCollection> CBLDatabase::createCollection(slice collectionName, slic
     
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
     auto c4col = c4db->createCollection(spec);
-    return createCBLCollection(c4col);
+    
+    bool cache = true;
+    auto scope = getScope(scopeName);
+    if (!scope) {
+        // Note (Edge Case):
+        // The scope is NULL because at the same time, its all collections including the
+        // the one just created were deleted on a different thread using another database.
+        // So create the scope in non-cached mode, and the returned collection will not
+        // be cached.
+        cache = false;
+        scope = new CBLScope(scopeName, this, cache);
+    }
+    return createCBLCollection(c4col, scope.get(), cache);
 }
 
 
@@ -251,17 +281,32 @@ Retained<CBLCollection> CBLDatabase::getDefaultCollection(bool mustExist) {
 }
 
 
-Retained<CBLCollection> CBLDatabase::createCBLCollection(C4Collection* c4col) {
-    auto retainedCollection = make_retained<CBLCollection>(c4col, const_cast<CBLDatabase*>(this));
+Retained<CBLCollection> CBLDatabase::createCBLCollection(C4Collection* c4col, CBLScope* scope, bool cache) {
+    auto retainedCollection = make_retained<CBLCollection>(c4col, scope, const_cast<CBLDatabase*>(this));
     auto collection = retainedCollection.get();
-    _collections.insert({C4Database::CollectionSpec(c4col->getSpec()), move(retainedCollection)});
+    if (cache) {
+        _collections.insert({C4Database::CollectionSpec(c4col->getSpec()), move(retainedCollection)});
+    }
     return collection;
 }
 
 
 void CBLDatabase::removeCBLCollection(C4Database::CollectionSpec spec) {
     if (auto i = _collections.find(spec); i != _collections.end()) {
+        i->second.get()->close();
         _collections.erase(i);
+    }
+}
+
+void CBLDatabase::removeCBLCollections(slice scopeName) {
+    auto i = _collections.begin();
+    while (i != _collections.end()) {
+        if (i->first.scope == scopeName) {
+            i->second->close();
+            i = _collections.erase(i);
+        } else {
+            i++;
+        }
     }
 }
 

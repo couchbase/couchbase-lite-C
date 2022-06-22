@@ -320,10 +320,13 @@ private:
     /**
      Create a CBLCollection from the C4Collection.
      The created CBLCollection will be retained and cached in the _collections map. */
-    Retained<CBLCollection> createCBLCollection(C4Collection* c4col);
+    Retained<CBLCollection> createCBLCollection(C4Collection* c4col, CBLScope* scope, bool cache= true);
     
-    /** Remove and release the CBLCollection from the _collections map */
+    /** Remove and close the collection from the _collections map */
     void removeCBLCollection(C4Database::CollectionSpec spec);
+    
+    /** Remove and close all collections in the specify scope the _collections map */
+    void removeCBLCollections(slice scopeName);
 
     void callDocListeners();
     
