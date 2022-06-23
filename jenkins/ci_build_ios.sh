@@ -36,7 +36,13 @@ echo
 
 pushd ${WORKSPACE}/couchbase-lite-c/build_apple_out/
 cp ${WORKSPACE}/product-texts/mobile/couchbase-lite/license/LICENSE_${EDITION}.txt LICENSE.txt
-${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} CouchbaseLite.xcframework LICENSE.txt
+#notices.txt is produced by blackduck.
+#It is not part of source tar, it is download to the workspace by a separate curl command by jenkins job.
+if [[ -f ${WORKSPACE}/notices.txt ]]; then
+    cp ${WORKSPACE}/notices.txt notices.txt
+fi
+${PKG_CMD} ${WORKSPACE}/${PACKAGE_NAME} CouchbaseLite.xcframework *.txt
+
 RELEASE_IOS_PKG_NAME=${PACKAGE_NAME}
 popd
 

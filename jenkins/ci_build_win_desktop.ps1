@@ -31,8 +31,11 @@ function Make-Package() {
     )
 
     Push-Location $directory
+    if(Test-Path -Path $env:WORKSPACE\notices.txt -PathType Leaf) {
+        Copy-Item $env:WORKSPACE\notices.txt libcblite-$VERSION\notices.txt
+    }
     Copy-Item $env:WORKSPACE\product-texts\mobile\couchbase-lite\license\LICENSE_$EDITION.txt libcblite-$VERSION\LICENSE.txt
-    & 7za a -tzip -mx9 $env:WORKSPACE\$filename libcblite-$VERSION\LICENSE.txt libcblite-$VERSION\include libcblite-$VERSION\lib libcblite-$VERSION\bin
+    & 7za a -tzip -mx9 $env:WORKSPACE\$filename libcblite-$VERSION\*.txt libcblite-$VERSION\include libcblite-$VERSION\lib libcblite-$VERSION\bin
     if($LASTEXITCODE -ne 0) {
         throw "Zip failed"
     }

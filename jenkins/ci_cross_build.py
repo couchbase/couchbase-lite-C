@@ -198,6 +198,10 @@ if __name__ == '__main__':
     shutil.copy2(workspace_path / 'product-texts' / 'mobile' / 'couchbase-lite' / 'license' / f'LICENSE_{args.edition}.txt',
         f'libcblite-{args.version}/LICENSE.txt')
 
+    #notices.txt is produced by blackduck.
+    #It is not part of source tar, it is download to the workspace by a separate curl command by jenkins job.
+    if os.path.isfile(workspace_path / 'notices.txt'):
+        shutil.copy2(workspace_path / 'notices.txt', f'libcblite-{args.version}/notices.txt')
     pbar = ProgressBar(maxval=3)
     pbar.start()
     with tarfile.open(f'{workspace}/{package_name}', 'w:gz') as tar:
@@ -207,6 +211,11 @@ if __name__ == '__main__':
         pbar.update(2)
         tar.add(f'libcblite-{args.version}/LICENSE.txt')
         pbar.update(3)
+
+        #notices.txt is produced by blackduck.
+        #It is not part of source tar, it is download to the workspace by a separate curl command by jenkins job.
+        if os.path.isfile(f'libcblite-{args.version}/notices.txt'):
+            tar.add(f'libcblite-{args.version}/notices.txt')
         pbar.finish()
 
     symbols_package_name = f'{args.product}-{args.edition}-{args.version}-{args.bld_num}-{args.os}-symbols.tar.gz'
