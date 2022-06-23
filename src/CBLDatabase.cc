@@ -183,10 +183,8 @@ Retained<CBLCollection> CBLDatabase::getCollection(slice collectionName, slice s
         collection = i->second.get();
     }
     
-    if (collection) {
-        if (c4db->hasCollection(spec)) {
-            return collection;
-        }
+    if (collection && collection->isValid()) {
+        return collection;
     }
     
     auto c4col = c4db->getCollection(spec);
@@ -240,8 +238,7 @@ Retained<CBLScope> CBLDatabase::getDefaultScope() {
 Retained<CBLCollection> CBLDatabase::getDefaultCollection(bool mustExist) {
     auto db = _c4db->useLocked();
     
-    if (_defaultCollection &&
-        !db->hasCollection({kC4DefaultCollectionName, kC4DefaultScopeID})) {
+    if (_defaultCollection && !_defaultCollection->isValid()) {
         _defaultCollection = nullptr;
     }
     

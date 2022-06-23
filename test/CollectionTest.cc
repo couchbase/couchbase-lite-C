@@ -371,7 +371,7 @@ TEST_CASE_METHOD(CollectionTest, "Get Non Existing Collection", "[Collection]") 
     CHECK(error.code == 0);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[.CBL-3142]") {
+TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[Collection]") {
     CBLError error = {};
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
@@ -394,7 +394,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[.CBL-3142]") {
     CHECK(col == nullptr);
     CHECK(error.code == 0);
     
-    // Recreate: CBL-3142
+    // Recreate:
     col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col);
     CHECK(CBLCollection_Name(col) == "colA"_sl);
@@ -643,7 +643,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Create Collection using Different 
     CBLDatabase_Release(db2);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB Instances", "[.CBL-3196]") {
+TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB Instances", "[Collection]") {
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
@@ -658,11 +658,15 @@ TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB I
     
     // Delete the collection from db:
     REQUIRE(CBLDatabase_DeleteCollection(db, "colA"_sl, "scopeA"_sl, &error));
-    CHECK(CBLCollection_Count(col1a) == 0);
-    CHECK(CBLCollection_Count(col1b) == 0);
-    CHECK(!CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error));
-    CHECK(error.code == 0);
+    {
+        ExpectingExceptions x;
+        CHECK(CBLCollection_Count(col1a) == 0);
+        CHECK(CBLCollection_Count(col1b) == 0);
+    }
     CHECK(!CBLDatabase_Collection(db2, "colA"_sl, "scopeA"_sl, &error));
+    CHECK(error.code == 0);
+    
+    CHECK(!CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error));
     CHECK(error.code == 0);
     
     CBLCollection_Release(col1a);
@@ -670,7 +674,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB I
     CBLDatabase_Release(db2);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Delete and Recreate then Get Collection from Different DB Instances", "[.CBL-3142][.CBL-3196]") {
+TEST_CASE_METHOD(CollectionTest, "Delete and Recreate then Get Collection from Different DB Instances", "[Collection]") {
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
@@ -685,14 +689,19 @@ TEST_CASE_METHOD(CollectionTest, "Delete and Recreate then Get Collection from D
     
     // Delete the collection from db:
     REQUIRE(CBLDatabase_DeleteCollection(db, "colA"_sl, "scopeA"_sl, &error));
+    CHECK(!CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error));
+    CHECK(!CBLDatabase_Collection(db2, "colA"_sl, "scopeA"_sl, &error));
     
     // Recreate:
     CBLCollection* col1c = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1c);
     CHECK(col1c != col1a);
-    
-    CHECK(CBLCollection_Count(col1a) == 0);
-    CHECK(CBLCollection_Count(col1b) == 0);
+    {
+        ExpectingExceptions x;
+        CHECK(CBLCollection_Count(col1a) == 0);
+        CHECK(CBLCollection_Count(col1b) == 0);
+    }
+    CHECK(CBLCollection_Count(col1c) == 0);
     
     CBLCollection* col1d = CBLDatabase_Collection(db2, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1d);
