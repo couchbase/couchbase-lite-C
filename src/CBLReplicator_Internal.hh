@@ -72,19 +72,96 @@ public:
         static once_flag once;
         call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
         
+        // TODO:
+        // When collection is supported in LiteCore Replicator,
+        // remove the check here.
         if (_conf.collections) {
             C4Error::raise(LiteCoreDomain, kC4ErrorUnimplemented,
                            "The collections configuration has not been implemented yet.");
         }
+        
+        if (_conf.database) {
+            _defaultCollection = _conf.database->getDefaultCollection(true);
+        }
 
-        // Set up the LiteCore replicator parameters:
+        // Validate:
         _conf.validate();
+        
+        // Set up the LiteCore replicator parameters:
         C4ReplicatorParameters params = { };
+        
+        // TODO:
+        // When collection is supported in LiteCore Replicator,
+        // remove the code that sets the type here as it will be
+        // set using CBLReplicationCollection.
         auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
         if (_conf.replicatorType != kCBLReplicatorTypePull)
             params.push = type;
         if (_conf.replicatorType != kCBLReplicatorTypePush)
             params.pull = type;
+        
+        // Note: If using .database, a C4ReplicationCollection with the default collection
+        // and the outer conflict resolver and filters will be construct:
+        size_t collectionCount =  _conf.collections ? _conf.collectionCount : 1;
+        C4ReplicationCollection* cols = new C4ReplicationCollection[collectionCount] { };
+        for (int i = 0; i < collectionCount; i++) {
+            CBLReplicationCollection replCol;
+            if (_conf.database) {
+                assert(collectionCount == 1);
+                replCol.collection = _defaultCollection.get();
+                replCol.conflictResolver = _conf.conflictResolver;
+                replCol.pushFilter = _conf.pushFilter;
+                replCol.pullFilter = _conf.pullFilter;
+                replCol.channels = _conf.channels;
+                replCol.documentIDs = _conf.documentIDs;
+            } else {
+                replCol = _conf.collections[i];
+            }
+            
+            auto spec = replCol.collection->spec();
+            cols[i].collection = spec;
+            
+            if (_conf.replicatorType != kCBLReplicatorTypePull)
+                cols[i].push = type;
+            if (_conf.replicatorType != kCBLReplicatorTypePush)
+                cols[i].pull = type;
+            
+            if (replCol.pushFilter) {
+                cols[i].pushFilter = [](C4CollectionSpec collectionSpec,
+                                        C4String docID,
+                                        C4String revID,
+                                        C4RevisionFlags flags,
+                                        FLDict body,
+                                        void* ctx) {
+                     return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, true);
+                 };
+            }
+            
+            if (replCol.pullFilter) {
+                cols[i].pullFilter = [](C4CollectionSpec collectionSpec,
+                                        C4String docID,
+                                        C4String revID,
+                                        C4RevisionFlags flags,
+                                        FLDict body,
+                                        void* ctx) {
+                    return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, false);
+                };
+            }
+            
+            if (replCol.documentIDs || replCol.channels) {
+                alloc_slice options = encodeCollectionOptions(replCol);
+                cols[i].optionsDictFleece = options;
+            }
+            
+            cols[i].callbackContext = this;
+            
+            _collections.insert({spec, replCol});
+        }
+        
+        params.collections = cols;
+        // TODO : Remove type cast (CBL-3333)
+        params.collectionCount = (unsigned)collectionCount;
+        
         params.callbackContext = this;
         params.onStatusChanged = [](C4Replicator* c4repl, C4ReplicatorStatus status, void *ctx) {
             ((CBLReplicator*)ctx)->_statusChanged(status);
@@ -97,6 +174,10 @@ public:
             ((CBLReplicator*)ctx)->_documentsEnded(pushing, numDocs, docs);
         };
 
+        // TODO:
+        // When collection is supported in LiteCore Replicator,
+        // remove the code that sets push and pull filter here:
+        // set using CBLReplicationCollection.
         if (_conf.pushFilter) {
             params.pushFilter = [](C4CollectionSpec collectionSpec,
                                    C4String docID,
@@ -174,6 +255,9 @@ public:
                                               params);
             }
         });
+        
+        delete[] cols;
+        
         _c4status = _c4repl->getStatus();
         _useInitialStatus = true;
     }
@@ -254,6 +338,15 @@ private:
         enc.endDict();
         return enc.finish();
     }
+    
+    
+    alloc_slice encodeCollectionOptions(CBLReplicationCollection& collection) {
+        Encoder enc;
+        enc.beginDict();
+        _conf.writeCollectionOptions(collection, enc);
+        enc.endDict();
+        return enc.finish();
+    }
 
 
     CBLReplicatorStatus effectiveStatus(C4ReplicatorStatus c4status) {
@@ -322,7 +415,13 @@ private:
             auto src = *c4Docs[i];
             if (!pushing && src.flags & kRevIsConflict) {
                 // Conflict -- start an async resolver task:
-                auto r = new ConflictResolver(_db, _conf.conflictResolver, _conf.context, src);
+                
+                // TODO:
+                // src.collectionSpec has null collection and scope name now.
+                // Only use the default collection for now:
+                // auto replCol = _collections[src.collectionSpec];
+                auto replCol = _collections[CollectionSpec()];
+                auto r = new ConflictResolver(replCol.collection, replCol.conflictResolver, _conf.context, src);
                 bumpConflictResolverCount(1);
                 r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, std::placeholders::_1) );
             } else if (docs) {
@@ -356,12 +455,13 @@ private:
     bool _filter(C4CollectionSpec colSpec, slice docID, slice revID,
                  C4RevisionFlags flags, Dict body, bool pushing)
     {
-        // CBL-3191:
-        // As now LiteCore doesn't send the correct colSpec and has no
+        // TODO:
+        // CBL-3191: As now LiteCore doesn't send the correct colSpec and has no
         // collections supported, call to get the default collection:
-        auto col = _conf.database->getDefaultCollection(false);
-        Retained<CBLDocument> doc = new CBLDocument(col.get(), docID, revID, flags, body);
-        CBLReplicationFilter filter = pushing ? _conf.pushFilter : _conf.pullFilter;
+        // auto replCol = _collections[colSpec];
+        auto replCol = _collections[CollectionSpec()];
+        Retained<CBLDocument> doc = new CBLDocument(replCol.collection, docID, revID, flags, body);
+        CBLReplicationFilter filter = pushing ? replCol.pushFilter : replCol.pullFilter;
         
         CBLDocumentFlags docFlags = 0;
         if (flags & kRevDeleted)
@@ -397,11 +497,15 @@ private:
     }
     
 #endif
+    
+    using ReplicationCollectionsMap = std::unordered_map<C4Database::CollectionSpec, CBLReplicationCollection>;
 
     recursive_mutex                             _mutex;
     ReplicatorConfiguration const               _conf;
     Retained<CBLDatabase>                       _db;
+    Retained<CBLCollection>                     _defaultCollection;
     Retained<C4Replicator>                      _c4repl;
+    ReplicationCollectionsMap                   _collections;       // For filters and conflict resolver
     bool                                        _useInitialStatus;  // For returning status before first start
     C4ReplicatorStatus                          _c4status {kC4Stopped};
     Retained<CBLReplicator>                     _retainSelf;
