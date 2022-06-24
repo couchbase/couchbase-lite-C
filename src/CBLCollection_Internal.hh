@@ -31,12 +31,11 @@ public:
     
 #pragma mark - CONSTRUCTORS:
     
-    CBLCollection(C4Collection* c4col, CBLDatabase* database)
+    CBLCollection(C4Collection* c4col, CBLScope* scope, CBLDatabase* database)
     :_c4col(c4col, database)
-    {
-        _name = c4col->getName();
-        _scope = database->getScope(c4col->getScope());
-    }
+    ,_scope(scope)
+    ,_name(c4col->getName())
+    { }
     
 #pragma mark - ACCESSORS:
     

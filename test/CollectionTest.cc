@@ -726,6 +726,76 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection then Use Collection", "[Coll
     CBLCollection_Release(col);
 }
 
+TEST_CASE_METHOD(CollectionTest, "Delete Collection from Different DB Instance then Use Collection", "[Collection]") {
+    CBLError error = {};
+    CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col);
+    
+    CBLDatabase* db2 = openDB();
+    REQUIRE(CBLDatabase_DeleteCollection(db2, "colA"_sl, "scopeA"_sl, &error));
+    
+    testInvalidCollection(col);
+    
+    CBLCollection_Release(col);
+    CBLDatabase_Release(db2);
+}
+
+TEST_CASE_METHOD(CollectionTest, "Delete Scope then Use Scope", "[Collection]") {
+    CBLError error = {};
+    CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col);
+    
+    CBLScope* scope = CBLDatabase_Scope(db, "scopeA"_sl, &error);
+    REQUIRE(scope);
+    
+    FLMutableArray colNames = CBLScope_CollectionNames(scope, &error);
+    CHECK(Array(colNames).toJSONString() == R"(["colA"])");
+    FLMutableArray_Release(colNames);
+    
+    REQUIRE(CBLDatabase_DeleteCollection(db, "colA"_sl, "scopeA"_sl, &error));
+    CHECK(!CBLDatabase_Scope(db, "scopeA"_sl, &error));
+    CHECK(error.code == 0);
+    
+    colNames = CBLScope_CollectionNames(scope, &error);
+    CHECK(Array(colNames).toJSONString() == R"([])");
+    FLMutableArray_Release(colNames);
+    
+    CHECK(!CBLScope_Collection(scope, "scopeA"_sl, &error));
+    CHECK(error.code == 0);
+    
+    CBLCollection_Release(col);
+    CBLScope_Release(scope);
+}
+
+TEST_CASE_METHOD(CollectionTest, "Delete Scope from Different DB Instance then Use Scope", "[Collection]") {
+    CBLError error = {};
+    CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col);
+    
+    CBLScope* scope = CBLDatabase_Scope(db, "scopeA"_sl, &error);
+    REQUIRE(scope);
+    
+    FLMutableArray colNames = CBLScope_CollectionNames(scope, &error);
+    CHECK(Array(colNames).toJSONString() == R"(["colA"])");
+    FLMutableArray_Release(colNames);
+    
+    CBLDatabase* db2 = openDB();
+    REQUIRE(CBLDatabase_DeleteCollection(db2, "colA"_sl, "scopeA"_sl, &error));
+    CHECK(!CBLDatabase_Scope(db, "scopeA"_sl, &error));
+    CHECK(error.code == 0);
+    
+    colNames = CBLScope_CollectionNames(scope, &error);
+    CHECK(Array(colNames).toJSONString() == R"([])");
+    FLMutableArray_Release(colNames);
+    
+    CHECK(!CBLScope_Collection(scope, "scopeA"_sl, &error));
+    CHECK(error.code == 0);
+    
+    CBLCollection_Release(col);
+    CBLScope_Release(scope);
+    CBLDatabase_Release(db2);
+}
+
 TEST_CASE_METHOD(CollectionTest, "Close Database then Use Collection", "[Collection]") {
     CBLError error = {};
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
@@ -783,4 +853,45 @@ TEST_CASE_METHOD(CollectionTest, "Close Database then Create Or Get Collections 
     REQUIRE(CBLDatabase_Close(db, &error));
     
     testInvalidDatabase(db);
+}
+
+TEST_CASE_METHOD(CollectionTest, "Delete Collection and Close Database then Use Collection", "[Collection]") {
+    CBLError error = {};
+    CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col);
+    
+    REQUIRE(CBLDatabase_DeleteCollection(db, "colA"_sl, "scopeA"_sl, &error));
+    CHECK(!CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error));
+    CHECK(error.code == 0);
+    
+    REQUIRE(CBLDatabase_Close(db, &error));
+    CBLDatabase_Release(db);
+    db = nullptr;
+    
+    testInvalidCollection(col);
+    
+    CBLCollection_Release(col);
+}
+
+TEST_CASE_METHOD(CollectionTest, "Delete Scope and Close Database then Use Scope", "[Collection]") {
+    CBLError error = {};
+    CBLCollection* colA = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(colA);
+    CBLCollection_Release(colA);
+    
+    CBLScope* scope = CBLDatabase_Scope(db, "scopeA"_sl, &error);
+    REQUIRE(scope);
+    CHECK(CBLScope_Name(scope) == "scopeA"_sl);
+    
+    REQUIRE(CBLDatabase_DeleteCollection(db, "colA"_sl, "scopeA"_sl, &error));
+    CHECK(!CBLDatabase_Scope(db, "scopeA"_sl, &error));
+    CHECK(error.code == 0);
+    
+    REQUIRE(CBLDatabase_Close(db, &error));
+    CBLDatabase_Release(db);
+    db = nullptr;
+    
+    testInvalidScope(scope);
+    
+    CBLScope_Release(scope);
 }

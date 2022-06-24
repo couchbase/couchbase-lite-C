@@ -29,10 +29,21 @@ public:
     
 #pragma mark - CONSTRUCTORS:
     
-    CBLScope(slice name, CBLDatabase* database)
+    CBLScope(slice name, CBLDatabase* database, bool cached= true)
     :_name(name)
     ,_database(database)
-    { }
+    {
+        if (!cached) {
+            _detach();
+        }
+    }
+    
+    ~CBLScope() {
+        LOCK(_mutex);
+        if (_detached) {
+            release(_database);
+        }
+    }
     
 #pragma mark - ACCESSORS:
     
@@ -56,20 +67,39 @@ protected:
     void checkOpen() const {
         if (!_database) {
             C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
-                           "Invalid scope: db closed or deleted");
+                           "Invalid scope: scope deleted or db closed");
         }
     }
     
+    // Called by database when the database is closed or released
+    // to invalidate the database pointer.
     void close() {
         LOCK(_mutex);
+        assert(!_detached);
         _database = nullptr;
+    }
+    
+    // Called by the database when the scope is removed from
+    // the database cache (e.g. when no collections are in the scope).
+    // The detach() allows the scope to retain and keep using the database.
+    void detach() {
+        LOCK(_mutex);
+        _detach();
     }
     
 private:
     
-    CBLDatabase* _cbl_nullable              _database;  // Not retain to prevent retain cycle
-    alloc_slice const                       _name;      // Name (never empty)
-    mutable std::mutex                      _mutex;
+    void _detach() {
+        assert(!_detached);
+        retain(_database);
+        _detached = true;
+    }
+    
+    CBLDatabase* _cbl_nullable              _database;
+    bool                                    _detached {false};  // Detached mode in which database is retained
+    
+    alloc_slice const                       _name;              // Name (never empty)
+    mutable std::recursive_mutex            _mutex;
 };
 
 CBL_ASSUME_NONNULL_END
