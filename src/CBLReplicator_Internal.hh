@@ -66,7 +66,6 @@ struct CBLReplicator final : public CBLRefCounted, public CBLStoppable {
 public:
     CBLReplicator(const CBLReplicatorConfiguration &conf)
     :_conf(conf)
-    ,_db(conf.database)
     {
         // One-time initialization of network transport:
         static once_flag once;
@@ -100,13 +99,15 @@ public:
         if (_conf.replicatorType != kCBLReplicatorTypePush)
             params.pull = type;
         
-        // Note: If using .database, a C4ReplicationCollection with the default collection
-        // and the outer conflict resolver and filters will be construct:
+        // Construct params.collections and validate if collections
+        // are from the same database instance:
+        std::vector<C4ReplicationCollection> cols;
         size_t collectionCount =  _conf.collections ? _conf.collectionCount : 1;
-        C4ReplicationCollection* cols = new C4ReplicationCollection[collectionCount] { };
         for (int i = 0; i < collectionCount; i++) {
             CBLReplicationCollection replCol;
             if (_conf.database) {
+                // If using .database, a C4ReplicationCollection with the default collection
+                // and the outer conflict resolver and filters will be construct:
                 assert(collectionCount == 1);
                 replCol.collection = _defaultCollection.get();
                 replCol.conflictResolver = _conf.conflictResolver;
@@ -118,32 +119,41 @@ public:
                 replCol = _conf.collections[i];
             }
             
+            if (!_db) {
+                _db = replCol.collection->database();
+            } else if (_db != replCol.collection->database()) {
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                               "The collections are not from the same database object.");
+            }
+            
+            C4ReplicationCollection col = {};
+            
             auto spec = replCol.collection->spec();
-            cols[i].collection = spec;
+            col.collection = spec;
             
             if (_conf.replicatorType != kCBLReplicatorTypePull)
-                cols[i].push = type;
+                col.push = type;
             if (_conf.replicatorType != kCBLReplicatorTypePush)
-                cols[i].pull = type;
+                col.pull = type;
             
             if (replCol.pushFilter) {
-                cols[i].pushFilter = [](C4CollectionSpec collectionSpec,
-                                        C4String docID,
-                                        C4String revID,
-                                        C4RevisionFlags flags,
-                                        FLDict body,
-                                        void* ctx) {
-                     return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, true);
-                 };
+                col.pushFilter = [](C4CollectionSpec collectionSpec,
+                                    C4String docID,
+                                    C4String revID,
+                                    C4RevisionFlags flags,
+                                    FLDict body,
+                                    void* ctx) {
+                    return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, true);
+                };
             }
             
             if (replCol.pullFilter) {
-                cols[i].pullFilter = [](C4CollectionSpec collectionSpec,
-                                        C4String docID,
-                                        C4String revID,
-                                        C4RevisionFlags flags,
-                                        FLDict body,
-                                        void* ctx) {
+                col.pullFilter = [](C4CollectionSpec collectionSpec,
+                                    C4String docID,
+                                    C4String revID,
+                                    C4RevisionFlags flags,
+                                    FLDict body,
+                                    void* ctx) {
                     return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, false);
                 };
             }
@@ -153,12 +163,16 @@ public:
                 cols[i].optionsDictFleece = options;
             }
             
-            cols[i].callbackContext = this;
+            col.callbackContext = this;
             
+            cols.push_back(col);
+            
+            // For callback to access replicator collection object by collection spec:
             _collections.insert({spec, replCol});
         }
         
-        params.collections = cols;
+        params.collections = cols.data();
+        
         // TODO : Remove type cast (CBL-3333)
         params.collectionCount = (unsigned)collectionCount;
         
@@ -242,7 +256,7 @@ public:
         params.optionsDictFleece = options;
 
         // Create the LiteCore replicator:
-        _conf.database->useLocked([&](C4Database *c4db) {
+        _db->useLocked([&](C4Database *c4db) {
 #ifdef COUCHBASE_ENTERPRISE
             if (_conf.endpoint->otherLocalDB()) {
                 _c4repl = c4db->newLocalReplicator(_conf.endpoint->otherLocalDB()->useLocked().get(),
@@ -255,8 +269,6 @@ public:
                                               params);
             }
         });
-        
-        delete[] cols;
         
         _c4status = _c4repl->getStatus();
         _useInitialStatus = true;

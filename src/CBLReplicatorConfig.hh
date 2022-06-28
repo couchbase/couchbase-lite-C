@@ -29,6 +29,7 @@
 #include <climits>
 #include <mutex>
 #include <string>
+#include <vector>
 
 CBL_ASSUME_NONNULL_BEGIN
 
@@ -181,12 +182,11 @@ namespace cbl_internal {
             
             if (collections) {
                 // Copy collections and retain the collection object inside:
-                auto cols = new CBLReplicationCollection[collectionCount];
                 for (int i = 0; i < collectionCount; i++) {
-                    cols[i] = collections[i];
-                    retain(cols[i].collection);
+                    retain(collections[i].collection);
+                    _collections.push_back(collections[i]);
                 }
-                collections = cols;
+                collections = _collections.data();
             }
             
             authenticator = authenticator ? authenticator->clone() : nullptr;
@@ -209,11 +209,8 @@ namespace cbl_internal {
         ~ReplicatorConfiguration() {
             release(database);
             
-            if (collections) {
-                for (int i = 0; i < collectionCount; i++) {
-                    release(collections[i].collection);
-                }
-                delete [] collections;
+            for (int i = 0; i < collectionCount; i++) {
+                release(_collections[i].collection);
             }
             
             CBLEndpoint_Free(endpoint);
@@ -222,7 +219,7 @@ namespace cbl_internal {
             FLArray_Release(channels);
             FLArray_Release(documentIDs);
         }
-
+        
 
         void validate() const {
             const char *problem = nullptr;
@@ -327,10 +324,11 @@ namespace cbl_internal {
             return allocated;
         }
         
-        alloc_slice      _pinnedServerCert, _trustedRootCerts;
-        CBLProxySettings _proxy;
-        alloc_slice      _proxyHostname, _proxyUsername, _proxyPassword;
-        alloc_slice      _networkInterface;
+        std::vector<CBLReplicationCollection>   _collections;
+        alloc_slice                             _pinnedServerCert, _trustedRootCerts;
+        CBLProxySettings                        _proxy;
+        alloc_slice                             _proxyHostname, _proxyUsername, _proxyPassword;
+        alloc_slice                             _networkInterface;
     };
 }
 
