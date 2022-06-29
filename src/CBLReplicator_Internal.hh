@@ -83,7 +83,6 @@ public:
             _defaultCollection = _conf.database->getDefaultCollection(true);
         }
 
-        // Validate:
         _conf.validate();
         
         // Set up the LiteCore replicator parameters:
