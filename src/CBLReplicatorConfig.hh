@@ -20,6 +20,7 @@
 
 #include "CBLReplicator.h"
 #include "CBLDatabase_Internal.hh"
+#include "CBLCollection_Internal.hh"
 #include "Internal.hh"
 #include "c4ReplicatorTypes.h"
 #include "c4Private.h"
@@ -28,6 +29,7 @@
 #include <climits>
 #include <mutex>
 #include <string>
+#include <vector>
 
 CBL_ASSUME_NONNULL_BEGIN
 
@@ -177,6 +179,16 @@ namespace cbl_internal {
             retain(database);
             if (endpoint)
                 endpoint = endpoint->clone();
+            
+            if (collections) {
+                // Copy collections and retain the collection object inside:
+                for (int i = 0; i < collectionCount; i++) {
+                    retain(collections[i].collection);
+                    _collections.push_back(collections[i]);
+                }
+                collections = _collections.data();
+            }
+            
             authenticator = authenticator ? authenticator->clone() : nullptr;
             headers = FLDict_MutableCopy(headers, kFLDeepCopyImmutables);
             channels = FLArray_MutableCopy(channels, kFLDeepCopyImmutables);
@@ -196,17 +208,28 @@ namespace cbl_internal {
 
         ~ReplicatorConfiguration() {
             release(database);
+            
+            for (int i = 0; i < collectionCount; i++) {
+                release(_collections[i].collection);
+            }
+            
             CBLEndpoint_Free(endpoint);
             CBLAuth_Free(authenticator);
             FLDict_Release(headers);
             FLArray_Release(channels);
             FLArray_Release(documentIDs);
         }
-
+        
 
         void validate() const {
             const char *problem = nullptr;
-            if (!database || !endpoint || replicatorType > kCBLReplicatorTypePull)
+            if (!database && !collections)
+                problem = "Invalid replicator config: missing both database and collections";
+            else if (database && collections)
+                problem = "Invalid replicator config: both database and collections are set at same time";
+            else if (collections && collectionCount == 0)
+                problem = "Invalid replicator config: collectionCount is zero";
+            else if (!endpoint || replicatorType > kCBLReplicatorTypePull)
                 problem = "Invalid replicator config: missing endpoints or bad type";
             else if (!endpoint->valid())
                 problem = "Invalid endpoint";
@@ -222,8 +245,14 @@ namespace cbl_internal {
         // Writes a LiteCore replicator optionsDict
         void writeOptions(Encoder &enc) const {
             writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders,  Dict(headers));
+            
+            // TODO:
+            // When collection is supported in LiteCore Replicator,
+            // remove the code that encodes documentIDs and channels here as it will be
+            // set using CBLReplicationCollection.
             writeOptionalKey(enc, kC4ReplicatorOptionDocIDs,        Array(documentIDs));
             writeOptionalKey(enc, kC4ReplicatorOptionChannels,      Array(channels));
+            
             if (pinnedServerCertificate.buf) {
                 enc.writeKey(slice(kC4ReplicatorOptionPinnedServerCert));
                 enc.writeData(pinnedServerCertificate);
@@ -277,6 +306,11 @@ namespace cbl_internal {
                 enc.writeString(networkInterface);
             }
         }
+        
+        void writeCollectionOptions(CBLReplicationCollection& collection, Encoder &enc) const {
+            writeOptionalKey(enc, kC4ReplicatorOptionDocIDs,        Array(collection.documentIDs));
+            writeOptionalKey(enc, kC4ReplicatorOptionChannels,      Array(collection.channels));
+        }
 
         ReplicatorConfiguration(const ReplicatorConfiguration&) =delete;
         ReplicatorConfiguration& operator=(const ReplicatorConfiguration&) =delete;
@@ -290,10 +324,11 @@ namespace cbl_internal {
             return allocated;
         }
         
-        alloc_slice      _pinnedServerCert, _trustedRootCerts;
-        CBLProxySettings _proxy;
-        alloc_slice      _proxyHostname, _proxyUsername, _proxyPassword;
-        alloc_slice      _networkInterface;
+        std::vector<CBLReplicationCollection>   _collections;
+        alloc_slice                             _pinnedServerCert, _trustedRootCerts;
+        CBLProxySettings                        _proxy;
+        alloc_slice                             _proxyHostname, _proxyUsername, _proxyPassword;
+        alloc_slice                             _networkInterface;
     };
 }
 

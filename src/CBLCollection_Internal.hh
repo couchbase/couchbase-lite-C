@@ -25,6 +25,8 @@
 
 CBL_ASSUME_NONNULL_BEGIN
 
+using CollectionSpec = C4Database::CollectionSpec;
+
 struct CBLCollection final : public CBLRefCounted {
     
 public:
@@ -39,8 +41,9 @@ public:
     
 #pragma mark - ACCESSORS:
     
-    CBLScope* scope() noexcept              {return _scope;}
+    CBLScope* scope() const noexcept        {return _scope;}
     slice name() const noexcept             {return _name;}
+    CollectionSpec spec() const noexcept    {return CollectionSpec(_name, _scope->name());}
     bool isValid() const noexcept           {return _c4col.isValid();}
     uint64_t count() const                  {return _c4col.useLocked()->getDocumentCount();}
     uint64_t lastSequence() const           {return static_cast<uint64_t>(_c4col.useLocked()->getLastSequence());}

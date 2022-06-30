@@ -20,13 +20,13 @@ namespace cbl_internal {
     class ConflictResolver {
     public:
         /// Basic constructor.
-        ConflictResolver(CBLDatabase *db,
+        ConflictResolver(CBLCollection *collection,
                          CBLConflictResolver _cbl_nullable customResolver,
                          void* _cbl_nullable context,
                          alloc_slice docID,
                          alloc_slice revID = nullslice);
 
-        ConflictResolver(CBLDatabase*,
+        ConflictResolver(CBLCollection*,
                          CBLConflictResolver _cbl_nullable,
                          void* _cbl_nullable context,
                          const C4DocumentEnded&);
@@ -50,7 +50,7 @@ namespace cbl_internal {
         bool defaultResolve(CBLDocument *conflict);
         bool customResolve(CBLDocument *conflict);
 
-        Retained<CBLDatabase>   _db;
+        Retained<CBLCollection>  _collection;
         CBLConflictResolver _cbl_nullable _clientResolver;
         void* _cbl_nullable     _clientResolverContext;
         alloc_slice const       _docID;
@@ -65,7 +65,7 @@ namespace cbl_internal {
     /** Scans the database for all unresolved conflicts and resolves them. */
     class AllConflictsResolver {
     public:
-        explicit AllConflictsResolver(CBLDatabase*,
+        explicit AllConflictsResolver(CBLCollection*,
                                       CBLConflictResolver,
                                       void* _cbl_nullable context);
         void runNow();
@@ -73,7 +73,7 @@ namespace cbl_internal {
     private:
         bool next();
         
-        Retained<CBLDatabase>               _db;
+        Retained<CBLCollection>             _collection;
         CBLConflictResolver                 _clientResolver;
         void* _cbl_nullable                 _clientResolverContext;
         std::unique_ptr<C4DocEnumerator>    _enum;

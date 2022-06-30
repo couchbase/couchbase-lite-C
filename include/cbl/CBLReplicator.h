@@ -238,7 +238,7 @@ typedef struct {
 typedef struct {
     /** The database to replicate
         @warning  <b>Deprecated :</b> Use collections instead. */
-    CBLDatabase* database;
+    CBLDatabase* _cbl_nullable database;
     CBLEndpoint* endpoint;                  ///< The address of the other database to replicate with
     
     //-- Types:
@@ -311,12 +311,12 @@ typedef struct {
         @warning  <b>Deprecated :</b> Use documentPropertyDecryptor instead. */
     CBLPropertyDecryptor propertyDecryptor;
     
-    CBLDocumentPropertyEncryptor documentPropertyEncryptor;   ///< Optional callback to encrypt \ref CBLEncryptable values.
-    CBLDocumentPropertyDecryptor documentPropertyDecryptor;   ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
+    CBLDocumentPropertyEncryptor documentPropertyEncryptor;     ///< Optional callback to encrypt \ref CBLEncryptable values.
+    CBLDocumentPropertyDecryptor documentPropertyDecryptor;     ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
 #endif
     
-    CBLReplicationCollection* collections;  ///< The collections to replicate with the target's endpoint
-    size_t collectionCount;                 ///< The number of collections
+    CBLReplicationCollection* _cbl_nullable collections;        ///< The collections to replicate with the target's endpoint
+    size_t collectionCount;                                     ///< The number of collections
 } CBLReplicatorConfiguration;
 
 
