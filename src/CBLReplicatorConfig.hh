@@ -224,13 +224,26 @@ namespace cbl_internal {
         void validate() const {
             const char *problem = nullptr;
             if (!database && !collections)
-                problem = "Invalid replicator config: missing both database and collections";
+                problem = "Invalid config: Missing both database and collections";
             else if (database && collections)
-                problem = "Invalid replicator config: both database and collections are set at same time";
+                problem = "Invalid config: Both database and collections are set at same time";
             else if (collections && collectionCount == 0)
-                problem = "Invalid replicator config: collectionCount is zero";
+                problem = "Invalid config: collectionCount is zero";
+            else if ((documentIDs || channels || pushFilter || pullFilter) && !database)
+                problem = "Invalid config: Cannot use documentIDs, channels, pushFilter or "
+                          "pullFilter when collections is set. Set the properties in "
+                          "CBLReplicationCollection instead.";
+            else if (conflictResolver && !database)
+                problem = "Invalid config: Cannot use conflictResolver when collections is set. "
+                          "Set the property in CBLReplicationCollection instead.";
+        #ifdef COUCHBASE_ENTERPRISE
+            else if ((propertyEncryptor || propertyDecryptor ) && !database)
+                problem = "Invalid config: Cannot use propertyEncryptor or propertyDecryptor "
+                          "when collections is set. Use documentPropertyEncryptor or "
+                          "documentPropertyDecryptor instead.";
+        #endif
             else if (!endpoint || replicatorType > kCBLReplicatorTypePull)
-                problem = "Invalid replicator config: missing endpoints or bad type";
+                problem = "Invalid config: Missing endpoints or bad type";
             else if (!endpoint->valid())
                 problem = "Invalid endpoint";
             else if (proxy && (proxy->type > kCBLProxyHTTPS ||
@@ -245,13 +258,6 @@ namespace cbl_internal {
         // Writes a LiteCore replicator optionsDict
         void writeOptions(Encoder &enc) const {
             writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders,  Dict(headers));
-            
-            // TODO:
-            // When collection is supported in LiteCore Replicator,
-            // remove the code that encodes documentIDs and channels here as it will be
-            // set using CBLReplicationCollection.
-            writeOptionalKey(enc, kC4ReplicatorOptionDocIDs,        Array(documentIDs));
-            writeOptionalKey(enc, kC4ReplicatorOptionChannels,      Array(channels));
             
             if (pinnedServerCertificate.buf) {
                 enc.writeKey(slice(kC4ReplicatorOptionPinnedServerCert));

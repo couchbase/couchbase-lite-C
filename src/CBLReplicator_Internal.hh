@@ -71,14 +71,6 @@ public:
         static once_flag once;
         call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
         
-        // TODO:
-        // When collection is supported in LiteCore Replicator,
-        // remove the check here.
-        if (_conf.collections) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorUnimplemented,
-                           "The collections configuration has not been implemented yet.");
-        }
-        
         if (_conf.database) {
             _defaultCollection = _conf.database->getDefaultCollection(true);
         }
@@ -88,26 +80,24 @@ public:
         // Set up the LiteCore replicator parameters:
         C4ReplicatorParameters params = { };
         
-        // TODO:
-        // When collection is supported in LiteCore Replicator,
-        // remove the code that sets the type here as it will be
-        // set using CBLReplicationCollection.
-        auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
-        if (_conf.replicatorType != kCBLReplicatorTypePull)
-            params.push = type;
-        if (_conf.replicatorType != kCBLReplicatorTypePush)
-            params.pull = type;
-        
         // Construct params.collections and validate if collections
         // are from the same database instance:
-        std::vector<C4ReplicationCollection> cols;
-        size_t collectionCount =  _conf.collections ? _conf.collectionCount : 1;
-        for (int i = 0; i < collectionCount; i++) {
+        auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
+        
+        size_t colsCount =  _conf.collections ? _conf.collectionCount : 1;
+        
+        std::vector<C4ReplicationCollection> c4ReplCols;
+        c4ReplCols.reserve(colsCount);
+        
+        std::vector<alloc_slice> optionDicts;
+        optionDicts.reserve(colsCount);
+        
+        for (int i = 0; i < colsCount; i++) {
             CBLReplicationCollection replCol;
             if (_conf.database) {
                 // If using .database, a C4ReplicationCollection with the default collection
                 // and the outer conflict resolver and filters will be construct:
-                assert(collectionCount == 1);
+                assert(colsCount == 1);
                 replCol.collection = _defaultCollection.get();
                 replCol.conflictResolver = _conf.conflictResolver;
                 replCol.pushFilter = _conf.pushFilter;
@@ -118,6 +108,11 @@ public:
                 replCol = _conf.collections[i];
             }
             
+            if (!replCol.collection->isValid()) {
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                               "An invalid collection was found in the configuration.");
+            }
+            
             if (!_db) {
                 _db = replCol.collection->database();
             } else if (_db != replCol.collection->database()) {
@@ -125,7 +120,7 @@ public:
                                "The collections are not from the same database object.");
             }
             
-            C4ReplicationCollection col = {};
+            auto& col = c4ReplCols.emplace_back();
             
             auto spec = replCol.collection->spec();
             col.collection = spec;
@@ -158,22 +153,18 @@ public:
             }
             
             if (replCol.documentIDs || replCol.channels) {
-                alloc_slice options = encodeCollectionOptions(replCol);
-                cols[i].optionsDictFleece = options;
+                auto& optDict = optionDicts.emplace_back(encodeCollectionOptions(replCol));
+                col.optionsDictFleece = optDict;
             }
             
             col.callbackContext = this;
-            
-            cols.push_back(col);
             
             // For callback to access replicator collection object by collection spec:
             _collections.insert({spec, replCol});
         }
         
-        params.collections = cols.data();
-        
-        // TODO : Remove type cast (CBL-3333)
-        params.collectionCount = (unsigned)collectionCount;
+        params.collections = c4ReplCols.data();
+        params.collectionCount = colsCount;
         
         params.callbackContext = this;
         params.onStatusChanged = [](C4Replicator* c4repl, C4ReplicatorStatus status, void *ctx) {
@@ -186,53 +177,25 @@ public:
                                      void *ctx) {
             ((CBLReplicator*)ctx)->_documentsEnded(pushing, numDocs, docs);
         };
-
-        // TODO:
-        // When collection is supported in LiteCore Replicator,
-        // remove the code that sets push and pull filter here:
-        // set using CBLReplicationCollection.
-        if (_conf.pushFilter) {
-            params.pushFilter = [](C4CollectionSpec collectionSpec,
-                                   C4String docID,
-                                   C4String revID,
-                                   C4RevisionFlags flags,
-                                   FLDict body,
-                                   void* ctx)
-            {
-                return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, true);
-            };
-        }
-        if (_conf.pullFilter) {
-            params.validationFunc = [](C4CollectionSpec collectionSpec,
-                                       C4String docID,
-                                       C4String revID,
-                                       C4RevisionFlags flags,
-                                       FLDict body,
-                                       void* ctx)
-            {
-                return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, false);
-            };
-        }
         
 #ifdef COUCHBASE_ENTERPRISE
-        
-        if (_conf.propertyEncryptor) {
+        if (_conf.propertyEncryptor || _conf.documentPropertyEncryptor) {
             params.propertyEncryptor = [](void* ctx,
                                           C4CollectionSpec spec,
                                           C4String documentID,
                                           FLDict properties,
                                           C4String keyPath,
                                           C4Slice input,
-                                          C4StringResult* outAlgorithm,
-                                          C4StringResult* outKeyID,
+                                          C4StringResult* algorithm,
+                                          C4StringResult* keyID,
                                           C4Error* outError)
             {
-                return ((CBLReplicator*)ctx)->_encrypt(documentID, properties, keyPath, input,
-                                                       outAlgorithm, outKeyID, outError);
+                return ((CBLReplicator*)ctx)->_encrypt(spec, documentID, properties, keyPath, input,
+                                                       algorithm, keyID, outError);
             };
         }
         
-        if (_conf.propertyDecryptor) {
+        if (_conf.propertyDecryptor || _conf.documentPropertyDecryptor) {
             params.propertyDecryptor = [](void* ctx,
                                           C4CollectionSpec spec,
                                           C4String documentID,
@@ -243,11 +206,10 @@ public:
                                           C4String keyID,
                                           C4Error* outError)
             {
-                return ((CBLReplicator*)ctx)->_decrypt(documentID, properties, keyPath, input,
+                return ((CBLReplicator*)ctx)->_decrypt(spec, documentID, properties, keyPath, input,
                                                        algorithm, keyID, outError);
             };
         }
-        
 #endif
 
         // Encode replicator options dict:
@@ -275,6 +237,7 @@ public:
     
 
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
+    CBLDatabase* database() const                           {return _db;}
     void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}
     void setSuspended(bool suspended)                       {_c4repl->setSuspended(suspended);}
     void stop() override                                    {_c4repl->stop();}
@@ -301,8 +264,9 @@ public:
     }
 
 
-    MutableDict pendingDocumentIDs() {
-        alloc_slice arrayData(_c4repl->pendingDocIDs());
+    MutableDict pendingDocumentIDs(const CBLCollection* col) const {
+        checkCollectionParam(col);
+        alloc_slice arrayData(_c4repl->pendingDocIDs(col->spec()));
         if (!arrayData)
             return nullptr;
 
@@ -316,8 +280,9 @@ public:
     }
 
 
-    bool isDocumentPending(FLSlice docID) {
-        return _c4repl->isDocumentPending(docID);
+    bool isDocumentPending(FLString docID, const CBLCollection* col) const {
+        checkCollectionParam(col);
+        return _c4repl->isDocumentPending(docID, col->spec());
     }
 
 
@@ -426,18 +391,23 @@ private:
             auto src = *c4Docs[i];
             if (!pushing && src.flags & kRevIsConflict) {
                 // Conflict -- start an async resolver task:
-                
-                // TODO:
-                // src.collectionSpec has null collection and scope name now.
-                // Only use the default collection for now:
-                // auto replCol = _collections[src.collectionSpec];
-                auto replCol = _collections[CollectionSpec()];
-                auto r = new ConflictResolver(replCol.collection, replCol.conflictResolver, _conf.context, src);
-                bumpConflictResolverCount(1);
-                r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, std::placeholders::_1) );
+                if (auto it = _collections.find(src.collectionSpec); it != _collections.end()) {
+                    auto replCol = it->second;
+                    auto r = new ConflictResolver(replCol.collection, replCol.conflictResolver, _conf.context, src);
+                    bumpConflictResolverCount(1);
+                    r->runAsync( bind(&CBLReplicator::_conflictResolverFinished, this, std::placeholders::_1) );
+                } else {
+                    // Shouldn't happen unless we have a bug in LiteCore:
+                    auto colPath = CBLCollection::collectionSpecToPath(src.collectionSpec);
+                    C4Error::raise(LiteCoreDomain, kC4ErrorUnexpectedError,
+                                   "Couldn't find collection '%*.s' in the replicator config when resolving conflict for doc '%*.s'",
+                                   FMTSLICE(colPath), FMTSLICE(src.docID));
+                }
             } else if (docs) {
                 // Otherwise add to list of changes to notify:
                 CBLReplicatedDocument doc = {};
+                doc.scope = src.collectionSpec.scope;
+                doc.collection = src.collectionSpec.name;
                 doc.ID = src.docID;
                 doc.error = external(src.error);
                 doc.flags = 0;
@@ -466,48 +436,75 @@ private:
     bool _filter(C4CollectionSpec colSpec, slice docID, slice revID,
                  C4RevisionFlags flags, Dict body, bool pushing)
     {
-        // TODO:
-        // CBL-3191: As now LiteCore doesn't send the correct colSpec and has no
-        // collections supported, call to get the default collection:
-        // auto replCol = _collections[colSpec];
-        auto replCol = _collections[CollectionSpec()];
-        Retained<CBLDocument> doc = new CBLDocument(replCol.collection, docID, revID, flags, body);
-        CBLReplicationFilter filter = pushing ? replCol.pushFilter : replCol.pullFilter;
-        
-        CBLDocumentFlags docFlags = 0;
-        if (flags & kRevDeleted)
-            docFlags |= kCBLDocumentFlagsDeleted;
-        if (flags & kRevPurged)
-            docFlags |= kCBLDocumentFlagsAccessRemoved;
-        
-        return filter(_conf.context, doc, docFlags);
+        if (auto it = _collections.find(colSpec); it != _collections.end()) {
+            auto replCol = it->second;
+            Retained<CBLDocument> doc = new CBLDocument(replCol.collection, docID, revID, flags, body);
+            CBLReplicationFilter filter = pushing ? replCol.pushFilter : replCol.pullFilter;
+            
+            CBLDocumentFlags docFlags = 0;
+            if (flags & kRevDeleted)
+                docFlags |= kCBLDocumentFlagsDeleted;
+            if (flags & kRevPurged)
+                docFlags |= kCBLDocumentFlagsAccessRemoved;
+            
+            return filter(_conf.context, doc, docFlags);
+        } else {
+            // Shouldn't happen unless we have a bug in LiteCore:
+            auto colPath = CBLCollection::collectionSpecToPath(colSpec);
+            C4Error::raise(LiteCoreDomain, kC4ErrorUnexpectedError,
+                           "Couldn't find collection '%*.s' in the replicator config when calling filter function for doc '%*.s'",
+                           FMTSLICE(colPath), FMTSLICE(docID));
+        }
     }
 
 #ifdef COUCHBASE_ENTERPRISE
     
-    C4SliceResult _encrypt(C4String documentID, FLDict properties, C4String keyPath, C4Slice input,
-                           C4StringResult* outAlgorithm, C4StringResult* outKeyID, C4Error* outError)
+    C4SliceResult _encrypt(C4CollectionSpec spec, C4String documentID, FLDict properties,
+                           C4String keyPath, C4Slice input, C4StringResult* algorithm,
+                           C4StringResult* keyID, C4Error* outError)
     {
-        CBLError error = {};
-        auto encryptor = _conf.propertyEncryptor;
-        auto result = encryptor(_conf.context, documentID, properties, keyPath, input,
-                                outAlgorithm, outKeyID, &error);
+        CBLError error {};
+        C4SliceResult result;
+        if (_conf.propertyEncryptor) {
+            assert(spec == kC4DefaultCollectionSpec);
+            result = _conf.propertyEncryptor(_conf.context, documentID, properties, keyPath, input,
+                                             algorithm, keyID, &error);
+        } else {
+            result = _conf.documentPropertyEncryptor(_conf.context, spec.scope, spec.name, documentID,
+                                                     properties, keyPath, input, algorithm, keyID, &error);
+        }
         *outError = internal(error);
         return result;
     }
     
-    C4SliceResult _decrypt(C4String documentID, FLDict properties, C4String keyPath, C4Slice input,
-                           C4String algorithm, C4String keyID, C4Error* outError)
+    C4SliceResult _decrypt(C4CollectionSpec spec, C4String documentID, FLDict properties,
+                           C4String keyPath, C4Slice input, C4String algorithm,
+                           C4String keyID, C4Error* outError)
     {
-        CBLError error = {};
-        auto decryptor = _conf.propertyDecryptor;
-        auto result = decryptor(_conf.context, documentID, properties, keyPath, input,
-                                algorithm, keyID, &error);
+        CBLError error {};
+        C4SliceResult result;
+        if (_conf.propertyDecryptor) {
+            assert(spec == kC4DefaultCollectionSpec);
+            result = _conf.propertyDecryptor(_conf.context, documentID, properties, keyPath, input,
+                                             algorithm, keyID, &error);
+        } else {
+            result = _conf.documentPropertyDecryptor(_conf.context, spec.scope, spec.name, documentID,
+                                                     properties, keyPath, input, algorithm, keyID, &error);
+        }
         *outError = internal(error);
         return result;
     }
     
 #endif
+    
+    void checkCollectionParam(const CBLCollection* col) const {
+        if (auto i = _collections.find(col->spec()); i != _collections.end()) {
+            if (i->second.collection == col)
+                return;
+        }
+        C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                       "The collection is not included in the replicator config.");
+    }
     
     using ReplicationCollectionsMap = std::unordered_map<C4Database::CollectionSpec, CBLReplicationCollection>;
 

@@ -251,6 +251,9 @@ namespace cbl_internal {
 
     CBLReplicatedDocument ConflictResolver::result() const {
         CBLReplicatedDocument doc = {};
+        auto spec = _collection->spec();
+        doc.scope = spec.scope;
+        doc.collection = spec.name;
         doc.ID = _docID;
         doc.error = _error;
         if (_flags & kRevDeleted)

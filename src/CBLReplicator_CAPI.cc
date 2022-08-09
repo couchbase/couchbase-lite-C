@@ -78,39 +78,39 @@ void CBLReplicator_SetSuspended(CBLReplicator* repl, bool sus) noexcept   {repl-
 
 FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator *repl, CBLError *outError) noexcept {
     try {
-        auto result = FLDict_Retain(repl->pendingDocumentIDs());
-        if (!result)
-            if (outError) outError->code = 0;
-        return result;
+        auto col = repl->database()->getDefaultCollection(true);
+        return CBLReplicator_PendingDocumentIDs2(repl, col, outError);
     } catchAndBridge(outError)
 }
 
 bool CBLReplicator_IsDocumentPending(CBLReplicator *repl, FLString docID, CBLError *outError) noexcept {
     try {
-        bool result = repl->isDocumentPending(docID);
-        if (!result)
-            if (outError) outError->code = 0;
-        return result;
+        auto col = repl->database()->getDefaultCollection(true);
+        return CBLReplicator_IsDocumentPending2(repl, docID, col, outError);
     } catchAndBridge(outError)
 }
 
 FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator* repl,
                                                        const CBLCollection* collection,
                                                        CBLError* _cbl_nullable outError) noexcept {
-    if (outError) {
-        *outError = {kCBLDomain, kCBLErrorUnimplemented};
-    }
-    return nullptr;
+    try {
+        auto result = FLDict_Retain(repl->pendingDocumentIDs(collection));
+        if (!result)
+            if (outError) outError->code = 0;
+        return result;
+    } catchAndBridge(outError)
 }
 
 bool CBLReplicator_IsDocumentPending2(CBLReplicator *repl,
                                       FLString docID,
                                       const CBLCollection* collection,
                                       CBLError* _cbl_nullable outError) noexcept {
-    if (outError) {
-        *outError = {kCBLDomain, kCBLErrorUnimplemented};
-    }
-    return false;
+    try {
+        bool result = repl->isDocumentPending(docID, collection);
+        if (!result)
+            if (outError) outError->code = 0;
+        return result;
+    } catchAndBridge(outError)
 }
 
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* repl,
