@@ -103,6 +103,8 @@
 		FC5FBBA62821B3450066157F /* CBLCollection_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = FC5FBBA42821B3450066157F /* CBLCollection_Internal.hh */; };
 		FC5FBBB52821CC2E0066157F /* CBLCollection_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */; };
 		FC5FBBB72821E4970066157F /* CBLDatabase_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27C9B5E021F655110040BC45 /* CBLDatabase_Internal.hh */; };
+		FC8678E4289C69470023F34F /* ReplicatorCollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC8678E3289C69470023F34F /* ReplicatorCollectionTest.cc */; };
+		FC8678F2289C69690023F34F /* ReplicatorCollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC8678E3289C69470023F34F /* ReplicatorCollectionTest.cc */; };
 		FCC063C928588DA6000C5BD7 /* CBLScope.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063C828588DA6000C5BD7 /* CBLScope.cc */; };
 		FCC063F3285BA641000C5BD7 /* DocumentTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063F2285BA641000C5BD7 /* DocumentTest.cc */; };
 		FCC06403285BCAC9000C5BD7 /* DocumentTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063F2285BA641000C5BD7 /* DocumentTest.cc */; };
@@ -403,6 +405,7 @@
 		FC5FBBA32821B3450066157F /* CBLCollection.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection.cc; sourceTree = "<group>"; };
 		FC5FBBA42821B3450066157F /* CBLCollection_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLCollection_Internal.hh; sourceTree = "<group>"; };
 		FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection_CAPI.cc; sourceTree = "<group>"; };
+		FC8678E3289C69470023F34F /* ReplicatorCollectionTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorCollectionTest.cc; sourceTree = "<group>"; };
 		FCC063C828588DA6000C5BD7 /* CBLScope.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLScope.cc; sourceTree = "<group>"; };
 		FCC063F2285BA641000C5BD7 /* DocumentTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DocumentTest.cc; sourceTree = "<group>"; };
 		FCD8298B283591D4004AA814 /* CollectionTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CollectionTest.cc; sourceTree = "<group>"; };
@@ -640,6 +643,7 @@
 				275B359D234D064600FE9CF0 /* QueryTest.cc */,
 				2736A625242E5A07002B9D65 /* ReplicatorTest.hh */,
 				277CC99422BC23DE00B245CB /* ReplicatorTest.cc */,
+				FC8678E3289C69470023F34F /* ReplicatorCollectionTest.cc */,
 				2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */,
 				93C70D1626CB334D0093E927 /* ReplicatorPropEncTest.cc */,
 				27D30F9123A2D30500392107 /* PerfTest.cc */,
@@ -1253,6 +1257,7 @@
 				27DBD095246C9573002FD7A7 /* LibC++Debug.cc in Sources */,
 				275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */,
 				275B358D23481D0C00FE9CF0 /* ReplicatorTest.cc in Sources */,
+				FC8678E4289C69470023F34F /* ReplicatorCollectionTest.cc in Sources */,
 				FCD8298D283591D4004AA814 /* CollectionTest.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1285,6 +1290,7 @@
 				93C70D3426D01B5A0093E927 /* BlobTest.cc in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
+				FC8678F2289C69690023F34F /* ReplicatorCollectionTest.cc in Sources */,
 				93C70D1826CB535D0093E927 /* ReplicatorPropEncTest.cc in Sources */,
 				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,
 				93965A6326A7CD50008728EE /* LogTest.cc in Sources */,

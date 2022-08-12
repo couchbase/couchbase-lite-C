@@ -146,6 +146,7 @@ uint64_t CBLDatabase_Count(const CBLDatabase* db) noexcept {
     } catchAndWarn();
 }
 
+/** Private API */
 uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) noexcept {
     try {
         return db->lastSequence();
@@ -229,6 +230,7 @@ bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db,
     } catchAndBridge(outError)
 }
 
+/** Private API */
 bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db,
                                     FLString docID,
                                     CBLError* outError) noexcept
@@ -250,6 +252,7 @@ bool CBLDatabase_PurgeDocument(CBLDatabase* db,
     } catchAndBridge(outError)
 }
 
+/** Private API */
 bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
                                    FLString docID,
                                    CBLError* outError) noexcept

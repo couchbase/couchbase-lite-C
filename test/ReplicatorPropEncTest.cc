@@ -149,6 +149,19 @@ public:
         
         return FLSliceResult(decrypted);
     }
+    
+    void createEncryptedDoc(CBLCollection* collection, FLString docID, FLString secret ="Secret 1"_sl) {
+        auto doc = CBLDocument_CreateWithID(docID);
+        FLMutableDict props = CBLDocument_MutableProperties(doc);
+        
+        auto encryptable = CBLEncryptable_CreateWithString(secret);
+        FLMutableDict_SetEncryptableValue(props, "secret"_sl, encryptable);
+        
+        CBLError error {};
+        REQUIRE(CBLCollection_SaveDocument(collection, doc, &error));
+        CBLDocument_Release(doc);
+        CBLEncryptable_Release(encryptable);
+    }
 };
 
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Create Encryptable", "[Encryptable]") {
@@ -514,8 +527,8 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No encryptor : crypto error"
     }
     
     CHECK(replicatedDocs.size() == 1);
-    CHECK(replicatedDocs[0].error.code == kCBLErrorCrypto);
-    CHECK(replicatedDocs[0].error.domain == kCBLDomain);
+    CHECK(replicatedDocs["doc1"].error.code == kCBLErrorCrypto);
+    CHECK(replicatedDocs["doc1"].error.domain == kCBLDomain);
     CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
 }
 
@@ -578,8 +591,8 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip encryption : crypto err
     }
     
     CHECK(replicatedDocs.size() == 1);
-    CHECK(replicatedDocs[0].error.code == kCBLErrorCrypto);
-    CHECK(replicatedDocs[0].error.domain == kCBLDomain);
+    CHECK(replicatedDocs["doc1"].error.code == kCBLErrorCrypto);
+    CHECK(replicatedDocs["doc1"].error.domain == kCBLDomain);
     CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
 }
 
@@ -647,8 +660,8 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encryption error", "[Replica
     }
     
     CHECK(replicatedDocs.size() == 1);
-    CHECK(replicatedDocs[0].error.code == kCBLErrorCrypto);
-    CHECK(replicatedDocs[0].error.domain == kCBLDomain);
+    CHECK(replicatedDocs["doc1"].error.code == kCBLErrorCrypto);
+    CHECK(replicatedDocs["doc1"].error.domain == kCBLDomain);
     CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
 }
 
@@ -686,8 +699,8 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Decryption error", "[Replica
         }
 
         CHECK(replicatedDocs.size() == 1);
-        CHECK(replicatedDocs[0].error.code == kCBLErrorCrypto);
-        CHECK(replicatedDocs[0].error.domain == kCBLDomain);
+        CHECK(replicatedDocs["doc1"].error.code == kCBLErrorCrypto);
+        CHECK(replicatedDocs["doc1"].error.domain == kCBLDomain);
         
         CBLError error;
         CHECK(!CBLDatabase_GetDocument(db.ref(), "doc1"_sl, &error));
@@ -766,6 +779,105 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Key ID and Algorithm", "[Rep
         CHECK(decryptCount == 1);
         CBLDocument_Release(doc);
     }
+}
+
+TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt with collections", "[Replicator][Encryptable]") {
+    CBLLog_SetConsoleLevel(kCBLLogVerbose);
+    auto c1x = CreateCollection(db.ref(), "colA", "scopeA");
+    auto c2x = CreateCollection(db.ref(), "colB", "scopeA");
+    
+    auto c1y = CreateCollection(otherDB.ref(), "colA", "scopeA");
+    auto c2y = CreateCollection(otherDB.ref(), "colB", "scopeA");
+    
+    createEncryptedDoc(c1x, "doc1"_sl);
+    createEncryptedDoc(c2x, "doc2"_sl);
+    
+    config.replicatorType = kCBLReplicatorTypePushAndPull;
+    config.documentPropertyEncryptor = [](void* context,
+                                          FLString scope,
+                                          FLString collection,
+                                          FLString docID,
+                                          FLDict props,
+                                          FLString path,
+                                          FLSlice input,
+                                          FLStringResult* alg,
+                                          FLStringResult* kid,
+                                          CBLError* error) -> FLSliceResult
+    {
+        CHECK(slice(scope) == "scopeA"_sl);
+        if (slice(collection) == "colA")
+            CHECK(slice(docID) == "doc1"_sl);
+        else if (slice(collection) == "colB")
+            CHECK(slice(docID) == "doc2"_sl);
+        else
+            FAIL("Invalid docID");
+        return ((ReplicatorPropertyEncryptionTest*)context) -> encrypt(context, docID, props, path,
+                                                                       input, alg, kid, error);
+    };
+    
+    config.documentPropertyDecryptor = [](void* context,
+                                          FLString scope,
+                                          FLString collection,
+                                          FLString docID,
+                                          FLDict props,
+                                          FLString path,
+                                          FLSlice input,
+                                          FLString alg,
+                                          FLString kid,
+                                          CBLError* error) -> FLSliceResult
+    {
+        CHECK(slice(scope) == "scopeA"_sl);
+        if (slice(collection) == "colA")
+            CHECK(slice(docID) == "doc1"_sl);
+        else if (slice(collection) == "colB")
+            CHECK(slice(docID) == "doc2"_sl);
+        else
+            FAIL("Invalid docID");
+        return ((ReplicatorPropertyEncryptionTest*)context) -> decrypt(context, docID, props, path,
+                                                                       input, alg, kid, error);
+    };
+    
+    config.database = nullptr;
+    
+    vector<CBLReplicationCollection> configs(2);
+    configs[0].collection = c1x;
+    configs[1].collection = c2x;
+    config.collections = configs.data();
+    config.collectionCount = configs.size();
+    
+    // Push:
+    replicate();
+    
+    CBLError error {};
+    auto doc1 = CBLCollection_GetMutableDocument(c1y, "doc1"_sl, &error);
+    CHECK(Dict(CBLDocument_Properties(doc1)).toJSON(false, true) ==
+          "{\"encrypted$secret\":{\"alg\":\"CB_MOBILE_CUSTOM\",\"ciphertext\":\"aRguKDkuP2t6aQ==\"}}");
+    CBLDocument_Release(doc1);
+    
+    auto doc2 = CBLCollection_GetMutableDocument(c2y, "doc2"_sl, &error);
+    CHECK(Dict(CBLDocument_Properties(doc2)).toJSON(false, true) ==
+          "{\"encrypted$secret\":{\"alg\":\"CB_MOBILE_CUSTOM\",\"ciphertext\":\"aRguKDkuP2t6aQ==\"}}");
+    CBLDocument_Release(doc2);
+    
+    // Purge and pull again with reset checkpoint:
+    REQUIRE(CBLCollection_PurgeDocumentByID(c1x, "doc1"_sl, &error));
+    REQUIRE(CBLCollection_PurgeDocumentByID(c2x, "doc2"_sl, &error));
+    replicate(true);
+    
+    doc1 = CBLCollection_GetMutableDocument(c1x, "doc1"_sl, &error);
+    CHECK(Dict(CBLDocument_Properties(doc1)).toJSON(false, true) ==
+          "{\"secret\":{\"@type\":\"encryptable\",\"value\":\"Secret 1\"}}");
+    CBLDocument_Release(doc1);
+    
+    doc2 = CBLCollection_GetMutableDocument(c2x, "doc2"_sl, &error);
+    CHECK(Dict(CBLDocument_Properties(doc2)).toJSON(false, true) ==
+          "{\"secret\":{\"@type\":\"encryptable\",\"value\":\"Secret 1\"}}");
+    CBLDocument_Release(doc2);
+    
+    CBLCollection_Release(c1x);
+    CBLCollection_Release(c2x);
+    CBLCollection_Release(c1y);
+    CBLCollection_Release(c2y);
 }
 
 #endif

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <thread>
 #include <set>
+#include <unordered_map>
 #include <vector>
 
 using namespace std;
@@ -34,12 +35,25 @@ public:
     
     bool enableDocReplicationListener = true;
     bool logEveryDocument = true;
+    
+    struct ReplicatedDoc {
+        string scope;
+        string collection;
+        string docID;
+        CBLDocumentFlags flags;
+        CBLError error;
+    };
+    // docID format : <scope>.<collection>.<docID> or <docID> for default collection
     set<string> replicatedDocIDs;
-    vector<CBLReplicatedDocument> replicatedDocs;
+    std::unordered_map<string, ReplicatedDoc> replicatedDocs;
     
     CBLError replError = {};
     IdleAction idleAction = IdleAction::kStopReplicator;
     double timeoutSeconds = 30.0;
+    
+    CBLError expectedError = {};
+    int64_t expectedDocumentCount = -1;
+    
 
     ReplicatorTest() {
         config.database = db.ref();
@@ -47,7 +61,7 @@ public:
         config.context = this;
     }
 
-    void replicate(CBLError expectedError = {}) {
+    void replicate(bool reset =false) {
         CBLError error;
         CBLReplicatorStatus status;
         if (!repl) {
@@ -76,7 +90,7 @@ public:
             }, this);
         }
         
-        CBLReplicator_Start(repl, false);
+        CBLReplicator_Start(repl, reset);
 
         time start = clock::now();
         cerr << "Waiting...\n";
@@ -109,6 +123,10 @@ public:
         } else {
             CHECK(status.error.code == 0);
             CHECK(status.progress.complete == 1.0);
+        }
+        
+        if (expectedDocumentCount >= 0) {
+            CHECK(status.progress.documentCount == expectedDocumentCount);
         }
         
         CBLListener_Remove(ctoken);
@@ -150,14 +168,29 @@ public:
         cerr << "--- " << numDocuments << " docs " << (isPush ? "pushed" : "pulled") << ":";
         if (logEveryDocument) {
             for (unsigned i = 0; i < numDocuments; ++i) {
-                replicatedDocIDs.insert(string(documents[i].ID));
-                replicatedDocs.push_back(documents[i]);
-                cerr << " " << documents[i].ID;
+                auto doc = documents[i];
+                
+                ReplicatedDoc rdoc {};
+                rdoc.scope = slice(doc.scope).asString();;
+                rdoc.collection = slice(doc.collection).asString();
+                rdoc.docID = slice(doc.ID).asString();
+                rdoc.flags = doc.flags;
+                rdoc.error = doc.error;
+                
+                string key;
+                if (rdoc.scope == "_default" && rdoc.collection == "_default")
+                    key = rdoc.docID;
+                else
+                    key = rdoc.scope + "." + rdoc.collection + "." + rdoc.docID;
+                
+                replicatedDocs[key] = rdoc;
+                replicatedDocIDs.insert(key);
+                cerr << " " << key;
             }
         }
         cerr << "\n";
     }
-
+    
     alloc_slice getServerCert() {
         FILE* f = fopen("vendor/couchbase-lite-core/Replicator/tests/data/cert.pem", "r");
         REQUIRE(f);
@@ -185,6 +218,14 @@ public:
         for (const string &s : strings)
             out.push_back(s);
         return out;
+    }
+    
+    static string getDocIDKey(ReplicatedDoc& doc) {
+        if (doc.scope == "_default" && doc.collection == "_default") {
+            return doc.docID;
+        } else {
+            return doc.scope + "." + doc.collection + "." + doc.docID;
+        }
     }
 
 };

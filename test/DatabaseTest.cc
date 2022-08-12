@@ -84,80 +84,80 @@ public:
         
         error = {};
         CHECK(!CBLDatabase_Delete(db, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_BeginTransaction(db, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_EndTransaction(db, false, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
     #ifdef COUCHBASE_ENTERPRISE
         error = {};
         CHECK(!CBLDatabase_ChangeEncryptionKey(db, NULL, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
     #endif
         
         error = {};
         CHECK(!CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeIntegrityCheck, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         // Document Functions:
         error = {};
         auto doc = CBLDocument_CreateWithID("doc1"_sl);
         CHECK(!CBLDatabase_SaveDocument(db, doc, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         auto conflictHandler = [](void *c, CBLDocument* d1, const CBLDocument* d2) -> bool { return true; };
         CHECK(!CBLDatabase_SaveDocumentWithConflictHandler(db, doc, conflictHandler, nullptr, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_SaveDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_GetDocument(db, "doc1"_sl, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_DeleteDocument(db, doc, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_DeleteDocumentWithConcurrencyControl(db, doc, kCBLConcurrencyControlLastWriteWins, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_PurgeDocument(db, doc, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_PurgeDocumentByID(db, "doc1"_sl, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(CBLDatabase_GetDocumentExpiration(db, "doc1"_sl, &error) == 0);
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_SetDocumentExpiration(db, "doc1"_sl, CBL_Now(), &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_CreateValueIndex(db, "Value"_sl, {}, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_CreateFullTextIndex(db, "FTS"_sl, {}, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         FLArray names = CBLDatabase_GetIndexNames(db);
         CHECK(names);
@@ -1300,9 +1300,9 @@ TEST_CASE_METHOD(DatabaseTest, "Maintenance : FullOptimize") {
     index1.expressions = "name.first"_sl;
     CBLError error;
     CHECK(CBLDatabase_CreateValueIndex(db, "index1"_sl, index1, &error));
-    
+
     ImportJSONLines(GetTestFilePath("names_100.json"), db);
-    
+
     CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeFullOptimize, &error));
 }
 

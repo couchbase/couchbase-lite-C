@@ -85,7 +85,8 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
         return true;
     };
 
-    replicate({kCBLNetworkDomain, kCBLNetErrUnknownHost});
+    expectedError = {kCBLNetworkDomain, kCBLNetErrUnknownHost};
+    replicate();
 }
 
 
@@ -104,7 +105,8 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replica
     proxy.password = "123456"_sl;
     config.proxy = &proxy;
     
-    replicate({ kCBLNetworkDomain, kCBLNetErrUnknownHost });
+    expectedError = {kCBLNetworkDomain, kCBLNetErrUnknownHost};
+    replicate();
 }
 
 
@@ -122,7 +124,8 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with freed auth and doc listene
     CBLAuth_Free(auth);
     
     // Note: replicate() will add a document listener
-    replicate({ kCBLNetworkDomain, kCBLNetErrUnknownHost });
+    expectedError = {kCBLNetworkDomain, kCBLNetErrUnknownHost};
+    replicate();
     
     // Clean up
     config.authenticator = nullptr;
