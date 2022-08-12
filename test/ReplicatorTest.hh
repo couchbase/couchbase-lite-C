@@ -143,10 +143,19 @@ public:
     }
     
     bool waitForActivityLevel(CBLReplicatorActivityLevel level, double timeout) {
+        return waitForActivityLevelAndDocumentCount(level, -1, timeout);
+    }
+    
+    bool waitForActivityLevelAndDocumentCount(CBLReplicatorActivityLevel level,
+                                              int64_t documentCount, double timeout)
+    {
         time start = clock::now();
         while (std::chrono::duration_cast<seconds>(clock::now() - start).count() < timeout) {
-            if (CBLReplicator_Status(repl).activity == level)
+            auto status = CBLReplicator_Status(repl);
+            if (status.activity == level && (documentCount < 0 ||
+                                             status.progress.documentCount == documentCount)) {
                 return true;
+            }
             this_thread::sleep_for(100ms);
         }
         return false;

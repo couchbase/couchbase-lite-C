@@ -340,8 +340,9 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Incremental Continuous Replication",
 
         createDocs(cx[0], 5, "doc3");
         createDocs(cx[1], 5, "doc3");
-        REQUIRE(waitForActivityLevel(kCBLReplicatorIdle, 10.0));
+        REQUIRE(waitForActivityLevelAndDocumentCount(kCBLReplicatorIdle, 30, 10.0));
         status = CBLReplicator_Status(repl);
+        CHECK(status.activity == kCBLReplicatorIdle);
         CHECK(status.progress.documentCount == 30);
         CHECK(status.error.code == 0);
     }
@@ -356,8 +357,9 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Incremental Continuous Replication",
         
         createDocs(cy[0], 5, "doc3");
         createDocs(cy[1], 5, "doc3");
-        REQUIRE(waitForActivityLevel(kCBLReplicatorIdle, 10.0));
+        REQUIRE(waitForActivityLevelAndDocumentCount(kCBLReplicatorIdle, 50, 10.0));
         status = CBLReplicator_Status(repl);
+        CHECK(status.activity == kCBLReplicatorIdle);
         CHECK(status.progress.documentCount == 50);
         CHECK(status.error.code == 0);
     }
@@ -374,8 +376,9 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Incremental Continuous Replication",
         createDocs(cy[1], 5, "doc3");
         createDocs(cy[0], 10, "doc4");
         createDocs(cy[1], 10, "doc4");
-        REQUIRE(waitForActivityLevel(kCBLReplicatorIdle, 10.0));
+        REQUIRE(waitForActivityLevelAndDocumentCount(kCBLReplicatorIdle, 90, 10.0));
         status = CBLReplicator_Status(repl);
+        CHECK(status.activity == kCBLReplicatorIdle);
         CHECK(status.progress.documentCount == 90);
         CHECK(status.error.code == 0);
     }
