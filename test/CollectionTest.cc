@@ -67,60 +67,60 @@ public:
         CBLError error = {};
         auto doc = CBLDocument_CreateWithID("doc1"_sl);
         CHECK(!CBLCollection_SaveDocument(col, doc, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         auto conflictHandler = [](void *c, CBLDocument* d1, const CBLDocument* d2) -> bool { return true; };
         CHECK(!CBLCollection_SaveDocumentWithConflictHandler(col, doc, conflictHandler, nullptr, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, kCBLConcurrencyControlLastWriteWins, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_GetDocument(col, "doc1"_sl, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_GetMutableDocument(col, "doc1"_sl, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_DeleteDocument(col, doc, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_DeleteDocumentWithConcurrencyControl(col, doc, kCBLConcurrencyControlLastWriteWins, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_PurgeDocument(col, doc, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_PurgeDocumentByID(col, "doc1"_sl, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(CBLCollection_GetDocumentExpiration(col, "doc1"_sl, &error) == 0);
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_SetDocumentExpiration(col, "doc1"_sl, CBL_Now(), &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_CreateValueIndex(col, "Value"_sl, {}, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_CreateFullTextIndex(col, "FTS"_sl, {}, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLCollection_GetIndexNames(col, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         auto listener = [](void* ctx, const CBLCollectionChange* change) { };
         auto token = CBLCollection_AddChangeListener(col, listener, nullptr);
@@ -143,11 +143,11 @@ public:
         
         CBLError error = {};
         CHECK(!CBLScope_Collection(scope, "collection"_sl, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLScope_CollectionNames(scope, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
     }
     
     void testInvalidDatabase(CBLDatabase* database) {
@@ -157,27 +157,27 @@ public:
         
         CBLError error = {};
         CHECK(!CBLDatabase_DefaultScope(db, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_DefaultCollection(db, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_ScopeNames(db, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_CollectionNames(db, "_default"_sl,  &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_Collection(db, "_default"_sl, "_default"_sl, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
         
         error = {};
         CHECK(!CBLDatabase_Scope(db, "_default"_sl, &error));
-        checkNotOpenError(error);
+        CheckNotOpenError(error);
     }
 };
 

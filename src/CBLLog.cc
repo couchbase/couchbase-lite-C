@@ -228,11 +228,13 @@ bool CBLLog_SetFileConfig(CBLLogFileConfiguration config, CBLError *outError) CB
 
 extern "C" CBL_PUBLIC std::atomic_int gC4ExpectExceptions;
 
+/** Private API */
 void CBLLog_BeginExpectingExceptions() CBLAPI {
     ++gC4ExpectExceptions;
     c4log_warnOnErrors(false);
 }
 
+/** Private API */
 void CBLLog_EndExpectingExceptions() CBLAPI {
     if (--gC4ExpectExceptions == 0)
         c4log_warnOnErrors(true);

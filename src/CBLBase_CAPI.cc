@@ -25,41 +25,35 @@
 
 static_assert(sizeof(CBLError) == sizeof(C4Error));
 
-
 FLSliceResult CBLError_Message(const CBLError* error) noexcept {
     return c4error_getMessage(internal(*error));
 }
 
-
+/** Private API */
 void CBLError_SetCaptureBacktraces(bool capture) noexcept {
     C4Error::setCaptureBacktraces(capture);
 }
 
+/** Private API */
 bool CBLError_GetCaptureBacktraces(void) noexcept {
     return C4Error::getCaptureBacktraces();
 }
-
-
 
 CBLTimestamp CBL_Now(void) noexcept {
     return static_cast<CBLTimestamp>(c4_now());
 }
 
-
 CBLRefCounted* CBL_Retain(CBLRefCounted *self) noexcept {
     return retain(self);
 }
-
 
 void CBL_Release(CBLRefCounted *self) noexcept {
     release(self);
 }
 
-
 unsigned CBL_InstanceCount() noexcept {
     return fleece::InstanceCounted::liveInstanceCount();
 }
-
 
 void CBL_DumpInstances(void) noexcept {
 #if INSTANCECOUNTED_TRACK
@@ -68,7 +62,6 @@ void CBL_DumpInstances(void) noexcept {
     std::cerr << "(CBL_DumpInstances() is not functional in non-debug builds)\n";
 #endif
 }
-
 
 void CBLListener_Remove(CBLListenerToken *token) noexcept {
     if (token) {

@@ -71,9 +71,6 @@ public:
 
 
     CBLDatabase *db {nullptr};
-    
-    void checkError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain = kCBLDomain);
-    void checkNotOpenError(CBLError& error);
 };
 
 
@@ -82,6 +79,20 @@ std::string GetTestFilePath(const std::string &filename);
 bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)> &callback);
 
 unsigned ImportJSONLines(std::string &&path, CBLDatabase* database);
+
+unsigned ImportJSONLines(std::string &&path, CBLCollection* collection);
+
+void CheckError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain = kCBLDomain);
+
+void CheckNotOpenError(CBLError& error);
+
+std::string CollectionPath(CBLCollection* collection);
+
+CBLCollection* CreateCollection(CBLDatabase* database, std::string collection, std::string scope ="_default");
+
+void CreateDoc(CBLCollection *col, std::string docID, std::string jsonContent);
+
+void PurgeAllDocs(CBLCollection* collection);
 
 
 // RAII utility to suppress reporting C++ exceptions (or breaking at them, in the Xcode debugger.)

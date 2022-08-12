@@ -114,6 +114,13 @@ uint64_t CBLCollection_Count(const CBLCollection* collection) noexcept {
 }
 
 /** Private API */
+CBLDatabase* CBLCollection_Database(const CBLCollection* collection) noexcept {
+    try {
+        return collection->database();
+    } catchAndWarn()
+}
+
+/** Private API */
 uint64_t CBLCollection_LastSequence(const CBLCollection* collection) noexcept {
     try {
         return collection->lastSequence();

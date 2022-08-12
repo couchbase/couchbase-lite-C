@@ -28,6 +28,9 @@ CBL_CAPI_BEGIN
     void CBLLog_BeginExpectingExceptions() CBLAPI;
     void CBLLog_EndExpectingExceptions() CBLAPI;
 
+/** Returns the collection's database, or NULL if the collection is invalid, or the database is released. */
+    CBLDatabase* _cbl_nullable CBLCollection_Database(const CBLCollection*) CBLAPI;
+
 /** Returns the last sequence number assigned in the database (default collection).
     This starts at zero and increments every time a document is saved or deleted. */
     uint64_t CBLDatabase_LastSequence(const CBLDatabase*) CBLAPI;
@@ -57,23 +60,6 @@ CBL_CAPI_BEGIN
     bool CBLCollection_DeleteDocumentByID(CBLCollection* collection,
                                           FLString docID,
                                           CBLError* _cbl_nullable outError) CBLAPI;
-
-    /** Given a list of (docID, revID) pairs, finds which ones are new to this database, i.e. don't
-        currently exist and are not older than what currently exists.
-        @param db  The database.
-        @param numRevisions  The number of document revisions to check.
-        @param docIDs  An array of `numRevisions` document IDs.
-        @param revIDs  An array of `numRevisions` revision IDs, matching up with `docIDs`.
-        @param outIsNew  An array of `numRevisions` bools, which will be filled in with a `true` for
-                each revision that's new, or `false` for ones that aren't new.
-        @param outError  On failure, an error will be stored here.
-        @return  True on success, false on failure. */
-    bool CBLDatabase_FindNewRevisions(const CBLDatabase* db,
-                                      unsigned numRevisions,
-                                      const FLSlice docIDs[_cbl_nonnull],
-                                      const FLSlice revIDs[_cbl_nonnull],
-                                      bool outIsNew[_cbl_nonnull],
-                                      CBLError* _cbl_nullable outError);
 
     FLSliceResult CBLDocument_CanonicalRevisionID(const CBLDocument* doc) CBLAPI;
 

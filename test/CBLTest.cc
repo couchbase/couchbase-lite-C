@@ -22,6 +22,7 @@
 #include "CBLTest_Cpp.hh"
 #include "CBLPrivate.h"
 #include "fleece/slice.hh"
+#include <sstream>
 #include <fstream>
 
 #ifdef __APPLE__
@@ -87,15 +88,6 @@ CBLTest::~CBLTest() {
     if (CBL_InstanceCount() > 0)
         CBL_DumpInstances();
     CHECK(CBL_InstanceCount() == 0);
-}
-
-void CBLTest::checkError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain) {
-    CHECK(error.domain == expectedDomain);
-    CHECK(error.code == expectedCode);
-}
-
-void CBLTest::checkNotOpenError(CBLError& error) {
-    checkError(error, kCBLErrorNotOpen);
 }
 
 
@@ -180,21 +172,31 @@ bool ReadFileByLines(const string &path, const function<bool(FLSlice)> &callback
     return true;
 }
 
-
+unsigned ImportJSONLines(string &&path, CBLDatabase* database) {
+    CBLError error {};
+    CBLCollection *collection = CBLDatabase_DefaultCollection(database, &error);
+    REQUIRE(collection);
+    auto result = ImportJSONLines(move(path), collection);
+    CBLCollection_Release(collection);
+    return result;
+}
 
 // Read a file that contains a JSON document per line. Every line becomes a document.
-unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
+unsigned ImportJSONLines(string &&path, CBLCollection* collection) {
     CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Reading %s ...  ", path.c_str());
     CBLError error;
     unsigned numDocs = 0;
-
+    
+    CBLDatabase* database = CBLCollection_Database(collection);
+    REQUIRE(database);
+    
     cbl::Transaction t(database);
     ReadFileByLines(path, [&](FLSlice line) {
         char docID[20];
         sprintf(docID, "%07u", numDocs+1);
         auto doc = CBLDocument_CreateWithID(slice(docID));
         REQUIRE(CBLDocument_SetJSON(doc, line, &error));
-        CHECK(CBLDatabase_SaveDocumentWithConcurrencyControl(database, doc, kCBLConcurrencyControlFailOnConflict, &error));
+        CHECK(CBLCollection_SaveDocumentWithConcurrencyControl(collection, doc, kCBLConcurrencyControlFailOnConflict, &error));
         CBLDocument_Release(doc);
         ++numDocs;
         return true;
@@ -202,4 +204,57 @@ unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
     CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Committing %u docs...", numDocs);
     t.commit();
     return numDocs;
+}
+
+void CheckError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain) {
+    CHECK(error.domain == expectedDomain);
+    CHECK(error.code == expectedCode);
+}
+
+void CheckNotOpenError(CBLError& error) {
+    CheckError(error, kCBLErrorNotOpen);
+}
+
+CBLCollection* CreateCollection(CBLDatabase* database, string collection, string scope) {
+    CBLError error {};
+    auto col = CBLDatabase_CreateCollection(database, slice(collection), slice(scope), &error);
+    REQUIRE(col);
+    return col;
+}
+
+void CreateDoc(CBLCollection *col, std::string docID, std::string jsonContent) {
+    CBLError error {};
+    CBLDocument* doc = docID.empty() ? CBLDocument_Create() : CBLDocument_CreateWithID(slice(docID));
+    REQUIRE(CBLDocument_SetJSON(doc, slice(jsonContent), &error));
+    REQUIRE(CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, kCBLConcurrencyControlFailOnConflict, &error));
+    CBLDocument_Release(doc);
+}
+
+std::string CollectionPath(CBLCollection* collection) {
+   return slice(CBLScope_Name(CBLCollection_Scope(collection))).asString() + "." +
+          slice(CBLCollection_Name(collection)).asString();
+}
+
+void PurgeAllDocs(CBLCollection* collection) {
+    std::stringstream ss;
+    ss << "SELECT meta().id FROM ";
+    ss << CollectionPath(collection);
+
+    CBLDatabase* database = CBLCollection_Database(collection);
+    REQUIRE(database);
+    
+    auto query = CBLDatabase_CreateQuery(database, kCBLN1QLLanguage, slice(ss.str()), NULL, NULL);
+    REQUIRE(query);
+    
+    auto rs = CBLQuery_Execute(query, NULL);
+    REQUIRE(rs);
+    
+    while (CBLResultSet_Next(rs)) {
+        FLString id = FLValue_AsString(CBLResultSet_ValueAtIndex(rs, 0));
+        REQUIRE(id.buf);
+        REQUIRE(CBLCollection_PurgeDocumentByID(collection, id, NULL));
+    }
+    
+    CBLResultSet_Release(rs);
+    CBLQuery_Release(query);
 }

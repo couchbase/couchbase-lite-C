@@ -41,10 +41,12 @@ uint64_t CBLDocument_Sequence(const CBLDocument* doc) noexcept          {return 
 CBLCollection* CBLDocument_Collection(const CBLDocument* doc) noexcept  {return doc->collection();}
 FLDict CBLDocument_Properties(const CBLDocument* doc) noexcept          {return doc->properties();}
 
+/** Private API */
 FLSliceResult CBLDocument_CanonicalRevisionID(const CBLDocument* doc) noexcept {
     return FLSliceResult(doc->canonicalRevisionID());
 }
 
+/** Private API */
 unsigned CBLDocument_Generation(const CBLDocument* doc) noexcept {
     return doc->generation();
 }
