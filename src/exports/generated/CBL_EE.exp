@@ -37,8 +37,6 @@ _CBL_InstanceCount
 _CBL_DumpInstances
 _CBL_Now
 _CBLError_Message
-_CBLError_GetCaptureBacktraces
-_CBLError_SetCaptureBacktraces
 _CBLListener_Remove
 _kCBLTypeProperty
 _kCBLBlobType
@@ -78,7 +76,6 @@ _CBLDatabase_Name
 _CBLDatabase_Path
 _CBLDatabase_Config
 _CBLDatabase_Count
-_CBLDatabase_LastSequence
 _CBLDatabase_Delete
 _CBLDatabase_BeginTransaction
 _CBLDatabase_EndTransaction
@@ -103,13 +100,11 @@ _kCBLDefaultCollectionName
 _CBLCollection_Name
 _CBLCollection_Scope
 _CBLCollection_Count
-_CBLCollection_LastSequence
 _CBLCollection_GetDocument
 _CBLCollection_SaveDocument
 _CBLCollection_SaveDocumentWithConcurrencyControl
 _CBLCollection_SaveDocumentWithConflictHandler
 _CBLCollection_DeleteDocument
-_CBLCollection_DeleteDocumentByID
 _CBLCollection_DeleteDocumentWithConcurrencyControl
 _CBLCollection_PurgeDocument
 _CBLCollection_PurgeDocumentByID
@@ -128,8 +123,6 @@ _CBLScope_Collection
 _CBLScope_CollectionNames
 _CBLDocument_ID
 _CBLDocument_RevisionID
-_CBLDocument_CanonicalRevisionID
-_CBLDocument_Generation
 _CBLDocument_Sequence
 _CBLDocument_Collection
 _CBLDocument_Create
@@ -147,7 +140,6 @@ _CBLDatabase_SaveDocumentWithConcurrencyControl
 _CBLDatabase_SaveDocumentWithConflictHandler
 _CBLDatabase_DeleteDocument
 _CBLDatabase_DeleteDocumentWithConcurrencyControl
-_CBLDatabase_DeleteDocumentByID
 _CBLDatabase_PurgeDocument
 _CBLDatabase_PurgeDocumentByID
 _CBLDatabase_GetDocumentExpiration
@@ -162,8 +154,6 @@ _CBLLog_ConsoleLevel
 _CBLLog_SetConsoleLevel
 _CBLLog_FileConfig
 _CBLLog_SetFileConfig
-_CBLLog_BeginExpectingExceptions
-_CBLLog_EndExpectingExceptions
 _CBLDatabase_CreateQuery
 _CBLQuery_Parameters
 _CBLQuery_SetParameters
@@ -199,6 +189,17 @@ _CBLReplicator_IsDocumentPending2
 _CBLReplicator_AddChangeListener
 _CBLReplicator_AddDocumentReplicationListener
 _CBLDefaultConflictResolver
+_CBLCollection_Database
+_CBLCollection_DeleteDocumentByID
+_CBLCollection_LastSequence
+_CBLDatabase_DeleteDocumentByID
+_CBLDatabase_LastSequence
+_CBLDocument_CanonicalRevisionID
+_CBLDocument_Generation
+_CBLError_GetCaptureBacktraces
+_CBLError_SetCaptureBacktraces
+_CBLLog_BeginExpectingExceptions
+_CBLLog_EndExpectingExceptions
 _kFLNullValue
 _kFLUndefinedValue
 _kFLEmptyArray

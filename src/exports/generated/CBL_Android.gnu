@@ -7,8 +7,6 @@ CBL_C {
 		CBL_DumpInstances;
 		CBL_Now;
 		CBLError_Message;
-		CBLError_GetCaptureBacktraces;
-		CBLError_SetCaptureBacktraces;
 		CBLListener_Remove;
 		kCBLTypeProperty;
 		kCBLBlobType;
@@ -48,7 +46,6 @@ CBL_C {
 		CBLDatabase_Path;
 		CBLDatabase_Config;
 		CBLDatabase_Count;
-		CBLDatabase_LastSequence;
 		CBLDatabase_Delete;
 		CBLDatabase_BeginTransaction;
 		CBLDatabase_EndTransaction;
@@ -73,13 +70,11 @@ CBL_C {
 		CBLCollection_Name;
 		CBLCollection_Scope;
 		CBLCollection_Count;
-		CBLCollection_LastSequence;
 		CBLCollection_GetDocument;
 		CBLCollection_SaveDocument;
 		CBLCollection_SaveDocumentWithConcurrencyControl;
 		CBLCollection_SaveDocumentWithConflictHandler;
 		CBLCollection_DeleteDocument;
-		CBLCollection_DeleteDocumentByID;
 		CBLCollection_DeleteDocumentWithConcurrencyControl;
 		CBLCollection_PurgeDocument;
 		CBLCollection_PurgeDocumentByID;
@@ -98,8 +93,6 @@ CBL_C {
 		CBLScope_CollectionNames;
 		CBLDocument_ID;
 		CBLDocument_RevisionID;
-		CBLDocument_CanonicalRevisionID;
-		CBLDocument_Generation;
 		CBLDocument_Sequence;
 		CBLDocument_Collection;
 		CBLDocument_Create;
@@ -117,7 +110,6 @@ CBL_C {
 		CBLDatabase_SaveDocumentWithConflictHandler;
 		CBLDatabase_DeleteDocument;
 		CBLDatabase_DeleteDocumentWithConcurrencyControl;
-		CBLDatabase_DeleteDocumentByID;
 		CBLDatabase_PurgeDocument;
 		CBLDatabase_PurgeDocumentByID;
 		CBLDatabase_GetDocumentExpiration;
@@ -132,8 +124,6 @@ CBL_C {
 		CBLLog_SetConsoleLevel;
 		CBLLog_FileConfig;
 		CBLLog_SetFileConfig;
-		CBLLog_BeginExpectingExceptions;
-		CBLLog_EndExpectingExceptions;
 		CBLDatabase_CreateQuery;
 		CBLQuery_Parameters;
 		CBLQuery_SetParameters;
@@ -169,6 +159,17 @@ CBL_C {
 		CBLReplicator_AddChangeListener;
 		CBLReplicator_AddDocumentReplicationListener;
 		CBLDefaultConflictResolver;
+		CBLCollection_Database;
+		CBLCollection_DeleteDocumentByID;
+		CBLCollection_LastSequence;
+		CBLDatabase_DeleteDocumentByID;
+		CBLDatabase_LastSequence;
+		CBLDocument_CanonicalRevisionID;
+		CBLDocument_Generation;
+		CBLError_GetCaptureBacktraces;
+		CBLError_SetCaptureBacktraces;
+		CBLLog_BeginExpectingExceptions;
+		CBLLog_EndExpectingExceptions;
 		kFLNullValue;
 		kFLUndefinedValue;
 		kFLEmptyArray;
