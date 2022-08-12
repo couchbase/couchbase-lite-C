@@ -43,7 +43,7 @@ public:
     
     CBLScope* scope() const noexcept        {return _scope;}
     slice name() const noexcept             {return _name;}
-    CollectionSpec spec() const noexcept    {return CollectionSpec(_name, _scope->name());}
+    C4CollectionSpec spec() const noexcept  {return {_name, _scope->name()};}
     bool isValid() const noexcept           {return _c4col.isValid();}
     uint64_t count() const                  {return _c4col.useLocked()->getDocumentCount();}
     uint64_t lastSequence() const           {return static_cast<uint64_t>(_c4col.useLocked()->getLastSequence());}
@@ -141,6 +141,18 @@ public:
                                                    CBLCollectionDocumentChangeListener listener,
                                                    void* _cbl_nullable ctx);
         
+#pragma mark - UTILS
+    
+    static alloc_slice collectionSpecToPath(C4CollectionSpec& spec) {
+        alloc_slice ret(spec.scope.size + spec.name.size + 1);
+        void* buf = const_cast<void*>(ret.buf);
+        slice(spec.scope).copyTo(buf);
+        ((uint8_t*)buf)[spec.scope.size] = '.';
+        size_t nameOffset = spec.scope.size + 1;
+        slice(spec.name).copyTo((uint8_t*)buf + nameOffset);
+        return ret;
+    }
+    
 protected:
     
     friend struct CBLDatabase;

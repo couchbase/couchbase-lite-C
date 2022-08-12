@@ -236,7 +236,7 @@ typedef struct {
 
 /** The configuration of a replicator. */
 typedef struct {
-    /** The database to replicate
+    /** The database to replicate. When setting the database, ONLY the default collection will be used for replication.
         @warning  <b>Deprecated :</b> Use collections instead. */
     CBLDatabase* _cbl_nullable database;
     CBLEndpoint* endpoint;                  ///< The address of the other database to replicate with
@@ -274,23 +274,28 @@ typedef struct {
     FLSlice trustedRootCertificates;    ///< Set of anchor certs (PEM format)
     
     //-- Filtering:
-    /** Optional set of channels to pull from
+    /** Optional set of channels to pull from when replicating with the default collection.
+        @Note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.channels instead. */
     FLArray _cbl_nullable channels;
     
-    /** Optional set of document IDs to replicate
+    /** Optional set of document IDs to replicate when replicating with the default collection.
+        @Note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.documentIDs instead. */
     FLArray _cbl_nullable documentIDs;
     
-    /** Optional callback to filter which docs are pushed.
+    /** Optional callback to filter which docs are pushed when replicating with the default collection.
+        @Note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.pushFilter instead. */
     CBLReplicationFilter _cbl_nullable pushFilter;
     
-    /** Optional callback to validate incoming docs.
+    /** Optional callback to validate incoming docs when replicating with the default collection.
+        @Note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.pullFilter instead. */
     CBLReplicationFilter _cbl_nullable pullFilter;
     
     /** Optional conflict-resolver callback.
+        @Note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.conflictResolver instead. */
     CBLConflictResolver _cbl_nullable conflictResolver;
     
@@ -299,15 +304,13 @@ typedef struct {
     
 #ifdef COUCHBASE_ENTERPRISE
     //-- Property Encryption
-    /** Optional callback to encrypt \ref CBLEncryptable values of the documents in
-        the default collection. If the default collection is not part of the replication,
-        the replicator will fail to create with an error.
+    /** Optional callback to encrypt \ref CBLEncryptable values of the documents in the default collection.
+        @Note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use documentPropertyEncryptor instead. */
     CBLPropertyEncryptor propertyEncryptor;
     
-    /** Optional callback to decrypt encrypted \ref CBLEncryptable values of the documents in
-        the default collection. If the default collection is not part of the replication,
-        the replicator will fail to create with an error.
+    /** Optional callback to decrypt encrypted \ref CBLEncryptable values of the documents in the default collection.
+        @Note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use documentPropertyDecryptor instead. */
     CBLPropertyDecryptor propertyDecryptor;
     
