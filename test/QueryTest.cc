@@ -595,6 +595,186 @@ TEST_CASE_METHOD(QueryTest, "Query Listener and Coalescing notification", "[Quer
     this_thread::sleep_for(500ms);
 }
 
+TEST_CASE_METHOD(QueryTest, "Query Default Collection", "[Query]") {
+    string queryString;
+    
+    SECTION("Use _") {
+        queryString = "SELECT name.first FROM _ ORDER BY name.first LIMIT 1";
+    }
+    
+    SECTION("Use _default") {
+        queryString = "SELECT name.first FROM _default ORDER BY name.first LIMIT 1";
+    }
+    
+    SECTION("Use _default._default") {
+        queryString = "SELECT name.first FROM _default._default ORDER BY name.first LIMIT 1";
+    }
+    
+    SECTION("Use database name") {
+        queryString = "SELECT name.first FROM ";
+        queryString += slice(CBLDatabase_Name(db)).asString();
+        queryString += " ORDER BY name.first LIMIT 1";
+    }
+    
+    CBLError error;
+    int errPos;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), &errPos, &error);
+    REQUIRE(query);
+    
+    int n = 0;
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+    
+    while (CBLResultSet_Next(results)) {
+        FLString name = FLValue_AsString(CBLResultSet_ValueForKey(results, "first"_sl));
+        REQUIRE(name);
+        CHECK(slice(name) == "Abe");
+        ++n;
+    }
+    CHECK(n == 1);
+}
+
+TEST_CASE_METHOD(QueryTest, "Query Collection in Default Scope", "[.CBL-3538]") {
+    auto col = CreateCollection(db, "colA");
+    ImportJSONLines(GetTestFilePath("names_100.json"), col);
+    CBLCollection_Release(col);
+    
+    string queryString;
+    
+    SECTION("Use _default.COLLECTION_NAME") {
+        queryString = "SELECT name.first FROM _default.colA ORDER BY name.first LIMIT 1";
+    }
+    
+    SECTION("Use COLLECTION_NAME") {
+        queryString = "SELECT name.first FROM colA ORDER BY name.first LIMIT 1";
+    }
+    
+    CBLError error;
+    int errPos;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), &errPos, &error);
+    REQUIRE(query);
+    
+    int n = 0;
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+    
+    while (CBLResultSet_Next(results)) {
+        FLString name = FLValue_AsString(CBLResultSet_ValueForKey(results, "first"_sl));
+        REQUIRE(name);
+        CHECK(slice(name) == "Abe");
+        ++n;
+    }
+    CHECK(n == 1);
+}
+
+TEST_CASE_METHOD(QueryTest, "Query Named Collection and Scope", "[Query]") {
+    auto col = CreateCollection(db, "colA", "scopeA");
+    ImportJSONLines(GetTestFilePath("names_100.json"), col);
+    CBLCollection_Release(col);
+    
+    string queryString = "SELECT name.first FROM scopeA.colA ORDER BY name.first LIMIT 1";
+    
+    CBLError error;
+    int errPos;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), &errPos, &error);
+    REQUIRE(query);
+
+    int n = 0;
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+
+    while (CBLResultSet_Next(results)) {
+        FLString name = FLValue_AsString(CBLResultSet_ValueForKey(results, "first"_sl));
+        REQUIRE(name);
+        CHECK(slice(name) == "Abe");
+        ++n;
+    }
+    CHECK(n == 1);
+}
+
+TEST_CASE_METHOD(QueryTest, "Create Query with Different Collection Name Cases Failed", "[Query]") {
+    auto col = CreateCollection(db, "colA", "scopeA");
+    ImportJSONLines(GetTestFilePath("names_100.json"), col);
+    CBLCollection_Release(col);
+    
+    string queryString = "SELECT name.first FROM ScOpEa.CoLa ORDER BY name.first LIMIT 1";
+    
+    CBLError error;
+    int errPos;
+    ExpectingExceptions ex;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), &errPos, &error);
+    REQUIRE(!query);
+    CheckError(error, kCBLErrorInvalidQuery);
+}
+
+TEST_CASE_METHOD(QueryTest, "Query Non Existing Collection", "[Query]") {
+    string queryString = "SELECT name.first FROM scopeA.colA ORDER BY name.first LIMIT 1";
+    
+    CBLError error;
+    int errPos;
+    ExpectingExceptions ex;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), &errPos, &error);
+    REQUIRE(!query);
+    CheckError(error, kCBLErrorInvalidQuery);
+}
+
+TEST_CASE_METHOD(QueryTest, "Test Joins with Collections", "[Query]") {
+    auto flowers = CreateCollection(db, "flowers", "test");
+    auto colors = CreateCollection(db, "colors", "test");
+    
+    CreateDoc(flowers, "flower1", "{\"name\":\"rose\",\"cid\":\"c1\"}");
+    CreateDoc(flowers, "flower2", "{\"name\":\"hydrangea\",\"cid\":\"c2\"}");
+    
+    CreateDoc(colors, "color1", "{\"cid\":\"c1\",\"color\":\"red\"}");
+    CreateDoc(colors, "color2", "{\"cid\":\"c2\",\"color\":\"blue\"}");
+    CreateDoc(colors, "color3", "{\"cid\":\"c3\",\"color\":\"white\"}");
+    
+    CBLCollection_Release(flowers);
+    CBLCollection_Release(colors);
+
+    string queryString;
+    
+    SECTION("Use Full Collection Name") {
+        queryString = "SELECT flowers.name, colors.color "
+                      "FROM test.flowers "
+                      "JOIN test.colors "
+                      "ON flowers.cid = colors.cid "
+                      "ORDER BY flowers.name";
+    }
+
+    SECTION("Use Alias Name") {
+        queryString = "SELECT f.name, c.color "
+                      "FROM test.flowers f "
+                      "JOIN test.colors c "
+                      "ON f.cid = c.cid "
+                      "ORDER BY f.name";
+    }
+
+    CBLError error;
+    int errPos;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), &errPos, &error);
+    REQUIRE(query);
+
+    static const slice kExpectedNames[2] = {"hydrangea", "rose"};
+    static const slice kExpectedColors[2] = {"blue", "red"};
+
+    int n = 0;
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+
+    while (CBLResultSet_Next(results)) {
+        FLString name = FLValue_AsString(CBLResultSet_ValueForKey(results, "name"_sl));
+        REQUIRE(name);
+        CHECK(slice(name) == kExpectedNames[n]);
+
+        FLString color = FLValue_AsString(CBLResultSet_ValueForKey(results, "color"_sl));
+        REQUIRE(color);
+        CHECK(slice(color) == kExpectedColors[n]);
+
+        ++n;
+    }
+    CHECK(n == 2);
+}
 
 #ifdef COUCHBASE_ENTERPRISE
 
