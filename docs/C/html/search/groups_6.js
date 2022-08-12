@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['other_20types_0',['Other Types',['../group__other__types.html',1,'']]]
+  ['listeners_0',['Listeners',['../group__listeners.html',1,'']]],
+  ['logging_1',['Logging',['../group__logging.html',1,'']]]
 ];

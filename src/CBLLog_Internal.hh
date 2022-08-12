@@ -25,7 +25,7 @@
  * This method is safe to call multiple times but the initializing logic will be executed only
  * once when the method is called the first time.
  *
- * @NOTE As we cannot use static initializer to initialize the log level and the log callback,
+ * @note As we cannot use static initializer to initialize the log level and the log callback,
  * we will need to call CBLLog_Init() from the top level methods that logs (level < Warnings)
  * are expected including CBLDatabase's open(), copyDatabase(), deleteDatabase(),
  * Andriod's CBL_Init(), and any methods used for configuring logs in CBLLog.cc.

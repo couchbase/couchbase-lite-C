@@ -9,5 +9,5 @@ var searchData=
   ['cbl_5fpublic_6',['CBL_PUBLIC',['../_c_b_l___compat_8h.html#aa34e56dcd765d498243337335370d321',1,'CBL_Compat.h']]],
   ['cblapi_7',['CBLAPI',['../_c_b_l___compat_8h.html#a070f88a2a83fabfbdbe4f492a11d068f',1,'CBL_Compat.h']]],
   ['cblinline_8',['CBLINLINE',['../_c_b_l___compat_8h.html#ae7bae5cc4d6977229d075e3a6c963e4f',1,'CBL_Compat.h']]],
-  ['coldlevel_9',['COLDLEVEL',['../_base_8h.html#a9b2436fdcebefc30179f697a8a483aa6',1,'Base.h']]]
+  ['coldlevel_9',['COLDLEVEL',['../_compiler_support_8h.html#a9b2436fdcebefc30179f697a8a483aa6',1,'CompilerSupport.h']]]
 ];

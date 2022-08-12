@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['shared_20keys_0',['Shared Keys',['../group___f_l_shared_keys.html',1,'']]],
-  ['size_1',['size',['../struct_f_l_slice.html#a8fb4c8187bdd5a8d645809d5d0a72c90',1,'FLSlice::size()'],['../struct_f_l_slice_result.html#a622d35e8c1031bb88d0fe89cfaca12e1',1,'FLSliceResult::size()']]],
-  ['slices_2',['Slices',['../group___f_l_slice.html',1,'']]],
-  ['stepover_3',['STEPOVER',['../_base_8h.html#aba2fee9d572b22e3ab4c2683d02bae91',1,'Base.h']]]
+  ['rarely_2dneeded_20or_20advanced_20functions_0',['Rarely-needed or advanced functions',['../group___obscure.html',1,'']]],
+  ['reading_20fleece_20data_1',['Reading Fleece Data',['../group__reading.html',1,'']]],
+  ['reference_20counting_2',['Reference Counting',['../group__refcounting.html',1,'']]],
+  ['replication_3',['Replication',['../group__replication.html',1,'']]],
+  ['replicatortype_4',['replicatorType',['../struct_c_b_l_replicator_configuration.html#a40f3195389ab0578aa17e63dd832a390',1,'CBLReplicatorConfiguration']]],
+  ['returns_5fnonnull_5',['RETURNS_NONNULL',['../_compiler_support_8h.html#a4c3f3effd56594693250b80e0a0675ef',1,'CompilerSupport.h']]]
 ];

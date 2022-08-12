@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['useplaintext_0',['usePlaintext',['../struct_c_b_l_log_file_configuration.html#aa6fe8002b56d5502db77724ed06a47be',1,'CBLLogFileConfiguration']]],
-  ['username_1',['username',['../struct_c_b_l_proxy_settings.html#abb0f9c744134b0a58d577bff22731304',1,'CBLProxySettings']]]
+  ['trustedrootcertificates_0',['trustedRootCertificates',['../struct_c_b_l_replicator_configuration.html#abba75db71f5e08718a924d76bc1a0e1e',1,'CBLReplicatorConfiguration']]],
+  ['type_1',['type',['../struct_c_b_l_proxy_settings.html#afdbfc4fc8338df8f0974f6db55d85248',1,'CBLProxySettings']]]
 ];
