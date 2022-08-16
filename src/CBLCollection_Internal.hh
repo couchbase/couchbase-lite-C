@@ -88,7 +88,9 @@ public:
     }
 
     void setDocumentExpiration(slice docID, CBLTimestamp expiration) {
-        _c4col.useLocked()->setExpiration(docID, C4Timestamp(expiration));
+        if (!_c4col.useLocked()->setExpiration(docID, C4Timestamp(expiration))) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorNotFound, "Document not found");
+        }
     }
     
 #pragma mark - INDEXES:

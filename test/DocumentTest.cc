@@ -910,14 +910,14 @@ TEST_CASE_METHOD(DocumentTest, "Purge Document from Different Collection", "[Doc
 
 #pragma mark - Document Expiry:
 
-TEST_CASE_METHOD(DocumentTest, "Expiration", "[.CBL-3306]") {
+TEST_CASE_METHOD(DocumentTest, "Document Expiration", "[Document][Expiry]") {
     CBLLog_SetConsoleLevel(kCBLLogVerbose);
     
     createDocument(col, "doc1", "foo", "bar");
     createDocument(col, "doc2", "foo", "bar");
     createDocument(col, "doc3", "foo", "bar");
 
-    CBLError error;
+    CBLError error {};
     CBLTimestamp future = CBL_Now() + 1000;
     CHECK(CBLCollection_SetDocumentExpiration(col, "doc1"_sl, future, &error));
     CHECK(CBLCollection_SetDocumentExpiration(col, "doc3"_sl, future, &error));
@@ -931,12 +931,12 @@ TEST_CASE_METHOD(DocumentTest, "Expiration", "[.CBL-3306]") {
     CHECK(CBLCollection_Count(col) == 1);
 }
 
-TEST_CASE_METHOD(DocumentTest, "Expiration After Reopen", "[.CBL-3306]") {
+TEST_CASE_METHOD(DocumentTest, "Document Expiring After Reopen", "[Document][Expiry]") {
     createDocument(col, "doc1", "foo", "bar");
     createDocument(col, "doc2", "foo", "bar");
     createDocument(col, "doc3", "foo", "bar");
 
-    CBLError error;
+    CBLError error {};
     CBLTimestamp future = CBL_Now() + 2000;
     CHECK(CBLCollection_SetDocumentExpiration(col, "doc1"_sl, future, &error));
     CHECK(CBLCollection_SetDocumentExpiration(col, "doc3"_sl, future, &error));
@@ -953,6 +953,17 @@ TEST_CASE_METHOD(DocumentTest, "Expiration After Reopen", "[.CBL-3306]") {
     REQUIRE(col2);
     CHECK(CBLCollection_Count(col2) == 1);
     CBLCollection_Release(col2);
+}
+
+TEST_CASE_METHOD(DocumentTest, "Get and Set Expiration on Non Existing Doc", "[Document][Expiry]") {
+    CBLError error {};
+    CHECK(CBLCollection_GetDocumentExpiration(col, "NonExistingDoc"_sl, &error) == 0);
+    CHECK(error.code == 0);
+    
+    ExpectingExceptions ex;
+    CBLTimestamp future = CBL_Now() + 2000;
+    CHECK(!CBLCollection_SetDocumentExpiration(col, "NonExistingDoc"_sl, future, &error));
+    CheckError(error, kCBLErrorNotFound);
 }
 
 #pragma mark - Blobs
