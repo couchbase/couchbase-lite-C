@@ -249,7 +249,7 @@ CBLTimestamp CBLCollection_GetDocumentExpiration(CBLCollection* collection,
 {
     try {
         return collection->getDocumentExpiration(docID);
-    } catchAndBridge(outError)
+    } catchAndBridgeReturning(outError, -1)
 }
 
 bool CBLCollection_SetDocumentExpiration(CBLCollection* collection,

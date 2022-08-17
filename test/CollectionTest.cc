@@ -103,7 +103,7 @@ public:
         CheckNotOpenError(error);
         
         error = {};
-        CHECK(CBLCollection_GetDocumentExpiration(col, "doc1"_sl, &error) == 0);
+        CHECK(CBLCollection_GetDocumentExpiration(col, "doc1"_sl, &error) == -1);
         CheckNotOpenError(error);
         
         error = {};
