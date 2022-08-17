@@ -1708,7 +1708,7 @@ TEST_CASE_METHOD(DatabaseTest, "Get blob", "[Blob]") {
 
 #ifdef COUCHBASE_ENTERPRISE
 
-TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator", "[.CBL-3183]") {
+TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator") {
     CBLError error;
     otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
     REQUIRE(otherDB);
@@ -1723,12 +1723,13 @@ TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator", "[.CBL-3
     REQUIRE(repl);
     CBLReplicator_Start(repl, false);
     
-    // Wait util the replicator starts to run:
     int count = 0;
-    while (CBLReplicator_Status(repl).activity == kCBLReplicatorStopped && count++ < 100) {
+    while (count++ < 100) {
+        if (CBLReplicator_Status(repl).activity == kCBLReplicatorIdle)
+            break;
         this_thread::sleep_for(100ms);
     }
-    CHECK(CBLReplicator_Status(repl).activity != kCBLReplicatorStopped);
+    CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorIdle);
     
     // Close Database:
     CHECK(CBLDatabase_Close(db, &error));
@@ -1743,7 +1744,7 @@ TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator", "[.CBL-3
     this_thread::sleep_for(200ms);
 }
 
-TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator", "[.CBL-3183]") {
+TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator") {
     CBLError error;
     otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
     REQUIRE(otherDB);
@@ -1760,10 +1761,13 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator", "[.CBL-
     
     // Wait util the replicator starts to run:
     int count = 0;
-    while (CBLReplicator_Status(repl).activity == kCBLReplicatorStopped && count++ < 100) {
+    while (count++ < 100) {
+        if (CBLReplicator_Status(repl).activity == kCBLReplicatorIdle) {
+            break;
+        }
         this_thread::sleep_for(100ms);
     }
-    CHECK(CBLReplicator_Status(repl).activity != kCBLReplicatorStopped);
+    CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorIdle);
     
     // Delete Database:
     CHECK(CBLDatabase_Delete(db, &error));

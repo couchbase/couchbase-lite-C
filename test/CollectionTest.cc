@@ -558,7 +558,7 @@ TEST_CASE_METHOD(CollectionTest, "Overflow Collection and Scope Names", "[Collec
     CHECK(error.code == kCBLErrorInvalidParameter);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Collection Name Case Sensitive", "[.CBL-3195]") {
+TEST_CASE_METHOD(CollectionTest, "Collection Name Case Sensitive", "[Collection]") {
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "COL1"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
@@ -569,14 +569,14 @@ TEST_CASE_METHOD(CollectionTest, "Collection Name Case Sensitive", "[.CBL-3195]"
     CHECK(col1a != col1b);
     
     FLMutableArray colNames = CBLDatabase_CollectionNames(db, "scopeA"_sl, &error);
-    CHECK(Array(colNames).toJSONString() == R"(["_default",COL1","col1"])");
+    CHECK(Array(colNames).toJSONString() == R"(["COL1","col1"])");
     FLMutableArray_Release(colNames);
     
     CBLCollection_Release(col1a);
     CBLCollection_Release(col1b);
 }
 
-TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[.CBL-3195]") {
+TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[Collection]") {
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "col1"_sl, "SCOPEA"_sl, &error);
     REQUIRE(col1a);
@@ -587,7 +587,7 @@ TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[.CBL-3195]") {
     CHECK(col1a != col1b);
     
     FLMutableArray scopeNames = CBLDatabase_ScopeNames(db, &error);
-    CHECK(Array(scopeNames).toJSONString() == R"(["_default",SCOPEA","scopea"])");
+    CHECK(Array(scopeNames).toJSONString() == R"(["_default","SCOPEA","scopea"])");
     FLMutableArray_Release(scopeNames);
     
     CBLCollection_Release(col1a);
