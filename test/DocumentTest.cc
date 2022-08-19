@@ -91,10 +91,6 @@ TEST_CASE_METHOD(DocumentTest, "Missing Document", "[Document]") {
     CBLDocument* mdoc = CBLCollection_GetMutableDocument(col, "foo"_sl, &error);
     CHECK(mdoc == nullptr);
     CHECK(error.code == 0);
-
-    CHECK(!CBLCollection_PurgeDocumentByID(col, "foo"_sl, &error));
-    CHECK(error.domain == kCBLDomain);
-    CHECK(error.code == kCBLErrorNotFound);
 }
 
 TEST_CASE_METHOD(DocumentTest, "New Document", "[Document]") {
@@ -119,7 +115,7 @@ TEST_CASE_METHOD(DocumentTest, "New Document With Auto ID", "[Document]") {
     CBLDocument_Release(doc);
 }
 
-TEST_CASE_METHOD(DocumentTest, "Mutable Copy New Document", "[Document]") {
+TEST_CASE_METHOD(DocumentTest, "Mutable Copy Mutable Document", "[Document]") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     CHECK(doc != nullptr);
     MutableDict props = CBLDocument_MutableProperties(doc);
@@ -298,7 +294,7 @@ TEST_CASE_METHOD(DocumentTest, "Access nested collections from a copy of modifie
     CBLDocument_Release(doc);
 }
 
-TEST_CASE_METHOD(DocumentTest, "Set MutableProperties", "[Document]") {
+TEST_CASE_METHOD(DocumentTest, "Set Properties", "[Document]") {
     CBLDocument* doc1 = CBLDocument_Create();
     FLMutableDict prop1 = CBLDocument_MutableProperties(doc1);
     FLMutableDict_SetString(prop1, "greeting"_sl, "hello"_sl);
@@ -312,13 +308,6 @@ TEST_CASE_METHOD(DocumentTest, "Set MutableProperties", "[Document]") {
     CBLDocument_Release(doc1);
     CHECK(FLValue_AsString(FLDict_Get(prop2, "greeting"_sl)) == "hello"_sl );
     CBLDocument_Release(doc2);
-}
-
-TEST_CASE_METHOD(DocumentTest, "Get Non Existing Document", "[Document]") {
-    CBLError error;
-    const CBLDocument* doc = CBLCollection_GetDocument(col, "foo"_sl, &error);
-    REQUIRE(doc == nullptr);
-    CHECK(error.code == 0);
 }
 
 TEST_CASE_METHOD(DocumentTest, "Get Document with Empty ID", "[Document]") {
@@ -348,7 +337,7 @@ TEST_CASE_METHOD(DocumentTest, "Save Empty Document", "[Document]") {
     CBLDocument_Release(doc);
 }
 
-TEST_CASE_METHOD(DocumentTest, "Save Document With Property", "[Document]") {
+TEST_CASE_METHOD(DocumentTest, "Save Document With Properties", "[Document]") {
     CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
     MutableDict props = CBLDocument_MutableProperties(doc);
     props["greeting"_sl] = "Howdy!"_sl;
@@ -911,8 +900,6 @@ TEST_CASE_METHOD(DocumentTest, "Purge Document from Different Collection", "[Doc
 #pragma mark - Document Expiry:
 
 TEST_CASE_METHOD(DocumentTest, "Document Expiration", "[Document][Expiry]") {
-    CBLLog_SetConsoleLevel(kCBLLogVerbose);
-    
     createDocument(col, "doc1", "foo", "bar");
     createDocument(col, "doc2", "foo", "bar");
     createDocument(col, "doc3", "foo", "bar");
@@ -966,7 +953,7 @@ TEST_CASE_METHOD(DocumentTest, "Get and Set Expiration on Non Existing Doc", "[D
     CheckError(error, kCBLErrorNotFound);
 }
 
-#pragma mark - Blobs
+#pragma mark - Blobs:
 
 TEST_CASE_METHOD(DocumentTest, "Set blob in document", "[Document][Blob]") {
     // Create and Save blob:
@@ -1078,7 +1065,7 @@ TEST_CASE_METHOD(DocumentTest, "Save blob and set blob properties in document", 
     CBLDocument_Release(doc);
 }
 
-#pragma mark - LISTENERS:
+#pragma mark - Listeners:
 
 TEST_CASE_METHOD(DocumentTest, "Collection Change Notifications", "[Document]") {
     // Add a listener:
