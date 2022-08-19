@@ -389,7 +389,7 @@ private:
         
         for (size_t i = 0; i < numDocs; ++i) {
             auto src = *c4Docs[i];
-            if (!pushing && src.flags & kRevIsConflict) {
+            if (!pushing && src.error.code == kC4ErrorConflict && src.error.domain == LiteCoreDomain) {
                 // Conflict -- start an async resolver task:
                 if (auto it = _collections.find(src.collectionSpec); it != _collections.end()) {
                     auto replCol = it->second;

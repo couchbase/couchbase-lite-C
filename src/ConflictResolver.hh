@@ -23,8 +23,7 @@ namespace cbl_internal {
         ConflictResolver(CBLCollection *collection,
                          CBLConflictResolver _cbl_nullable customResolver,
                          void* _cbl_nullable context,
-                         alloc_slice docID,
-                         alloc_slice revID = nullslice);
+                         alloc_slice docID);
 
         ConflictResolver(CBLCollection*,
                          CBLConflictResolver _cbl_nullable,
@@ -54,7 +53,6 @@ namespace cbl_internal {
         CBLConflictResolver _cbl_nullable _clientResolver;
         void* _cbl_nullable     _clientResolverContext;
         alloc_slice const       _docID;
-        alloc_slice             _revID;
         C4RevisionFlags         _flags {};
         CompletionHandler       _completionHandler;
         CBLError                _error {};
