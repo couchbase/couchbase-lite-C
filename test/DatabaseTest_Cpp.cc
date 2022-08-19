@@ -32,11 +32,9 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database") {
     CHECK(db.name() == string(kDatabaseName));
     CHECK(db.path() == string(kDatabaseDir) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
     CHECK(db.count() == 0);
-//    CHECK(db.lastSequence() == 0);
 }
 
-
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Missing Document") {
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Missing Document") {
     Document doc = db.getDocument("foo");
     CHECK(!doc);
 
@@ -44,20 +42,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Missing Document") {
     CHECK(!mdoc);
 }
 
-
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ New Document") {
-    MutableDocument doc("foo");
-    CHECK(doc);
-    CHECK(string(doc.id()) == "foo");
-    CHECK(doc.sequence() == 0);
-    CHECK(doc.properties().toJSONString() == "{}");
-
-    Document immDoc = doc;
-    CHECK((doc.properties() == immDoc.properties()));
-}
-
-
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Empty Document") {
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Save Empty Document") {
     MutableDocument doc("foo");
     db.saveDocument(doc);
     CHECK(string(doc.id()) == "foo");
@@ -72,8 +57,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Empty Document") {
     CHECK(doc2.properties().toJSONString() == "{}");
 }
 
-
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Save Document With Property") {
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
     CHECK(doc["greeting"].asString() == "Howdy!");
@@ -94,8 +78,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Document With Property") {
     CHECK(doc2["greeting"].asString() == "Howdy!");
 }
 
-
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Delete Unsaved Doc") {
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Delete Unsaved Doc") {
     MutableDocument doc("foo");
     ExpectingExceptions x;
     CBLError error;
@@ -103,7 +86,6 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Delete Unsaved Doc") {
     CHECK(error.domain == kCBLDomain);
     CHECK(error.code == kCBLErrorNotFound);
 }
-
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction") {
     {
@@ -124,7 +106,6 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction") {
     CHECK(checkDoc.properties().get("meeting").asInt() == 23);
 }
 
-
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction, Aborted") {
     {
         Transaction t(db);
@@ -140,7 +121,6 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction, Aborted") {
     Document checkDoc = db.getDocument("foo");
     REQUIRE(!checkDoc);
 }
-
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction With Exception", "[!throws]") {
     {
@@ -177,7 +157,6 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction With Exception", "[!throws]") {
     CHECK(doc["meeting"] == nullptr);
 }
 
-
 static void createDocument(Database db, const char *docID,
                            const char *property, const char *value)
 {
@@ -186,8 +165,7 @@ static void createDocument(Database db, const char *docID,
     db.saveDocument(doc);
 }
 
-
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Database notifications") {
     int dbListenerCalls = 0, fooListenerCalls = 0;
     {
         // Add a listener:
@@ -213,7 +191,6 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
     CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
 }
-
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
     // Add a listener:
@@ -265,48 +242,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
     CHECK(barListenerCalls == 1);
 }
 
-
-TEST_CASE_METHOD(CBLTest_Cpp, "Add new key") {
-    // Regression test for <https://github.com/couchbaselabs/couchbase-lite-C/issues/18>
-    // Add doc to db:
-    MutableDocument doc("foo");
-    doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
-
-    // Add a new, shareable key:
-    doc.set("new", 10);
-    db.saveDocument(doc);
-
-    CHECK(doc["new"].asInt() == 10);
-    doc["new"] = 999;
-    CHECK(doc["new"].asInt() == 999);
-    CHECK(doc.properties().count() == 2);
-
-    doc = db.getMutableDocument("foo");
-    CHECK(doc["new"].asInt() == 10);
-}
-
-
-TEST_CASE_METHOD(CBLTest_Cpp, "Data disappears") {
-    // Regression test for <https://github.com/couchbaselabs/couchbase-lite-C/issues/19>
-    MutableDocument doc = MutableDocument("foo");
-    doc["var1"]= 1;
-    db.saveDocument(doc);
-    CHECK(doc.properties().toJSONString() == "{\"var1\":1}");
-
-    doc = db.getMutableDocument("foo");
-    doc["var2"]= 2;
-    db.saveDocument(doc);
-    CHECK(doc.properties().toJSONString() == "{\"var1\":1,\"var2\":2}");
-
-    doc = db.getMutableDocument("foo");
-    doc["var3"]= 3;
-    db.saveDocument(doc);
-    CHECK(doc.properties().toJSONString() == "{\"var1\":1,\"var2\":2,\"var3\":3}");
-}
-
-
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Conflict") {
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Save Conflict") {
     MutableDocument doc("foo");
     doc["n"] = 10;
     db.saveDocument(doc);
@@ -330,6 +266,61 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Save Conflict") {
     CHECK(shadowDoc["n"].asInt() == 19);
 }
 
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - Get index names") {
+    RetainedArray names = db.getIndexNames();
+    REQUIRE(names);
+    REQUIRE(names.count() == 0);
+    
+    CBLValueIndexConfiguration index1 = {kCBLN1QLLanguage, "id"_sl};
+    db.createValueIndex("index1", index1);
+    
+    CBLValueIndexConfiguration index2 = {kCBLN1QLLanguage, "firstname, lastname"_sl};
+    db.createValueIndex("index2", index2);
+    
+    names = db.getIndexNames();
+    REQUIRE(names);
+    REQUIRE(names.count() == 2);
+    CHECK(names[0].asString() == "index1");
+    CHECK(names[1].asString() == "index2");
+}
+
+TEST_CASE_METHOD(CBLTest_Cpp, "Add new key") {
+    // Regression test for <https://github.com/couchbaselabs/couchbase-lite-C/issues/18>
+    // Add doc to db:
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+
+    // Add a new, shareable key:
+    doc.set("new", 10);
+    db.saveDocument(doc);
+
+    CHECK(doc["new"].asInt() == 10);
+    doc["new"] = 999;
+    CHECK(doc["new"].asInt() == 999);
+    CHECK(doc.properties().count() == 2);
+
+    doc = db.getMutableDocument("foo");
+    CHECK(doc["new"].asInt() == 10);
+}
+
+TEST_CASE_METHOD(CBLTest_Cpp, "Data disappears") {
+    // Regression test for <https://github.com/couchbaselabs/couchbase-lite-C/issues/19>
+    MutableDocument doc = MutableDocument("foo");
+    doc["var1"]= 1;
+    db.saveDocument(doc);
+    CHECK(doc.properties().toJSONString() == "{\"var1\":1}");
+
+    doc = db.getMutableDocument("foo");
+    doc["var2"]= 2;
+    db.saveDocument(doc);
+    CHECK(doc.properties().toJSONString() == "{\"var1\":1,\"var2\":2}");
+
+    doc = db.getMutableDocument("foo");
+    doc["var3"]= 3;
+    db.saveDocument(doc);
+    CHECK(doc.properties().toJSONString() == "{\"var1\":1,\"var2\":2,\"var3\":3}");
+}
 
 TEST_CASE_METHOD(CBLTest_Cpp, "Retaining immutable Fleece") {
     MutableDocument mdoc("ubiq");
@@ -349,23 +340,4 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Retaining immutable Fleece") {
     CHECK(mdoc.propertiesAsJSON() == R"({"BAR":"Wahooma","FOO":18})");
     auto savedDoc = db.getDocument("ubiq");
     CHECK(savedDoc.propertiesAsJSON() == mdoc.propertiesAsJSON());
-}
-
-
-TEST_CASE_METHOD(CBLTest_Cpp, "Get index names") {
-    RetainedArray names = db.getIndexNames();
-    REQUIRE(names);
-    REQUIRE(names.count() == 0);
-    
-    CBLValueIndexConfiguration index1 = {kCBLN1QLLanguage, "id"_sl};
-    db.createValueIndex("index1", index1);
-    
-    CBLValueIndexConfiguration index2 = {kCBLN1QLLanguage, "firstname, lastname"_sl};
-    db.createValueIndex("index2", index2);
-    
-    names = db.getIndexNames();
-    REQUIRE(names);
-    REQUIRE(names.count() == 2);
-    CHECK(names[0].asString() == "index1");
-    CHECK(names[1].asString() == "index2");
 }

@@ -90,22 +90,20 @@ CBLTest::~CBLTest() {
     CHECK(CBL_InstanceCount() == 0);
 }
 
-
 #pragma mark - C++ TEST CLASS:
-
 
 alloc_slice const CBLTest_Cpp::kDatabaseDir = CBLTest::kDatabaseDir;
 slice const CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
-
 
 CBLTest_Cpp::CBLTest_Cpp()
 :db(openEmptyDatabaseNamed(kDatabaseName))
 { }
 
-
 CBLTest_Cpp::~CBLTest_Cpp() {
-    db.close();
-    db = nullptr;
+    if (db) {
+        db.close();
+        db = nullptr;
+    }
 
     if (CBL_InstanceCount() > 0) {
         WARN("*** LEAKED OBJECTS: ***");
@@ -114,7 +112,6 @@ CBLTest_Cpp::~CBLTest_Cpp() {
     CHECK(CBL_InstanceCount() == 0);
 }
 
-
 cbl::Database CBLTest_Cpp::openEmptyDatabaseNamed(slice name) {
     cbl::Database::deleteDatabase(name, CBLTest::kDatabaseConfiguration.directory);
     cbl::Database emptyDB = cbl::Database(name, CBLTest::kDatabaseConfiguration);
@@ -122,6 +119,26 @@ cbl::Database CBLTest_Cpp::openEmptyDatabaseNamed(slice name) {
     return emptyDB;
 }
 
+cbl::Database CBLTest_Cpp::openDatabaseNamed(fleece::slice name) {
+    cbl::Database openedDB = cbl::Database(name, CBLTest::kDatabaseConfiguration);
+    REQUIRE(openedDB);
+    return openedDB;
+}
+
+void CBLTest_Cpp::createNumberedDocs(cbl::Collection& collection, unsigned n, unsigned start) {
+    for (unsigned i = 0; i < n; i++) {
+        char docID[20];
+        sprintf(docID, "doc-%03u", start + i);
+        
+        char content[100];
+        sprintf(content, "This is the document #%03u.", start + i);
+        cbl::MutableDocument doc(docID);
+        doc["content"] = content;
+        collection.saveDocument(doc);
+    }
+}
+
+#pragma mark - Test Utils :
 
 string GetTestFilePath(const std::string &filename) {
     static string sTestFilesPath;
@@ -184,13 +201,13 @@ unsigned ImportJSONLines(string &&path, CBLDatabase* database) {
 // Read a file that contains a JSON document per line. Every line becomes a document.
 unsigned ImportJSONLines(string &&path, CBLCollection* collection) {
     CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Reading %s ...  ", path.c_str());
-    CBLError error;
+    CBLError error {};
     unsigned numDocs = 0;
     
     CBLDatabase* database = CBLCollection_Database(collection);
     REQUIRE(database);
     
-    cbl::Transaction t(database);
+    REQUIRE(CBLDatabase_BeginTransaction(database, &error));
     ReadFileByLines(path, [&](FLSlice line) {
         char docID[20];
         sprintf(docID, "%07u", numDocs+1);
@@ -202,7 +219,8 @@ unsigned ImportJSONLines(string &&path, CBLCollection* collection) {
         return true;
     });
     CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Committing %u docs...", numDocs);
-    t.commit();
+    REQUIRE(CBLDatabase_EndTransaction(database, true, &error));
+    
     return numDocs;
 }
 

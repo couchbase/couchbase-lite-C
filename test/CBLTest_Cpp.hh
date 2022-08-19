@@ -46,6 +46,10 @@ public:
     ~CBLTest_Cpp();
 
     cbl::Database openEmptyDatabaseNamed(fleece::slice name);
+    
+    cbl::Database openDatabaseNamed(fleece::slice name);
+    
+    void createNumberedDocs(cbl::Collection& collection, unsigned n, unsigned start = 1);
 
     cbl::Database db;
 };
