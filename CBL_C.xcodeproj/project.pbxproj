@@ -99,6 +99,10 @@
 		93C70D3426D01B5A0093E927 /* BlobTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93C70D3326D01B5A0093E927 /* BlobTest.cc */; };
 		93C70D3526D01B5A0093E927 /* BlobTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93C70D3326D01B5A0093E927 /* BlobTest.cc */; };
 		93EC366226C49AF700182B02 /* CBLEncryptable_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 93EC365D26C498AB00182B02 /* CBLEncryptable_Internal.hh */; };
+		FC09077C28A5F3EF00201B07 /* CollectionTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC09077B28A5F3EF00201B07 /* CollectionTest_Cpp.cc */; };
+		FC09078A28A5F40200201B07 /* CollectionTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC09077B28A5F3EF00201B07 /* CollectionTest_Cpp.cc */; };
+		FC0907E728AD763600201B07 /* DocumentTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC0907E628AD763600201B07 /* DocumentTest_Cpp.cc */; };
+		FC0907E828AD763600201B07 /* DocumentTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC0907E628AD763600201B07 /* DocumentTest_Cpp.cc */; };
 		FC5FBBA52821B3450066157F /* CBLCollection.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC5FBBA32821B3450066157F /* CBLCollection.cc */; };
 		FC5FBBA62821B3450066157F /* CBLCollection_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = FC5FBBA42821B3450066157F /* CBLCollection_Internal.hh */; };
 		FC5FBBB52821CC2E0066157F /* CBLCollection_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */; };
@@ -402,12 +406,15 @@
 		93D0AFF1262619B800777AFC /* generate_edition_header.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_edition_header.sh; sourceTree = "<group>"; };
 		93E490C326BDE10F0091B587 /* DatabaseTest_Android.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DatabaseTest_Android.cc; sourceTree = "<group>"; };
 		93EC365D26C498AB00182B02 /* CBLEncryptable_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLEncryptable_Internal.hh; sourceTree = "<group>"; };
+		FC09077B28A5F3EF00201B07 /* CollectionTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CollectionTest_Cpp.cc; sourceTree = "<group>"; };
+		FC0907E628AD763600201B07 /* DocumentTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DocumentTest_Cpp.cc; sourceTree = "<group>"; };
 		FC5FBBA32821B3450066157F /* CBLCollection.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection.cc; sourceTree = "<group>"; };
 		FC5FBBA42821B3450066157F /* CBLCollection_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLCollection_Internal.hh; sourceTree = "<group>"; };
 		FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection_CAPI.cc; sourceTree = "<group>"; };
 		FC8678E3289C69470023F34F /* ReplicatorCollectionTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorCollectionTest.cc; sourceTree = "<group>"; };
 		FCC063C828588DA6000C5BD7 /* CBLScope.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLScope.cc; sourceTree = "<group>"; };
 		FCC063F2285BA641000C5BD7 /* DocumentTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DocumentTest.cc; sourceTree = "<group>"; };
+		FCC064BD287CBD95000C5BD7 /* Collection.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Collection.hh; sourceTree = "<group>"; };
 		FCD8298B283591D4004AA814 /* CollectionTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CollectionTest.cc; sourceTree = "<group>"; };
 		FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLScope_Internal.hh; sourceTree = "<group>"; };
 		FCD829B12835ECE0004AA814 /* CBLScope.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLScope.h; sourceTree = "<group>"; };
@@ -617,6 +624,7 @@
 				277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */,
 				277FEE3D21DEF0C700B60E3C /* Base.hh */,
 				275BC4E22204E6A800DBE7D2 /* Blob.hh */,
+				FCC064BD287CBD95000C5BD7 /* Collection.hh */,
 				27B61DD821DEEC540027CCDB /* Database.hh */,
 				277FEE4E21DEF54D00B60E3C /* Document.hh */,
 				277FEE4F21E6AB1100B60E3C /* Query.hh */,
@@ -629,16 +637,18 @@
 			isa = PBXGroup;
 			children = (
 				27B61D6821D6B60D0027CCDB /* CBLTest.hh */,
-				27A63F252633408000634F7B /* CBLTest_Cpp.hh */,
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
+				27A63F252633408000634F7B /* CBLTest_Cpp.hh */,
 				275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */,
 				93C70D3326D01B5A0093E927 /* BlobTest.cc */,
 				275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */,
 				FCD8298B283591D4004AA814 /* CollectionTest.cc */,
+				FC09077B28A5F3EF00201B07 /* CollectionTest_Cpp.cc */,
 				27B61DB821D6ECA70027CCDB /* DatabaseTest.cc */,
 				93E490C326BDE10F0091B587 /* DatabaseTest_Android.cc */,
 				277FEE5221E6BCA500B60E3C /* DatabaseTest_Cpp.cc */,
 				FCC063F2285BA641000C5BD7 /* DocumentTest.cc */,
+				FC0907E628AD763600201B07 /* DocumentTest_Cpp.cc */,
 				93965A6226A7CD50008728EE /* LogTest.cc */,
 				275B359D234D064600FE9CF0 /* QueryTest.cc */,
 				2736A625242E5A07002B9D65 /* ReplicatorTest.hh */,
@@ -1248,6 +1258,8 @@
 				275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */,
 				2736A635242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,
 				93C70D3526D01B5A0093E927 /* BlobTest.cc in Sources */,
+				FC0907E828AD763600201B07 /* DocumentTest_Cpp.cc in Sources */,
+				FC09077C28A5F3EF00201B07 /* CollectionTest_Cpp.cc in Sources */,
 				FCC063F3285BA641000C5BD7 /* DocumentTest.cc in Sources */,
 				275B358923481D0C00FE9CF0 /* CBLTest.cc in Sources */,
 				275B358A23481D0C00FE9CF0 /* DatabaseTest.cc in Sources */,
@@ -1292,11 +1304,13 @@
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				FC8678F2289C69690023F34F /* ReplicatorCollectionTest.cc in Sources */,
 				93C70D1826CB535D0093E927 /* ReplicatorPropEncTest.cc in Sources */,
+				FC0907E728AD763600201B07 /* DocumentTest_Cpp.cc in Sources */,
 				275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */,
 				93965A6326A7CD50008728EE /* LogTest.cc in Sources */,
 				275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */,
 				277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */,
 				2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,
+				FC09078A28A5F40200201B07 /* CollectionTest_Cpp.cc in Sources */,
 				27D30F9F23A2D30500392107 /* PerfTest.cc in Sources */,
 				27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */,
 			);

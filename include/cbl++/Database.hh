@@ -18,10 +18,12 @@
 
 #pragma once
 #include "cbl++/Base.hh"
+#include "cbl/CBLCollection.h"
 #include "cbl/CBLDatabase.h"
 #include "cbl/CBLDocument.h"
 #include "cbl/CBLQuery.h"
 #include "cbl/CBLLog.h"
+#include "cbl/CBLScope.h"
 #include "fleece/Mutable.hh"
 #include <functional>
 #include <string>
@@ -33,6 +35,7 @@
 CBL_ASSUME_NONNULL_BEGIN
 
 namespace cbl {
+    class Collection;
     class Document;
     class MutableDocument;
     class Query;
@@ -117,6 +120,48 @@ namespace cbl {
         uint64_t count() const                          {return CBLDatabase_Count(ref());}
         CBLDatabaseConfiguration config() const         {return CBLDatabase_Config(ref());}
 
+        // Collections:
+        
+        fleece::MutableArray getScopeNames() const {
+            CBLError error {};
+            FLMutableArray flNames = CBLDatabase_ScopeNames(ref(), &error);
+            check(flNames, error);
+            fleece::MutableArray names(flNames);
+            FLMutableArray_Release(flNames);
+            return names;
+        }
+        
+        fleece::MutableArray getCollectionNames(slice scopeName =kCBLDefaultScopeName) const {
+            CBLError error {};
+            FLMutableArray flNames = CBLDatabase_CollectionNames(ref(), scopeName, &error);
+            check(flNames, error);
+            fleece::MutableArray names(flNames);
+            FLMutableArray_Release(flNames);
+            return names;
+        }
+        
+        // inline Scope getScope(slice scopeName) const;
+        
+        inline Collection getCollection(slice collectionName, slice scopeName =kCBLDefaultScopeName) const {
+            CBLError error {};
+            return Collection::adopt(CBLDatabase_Collection(ref(), collectionName, scopeName, &error), &error) ;
+        }
+        
+        inline Collection createCollection(slice collectionName, slice scopeName =kCBLDefaultScopeName) {
+            CBLError error {};
+            return Collection::adopt(CBLDatabase_CreateCollection(ref(), collectionName, scopeName, &error), &error) ;
+        }
+        
+        inline void deleteCollection(slice collectionName, slice scopeName =kCBLDefaultScopeName) {
+            CBLError error {};
+            check(CBLDatabase_DeleteCollection(ref(), collectionName, scopeName, &error), error);
+        }
+        
+        inline Collection getDefaultCollection() const {
+            CBLError error {};
+            return Collection::adopt(CBLDatabase_DefaultCollection(ref(), &error), &error) ;
+        }
+        
         // Documents:
 
         inline Document getDocument(slice id) const;

@@ -17,6 +17,7 @@
 //
 
 #pragma once
+#include "cbl++/Collection.hh"
 #include "cbl++/Database.hh"
 #include "cbl/CBLDocument.h"
 #include "fleece/Mutable.hh"
@@ -72,6 +73,7 @@ namespace cbl {
                 throw error;
         }
 
+        friend class Collection;
         friend class Database;
         friend class Replicator;
 
@@ -117,12 +119,11 @@ namespace cbl {
             return doc;
         }
 
+        friend class Collection;
         friend class Database;
         friend class Document;
         CBL_REFCOUNTED_BOILERPLATE(MutableDocument, Document, CBLDocument)
     };
-
-
     
     // Document method bodies:
 
@@ -132,6 +133,54 @@ namespace cbl {
         return doc;
     }
 
+    // Collection method bodies:
+
+    inline Document Collection::getDocument(slice id) const {
+        CBLError error;
+        return Document::adopt(CBLCollection_GetDocument(ref(), id, &error), &error);
+    }
+
+    inline MutableDocument Collection::getMutableDocument(slice id) const {
+        CBLError error;
+        return MutableDocument::adopt(CBLCollection_GetMutableDocument(ref(), id, &error), &error);
+    }
+
+    inline void Collection::saveDocument(MutableDocument &doc) {
+        (void) saveDocument(doc, kCBLConcurrencyControlLastWriteWins);
+    }
+
+    inline bool Collection::saveDocument(MutableDocument &doc, CBLConcurrencyControl c) {
+        CBLError error;
+        return Document::checkSave(
+            CBLCollection_SaveDocumentWithConcurrencyControl(ref(), doc.ref(), c, &error), error);
+    }
+
+    inline bool Collection::saveDocument(MutableDocument &doc, CollectionConflictHandler conflictHandler) {
+        CBLConflictHandler cHandler = [](void *context, CBLDocument *myDoc,
+                                         const CBLDocument *otherDoc) -> bool {
+            return (*(CollectionConflictHandler*)context)(MutableDocument(myDoc),
+                                                Document(otherDoc));
+        };
+        CBLError error;
+        return Document::checkSave(
+            CBLCollection_SaveDocumentWithConflictHandler(ref(), doc.ref(), cHandler,
+                                                          &conflictHandler, &error), error);
+    }
+
+    inline void Collection::deleteDocument(Document &doc) {
+        (void) deleteDocument(doc, kCBLConcurrencyControlLastWriteWins);
+    }
+
+    inline bool Collection::deleteDocument(Document &doc, CBLConcurrencyControl cc) {
+        CBLError error;
+        return Document::checkSave(
+            CBLCollection_DeleteDocumentWithConcurrencyControl(ref(), doc.ref(), cc, &error), error);
+    }
+
+    inline void Collection::purgeDocument(Document &doc) {
+        CBLError error;
+        check(CBLCollection_PurgeDocument(ref(), doc.ref(), &error), error);
+    }
 
     // Database method bodies:
 

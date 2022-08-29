@@ -21,8 +21,8 @@
 
 #pragma once
 #include "Blob.hh"
+#include "Collection.hh"
 #include "Database.hh"
 #include "Document.hh"
 #include "Query.hh"
 #include "Replicator.hh"
-
