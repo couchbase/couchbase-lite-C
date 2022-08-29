@@ -625,8 +625,6 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Conflict Resolver with Collections",
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Resolve Pending Conflicts", "[Replicator]") {
-    CBLLog_SetConsoleLevel(kCBLLogVerbose);
-    
     createDoc(cx[0], "foo1");
     
     auto badConflictResolver = [](void *context,
