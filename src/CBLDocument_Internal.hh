@@ -88,7 +88,7 @@ public:
 
     uint64_t sequence() const {
         auto c4doc = _c4doc.useLocked();
-        return c4doc ? c4doc->sequence() : 0;
+        return c4doc ? static_cast<uint64_t>(c4doc->selectedRev().sequence) : 0;
     }
 
 
@@ -233,8 +233,10 @@ public:
         _properties = nullptr;
         _fromJSON = nullptr;
         while (c4doc->selectNextLeafRevision(true, true))
-            if (c4doc->selectedRev().flags & kRevIsConflict)
+            if (c4doc->selectedRev().flags & kRevIsConflict) {
+                _revID = c4doc->selectedRev().revID;
                 return true;
+            }
         return false;
     }
 
