@@ -624,6 +624,67 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Conflict Resolver with Collections",
     CBLDocument_Release(bar1);
 }
 
+TEST_CASE_METHOD(ReplicatorCollectionTest, "Resolve Pending Conflicts", "[Replicator]") {
+    createDoc(cx[0], "foo1");
+    
+    auto badConflictResolver = [](void *context,
+                                  FLString documentID,
+                                  const CBLDocument *localDocument,
+                                  const CBLDocument *remoteDocument) -> const CBLDocument*
+    {
+        throw std::runtime_error("An unexpected error has occurred.");
+    };
+    
+    auto conflictResolver = [](void *context,
+                               FLString documentID,
+                               const CBLDocument *localDocument,
+                               const CBLDocument *remoteDocument) -> const CBLDocument*
+    {
+        return localDocument;
+    };
+    
+    auto cols = collectionConfigs({cx[0]});
+    config.collections = cols.data();
+    config.collectionCount = cols.size();
+    config.replicatorType = kCBLReplicatorTypePush;
+    expectedDocumentCount = 1;
+    replicate();
+    
+    CBLError error {};
+    auto foo1a = CBLCollection_GetMutableDocument(cx[0], "foo1"_sl, &error);
+    REQUIRE(foo1a);
+    REQUIRE(CBLDocument_SetJSON(foo1a, slice("{\"greeting\":\"hey\"}"), &error));
+    REQUIRE(CBLCollection_SaveDocument(cx[0], foo1a, &error));
+    CBLDocument_Release(foo1a);
+    
+    auto foo1b = CBLCollection_GetMutableDocument(cy[0], "foo1"_sl, &error);
+    REQUIRE(foo1b);
+    REQUIRE(CBLDocument_SetJSON(foo1b, slice("{\"greeting\":\"hola\"}"), &error));
+    REQUIRE(CBLCollection_SaveDocument(cy[0], foo1b, &error));
+    CBLDocument_Release(foo1b);
+    
+    resetReplicator();
+    config.collections[0].conflictResolver = badConflictResolver;
+    config.replicatorType = kCBLReplicatorTypePull;
+    expectedDocumentCount = 1;
+    
+    {
+        ExpectingExceptions ex;
+        replicate();
+    }
+
+    resetReplicator();
+    config.collections[0].conflictResolver = conflictResolver;
+    config.replicatorType = kCBLReplicatorTypePull;
+    expectedDocumentCount = 0;
+    replicate();
+
+    auto foo1 = CBLCollection_GetDocument(cx[0], "foo1"_sl, &error);
+    REQUIRE(foo1);
+    CHECK(Dict(CBLDocument_Properties(foo1)).toJSONString() == "{\"greeting\":\"hey\"}");
+    CBLDocument_Release(foo1);
+}
+
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection DocIDs Push Filters", "[Replicator]") {
     createDoc(cx[0], "foo1");
     createDoc(cx[0], "foo2");
