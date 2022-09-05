@@ -146,6 +146,7 @@ namespace cbl {
         }
         
         friend class Database;
+        friend class Document;
         
         CBL_REFCOUNTED_BOILERPLATE(Collection, RefCounted, CBLCollection);
     
