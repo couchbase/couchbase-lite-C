@@ -68,6 +68,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ New Document", "[Document]") {
     CHECK(doc.id() == "foo");
     CHECK(doc.sequence() == 0);
     CHECK(doc.properties().toJSONString() == "{}");
+    CHECK(!doc.collection());
 
     Document immDoc = doc;
     CHECK((doc.properties() == immDoc.properties()));
@@ -78,6 +79,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ New Document with Auto ID", "[Document]"
     CHECK(doc);
     CHECK(!doc.id().empty());
     CHECK(doc.sequence() == 0);
+    CHECK(!doc.collection());
     CHECK(doc.properties().toJSONString() == "{}");
 
     Document immDoc = doc;
@@ -90,6 +92,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Mutable Copy Mutable Document", "[Docume
     
     CHECK(doc.id() == "foo");
     CHECK(doc.sequence() == 0);
+    CHECK(!doc.collection());
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
     
     MutableDocument copiedDoc = doc.mutableCopy();
@@ -97,6 +100,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Mutable Copy Mutable Document", "[Docume
     
     CHECK(copiedDoc.id() == "foo");
     CHECK(copiedDoc.sequence() == 0);
+    CHECK(!doc.collection());
     CHECK(copiedDoc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
 }
 
@@ -104,10 +108,12 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Mutable Copy Immutable Document", "[Docu
     MutableDocument newdoc("foo");
     newdoc["greeting"] = "Howdy!";
     col.saveDocument(newdoc);
+    CHECK(newdoc.collection() == col);
     
     Document doc = col.getDocument("foo");
     REQUIRE(doc);
     CHECK(doc.sequence() == 1);
+    CHECK(doc.collection() == col);
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
     
     MutableDocument copiedDoc = doc.mutableCopy();
@@ -115,6 +121,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Mutable Copy Immutable Document", "[Docu
     
     CHECK(copiedDoc.id() == "foo");
     CHECK(copiedDoc.sequence() == 1);
+    CHECK(copiedDoc.collection() == col);
     CHECK(copiedDoc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
 }
 

@@ -40,6 +40,8 @@ namespace cbl {
         std::string revisionID() const             {return asString(CBLDocument_RevisionID(ref()));}
 
         uint64_t sequence() const                  {return CBLDocument_Sequence(ref());}
+        
+        Collection collection() const              {return Collection(CBLDocument_Collection(ref()));}
 
         // Properties:
 
