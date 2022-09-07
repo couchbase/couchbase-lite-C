@@ -50,6 +50,10 @@ public:
     cbl::Database openDatabaseNamed(fleece::slice name);
     
     void createNumberedDocs(cbl::Collection& collection, unsigned n, unsigned start = 1);
+    
+    void createDoc(cbl::Collection& collection, std::string docID, std::string jsonContent);
+    
+    void createDocs(cbl::Collection& collection, unsigned n, std::string idprefix ="doc");
 
     cbl::Database db;
 };

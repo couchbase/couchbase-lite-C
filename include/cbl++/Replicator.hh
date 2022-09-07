@@ -22,6 +22,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 // VOLATILE API: Couchbase Lite C++ API is not finalized, and may change in
 // future releases.
@@ -34,46 +35,88 @@ namespace cbl {
     public:
         void setURL(slice url) {
             CBLError error;
-            _ref = CBLEndpoint_CreateWithURL(url, &error);
+            _ref = std::shared_ptr<CBLEndpoint>(CBLEndpoint_CreateWithURL(url, &error), [](auto ref) {
+                CBLEndpoint_Free(ref);
+            });
             if (!_ref)
                 throw error;
         }
 #ifdef COUCHBASE_ENTERPRISE
-        void setLocalDB(Database db)                {_ref = CBLEndpoint_CreateWithLocalDB(db.ref());}
+        void setLocalDB(Database db) {
+            _ref = std::shared_ptr<CBLEndpoint>(CBLEndpoint_CreateWithLocalDB(db.ref()), [](auto ref) {
+                CBLEndpoint_Free(ref);
+            });
+        }
 #endif
-        ~Endpoint()                                 {CBLEndpoint_Free(_ref);}
-        CBLEndpoint* ref() const                    {return _ref;}
+        CBLEndpoint* _cbl_nullable ref() const {return _ref.get();}
     private:
-        CBLEndpoint* _cbl_nullable _ref             {nullptr};
+        std::shared_ptr<CBLEndpoint> _ref;
     };
 
 
     class Authenticator {
     public:
-        void setBasic(slice username,
-                      slice password)
-                                                    {_ref = CBLAuth_CreatePassword(username, password);}
+        void setBasic(slice username, slice password) {
+            _ref = std::shared_ptr<CBLAuthenticator>(CBLAuth_CreatePassword(username, password),
+                                                    [](auto ref) {
+                CBLAuth_Free(ref);
+            });
+        }
 
         void setSession(slice sessionId, slice cookieName) {
-          _ref = CBLAuth_CreateSession(sessionId, cookieName);
+            _ref = std::shared_ptr<CBLAuthenticator>(CBLAuth_CreateSession(sessionId, cookieName),
+                                                     [](auto ref) {
+                CBLAuth_Free(ref);
+            });
         }
-        ~Authenticator()                            {CBLAuth_Free(_ref);}
-        CBLAuthenticator* _cbl_nullable ref() const {return _ref;}
+        CBLAuthenticator* _cbl_nullable ref() const {return _ref.get();}
     private:
-        CBLAuthenticator* _cbl_nullable _ref        {nullptr};
+        std::shared_ptr<CBLAuthenticator> _ref;
     };
 
 
     using ReplicationFilter = std::function<bool(Document, CBLDocumentFlags flags)>;
 
+    using ConflictResolver = std::function<Document(slice docID,
+                                                    const Document localDoc,
+                                                    const Document remoteDoc)>;
 
-    struct ReplicatorConfiguration {
-        ReplicatorConfiguration(Database db)
-        :database(db)
+    class ReplicationCollection {
+    public:
+        ReplicationCollection(Collection collection)
+        :_collection(collection)
         { }
+        
+        Collection collection() const       {return _collection;}
+        
+        fleece::MutableArray channels       = fleece::MutableArray::newArray();
+        fleece::MutableArray documentIDs    = fleece::MutableArray::newArray();
 
-        Database const database;
-        Endpoint endpoint;
+        ReplicationFilter pushFilter;
+        ReplicationFilter pullFilter;
+        
+        ConflictResolver conflictResolver;
+        
+    private:
+        Collection _collection;
+    };
+
+    class ReplicatorConfiguration {
+    public:
+        ReplicatorConfiguration(Database db, Endpoint endpoint)
+        :_database(db)
+        ,_endpoint(endpoint)
+        { }
+        
+        ReplicatorConfiguration(std::vector<ReplicationCollection>collections, Endpoint endpoint)
+        :_collections(collections)
+        ,_endpoint(endpoint)
+        { }
+        
+        Database database() const           {return _database;}
+        Endpoint endpoint() const           {return _endpoint;}
+        std::vector<ReplicationCollection> collections() const  {return _collections;}
+        
         CBLReplicatorType replicatorType    = kCBLReplicatorTypePushAndPull;
         bool continuous                     = false;
         
@@ -98,10 +141,16 @@ namespace cbl {
 
         ReplicationFilter pushFilter;
         ReplicationFilter pullFilter;
+        
+        ConflictResolver conflictResolver;
+        
+    protected:
+        friend class Replicator;
+        
+        /** Base config without database, collections, filters, and conflict resolver set. */
         operator CBLReplicatorConfiguration() const {
             CBLReplicatorConfiguration conf = {};
-            conf.database = database.ref();
-            conf.endpoint = endpoint.ref();
+            conf.endpoint = _endpoint.ref();
             conf.replicatorType = replicatorType;
             conf.continuous = continuous;
             conf.disableAutoPurge = !enableAutoPurge;
@@ -118,32 +167,112 @@ namespace cbl {
                 conf.pinnedServerCertificate = slice(pinnedServerCertificate);
             if (!trustedRootCertificates.empty())
                 conf.trustedRootCertificates = slice(trustedRootCertificates);
-            if (!channels.empty())
-                conf.channels = channels;
-            if (!documentIDs.empty())
-                conf.documentIDs = documentIDs;
             return conf;
         }
+        
+    private:
+        Database _database;
+        Endpoint _endpoint;
+        std::vector<ReplicationCollection> _collections;
     };
 
     class Replicator : private RefCounted {
     public:
-        Replicator(const ReplicatorConfiguration &config) {
-            CBLError error;
+        Replicator(const ReplicatorConfiguration& config)
+        {
+            // Get the current configured collections and populate one for the
+            // default collection if the config is configured with the database:
+            auto collections = config.collections();
+            
+            auto database = config.database();
+            if (database) {
+                assert(collections.empty());
+                auto defaultCollection = database.getDefaultCollection();
+                if (!defaultCollection) {
+                    throw std::invalid_argument("default collection not exist");
+                }
+                ReplicationCollection col = ReplicationCollection(defaultCollection);
+                col.channels = config.channels;
+                col.documentIDs = config.documentIDs;
+                col.pushFilter = config.pushFilter;
+                col.pullFilter = config.pullFilter;
+                col.conflictResolver = config.conflictResolver;
+                collections.push_back(col);
+            }
+            
+            // Created a shared collection map. The pointer of the collection map will be
+            // used as a context.
+            _collectionMap = std::shared_ptr<CollectionToReplCollectionMap>(new CollectionToReplCollectionMap());
+            
+            // Get base C config:
             CBLReplicatorConfiguration c_config = config;
-            _pushFilter = config.pushFilter;
-            if (_pushFilter) {
-                c_config.pushFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
-                    return ((Replicator*)context)->_pushFilter(Document(doc), flags);
-                };
+            
+            // Construct C replication collections to set to the c_config:
+            std::vector<CBLReplicationCollection> replCols;
+            for (int i = 0; i < collections.size(); i++) {
+                ReplicationCollection& col = collections[i];
+                
+                CBLReplicationCollection replCol {};
+                replCol.collection = col.collection().ref();
+                
+                if (!col.channels.empty()) {
+                    replCol.channels = col.channels;
+                }
+
+                if (!col.documentIDs.empty()) {
+                    replCol.documentIDs = col.documentIDs;
+                }
+
+                if (col.pushFilter) {
+                    replCol.pushFilter = [](void* context,
+                                            CBLDocument* cDoc,
+                                            CBLDocumentFlags flags) -> bool {
+                        auto doc = Document(cDoc);
+                        auto map = (CollectionToReplCollectionMap*)context;
+                        return map->find(doc.collection())->second.pushFilter(doc, flags);
+                    };
+                }
+                
+                if (col.pullFilter) {
+                    replCol.pullFilter = [](void* context,
+                                            CBLDocument* cDoc,
+                                            CBLDocumentFlags flags) -> bool {
+                        auto doc = Document(cDoc);
+                        auto map = (CollectionToReplCollectionMap*)context;
+                        return map->find(doc.collection())->second.pullFilter(doc, flags);
+                    };
+                }
+                
+                if (col.conflictResolver) {
+                    replCol.conflictResolver = [](void* context,
+                                                 FLString docID,
+                                                 const CBLDocument* cLocalDoc,
+                                                 const CBLDocument* cRemoteDoc) -> const CBLDocument*
+                    {
+                        auto localDoc = Document(cLocalDoc);
+                        auto remoteDoc = Document(cRemoteDoc);
+                        auto collection = localDoc ? localDoc.collection() : remoteDoc.collection();
+                        
+                        auto map = (CollectionToReplCollectionMap*)context;
+                        auto resolved = map->find(collection)->second.
+                            conflictResolver(slice(docID), localDoc, remoteDoc);
+                        
+                        auto ref = resolved.ref();
+                        if (ref && ref != cLocalDoc && ref != cRemoteDoc) {
+                            CBLDocument_Retain(ref);
+                        }
+                        return ref;
+                    };
+                }
+                replCols.push_back(replCol);
+                _collectionMap->insert({col.collection(), col});
             }
-            _pullFilter = config.pullFilter;
-            if (_pullFilter) {
-                c_config.pullFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
-                    return ((Replicator*)context)->_pullFilter(Document(doc), flags);
-                };
-            }
-            c_config.context = this;
+            
+            c_config.collections = replCols.data();
+            c_config.collectionCount = replCols.size();
+            c_config.context = _collectionMap.get();
+            
+            CBLError error {};
             _ref = (CBLRefCounted*) CBLReplicator_Create(&c_config, &error);
             check(_ref, error);
         }
@@ -186,7 +315,7 @@ namespace cbl {
             l.setToken( CBLReplicator_AddDocumentReplicationListener(ref(), &_callDocListener, l.context()) );
             return l;
         }
-
+        
     private:
         static void _callChangeListener(void* _cbl_nullable context,
                                         CBLReplicator *repl,
@@ -204,11 +333,39 @@ namespace cbl {
             std::vector<CBLReplicatedDocument> docs(&documents[0], &documents[numDocuments]);
             DocumentReplicationListener::call(context, Replicator(repl), isPush, docs);
         }
-
-        ReplicationFilter _pushFilter;
-        ReplicationFilter _pullFilter;
-
-        CBL_REFCOUNTED_BOILERPLATE(Replicator, RefCounted, CBLReplicator)
+        
+        using CollectionToReplCollectionMap = std::unordered_map<Collection, ReplicationCollection>;
+        std::shared_ptr<CollectionToReplCollectionMap> _collectionMap;
+        
+        CBL_REFCOUNTED_WITHOUT_COPY_MOVE_BOILERPLATE(Replicator, RefCounted, CBLReplicator)
+        
+    public:
+        Replicator(const Replicator &other) noexcept
+        :RefCounted(other)
+        ,_collectionMap(other._collectionMap)
+        { }
+        
+        Replicator(Replicator &&other) noexcept
+        :RefCounted((RefCounted&&)other)
+        ,_collectionMap(std::move(other._collectionMap))
+        { }
+        
+        Replicator& operator=(const Replicator &other) noexcept {
+            RefCounted::operator=(other);
+            _collectionMap = other._collectionMap;
+            return *this;
+        }
+        
+        Replicator& operator=(Replicator &&other) noexcept {
+            RefCounted::operator=((RefCounted&&)other);
+            _collectionMap = std::move(other._collectionMap);
+            return *this;
+        }
+        
+        void clear() {
+            RefCounted::clear();
+            _collectionMap.reset();
+        }
     };
 }
 
