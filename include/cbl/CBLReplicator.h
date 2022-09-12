@@ -270,7 +270,9 @@ typedef struct {
     FLDict _cbl_nullable headers;                     ///< Extra HTTP headers to add to the WebSocket request
     
     //-- TLS settings:
-    FLSlice pinnedServerCertificate;    ///< An X.509 cert to "pin" TLS connections to (PEM or DER)
+    /** An X.509 cert (PEM or DER) to "pin" for TLS connections. The pinned cert will be evaluated against any certs
+        in a cert chain, and the cert chain will be valid only if the cert chain contains the pinned cert. */
+    FLSlice pinnedServerCertificate;
     FLSlice trustedRootCertificates;    ///< Set of anchor certs (PEM format)
     
     //-- Filtering:
