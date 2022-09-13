@@ -95,13 +95,9 @@ namespace cbl {
     };
 
 // Internal use only: Copy/move ctors and assignment ops that have to be declared in subclasses
-#define CBL_REFCOUNTED_BOILERPLATE(CLASS, SUPER, C_TYPE) \
+#define CBL_REFCOUNTED_WITHOUT_COPY_MOVE_BOILERPLATE(CLASS, SUPER, C_TYPE) \
 public: \
     CLASS() noexcept                              :SUPER() { } \
-    CLASS(const CLASS &other) noexcept            :SUPER(other) { } \
-    CLASS(CLASS &&other) noexcept                 :SUPER((CLASS&&)other) { } \
-    CLASS& operator=(const CLASS &other) noexcept {SUPER::operator=(other); return *this;} \
-    CLASS& operator=(CLASS &&other) noexcept      {SUPER::operator=((SUPER&&)other); return *this;}\
     CLASS& operator=(std::nullptr_t)              {clear(); return *this;} \
     bool valid() const                            {return RefCounted::valid();} \
     explicit operator bool() const                {return valid();} \
@@ -109,9 +105,15 @@ public: \
     bool operator!=(const CLASS &other) const     {return _ref != other._ref;} \
     C_TYPE* _cbl_nullable ref() const             {return (C_TYPE*)_ref;}\
 protected: \
-    explicit CLASS(C_TYPE* ref)                   :SUPER((CBLRefCounted*)ref) { }
+    explicit CLASS(C_TYPE* _cbl_nullable ref)     :SUPER((CBLRefCounted*)ref) { }
 
-
+#define CBL_REFCOUNTED_BOILERPLATE(CLASS, SUPER, C_TYPE) \
+CBL_REFCOUNTED_WITHOUT_COPY_MOVE_BOILERPLATE(CLASS, SUPER, C_TYPE) \
+public: \
+    CLASS(const CLASS &other) noexcept            :SUPER(other) { } \
+    CLASS(CLASS &&other) noexcept                 :SUPER((SUPER&&)other) { } \
+    CLASS& operator=(const CLASS &other) noexcept {SUPER::operator=(other); return *this;} \
+    CLASS& operator=(CLASS &&other) noexcept      {SUPER::operator=((SUPER&&)other); return *this;}
 
     /** A token representing a registered listener; instances are returned from the various
         methods that register listeners, such as \ref Database::addListener.

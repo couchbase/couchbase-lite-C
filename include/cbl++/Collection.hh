@@ -202,4 +202,13 @@ namespace cbl {
     };
 }
 
+/** Hash function for Collection. */
+template<> struct std::hash<cbl::Collection> {
+    std::size_t operator() (cbl::Collection const& col) const {
+        auto name = CBLCollection_Name(col.ref());
+        auto scope = CBLScope_Name(CBLCollection_Scope(col.ref()));
+        return fleece::slice(name).hash() ^ fleece::slice(scope).hash();
+    }
+};
+
 CBL_ASSUME_NONNULL_END

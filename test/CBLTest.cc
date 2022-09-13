@@ -138,6 +138,24 @@ void CBLTest_Cpp::createNumberedDocs(cbl::Collection& collection, unsigned n, un
     }
 }
 
+void CBLTest_Cpp::createDoc(cbl::Collection& collection, std::string docID, std::string jsonContent) {
+    cbl::MutableDocument doc(docID);
+    doc.setPropertiesAsJSON(jsonContent);
+    collection.saveDocument(doc);
+}
+
+void CBLTest_Cpp::createDocs(cbl::Collection& collection, unsigned n, std::string idprefix) {
+    for (unsigned i = 0; i < n; i++) {
+        string docID = idprefix.append("-").append(to_string(i+1));
+        
+        char content[100];
+        sprintf(content, "This is the document #%03u.", i+1);
+        cbl::MutableDocument doc(docID);
+        doc["content"] = content;
+        collection.saveDocument(doc);
+    }
+}
+
 #pragma mark - Test Utils :
 
 string GetTestFilePath(const std::string &filename) {
