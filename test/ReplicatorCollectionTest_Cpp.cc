@@ -161,6 +161,17 @@ public:
         CHECK(r == repl);
         cerr << "--- " << docs.size() << " docs " << (isPush ? "pushed" : "pulled") << ":";
         cerr << "\n";
+        
+        for (auto& doc : docs) {
+            ReplicatedDoc rdoc {};
+            rdoc.scope = slice(doc.scope).asString();;
+            rdoc.collection = slice(doc.collection).asString();
+            rdoc.docID = slice(doc.ID).asString();
+            rdoc.flags = doc.flags;
+            rdoc.error = doc.error;
+            string key = rdoc.scope + "." + rdoc.collection + "." + rdoc.docID;
+            replicatedDocs[key] = rdoc;
+        }
     }
     
     void createDoc(cbl::Collection& collection, std::string docID) {
@@ -179,6 +190,16 @@ public:
     
     CBLError expectedError = {};
     int64_t expectedDocumentCount = -1;
+    
+    struct ReplicatedDoc {
+        string scope;
+        string collection;
+        string docID;
+        CBLDocumentFlags flags;
+        CBLError error;
+    };
+    // Key format : <scope>.<collection>.<docID> or <docID> for default collection
+    unordered_map<string, ReplicatedDoc> replicatedDocs;
 };
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Create Replicator with zero collections", "[Replicator]") {
@@ -270,7 +291,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Continuous Replication", "[R
     }
 }
 
-TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Push Filters", "[Replicator][Current]") {
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Push Filters", "[Replicator]") {
     createDoc(cx[0], "foo1");
     createDoc(cx[0], "foo2");
     createDoc(cx[0], "foo3");
@@ -322,6 +343,173 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Push Filters", "[
     
     auto bar3 = cy[1].getDocument("bar3"_sl);
     REQUIRE(!bar3);
+}
+
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Pull Filters", "[Replicator]") {
+    createDoc(cy[0], "foo1");
+    createDoc(cy[0], "foo2");
+    createDoc(cy[0], "foo3");
+    
+    createDoc(cy[1], "bar1");
+    createDoc(cy[1], "bar2");
+    createDoc(cy[1], "bar3");
+    
+    auto rcol1 = ReplicationCollection(cx[0]);
+    rcol1.pullFilter = [](Document doc, CBLDocumentFlags flags) -> bool {
+        string id = doc.id();
+        CHECK(doc.collection().name() == "colA");
+        CHECK(doc.collection().scopeName() == "scopeA");
+        return id == "foo1" || id == "foo3";
+    };
+    
+    auto rcol2 = ReplicationCollection(cx[1]);
+    rcol2.pullFilter = [](Document doc, CBLDocumentFlags flags) -> bool {
+        string id = doc.id();
+        CHECK(doc.collection().name() == "colB");
+        CHECK(doc.collection().scopeName() == "scopeA");
+        return id == "bar2";
+    };
+    
+    createConfig({rcol1, rcol2});
+    
+    config.replicatorType = kCBLReplicatorTypePull;
+    expectedDocumentCount = 3;
+    replicate();
+    
+    CHECK(cx[0].count() == 2);
+    
+    auto foo1 = cx[0].getDocument("foo1"_sl);
+    REQUIRE(foo1);
+    
+    auto foo2 = cx[0].getDocument("foo2"_sl);
+    REQUIRE(!foo2);
+    
+    auto foo3 = cx[0].getDocument("foo3"_sl);
+    REQUIRE(foo3);
+    
+    CHECK(cx[1].count() == 1);
+    
+    auto bar1 = cx[1].getDocument("bar1"_sl);
+    REQUIRE(!bar1);
+    
+    auto bar2 = cx[1].getDocument("bar2"_sl);
+    REQUIRE(bar2);
+    
+    auto bar3 = cx[1].getDocument("bar3"_sl);
+    REQUIRE(!bar3);
+}
+
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection DocIDs Push Filters", "[Replicator]") {
+    createDoc(cx[0], "foo1");
+    createDoc(cx[0], "foo2");
+    createDoc(cx[0], "foo3");
+    
+    createDoc(cx[1], "bar1");
+    createDoc(cx[1], "bar2");
+    createDoc(cx[1], "bar3");
+    
+    auto rcol1 = ReplicationCollection(cx[0]);
+    rcol1.documentIDs = MutableArray::newArray();
+    rcol1.documentIDs.append("foo1");
+    rcol1.documentIDs.append("foo3");
+    
+    auto rcol2 = ReplicationCollection(cx[1]);
+    rcol2.documentIDs = MutableArray::newArray();
+    rcol2.documentIDs.append("bar2");
+    
+    createConfig({rcol1, rcol2});
+    
+    config.replicatorType = kCBLReplicatorTypePush;
+    expectedDocumentCount = 3;
+    replicate();
+    
+    CHECK(cy[0].count() == 2);
+    
+    auto foo1 = cy[0].getDocument("foo1");
+    REQUIRE(foo1);
+    
+    auto foo2 = cy[0].getDocument("foo2");
+    REQUIRE(!foo2);
+    
+    auto foo3 = cy[0].getDocument("foo3");
+    REQUIRE(foo3);
+    
+    CHECK(cy[1].count() == 1);
+    
+    auto bar1 = cy[1].getDocument("bar1");
+    REQUIRE(!bar1);
+    
+    auto bar2 = cy[1].getDocument("bar2");
+    REQUIRE(bar2);
+    
+    auto bar3 = cy[1].getDocument("bar3");
+    REQUIRE(!bar3);
+}
+
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Conflict Resolver with Collections", "[Replicator][Current]") {
+    createDoc(cx[0], "foo1");
+    createDoc(cx[1], "bar1");
+    
+    auto conflictResolver = [](slice docID, const Document localDoc, const Document remoteDoc) -> Document
+    {
+        return (docID == "foo1"_sl) ? localDoc : remoteDoc;
+    };
+    
+    auto rcol1 = ReplicationCollection(cx[0]);
+    rcol1.conflictResolver = conflictResolver;
+    
+    auto rcol2 = ReplicationCollection(cx[1]);
+    rcol2.conflictResolver = conflictResolver;
+    
+    createConfig({rcol1, rcol2});
+    
+    config.replicatorType = kCBLReplicatorTypePush;
+    expectedDocumentCount = 2;
+    replicate();
+    
+    MutableDocument foo1a("foo1");
+    foo1a["greeting"] = "hey";
+    cx[0].saveDocument(foo1a);
+    
+    MutableDocument foo1b("foo1");
+    foo1b["greeting"] = "hola";
+    cy[0].saveDocument(foo1b);
+    
+    MutableDocument bar1a("bar1");
+    bar1a["greeting"] = "sawasdee";
+    cx[1].saveDocument(bar1a);
+    
+    MutableDocument bar1b("bar1");
+    bar1b["greeting"] = "bonjour";
+    cy[1].saveDocument(bar1b);
+    
+    config.replicatorType = kCBLReplicatorTypePush;
+    expectedDocumentCount = 0;
+    replicate();
+    
+    REQUIRE(replicatedDocs.size() == 2);
+    auto key1 = CollectionPath(cx[0].ref()) + ".foo1";
+    CHECK(replicatedDocs[key1].docID == "foo1");
+    CHECK(replicatedDocs[key1].error.code == 409);
+    CHECK(replicatedDocs[key1].error.domain == kCBLWebSocketDomain);
+    
+    auto key2 = CollectionPath(cx[1].ref()) + ".bar1";
+    CHECK(replicatedDocs[key2].docID == "bar1");
+    CHECK(replicatedDocs[key2].error.code == 409);
+    CHECK(replicatedDocs[key2].error.domain == kCBLWebSocketDomain);
+    
+    repl = nullptr;
+    config.replicatorType = kCBLReplicatorTypePull;
+    expectedDocumentCount = 2;
+    replicate();
+
+    auto foo1 = cx[0].getDocument("foo1");
+    REQUIRE(foo1);
+    CHECK(foo1.properties().toJSONString() == "{\"greeting\":\"hey\"}");
+
+    auto bar1 = cx[1].getDocument("bar1");
+    REQUIRE(bar1);
+    CHECK(bar1.properties().toJSONString() == "{\"greeting\":\"bonjour\"}");
 }
 
 #endif
