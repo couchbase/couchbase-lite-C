@@ -229,8 +229,7 @@ FLStringResult CBLDatabase_Path(const CBLDatabase*) CBLAPI;
     @warning  <b>Deprecated :</b> Use CBLCollection_Count on the default collection instead. */
 uint64_t CBLDatabase_Count(const CBLDatabase*) CBLAPI;
 
-/** Returns the database's configuration, as given when it was opened.
-    @note  The encryption key is not filled in, for security reasons. */
+/** Returns the database's configuration, as given when it was opened. */
 const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*) CBLAPI;
 
 /** @} */
@@ -241,16 +240,16 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*) CBLAPI;
 #endif
 /** \name  Database listeners
     @{
-    A database change listener lets you detect changes made to all documents in a database.
+    A database change listener lets you detect changes made to all documents in the default collection.
     (If you only want to observe specific documents, use a \ref CBLDocumentChangeListener instead.)
     @note If there are multiple \ref CBLDatabase instances on the same database file, each one's
     listeners will be notified of changes made by other database instances.
     @warning  Changes made to the database file by other processes will _not_ be notified. */
 
-/** A database change listener callback, invoked after one or more documents are changed on disk.
+/** A default collection change listener callback, invoked after one or more documents in the default collection are changed on disk.
     @warning  By default, this listener may be called on arbitrary threads. If your code isn't
-                    prepared for that, you may want to use \ref CBLDatabase_BufferNotifications
-                    so that listeners will be called in a safe context.
+              prepared for that, you may want to use \ref CBLDatabase_BufferNotifications
+              so that listeners will be called in a safe context.
     @warning  <b>Deprecated :</b> CBLCollectionChangeListener instead.
     @param context  An arbitrary value given when the callback was registered.
     @param db  The database that changed.
@@ -261,7 +260,7 @@ typedef void (*CBLDatabaseChangeListener)(void* _cbl_nullable context,
                                           unsigned numDocs,
                                           FLString docIDs[_cbl_nonnull]);
 
-/** Registers a database change listener callback. It will be called after one or more
+/** Registers a default collection change listener callback. It will be called after one or more
     documents are changed on disk.
     @warning  <b>Deprecated :</b> Use CBLCollection_AddChangeListener on the default collection instead.
     @param db  The database to observe.

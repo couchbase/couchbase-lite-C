@@ -116,7 +116,6 @@ CBLCollection* _cbl_nullable CBLDatabase_Collection(const CBLDatabase* db,
                                                     CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Create a new collection.
-    When creating a new collection, the collection name, and the scope name are required.
     The naming rules of the collections and scopes are as follows:
         - Must be between 1 and 251 characters in length.
         - Can only contain the characters A-Z, a-z, 0-9, and the symbols _, -, and %.
@@ -134,7 +133,7 @@ CBLCollection* _cbl_nullable CBLDatabase_CreateCollection(CBLDatabase* db,
                                                           FLString scopeName,
                                                           CBLError* _cbl_nullable outError) CBLAPI;
 
-/** Delete the collection.
+/** Delete an existing collection.
     @param db  The database.
     @param collectionName  The name of the collection.
     @param scopeName  The name of the scope.
