@@ -103,7 +103,6 @@ CBLResultSet* _cbl_nullable CBLQuery_Execute(CBLQuery*,
     indicates a linear scan of the entire database, which should be avoided by adding an index.
     The strategy will also show which index(es), if any, are used.
     @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
-
 _cbl_warn_unused
 FLSliceResult CBLQuery_Explain(const CBLQuery*) CBLAPI;
 
