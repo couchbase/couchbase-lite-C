@@ -11,7 +11,7 @@
 LITECORE    = vendor/couchbase-lite-core
 FLEECE      = $(LITECORE)/vendor/fleece
 
-CBL_VERSION_STRING                                 = 3.0.2
+CBL_VERSION_STRING                                 = 3.0.3
 CBL_BUILD_NUMBER                                   = 0
 
 IPHONEOS_DEPLOYMENT_TARGET                         = 10.0
