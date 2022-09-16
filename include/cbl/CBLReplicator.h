@@ -239,41 +239,47 @@ typedef struct {
     /** The database to replicate. When setting the database, ONLY the default collection will be used for replication.
         @warning  <b>Deprecated :</b> Use collections instead. */
     CBLDatabase* _cbl_nullable database;
-    CBLEndpoint* endpoint;                  ///< The address of the other database to replicate with
+    CBLEndpoint* endpoint;                              ///< The address of the other database to replicate with
     
     //-- Types:
-    CBLReplicatorType replicatorType;       ///< Push, pull or both
-    bool continuous;                        ///< Continuous replication?
+    CBLReplicatorType replicatorType;                   ///< Push, pull or both
+    bool continuous;                                    ///< Continuous replication?
     
     //-- Auto Purge:
     /** If auto purge is active, then the library will automatically purge any documents that
         the replicating user loses access to via the Sync Function on Sync Gateway.
         If disableAutoPurge is true, this behavior is disabled and an access removed
-        event will be sent to any document listeners that are active on the replicator.
-     
-        IMPORTANT: For performance reasons, the document listeners must be
-        added *before* the replicator is started or they will not receive the events. */
+        event will be sent to any document listeners that are active on the replicator. */
     bool disableAutoPurge;
     
     //-- Retry Logic:
-    unsigned maxAttempts;               ///< Max retry attempts where the initial connect to replicate counts toward the given value.
-                                        ///< Specify 0 to use the default value, 10 times for a non-continuous replicator and max-int time for a continuous replicator. Specify 1 means there will be no retry after the first attempt.
-    unsigned maxAttemptWaitTime;        ///< Max wait time between retry attempts in seconds. Specify 0 to use the default value of 300 seconds.
+    
+    /** Max retry attempts where the initial connect to replicate counts toward the given value.
+        Specify 0 to use the default value, 10 times for a non-continuous replicator and max-int time for a continuous replicator.
+        Specify 1 means there will be no retry after the first attempt. */
+    unsigned maxAttempts;
+    /** Max wait time between retry attempts in seconds.
+        Specify 0 to use the default value of 300 seconds. */
+    unsigned maxAttemptWaitTime;
+    
     //-- WebSocket:
-    unsigned heartbeat;                 ///< The heartbeat interval in seconds. Specify 0 to use the default value of 300 seconds.
-    FLString networkInterface;          ///< The specific network interface to be used by the replicator to connect to the remote server.
-                                        ///< If not specified, an active network interface based on the OS's routing table will be used.
+    /** The heartbeat interval in seconds.
+        Specify 0 to use the default value of 300 seconds. */
+    unsigned heartbeat;
+    /** The specific network interface to be used by the replicator to connect to the remote server.
+        If not specified, an active network interface based on the OS's routing table will be used. */
+    FLString networkInterface;
     
     //-- HTTP settings:
-    CBLAuthenticator* _cbl_nullable authenticator;    ///< Authentication credentials, if needed
-    const CBLProxySettings* _cbl_nullable proxy;      ///< HTTP client proxy settings
-    FLDict _cbl_nullable headers;                     ///< Extra HTTP headers to add to the WebSocket request
+    CBLAuthenticator* _cbl_nullable authenticator;  ///< Authentication credentials, if needed
+    const CBLProxySettings* _cbl_nullable proxy;    ///< HTTP client proxy settings
+    FLDict _cbl_nullable headers;                   ///< Extra HTTP headers to add to the WebSocket request
     
     //-- TLS settings:
     /** An X.509 cert (PEM or DER) to "pin" for TLS connections. The pinned cert will be evaluated against any certs
         in a cert chain, and the cert chain will be valid only if the cert chain contains the pinned cert. */
     FLSlice pinnedServerCertificate;
-    FLSlice trustedRootCertificates;    ///< Set of anchor certs (PEM format)
+    FLSlice trustedRootCertificates;                ///< Set of anchor certs (PEM format)
     
     //-- Filtering:
     /** Optional set of channels to pull from when replicating with the default collection.
@@ -296,13 +302,14 @@ typedef struct {
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.pullFilter instead. */
     CBLReplicationFilter _cbl_nullable pullFilter;
     
+    //-- Conflict Resolver:
     /** Optional conflict-resolver callback.
         @note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.conflictResolver instead. */
     CBLConflictResolver _cbl_nullable conflictResolver;
     
     //-- Context:
-    void* _cbl_nullable context;                      ///< Arbitrary value that will be passed to callbacks
+    void* _cbl_nullable context;                    ///< Arbitrary value that will be passed to callbacks
     
 #ifdef COUCHBASE_ENTERPRISE
     //-- Property Encryption
@@ -425,12 +432,11 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator*) CBLAPI;
 _cbl_warn_unused
 FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs(CBLReplicator*, CBLError* _cbl_nullable outError) CBLAPI;
 
-/** Indicates whether the document in the default with the given ID has local changes that
+/** Indicates whether the document in the default collection with the given ID has local changes that
     have not yet been pushed to the server by this replicator.
 
     This is equivalent to, but faster than, calling \ref CBLReplicator_PendingDocumentIDs and
     checking whether the result contains \p docID. See that function's documentation for details.
-
     @note  A `false` result means the document is not pending, _or_ there was an error.
            To tell the difference, compare the error code to zero.
     @warning  If the default collection is not part of the replication, a NULL with an error
@@ -448,7 +454,7 @@ bool CBLReplicator_IsDocumentPending(CBLReplicator *repl,
     values are `true`.
     If there are no pending documents, the dictionary is empty.
     On error, NULL is returned.
-    @warning  If the given collection is not part of the replication, a NULL with an error will be returned. */
+    @warning If the given collection is not part of the replication, a NULL with an error will be returned. */
 FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator*,
                                                        const CBLCollection* collection,
                                                        CBLError* _cbl_nullable outError) CBLAPI;
@@ -458,9 +464,8 @@ FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator*,
  
     This is equivalent to, but faster than, calling \ref CBLReplicator_PendingDocumentIDs2 and
     checking whether the result contains \p docID. See that function's documentation for details.
-
     @note  A `false` result means the document is not pending, _or_ there was an error.
-        To tell the difference, compare the error code to zero.
+         To tell the difference, compare the error code to zero.
     @warning  If the given collection is not part of the replication, a NULL with an error will be returned. */
 bool CBLReplicator_IsDocumentPending2(CBLReplicator *repl,
                                       FLString docID,
@@ -468,9 +473,9 @@ bool CBLReplicator_IsDocumentPending2(CBLReplicator *repl,
                                       CBLError* _cbl_nullable outError) CBLAPI;
 
 /** A callback that notifies you when the replicator's status changes.
-    @warning  This callback will be called on a background thread managed by the replicator.
-                It must pay attention to thread-safety. It should not take a long time to return,
-                or it will slow down the replicator.
+    @note This callback will be called on a background thread managed by the replicator.
+          It must pay attention to thread-safety. It should not take a long time to return,
+          or it will slow down the replicator.
     @param context  The value given when the listener was added.
     @param replicator  The replicator.
     @param status  The replicator's status. */
@@ -478,7 +483,7 @@ typedef void (*CBLReplicatorChangeListener)(void* _cbl_nullable context,
                                             CBLReplicator *replicator,
                                             const CBLReplicatorStatus *status);
 
-/** Adds a listener that will be called when the replicator's status changes. */
+/** Registers a listener that will be called when the replicator's status changes. */
 _cbl_warn_unused
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator*,
                                                   CBLReplicatorChangeListener,
@@ -495,9 +500,9 @@ typedef struct {
 } CBLReplicatedDocument;
 
 /** A callback that notifies you when documents are replicated.
-    @warning  This callback will be called on a background thread managed by the replicator.
-                It must pay attention to thread-safety. It should not take a long time to return,
-                or it will slow down the replicator.
+    @note This callback will be called on a background thread managed by the replicator.
+          It must pay attention to thread-safety. It should not take a long time to return,
+          or it will slow down the replicator.
     @param context  The value given when the listener was added.
     @param replicator  The replicator.
     @param isPush  True if the document(s) were pushed, false if pulled.
@@ -509,7 +514,7 @@ typedef void (*CBLDocumentReplicationListener)(void *context,
                                                unsigned numDocuments,
                                                const CBLReplicatedDocument* documents);
 
-/** Adds a listener that will be called when documents are replicated. */
+/** Registers a listener that will be called when documents are replicated. */
 _cbl_warn_unused
 CBLListenerToken* CBLReplicator_AddDocumentReplicationListener(CBLReplicator*,
                                                                CBLDocumentReplicationListener,
