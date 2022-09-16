@@ -82,11 +82,11 @@ CBL_CAPI_BEGIN
     /** Returns the length in bytes of a blob's content (from its `length` property). */
     uint64_t CBLBlob_Length(const CBLBlob*) CBLAPI;
 
-    /** Returns the cryptographic digest of a blob's content (from its `digest` property). */
-    FLString CBLBlob_Digest(const CBLBlob*) CBLAPI;
-
     /** Returns a blob's MIME type, if its metadata has a `content_type` property. */
     FLString CBLBlob_ContentType(const CBLBlob*) CBLAPI;
+
+    /** Returns the cryptographic digest of a blob's content (from its `digest` property). */
+    FLString CBLBlob_Digest(const CBLBlob*) CBLAPI;
 
     /** Returns a blob's metadata. This includes the `digest`, `length`, `content_type`,
         and `@type` properties, as well as any custom ones that may have been added. */
@@ -100,7 +100,7 @@ CBL_CAPI_BEGIN
 #pragma mark - READING:
 #endif
 
-    /** Reads the blob's contents into memory and returns them.
+    /** Reads the blob's content into memory and returns them.
         @note  You are responsible for releasing the result by calling \ref FLSliceResult_Release. */
     _cbl_warn_unused
     FLSliceResult CBLBlob_Content(const CBLBlob* blob,
