@@ -400,10 +400,10 @@ namespace cbl {
             documents in the default collection are changed on disk.
             @warning <b>Deprecated :</b> Use Collection::addChangeListener(ChangeListener::Callback f)
                      on the default collection instead.
-            @param listener  The callback to be invoked.
+            @param callback  The callback to be invoked.
             @return A Change Listener Token. Call \ref ListenerToken::remove() method to remove the listener. */
-        [[nodiscard]] ChangeListener addChangeListener(ChangeListener::Callback listener) {
-            auto l = ChangeListener(listener);
+        [[nodiscard]] ChangeListener addChangeListener(ChangeListener::Callback callback) {
+            auto l = ChangeListener(callback);
             l.setToken( CBLDatabase_AddChangeListener(ref(), &_callListener, l.context()) );
             return l;
         }
@@ -416,12 +416,12 @@ namespace cbl {
             @warning <b>Deprecated :</b> Use Collection::addDocumentChangeListener(slice docID,
                      DocumentChangeListener::Callback listener) on the default collection instead.
             @param docID  The ID of the document to observe.
-            @param listener  The callback to be invoked.
+            @param callback  The callback to be invoked.
             @return A Change Listener Token. Call \ref ListenerToken::remove() method to remove the listener. */
         [[nodiscard]] DocumentChangeListener addDocumentChangeListener(slice docID,
-                                                                       DocumentChangeListener::Callback listener)
+                                                                       DocumentChangeListener::Callback callback)
         {
-            auto l = DocumentChangeListener(listener);
+            auto l = DocumentChangeListener(callback);
             l.setToken( CBLDatabase_AddDocumentChangeListener(ref(), docID, &_callDocListener, l.context()) );
             return l;
         }

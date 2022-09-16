@@ -97,9 +97,9 @@ namespace cbl {
             When the first change listener is added, the query will run (in the background) and notify
             the listener(s) of the results when ready. After that, it will run in the background after
             the database changes, and only notify the listeners when the result set changes.
-            @param listener  The callback to be invoked.
+            @param callback  The callback to be invoked.
             @return A Change Listener Token. Call \ref ListenerToken::remove() method to remove the listener. */
-        [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<Change>::Callback listener);
+        [[nodiscard]] inline ChangeListener addChangeListener(ListenerToken<Change>::Callback callback);
 
     private:
         static void _callListener(void *context, CBLQuery*, CBLListenerToken* token);

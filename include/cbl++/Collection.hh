@@ -209,10 +209,10 @@ namespace cbl {
 
         /** Registers a collection change listener callback. It will be called after one or more
             documents in the collection are changed on disk.
-            @param listener  The callback to be invoked.
+            @param callback  The callback to be invoked.
             @return A Change Listener Token. Call \ref ListenerToken::remove() method to remove the listener. */
-        [[nodiscard]] CollectionChangeListener addChangeListener(CollectionChangeListener::Callback listener) {
-            auto l = CollectionChangeListener(listener);
+        [[nodiscard]] CollectionChangeListener addChangeListener(CollectionChangeListener::Callback callback) {
+            auto l = CollectionChangeListener(callback);
             l.setToken( CBLCollection_AddChangeListener(ref(), &_callListener, l.context()) );
             return l;
         }
@@ -222,15 +222,13 @@ namespace cbl {
 
         /** Registers a document change listener callback. It will be called after a specific document in the collection
             is changed on disk.
-            @warning <b>Deprecated :</b> Use Collection::addDocumentChangeListener(slice docID,
-                     DocumentChangeListener::Callback listener) on the default collection instead.
             @param docID  The ID of the document to observe.
-            @param listener  The callback to be invoked.
+            @param callback  The callback to be invoked.
             @return A Change Listener Token. Call \ref ListenerToken::remove() method to remove the listener. */
         [[nodiscard]] CollectionDocumentChangeListener addDocumentChangeListener(slice docID,
-                                                                                 CollectionDocumentChangeListener::Callback listener)
+                                                                                 CollectionDocumentChangeListener::Callback callback)
         {
-            auto l = CollectionDocumentChangeListener(listener);
+            auto l = CollectionDocumentChangeListener(callback);
             l.setToken( CBLCollection_AddDocumentChangeListener(ref(), docID, &_callDocListener, l.context()) );
             return l;
         }
