@@ -65,7 +65,7 @@ void CBLDocument_SetProperties(CBLDocument* doc, FLMutableDict properties) noexc
 
 bool CBLDocument_SetJSON(CBLDocument* doc, FLSlice json, CBLError* outError) noexcept {
     try {
-        doc->setPropertiesAsJSON(json);//FIXME: Catch
+        doc->setPropertiesAsJSON(json);
         return true;
     } catchAndBridge(outError)
 }

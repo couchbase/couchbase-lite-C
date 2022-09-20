@@ -56,17 +56,21 @@ static_assert(sizeof(CBLEncryptionKey::bytes) == sizeof(C4EncryptionKey::bytes),
               "C4EncryptionKey and CBLEncryptionKey size do not match");
 
 bool CBLEncryptionKey_FromPassword(CBLEncryptionKey *key, FLString password) CBLAPI {
-    auto c4key = C4EncryptionKeyFromPassword(password, kC4EncryptionAES256);    //FIXME: Catch
-    key->algorithm = CBLEncryptionAlgorithm(c4key.algorithm);
-    memcpy(key->bytes, c4key.bytes, sizeof(key->bytes));
-    return true;
+    try {
+        auto c4key = C4EncryptionKeyFromPassword(password, kC4EncryptionAES256);
+        key->algorithm = CBLEncryptionAlgorithm(c4key.algorithm);
+        memcpy(key->bytes, c4key.bytes, sizeof(key->bytes));
+        return true;
+    } catchAndWarn();
 }
 
 bool CBLEncryptionKey_FromPasswordOld(CBLEncryptionKey *key, FLString password) CBLAPI {
-    auto c4key = C4EncryptionKeyFromPasswordSHA1(password, kC4EncryptionAES256);    //FIXME: Catch
-    key->algorithm = CBLEncryptionAlgorithm(c4key.algorithm);
-    memcpy(key->bytes, c4key.bytes, sizeof(key->bytes));
-    return true;
+    try {
+        auto c4key = C4EncryptionKeyFromPasswordSHA1(password, kC4EncryptionAES256);
+        key->algorithm = CBLEncryptionAlgorithm(c4key.algorithm);
+        memcpy(key->bytes, c4key.bytes, sizeof(key->bytes));
+        return true;
+    } catchAndWarn();
 }
 #endif
 
