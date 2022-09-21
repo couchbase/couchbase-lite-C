@@ -26,6 +26,7 @@
 #include "cbl/CBLScope.h"
 #include "fleece/Mutable.hh"
 #include <functional>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -109,6 +110,7 @@ namespace cbl {
             CBLError error;
             _ref = (CBLRefCounted*) CBLDatabase_Open(name, nullptr, &error);
             check(_ref != nullptr, error);
+            _notificationReadyCallbackAccess = std::make_shared<NotificationsReadyCallbackAccess>();
         }
 
         /** Opens a database, or creates it if it doesn't exist yet, returning a new \ref Database instance.
@@ -122,6 +124,7 @@ namespace cbl {
             CBLError error;
             _ref = (CBLRefCounted*) CBLDatabase_Open(name, &config, &error);
             check(_ref != nullptr, error);
+            _notificationReadyCallbackAccess = std::make_shared<NotificationsReadyCallbackAccess>();
         }
 
         /** Closes an open database. */
@@ -427,7 +430,7 @@ namespace cbl {
         }
 
         // Notifications:
-
+        
         using NotificationsReadyCallback = std::function<void(Database)>;
 
         /** Switches the database to buffered-notification mode. Notifications for objects belonging
@@ -435,10 +438,10 @@ namespace cbl {
             called immediately; your \ref NotificationsReadyCallback will be called instead.
             @param callback  The function to be called when a notification is available. */
         void bufferNotifications(NotificationsReadyCallback callback) {
-            auto callbackPtr = new NotificationsReadyCallback(callback); //FIXME: This is leaked
+            _notificationReadyCallbackAccess->setCallback(callback);
             CBLDatabase_BufferNotifications(ref(), [](void *context, CBLDatabase *db) {
-                (*(NotificationsReadyCallback*)context)(Database(db));
-            }, callbackPtr);
+                ((NotificationsReadyCallbackAccess*)context)->call(Database(db));
+            }, _notificationReadyCallbackAccess.get());
         }
 
         /** Immediately issues all pending notifications for this database, by calling their listener callbacks. */
@@ -447,6 +450,27 @@ namespace cbl {
         }
 
     private:
+        
+        class NotificationsReadyCallbackAccess {
+        public:
+            void setCallback(NotificationsReadyCallback callback) {
+                std::lock_guard<std::mutex> lock(_mutex);
+                _callback = callback;
+            }
+            
+            void call(Database db) {
+                NotificationsReadyCallback callback;
+                {
+                    std::lock_guard<std::mutex> lock(_mutex);
+                    callback = _callback;
+                }
+                callback(db);
+            }
+        private:
+            std::mutex _mutex;
+            NotificationsReadyCallback _callback;
+        };
+        
         static void _callListener(void* _cbl_nullable context,
                                   const CBLDatabase *db,
                                   unsigned nDocs, FLString *docIDs)
@@ -459,8 +483,38 @@ namespace cbl {
                                      const CBLDatabase *db, FLString docID) {
             DocumentChangeListener::call(context, Database((CBLDatabase*)db), docID);
         }
-
-        CBL_REFCOUNTED_BOILERPLATE(Database, RefCounted, CBLDatabase)
+        
+        std::shared_ptr<NotificationsReadyCallbackAccess> _notificationReadyCallbackAccess;
+        
+        CBL_REFCOUNTED_WITHOUT_COPY_MOVE_BOILERPLATE(Database, RefCounted, CBLDatabase)
+        
+    public:
+        Database(const Database &other) noexcept
+        :RefCounted(other)
+        ,_notificationReadyCallbackAccess(other._notificationReadyCallbackAccess)
+        { }
+        
+        Database(Database &&other) noexcept
+        :RefCounted((RefCounted&&)other)
+        ,_notificationReadyCallbackAccess(std::move(other._notificationReadyCallbackAccess))
+        { }
+        
+        Database& operator=(const Database &other) noexcept {
+            RefCounted::operator=(other);
+            _notificationReadyCallbackAccess = other._notificationReadyCallbackAccess;
+            return *this;
+        }
+        
+        Database& operator=(Database &&other) noexcept {
+            RefCounted::operator=((RefCounted&&)other);
+            _notificationReadyCallbackAccess = std::move(other._notificationReadyCallbackAccess);
+            return *this;
+        }
+        
+        void clear() {
+            RefCounted::clear();
+            _notificationReadyCallbackAccess.reset();
+        }
     };
 
 
