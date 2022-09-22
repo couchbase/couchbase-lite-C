@@ -442,33 +442,24 @@ namespace cbl {
         void sendNotifications() {
             CBLDatabase_SendNotifications(ref());
         }
+        
+        // Destructors:
+        
+        ~Database() {
+            clear();
+        }
 
     private:
         void open(slice& name, const CBLDatabaseConfiguration* _cbl_nullable config) {
-            CBLError error;
-            CBLDatabase* db = CBLDatabase_Open(name, config, &error);
-            check(db != nullptr, error);
+            CBLError error {};
+            _ref = (CBLRefCounted*)CBLDatabase_Open(name, config, &error);
+            check(_ref != nullptr, error);
             
-            _ref = (CBLRefCounted*)db;
-            
-            _notificationReadyCallbackAccess = std::shared_ptr<NotificationsReadyCallbackAccess>
-            (new NotificationsReadyCallbackAccess(), [db](NotificationsReadyCallbackAccess* ref) {
-                if (ref->callback()) {
-                    // Set the callback to NULL so that the deleted callback access will
-                    // not get used if new ready notification is still coming (edge case):
-                    CBLDatabase_BufferNotifications(db, nullptr, nullptr);
-                    delete ref;
-                }
-            });
+            _notificationReadyCallbackAccess = std::make_shared<NotificationsReadyCallbackAccess>();
         }
         
         class NotificationsReadyCallbackAccess {
         public:
-            NotificationsReadyCallback callback() {
-                std::lock_guard<std::mutex> lock(_mutex);
-                return _callback;
-            }
-            
             void setCallback(NotificationsReadyCallback callback) {
                 std::lock_guard<std::mutex> lock(_mutex);
                 _callback = callback;
@@ -480,7 +471,8 @@ namespace cbl {
                     std::lock_guard<std::mutex> lock(_mutex);
                     callback = _callback;
                 }
-                callback(db);
+                if (callback)
+                    callback(db);
             }
         private:
             std::mutex _mutex;
@@ -528,8 +520,10 @@ namespace cbl {
         }
         
         void clear() {
-            _notificationReadyCallbackAccess.reset();
+            // Reset _notificationReadyCallbackAccess the releasing the _ref to
+            // ensure that CBLDatabase is deleted before _notificationReadyCallbackAccess.
             RefCounted::clear();
+            _notificationReadyCallbackAccess.reset();
         }
     };
 
