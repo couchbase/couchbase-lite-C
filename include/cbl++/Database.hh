@@ -107,10 +107,7 @@ namespace cbl {
             independent of the others (and must be separately closed and released.)
             @param name  The database name (without the ".cblite2" extension.) */
         Database(slice name) {
-            CBLError error;
-            _ref = (CBLRefCounted*) CBLDatabase_Open(name, nullptr, &error);
-            check(_ref != nullptr, error);
-            _notificationReadyCallbackAccess = std::make_shared<NotificationsReadyCallbackAccess>();
+            open(name, nullptr);
         }
 
         /** Opens a database, or creates it if it doesn't exist yet, returning a new \ref Database instance.
@@ -121,10 +118,7 @@ namespace cbl {
         Database(slice name,
                  const CBLDatabaseConfiguration& config)
         {
-            CBLError error;
-            _ref = (CBLRefCounted*) CBLDatabase_Open(name, &config, &error);
-            check(_ref != nullptr, error);
-            _notificationReadyCallbackAccess = std::make_shared<NotificationsReadyCallbackAccess>();
+            open(name, &config);
         }
 
         /** Closes an open database. */
@@ -450,9 +444,31 @@ namespace cbl {
         }
 
     private:
+        void open(slice& name, const CBLDatabaseConfiguration* _cbl_nullable config) {
+            CBLError error;
+            CBLDatabase* db = CBLDatabase_Open(name, config, &error);
+            check(db != nullptr, error);
+            
+            _ref = (CBLRefCounted*)db;
+            
+            _notificationReadyCallbackAccess = std::shared_ptr<NotificationsReadyCallbackAccess>
+            (new NotificationsReadyCallbackAccess(), [db](NotificationsReadyCallbackAccess* ref) {
+                if (ref->callback()) {
+                    // Set the callback to NULL so that the deleted callback access will
+                    // not get used if new ready notification is still coming (edge case):
+                    CBLDatabase_BufferNotifications(db, nullptr, nullptr);
+                    delete ref;
+                }
+            });
+        }
         
         class NotificationsReadyCallbackAccess {
         public:
+            NotificationsReadyCallback callback() {
+                std::lock_guard<std::mutex> lock(_mutex);
+                return _callback;
+            }
+            
             void setCallback(NotificationsReadyCallback callback) {
                 std::lock_guard<std::mutex> lock(_mutex);
                 _callback = callback;
@@ -468,7 +484,7 @@ namespace cbl {
             }
         private:
             std::mutex _mutex;
-            NotificationsReadyCallback _callback;
+            NotificationsReadyCallback _callback {nullptr};
         };
         
         static void _callListener(void* _cbl_nullable context,
@@ -512,8 +528,8 @@ namespace cbl {
         }
         
         void clear() {
-            RefCounted::clear();
             _notificationReadyCallbackAccess.reset();
+            RefCounted::clear();
         }
     };
 

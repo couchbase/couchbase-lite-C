@@ -177,7 +177,7 @@ public:
         _notificationQueue.notifyAll();
     }
 
-    void bufferNotifications(CBLNotificationsReadyCallback callback, void *context) {
+    void bufferNotifications(CBLNotificationsReadyCallback _cbl_nullable callback, void* _cbl_nullable context) {
         _notificationQueue.setCallback(callback, context);
     }
 

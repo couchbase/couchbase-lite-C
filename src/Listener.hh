@@ -193,7 +193,7 @@ namespace cbl_internal {
         NotificationQueue(CBLDatabase*);
 
         /** Sets or clears the client callback. */
-        void setCallback(CBLNotificationsReadyCallback callback, void* _cbl_nullable context);
+        void setCallback(CBLNotificationsReadyCallback _cbl_nullable callback, void* _cbl_nullable context);
 
         /** If there is a callback, this adds a notification to the queue, and if the queue was
             empty, invokes the callback to tell the client.
