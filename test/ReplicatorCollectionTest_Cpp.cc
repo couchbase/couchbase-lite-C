@@ -46,7 +46,7 @@ public:
     
     ReplicatorCollectionTest_Cpp()
     :db2(openEmptyDatabaseNamed("otherDB"))
-    ,config({vector<ReplicationCollection>(), Endpoint()})
+    ,config({vector<ReplicationCollection>(), Endpoint::databaseEndpoint(db2)})
     {
         cx.push_back(db.createCollection("colA"_sl, "scopeA"_sl));
         cx.push_back(db.createCollection("colB"_sl, "scopeA"_sl));
@@ -72,8 +72,7 @@ public:
     }
     
     void createConfig(vector<ReplicationCollection>collections) {
-        Endpoint endpoint;
-        endpoint.setLocalDB(db2);
+        Endpoint endpoint = Endpoint::databaseEndpoint(db2);
         config = ReplicatorConfiguration(collections, endpoint);
     }
     
@@ -212,9 +211,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Create Replicator with zero 
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Create Replicator with legacy database", "[Replicator]") {
-    Endpoint endpoint;
-    endpoint.setLocalDB(db2);
-    
+    Endpoint endpoint = Endpoint::databaseEndpoint(db2);
     auto c = ReplicatorConfiguration(db, endpoint);
     
     auto docIDs = MutableArray::newArray();

@@ -34,56 +34,73 @@ namespace cbl {
     /** The replication endpoint representing the location of a database to replicate with. */
     class Endpoint {
     public:        
-        /** Configures the endpoint with a given URL.
+        /** Creates a URL endpoint with a given URL.
             The URL's scheme must be `ws` or `wss`, it must of course have a valid hostname,
             and its path must be the name of the database on that server.
          
             The port can be omitted; it defaults to 80 for `ws` and 443 for `wss`.
             For example: `wss://example.org/dbname`.
             @param url  The url. */
-        void setURL(slice url) {
-            CBLError error;
-            _ref = std::shared_ptr<CBLEndpoint>(CBLEndpoint_CreateWithURL(url, &error), [](auto ref) {
-                CBLEndpoint_Free(ref);
-            });
-            if (!_ref)
+        static Endpoint urlEndpoint(slice url) {
+            CBLError error {};
+            auto endpoint = CBLEndpoint_CreateWithURL(url, &error);
+            if (!endpoint)
                 throw error;
+            return Endpoint(endpoint);
         }
         
 #ifdef COUCHBASE_ENTERPRISE
-        /** Configures the endpoint with another local database. (Enterprise Edition only.) */
-        void setLocalDB(Database db) {
-            _ref = std::shared_ptr<CBLEndpoint>(CBLEndpoint_CreateWithLocalDB(db.ref()), [](auto ref) {
-                CBLEndpoint_Free(ref);
-            });
+        /** Creates a database endpoint with another local database. (Enterprise Edition only.) */
+        static Endpoint databaseEndpoint(Database db) {
+            return Endpoint(CBLEndpoint_CreateWithLocalDB(db.ref()));
         }
 #endif
+        
+    protected:
+        friend class ReplicatorConfiguration;
+        
         CBLEndpoint* _cbl_nullable ref() const {return _ref.get();}
+
     private:
+        Endpoint() = default;
+        
+        Endpoint(CBLEndpoint* ref) {
+            _ref = std::shared_ptr<CBLEndpoint>(ref, [](auto r) {
+                CBLEndpoint_Free(r);
+            });
+        }
+        
         std::shared_ptr<CBLEndpoint> _ref;
     };
 
     /** Authentication credentials for a remote server. */
     class Authenticator {
     public:
-        /** Configures the authenticator using the HTTP Basic (username/password) credentials. */
-        void setBasic(slice username, slice password) {
-            _ref = std::shared_ptr<CBLAuthenticator>(CBLAuth_CreatePassword(username, password),
-                                                    [](auto ref) {
-                CBLAuth_Free(ref);
-            });
+        /** Creates a basic authenticator authenticator using username/password credentials. */
+        static Authenticator basicAuthenticator(slice username, slice password) {
+            return Authenticator(CBLAuth_CreatePassword(username, password));
         }
 
-        /** Configures the authenticator using a Couchbase Sync Gateway login session identifier,
+        /** Creates a sesssion authenticator using a Couchbase Sync Gateway login session identifier,
             and optionally a cookie name (pass NULL for the default.) */
-        void setSession(slice sessionId, slice cookieName) {
-            _ref = std::shared_ptr<CBLAuthenticator>(CBLAuth_CreateSession(sessionId, cookieName),
-                                                     [](auto ref) {
-                CBLAuth_Free(ref);
+        static Authenticator sessionAuthenticator(slice sessionId, slice cookieName) {
+            return Authenticator(CBLAuth_CreateSession(sessionId, cookieName));
+        }
+        
+    protected:
+        friend class ReplicatorConfiguration;
+        
+        CBLAuthenticator* _cbl_nullable ref() const {return _ref.get();}
+        
+    private:
+        Authenticator() = default;
+        
+        Authenticator(CBLAuthenticator* ref) {
+            _ref = std::shared_ptr<CBLAuthenticator>(ref, [](auto r) {
+                CBLAuth_Free(r);
             });
         }
-        CBLAuthenticator* _cbl_nullable ref() const {return _ref.get();}
-    private:
+        
         std::shared_ptr<CBLAuthenticator> _ref;
     };
 
@@ -237,6 +254,7 @@ namespace cbl {
         operator CBLReplicatorConfiguration() const {
             CBLReplicatorConfiguration conf = {};
             conf.endpoint = _endpoint.ref();
+            assert(conf.endpoint);
             conf.replicatorType = replicatorType;
             conf.continuous = continuous;
             conf.disableAutoPurge = !enableAutoPurge;
