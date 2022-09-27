@@ -782,7 +782,6 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Key ID and Algorithm", "[Rep
 }
 
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt with collections", "[Replicator][Encryptable]") {
-    CBLLog_SetConsoleLevel(kCBLLogVerbose);
     auto c1x = CreateCollection(db.ref(), "colA", "scopeA");
     auto c2x = CreateCollection(db.ref(), "colB", "scopeA");
     
