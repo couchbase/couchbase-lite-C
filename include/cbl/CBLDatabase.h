@@ -312,7 +312,7 @@ typedef void (*CBLNotificationsReadyCallback)(void* _cbl_nullable context,
     @param callback  The function to be called when a notification is available.
     @param context  An arbitrary value that will be passed to the callback. */
 void CBLDatabase_BufferNotifications(CBLDatabase *db,
-                                     CBLNotificationsReadyCallback callback,
+                                     CBLNotificationsReadyCallback _cbl_nullable callback,
                                      void* _cbl_nullable context) CBLAPI;
 
 /** Immediately issues all pending notifications for this database, by calling their listener
