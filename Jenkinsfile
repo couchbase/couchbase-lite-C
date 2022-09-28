@@ -15,13 +15,15 @@ pipeline {
                        powershell 'jenkins\\jenkins_win.ps1'
                    }
                 }
-                stage("macOS") {
+                stage("Apple") {
                     agent { label 'mobile-mac-mini'  }
                     environment {
                         BRANCH = "${BRANCH_NAME}"
+                        GH_PAT = credentials("cbl-bot-github-pat")
                     }
                     steps {
-                        sh 'jenkins/jenkins_unix.sh'
+                        sh 'jenkins/jenkins_ios.sh'
+                        sh 'scripts/coverage_macos.sh --push'
                     }
                 }
                 stage("Linux") {
