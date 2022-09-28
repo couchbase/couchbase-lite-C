@@ -230,7 +230,7 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Value Index", "[Query]") {
                                     &errPos, &error);
     
     alloc_slice explanation1(CBLQuery_Explain(query));
-    CHECK(explanation1.find("SCAN TABLE kv_default AS _ USING INDEX index1"_sl));
+    CHECK(explanation1.find("USING INDEX index1"_sl));
     CBLQuery_Release(query);
     
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
@@ -238,7 +238,7 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Value Index", "[Query]") {
                                     &errPos, &error);
     
     alloc_slice explanation2(CBLQuery_Explain(query));
-    CHECK(explanation2.find("SCAN TABLE kv_default AS _ USING INDEX index2"_sl));
+    CHECK(explanation2.find("USING INDEX index2"_sl));
     CBLQuery_Release(query);
     query = nullptr;
     
@@ -277,7 +277,8 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
                                     &errPos, &error);
     
     alloc_slice explanation1(CBLQuery_Explain(query));
-    CHECK(explanation1.find("SCAN TABLE kv_default::index1 AS fts1"_sl));
+    CHECK(explanation1.find("JOIN \"kv_default::index1\" AS fts1"));
+    CHECK(explanation1.find("SCAN fts1 VIRTUAL TABLE INDEX"_sl));
     CBLQuery_Release(query);
     
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
@@ -285,7 +286,8 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
                                     &errPos, &error);
     
     alloc_slice explanation2(CBLQuery_Explain(query));
-    CHECK(explanation2.find("SCAN TABLE kv_default::index2 AS fts1"_sl));
+    CHECK(explanation2.find("JOIN \"kv_default::index2\" AS fts1"));
+    CHECK(explanation2.find("SCAN fts1 VIRTUAL TABLE INDEX"_sl));
     CBLQuery_Release(query);
     query = nullptr;
     

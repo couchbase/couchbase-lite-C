@@ -219,7 +219,7 @@ public:
         CBLEndpoint_Free(config.endpoint);
         
         // For async clean up in Replicator:
-        this_thread::sleep_for(200ms);
+        this_thread::sleep_for(500ms);
     }
 
     static vector<string> asVector(const set<string> strings) {
