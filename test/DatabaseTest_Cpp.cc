@@ -20,6 +20,7 @@
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
 #include <string>
+#include <thread>
 
 #include "cbl++/CouchbaseLite.hh"
 
@@ -32,6 +33,32 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database") {
     CHECK(db.name() == string(kDatabaseName));
     CHECK(db.path() == string(kDatabaseDir) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
     CHECK(db.count() == 0);
+}
+
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database Exist") {
+    CHECK(!Database::exists(kDatabaseName, nullptr));
+    CHECK(Database::exists(kDatabaseName, kDatabaseDir));
+}
+
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Copy Database") {
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+    
+    const slice copiedDBName = "CBLtest_Copied";
+    Database::deleteDatabase(copiedDBName, kDatabaseDir);
+    REQUIRE(!Database::exists(copiedDBName, kDatabaseDir));
+    
+    Database::copyDatabase(db.path(), copiedDBName, CBLTest::kDatabaseConfiguration);
+    
+    CHECK(Database::exists(copiedDBName, kDatabaseDir));
+    auto copiedDB = cbl::Database(copiedDBName, CBLTest::kDatabaseConfiguration);
+    CHECK(copiedDB.count() == 1);
+    
+    doc = copiedDB.getMutableDocument("foo");
+    CHECK(doc["greeting"].asString() == "Howdy!");
+    
+    copiedDB.deleteDatabase();
 }
 
 TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Missing Document") {
@@ -87,6 +114,50 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Delete Unsaved Doc") {
     CHECK(error.code == kCBLErrorNotFound);
 }
 
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Purge Doc") {
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+    
+    doc = db.getMutableDocument("foo");
+    REQUIRE(doc);
+    
+    SECTION("Purge with Doc") {
+        db.purgeDocument(doc);
+    }
+    
+    SECTION("Purge with ID") {
+        db.purgeDocument("foo");
+    }
+    
+    doc = db.getMutableDocument("foo");
+    CHECK(!doc);
+}
+
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Document Expiration") {
+    MutableDocument doc1("doc1");
+    db.saveDocument(doc1);
+    
+    MutableDocument doc2("doc2");
+    db.saveDocument(doc2);
+    
+    MutableDocument doc3("doc3");
+    db.saveDocument(doc3);
+    
+    CBLTimestamp future = CBL_Now() + 1000;
+    db.setDocumentExpiration("doc1", future);
+    db.setDocumentExpiration("doc3", future);
+    
+    CHECK(db.count() == 3);
+    CHECK(db.getDocumentExpiration("doc1") == future);
+    CHECK(db.getDocumentExpiration("doc3") == future);
+    CHECK(db.getDocumentExpiration("doc2") == 0);
+    CHECK(db.getDocumentExpiration("docx") == 0);
+
+    this_thread::sleep_for(2000ms);
+    CHECK(db.count() == 1);
+}
+
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction") {
     {
         Transaction t(db);
@@ -106,7 +177,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction") {
     CHECK(checkDoc.properties().get("meeting").asInt() == 23);
 }
 
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction, Aborted") {
+TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction, Abort") {
     {
         Transaction t(db);
 
@@ -115,7 +186,12 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction, Aborted") {
         db.saveDocument(doc);
         doc["meeting"] = 23;
         db.saveDocument(doc);
-        // no explicit commit means abort
+        
+        SECTION("No commit abort") { }
+        
+        SECTION("Explicit abort") {
+            t.abort();
+        }
     }
 
     Document checkDoc = db.getDocument("foo");
@@ -266,7 +342,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - C++ Save Conflict") {
     CHECK(shadowDoc["n"].asInt() == 19);
 }
 
-TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - Get index names") {
+TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - Create and Delete Index") {
     RetainedArray names = db.getIndexNames();
     REQUIRE(names);
     REQUIRE(names.count() == 0);
@@ -277,11 +353,23 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Legacy - Get index names") {
     CBLValueIndexConfiguration index2 = {kCBLN1QLLanguage, "firstname, lastname"_sl};
     db.createValueIndex("index2", index2);
     
+    CBLFullTextIndexConfiguration index3 = {kCBLN1QLLanguage, "product.description"_sl, true};
+    db.createFullTextIndex("index3", index3);
+    
     names = db.getIndexNames();
     REQUIRE(names);
-    REQUIRE(names.count() == 2);
+    REQUIRE(names.count() == 3);
     CHECK(names[0].asString() == "index1");
     CHECK(names[1].asString() == "index2");
+    CHECK(names[2].asString() == "index3");
+    
+    db.deleteIndex("index1");
+    db.deleteIndex("index3");
+    
+    names = db.getIndexNames();
+    REQUIRE(names);
+    REQUIRE(names.count() == 1);
+    CHECK(names[0].asString() == "index2");
 }
 
 TEST_CASE_METHOD(CBLTest_Cpp, "Add new key") {
