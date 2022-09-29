@@ -950,6 +950,21 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Document Pending", "[Repl
     expectedDocumentCount = 5;
     replicate();
     
+    // Check Pending Docs:
+    pending1 = CBLReplicator_PendingDocumentIDs2(repl, cx[0], &error);
+    REQUIRE(pending1);
+    CHECK(FLDict_Count(pending1) == 0);
+    FLDict_Release(pending1);
+    
+    CHECK(!CBLReplicator_IsDocumentPending2(repl, "foo2"_sl, cx[0], &error));
+    
+    pending2 = CBLReplicator_PendingDocumentIDs2(repl, cx[1], &error);
+    REQUIRE(pending2);
+    CHECK(FLDict_Count(pending2) == 0);
+    FLDict_Release(pending2);
+    
+    CHECK(!CBLReplicator_IsDocumentPending2(repl, "bar1"_sl, cx[1], &error));
+    
     // Upadate Docs:
     auto foo2 = CBLCollection_GetMutableDocument(cx[0], "foo2"_sl, &error);
     REQUIRE(foo2);
