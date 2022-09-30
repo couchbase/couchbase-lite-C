@@ -429,7 +429,6 @@ namespace cbl {
             CBLError error;
             fleece::Dict result = CBLReplicator_PendingDocumentIDs(ref(), &error);
             check(result != nullptr, error);
-            FLDict_Release(result);  // remove the extra ref the C function returned with
             return result;
         }
 
@@ -461,7 +460,6 @@ namespace cbl {
             CBLError error;
             fleece::Dict result = CBLReplicator_PendingDocumentIDs2(ref(), collection.ref(), &error);
             check(result != nullptr, error);
-            FLDict_Release(result);  // remove the extra ref the C function returned with
             return result;
         }
         

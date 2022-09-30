@@ -95,8 +95,10 @@ FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator* repl,
                                                        CBLError* _cbl_nullable outError) noexcept {
     try {
         auto result = FLDict_Retain(repl->pendingDocumentIDs(collection));
-        if (!result)
+        if (!result) {
+            result = FLMutableDict_New();
             if (outError) outError->code = 0;
+        }
         return result;
     } catchAndBridge(outError)
 }

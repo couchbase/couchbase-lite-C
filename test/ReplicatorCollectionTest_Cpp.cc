@@ -233,6 +233,36 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Create Replicator with legac
     CHECK(r);
 }
 
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ URL Endpoint", "[Replicator]") {
+    Endpoint endpoint = Endpoint::urlEndpoint("wss://localhost:4985/db");
+    auto config = ReplicatorConfiguration({ ReplicationCollection(cx[0]) }, endpoint);
+    
+    Replicator repl = Replicator(config);
+    CBLReplicator* cRepl = repl.ref();
+    REQUIRE(cRepl);
+    CHECK(CBLReplicator_Config(cRepl)->endpoint);
+}
+
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Authenticator", "[Replicator]") {
+    Endpoint endpoint = Endpoint::databaseEndpoint(db2);
+    auto config = ReplicatorConfiguration({ ReplicationCollection(cx[0]) }, endpoint);
+    
+    SECTION("Basic") {
+        Authenticator auth = Authenticator::basicAuthenticator("user1", "pa55w0rd");
+        config.authenticator = auth;
+    }
+    
+    SECTION("Session") {
+        Authenticator auth = Authenticator::sessionAuthenticator("s3ss10n", "sessionID");
+        config.authenticator = auth;
+    }
+    
+    Replicator repl = Replicator(config);
+    CBLReplicator* cRepl = repl.ref();
+    REQUIRE(cRepl);
+    CHECK(CBLReplicator_Config(cRepl)->authenticator);
+}
+
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Single Shot Replication", "[Replicator]") {
     createDocs(cx[0], 10);
     createDocs(cx[1], 10);
@@ -443,7 +473,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection DocIDs Push Filte
     REQUIRE(!bar3);
 }
 
-TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Conflict Resolver with Collections", "[Replicator][Current]") {
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Conflict Resolver with Collections", "[Replicator]") {
     createDoc(cx[0], "foo1");
     createDoc(cx[1], "bar1");
     
@@ -507,6 +537,79 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Conflict Resolver with Colle
     auto bar1 = cx[1].getDocument("bar1");
     REQUIRE(bar1);
     CHECK(bar1.properties().toJSONString() == "{\"greeting\":\"bonjour\"}");
+}
+
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents", "[Replicator]") {
+    createConfigWithCollections({db.getDefaultCollection()});
+    config.replicatorType = kCBLReplicatorTypePush;
+    replicate();
+    
+    Dict ids = repl.pendingDocumentIDs();
+    CHECK(ids.count() == 0);
+    
+    MutableDocument doc1("foo1");
+    doc1["greeting"] = "Howdy!";
+    db.saveDocument(doc1);
+    
+    MutableDocument doc2("foo2");
+    doc2["greeting"] = "Hello!";
+    db.saveDocument(doc2);
+    
+    ids = repl.pendingDocumentIDs();
+    CHECK(ids.count() == 2);
+    CHECK(ids["foo1"]);
+    CHECK(ids["foo2"]);
+    
+    CHECK(repl.isDocumentPending("foo1"));
+    CHECK(repl.isDocumentPending("foo2"));
+    
+    replicate();
+    
+    CHECK(db2.getDocument("foo1"));
+    CHECK(db2.getDocument("foo2"));
+    
+    ids = repl.pendingDocumentIDs();
+    CHECK(ids.count() == 0);
+    
+    CHECK(!repl.isDocumentPending("foo1"));
+    CHECK(!repl.isDocumentPending("foo2"));
+}
+
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents with Collection", "[Replicator]") {
+    Collection col = cx[0];
+    createConfigWithCollections({col});
+    config.replicatorType = kCBLReplicatorTypePush;
+    replicate();
+    
+    Dict ids = repl.pendingDocumentIDs(cx[0]);
+    CHECK(ids.count() == 0);
+    
+    MutableDocument doc1("foo1");
+    doc1["greeting"] = "Howdy!";
+    col.saveDocument(doc1);
+    
+    MutableDocument doc2("foo2");
+    doc2["greeting"] = "Hello!";
+    col.saveDocument(doc2);
+    
+    ids = repl.pendingDocumentIDs(col);
+    CHECK(ids.count() == 2);
+    CHECK(ids["foo1"]);
+    CHECK(ids["foo2"]);
+    
+    CHECK(repl.isDocumentPending("foo1", col));
+    CHECK(repl.isDocumentPending("foo2", col));
+    
+    replicate();
+    
+    CHECK(col.getDocument("foo1"));
+    CHECK(col.getDocument("foo2"));
+    
+    ids = repl.pendingDocumentIDs(col);
+    CHECK(ids.count() == 0);
+    
+    CHECK(!repl.isDocumentPending("foo1", col));
+    CHECK(!repl.isDocumentPending("foo2", col));
 }
 
 #endif
