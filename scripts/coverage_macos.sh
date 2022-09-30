@@ -76,8 +76,6 @@ pushd test > /dev/null
 ./CBL_C_Tests -r list
 popd > /dev/null
 
-xcrun llvm-profdata merge -sparse test/default.profraw -o test/default.profdata
-
 mkdir -p report
 
 ARCH="x86_64"
@@ -86,14 +84,25 @@ if [[ "$FILE_INFO" == *"arm64"* ]]; then
   ARCH="arm64"
 fi
 
-xcrun llvm-cov show -instr-profile=test/default.profdata -show-line-counts-or-regions -arch $ARCH \
- -output-dir=report -format="html" \
- -ignore-filename-regex="/vendor/*" \
- libcblite.dylib
+xcrun llvm-profdata merge -sparse test/default.profraw -o test/default.profdata
 
-xcrun llvm-cov export -instr-profile=test/default.profdata -arch $ARCH \
-  -ignore-filename-regex="/vendor/*" \
-  libcblite.dylib > report/coverage.json
+xcrun llvm-cov show \
+  -format="html" \
+  -instr-profile=test/default.profdata \
+  -show-line-counts-or-regions \
+  -ignore-filename-regex="/vendor/.*" \
+  -ignore-filename-regex="/test/.*" \
+  -arch $ARCH -object libcblite.dylib \
+  -arch $ARCH -object test/CBL_C_Tests \
+  -output-dir=report
+
+xcrun llvm-cov export \
+  -instr-profile=test/default.profdata \
+  -ignore-filename-regex="/vendor/.*" \
+  -ignore-filename-regex="/test/.*" \
+  -arch $ARCH -object libcblite.dylib \
+  -arch $ARCH -object test/CBL_C_Tests \
+  > report/coverage.json
 
 if [[ -n "$SHOW" ]]; then
   open report/index.html

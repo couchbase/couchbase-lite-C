@@ -31,9 +31,11 @@ set(TEST_SRC
     CBLTest.c
     CBLTest.cc
     CBLTestsMain.cpp
+    CollectionTest.cc
     CollectionTest_Cpp.cc
     DatabaseTest.cc
     DatabaseTest_Cpp.cc
+    DocumentTest.cc
     DocumentTest_Cpp.cc
     LogTest.cc
     QueryTest.cc
