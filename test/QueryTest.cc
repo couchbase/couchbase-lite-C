@@ -912,6 +912,7 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ API", "[Query]") {
         Query::ChangeListener listenerToken = query.addChangeListener([&](Query::Change change) {
             ResultSet rs = change.results();
             resultCount = countResults(rs);
+            CHECK(change.query() == query);
         });
 
         cerr << "Waiting for listener...\n";
@@ -937,4 +938,27 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ API", "[Query]") {
     // CBLTest_Cpp's destructor:
     cerr << "Sleeping to ensure async cleanup ..." << endl;
     this_thread::sleep_for(500ms);
+}
+
+TEST_CASE_METHOD(QueryTest_Cpp, "C++ Query Parameters", "[Query]") {
+    Query query = Query(db, kCBLN1QLLanguage, "SELECT count(*) AS n FROM _ WHERE contact.address.zip BETWEEN $zip0 AND $zip1");
+    CHECK(!query.parameters());
+    
+    auto params = MutableDict::newDict();
+    params["zip0"] = "30000";
+    params["zip1"] = "39999";
+    query.setParameters(params);
+    
+    auto readParams = query.parameters();
+    CHECK(readParams["zip0"].asString() == "30000");
+    CHECK(readParams["zip1"].asString() == "39999");
+    
+    auto results = query.execute();
+    int n = 0;
+    for (auto &result : results) {
+        CHECK(result.count() == 1);
+        CHECK(result[0].asInt() == 7);
+        ++n;
+    }
+    CHECK(n == 1);
 }
