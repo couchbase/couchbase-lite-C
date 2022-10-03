@@ -226,7 +226,19 @@ TEST_CASE_METHOD(DatabaseTest, "Database Encryption") {
     // Correct key:
     CBLError error;
     CBLEncryptionKey key;
-    CBLEncryptionKey_FromPassword(&key, "sekrit"_sl);
+    
+    bool useSHA256Key = true;
+    SECTION("SHA-265 Key")
+    {
+        CBLEncryptionKey_FromPassword(&key, "sekrit"_sl);
+    }
+    
+    SECTION("SHA-1 Key")
+    {
+        useSHA256Key = false;
+        CBLEncryptionKey_FromPasswordOld(&key, "sekrit"_sl);
+    }
+    
     CBLDatabaseConfiguration config = {nullslice, key};
     CBLDatabase *defaultdb = CBLDatabase_Open("encdb"_sl, &config, &error);
     REQUIRE(defaultdb);
@@ -256,7 +268,13 @@ TEST_CASE_METHOD(DatabaseTest, "Database Encryption") {
     {
         ExpectingExceptions x;
         CBLEncryptionKey key2;
-        CBLEncryptionKey_FromPassword(&key2, "wrongpassword"_sl);
+        
+        if (useSHA256Key) {
+            CBLEncryptionKey_FromPassword(&key2, "wrongpassword"_sl);
+        } else {
+            CBLEncryptionKey_FromPasswordOld(&key2, "wrongpassword"_sl);
+        }
+        
         CBLDatabaseConfiguration config2 = {nullslice, key2};
         CBLDatabase *wrongkeydb = CBLDatabase_Open("encdb"_sl, &config2, &error);
         REQUIRE(wrongkeydb == nullptr);

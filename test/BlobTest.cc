@@ -163,3 +163,35 @@ TEST_CASE_METHOD(BlobTest, "Create JSON from Blob", "[Blob]") {
     CHECK(alloc_slice(CBLBlob_CreateJSON(gotBlob)) == "{\"content_type\":\"text/plain\",\"digest\":\"sha1-dXNgUcxC3n7lxfrYkbLUG4gOKRw=\",\"length\":34,\"@type\":\"blob\"}"_sl);
     CBLDocument_Release(doc);
 }
+
+
+TEST_CASE_METHOD(BlobTest, "Check Is Blob", "[Blob]") {
+    CBLError error {};
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+    REQUIRE(doc);
+    
+    slice json = "{\"dict\":{\"first\":\"Jane\"},"
+                  "\"string\":\"hello\","
+                  "\"blob1\":{\"@type\":\"blob\",\"digest\":\"sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=\",\"length\":32}}"_sl;
+    REQUIRE(CBLDocument_SetJSON(doc, json, &error));
+    
+    FLDict props = CBLDocument_Properties(doc);
+    
+    FLValue dict = FLDict_Get(props, "dict"_sl);
+    REQUIRE(dict);
+    CHECK(!FLValue_IsBlob(dict));
+    
+    FLValue string = FLDict_Get(props, "string"_sl);
+    REQUIRE(string);
+    CHECK(!FLValue_IsBlob(string));
+    
+    FLValue blob = FLDict_Get(props, "dict"_sl);
+    REQUIRE(blob);
+    CHECK(!FLValue_IsBlob(blob));
+    
+    FLValue noValue = FLDict_Get(props, "foo"_sl);
+    REQUIRE(!noValue);
+    CHECK(!FLValue_IsBlob(noValue));
+    
+    CBLDocument_Release(doc);
+}

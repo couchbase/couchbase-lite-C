@@ -1065,6 +1065,62 @@ TEST_CASE_METHOD(DocumentTest, "Save blob and set blob properties in document", 
     CBLDocument_Release(doc);
 }
 
+TEST_CASE_METHOD(DocumentTest, "Set blob in array", "[Document][Blob][Current]") {
+    // Create and Save blob:
+    CBLError error;
+    FLSlice blobContent1 = FLStr("I'm Blob 1.");
+    CBLBlob* blob1 = CBLBlob_CreateWithData("text/plain"_sl, blobContent1);
+    
+    FLSlice blobContent2 = FLStr("I'm Blob 2.");
+    CBLBlob* blob2 = CBLBlob_CreateWithData("text/plain"_sl, blobContent2);
+    
+    FLMutableArray blobs = FLMutableArray_New();
+    
+    SECTION("Use Append Blob")
+    {
+        FLMutableArray_AppendBlob(blobs, blob1);
+        FLMutableArray_AppendBlob(blobs, blob2);
+    }
+    
+    SECTION("Use Set Blob")
+    {
+        FLMutableArray_Resize(blobs, 2);
+        FLMutableArray_SetBlob(blobs, 0, blob1);
+        FLMutableArray_SetBlob(blobs, 1, blob2);
+    }
+    
+    // Set blobs in document
+    CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
+    FLMutableDict docProps = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetArray(docProps, "blobs"_sl, blobs);
+    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    CBLDocument_Release(doc);
+    
+    CBLBlob_Release(blob1);
+    CBLBlob_Release(blob2);
+    FLArray_Release(blobs);
+    
+    // Get blobs from the saved doc and check:
+    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    docProps = CBLDocument_MutableProperties(doc);
+    FLArray blobArray = FLValue_AsArray(FLDict_Get(docProps, "blobs"_sl));
+    REQUIRE(blobArray);
+    
+    auto blob1a = FLValue_GetBlob(FLArray_Get(blobArray, 0));
+    REQUIRE(blob1a);
+    FLSliceResult content = CBLBlob_Content(blob1a, &error);
+    CHECK((slice)content == blobContent1);
+    FLSliceResult_Release(content);
+    
+    auto blob2a = FLValue_GetBlob(FLArray_Get(blobArray, 1));
+    REQUIRE(blob2a);
+    content = CBLBlob_Content(blob2a, &error);
+    CHECK((slice)content == blobContent2);
+    FLSliceResult_Release(content);
+    
+    CBLDocument_Release(doc);
+}
+
 #pragma mark - Listeners:
 
 TEST_CASE_METHOD(DocumentTest, "Collection Change Notifications", "[Document]") {
