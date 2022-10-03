@@ -159,7 +159,6 @@ protected:
     
     friend struct CBLDatabase;
     friend struct CBLDocument;
-    friend class cbl_internal::AllConflictsResolver;
     friend struct cbl_internal::ListenerToken<CBLCollectionDocumentChangeListener>;
     
     auto useLocked()                        { return _c4col.useLocked(); }

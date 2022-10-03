@@ -57,26 +57,6 @@ namespace cbl_internal {
         CompletionHandler       _completionHandler;
         CBLError                _error {};
     };
-
-
-
-    /** Scans the database for all unresolved conflicts and resolves them. */
-    class AllConflictsResolver {
-    public:
-        explicit AllConflictsResolver(CBLCollection*,
-                                      CBLConflictResolver,
-                                      void* _cbl_nullable context);
-        void runNow();
-
-    private:
-        bool next();
-        
-        Retained<CBLCollection>             _collection;
-        CBLConflictResolver                 _clientResolver;
-        void* _cbl_nullable                 _clientResolverContext;
-        std::unique_ptr<C4DocEnumerator>    _enum;
-    };
-
 }
 
 CBL_ASSUME_NONNULL_END
