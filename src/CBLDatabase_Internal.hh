@@ -38,7 +38,6 @@
 CBL_ASSUME_NONNULL_BEGIN
 
 namespace cbl_internal {
-    class AllConflictsResolver;
     struct CBLLocalEndpoint;
 }
 
@@ -202,7 +201,6 @@ protected:
     friend struct CBLDocument;
     friend struct CBLReplicator;
     friend struct CBLURLEndpointListener;
-    friend class cbl_internal::AllConflictsResolver;
     friend struct cbl_internal::CBLLocalEndpoint;
     friend struct cbl_internal::ListenerToken<CBLDocumentChangeListener>;
     friend struct cbl_internal::ListenerToken<CBLQueryChangeListener>;

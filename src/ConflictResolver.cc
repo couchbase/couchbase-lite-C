@@ -250,35 +250,4 @@ namespace cbl_internal {
         return doc;
     }
 
-
-#pragma mark - ALL CONFLICTS RESOLVER:
-
-
-    AllConflictsResolver::AllConflictsResolver(CBLCollection *collection,
-                                               CBLConflictResolver resolver, void *context)
-    :_collection(collection)
-    ,_clientResolver(resolver)
-    ,_clientResolverContext(context)
-    { }
-
-
-    void AllConflictsResolver::runNow() {
-        while (next()) {
-            alloc_slice docID = _enum->documentInfo().docID;
-            ConflictResolver resolver(_collection, _clientResolver, _clientResolverContext, docID);
-            resolver.runNow();
-        }
-    }
-
-
-    bool AllConflictsResolver::next() {
-        return _collection->useLocked<bool>([&](C4Collection *c4col) {
-            if (!_enum) {
-                // Flags value of 0 means without kC4IncludeNonConflicted, i.e. only conflicted.
-                _enum = make_unique<C4DocEnumerator>(c4col, C4EnumeratorOptions{ 0 });
-            }
-            return _enum->next();
-        });
-    }
-
 }
