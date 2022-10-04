@@ -121,11 +121,20 @@ TEST_CASE_METHOD(QueryTest, "Invalid Query", "[Query][!throws]") {
 TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     CBLError error;
     int errPos;
-    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
-                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
-                                    &errPos, &error);
+    
+    SECTION("SQL++") {
+        query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                        "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                        &errPos, &error);
+    }
+    
+    SECTION("JSON") {
+        query = CBLDatabase_CreateQuery(db, kCBLJSONLanguage,
+                                        "{'WHAT':[['.name']],'FROM':[{'COLLECTION':'_'}],'WHERE':['LIKE',['.birthday'],'1959-%'],'ORDER_BY':[['.birthday']]}"_sl,
+                                        &errPos, &error);
+    }
+    
     REQUIRE(query);
-
     CHECK(CBLQuery_ColumnCount(query) == 1);
     CHECK(CBLQuery_ColumnName(query, 0) == "name"_sl);
 
