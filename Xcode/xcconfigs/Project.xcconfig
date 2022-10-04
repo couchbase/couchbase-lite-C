@@ -11,8 +11,8 @@
 LITECORE    = vendor/couchbase-lite-core
 FLEECE      = $(LITECORE)/vendor/fleece
 
-CBL_VERSION_STRING                                 = 3.0.0
-CBL_BUILD_NUMBER                                   = 0
+CBL_VERSION_STRING                                 = 0.0.0 // The actual version number will be set by Jenkins Build.
+CBL_BUILD_NUMBER                                   = 0     // The actual build number will be set by Jenkins Build.
 
 IPHONEOS_DEPLOYMENT_TARGET                         = 10.0
 MACOSX_DEPLOYMENT_TARGET                           = 10.14
