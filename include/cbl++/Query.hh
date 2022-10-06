@@ -216,12 +216,17 @@ namespace cbl {
 
     class Query::ChangeListener : public ListenerToken<Change> {
     public:
+        ChangeListener(): ListenerToken<Change>() { }
+        
         ChangeListener(Query query, Callback cb)
         :ListenerToken<Change>(cb)
         ,_query(std::move(query))
         { }
 
         ResultSet results() {
+            if (!_query) {
+                throw std::runtime_error("Not allowed to call on uninitialized ChangeListeners");
+            }
             return getResults(_query, token());
         }
 
