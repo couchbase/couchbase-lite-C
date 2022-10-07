@@ -184,7 +184,7 @@ namespace cbl_internal {
                 _c4obs = c4query->observe([this](C4QueryObserver*) { this->queryChanged(); });
             });
         }
-        
+
         ~ListenerToken() {
             // Note:
             // When calling CBLListener_Remove(CBLListenerToken*), the ListenerToken object
@@ -206,20 +206,23 @@ namespace cbl_internal {
 
         void call() {
             CBLQueryChangeListener cb = callback();
-            if (cb)
+            if (cb) {
+                willRunCallback();
                 cb(_context, _query, this);
+                didRunCallback();
+            }
         }
 
         Retained<CBLResultSet> resultSet() {
             return new CBLResultSet(_query, _c4obs->getEnumerator(false));
         }
-        
+
         // CBLStoppable :
-        
+
         void stop() override {
             setEnabled(false);
         }
-        
+
     private:
         void queryChanged();    // defn is in CBLDatabase.cc, to prevent circular hdr dependency
 

@@ -25,6 +25,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <condition_variable>
 #include <vector>
 #include "betterassert.hh"
 
@@ -56,7 +57,7 @@ public:
 
     /** Called by `CBLListener_Remove` */
     void remove();
-    
+
     /** For attaching some extra info. For example, use the extraInfo for keeping a listener
         and its context when wrapping the to pass the listener to another listner. */
     C4ExtraInfo& extraInfo()                                {return _extraInfo;}
@@ -70,11 +71,38 @@ protected:
         _callback = nullptr;
     }
 
+    // Must be called by subclasses before running the callback.
+    void willRunCallback() {
+        assert(!_inCallback);
+        {
+            std::lock_guard<std::mutex> lock(_mutex);
+            _runningCallbacks++;
+        }
+        _inCallback = true;
+    }
+
+    // Must be called by subclasses after the callback finished.
+    void didRunCallback() {
+        assert(_inCallback);
+        _inCallback = false;
+        {
+            std::lock_guard<std::mutex> lock(_mutex);
+            _runningCallbacks--;
+        }
+        _cv.notify_all();
+    }
+
     std::atomic<const void*>                   _callback;          // Really a C fn pointer
     void* const  _cbl_nullable                 _context;
     C4ExtraInfo                                _extraInfo = {};
-    
+
     cbl_internal::ListenersBase* _cbl_nullable _owner {nullptr};
+
+    int                                        _runningCallbacks {0};
+    std::mutex                                 _mutex;
+    std::condition_variable                    _cv;
+
+    static thread_local bool _inCallback;
 };
 
 
@@ -90,15 +118,16 @@ namespace cbl_internal {
 
         LISTENER callback() const           {return (LISTENER)_callback.load();}
 
-            template <class... Args>
+        template <class... Args>
         void call(Args... args) {
             LISTENER cb = callback();
-            if (cb)
+            if (cb) {
+                willRunCallback();
                 cb(_context, args...);
+                didRunCallback();
+            }
         }
     };
-
-
 
     /** Manages a set of CBLListenerTokens. Thread-safe. */
     class ListenersBase {
@@ -171,12 +200,12 @@ namespace cbl_internal {
         void add(ListenerToken<LISTENER>* _cbl_nonnull token)                {ListenersBase::add(token);}
         void clear()                                            {ListenersBase::clear();}
         bool empty() const                                      {return ListenersBase::empty();}
-        
+
         ListenerToken<LISTENER>* _cbl_nullable find(CBLListenerToken *token) const {
             return contains(token) ? (ListenerToken<LISTENER>*) token : nullptr;
         }
 
-            template <class... Args>
+        template <class... Args>
         void call(Args... args) const {
             for (auto &lp : tokens())
                 ((ListenerToken<LISTENER>*)lp.get())->call(args...);
@@ -208,7 +237,7 @@ namespace cbl_internal {
         using Notifications = std::unique_ptr<std::vector<Notification>>;
 
         void call(const Notifications&);
-        
+
         struct State {
             CBLNotificationsReadyCallback _cbl_nullable callback {nullptr};
             void* _cbl_nullable context;

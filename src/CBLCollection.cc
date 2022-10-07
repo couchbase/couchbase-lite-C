@@ -40,7 +40,7 @@ namespace cbl_internal {
                 this->docChanged();
             });
         }
-        
+
         ~ListenerToken() {
             try {
                 auto lock = _collection->useLocked();
@@ -50,25 +50,27 @@ namespace cbl_internal {
                 _c4obs = nullptr;
             }
         }
-        
+
         CBLCollectionDocumentChangeListener callback() const {
             return (CBLCollectionDocumentChangeListener)_callback.load();
         }
-        
+
         // this is called indirectly by CBLDatabase::sendNotifications
         void call(CBLDocumentChange change) {
             auto cb = callback();
             if (cb) {
+                willRunCallback();
                 cb(_context, &change);
+                didRunCallback();
             }
         }
-        
+
     private:
         void docChanged() {
             CBLDocumentChange change = {};
             change.collection = _collection;
             change.docID = _docID;
-            
+
             Retained<CBLDatabase> db;
             try {
                 db = _collection->database();
@@ -77,12 +79,12 @@ namespace cbl_internal {
                 CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
                         "Document changed notification failed: %s", error.description().c_str());
             }
-            
+
             if (db) {
                 db->notify(this, change);
             }
         }
-        
+
         Retained<CBLCollection> _collection;
         alloc_slice _docID;
         std::unique_ptr<C4DocumentObserver> _c4obs;
