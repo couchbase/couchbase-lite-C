@@ -117,7 +117,8 @@ public: \
 
     /** A token representing a registered listener; instances are returned from the various
         methods that register listeners, such as \ref Database::addListener.
-        When this object goes out of scope, the listener will be unregistered. */
+        When this object goes out of scope, the listener will be unregistered.
+        @note ListenerToken is now allowed to copy. */
     template <class... Args>
     class ListenerToken {
     public:
@@ -138,8 +139,8 @@ public: \
         ListenerToken& operator=(ListenerToken &&other) {
             CBLListener_Remove(_token);
             _token = other._token;
-            _callback = other._callback;
             other._token = nullptr;
+            _callback = std::move(other._callback);
             return *this;
         }
 
@@ -150,9 +151,9 @@ public: \
             _callback = nullptr;
         }
 
-        void* _cbl_nullable context() const         {return _callback.get();}
-        CBLListenerToken* token() const             {return _token;}
-        void setToken(CBLListenerToken* token)      {assert(!_token); _token = token;}
+        void* _cbl_nullable context() const             {return _callback.get();}
+        CBLListenerToken* _cbl_nullable token() const   {return _token;}
+        void setToken(CBLListenerToken* token)          {assert(!_token); _token = token;}
 
         static void call(void* _cbl_nullable context, Args... args) {
             auto listener = (Callback*)context;
@@ -161,13 +162,11 @@ public: \
 
     private:
         CBLListenerToken* _cbl_nullable _token {nullptr};
-        std::unique_ptr<Callback> _callback;
+        std::shared_ptr<Callback> _callback; // Use shared_ptr instead of unique_ptr to allow to move
 
         ListenerToken(const ListenerToken&) =delete;
         ListenerToken& operator=(const ListenerToken &other) =delete;
     };
-
-
 }
 
 CBL_ASSUME_NONNULL_END

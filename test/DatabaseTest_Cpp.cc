@@ -429,3 +429,60 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Retaining immutable Fleece") {
     auto savedDoc = db.getDocument("ubiq");
     CHECK(savedDoc.propertiesAsJSON() == mdoc.propertiesAsJSON());
 }
+
+TEST_CASE_METHOD(CBLTest_Cpp, "Empty Listener Token") {
+    ListenerToken<> listenerToken;
+    CHECK(!listenerToken.context());
+    CHECK(!listenerToken.token());
+    listenerToken.remove(); // Noops
+}
+
+TEST_CASE_METHOD(CBLTest_Cpp, "Listener Token") {
+    int num = 0;
+    auto cb = [&num]() { num++; };
+    ListenerToken<> listenerToken = ListenerToken<>(cb);
+    
+    // Context / Callback:
+    REQUIRE(listenerToken.context());
+    (*(ListenerToken<>::Callback*)listenerToken.context())();
+    CHECK(num == 1);
+    
+    // Token:
+    CHECK(!listenerToken.token());
+    auto dummy = [](void* context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs){ };
+    auto listener = CBLDatabase_AddChangeListener(db.ref(), dummy, nullptr);
+    listenerToken.setToken(listener);
+    CHECK(listenerToken.token() == listener);
+    
+    // Move Constructor:
+    ListenerToken<> listenerToken2 = move(listenerToken);
+    REQUIRE(listenerToken2.context());
+    (*(ListenerToken<>::Callback*)listenerToken2.context())();
+    CHECK(num == 2);
+    CHECK(listenerToken2.token() == listener);
+    
+#ifndef __clang_analyzer__ // Exclude the code from being compiled for analyzer
+    CHECK(!listenerToken.context());
+    CHECK(!listenerToken.token());
+    listenerToken.remove(); // Noops
+#endif
+    
+    // Move Assignment:
+    listenerToken = move(listenerToken2);
+    REQUIRE(listenerToken.context());
+    (*(ListenerToken<>::Callback*)listenerToken.context())();
+    CHECK(num == 3);
+    CHECK(listenerToken.token() == listener);
+    
+#ifndef __clang_analyzer__ // Exclude the code from being compiled for analyzer
+    CHECK(!listenerToken2.context());
+    CHECK(!listenerToken2.token());
+    listenerToken2.remove(); // Noops
+#endif
+    
+    // Remove:
+    listenerToken.remove();
+    CHECK(!listenerToken.context());
+    CHECK(!listenerToken.context());
+    listenerToken.remove(); // Noops
+}
