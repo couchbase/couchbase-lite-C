@@ -7,7 +7,8 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 ANDROID_NDK_VERSION="21.4.7075529"
-ANDROID_CMAKE_VERSION="3.18.1"
+ANDROID_CMAKE_VERSION="3.23.0"
+ANDROID_NINJA_VERSION="1.10.2"
 PKG_TYPE="zip"
 PKG_CMD="zip -r"
 
@@ -46,17 +47,32 @@ if [ -z "$EDITION" ]; then
 fi
 
 SDK_MGR="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
-CMAKE_PATH="${ANDROID_HOME}/cmake/${ANDROID_CMAKE_VERSION}/bin"
 
-echo " ======== Installing toolchain with CMake ${ANDROID_CMAKE_VERSION} and NDK ${ANDROID_NDK_VERSION} (this will accept the licenses!)"
+echo " ======== Installing toolchain with NDK ${ANDROID_NDK_VERSION} (this will accept the licenses!)"
 yes | ${SDK_MGR} --licenses > /dev/null 2>&1
-${SDK_MGR} --install "cmake;${ANDROID_CMAKE_VERSION}" > /dev/null
 ${SDK_MGR} --install "ndk;${ANDROID_NDK_VERSION}" > /dev/null
 
+echo " ======== Installing cbdeps ========"
+mkdir -p .tools
+if [ ! -f .tools/cbdep ]; then 
+    curl -o .tools/cbdep http://downloads.build.couchbase.com/cbdep/cbdep.$(uname -s | tr "[:upper:]" "[:lower:]")-$(uname -m)
+    chmod +x .tools/cbdep
+fi 
+
+CMAKE="$(pwd)/.tools/cmake-${ANDROID_CMAKE_VERSION}/bin/cmake"
+NINJA="$(pwd)/.tools/ninja-${ANDROID_NINJA_VERSION}/bin/ninja"
+if [ ! -f ${CMAKE} ]; then
+    .tools/cbdep install -d .tools cmake ${ANDROID_CMAKE_VERSION}
+fi
+
+if [ ! -f ${NINJA} ]; then
+    .tools/cbdep install -d .tools ninja ${ANDROID_NINJA_VERSION}
+fi
+
 function build_variant {
-    ${CMAKE_PATH}/cmake -G Ninja \
+    ${CMAKE} -G Ninja \
 	    -DCMAKE_TOOLCHAIN_FILE=$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION/build/cmake/android.toolchain.cmake \
-	    -DCMAKE_MAKE_PROGRAM=${CMAKE_PATH}/ninja \
+	    -DCMAKE_MAKE_PROGRAM=${NINJA} \
 	    -DANDROID_NATIVE_API_LEVEL=22 \
 	    -DANDROID_ABI=$1 \
 	    -DCMAKE_INSTALL_PREFIX=$(pwd)/../libcblite-$VERSION \
@@ -64,10 +80,12 @@ function build_variant {
         -DEDITION=$EDITION \
 	    ..
 
-    ${CMAKE_PATH}/ninja install
+    ${NINJA} install/strip
 }
 
-ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
+if [ "$EDITION" = "enterprise" ]; then
+    ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
+fi
 
 set -x
 mkdir -p build_android_x86
