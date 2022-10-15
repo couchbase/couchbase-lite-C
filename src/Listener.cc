@@ -20,21 +20,12 @@
 
 using namespace std;
 
-thread_local bool CBLListenerToken::_inCallback = false;
 
 void CBLListenerToken::remove() {
     auto oldOwner = _owner;
     if (oldOwner) {
-        _callback = nullptr;
-        _owner = nullptr;
+        removed();
         oldOwner->remove(this);
-
-        // If the listener is removed from within its callback, don't wait for it to finish.
-        // Otherwise the callback would deadlock waiting for itself to finish.
-        if (!_inCallback) {
-            std::unique_lock lock(_mutex);
-            _cv.wait(lock, [this]{return _runningCallbacks == 0;});
-        }
     }
 }
 

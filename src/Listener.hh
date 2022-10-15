@@ -21,11 +21,9 @@
 #include "Internal.hh"
 #include "fleece/InstanceCounted.hh"
 #include <access_lock.hh>
-#include <atomic>
 #include <functional>
 #include <memory>
 #include <mutex>
-#include <condition_variable>
 #include <vector>
 #include "betterassert.hh"
 
@@ -36,7 +34,7 @@ namespace cbl_internal {
 }
 
 
-/** Abstract base class of listener tokens. (In the public API, as an opaque typeef.) */
+/** Abstract base class of listener tokens. (In the public API, as an opaque typedef.) */
 struct CBLListenerToken : public CBLRefCounted {
 public:
     CBLListenerToken(const void* callback, void* _cbl_nullable context)
@@ -59,7 +57,7 @@ public:
     void remove();
 
     /** For attaching some extra info. For example, use the extraInfo for keeping a listener
-        and its context when wrapping the to pass the listener to another listner. */
+        and its context when wrapping the to pass the listener to another listener. */
     C4ExtraInfo& extraInfo()                                {return _extraInfo;}
     const C4ExtraInfo& extraInfo() const                    {return _extraInfo;}
 
@@ -67,42 +65,19 @@ protected:
     friend class cbl_internal::ListenersBase;
 
     void removed() {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
         _owner = nullptr;
         _callback = nullptr;
     }
 
-    // Must be called by subclasses before running the callback.
-    void willRunCallback() {
-        assert(!_inCallback);
-        {
-            std::lock_guard<std::mutex> lock(_mutex);
-            _runningCallbacks++;
-        }
-        _inCallback = true;
-    }
-
-    // Must be called by subclasses after the callback finished.
-    void didRunCallback() {
-        assert(_inCallback);
-        _inCallback = false;
-        {
-            std::lock_guard<std::mutex> lock(_mutex);
-            _runningCallbacks--;
-        }
-        _cv.notify_all();
-    }
-
-    std::atomic<const void*>                   _callback;          // Really a C fn pointer
+    /** Must be held when accessing _callback and while running it.
+        https://github.com/couchbase/couchbase-lite-C/pull/372 */
+    std::recursive_mutex                       _mutex;
+    const void*                                _callback;          // Really a C fn pointer
     void* const  _cbl_nullable                 _context;
     C4ExtraInfo                                _extraInfo = {};
 
     cbl_internal::ListenersBase* _cbl_nullable _owner {nullptr};
-
-    int                                        _runningCallbacks {0};
-    std::mutex                                 _mutex;
-    std::condition_variable                    _cv;
-
-    static thread_local bool _inCallback;
 };
 
 
@@ -116,18 +91,18 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         { }
 
-        LISTENER callback() const           {return (LISTENER)_callback.load();}
+        LISTENER callback() const           {return (LISTENER)_callback;}
 
         template <class... Args>
         void call(Args... args) {
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
             LISTENER cb = callback();
-            if (cb) {
-                willRunCallback();
+            if (cb)
                 cb(_context, args...);
-                didRunCallback();
-            }
         }
     };
+
+
 
     /** Manages a set of CBLListenerTokens. Thread-safe. */
     class ListenersBase {

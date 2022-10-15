@@ -201,16 +201,14 @@ namespace cbl_internal {
         void setEnabled(bool enabled);
 
         CBLQueryChangeListener callback() const {
-            return (CBLQueryChangeListener)_callback.load();
+            return (CBLQueryChangeListener)_callback;
         }
 
         void call() {
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
             CBLQueryChangeListener cb = callback();
-            if (cb) {
-                willRunCallback();
+            if (cb)
                 cb(_context, _query, this);
-                didRunCallback();
-            }
         }
 
         Retained<CBLResultSet> resultSet() {
