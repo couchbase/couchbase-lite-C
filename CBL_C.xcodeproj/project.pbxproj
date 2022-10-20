@@ -835,7 +835,7 @@
 			buildConfigurationList = 27984E1B2249A127000FE777 /* Build configuration list for PBXNativeTarget "CBL_C Framework" */;
 			buildPhases = (
 				93D0AF88262557D200777AFC /* Generate CBL_Edition.h */,
-				279157C824E1CAF2008B56FE /* Generate Export List */,
+				279157C824E1CAF2008B56FE /* Copy Export List */,
 				27984E052249A126000FE777 /* Headers */,
 				27984E062249A126000FE777 /* Sources */,
 				27984E072249A126000FE777 /* Frameworks */,
@@ -858,7 +858,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 27B61D7821D6B64A0027CCDB /* Build configuration list for PBXNativeTarget "CBL_C Dylib" */;
 			buildPhases = (
-				2716F8F4247D9C5A00BE21D9 /* Generate Export List */,
+				2716F8F4247D9C5A00BE21D9 /* Copy Export List */,
 				27B61D6C21D6B64A0027CCDB /* Headers */,
 				27B61D6D21D6B64A0027CCDB /* Sources */,
 				27B61D6E21D6B64A0027CCDB /* Frameworks */,
@@ -1056,7 +1056,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2716F8F4247D9C5A00BE21D9 /* Generate Export List */ = {
+		2716F8F4247D9C5A00BE21D9 /* Copy Export List */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1064,13 +1064,9 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/Xcode/generate_exports.sh",
-				"$(SRCROOT)/src/exports/Fleece_Exports.txt",
-				"$(SRCROOT)/src/exports/Fleece_Apple_Exports.txt",
-				"$(SRCROOT)/src/exports/CBL_Exports.txt",
-				"$(SRCROOT)/src/exports/CBL_EE_Exports.txt",
+				"$(SRCROOT)/Xcode/copy_exports.sh",
 			);
-			name = "Generate Export List";
+			name = "Copy Export List";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -1078,9 +1074,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/bash -e";
-			shellScript = "\"$SCRIPT_INPUT_FILE_0\" \n";
+			shellScript = "\"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
-		279157C824E1CAF2008B56FE /* Generate Export List */ = {
+		279157C824E1CAF2008B56FE /* Copy Export List */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1088,12 +1084,9 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/Xcode/generate_exports.sh",
-				"$(SRCROOT)/src/exports/Fleece.exp",
-				"$(SRCROOT)/src/exports/CBL.exp",
-				"$(SRCROOT)/src/exports/CBL_EE.exp",
+				"$(SRCROOT)/Xcode/copy_exports.sh",
 			);
-			name = "Generate Export List";
+			name = "Copy Export List";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -1101,7 +1094,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"$SCRIPT_INPUT_FILE_0\" \n";
+			shellScript = "\"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
 		27984E382249A36A000FE777 /* Copy Fleece Headers */ = {
 			isa = PBXShellScriptBuildPhase;
