@@ -237,51 +237,67 @@ typedef struct {
 /** The configuration of a replicator. */
 typedef struct {
     /** The database to replicate. When setting the database, ONLY the default collection will be used for replication.
+        (Required if collections is not set)
         @warning  <b>Deprecated :</b> Use collections instead. */
     CBLDatabase* _cbl_nullable database;
-    CBLEndpoint* endpoint;                              ///< The address of the other database to replicate with
+    /** The address of the other database to replicate with (Required) */
+    CBLEndpoint* endpoint;                              ///<
     
     //-- Types:
-    CBLReplicatorType replicatorType;                   ///< Push, pull or both
-    bool continuous;                                    ///< Continuous replication?
+    
+    /** Push, pull or both. The default value is \ref kCBLDefaultReplicatorType (kCBLReplicatorTypePushAndPull)  */
+    CBLReplicatorType replicatorType;
+    
+    /** Continuous replication?. The default value is \ref kCBLDefaultReplicatorContinuous (false or one shot replication) */
+    bool continuous;
     
     //-- Auto Purge:
+    
     /** If auto purge is active, then the library will automatically purge any documents that
         the replicating user loses access to via the Sync Function on Sync Gateway.
         If disableAutoPurge is true, this behavior is disabled and an access removed
-        event will be sent to any document listeners that are active on the replicator. */
+        event will be sent to any document listeners that are active on the replicator.
+        The default value is \ref kCBLDefaultReplicatorDisableAutoPurge (false). */
+    
     bool disableAutoPurge;
     
     //-- Retry Logic:
     
     /** Max retry attempts where the initial connect to replicate counts toward the given value.
-        Specify 0 to use the default value, 10 times for a non-continuous replicator and max-int time for a continuous replicator.
+        The default value is  \ref kCBLDefaultReplicatorMaxAttemptsSingleShot (10 times) for a one-shot replicator
+        and \ref kCBLDefaultReplicatorMaxAttemptsContinuous (UINT_MAX times) for a continuous replicator.
         Specify 1 means there will be no retry after the first attempt. */
     unsigned maxAttempts;
+    
     /** Max wait time between retry attempts in seconds.
-        Specify 0 to use the default value of 300 seconds. */
+        The default value \ref kCBLDefaultReplicatorMaxAttemptWaitTime (300 seconds). */
     unsigned maxAttemptWaitTime;
     
     //-- WebSocket:
+    
     /** The heartbeat interval in seconds.
-        Specify 0 to use the default value of 300 seconds. */
+        The default value is \ref kCBLDefaultReplicatorHeartbeat (300 seconds). */
     unsigned heartbeat;
+    
     /** The specific network interface to be used by the replicator to connect to the remote server.
         If not specified, an active network interface based on the OS's routing table will be used. */
     FLString networkInterface;
     
     //-- HTTP settings:
+    
     CBLAuthenticator* _cbl_nullable authenticator;  ///< Authentication credentials, if needed
     const CBLProxySettings* _cbl_nullable proxy;    ///< HTTP client proxy settings
     FLDict _cbl_nullable headers;                   ///< Extra HTTP headers to add to the WebSocket request
     
     //-- TLS settings:
+    
     /** An X.509 cert (PEM or DER) to "pin" for TLS connections. The pinned cert will be evaluated against any certs
         in a cert chain, and the cert chain will be valid only if the cert chain contains the pinned cert. */
     FLSlice pinnedServerCertificate;
     FLSlice trustedRootCertificates;                ///< Set of anchor certs (PEM format)
     
     //-- Filtering:
+    
     /** Optional set of channels to pull from when replicating with the default collection.
         @note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.channels instead. */
@@ -303,6 +319,7 @@ typedef struct {
     CBLReplicationFilter _cbl_nullable pullFilter;
     
     //-- Conflict Resolver:
+    
     /** Optional conflict-resolver callback.
         @note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.conflictResolver instead. */
@@ -327,8 +344,11 @@ typedef struct {
     CBLDocumentPropertyDecryptor documentPropertyDecryptor;     ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
 #endif
     
-    CBLReplicationCollection* _cbl_nullable collections;        ///< The collections to replicate with the target's endpoint
-    size_t collectionCount;                                     ///< The number of collections
+    /** The collections to replicate with the target's endpoint (Required if the database is not set). */
+    CBLReplicationCollection* _cbl_nullable collections;
+    
+    /** The number of collections (Required if the database is not set */
+    size_t collectionCount;
 } CBLReplicatorConfiguration;
 
 

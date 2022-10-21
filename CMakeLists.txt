@@ -120,6 +120,7 @@ set(
     src/CBLCollection_CAPI.cc
     src/CBLDatabase.cc
     src/CBLDatabase_CAPI.cc
+    src/CBLDefaults_CAPI.cc
     src/CBLDocument.cc
     src/CBLDocument_CAPI.cc
     src/CBLEncryptable_CAPI.cc

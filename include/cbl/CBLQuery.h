@@ -285,15 +285,16 @@ bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
 
 /** Full-Text Index Configuration. */
 typedef struct {
-    /** The language used in the expressions. */
+    /** The language used in the expressions (Required). */
     CBLQueryLanguage expressionLanguage;
     
     /** The expressions describing each coloumn of the index. The expressions could be specified
-        in a JSON Array or in N1QL syntax using comma delimiter. */
+        in a JSON Array or in N1QL syntax using comma delimiter. (Required) */
     FLString expressions;
     
     /** Should diacritical marks (accents) be ignored?
-        Defaults to false. Generally this should be left `false` for non-English text. */
+        Defaults to  \ref kCBLDefaultFullTextIndexIgnoreAccents (false).
+        Generally this should be left `false` for non-English text. */
     bool ignoreAccents;
     
     /** The dominant language. Setting this enables word stemming, i.e.

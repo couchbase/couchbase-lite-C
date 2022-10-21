@@ -287,24 +287,32 @@ namespace cbl_internal {
                 enc.endDict();
             }
             
-            if (disableAutoPurge) {
-                enc.writeKey(slice(kC4ReplicatorOptionAutoPurge));
-                enc.writeBool(!disableAutoPurge);
-            }
+            enc.writeKey(slice(kC4ReplicatorOptionAutoPurge));
+            enc.writeBool(!disableAutoPurge); 
             
+            enc.writeKey(slice(kC4ReplicatorOptionMaxRetries));
             if (maxAttempts > 0) {
-                enc.writeKey(slice(kC4ReplicatorOptionMaxRetries));
                 enc.writeUInt(maxAttempts - 1);
+            } else {
+                if (continuous) {
+                    enc.writeUInt(kCBLDefaultReplicatorMaxAttemptsContinuous - 1);
+                } else {
+                    enc.writeUInt(kCBLDefaultReplicatorMaxAttemptsSingleShot - 1);
+                }
             }
             
+            enc.writeKey(slice(kC4ReplicatorOptionMaxRetryInterval));
             if (maxAttemptWaitTime > 0) {
-                enc.writeKey(slice(kC4ReplicatorOptionMaxRetryInterval));
                 enc.writeUInt(maxAttemptWaitTime);
+            } else {
+                enc.writeUInt(kCBLDefaultReplicatorMaxAttemptWaitTime);
             }
             
+            enc.writeKey(slice(kC4ReplicatorHeartbeatInterval));
             if (heartbeat > 0) {
-                enc.writeKey(slice(kC4ReplicatorHeartbeatInterval));
                 enc.writeUInt(heartbeat);
+            } else {
+                enc.writeUInt(kCBLDefaultReplicatorHeartbeat);
             }
             
             if (networkInterface.buf) {

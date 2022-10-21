@@ -8,7 +8,7 @@
 SCRIPT_DIR=`dirname $0`
 cd "$SCRIPT_DIR/generated"
 
-cat ../CBL_Exports.txt ../Fleece_Exports.txt    >exports.txt
+cat ../CBL_Exports.txt ../CBLDefaults_Exports.txt ../Fleece_Exports.txt >exports.txt
 cat ../CBL_EE_Exports.txt exports.txt           >exports_ee.txt
 
 cat ../Fleece_Apple_Exports.txt exports.txt     >apple_exports.txt

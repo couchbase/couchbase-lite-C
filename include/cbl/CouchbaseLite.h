@@ -21,6 +21,7 @@
 #include "CBLBlob.h"
 #include "CBLCollection.h"
 #include "CBLDatabase.h"
+#include "CBLDefaults.h"
 #include "CBLDocument.h"
 #include "CBLEncryptable.h"
 #include "CBLLog.h"
