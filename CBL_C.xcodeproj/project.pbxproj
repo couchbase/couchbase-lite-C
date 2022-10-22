@@ -825,6 +825,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 275B3584234812C800FE9CF0 /* Build configuration list for PBXNativeTarget "CouchbaseLiteTests" */;
 			buildPhases = (
+				FCB96EC5290341B2001C4DED /* Generate CBL_Edition.h */,
 				275B3578234812C700FE9CF0 /* Sources */,
 				275B3579234812C700FE9CF0 /* Frameworks */,
 				275B357A234812C700FE9CF0 /* Resources */,
@@ -1225,6 +1226,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\ncp \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
+		};
+		FCB96EC5290341B2001C4DED /* Generate CBL_Edition.h */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Xcode/generate_edition_header.sh",
+			);
+			name = "Generate CBL_Edition.h";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/CBL_Edition.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "source \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
