@@ -120,15 +120,15 @@ typedef struct {
     FLString directory;      ///< The directory where log files will be created (Required).
     
     /** Max number of older log files to keep (in addition to current one.)
-        The default is \ref kCBLDefaultLogFileMaxRotateCount (1) */
+        The default is \ref kCBLDefaultLogFileMaxRotateCount. */
     uint32_t maxRotateCount;
     
     /** The size in bytes at which a file will be rotated out (best effort).
-        The default is \ref kCBLDefaultLogFileMaxSize (512 KiB). */
+        The default is \ref kCBLDefaultLogFileMaxSize. */
     size_t maxSize;
     
     /** Whether or not to log in plaintext (as opposed to binary.) Plaintext logging is slower and bigger.
-        The default is \ref kCBLDefaultLogFileUsePlainText (false). */
+        The default is \ref kCBLDefaultLogFileUsePlainText. */
     bool usePlaintext;
 } CBLLogFileConfiguration;
 

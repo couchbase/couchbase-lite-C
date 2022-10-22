@@ -293,7 +293,7 @@ typedef struct {
     FLString expressions;
     
     /** Should diacritical marks (accents) be ignored?
-        Defaults to  \ref kCBLDefaultFullTextIndexIgnoreAccents (false).
+        Defaults to  \ref kCBLDefaultFullTextIndexIgnoreAccents.
         Generally this should be left `false` for non-English text. */
     bool ignoreAccents;
     

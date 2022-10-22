@@ -245,10 +245,10 @@ typedef struct {
     
     //-- Types:
     
-    /** Push, pull or both. The default value is \ref kCBLDefaultReplicatorType (kCBLReplicatorTypePushAndPull)  */
+    /** Push, pull or both. The default value is \ref kCBLDefaultReplicatorType. */
     CBLReplicatorType replicatorType;
     
-    /** Continuous replication?. The default value is \ref kCBLDefaultReplicatorContinuous (false or one shot replication) */
+    /** Continuous replication?. The default value is \ref kCBLDefaultReplicatorContinuous. */
     bool continuous;
     
     //-- Auto Purge:
@@ -257,26 +257,25 @@ typedef struct {
         the replicating user loses access to via the Sync Function on Sync Gateway.
         If disableAutoPurge is true, this behavior is disabled and an access removed
         event will be sent to any document listeners that are active on the replicator.
-        The default value is \ref kCBLDefaultReplicatorDisableAutoPurge (false). */
-    
+        The default value is \ref kCBLDefaultReplicatorDisableAutoPurge. */
     bool disableAutoPurge;
     
     //-- Retry Logic:
     
     /** Max retry attempts where the initial connect to replicate counts toward the given value.
-        The default value is  \ref kCBLDefaultReplicatorMaxAttemptsSingleShot (10 times) for a one-shot replicator
-        and \ref kCBLDefaultReplicatorMaxAttemptsContinuous (UINT_MAX times) for a continuous replicator.
+        The default value is  \ref kCBLDefaultReplicatorMaxAttemptsSingleShot for a one-shot replicator
+        and \ref kCBLDefaultReplicatorMaxAttemptsContinuous for a continuous replicator.
         Specify 1 means there will be no retry after the first attempt. */
     unsigned maxAttempts;
     
     /** Max wait time between retry attempts in seconds.
-        The default value \ref kCBLDefaultReplicatorMaxAttemptWaitTime (300 seconds). */
+        The default value \ref kCBLDefaultReplicatorMaxAttemptWaitTime. */
     unsigned maxAttemptWaitTime;
     
     //-- WebSocket:
     
     /** The heartbeat interval in seconds.
-        The default value is \ref kCBLDefaultReplicatorHeartbeat (300 seconds). */
+        The default value is \ref kCBLDefaultReplicatorHeartbeat. */
     unsigned heartbeat;
     
     /** The specific network interface to be used by the replicator to connect to the remote server.
