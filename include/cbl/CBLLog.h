@@ -115,11 +115,21 @@ void CBLLog_SetCallback(CBLLogCallback _cbl_nullable callback) CBLAPI;
     @warning `usePlaintext` results in significantly larger log files and higher CPU usage that may slow
             down your app; we recommend turning it off in production. */
 typedef struct {
-    CBLLogLevel level;       ///< The minimum level of message to write
-    FLString directory;      ///< The directory where log files will be created.
-    uint32_t maxRotateCount; ///< Max number of older log files to keep (in addition to current one.)
-    size_t maxSize;          ///< The size in bytes at which a file will be rotated out (best effort).
-    bool usePlaintext;       ///< Whether or not to log in plaintext (as opposed to binary.) Plaintext logging is slower and bigger.
+    CBLLogLevel level;       ///< The minimum level of message to write (Required).
+    
+    FLString directory;      ///< The directory where log files will be created (Required).
+    
+    /** Max number of older log files to keep (in addition to current one.)
+        The default is \ref kCBLDefaultLogFileMaxRotateCount. */
+    uint32_t maxRotateCount;
+    
+    /** The size in bytes at which a file will be rotated out (best effort).
+        The default is \ref kCBLDefaultLogFileMaxSize. */
+    size_t maxSize;
+    
+    /** Whether or not to log in plaintext (as opposed to binary.) Plaintext logging is slower and bigger.
+        The default is \ref kCBLDefaultLogFileUsePlainText. */
+    bool usePlaintext;
 } CBLLogFileConfiguration;
 
 /** Gets the current file logging configuration, or NULL if none is configured. */

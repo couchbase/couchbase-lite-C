@@ -190,6 +190,17 @@ CBL_C {
 		CBLError_SetCaptureBacktraces;
 		CBLLog_BeginExpectingExceptions;
 		CBLLog_EndExpectingExceptions;
+		kCBLDefaultLogFileUsePlainText;
+		kCBLDefaultLogFileMaxSize;
+		kCBLDefaultLogFileMaxRotateCount;
+		kCBLDefaultFullTextIndexIgnoreAccents;
+		kCBLDefaultReplicatorType;
+		kCBLDefaultReplicatorContinuous;
+		kCBLDefaultReplicatorHeartbeat;
+		kCBLDefaultReplicatorMaxAttemptsSingleShot;
+		kCBLDefaultReplicatorMaxAttemptsContinuous;
+		kCBLDefaultReplicatorMaxAttemptWaitTime;
+		kCBLDefaultReplicatorDisableAutoPurge;
 		kFLNullValue;
 		kFLUndefinedValue;
 		kFLEmptyArray;

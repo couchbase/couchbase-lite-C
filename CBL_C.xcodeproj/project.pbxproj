@@ -111,6 +111,9 @@
 		FC82CE1328C6E2FD001FA083 /* ReplicatorCollectionTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC82CE0428C6E2BD001FA083 /* ReplicatorCollectionTest_Cpp.cc */; };
 		FC8678E4289C69470023F34F /* ReplicatorCollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC8678E3289C69470023F34F /* ReplicatorCollectionTest.cc */; };
 		FC8678F2289C69690023F34F /* ReplicatorCollectionTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC8678E3289C69470023F34F /* ReplicatorCollectionTest.cc */; };
+		FCB96E8329007D37001C4DED /* CBLDefaults_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCB96E8229007D37001C4DED /* CBLDefaults_CAPI.cc */; };
+		FCB96E8429007D4F001C4DED /* CBLDefaults.h in Headers */ = {isa = PBXBuildFile; fileRef = FCB96E7429007C81001C4DED /* CBLDefaults.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FCB96E8529007D50001C4DED /* CBLDefaults.h in Headers */ = {isa = PBXBuildFile; fileRef = FCB96E7429007C81001C4DED /* CBLDefaults.h */; };
 		FCC063C928588DA6000C5BD7 /* CBLScope.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063C828588DA6000C5BD7 /* CBLScope.cc */; };
 		FCC063F3285BA641000C5BD7 /* DocumentTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063F2285BA641000C5BD7 /* DocumentTest.cc */; };
 		FCC06403285BCAC9000C5BD7 /* DocumentTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = FCC063F2285BA641000C5BD7 /* DocumentTest.cc */; };
@@ -415,6 +418,8 @@
 		FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLCollection_CAPI.cc; sourceTree = "<group>"; };
 		FC82CE0428C6E2BD001FA083 /* ReplicatorCollectionTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorCollectionTest_Cpp.cc; sourceTree = "<group>"; };
 		FC8678E3289C69470023F34F /* ReplicatorCollectionTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ReplicatorCollectionTest.cc; sourceTree = "<group>"; };
+		FCB96E7429007C81001C4DED /* CBLDefaults.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLDefaults.h; sourceTree = "<group>"; };
+		FCB96E8229007D37001C4DED /* CBLDefaults_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLDefaults_CAPI.cc; sourceTree = "<group>"; };
 		FCC063C828588DA6000C5BD7 /* CBLScope.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLScope.cc; sourceTree = "<group>"; };
 		FCC063F2285BA641000C5BD7 /* DocumentTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DocumentTest.cc; sourceTree = "<group>"; };
 		FCC064BD287CBD95000C5BD7 /* Collection.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Collection.hh; sourceTree = "<group>"; };
@@ -517,6 +522,7 @@
 				275BC4CC22012D8700DBE7D2 /* CBLBlob.h */,
 				FCD988AD2821B0F500512BBD /* CBLCollection.h */,
 				271C2A2F21CAC98F0045856E /* CBLDatabase.h */,
+				FCB96E7429007C81001C4DED /* CBLDefaults.h */,
 				271C2A2E21CAC98F0045856E /* CBLDocument.h */,
 				93C70CD226C4D3F20093E927 /* CBLEncryptable.h */,
 				277B77C6245B44BE00B222D3 /* CBLLog.h */,
@@ -611,6 +617,7 @@
 				275BC4DD2201323700DBE7D2 /* CBLBlob_CAPI.cc */,
 				FC5FBBB42821CC2E0066157F /* CBLCollection_CAPI.cc */,
 				276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */,
+				FCB96E8229007D37001C4DED /* CBLDefaults_CAPI.cc */,
 				276634182605338300B9BD36 /* CBLDocument_CAPI.cc */,
 				93C70CE226C5B4BC0093E927 /* CBLEncryptable_CAPI.cc */,
 				9320631126BDB5CA006917A5 /* CBLPlatform_CAPI+Android.cc */,
@@ -731,6 +738,7 @@
 				FCC064122862B848000C5BD7 /* CBLBlob.h in Headers */,
 				271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */,
 				271C2A3221CAC98F0045856E /* CBLBase.h in Headers */,
+				FCB96E8529007D50001C4DED /* CBLDefaults.h in Headers */,
 				27886C8D21F64C1400069BEA /* Listener.hh in Headers */,
 				93EC366226C49AF700182B02 /* CBLEncryptable_Internal.hh in Headers */,
 			);
@@ -742,6 +750,7 @@
 			files = (
 				27984E292249A240000FE777 /* CouchbaseLite.h in Headers */,
 				27984E302249A240000FE777 /* CBL_Compat.h in Headers */,
+				FCB96E8429007D4F001C4DED /* CBLDefaults.h in Headers */,
 				27984E2A2249A240000FE777 /* CBLBase.h in Headers */,
 				27984E2B2249A240000FE777 /* CBLBlob.h in Headers */,
 				27984E2D2249A240000FE777 /* CBLDocument.h in Headers */,
@@ -1240,6 +1249,7 @@
 				FCD829B32835EE39004AA814 /* CBLScope_CAPI.cc in Sources */,
 				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
+				FCB96E8329007D37001C4DED /* CBLDefaults_CAPI.cc in Sources */,
 				271C2A7621CC4BD60045856E /* Internal.cc in Sources */,
 				FCC063C928588DA6000C5BD7 /* CBLScope.cc in Sources */,
 				FC5FBBA52821B3450066157F /* CBLCollection.cc in Sources */,
