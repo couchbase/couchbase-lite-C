@@ -24,14 +24,16 @@
 using namespace fleece;
 using namespace std;
 
+static const size_t kDocIDBufferSize = 20;
+
 class CollectionTest : public CBLTest {
     
 public:
     
     void createNumberedDocs(CBLCollection *col, unsigned n, unsigned start = 1) {
         for (unsigned i = 0; i < n; i++) {
-            char docID[10];
-            snprintf(docID, 10, "doc-%03u", start + i);
+            char docID[kDocIDBufferSize];
+            snprintf(docID, kDocIDBufferSize, "doc-%03u", start + i);
             auto doc = CBLDocument_CreateWithID(slice(docID));
             
             MutableDict props = CBLDocument_MutableProperties(doc);
