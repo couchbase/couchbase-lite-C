@@ -50,8 +50,8 @@ static string databaseDir() {
     return dir;
 }
 
-static const size_t kDocIDBufferSize = 20;
-static const size_t kDocContentBufferSize = 100;
+static constexpr size_t kDocIDBufferSize = 20;
+static constexpr size_t kDocContentBufferSize = 100;
 
 alloc_slice const CBLTest::kDatabaseDir(databaseDir());
 slice       const CBLTest::kDatabaseName = "CBLtest";

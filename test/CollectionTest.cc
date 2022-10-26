@@ -24,7 +24,7 @@
 using namespace fleece;
 using namespace std;
 
-static const size_t kDocIDBufferSize = 20;
+static constexpr size_t kDocIDBufferSize = 20;
 
 class CollectionTest : public CBLTest {
     
