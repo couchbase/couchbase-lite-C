@@ -50,6 +50,8 @@ static string databaseDir() {
     return dir;
 }
 
+static constexpr size_t kDocIDBufferSize = 20;
+static constexpr size_t kDocContentBufferSize = 100;
 
 alloc_slice const CBLTest::kDatabaseDir(databaseDir());
 slice       const CBLTest::kDatabaseName = "CBLtest";
@@ -127,11 +129,11 @@ cbl::Database CBLTest_Cpp::openDatabaseNamed(fleece::slice name) {
 
 void CBLTest_Cpp::createNumberedDocs(cbl::Collection& collection, unsigned n, unsigned start) {
     for (unsigned i = 0; i < n; i++) {
-        char docID[20];
-        sprintf(docID, "doc-%03u", start + i);
+        char docID[kDocIDBufferSize];
+        snprintf(docID, kDocIDBufferSize, "doc-%03u", start + i);
         
-        char content[100];
-        sprintf(content, "This is the document #%03u.", start + i);
+        char content[kDocContentBufferSize];
+        snprintf(content, kDocContentBufferSize, "This is the document #%03u.", start + i);
         cbl::MutableDocument doc(docID);
         doc["content"] = content;
         collection.saveDocument(doc);
@@ -148,8 +150,8 @@ void CBLTest_Cpp::createDocs(cbl::Collection& collection, unsigned n, std::strin
     for (unsigned i = 0; i < n; i++) {
         string docID = idprefix.append("-").append(to_string(i+1));
         
-        char content[100];
-        sprintf(content, "This is the document #%03u.", i+1);
+        char content[kDocContentBufferSize];
+        snprintf(content, kDocContentBufferSize, "This is the document #%03u.", i+1);
         cbl::MutableDocument doc(docID);
         doc["content"] = content;
         collection.saveDocument(doc);
@@ -227,8 +229,8 @@ unsigned ImportJSONLines(string &&path, CBLCollection* collection) {
     
     REQUIRE(CBLDatabase_BeginTransaction(database, &error));
     ReadFileByLines(path, [&](FLSlice line) {
-        char docID[20];
-        sprintf(docID, "%07u", numDocs+1);
+        char docID[kDocIDBufferSize];
+        snprintf(docID, kDocIDBufferSize, "%07u", numDocs+1);
         auto doc = CBLDocument_CreateWithID(slice(docID));
         REQUIRE(CBLDocument_SetJSON(doc, line, &error));
         CHECK(CBLCollection_SaveDocumentWithConcurrencyControl(collection, doc, kCBLConcurrencyControlFailOnConflict, &error));
