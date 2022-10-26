@@ -73,7 +73,7 @@ protected:
     /** Must be held when accessing _callback and while running it.
         https://github.com/couchbase/couchbase-lite-C/pull/372 */
     std::recursive_mutex                       _mutex;
-    const void*                                _callback;          // Really a C fn pointer
+    const void*  _cbl_nullable                 _callback;          // Really a C fn pointer
     void* const  _cbl_nullable                 _context;
     C4ExtraInfo                                _extraInfo = {};
 
