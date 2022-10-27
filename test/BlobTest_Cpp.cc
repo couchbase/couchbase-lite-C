@@ -27,6 +27,7 @@ using namespace std;
 using namespace fleece;
 using namespace cbl;
 
+static constexpr size_t kDocIDBufferSize = 20;
 
 static const slice  kBlobContents = "This is the content of the blob.";
 static const string kBlobContentType = "text/plain";
@@ -173,8 +174,8 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in arrays/dicts", "[Blob]") {
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in ResultSet", "[Blob]") {
     for (int i = 0; i < 10; ++i) {
-        char docID[20];
-        sprintf(docID, "doc-%d", i);
+        char docID[kDocIDBufferSize];
+        snprintf(docID, kDocIDBufferSize, "doc-%d", i);
         MutableDocument doc(docID);
         Blob blob(kBlobContentType, kBlobContents);
         doc["picture"] = blob.properties();

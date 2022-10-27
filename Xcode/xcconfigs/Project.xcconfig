@@ -8,7 +8,7 @@
 
 #include "vendor/couchbase-lite-core/Xcode/xcconfigs/Project.xcconfig"
 
-LITECORE    = vendor/couchbase-lite-core
+LITECORE    = $(SRCROOT)/vendor/couchbase-lite-core
 FLEECE      = $(LITECORE)/vendor/fleece
 
 CBL_VERSION_STRING                                 = 0.0.0 // The actual version number will be set by Jenkins Build.

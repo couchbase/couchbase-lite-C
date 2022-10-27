@@ -75,10 +75,16 @@ if(MSVC)
         -P ${TOP}vendor/couchbase-lite-core/MSVC/copy_artifacts.cmake)
 elseif(ANDROID)
     target_link_libraries(CBL_C_Tests PUBLIC  "log")
-elseif(APPLE AND BUILD_ENTERPRISE)
-    target_link_libraries(CBL_C_Tests PUBLIC  "-framework CoreFoundation"
-                                          "-framework CoreML"
-                                          "-framework Vision")
+elseif(APPLE)
+    target_sources(
+        CBL_C_Tests PRIVATE
+        Platform_Apple.mm
+    )
+    if(BUILD_ENTERPRISE)
+        target_link_libraries(CBL_C_Tests PUBLIC  "-framework CoreFoundation"
+                                                  "-framework CoreML"
+                                                  "-framework Vision")
+    endif()
 elseif(UNIX)
     target_link_libraries(CBL_C_Tests PUBLIC dl)
 endif()

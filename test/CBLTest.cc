@@ -27,6 +27,7 @@
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
+#include "Platform_Apple.hh"
 #endif
 
 #ifndef _MSC_VER
@@ -38,6 +39,11 @@ using namespace fleece;
 
 
 static string databaseDir() {
+#ifdef __APPLE__
+    string dir = GetTempDirectory("CBL_C_Tests");
+    if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
+        FAIL("Can't create temp directory: errno " << errno);
+#else
 #ifndef WIN32
     string dir = "/tmp/CBL_C_tests";
     if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
@@ -46,6 +52,7 @@ static string databaseDir() {
     string dir = "C:\\tmp\\CBL_C_tests";
     if (_mkdir(dir.c_str()) != 0 && errno != EEXIST)
         FAIL("Can't create temp directory: errno " << errno);
+#endif
 #endif
     return dir;
 }
