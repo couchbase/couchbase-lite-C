@@ -1065,7 +1065,7 @@ TEST_CASE_METHOD(DocumentTest, "Save blob and set blob properties in document", 
     CBLDocument_Release(doc);
 }
 
-TEST_CASE_METHOD(DocumentTest, "Set blob in array", "[Document][Blob][Current]") {
+TEST_CASE_METHOD(DocumentTest, "Set blob in array", "[Document][Blob]") {
     // Create and Save blob:
     CBLError error;
     FLSlice blobContent1 = FLStr("I'm Blob 1.");

@@ -1,7 +1,7 @@
 //
-// CBL_Dylib_Release.xcconfig
+// ViewController.m
 //
-// Copyright (c) 2022 Couchbase, Inc All rights reserved.
+// Copyright © 2022 Couchbase. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,5 +16,18 @@
 // limitations under the License.
 //
 
-#include "CBL_dylib.xcconfig"
-#include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib_Release.xcconfig"
+#import "ViewController.h"
+
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+}
+
+
+@end

@@ -1,7 +1,7 @@
 //
-// CBL_Dylib_Release.xcconfig
+// Platform_Apple.mm
 //
-// Copyright (c) 2022 Couchbase, Inc All rights reserved.
+// Copyright © 2022 Couchbase. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,5 +16,18 @@
 // limitations under the License.
 //
 
-#include "CBL_dylib.xcconfig"
-#include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib_Release.xcconfig"
+#ifdef __APPLE__
+
+#include "Platform_Apple.hh"
+#include <Foundation/Foundation.h>
+
+std::string GetTempDirectory(std::string subdir) {
+    NSString* tempDir = NSTemporaryDirectory();
+    if (!subdir.empty()) {
+        NSString* sub = [NSString stringWithCString: subdir.c_str() encoding: NSUTF8StringEncoding];
+        tempDir = [tempDir stringByAppendingPathComponent: sub];
+    }
+    return std::string([tempDir UTF8String]);
+}
+
+#endif

@@ -1,5 +1,5 @@
 //
-// CBL_Dylib_Release.xcconfig
+// CBL_Tests.xcconfig
 //
 // Copyright (c) 2022 Couchbase, Inc All rights reserved.
 //
@@ -16,5 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBL_dylib.xcconfig"
-#include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib_Release.xcconfig"
+HEADER_SEARCH_PATHS     = include Xcode/generated_headers/public/cbl $(FLEECE)/API  $(FLEECE)/Fleece/Support  $(FLEECE)/vendor/catch
+PRODUCT_NAME            = cbl_tests
+
+LLVM_LTO                    = NO    // LTO makes tests very slow to link and confuses Instruments

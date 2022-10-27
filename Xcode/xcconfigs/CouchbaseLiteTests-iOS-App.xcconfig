@@ -1,5 +1,5 @@
 //
-// CBL_Dylib_Release.xcconfig
+// CouchbaseLiteTests-iOS-App.xcconfig
 //
 // Copyright (c) 2022 Couchbase, Inc All rights reserved.
 //
@@ -16,5 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBL_dylib.xcconfig"
-#include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib_Release.xcconfig"
+INFOPLIST_FILE              = $(SRCROOT)/test/iOS/Info.plist
+IPHONEOS_DEPLOYMENT_TARGET  = 13.0 // Min iOS Version required by UIScene
+PRODUCT_BUNDLE_IDENTIFIER   = com.couchbase.CouchbaseLiteTests
+PRODUCT_NAME                = CouchbaseLiteTests

@@ -1,5 +1,5 @@
 //
-// CBL_Dylib_Release.xcconfig
+// CouchbaseLiteTests-iOS.xcconfig
 //
 // Copyright (c) 2022 Couchbase, Inc All rights reserved.
 //
@@ -16,5 +16,4 @@
 // limitations under the License.
 //
 
-#include "CBL_dylib.xcconfig"
-#include "vendor/couchbase-lite-core/Xcode/xcconfigs/dylib_Release.xcconfig"
+HEADER_SEARCH_PATHS       = $(SRCROOT)/include $(SRCROOT)/Xcode/generated_headers/public/cbl $(FLEECE)/API $(FLEECE)/Fleece/Support $(FLEECE)/vendor/catch $(inherited) $(SRCROOT)/vendor/couchbase-lite-core/C/include
