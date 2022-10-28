@@ -116,11 +116,12 @@ namespace cbl_internal {
         }
 
         CBLDocumentChangeListener callback() const {
-            return (CBLDocumentChangeListener)_callback.load();
+            return (CBLDocumentChangeListener)_callback;
         }
 
         // this is called indirectly by CBLDatabase::sendNotifications
         void call(const CBLDatabase*, FLString) {
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
             auto cb = callback();
             if (cb)
                 cb(_context, _db, _docID);

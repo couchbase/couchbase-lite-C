@@ -21,7 +21,6 @@
 #include "Internal.hh"
 #include "InstanceCounted.hh"
 #include <access_lock.hh>
-#include <atomic>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -35,7 +34,7 @@ namespace cbl_internal {
 }
 
 
-/** Abstract base class of listener tokens. (In the public API, as an opaque typeef.) */
+/** Abstract base class of listener tokens. (In the public API, as an opaque typedef.) */
 struct CBLListenerToken : public CBLRefCounted {
 public:
     CBLListenerToken(const void *callback, void* _cbl_nullable context)
@@ -57,11 +56,15 @@ protected:
     friend class cbl_internal::ListenersBase;
 
     void removed() {
+        std::lock_guard<std::recursive_mutex> lock(_mutex);
         _owner = nullptr;
         _callback = nullptr;
     }
 
-    std::atomic<const void*>                   _callback;          // Really a C fn pointer
+    /** Must be held when accessing _callback and while running it.
+        https://github.com/couchbase/couchbase-lite-C/pull/372 */
+    std::recursive_mutex                       _mutex;
+    const void*  _cbl_nullable                 _callback;          // Really a C fn pointer
     void* const  _cbl_nullable                 _context;
     cbl_internal::ListenersBase* _cbl_nullable _owner {nullptr};
 };
@@ -77,10 +80,11 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         { }
 
-        LISTENER callback() const           {return (LISTENER)_callback.load();}
+        LISTENER callback() const           {return (LISTENER)_callback;}
 
-            template <class... Args>
+        template <class... Args>
         void call(Args... args) {
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
             LISTENER cb = callback();
             if (cb)
                 cb(_context, args...);
@@ -160,12 +164,12 @@ namespace cbl_internal {
         void add(ListenerToken<LISTENER>* _cbl_nonnull token)                {ListenersBase::add(token);}
         void clear()                                            {ListenersBase::clear();}
         bool empty() const                                      {return ListenersBase::empty();}
-        
+
         ListenerToken<LISTENER>* _cbl_nullable find(CBLListenerToken *token) const {
             return contains(token) ? (ListenerToken<LISTENER>*) token : nullptr;
         }
 
-            template <class... Args>
+        template <class... Args>
         void call(Args... args) const {
             for (auto &lp : tokens())
                 ((ListenerToken<LISTENER>*)lp.get())->call(args...);
@@ -197,7 +201,7 @@ namespace cbl_internal {
         using Notifications = std::unique_ptr<std::vector<Notification>>;
 
         void call(const Notifications&);
-        
+
         struct State {
             CBLNotificationsReadyCallback _cbl_nullable callback {nullptr};
             void* _cbl_nullable context;
