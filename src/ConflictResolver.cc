@@ -56,13 +56,11 @@ namespace cbl_internal {
     ConflictResolver::ConflictResolver(CBLDatabase *db,
                                        CBLConflictResolver customResolver,
                                        void* context,
-                                       alloc_slice docID,
-                                       alloc_slice revID)
+                                       alloc_slice docID)
     :_db(db)
     ,_clientResolver(customResolver)
     ,_clientResolverContext(context)
     ,_docID(move(docID))
-    ,_revID(move(revID))
     {
         //SyncLog(Info, "ConflictResolver %p on %.*s", this, _docID.c_str());
     }
@@ -72,7 +70,7 @@ namespace cbl_internal {
                                        CBLConflictResolver customResolver,
                                        void* context,
                                        const C4DocumentEnded &docEnded)
-    :ConflictResolver(db, customResolver, context, docEnded.docID, docEnded.revID)
+    :ConflictResolver(db, customResolver, context, docEnded.docID)
     { }
 
 
@@ -99,15 +97,8 @@ namespace cbl_internal {
                             FMTSLICE(_docID));
                     return true;
                 }
-
-                if (_revID) {
-                    ok = conflict->selectRevision(_revID) &&
-                         (conflict->revisionFlags() & (kRevLeaf|kRevIsConflict)) ==
-                                                      (kRevLeaf|kRevIsConflict);
-                } else {
-                    ok = conflict->selectNextConflictingRevision();
-                    _revID = conflict->revisionID();
-                }
+                
+                ok = conflict->selectNextConflictingRevision();
                 if (!ok) {
                     // Revision is gone or not a leaf: Conflict must be resolved, so stop
                     SyncLog(Info, "Conflict in doc '%.*s' already resolved, nothing to do",
@@ -115,7 +106,6 @@ namespace cbl_internal {
                     if (_completionHandler) {
                         _completionHandler(this);       // the handler will most likely delete me
                     }
-
                     return true;
                 }
 
@@ -126,8 +116,8 @@ namespace cbl_internal {
                     ok = defaultResolve(conflict);
 
                 if (ok) {
-                    _revID = conflict->revisionID();
                     _flags = conflict->revisionFlags();
+                    inConflict = false;
                 } else {
                     _error = external(C4Error::make(LiteCoreDomain, kC4ErrorConflict));
                     // If a local revision is saved at the same time we'll fail with a conflict, so retry:
@@ -169,8 +159,7 @@ namespace cbl_internal {
         CBLDocument *remoteDoc = conflict;
         if (remoteDoc->revisionFlags() & kRevDeleted)
             remoteDoc = nullptr;
-        
-        auto localDoc = _db->getDocument(_docID, true);
+        auto localDoc = _db->getDocument(_docID, false);
         if (localDoc && localDoc->revisionFlags() & kRevDeleted)
             localDoc = nullptr;
         

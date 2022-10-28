@@ -311,6 +311,73 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
     CHECK(remoteDoc.revisionID() == doc2.revisionID());
 }
 
+TEST_CASE_METHOD(ReplicatorLocalTest, "Resolve Pending Conflicts", "[Replicator][Current]") {
+    MutableDocument doc("foo1");
+    doc["greeting"] = "Howdy!";
+    db.saveDocument(doc);
+    
+    auto badConflictResolver = [](void *context,
+                                  FLString documentID,
+                                  const CBLDocument *localDocument,
+                                  const CBLDocument *remoteDocument) -> const CBLDocument*
+    {
+        throw std::runtime_error("An unexpected error has occurred.");
+    };
+    
+    auto conflictResolver = [](void *context,
+                               FLString documentID,
+                               const CBLDocument *localDocument,
+                               const CBLDocument *remoteDocument) -> const CBLDocument*
+    {
+        return remoteDocument;
+    };
+    
+    config.replicatorType = kCBLReplicatorTypePush;
+    replicate();
+    
+    Document foo1 = otherDB.getDocument("foo1");
+    REQUIRE(foo1);
+    CHECK(foo1["greeting"].asString() == "Howdy!"_sl);
+    
+    MutableDocument foo1a = db.getMutableDocument("foo1");
+    REQUIRE(foo1a);
+    foo1a["greeting"] = "hey";
+    db.saveDocument(foo1a);
+    
+    MutableDocument foo1b = otherDB.getMutableDocument("foo1");
+    REQUIRE(foo1b);
+    foo1b["greeting"] = "hola";
+    otherDB.saveDocument(foo1b);
+    
+    resetReplicator();
+    config.conflictResolver = badConflictResolver;
+    config.replicatorType = kCBLReplicatorTypePull;
+    {
+        ExpectingExceptions ex;
+        replicate();
+    }
+    
+    foo1 = db.getDocument("foo1");
+    REQUIRE(foo1);
+    CHECK(foo1["greeting"].asString() == "hey"_sl);
+
+    // Purge to ensure that no "foo1" to be pulled again
+    // and conflict resolver should be still called:
+    otherDB.purgeDocumentByID("foo1");
+    foo1b = otherDB.getMutableDocument("foo1");
+    REQUIRE(!foo1b);
+    
+    replicatedDocIDs.clear();
+    resetReplicator();
+    config.conflictResolver = conflictResolver;
+    config.replicatorType = kCBLReplicatorTypePull;
+    replicate();
+
+    foo1 = db.getDocument("foo1");
+    REQUIRE(foo1);
+    CHECK(foo1["greeting"].asString() == "hola"_sl);
+}
+
 class ReplicatorConflictTest : public ReplicatorLocalTest {
 public:
     enum class ResolverMode { kLocalWins, kRemoteWins, kMerge, kMergeAutoID };
