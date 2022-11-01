@@ -244,6 +244,5 @@ If you've created a language binding, please let us know by filing an issue, or 
 
 * **C++**: Already included; see [`include/cbl++`](https://github.com/couchbase/couchbase-lite-C/tree/master/include/cbl%2B%2B)
 * **Go** (Golang): [Third-party, in progress](https://github.com/svr4/couchbase-lite-cgo)
-* **Nim**: [couchbase-lite-nim](https://github.com/couchbaselabs/couchbase-lite-nim)
 * **Python**: [couchbase-lite-python](https://github.com/couchbaselabs/couchbase-lite-python)
 * **Rust**: [couchbase-lite-rust](https://github.com/couchbaselabs/couchbase-lite-rust)
