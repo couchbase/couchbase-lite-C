@@ -28,6 +28,10 @@ using namespace fleece;
 
 void ListenerToken<CBLQueryChangeListener>::setEnabled(bool enabled) {
     auto c4query = _query->_c4query.useLocked();
+    
+    if (enabled == _isEnabled)
+        return;
+    
     CBLDatabase* db = const_cast<CBLDatabase*>(_query->database());
     if (enabled) {
         if (!db->registerStoppable(this)) {
@@ -36,7 +40,9 @@ void ListenerToken<CBLQueryChangeListener>::setEnabled(bool enabled) {
             return;
         }
     }
+    
     _c4obs->setEnabled(enabled);
+    _isEnabled = enabled;
     if (!enabled)
         db->unregisterStoppable(this);
 }

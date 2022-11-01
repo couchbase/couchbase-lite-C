@@ -55,6 +55,11 @@ public:
 
     /** Called by `CBLListener_Remove` */
     void remove();
+    
+    /** Called by the remove() function before removing the token from the owner.
+        Subclasses can override this function to perform any tasks such as
+        stopping the underlinging observer and etc before the token is removed. */
+    virtual void willRemove() { }
 
     /** For attaching some extra info. For example, use the extraInfo for keeping a listener
         and its context when wrapping the to pass the listener to another listener. */

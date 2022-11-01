@@ -240,8 +240,7 @@ public:
     CBLDatabase* database() const                           {return _db;}
     void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}
     void setSuspended(bool suspended)                       {_c4repl->setSuspended(suspended);}
-    void stop() override                                    {_c4repl->stop();}
-
+    void stop()                                             {_c4repl->stop();}
 
     void start(bool reset) {
         LOCK(_mutex);
@@ -304,6 +303,13 @@ public:
         }
         return _docListeners.add(listener, context);
     }
+    
+    
+    // CBLStoppable :
+    
+    void stopStoppable() override                           {stop();}
+    void retainStoppable() override                         {retain(this);}
+    void releaseStoppable() override                        {release(this);}
 
 private:
 

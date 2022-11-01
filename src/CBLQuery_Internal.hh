@@ -185,18 +185,7 @@ namespace cbl_internal {
             });
         }
 
-        ~ListenerToken() {
-            // Note:
-            // When calling CBLListener_Remove(CBLListenerToken*), the ListenerToken object
-            // will be released. Hence its `_c4obs` will be freed, which will result in
-            // disabing and freed its LiveQuerier object.
-            //
-            // Explicity disabling here to unregister iteself (CBLStoppable) from the database
-            // so that the database can be safely closed. This would mean that the `_c4obs` will
-            // try to disabling itself again when it's free, however, that when disabing second
-            // time, the disabing logic will be mostly no ops.
-            setEnabled(false);
-        }
+        ~ListenerToken() = default;
 
         void setEnabled(bool enabled);
 
@@ -214,18 +203,23 @@ namespace cbl_internal {
         Retained<CBLResultSet> resultSet() {
             return new CBLResultSet(_query, _c4obs->getEnumerator(false));
         }
+        
+        // CBLListenerToken :
+        
+        void willRemove() override                              {setEnabled(false);}
 
         // CBLStoppable :
-
-        void stop() override {
-            setEnabled(false);
-        }
+        
+        void stopStoppable() override                           {setEnabled(false);}
+        void retainStoppable() override                         {retain(this);}
+        void releaseStoppable() override                        {release(this);}
 
     private:
         void queryChanged();    // defn is in CBLDatabase.cc, to prevent circular hdr dependency
 
         Retained<CBLQuery>  _query;
         std::unique_ptr<C4QueryObserver> _c4obs;
+        bool _isEnabled {false};
     };
 
 }
