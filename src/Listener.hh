@@ -91,7 +91,7 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         { }
 
-        LISTENER callback() const           {return (LISTENER)_callback;}
+        LISTENER _cbl_nullable callback() const {return (LISTENER)_callback;}
 
         template <class... Args>
         void call(Args... args) {

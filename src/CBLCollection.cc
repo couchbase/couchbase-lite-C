@@ -51,7 +51,7 @@ namespace cbl_internal {
             }
         }
 
-        CBLCollectionDocumentChangeListener callback() const {
+        CBLCollectionDocumentChangeListener _cbl_nullable callback() const {
             return (CBLCollectionDocumentChangeListener)_callback;
         }
 

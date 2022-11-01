@@ -200,7 +200,7 @@ namespace cbl_internal {
 
         void setEnabled(bool enabled);
 
-        CBLQueryChangeListener callback() const {
+        CBLQueryChangeListener _cbl_nullable callback() const {
             return (CBLQueryChangeListener)_callback;
         }
 
