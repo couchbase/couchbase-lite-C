@@ -172,7 +172,7 @@ namespace cbl_internal {
     // Custom subclass of CBLListenerToken for query listeners.
     // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
     template<>
-    struct ListenerToken<CBLQueryChangeListener> : public CBLListenerToken, public CBLStoppable {
+    struct ListenerToken<CBLQueryChangeListener> : public CBLListenerToken {
     public:
         ListenerToken(CBLQuery *query,
                       CBLQueryChangeListener callback,
@@ -183,6 +183,8 @@ namespace cbl_internal {
             query->_c4query.useLocked([&](C4Query *c4query) {
                 _c4obs = c4query->observe([this](C4QueryObserver*) { this->queryChanged(); });
             });
+            
+            _stoppable = std::make_unique<CBLQueryListenerStoppable>(this);
         }
 
         ~ListenerToken() = default;
@@ -208,20 +210,25 @@ namespace cbl_internal {
         
         void willRemove() override                              {setEnabled(false);}
 
-        // CBLStoppable :
-        
-        void stopStoppable() override                           {setEnabled(false);}
-        void retainStoppable() override                         {retain(this);}
-        void releaseStoppable() override                        {release(this);}
-
     private:
+        struct CBLQueryListenerStoppable : CBLStoppable {
+        public:
+            CBLQueryListenerStoppable(ListenerToken<CBLQueryChangeListener>* token)
+            :CBLStoppable(token)
+            {}
+            
+            void stop() const override {
+                ((ListenerToken<CBLQueryChangeListener>*)_ref)->setEnabled(false);
+            }
+        };
+        
         void queryChanged();    // defn is in CBLDatabase.cc, to prevent circular hdr dependency
 
         Retained<CBLQuery>  _query;
         std::unique_ptr<C4QueryObserver> _c4obs;
+        std::unique_ptr<CBLQueryListenerStoppable> _stoppable;
         bool _isEnabled {false};
     };
-
 }
 
 

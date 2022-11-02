@@ -340,7 +340,7 @@ private:
         
         // Call stop outside lock to prevent deadlock:
         for (auto s : stoppables) {
-            s->stopStoppable();
+            s->stop();
         }
         
         std::unique_lock<std::mutex> lock(_stopMutex);
@@ -359,7 +359,7 @@ private:
         
         if (_stoppables.find(stoppable) == _stoppables.end()) {
             _stoppables.insert(stoppable);
-            stoppable->retainStoppable();
+            stoppable->retain();
         }
         
         return true;
@@ -368,7 +368,7 @@ private:
     void unregisterStoppable(CBLStoppable* stoppable) {
         LOCK(_stopMutex);
         if (_stoppables.erase(stoppable) > 0) {
-            stoppable->releaseStoppable();
+            stoppable->release();
         }
         _stopCond.notify_one();
     }

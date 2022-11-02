@@ -48,10 +48,19 @@ protected:
     when there is an API call to unregister the object. The database will also retain the object when the object is registered,
     and will release the object when the object is unregistered to ensure that the object is alive until the object is unregistered. */
 struct CBLStoppable {
-    virtual ~CBLStoppable() = default;
-    virtual void stopStoppable() = 0;
-    virtual void retainStoppable() = 0;
-    virtual void releaseStoppable() = 0;
+public:
+    CBLStoppable(CBLRefCounted* ref)
+    :_ref(ref)
+    {}
+    
+    virtual ~CBLStoppable()                             =default;
+    virtual void stop() const                           =0;
+    
+    void retain()                                       {fleece::retain(_ref);}
+    void release()                                      {fleece::release(_ref);}
+    
+protected:
+    CBLRefCounted* _ref;
 };
 
 

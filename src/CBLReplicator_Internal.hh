@@ -62,7 +62,7 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
 }
 
 
-struct CBLReplicator final : public CBLRefCounted, public CBLStoppable {
+struct CBLReplicator final : public CBLRefCounted {
 public:
     CBLReplicator(const CBLReplicatorConfiguration &conf)
     :_conf(conf)
@@ -233,6 +233,8 @@ public:
         
         _c4status = _c4repl->getStatus();
         _useInitialStatus = true;
+        
+        _stoppable = make_unique<CBLReplicatorStoppable>(this);
     }
     
 
@@ -247,7 +249,7 @@ public:
         _retainSelf = this;     // keep myself from being freed until the replicator stops
         _useInitialStatus = false;
         
-        if (_db->registerStoppable(this))
+        if (_db->registerStoppable(_stoppable.get()))
             _c4repl->start(reset);
         else
             CBL_Log(kCBLLogDomainReplicator, kCBLLogWarning,
@@ -303,15 +305,20 @@ public:
         }
         return _docListeners.add(listener, context);
     }
-    
-    
-    // CBLStoppable :
-    
-    void stopStoppable() override                           {stop();}
-    void retainStoppable() override                         {retain(this);}
-    void releaseStoppable() override                        {release(this);}
 
 private:
+    
+    struct CBLReplicatorStoppable : CBLStoppable {
+    public:
+        CBLReplicatorStoppable(CBLReplicator* r)
+        :CBLStoppable(r)
+        {}
+        
+        void stop() const override {
+            ((CBLReplicator*)_ref)->stop();
+        }
+    };
+    
 
     alloc_slice encodeOptions() {
         Encoder enc;
@@ -373,7 +380,7 @@ private:
         }
 
         if (cblStatus.activity == kCBLReplicatorStopped) {
-            _db->unregisterStoppable(this);
+            _db->unregisterStoppable(_stoppable.get());
             _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
         }
     }
@@ -519,6 +526,7 @@ private:
     Retained<CBLDatabase>                       _db;
     Retained<CBLCollection>                     _defaultCollection;
     Retained<C4Replicator>                      _c4repl;
+    unique_ptr<CBLReplicatorStoppable>          _stoppable;
     ReplicationCollectionsMap                   _collections;       // For filters and conflict resolver
     bool                                        _useInitialStatus;  // For returning status before first start
     C4ReplicatorStatus                          _c4status {kC4Stopped};
