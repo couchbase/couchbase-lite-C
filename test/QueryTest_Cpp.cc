@@ -38,7 +38,7 @@ public:
 };
 
 
-TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query]") {
+TEST_CASE_METHOD(QueryTest_Cpp, "Query C++ API", "[Query][QueryCpp]") {
     Query query = db.createQuery(kCBLN1QLLanguage, "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday");
     
     CHECK(query.columnNames() == vector<string>({"name"}));
@@ -82,7 +82,7 @@ static int countResults(ResultSet &results) {
     return n;
 }
 
-TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ API", "[Query]") {
+TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ API", "[Query][QueryCpp]") {
     Query query(db, kCBLN1QLLanguage, "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday");
     {
         auto rs = query.execute();
@@ -123,7 +123,80 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ API", "[Query]") {
     this_thread::sleep_for(500ms);
 }
 
-TEST_CASE_METHOD(QueryTest_Cpp, "C++ Query Parameters", "[Query]") {
+TEST_CASE_METHOD(QueryTest_Cpp, "Empty Query Listener C++", "[Query][QueryCpp]") {
+    Query::ChangeListener listenerToken;
+    CHECK(!listenerToken.context());
+    CHECK(!listenerToken.token());
+    
+    bool threw = false;
+    try {
+        ExpectingExceptions x;
+        listenerToken.results();
+    } catch(runtime_error &x) {
+        threw = true;
+    }
+    CHECK(threw);
+    
+    listenerToken.remove(); // Noops
+}
+
+TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ Move Operation", "[Query][QueryCpp]") {
+    Query query(db, kCBLN1QLLanguage, "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday");
+    
+    std::atomic_int resultCount{-1};
+    
+    Query::ChangeListener listenerToken;
+    
+    // Move assignment:
+    listenerToken = query.addChangeListener([&](Query::Change change) {
+        ResultSet rs = change.results();
+        resultCount = countResults(rs);
+        CHECK(change.query() == query);
+    });
+    
+    CHECK(listenerToken.context());
+    CHECK(listenerToken.token());
+    
+    // Waiting for the first called:
+    while (resultCount < 0)
+        this_thread::sleep_for(100ms);
+    CHECK(resultCount == 3);
+    resultCount = -1;
+    
+    // Move constructor:
+    Query::ChangeListener listenerToken2 = move(listenerToken);
+    CHECK(listenerToken2.context());
+    CHECK(listenerToken2.token());
+    
+#ifndef __clang_analyzer__ // Exclude the code from being compiled for analyzer
+    CHECK(!listenerToken.context());
+    CHECK(!listenerToken.token());
+    listenerToken.remove(); // Noops
+#endif
+
+    cerr << "Deleting a doc...\n";
+    Document doc = db.getDocument("0000012");
+    REQUIRE(doc);
+    REQUIRE(db.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
+
+    cerr << "Waiting for listener again...\n";
+    while (resultCount < 0)
+        this_thread::sleep_for(100ms);
+    CHECK(resultCount == 2);
+    
+    listenerToken2.remove();
+    CHECK(!listenerToken2.context());
+    CHECK(!listenerToken2.token());
+    
+    // https://issues.couchbase.com/browse/CBL-2147
+    // Add a small sleep to ensure async cleanup in LiteCore's LiveQuerier's _stop() when the
+    // listenerToken is destructed is done bfore before checking instance leaking in
+    // CBLTest_Cpp's destructor:
+    cerr << "Sleeping to ensure async cleanup ..." << endl;
+    this_thread::sleep_for(500ms);
+}
+
+TEST_CASE_METHOD(QueryTest_Cpp, "C++ Query Parameters", "[Query][QueryCpp]") {
     Query query = Query(db, kCBLN1QLLanguage, "SELECT count(*) AS n FROM _ WHERE contact.address.zip BETWEEN $zip0 AND $zip1");
     CHECK(!query.parameters());
     
