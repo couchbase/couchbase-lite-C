@@ -356,13 +356,20 @@ private:
         LOCK(_stopMutex);
         if (_stopping)
             return false;
-        _stoppables.insert(stoppable);
+        
+        if (_stoppables.find(stoppable) == _stoppables.end()) {
+            _stoppables.insert(stoppable);
+            stoppable->retain();
+        }
+        
         return true;
     }
     
     void unregisterStoppable(CBLStoppable* stoppable) {
         LOCK(_stopMutex);
-        _stoppables.erase(stoppable);
+        if (_stoppables.erase(stoppable) > 0) {
+            stoppable->release();
+        }
         _stopCond.notify_one();
     }
 

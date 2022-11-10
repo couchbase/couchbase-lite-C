@@ -24,6 +24,7 @@ using namespace std;
 void CBLListenerToken::remove() {
     auto oldOwner = _owner;
     if (oldOwner) {
+        willRemove();
         removed();
         oldOwner->remove(this);
     }
