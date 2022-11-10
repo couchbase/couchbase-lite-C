@@ -39,6 +39,7 @@ set(TEST_SRC
     DocumentTest_Cpp.cc
     LogTest.cc
     QueryTest.cc
+    QueryTest_Cpp.cc
     ReplicatorCollectionTest.cc
     ReplicatorCollectionTest_Cpp.cc
     ReplicatorEETest.cc
