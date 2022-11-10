@@ -51,6 +51,11 @@ public:
 
     /** Called by `CBLListener_Remove` */
     void remove();
+    
+    /** Called by the remove() function before removing the token from the owner.
+        Subclasses can override this function to perform any tasks such as
+        stopping the underlinging observer and etc before the token is removed. */
+    virtual void willRemove() { }
 
 protected:
     friend class cbl_internal::ListenersBase;

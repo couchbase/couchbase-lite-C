@@ -43,9 +43,24 @@ protected:
 };
 
 
+/** CBLStoppable objects can be registered / unregisted to / from the database. The registered object will be called
+    to stop() when the database is closed. The object will be unregistered either after the object is called to stop() or
+    when there is an API call to unregister the object. The database will also retain the object when the object is registered,
+    and will release the object when the object is unregistered to ensure that the object is alive until the object is unregistered. */
 struct CBLStoppable {
-    virtual ~CBLStoppable() = default;
-    virtual void stop() = 0;
+public:
+    CBLStoppable(CBLRefCounted* ref)
+    :_ref(ref)
+    {}
+    
+    virtual ~CBLStoppable()                             =default;
+    virtual void stop() const                           =0;
+    
+    void retain()                                       {fleece::retain(_ref);}
+    void release()                                      {fleece::release(_ref);}
+    
+protected:
+    CBLRefCounted* _ref;
 };
 
 

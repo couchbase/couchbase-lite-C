@@ -61,7 +61,7 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
 }
 
 
-struct CBLReplicator final : public CBLRefCounted, public CBLStoppable {
+struct CBLReplicator final : public CBLRefCounted {
 public:
     CBLReplicator(const CBLReplicatorConfiguration &conf)
     :_conf(conf)
@@ -168,21 +168,22 @@ public:
         });
         _c4status = _c4repl->getStatus();
         _useInitialStatus = true;
+        
+        _stoppable = make_unique<CBLReplicatorStoppable>(this);
     }
     
 
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
     void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}
     void setSuspended(bool suspended)                       {_c4repl->setSuspended(suspended);}
-    void stop() override                                    {_c4repl->stop();}
-
+    void stop()                                             {_c4repl->stop();}
 
     void start(bool reset) {
         LOCK(_mutex);
         _retainSelf = this;     // keep myself from being freed until the replicator stops
         _useInitialStatus = false;
         
-        if (_db->registerStoppable(this))
+        if (_db->registerStoppable(_stoppable.get()))
             _c4repl->start(reset);
         else
             CBL_Log(kCBLLogDomainReplicator, kCBLLogWarning,
@@ -242,6 +243,18 @@ public:
     }
 
 private:
+    
+    struct CBLReplicatorStoppable : CBLStoppable {
+    public:
+        CBLReplicatorStoppable(CBLReplicator* r)
+        :CBLStoppable(r)
+        {}
+        
+        void stop() const override {
+            ((CBLReplicator*)_ref)->stop();
+        }
+    };
+    
 
     alloc_slice encodeOptions() {
         Encoder enc;
@@ -294,7 +307,7 @@ private:
         }
 
         if (cblStatus.activity == kCBLReplicatorStopped) {
-            _db->unregisterStoppable(this);
+            _db->unregisterStoppable(_stoppable.get());
             _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
         }
     }
@@ -392,6 +405,7 @@ private:
     ReplicatorConfiguration const               _conf;
     Retained<CBLDatabase>                       _db;
     Retained<C4Replicator>                      _c4repl;
+    unique_ptr<CBLReplicatorStoppable>          _stoppable;
     bool                                        _useInitialStatus;  // For returning status before first start
     C4ReplicatorStatus                          _c4status {kC4Stopped};
     Retained<CBLReplicator>                     _retainSelf;

@@ -171,7 +171,7 @@ namespace cbl_internal {
     // Custom subclass of CBLListenerToken for query listeners.
     // (It implements the ListenerToken<> template so that it will work with Listeners<>.)
     template<>
-    struct ListenerToken<CBLQueryChangeListener> : public CBLListenerToken, public CBLStoppable {
+    struct ListenerToken<CBLQueryChangeListener> : public CBLListenerToken {
     public:
         ListenerToken(CBLQuery *query,
                       CBLQueryChangeListener callback,
@@ -182,20 +182,11 @@ namespace cbl_internal {
             query->_c4query.useLocked([&](C4Query *c4query) {
                 _c4obs = c4query->observe([this](C4QueryObserver*) { this->queryChanged(); });
             });
+            
+            _stoppable = std::make_unique<CBLQueryListenerStoppable>(this);
         }
 
-        ~ListenerToken() {
-            // Note:
-            // When calling CBLListener_Remove(CBLListenerToken*), the ListenerToken object
-            // will be released. Hence its `_c4obs` will be freed, which will result in
-            // disabing and freed its LiveQuerier object.
-            //
-            // Explicity disabling here to unregister iteself (CBLStoppable) from the database
-            // so that the database can be safely closed. This would mean that the `_c4obs` will
-            // try to disabling itself again when it's free, however, that when disabing second
-            // time, the disabing logic will be mostly no ops.
-            setEnabled(false);
-        }
+        ~ListenerToken() = default;
 
         void setEnabled(bool enabled);
 
@@ -213,20 +204,30 @@ namespace cbl_internal {
         Retained<CBLResultSet> resultSet() {
             return new CBLResultSet(_query, _c4obs->getEnumerator(false));
         }
-
-        // CBLStoppable :
-
-        void stop() override {
-            setEnabled(false);
-        }
+        
+        // CBLListenerToken :
+        
+        void willRemove() override                              {setEnabled(false);}
 
     private:
+        struct CBLQueryListenerStoppable : CBLStoppable {
+        public:
+            CBLQueryListenerStoppable(ListenerToken<CBLQueryChangeListener>* token)
+            :CBLStoppable(token)
+            {}
+            
+            void stop() const override {
+                ((ListenerToken<CBLQueryChangeListener>*)_ref)->setEnabled(false);
+            }
+        };
+        
         void queryChanged();    // defn is in CBLDatabase.cc, to prevent circular hdr dependency
 
         Retained<CBLQuery>  _query;
         std::unique_ptr<C4QueryObserver> _c4obs;
+        std::unique_ptr<CBLQueryListenerStoppable> _stoppable;
+        bool _isEnabled {false};
     };
-
 }
 
 
