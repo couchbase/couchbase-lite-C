@@ -253,15 +253,14 @@ typedef struct {
     
     //-- Auto Purge:
     
-    /** 
-     * If auto purge is active, then the library will automatically purge any documents that
+    /** If auto purge is active, then the library will automatically purge any documents that
         the replicating user loses access to via the Sync Function on Sync Gateway.
         If disableAutoPurge is true, this behavior is disabled and an access removed
         event will be sent to any document listeners that are active on the replicator.
         The default value is \ref kCBLDefaultReplicatorDisableAutoPurge. 
-         
-      * **Auto Purge will not be performed when documentIDs filter is specified.** 
-      */
+        
+        \note Auto Purge will not be performed when documentIDs filter is specified. 
+    */
     bool disableAutoPurge;
     
     //-- Retry Logic:
