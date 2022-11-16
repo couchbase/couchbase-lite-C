@@ -35,6 +35,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
 option(BUILD_ENTERPRISE "Set whether or not to build enterprise edition" OFF)
 option(CODE_COVERAGE_ENABLED "Set whether or not code coverage report should be generated" OFF)
+option(DISABLE_LTO_BUILD "Disable build with Link-time optimization" OFF)
 option(STRIP_SYMBOLS "Set whether or not the private symbols will be stripped" OFF)
 
 if(CODE_COVERAGE_ENABLED)
