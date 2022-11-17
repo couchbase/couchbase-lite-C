@@ -257,7 +257,10 @@ typedef struct {
         the replicating user loses access to via the Sync Function on Sync Gateway.
         If disableAutoPurge is true, this behavior is disabled and an access removed
         event will be sent to any document listeners that are active on the replicator.
-        The default value is \ref kCBLDefaultReplicatorDisableAutoPurge. */
+        The default value is \ref kCBLDefaultReplicatorDisableAutoPurge. 
+        
+        \note Auto Purge will not be performed when documentIDs filter is specified. 
+    */
     bool disableAutoPurge;
     
     //-- Retry Logic:
