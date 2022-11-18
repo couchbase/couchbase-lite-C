@@ -90,7 +90,7 @@ def check_toolchain(name: str):
         os.makedirs(toolchain_path, 0o755, True)
         print(f'Extracting {name} toolchain to {toolchain_path}...')
         with tarfile.open('toolchain.tar.gz', 'r:gz') as tar:
-            safe_extract(tar, sysroot_path, members=tar_extract_callback(tar))
+            safe_extract(tar, toolchain_path, members=tar_extract_callback(tar))
         
         outer_dir = toolchain_path / os.listdir(toolchain_path)[0]
         files_to_move = outer_dir.glob("**/*")
