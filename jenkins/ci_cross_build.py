@@ -57,6 +57,22 @@ def tar_extract_callback(archive : tarfile.TarFile):
     pbar.finish()
     pbar = None
 
+def is_within_directory(directory, target):
+    abs_directory = os.path.abspath(directory)
+    abs_target = os.path.abspath(target)
+
+    prefix = os.path.commonprefix([abs_directory, abs_target])
+
+    return prefix == abs_directory
+
+def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+    for member in tar.getmembers():
+        member_path = os.path.join(path, member.name)
+        if not is_within_directory(path, member_path):
+            raise Exception("Attempted Path Traversal in Tar File")
+
+    tar.extractall(path, members, numeric_owner=numeric_owner)
+
 def check_toolchain(name: str):
     toolchain_path = Path.home() / '.cbl_cross' / f'{name}-toolchain'
     if toolchain_path.exists() and toolchain_path.is_dir() and len(os.listdir(toolchain_path)) > 0:
@@ -74,7 +90,7 @@ def check_toolchain(name: str):
         os.makedirs(toolchain_path, 0o755, True)
         print(f'Extracting {name} toolchain to {toolchain_path}...')
         with tarfile.open('toolchain.tar.gz', 'r:gz') as tar:
-            tar.extractall(toolchain_path, members=tar_extract_callback(tar))
+            safe_extract(tar, toolchain_path, members=tar_extract_callback(tar))
         
         outer_dir = toolchain_path / os.listdir(toolchain_path)[0]
         files_to_move = outer_dir.glob("**/*")
@@ -127,7 +143,7 @@ def check_sysroot(name: str):
     elif sysroot_name.endswith("tar.gz"):
         # Eventually let's make them all tarball
         with tarfile.open(sysroot_name, 'r:gz') as tar:
-            tar.extractall(sysroot_path, members=tar_extract_callback(tar))
+            safe_extract(tar, sysroot_path, members=tar_extract_callback(tar))
     else:
         raise NotImplementedError("Unknown file type for sysroot")
 
