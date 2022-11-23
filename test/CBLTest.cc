@@ -37,12 +37,39 @@
 using namespace std;
 using namespace fleece;
 
+#ifdef __ANDROID__
+    static CBLTestAndroidContext sAndriodContext = {};
 
-static string databaseDir() {
+    void CBLTest::initAndroidContext(CBLTestAndroidContext context) {
+        sAndriodContext.filesDir = strdup(context.filesDir);
+        sAndriodContext.tempDir = strdup(context.tempDir);
+        sAndriodContext.assetsDir = strdup(context.assetsDir);
+        
+        if (!CBL_Init({sAndriodContext.filesDir, sAndriodContext.tempDir}, NULL)) {
+            FAIL("Failed to init android context");
+        }
+    }
+#endif
+
+static alloc_slice sDatabaseDir;
+
+alloc_slice CBLTest::databaseDir() {
+    if (!sDatabaseDir.empty())
+        return sDatabaseDir;
+
 #ifdef __APPLE__
     string dir = GetTempDirectory("CBL_C_Tests");
     if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
         FAIL("Can't create temp directory: errno " << errno);
+#else
+#ifdef __ANDROID__
+    if (!sAndriodContext.filesDir) {
+        FAIL("Android context has not been initialized.");
+    }
+    
+    string dir = string(sAndriodContext.filesDir).append("/CBL_C_Tests");
+    if (mkdir(dir.c_str(), 0755) != 0 && errno != EEXIST)
+        FAIL("Can't create database directory: errno " << errno);
 #else
 #ifndef WIN32
     string dir = "/tmp/CBL_C_tests";
@@ -52,24 +79,25 @@ static string databaseDir() {
     string dir = "C:\\tmp\\CBL_C_tests";
     if (_mkdir(dir.c_str()) != 0 && errno != EEXIST)
         FAIL("Can't create temp directory: errno " << errno);
-#endif
-#endif
-    return dir;
+#endif // WIN32
+#endif // __ANDROID__
+#endif // __ APPLE__
+    
+    sDatabaseDir = dir;
+    return sDatabaseDir;
+}
+
+slice const CBLTest::kDatabaseName = "CBLtest";
+
+CBLDatabaseConfiguration CBLTest::databaseConfig() {
+    // One-time setup:
+    CBLError_SetCaptureBacktraces(true);
+    CBLDatabaseConfiguration config = {databaseDir()};
+    return config;
 }
 
 static constexpr size_t kDocIDBufferSize = 20;
 static constexpr size_t kDocContentBufferSize = 100;
-
-alloc_slice const CBLTest::kDatabaseDir(databaseDir());
-slice       const CBLTest::kDatabaseName = "CBLtest";
-
-const CBLDatabaseConfiguration CBLTest::kDatabaseConfiguration = []{
-    // One-time setup:
-    CBLError_SetCaptureBacktraces(true);
-    CBLDatabaseConfiguration config = {kDatabaseDir};
-    return config;
-}();
-
 
 CBLTest::CBLTest() {
     // Check that these have been correctly exported
@@ -79,9 +107,10 @@ CBLTest::CBLTest() {
     CHECK(FLValue_GetType((FLValue)kFLEmptyDict) == kFLDict);
 
     CBLError error;
-    if (!CBL_DeleteDatabase(kDatabaseName, kDatabaseConfiguration.directory, &error) && error.code != 0)
+    auto config = databaseConfig();
+    if (!CBL_DeleteDatabase(kDatabaseName, config.directory, &error) && error.code != 0)
         FAIL("Can't delete temp database: " << error.domain << "/" << error.code);
-    db = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
+    db = CBLDatabase_Open(kDatabaseName, &config, &error);
     REQUIRE(db);
 }
 
@@ -101,7 +130,6 @@ CBLTest::~CBLTest() {
 
 #pragma mark - C++ TEST CLASS:
 
-alloc_slice const CBLTest_Cpp::kDatabaseDir = CBLTest::kDatabaseDir;
 slice const CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
 
 CBLTest_Cpp::CBLTest_Cpp()
@@ -122,14 +150,16 @@ CBLTest_Cpp::~CBLTest_Cpp() {
 }
 
 cbl::Database CBLTest_Cpp::openEmptyDatabaseNamed(slice name) {
-    cbl::Database::deleteDatabase(name, CBLTest::kDatabaseConfiguration.directory);
-    cbl::Database emptyDB = cbl::Database(name, CBLTest::kDatabaseConfiguration);
+    auto config = CBLTest::databaseConfig();
+    cbl::Database::deleteDatabase(name, config.directory);
+    cbl::Database emptyDB = cbl::Database(name, config);
     REQUIRE(emptyDB);
     return emptyDB;
 }
 
 cbl::Database CBLTest_Cpp::openDatabaseNamed(fleece::slice name) {
-    cbl::Database openedDB = cbl::Database(name, CBLTest::kDatabaseConfiguration);
+    auto config = CBLTest::databaseConfig();
+    cbl::Database openedDB = cbl::Database(name, config);
     REQUIRE(openedDB);
     return openedDB;
 }
@@ -183,19 +213,23 @@ string GetTestFilePath(const std::string &filename) {
             CFStringGetCString(path, pathBuf, sizeof(pathBuf), kCFStringEncodingUTF8);
             strlcat(pathBuf, "/", sizeof(pathBuf));
             sTestFilesPath = pathBuf;
-        } else
-#endif
-        {
-#ifdef WIN32
-            sTestFilesPath = "..\\test\\";
-#else
+        } else {
             sTestFilesPath = "test/";
-#endif
         }
+#else
+#ifdef __ANDROID__
+        sTestFilesPath = string(sAndriodContext.assetsDir) + "/";
+#else
+#ifdef WIN32
+        sTestFilesPath = "..\\test\\";
+#else
+        sTestFilesPath = "test/";
+#endif // WIN32
+#endif // __ANDROID
+#endif // __APPLE__
     }
     return sTestFilesPath + filename;
 }
-
 
 bool ReadFileByLines(const string &path, const function<bool(FLSlice)> &callback) {
     INFO("Reading lines from " << path);
@@ -216,17 +250,17 @@ bool ReadFileByLines(const string &path, const function<bool(FLSlice)> &callback
     return true;
 }
 
-unsigned ImportJSONLines(string &&path, CBLDatabase* database) {
+unsigned ImportJSONLines(string filename, CBLDatabase* database) {
     CBLError error {};
     CBLCollection *collection = CBLDatabase_DefaultCollection(database, &error);
     REQUIRE(collection);
-    auto result = ImportJSONLines(move(path), collection);
+    auto result = ImportJSONLines(filename, collection);
     CBLCollection_Release(collection);
     return result;
 }
 
-// Read a file that contains a JSON document per line. Every line becomes a document.
-unsigned ImportJSONLines(string &&path, CBLCollection* collection) {
+unsigned ImportJSONLines(string filename, CBLCollection* collection) {
+    auto path = GetTestFilePath(filename);
     CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Reading %s ...  ", path.c_str());
     CBLError error {};
     unsigned numDocs = 0;

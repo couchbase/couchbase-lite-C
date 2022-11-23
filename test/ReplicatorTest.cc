@@ -69,7 +69,8 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad url", "[Replicator]") {
     CHECK(error.code == kCBLErrorInvalidParameter);
 }
 
-
+#ifndef __ANDROID__
+// On Android emulator, the error returned is kCBLNetErrDNSFailure which is a transient error.
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
     CBLError error;
     config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
@@ -88,8 +89,10 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
     expectedError = {kCBLNetworkDomain, kCBLNetErrUnknownHost};
     replicate();
 }
+#endif
 
-
+#ifndef __ANDROID__
+// On Android emulator, the error returned is kCBLNetErrDNSFailure which is a transient error.
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replicator]") {
     CBLError error;
     config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
@@ -108,8 +111,10 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replica
     expectedError = {kCBLNetworkDomain, kCBLNetErrUnknownHost};
     replicate();
 }
+#endif
 
-
+#ifndef __ANDROID__
+// On Android emulator, the error returned is kCBLNetErrDNSFailure which is a transient error.
 // CBL-2337
 TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with freed auth and doc listener", "[Replicator]") {
     CBLError error;
@@ -130,7 +135,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with freed auth and doc listene
     // Clean up
     config.authenticator = nullptr;
 }
-
+#endif
 
 TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs", "[Replicator]") {
     CBLReplicatorConfiguration config = {};

@@ -83,7 +83,7 @@ public:
     
     void prepareLogDir() {
         // Base:
-        string dir = string(CBLTest::kDatabaseDir) + kSeparatorChar + "CBLLogTest";
+        string dir = string(CBLTest::databaseDir()) + kSeparatorChar + "CBLLogTest";
         createDir(dir);
         
         // Log dir:

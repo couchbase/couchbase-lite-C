@@ -59,28 +59,40 @@ static inline std::ostream& operator<< (std::ostream &out, CBLError err) {
 
 #include "catch.hpp"
 
+#ifdef __ANDROID__
+struct CBLTestAndroidContext {
+    const char* filesDir;
+    const char* tempDir;
+    const char* assetsDir;
+};
+#endif
 
 class CBLTest {
 public:
-    static const fleece::alloc_slice kDatabaseDir;
     static const fleece::slice kDatabaseName;
-    static const CBLDatabaseConfiguration kDatabaseConfiguration;
-
+    
+#ifdef __ANDROID__
+    /** Initializing android context is required before running tests on Android platform. */
+    static void initAndroidContext(CBLTestAndroidContext context);
+#endif
+    
+    static fleece::alloc_slice databaseDir();
+    
+    static CBLDatabaseConfiguration databaseConfig();
+    
     CBLTest();
     ~CBLTest();
-
-
+    
     CBLDatabase *db {nullptr};
 };
-
 
 std::string GetTestFilePath(const std::string &filename);
 
 bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)> &callback);
 
-unsigned ImportJSONLines(std::string &&path, CBLDatabase* database);
+unsigned ImportJSONLines(std::string filename, CBLDatabase* database);
 
-unsigned ImportJSONLines(std::string &&path, CBLCollection* collection);
+unsigned ImportJSONLines(std::string filename, CBLCollection* collection);
 
 void CheckError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain = kCBLDomain);
 

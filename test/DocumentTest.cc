@@ -932,7 +932,9 @@ TEST_CASE_METHOD(DocumentTest, "Document Expiring After Reopen", "[Document][Exp
     // Close & reopen the database:
     REQUIRE(CBLDatabase_Close(db, &error));
     CBLDatabase_Release(db);
-    db = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
+    
+    auto config = databaseConfig();
+    db = CBLDatabase_Open(kDatabaseName, &config, &error);
 
     // Now wait for expiration:
     this_thread::sleep_for(3000ms);

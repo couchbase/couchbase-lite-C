@@ -32,7 +32,7 @@ using namespace fleece;
 class QueryTest : public CBLTest {
 public:
     QueryTest() {
-        ImportJSONLines(GetTestFilePath("names_100.json"), db);
+        ImportJSONLines("names_100.json", db);
     }
 
     ~QueryTest() {
@@ -647,7 +647,7 @@ TEST_CASE_METHOD(QueryTest, "Query Default Collection", "[Query]") {
 
 TEST_CASE_METHOD(QueryTest, "Query Collection in Default Scope", "[.CBL-3538]") {
     auto col = CreateCollection(db, "colA");
-    ImportJSONLines(GetTestFilePath("names_100.json"), col);
+    ImportJSONLines("names_100.json", col);
     CBLCollection_Release(col);
     
     string queryString;
@@ -680,7 +680,7 @@ TEST_CASE_METHOD(QueryTest, "Query Collection in Default Scope", "[.CBL-3538]") 
 
 TEST_CASE_METHOD(QueryTest, "Query Named Collection and Scope", "[Query]") {
     auto col = CreateCollection(db, "colA", "scopeA");
-    ImportJSONLines(GetTestFilePath("names_100.json"), col);
+    ImportJSONLines("names_100.json", col);
     CBLCollection_Release(col);
     
     string queryString = "SELECT name.first FROM scopeA.colA ORDER BY name.first LIMIT 1";
@@ -705,7 +705,7 @@ TEST_CASE_METHOD(QueryTest, "Query Named Collection and Scope", "[Query]") {
 
 TEST_CASE_METHOD(QueryTest, "Create Query with Different Collection Name Cases Failed", "[Query]") {
     auto col = CreateCollection(db, "colA", "scopeA");
-    ImportJSONLines(GetTestFilePath("names_100.json"), col);
+    ImportJSONLines("names_100.json", col);
     CBLCollection_Release(col);
     
     string queryString = "SELECT name.first FROM ScOpEa.CoLa ORDER BY name.first LIMIT 1";
