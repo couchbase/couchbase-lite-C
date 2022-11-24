@@ -17,5 +17,5 @@ mkdir -p build_cmake
 cd build_cmake
 
 core_count=`getconf _NPROCESSORS_ONLN`
-[ ! -f ../build_cmake/CMakeCache.txt ] && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 make -j `expr $core_count + 1`
