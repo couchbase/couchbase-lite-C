@@ -24,10 +24,8 @@ using namespace std;
 using namespace fleece;
 
 
-// NOTE: This file is large (~30MB) so it isn't checked into the repo.
-//FIXME: Not a portable path.
-static constexpr const char *kJSONFilePath = "../DataSets/travel-sample/travelSample.json";
-
+// NOTE: The "travelSample.json" is large (~30MB) so it isn't checked into the repo.
+// The file should be put int the test assets folder
 
 TEST_CASE_METHOD(CBLTest_Cpp, "Benchmark Import JSON", "[.Perf]") {
     Stopwatch st;
@@ -36,7 +34,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Benchmark Import JSON", "[.Perf]") {
     db.createValueIndex("locations",  {kCBLJSONLanguage, "[[\".country\"], [\".city\"]]"_sl});
     db.createValueIndex("longitudes", {kCBLJSONLanguage, "[[\".geo.lon\"]]"_sl});
 
-    ImportJSONLines(kJSONFilePath, db.ref());
+    ImportJSONLines("travelSample.json", db.ref());
 
     cout << "Elapsed time: " << st.elapsed() << " sec\n";
 }

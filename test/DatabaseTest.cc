@@ -53,7 +53,8 @@ public:
     
     DatabaseTest() {
         CBLError error;
-        if (!CBL_DeleteDatabase(kOtherDBName, kDatabaseConfiguration.directory, &error) && error.code != 0)
+        auto config = databaseConfig();
+        if (!CBL_DeleteDatabase(kOtherDBName, config.directory, &error) && error.code != 0)
             FAIL("Can't delete otherDB database: " << error.domain << "/" << error.code);
     }
 
@@ -188,9 +189,10 @@ static void createDocument(CBLDatabase *db, slice docID, slice property, slice v
 
 
 TEST_CASE_METHOD(DatabaseTest, "Database") {
+    auto dbDir = databaseDir();
     CHECK(CBLDatabase_Name(db) == kDatabaseName);
-    CHECK(string(CBLDatabase_Path(db)) == string(kDatabaseDir) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
-    CHECK(CBL_DatabaseExists(kDatabaseName, kDatabaseDir));
+    CHECK(string(CBLDatabase_Path(db)) == string(dbDir) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
+    CHECK(CBL_DatabaseExists(kDatabaseName, dbDir));
     CHECK(CBLDatabase_Count(db) == 0);
     CHECK(CBLDatabase_LastSequence(db) == 0);       // not public API
 }
@@ -844,7 +846,8 @@ TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document into Different DB") {
     CBLError error;
     CHECK(CBLDatabase_SaveDocument(db, doc, &error));
     
-    otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
+    auto config = databaseConfig();
+    otherDB = CBLDatabase_Open(kOtherDBName, &config, &error);
     REQUIRE(otherDB);
     
     ExpectingExceptions x;
@@ -863,7 +866,8 @@ TEST_CASE_METHOD(DatabaseTest, "Legacy - Save Document into Different DB Instanc
     CBLError error;
     CHECK(CBLDatabase_SaveDocument(db, doc, &error));
     
-    CBLDatabase* db2 = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
+    auto config = databaseConfig();
+    CBLDatabase* db2 = CBLDatabase_Open(kDatabaseName, &config, &error);
     REQUIRE(db2);
     
     ExpectingExceptions x;
@@ -1026,7 +1030,8 @@ TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Document from Different DB") {
     const CBLDocument* doc = CBLDatabase_GetDocument(db, "doc1"_sl, &error);
     REQUIRE(doc);
     
-    otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
+    auto config = databaseConfig();
+    otherDB = CBLDatabase_Open(kOtherDBName, &config, &error);
     REQUIRE(otherDB);
     
     ExpectingExceptions x;
@@ -1044,7 +1049,8 @@ TEST_CASE_METHOD(DatabaseTest, "Legacy - Delete Document from Different DB Insta
     const CBLDocument* doc = CBLDatabase_GetDocument(db, "doc1"_sl, &error);
     REQUIRE(doc);
     
-    CBLDatabase* db2 = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
+    auto config = databaseConfig();
+    CBLDatabase* db2 = CBLDatabase_Open(kDatabaseName, &config, &error);
     REQUIRE(db2);
     
     ExpectingExceptions x;
@@ -1126,7 +1132,8 @@ TEST_CASE_METHOD(DatabaseTest, "Legacy - Purge Document from Different DB") {
     const CBLDocument* doc = CBLDatabase_GetDocument(db, "doc1"_sl, &error);
     REQUIRE(doc);
     
-    otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
+    auto config = databaseConfig();
+    otherDB = CBLDatabase_Open(kOtherDBName, &config, &error);
     REQUIRE(otherDB);
     
     ExpectingExceptions x;
@@ -1144,7 +1151,8 @@ TEST_CASE_METHOD(DatabaseTest, "Legacy - Purge Document from Different DB Instan
     const CBLDocument* doc = CBLDatabase_GetDocument(db, "doc1"_sl, &error);
     REQUIRE(doc);
     
-    CBLDatabase* db2 = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
+    auto config = databaseConfig();
+    CBLDatabase* db2 = CBLDatabase_Open(kDatabaseName, &config, &error);
     REQUIRE(db2);
     
     ExpectingExceptions x;
@@ -1171,15 +1179,16 @@ TEST_CASE_METHOD(DatabaseTest, "Copy Database") {
     REQUIRE(CBLDatabase_SaveDocument(db, doc, &error));
     CBLDocument_Release(doc);
     
-    REQUIRE(!CBL_DatabaseExists(kOtherDBName, kDatabaseConfiguration.directory));
+    auto config = databaseConfig();
+    REQUIRE(!CBL_DatabaseExists(kOtherDBName, config.directory));
     
     // Copy:
     alloc_slice path = CBLDatabase_Path(db);
-    REQUIRE(CBL_CopyDatabase(path, kOtherDBName, &kDatabaseConfiguration, &error));
+    REQUIRE(CBL_CopyDatabase(path, kOtherDBName, &config, &error));
     
     // Check:
-    CHECK(CBL_DatabaseExists(kOtherDBName, kDatabaseConfiguration.directory));
-    otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
+    CHECK(CBL_DatabaseExists(kOtherDBName, config.directory));
+    otherDB = CBLDatabase_Open(kOtherDBName, &config, &error);
     CHECK(otherDB != nullptr);
     CHECK(CBLDatabase_Count(otherDB) == 1);
     
@@ -1227,7 +1236,8 @@ TEST_CASE_METHOD(DatabaseTest, "Legacy - Expiration After Reopen") {
     // Close & reopen the database:
     REQUIRE(CBLDatabase_Close(db, &error));
     CBLDatabase_Release(db);
-    db = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
+    auto config = databaseConfig();
+    db = CBLDatabase_Open(kDatabaseName, &config, &error);
 
     // Now wait for expiration:
     this_thread::sleep_for(3000ms);
@@ -1306,7 +1316,7 @@ TEST_CASE_METHOD(DatabaseTest, "Maintenance : Optimize") {
     CBLError error;
     CHECK(CBLDatabase_CreateValueIndex(db, "index1"_sl, index1, &error));
     
-    ImportJSONLines(GetTestFilePath("names_100.json"), db);
+    ImportJSONLines("names_100.json", db);
     
     CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeOptimize, &error));
 }
@@ -1319,7 +1329,7 @@ TEST_CASE_METHOD(DatabaseTest, "Maintenance : FullOptimize") {
     CBLError error;
     CHECK(CBLDatabase_CreateValueIndex(db, "index1"_sl, index1, &error));
 
-    ImportJSONLines(GetTestFilePath("names_100.json"), db);
+    ImportJSONLines("names_100.json", db);
 
     CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeFullOptimize, &error));
 }
@@ -1728,7 +1738,8 @@ TEST_CASE_METHOD(DatabaseTest, "Get blob", "[Blob]") {
 
 TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator") {
     CBLError error;
-    otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
+    auto dbConfig = databaseConfig();
+    otherDB = CBLDatabase_Open(kOtherDBName, &dbConfig, &error);
     REQUIRE(otherDB);
     
     // Start Replicator:
@@ -1764,7 +1775,8 @@ TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator") {
 
 TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator") {
     CBLError error;
-    otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
+    auto dbConfig = databaseConfig();
+    otherDB = CBLDatabase_Open(kOtherDBName, &dbConfig, &error);
     REQUIRE(otherDB);
     
     // Start Replicator:
@@ -1804,7 +1816,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator") {
 
 
 TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Live Query") {
-    ImportJSONLines(GetTestFilePath("names_100.json"), db);
+    ImportJSONLines("names_100.json", db);
     
     CBLError error;
     auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
@@ -1831,7 +1843,7 @@ TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Live Query") {
 
 
 TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Live Query") {
-    ImportJSONLines(GetTestFilePath("names_100.json"), db);
+    ImportJSONLines("names_100.json", db);
     
     CBLError error;
     auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,

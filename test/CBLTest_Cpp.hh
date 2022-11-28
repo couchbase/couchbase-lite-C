@@ -39,9 +39,8 @@ namespace cbl {
 
 class CBLTest_Cpp {
 public:
-    static const fleece::alloc_slice kDatabaseDir;
     static const fleece::slice kDatabaseName;
-
+    
     CBLTest_Cpp();
     ~CBLTest_Cpp();
 

@@ -50,7 +50,8 @@ public:
     
     CBLDatabase* openDB() {
         CBLError error = {};
-        CBLDatabase* db = CBLDatabase_Open(kDatabaseName, &kDatabaseConfiguration, &error);
+        auto config = databaseConfig();
+        CBLDatabase* db = CBLDatabase_Open(kDatabaseName, &config, &error);
         REQUIRE(db);
         return db;
     }

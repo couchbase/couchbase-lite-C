@@ -6,8 +6,12 @@
 //  Copyright © 2019 Couchbase. All rights reserved.
 //
 
+#ifndef __ANDROID__
+
 #define CATCH_CONFIG_CONSOLE_WIDTH 120
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 
 #include "CBLTest.hh"
 #include "CaseListReporter.hh"
+
+#endif

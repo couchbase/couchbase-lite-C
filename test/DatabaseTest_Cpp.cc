@@ -31,13 +31,13 @@ using namespace cbl;
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database") {
     CHECK(db.name() == string(kDatabaseName));
-    CHECK(db.path() == string(kDatabaseDir) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
+    CHECK(db.path() == string(CBLTest::databaseDir()) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
     CHECK(db.count() == 0);
 }
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database Exist") {
     CHECK(!Database::exists(kDatabaseName, nullptr));
-    CHECK(Database::exists(kDatabaseName, kDatabaseDir));
+    CHECK(Database::exists(kDatabaseName, CBLTest::databaseDir()));
 }
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Copy Database") {
@@ -45,14 +45,17 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Copy Database") {
     doc["greeting"] = "Howdy!";
     db.saveDocument(doc);
     
+    auto dbDir = CBLTest::databaseDir();
+    auto config = CBLTest::databaseConfig();
+    
     const slice copiedDBName = "CBLtest_Copied";
-    Database::deleteDatabase(copiedDBName, kDatabaseDir);
-    REQUIRE(!Database::exists(copiedDBName, kDatabaseDir));
+    Database::deleteDatabase(copiedDBName, dbDir);
+    REQUIRE(!Database::exists(copiedDBName, dbDir));
     
-    Database::copyDatabase(db.path(), copiedDBName, CBLTest::kDatabaseConfiguration);
+    Database::copyDatabase(db.path(), copiedDBName, config);
     
-    CHECK(Database::exists(copiedDBName, kDatabaseDir));
-    auto copiedDB = cbl::Database(copiedDBName, CBLTest::kDatabaseConfiguration);
+    CHECK(Database::exists(copiedDBName, dbDir));
+    auto copiedDB = cbl::Database(copiedDBName, config);
     CHECK(copiedDB.count() == 1);
     
     doc = copiedDB.getMutableDocument("foo");

@@ -33,7 +33,7 @@ using namespace cbl;
 class QueryTest_Cpp : public CBLTest_Cpp {
 public:
     QueryTest_Cpp() {
-        ImportJSONLines(GetTestFilePath("names_100.json"), db.ref());
+        ImportJSONLines("names_100.json", db.ref());
     }
 };
 
