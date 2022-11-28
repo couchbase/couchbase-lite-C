@@ -211,19 +211,19 @@ string GetTestFilePath(const std::string &filename) {
             CFAutorelease(path);
             char pathBuf[1000];
             CFStringGetCString(path, pathBuf, sizeof(pathBuf), kCFStringEncodingUTF8);
-            strlcat(pathBuf, "/", sizeof(pathBuf));
+            strlcat(pathBuf, "/assets/", sizeof(pathBuf));
             sTestFilesPath = pathBuf;
         } else {
-            sTestFilesPath = "test/";
+            sTestFilesPath = "test/assets/";
         }
 #else
 #ifdef __ANDROID__
         sTestFilesPath = string(sAndriodContext.assetsDir) + "/";
 #else
 #ifdef WIN32
-        sTestFilesPath = "..\\test\\";
+        sTestFilesPath = "..\\test\\assets\\";
 #else
-        sTestFilesPath = "test/";
+        sTestFilesPath = "test/assets/";
 #endif // WIN32
 #endif // __ANDROID
 #endif // __APPLE__
