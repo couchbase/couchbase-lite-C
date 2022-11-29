@@ -10,7 +10,9 @@
 
 INSTALL_PATH            = $(LOCAL_LIBRARY_DIR)/Frameworks
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/Frameworks
+CODE_SIGN_IDENTITY      = Apple Development
 DEFINES_MODULE          = YES
+DEVELOPMENT_TEAM        = N2Q372V7W2
 EXECUTABLE_PREFIX       =
 FRAMEWORK_VERSION       = A
 INFOPLIST_FILE          = Xcode/Framework-Info.plist

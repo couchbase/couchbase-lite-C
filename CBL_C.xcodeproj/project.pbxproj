@@ -1459,8 +1459,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27310FD7235F686D0046F8C8 /* CBL_Framework_Debug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
-				DEVELOPMENT_TEAM = N2Q372V7W2;
 				ENABLE_HARDENED_RUNTIME = YES;
 			};
 			name = Debug;
@@ -1469,8 +1467,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Apple Development";
-				DEVELOPMENT_TEAM = N2Q372V7W2;
 				ENABLE_HARDENED_RUNTIME = YES;
 			};
 			name = Release;
@@ -1630,8 +1626,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27310FD7235F686D0046F8C8 /* CBL_Framework_Debug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
-				DEVELOPMENT_TEAM = N2Q372V7W2;
 				ENABLE_HARDENED_RUNTIME = YES;
 			};
 			name = Debug_EE;
@@ -1791,8 +1785,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Apple Development";
-				DEVELOPMENT_TEAM = N2Q372V7W2;
 				ENABLE_HARDENED_RUNTIME = YES;
 			};
 			name = Release_EE;
