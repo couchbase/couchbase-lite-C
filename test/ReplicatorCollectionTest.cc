@@ -28,7 +28,7 @@ static const string kDefaultDocContent = "{\"greeting\":\"hello\"}";
 class ReplicatorCollectionTest : public ReplicatorTest {
 public:
     ReplicatorCollectionTest()
-    :db2(openEmptyDatabaseNamed("otherDB"))
+    :db2(openDatabaseNamed("otherDB", true)) // empty
     {
         config.database = nullptr;
         config.endpoint = CBLEndpoint_CreateWithLocalDB(db2.ref());

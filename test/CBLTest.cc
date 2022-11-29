@@ -133,7 +133,7 @@ CBLTest::~CBLTest() {
 slice const CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
 
 CBLTest_Cpp::CBLTest_Cpp()
-:db(openEmptyDatabaseNamed(kDatabaseName))
+:db(openDatabaseNamed(kDatabaseName, true)) // empty
 { }
 
 CBLTest_Cpp::~CBLTest_Cpp() {
@@ -149,19 +149,14 @@ CBLTest_Cpp::~CBLTest_Cpp() {
     CHECK(CBL_InstanceCount() == 0);
 }
 
-cbl::Database CBLTest_Cpp::openEmptyDatabaseNamed(slice name) {
+cbl::Database CBLTest_Cpp::openDatabaseNamed(slice name, Boolean createEmpty){
     auto config = CBLTest::databaseConfig();
-    cbl::Database::deleteDatabase(name, config.directory);
-    cbl::Database emptyDB = cbl::Database(name, config);
-    REQUIRE(emptyDB);
-    return emptyDB;
-}
-
-cbl::Database CBLTest_Cpp::openDatabaseNamed(fleece::slice name) {
-    auto config = CBLTest::databaseConfig();
-    cbl::Database openedDB = cbl::Database(name, config);
-    REQUIRE(openedDB);
-    return openedDB;
+    if(createEmpty == true){
+        cbl::Database::deleteDatabase(name, config.directory);
+    }
+    cbl::Database db = cbl::Database(name, config);
+    REQUIRE(db);
+    return db;
 }
 
 void CBLTest_Cpp::createNumberedDocs(cbl::Collection& collection, unsigned n, unsigned start) {
