@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-INFOPLIST_FILE              = $(SRCROOT)/test/iOS/Info.plist
+INFOPLIST_FILE              = $(SRCROOT)/test/platforms/iOS/Info.plist
 IPHONEOS_DEPLOYMENT_TARGET  = 13.0 // Min iOS Version required by UIScene
 PRODUCT_BUNDLE_IDENTIFIER   = com.couchbase.CouchbaseLiteTests
 PRODUCT_NAME                = CouchbaseLiteTests
