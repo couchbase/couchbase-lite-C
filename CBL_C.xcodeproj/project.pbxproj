@@ -33,7 +33,6 @@
 		275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */; };
 		275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
 		275B359F234D064600FE9CF0 /* QueryTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275B359D234D064600FE9CF0 /* QueryTest.cc */; };
-		275B35A1234D0ADC00FE9CF0 /* names_100.json in Resources */ = {isa = PBXBuildFile; fileRef = 275B35A0234D0A9F00FE9CF0 /* names_100.json */; };
 		275BC4DE2201323700DBE7D2 /* CBLBlob_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4DD2201323700DBE7D2 /* CBLBlob_CAPI.cc */; };
 		275BC4F42204FB1400DBE7D2 /* BlobTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275BC4F32204FB1400DBE7D2 /* BlobTest_Cpp.cc */; };
 		276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 276633A52602815000B9BD36 /* CBLDatabase_CAPI.cc */; };
@@ -85,6 +84,9 @@
 		27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */; };
 		27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4022546E29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
+		4022546F29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
+		4022547029355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 		932062DB26BC6B43006917A5 /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 932062DA26BC6B43006917A5 /* CBLQuery.cc */; };
 		9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 9320630126BDB340006917A5 /* CBLPlatform.h */; };
@@ -126,9 +128,7 @@
 		FC645E1B29085C87007D5536 /* ReplicatorEETest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */; };
 		FC645E1C29085C89007D5536 /* ReplicatorPropEncTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93C70D1626CB334D0093E927 /* ReplicatorPropEncTest.cc */; };
 		FC645E1D29085CBF007D5536 /* CBLTest.c in Sources */ = {isa = PBXBuildFile; fileRef = 27C9B5F221F7EE670040BC45 /* CBLTest.c */; };
-		FC645E1E29085CD4007D5536 /* names_100.json in Resources */ = {isa = PBXBuildFile; fileRef = 275B35A0234D0A9F00FE9CF0 /* names_100.json */; };
 		FC645E2029086153007D5536 /* CouchbaseLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27984E0A2249A126000FE777 /* CouchbaseLite.framework */; };
-		FC645E212908656F007D5536 /* names_100.json in Resources */ = {isa = PBXBuildFile; fileRef = 275B35A0234D0A9F00FE9CF0 /* names_100.json */; };
 		FC645E2429087419007D5536 /* CouchbaseLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27984E0A2249A126000FE777 /* CouchbaseLite.framework */; };
 		FC645E2529087419007D5536 /* CouchbaseLite.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 27984E0A2249A126000FE777 /* CouchbaseLite.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FC645E2C29087777007D5536 /* Platform_Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = FC645E292908756C007D5536 /* Platform_Apple.mm */; };
@@ -393,7 +393,6 @@
 		275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTestsMain.cpp; sourceTree = "<group>"; };
 		275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CouchbaseLiteTests.mm; path = test/CouchbaseLiteTests.mm; sourceTree = SOURCE_ROOT; };
 		275B359D234D064600FE9CF0 /* QueryTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = QueryTest.cc; sourceTree = "<group>"; };
-		275B35A0234D0A9F00FE9CF0 /* names_100.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = names_100.json; sourceTree = "<group>"; };
 		275BC4CC22012D8700DBE7D2 /* CBLBlob.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLBlob.h; sourceTree = "<group>"; };
 		275BC4DD2201323700DBE7D2 /* CBLBlob_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLBlob_CAPI.cc; sourceTree = "<group>"; };
 		275BC4E22204E6A800DBE7D2 /* Blob.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Blob.hh; sourceTree = "<group>"; };
@@ -458,6 +457,7 @@
 		27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "LibC++Debug.cc"; sourceTree = "<group>"; };
 		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
 		27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+Apple.mm"; sourceTree = "<group>"; };
+		4022546D29355576000FBAC8 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		932062DA26BC6B43006917A5 /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
 		9320630126BDB340006917A5 /* CBLPlatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLPlatform.h; sourceTree = "<group>"; };
 		9320631126BDB5CA006917A5 /* CBLPlatform_CAPI+Android.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "CBLPlatform_CAPI+Android.cc"; sourceTree = "<group>"; };
@@ -772,7 +772,7 @@
 				275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */,
 				27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */,
 				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
-				275B35A0234D0A9F00FE9CF0 /* names_100.json */,
+				4022546D29355576000FBAC8 /* assets */,
 			);
 			path = test;
 			sourceTree = "<group>";
@@ -1251,7 +1251,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				275B35A1234D0ADC00FE9CF0 /* names_100.json in Resources */,
+				4022546E29355577000FBAC8 /* assets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1259,8 +1259,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC645E212908656F007D5536 /* names_100.json in Resources */,
 				FCE497272907917400EF2354 /* LaunchScreen.storyboard in Resources */,
+				4022546F29355577000FBAC8 /* assets in Resources */,
 				FCE497242907917400EF2354 /* Assets.xcassets in Resources */,
 				FCE497222907917300EF2354 /* Main.storyboard in Resources */,
 			);
@@ -1270,7 +1270,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC645E1E29085CD4007D5536 /* names_100.json in Resources */,
+				4022547029355577000FBAC8 /* assets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
