@@ -25,31 +25,11 @@ include_directories(
     ${PROJECT_BINARY_DIR}/../generated_headers/public/cbl/ # or this
 )
 
-set(TEST_SRC
-    BlobTest.cc
-    BlobTest_Cpp.cc
-    CBLTest.c
-    CBLTest.cc
-    CBLTestsMain.cpp
-    CollectionTest.cc
-    CollectionTest_Cpp.cc
-    DatabaseTest.cc
-    DatabaseTest_Cpp.cc
-    DocumentTest.cc
-    DocumentTest_Cpp.cc
-    LogTest.cc
-    QueryTest.cc
-    QueryTest_Cpp.cc
-    ReplicatorCollectionTest.cc
-    ReplicatorCollectionTest_Cpp.cc
-    ReplicatorEETest.cc
-    ReplicatorPropEncTest.cc
-    ReplicatorTest.cc
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/Backtrace.cc
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/LibC++Debug.cc
-    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/betterassert.cc
-)
-add_executable(CBL_C_Tests ${TEST_SRC} )
+# Test source files:
+include("cmake/test_source_files.cmake")
+set_test_source_files(DIR ${PROJECT_SOURCE_DIR} RESULT TEST_SRC)
+
+add_executable(CBL_C_Tests ${TEST_SRC})
 
 target_link_libraries(CBL_C_Tests PRIVATE  cblite)
 
