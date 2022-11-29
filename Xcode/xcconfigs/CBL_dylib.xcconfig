@@ -20,3 +20,5 @@
 
 PRODUCT_NAME            = cblite
 EXPORTED_SYMBOLS_FILE   = $(DERIVED_FILE_DIR)/CBL.exp  // output of src/exports/generate_exports.sh
+CODE_SIGN_IDENTITY      = Apple Development
+DEVELOPMENT_TEAM        = N2Q372V7W2

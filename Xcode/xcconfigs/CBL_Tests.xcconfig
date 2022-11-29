@@ -18,5 +18,6 @@
 
 HEADER_SEARCH_PATHS     = include Xcode/generated_headers/public/cbl $(FLEECE)/API  $(FLEECE)/Fleece/Support  $(FLEECE)/vendor/catch
 PRODUCT_NAME            = cbl_tests
-
-LLVM_LTO                    = NO    // LTO makes tests very slow to link and confuses Instruments
+CODE_SIGN_IDENTITY      = Apple Development
+DEVELOPMENT_TEAM        = N2Q372V7W2
+LLVM_LTO                = NO    // LTO makes tests very slow to link and confuses Instruments
