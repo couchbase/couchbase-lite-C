@@ -44,7 +44,7 @@ public:
     CBLTest_Cpp();
     ~CBLTest_Cpp();
     
-    cbl::Database openDatabaseNamed(fleece::slice name, Boolean createEmpty = false);
+    cbl::Database openDatabaseNamed(fleece::slice name, bool createEmpty = 0);
     
     void createNumberedDocs(cbl::Collection& collection, unsigned n, unsigned start = 1);
     

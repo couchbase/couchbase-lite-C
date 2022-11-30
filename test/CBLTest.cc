@@ -149,14 +149,14 @@ CBLTest_Cpp::~CBLTest_Cpp() {
     CHECK(CBL_InstanceCount() == 0);
 }
 
-cbl::Database CBLTest_Cpp::openDatabaseNamed(slice name, Boolean createEmpty){
+cbl::Database CBLTest_Cpp::openDatabaseNamed(slice name, bool createEmpty){
     auto config = CBLTest::databaseConfig();
     if(createEmpty == true){
         cbl::Database::deleteDatabase(name, config.directory);
     }
-    cbl::Database db = cbl::Database(name, config);
-    REQUIRE(db);
-    return db;
+    cbl::Database database = cbl::Database(name, config);
+    REQUIRE(database);
+    return database;
 }
 
 void CBLTest_Cpp::createNumberedDocs(cbl::Collection& collection, unsigned n, unsigned start) {
