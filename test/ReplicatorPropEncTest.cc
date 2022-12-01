@@ -39,7 +39,7 @@ public:
     bool decryptionError = false;
     
     ReplicatorPropertyEncryptionTest()
-    :otherDB(openEmptyDatabaseNamed("otherDB"))
+    :otherDB(openDatabaseNamed("otherDB", true)) // empty
     {
         config.endpoint = CBLEndpoint_CreateWithLocalDB(otherDB.ref());
     }
@@ -52,7 +52,7 @@ public:
     void resetDBAndReplicator() {
         db.close();
         db = nullptr;
-        db = openEmptyDatabaseNamed(kDatabaseName);
+        db = openDatabaseNamed(kDatabaseName, true); // empty
         
         config.database = db.ref();
         resetReplicator();

@@ -45,7 +45,7 @@ public:
     };
     
     ReplicatorCollectionTest_Cpp()
-    :db2(openEmptyDatabaseNamed("otherDB"))
+    :db2(openDatabaseNamed("otherDB", true)) // empty
     ,config({vector<ReplicationCollection>(), Endpoint::databaseEndpoint(db2)})
     {
         cx.push_back(db.createCollection("colA"_sl, "scopeA"_sl));

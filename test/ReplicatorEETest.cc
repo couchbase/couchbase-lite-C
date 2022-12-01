@@ -29,7 +29,7 @@ public:
     Database otherDB;
 
     ReplicatorLocalTest()
-    :otherDB(openEmptyDatabaseNamed("otherDB"))
+    :otherDB(openDatabaseNamed("otherDB", true)) // empty
     {
         config.endpoint = CBLEndpoint_CreateWithLocalDB(otherDB.ref());
     }
