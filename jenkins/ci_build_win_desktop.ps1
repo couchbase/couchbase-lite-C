@@ -11,11 +11,16 @@
     The build number of this build (e.g. 123)
 .PARAMETER Edition
     The edition to build (community vs enterprise)
+.PARAMETER Architecture
+    The architecture to build (default x64 or ARM64) 
 #>
 param(
     [Parameter(Mandatory=$true, HelpMessage="The version number to give to the build (e.g. 3.0.0)")][string]$Version,
     [Parameter(Mandatory=$true, HelpMessage="The build number of this build (e.g. 123)")][string]$BuildNum,
-    [Parameter(Mandatory=$true, HelpMessage="The edition to build (community vs enterprise)")][string]$Edition
+    [ValidateSet("community", "enterprise")]
+    [Parameter(Mandatory=$true, HelpMessage="The edition to build (community vs enterprise)")][string]$Edition,
+    [ValidateSet("x64", "ARM64")]
+    [Parameter(Mandatory=$false, HelpMessage="The architecture to build (default x64, ARM64)")][string]$Architecture = "x64"
 )
 
 # NOTE: This is for Couchbase internal CI usage.  
@@ -40,7 +45,7 @@ function Make-Package() {
         throw "Zip failed"
     }
 
-    $PropFile = "$env:WORKSPACE\publish_x64.prop"
+    $PropFile = "$env:WORKSPACE\publish_${Architecture}.prop"
     New-Item -ItemType File -ErrorAction Ignore -Path $PropFile
     Add-Content $PropFile "PRODUCT=couchbase-lite-c"
     Add-Content $PropFile "VERSION=$Version"
@@ -57,7 +62,7 @@ function Build() {
     New-Item -ItemType Directory -ErrorAction Ignore $directory
     Push-Location $directory
 
-    & "C:\Program Files\CMake\bin\cmake.exe" -G "Visual Studio 15 2017" -A x64 -DEDITION="$Edition" -DCMAKE_INSTALL_PREFIX="$pwd/libcblite-${Version}" ..
+    & "C:\Program Files\CMake\bin\cmake.exe" -G "Visual Studio 15 2017" -A "${Architecture}" -DEDITION="$Edition" -DCMAKE_INSTALL_PREFIX="$pwd/libcblite-${Version}" ..
     if($LASTEXITCODE -ne 0) {
         throw "CMake failed"
     }
@@ -85,16 +90,23 @@ function Run-UnitTest() {
     Pop-Location
 }
 
-Remove-Item -Recurse -Force -ErrorAction Ignore "${env:WORKSPACE}\build_x64\libcblite-${Version}"
+$Build_Dir = "build_${Architecture}"
+Remove-Item -Recurse -Force -ErrorAction Ignore "${env:WORKSPACE}\${Build_Dir}\libcblite-${Version}"
 New-Item -Type Junction -Target ${env:WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE -Path ${env:WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
-Build "${env:WORKSPACE}\build_x64"
+Build "${env:WORKSPACE}\${Build_Dir}"
 if("${Edition}" -eq "enterprise") {
-    Run-UnitTest "${env:WORKSPACE}\build_x64"
+    Run-UnitTest "${env:WORKSPACE}\${Build_Dir}"
 }
 
-Make-Package "${env:WORKSPACE}\build_x64" "couchbase-lite-c-$Edition-$Version-$BuildNum-windows-x86_64.zip"
+$Package_Arch = ${Architecture}.ToLowerInvariant()
+if ("${Package_Arch}" -eq "x64") {
+    $Package_Arch = "x86_64"
+}
+
+$Package_Name = "couchbase-lite-c-${Edition}-${Version}-${BuildNum}-windows-${Package_Arch}"
+Make-Package "${env:WORKSPACE}\${Build_Dir}" "${Package_Name}.zip"
 
 # Windows symbols into a separate archive since they are not included in the "install" anyway
-Push-Location "${env:WORKSPACE}\build_x64\couchbase-lite-c\MinSizeRel"
-& 7za a -tzip -mx9 "${env:WORKSPACE}\couchbase-lite-c-$Edition-$Version-$BuildNum-windows-x86_64-symbols.zip" cblite.pdb
+Push-Location "${env:WORKSPACE}\${Build_Dir}\couchbase-lite-c\MinSizeRel"
+& 7za a -tzip -mx9 "${env:WORKSPACE}\${Package_Name}-symbols.zip" cblite.pdb
 Pop-Location
