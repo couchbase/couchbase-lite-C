@@ -743,8 +743,8 @@
 		27B61D6721D6B5DA0027CCDB /* test */ = {
 			isa = PBXGroup;
 			children = (
-				FCE497162907917300EF2354 /* iOS */,
-				FC645E1F29085CE5007D5536 /* Platforms */,
+				402254D929368C09000FBAC8 /* platforms */,
+				FC645E1F29085CE5007D5536 /* supports */,
 				27B61D6821D6B60D0027CCDB /* CBLTest.hh */,
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
 				27A63F252633408000634F7B /* CBLTest_Cpp.hh */,
@@ -812,6 +812,14 @@
 			path = xcconfigs;
 			sourceTree = "<group>";
 		};
+		402254D929368C09000FBAC8 /* platforms */ = {
+			isa = PBXGroup;
+			children = (
+				FCE497162907917300EF2354 /* iOS */,
+			);
+			path = platforms;
+			sourceTree = "<group>";
+		};
 		FC645DFD290852D5007D5536 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -838,13 +846,13 @@
 			name = Test;
 			sourceTree = "<group>";
 		};
-		FC645E1F29085CE5007D5536 /* Platforms */ = {
+		FC645E1F29085CE5007D5536 /* supports */ = {
 			isa = PBXGroup;
 			children = (
 				FC645E282908756C007D5536 /* Platform_Apple.hh */,
 				FC645E292908756C007D5536 /* Platform_Apple.mm */,
 			);
-			name = Platforms;
+			name = supports;
 			sourceTree = "<group>";
 		};
 		FCE497162907917300EF2354 /* iOS */ = {
