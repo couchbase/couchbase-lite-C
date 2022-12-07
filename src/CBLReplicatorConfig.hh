@@ -203,6 +203,9 @@ namespace cbl_internal {
                 _proxy.username = copyString(_proxy.username, _proxyUsername);
                 _proxy.password = copyString(_proxy.password, _proxyPassword);
             }
+
+            addUserAgentHeader();
+           
         }
 
 
@@ -333,6 +336,38 @@ namespace cbl_internal {
         using string = std::string;
         using alloc_slice = fleece::alloc_slice;
 
+// // “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
+        //CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
+        void addUserAgentHeader(){
+            if (!headers){
+                headers = FLMutableDict_New();
+            }
+            fleece::MutableDict _headers = FLDict_AsMutable(headers);
+            if (!_headers["userAgent"]){
+                _headers["userAgent"] = "CouchbaseLite/";
+            }
+              
+            //     std::string os;
+            // #ifdef _WIN32
+            //     os = "Windows 32-bit";
+            // #elif _WIN
+            //     os ="Windows 64-bit";
+            // #elif __APPLE__ || __MACH__
+            //     os = "Mac OSX";
+            // #elif _linux__
+            //     os = "Linux";_
+            // #elif __FreeBSD__
+            //     os = "FreeBSD";
+            // #elif __unix || __unix__
+            //     os = "Unix";
+            // #else
+            //     os = "Other";
+            // #endif
+            //     alloc_slice version = c4_getVersion();
+            //     alloc_slice build = c4_getBuildInfo();
+
+            //     std::string result = "CouchbaseLite/" + version.asString() + "-" + build.asString() + "(C;" + os  + "; <platform>) <build type>, Commit/unofficial@HQ-Rename0337 Core/" + version.asString();
+        }
         static slice copyString(slice str, alloc_slice &allocated) {
             allocated = alloc_slice(str);
             return allocated;

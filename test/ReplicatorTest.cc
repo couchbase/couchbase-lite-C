@@ -224,6 +224,23 @@ TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs with nullptr value", "[Re
     CBLReplicator_Release(repl2);
 }
 
+TEST_CASE_METHOD(ReplicatorTest, "Check userAgent header", "[Replicator]") {
+    CBLReplicatorConfiguration config = {};
+    config.database = db.ref();
+
+    CBLError error;
+    CBLEndpoint* endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
+    config.endpoint = endpoint;
+
+    auto repl1 = CBLReplicator_Create(&config, &error);
+    REQUIRE(repl1);
+
+    auto ccConfig = CBLReplicator_Config(repl1);
+    Dict headers = Dict(ccConfig->headers);
+    string userAgent = headers["userAgent"].asstring();
+    CHECK_THAT(userAgent, Catch::StartsWith("CouchbaseLite/"));
+    CBLReplicator_Release(repl1);
+}
 
 #pragma mark - ACTUAL-NETWORK TESTS:
 
