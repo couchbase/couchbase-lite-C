@@ -48,11 +48,11 @@ fi
 
 SDK_MGR="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
 
-echo " ======== Installing toolchain with NDK ${ANDROID_NDK_VERSION} (this will accept the licenses!)"
+echo "======== Installing toolchain with NDK ${ANDROID_NDK_VERSION} (this will accept the licenses!)"
 yes | ${SDK_MGR} --licenses > /dev/null 2>&1
 ${SDK_MGR} --install "ndk;${ANDROID_NDK_VERSION}" > /dev/null
 
-echo " ======== Installing cbdeps ========"
+echo "======== Installing cbdeps ========"
 mkdir -p .tools
 if [ ! -f .tools/cbdep ]; then 
     curl -o .tools/cbdep http://downloads.build.couchbase.com/cbdep/cbdep.$(uname -s | tr "[:upper:]" "[:lower:]")-$(uname -m)
