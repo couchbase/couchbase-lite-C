@@ -1,16 +1,38 @@
 #!/bin/bash -e
 
+function usage
+{
+  echo "Usage: ${0} [-a <x86,armeabi-v7a,x86_64,arm64-v8a>]"
+}
+
+while [[ $# -gt 0 ]]
+do
+  key=${1}
+  case $key in
+      -a)
+      ARCHS=${2}
+      shift
+      ;;
+      *)
+      usage
+      exit 3
+      ;;
+  esac
+  shift
+done
+
+if [ -z "$ARCHS" ]
+then
+    BUILD_ARCHS=("x86" "armeabi-v7a" "x86_64" "arm64-v8a")
+else
+    BUILD_ARCHS=(`echo $ARCHS | tr ',' ' '`)
+fi
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 pushd $SCRIPT_DIR/..
 
 NDK_DEFAULT_VERSION="21.4.7075529"
 CMAKE_DEFAULT_VERSION="3.18.1"
-
-mkdir -p build_android_out
-mkdir -p build_android_x86
-mkdir -p build_android_arm
-mkdir -p build_android_x64
-mkdir -p build_android_arm64
 
 if [ -z "${ANDROID_SDK_ROOT}" ]; then
     echo "Error: ANDROID_SDK_ROOT not set, aborting..."
@@ -35,19 +57,22 @@ function build_variant {
         -DANDROID_ABI=$1 \
         -DCMAKE_INSTALL_PREFIX=`pwd`/../build_android_out \
         ..
-
     $ANDROID_SDK_ROOT/cmake/$ANDROID_CMAKE_VERSION/bin/cmake --build . --target install
 }
 
-set -x
-cd build_android_x86
-build_variant x86
+# Create install directory:
+mkdir -p build_android_out
 
-cd ../build_android_arm
-build_variant armeabi-v7a
+# Build library for each archs:
+echo "Architectures : ${BUILD_ARCHS[@]}"
+for ARCH in "${BUILD_ARCHS[@]}"
+  do
+    echo "Build ${ARCH} ..."
+    mkdir -p build_${ARCH}
+    pushd build_${ARCH}
+    build_variant ${ARCH}
+    popd
+    rm -rf build_${ARCH}
+done
 
-cd ../build_android_x64
-build_variant x86_64
-
-cd ../build_android_arm64
-build_variant arm64-v8a
+popd

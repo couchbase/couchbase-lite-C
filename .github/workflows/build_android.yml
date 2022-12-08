@@ -1,4 +1,4 @@
-name: Build Android
+name: Build and Test Android
 
 on:
   push:
@@ -11,22 +11,51 @@ on:
       - '**'
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  # NOTE: If we decide to archive the build products we should build with RelWithDebInfo instead.
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, MinSizeRel, etc.)
   BUILD_TYPE: Debug
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
       with:
         submodules: recursive
+
     - name: Setup Android SDK
       run: |
         $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "ndk;21.4.7075529"
         $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "cmake;3.18.1"
+
+    - name: Setup Java SDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: 11
+
     - name: Build
       working-directory: ${{github.workspace}}
-      run: scripts/build_android.sh
-    
+      run: | 
+        scripts/build_android.sh -a x86_64
+
+    - name: Prepare for Tests
+      working-directory: ${{github.workspace}}
+      run: | 
+        cp -r build_android_out test/platforms/Android/app/libs/libcblite
+
+    - name: Tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        # Encounter random emulator issue when using lower API (e.g. 21)
+        api-level: 23
+        arch: x86_64
+        working-directory: ./test/platforms/Android
+        script: | 
+          adb logcat -s "CBLTests" &
+          ./gradlew cAT -PabiFilters=x86_64
+
+    - name: Post Tests
+      working-directory: ${{github.workspace}}
+      run: | 
+        ps ax | grep logcat | grep -v grep | awk '{print $1}' | xargs kill
