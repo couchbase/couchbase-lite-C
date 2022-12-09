@@ -64,5 +64,7 @@ CBL_CAPI_BEGIN
     FLSliceResult CBLDocument_CanonicalRevisionID(const CBLDocument* doc) CBLAPI;
 
     unsigned CBLDocument_Generation(const CBLDocument* doc) CBLAPI;
+    
+    FLSlice CBLReplicator_UserAgent(CBLReplicator* repl) CBLAPI;
 
 CBL_CAPI_END

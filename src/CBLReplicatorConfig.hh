@@ -21,6 +21,7 @@
 #include "CBLReplicator.h"
 #include "CBLDatabase_Internal.hh"
 #include "CBLCollection_Internal.hh"
+#include "CBLUserAgent.hh"
 #include "Internal.hh"
 #include "c4ReplicatorTypes.h"
 #include "c4Private.h"
@@ -203,9 +204,6 @@ namespace cbl_internal {
                 _proxy.username = copyString(_proxy.username, _proxyUsername);
                 _proxy.password = copyString(_proxy.password, _proxyPassword);
             }
-
-            addUserAgentHeader();
-           
         }
 
 
@@ -260,7 +258,11 @@ namespace cbl_internal {
 
         // Writes a LiteCore replicator optionsDict
         void writeOptions(Encoder &enc) const {
-            writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders,  Dict(headers));
+            fleece::MutableDict _headers = headers ? FLDict_AsMutable(headers) : FLMutableDict_New();
+            if (!_headers["userAgent"]){
+                _headers["userAgent"] = createUserAgentHeader();
+            }
+            writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders,  _headers);
             
             if (pinnedServerCertificate.buf) {
                 enc.writeKey(slice(kC4ReplicatorOptionPinnedServerCert));
@@ -335,46 +337,6 @@ namespace cbl_internal {
     private:
         using string = std::string;
         using alloc_slice = fleece::alloc_slice;
-
-        // “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
-        //CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
-        //"CouchbaseLite/0.0.0 (:fc1900d2+)-built from  branch, commit fc1900d2+CHANGES on Dec  7 2022 19:40:34(C;Apple OSX; <platform>) <build type>, Commit/unofficial@HQ-Rename0337 Core/0.0.0 (:fc1900d2+)"
-        static string createUserAgentHeader(){
-            string os, header;
-            alloc_slice version = c4_getVersion();
-            alloc_slice build = c4_getBuildInfo();
-#if defined (__APPLE__) && defined (__MACH__)
-    #if TARGET_IPHONE_SIMULATOR == 1
-            os = "Apple iOS Simulator";
-    #elif TARGET_OS_IPHONE == 1
-            os = "Apple iOS Device";
-    #elif TARGET_OS_MAC == 1
-            os = "Apple OSX";
-#endif
-#elif __ANDROID__
-            os = "Android" + string(__ANDROID_API__);
-#elif  _WIN64
-            os = "Microsoft Windows (64-bit)";
-#elif _WIN32
-            os = "Microsoft Windows (32-bit)";
-#elif __linux__
-            os = "Linux";
-#elif _AIX
-            os = "IBM AIX";
-#endif
-            header = "CouchbaseLite/" + os;
-            // header = "CouchbaseLite/" + version.asString() + "-" + build.asString() + "(C; " + os  + "; <platform>) <build type>, Commit/unofficial@HQ-Rename0337 Core/" + version.asString();
-            return header;
-        }
-        void addUserAgentHeader(){
-            if (!headers){
-                headers = FLMutableDict_New();
-            }
-            fleece::MutableDict _headers = FLDict_AsMutable(headers);
-            if (!_headers["userAgent"]){
-                _headers["userAgent"] = createUserAgentHeader();
-            }
-        }
 
         static slice copyString(slice str, alloc_slice &allocated) {
             allocated = alloc_slice(str);

@@ -214,6 +214,13 @@ public:
 
         // Encode replicator options dict:
         alloc_slice options = encodeOptions();
+
+        AllocedDict optionsDict { options };
+        _userAgent = optionsDict.get(kC4ReplicatorOptionExtraHeaders)
+                         .asDict()
+                         .get(kC4ReplicatorOptionUserAgent)
+                         .asString();
+
         params.optionsDictFleece = options;
 
         // Create the LiteCore replicator:
@@ -239,7 +246,7 @@ public:
     
 
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
-    CBLDatabase* database() const                           {return _db;}
+    CBLDatabase *database() const { return _db; }
     void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}
     void setSuspended(bool suspended)                       {_c4repl->setSuspended(suspended);}
     void stop()                                             {_c4repl->stop();}
@@ -304,6 +311,10 @@ public:
             _progressLevel = kC4ReplProgressPerDocument;
         }
         return _docListeners.add(listener, context);
+    }
+
+    alloc_slice getUserAgent(){
+        return _userAgent;
     }
 
 private:
@@ -535,6 +546,7 @@ private:
     Listeners<CBLReplicatorChangeListener>      _changeListeners;
     Listeners<CBLDocumentReplicationListener>   _docListeners;
     C4ReplicatorProgressLevel                   _progressLevel {kC4ReplProgressOverall};
+    alloc_slice _userAgent;
 };
 
 CBL_ASSUME_NONNULL_END
