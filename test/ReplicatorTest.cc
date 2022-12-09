@@ -236,9 +236,6 @@ TEST_CASE_METHOD(ReplicatorTest, "Check userAgent header", "[Replicator]") {
     REQUIRE(repl1);
 
     auto userAgent = slice(CBLReplicator_UserAgent(repl1)).asString();
-    // auto ccConfig = CBLReplicator_Config(repl1);
-    // Dict headers = Dict(ccConfig->headers);
-    // string userAgent = headers["userAgent"].asstring();
     CHECK_THAT(userAgent, Catch::StartsWith("CouchbaseLite/"));
     CBLReplicator_Release(repl1);
 }

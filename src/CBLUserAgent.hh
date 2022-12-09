@@ -19,17 +19,21 @@
 
 #pragma once
 #include "CBL_Edition.h"
+#include <sstream>
 
 
 using string = std::string;
+using stringstream = std::stringstream;
 using alloc_slice = fleece::alloc_slice;
-// “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
-        //CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
-        //"CouchbaseLite/0.0.0 (:fc1900d2+)-built from  branch, commit fc1900d2+CHANGES on Dec  7 2022 19:40:34(C;Apple OSX; <platform>) <build type>, Commit/unofficial@HQ-Rename0337 Core/0.0.0 (:fc1900d2+)"
+
+// JAVA TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
+// JAVA OUTPUT   - CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
+
     static string createUserAgentHeader(){
-        string os, header;
-        alloc_slice coreVersion = c4_getVersion();
-        alloc_slice coreBuild = c4_getBuildInfo();
+            stringstream header = {};
+            string os;
+            alloc_slice coreVersion = c4_getVersion();
+            alloc_slice coreBuild = c4_getBuildInfo();
 #if defined (__APPLE__) && defined (__MACH__)
     #if TARGET_IPHONE_SIMULATOR == 1
         os = "Apple iOS Simulator";
@@ -49,8 +53,14 @@ using alloc_slice = fleece::alloc_slice;
 #else 
         os = "Unknown OS";
 #endif
+        header << "CouchbaseLite/"
+               << CBLITE_VERSION
+               << "-"
+               << CBLITE_BUILD_NUMBER
+               << " ("
+               << os
+               << ") Core/"
+               << coreVersion.asString();
         
-        header = "CouchbaseLite/" + string(CBLITE_VERSION) + "-" + string(CBLITE_BUILD_NUMBER) + " (" + os + ") Core/" + coreVersion.asString();
-        // header = "CouchbaseLite/" + "-" + "(C; " + os  + "; <platform>) <build type>, Commit/unofficial@HQ-Rename0337 Core/" + coreVersion.asString() + coreBuild.asString();
-        return header;
+        return header.str();
 }
