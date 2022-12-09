@@ -169,6 +169,7 @@ CBL_C {
 		CBLError_SetCaptureBacktraces;
 		CBLLog_BeginExpectingExceptions;
 		CBLLog_EndExpectingExceptions;
+		CBLReplicator_UserAgent//;
 		kCBLDefaultLogFileUsePlainText;
 		kCBLDefaultLogFileMaxSize;
 		kCBLDefaultLogFileMaxRotateCount;

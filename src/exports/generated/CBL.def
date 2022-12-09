@@ -171,6 +171,7 @@ CBLError_GetCaptureBacktraces
 CBLError_SetCaptureBacktraces
 CBLLog_BeginExpectingExceptions
 CBLLog_EndExpectingExceptions
+CBLReplicator_UserAgent//
 kCBLDefaultLogFileUsePlainText
 kCBLDefaultLogFileMaxSize
 kCBLDefaultLogFileMaxRotateCount
