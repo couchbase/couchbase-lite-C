@@ -59,8 +59,8 @@ void CBLAuth_Free(CBLAuthenticator *auth) noexcept {
 }
 
 /** Private API*/
-FLSlice CBLReplicator_UserAgent(CBLReplicator* repl) noexcept {
-    return FLSlice(repl->getUserAgent());
+FLSlice CBLReplicator_UserAgent(const CBLReplicator* repl) noexcept {
+    return repl->getUserAgent();
 }
 
 CBLReplicator* CBLReplicator_Create(const CBLReplicatorConfiguration* conf, CBLError *outError) noexcept {
