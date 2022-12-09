@@ -240,7 +240,7 @@ public:
     
 
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
-    CBLDatabase *database() const { return _db; }
+    CBLDatabase* database() const                           {return _db;}
     void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}
     void setSuspended(bool suspended)                       {_c4repl->setSuspended(suspended);}
     void stop()                                             {_c4repl->stop();}
