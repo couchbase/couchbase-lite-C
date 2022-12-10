@@ -29,13 +29,20 @@ CBL_CAPI_BEGIN
 /** Application context information required for Android application to initialize before using
     CouchbaseLite library. */
 typedef struct {
-    const char* filesDir;   ///< The directory where the opened database will be stored when a specific database directory is not specified in \ref CBLDatabaseConfiguration.
-                            ///< Normally the path returned from Android Context's getFilesDir() method can be specified here unless different directory is desired.
-                            ///< The specified fileDir must exist otherwise an error will be returend when calling \r CBL_Init().
+    /** The directory where the opened database will be stored when a specific database
+        directory is not specified in \ref CBLDatabaseConfiguration.
+        @note Recommend to simply use the directory returned by the Android Context's
+              getFilesDir() API or a custom subdirectory under.
+        @note The specified fileDir directory must exist, otherwise an error will be returend
+              when calling \r CBL_Init(). */
+    const char* filesDir;
     
-    const char* tempDir;    ///< The directory where the SQLite stores its temporary files.
-                            ///< Normally the path returned from Android Context's getExternalFilesDir(String type) with a custom type such as "CBLTemp" can be specified here
-                            ///< unless different directory is desired. The specified tempDir must exist otherwise an error will be returend when calling \r CBL_Init().
+    /** The directory where the SQLite stores its temporary files.
+        @note Recommend to create and use a temp directory under the directory returned by
+              the Android Context's getFilesDir() API.
+        @note The specified tempDir must exist otherwise an error will be returend
+              when calling \r CBL_Init(). */
+    const char* tempDir;
 } CBLInitContext;
 
 /** Initialize application context information for Android application. This function is required
@@ -43,8 +50,7 @@ typedef struct {
     returned when calling CBLDatabase_Open to open a database. Call \r CBL_Init more than once will
     return an error.
     @param context  The application context information.
-    @param outError  On failure, the error will be written here.
- */
+    @param outError  On failure, the error will be written here. */
 bool CBL_Init(CBLInitContext context, CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
