@@ -43,7 +43,7 @@ using alloc_slice = fleece::alloc_slice;
         os = "Apple OSX";
     #endif
 #elif __ANDROID__
-        os = "Android" + string(__ANDROID_API__);
+        os = "Android" + std::to_string(__ANDROID_API__);
 #elif  _WIN64
         os = "Microsoft Windows (64-bit)";
 #elif _WIN32
