@@ -30,7 +30,7 @@ using alloc_slice = fleece::alloc_slice;
 // JAVA OUTPUT   - CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
 
     static string createUserAgentHeader(){
-            stringstream header = {};
+            stringstream header;
             string os;
             alloc_slice coreVersion = c4_getVersion();
             alloc_slice coreBuild = c4_getBuildInfo();
