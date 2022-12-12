@@ -159,6 +159,7 @@ CBLReplicator_IsDocumentPending
 CBLReplicator_IsDocumentPending2
 CBLReplicator_AddChangeListener
 CBLReplicator_AddDocumentReplicationListener
+CBLReplicator_UserAgent
 CBLDefaultConflictResolver
 CBLCollection_Database
 CBLCollection_DeleteDocumentByID
@@ -171,7 +172,6 @@ CBLError_GetCaptureBacktraces
 CBLError_SetCaptureBacktraces
 CBLLog_BeginExpectingExceptions
 CBLLog_EndExpectingExceptions
-CBLReplicator_UserAgent//
 kCBLDefaultLogFileUsePlainText
 kCBLDefaultLogFileMaxSize
 kCBLDefaultLogFileMaxRotateCount

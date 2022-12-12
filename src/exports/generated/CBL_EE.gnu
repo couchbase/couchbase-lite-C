@@ -178,6 +178,7 @@ CBL_C {
 		CBLReplicator_IsDocumentPending2;
 		CBLReplicator_AddChangeListener;
 		CBLReplicator_AddDocumentReplicationListener;
+		CBLReplicator_UserAgent;
 		CBLDefaultConflictResolver;
 		CBLCollection_Database;
 		CBLCollection_DeleteDocumentByID;
@@ -190,7 +191,6 @@ CBL_C {
 		CBLError_SetCaptureBacktraces;
 		CBLLog_BeginExpectingExceptions;
 		CBLLog_EndExpectingExceptions;
-		CBLReplicator_UserAgent//;
 		kCBLDefaultLogFileUsePlainText;
 		kCBLDefaultLogFileMaxSize;
 		kCBLDefaultLogFileMaxRotateCount;

@@ -210,7 +210,6 @@ namespace cbl_internal
             Dict headersDict = Dict(headers);
             fleece::Value userAgent = headersDict[kCBLReplicatorUserAgent];
             _userAgent = userAgent ? userAgent.asstring() : createUserAgentHeader();
-
         }
 
         ~ReplicatorConfiguration() {

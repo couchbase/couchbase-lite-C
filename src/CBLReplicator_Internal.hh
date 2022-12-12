@@ -214,7 +214,6 @@ public:
 
         // Encode replicator options dict:
         alloc_slice options = encodeOptions();
-
         params.optionsDictFleece = options;
 
         // Create the LiteCore replicator:
