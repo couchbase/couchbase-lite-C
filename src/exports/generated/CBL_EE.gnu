@@ -150,6 +150,7 @@ CBL_C {
 		CBLReplicator_IsDocumentPending;
 		CBLReplicator_AddChangeListener;
 		CBLReplicator_AddDocumentReplicationListener;
+		CBLReplicator_UserAgent;
 		CBLDefaultConflictResolver;
 		kFLNullValue;
 		kFLUndefinedValue;
