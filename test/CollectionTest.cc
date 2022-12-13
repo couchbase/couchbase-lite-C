@@ -184,6 +184,8 @@ public:
     }
 };
 
+#define NOT_DELETE_DEFAULT_COLLECTION
+
 TEST_CASE_METHOD(CollectionTest, "Default Collection", "[Collection]") {
     CBLError error = {};
     CBLCollection* col = CBLDatabase_DefaultCollection(db, &error);
@@ -237,6 +239,8 @@ TEST_CASE_METHOD(CollectionTest, "Default Scope Exists By Default", "[Collection
     FLMutableArray_Release(names);
 }
 
+#ifndef NOT_DELETE_DEFAULT_COLLECTION
+
 TEST_CASE_METHOD(CollectionTest, "Delete Default Collection", "[Collection]") {
     CBLError error = {};
     CBLCollection* col = CBLDatabase_DefaultCollection(db, &error);
@@ -280,6 +284,22 @@ TEST_CASE_METHOD(CollectionTest, "Get Default Scope After Delete Default Collect
     FLMutableArray_Release(names);
 }
 
+#else 
+
+TEST_CASE_METHOD(CollectionTest, "Default Collection Cannot Be Deleted", "[Collection]") {
+    ExpectingExceptions ex;
+    CBLError error = {};
+    CBLCollection* col = CBLDatabase_DefaultCollection(db, &error);
+    REQUIRE(col);
+    
+    // Try delete the default collection - should return false:
+    REQUIRE(!CBLDatabase_DeleteCollection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error));
+    CHECK((error.domain == kCBLDomain && error.code == kCBLErrorInvalidParameter ));
+
+    CBLCollection_Release(col);
+}
+
+#endif
 TEST_CASE_METHOD(CollectionTest, "Create And Get Collection In Default Scope", "[Collection]") {
     CBLError error = {};
     CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, kCBLDefaultScopeName, &error);

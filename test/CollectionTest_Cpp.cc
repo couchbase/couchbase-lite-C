@@ -110,6 +110,7 @@ public:
     }
 };
 
+#define NOT_DELETE_DEFAULT_COLLECTION
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Collection", "[Collection]") {
     Collection col = db.getDefaultCollection();
@@ -127,6 +128,7 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Collection", "[Collection]") {
     CHECK(names.toJSONString() == R"(["_default"])");
 }
 
+#ifndef NOT_DELETE_DEFAULT_COLLECTION
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Default Collection", "[Collection]") {
     Collection col = db.getDefaultCollection();
     CHECK(col);
@@ -165,6 +167,23 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Scope", "[Collection]") {
     REQUIRE(names);
     CHECK(names.toJSONString() == R"(["_default"])");
 }
+#else
+
+TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Collection Cannot Be Deleted", "[Collection]") {
+
+    ExpectingExceptions ex;
+    Collection col = db.getDefaultCollection();
+    REQUIRE(col);
+
+    // Try delete the default collection - should fail and catch error:
+    try {
+        db.deleteCollection(kCBLDefaultCollectionName);
+    } catch (CBLError e){
+        CHECK((e.domain == kCBLDomain && e.code == kCBLErrorInvalidParameter ));
+    }
+}
+
+#endif
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Create And Get Collection In Default Scope", "[Collection]") {
     Collection col = db.getCollection("colA", kCBLDefaultScopeName);
