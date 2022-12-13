@@ -16,6 +16,7 @@
 // limitations under the License.
 //
 
+#include "CBLPrivate.h"
 #include "CBLReplicator.h"
 #include "CBLReplicator_Internal.hh"
 
@@ -55,6 +56,11 @@ CBLAuthenticator* CBLAuth_CreateSession(FLString sessionID, FLString cookieName)
 
 void CBLAuth_Free(CBLAuthenticator *auth) noexcept {
     delete auth;
+}
+
+/** Private API*/
+FLSlice CBLReplicator_UserAgent(const CBLReplicator* repl) noexcept {
+    return repl->getUserAgent();
 }
 
 CBLReplicator* CBLReplicator_Create(const CBLReplicatorConfiguration* conf, CBLError *outError) noexcept {

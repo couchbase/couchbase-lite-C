@@ -214,6 +214,7 @@ CBLReplicator_IsDocumentPending
 CBLReplicator_IsDocumentPending2
 CBLReplicator_AddChangeListener
 CBLReplicator_AddDocumentReplicationListener
+CBLReplicator_UserAgent
 
 CBLDefaultConflictResolver
 

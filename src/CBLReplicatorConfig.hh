@@ -21,6 +21,7 @@
 #include "CBLReplicator.h"
 #include "CBLDatabase_Internal.hh"
 #include "CBLCollection_Internal.hh"
+#include "CBLUserAgent.hh"
 #include "Internal.hh"
 #include "c4ReplicatorTypes.h"
 #include "c4Private.h"
@@ -164,8 +165,10 @@ namespace cbl_internal {
 
 #pragma mark - CONFIGURATION:
 
+#define kCBLReplicatorUserAgent "kCBLReplicatorUserAgent"
 
-namespace cbl_internal {
+namespace cbl_internal
+{
     // Managed config object that retains/releases its properties.
     struct ReplicatorConfiguration : public CBLReplicatorConfiguration {
         using Encoder = fleece::Encoder;
@@ -188,7 +191,7 @@ namespace cbl_internal {
                 }
                 collections = _collections.data();
             }
-            
+
             authenticator = authenticator ? authenticator->clone() : nullptr;
             headers = FLDict_MutableCopy(headers, kFLDeepCopyImmutables);
             channels = FLArray_MutableCopy(channels, kFLDeepCopyImmutables);
@@ -203,8 +206,11 @@ namespace cbl_internal {
                 _proxy.username = copyString(_proxy.username, _proxyUsername);
                 _proxy.password = copyString(_proxy.password, _proxyPassword);
             }
-        }
 
+            Dict headersDict = Dict(headers);
+            fleece::Value userAgent = headersDict[kCBLReplicatorUserAgent];
+            _userAgent = userAgent ? userAgent.asstring() : createUserAgentHeader();
+        }
 
         ~ReplicatorConfiguration() {
             release(database);
@@ -257,7 +263,11 @@ namespace cbl_internal {
 
         // Writes a LiteCore replicator optionsDict
         void writeOptions(Encoder &enc) const {
-            writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders,  Dict(headers));
+            fleece::MutableDict mHeaders = headers ? FLDict_AsMutable(headers) : FLMutableDict_New();
+            if (!mHeaders[kCBLReplicatorUserAgent]) {
+                mHeaders[kCBLReplicatorUserAgent] = _userAgent;
+            }
+            writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders, mHeaders);
             
             if (pinnedServerCertificate.buf) {
                 enc.writeKey(slice(kC4ReplicatorOptionPinnedServerCert));
@@ -326,6 +336,10 @@ namespace cbl_internal {
             writeOptionalKey(enc, kC4ReplicatorOptionChannels,      Array(collection.channels));
         }
 
+        slice getUserAgent() const {
+            return slice(_userAgent);
+        }
+
         ReplicatorConfiguration(const ReplicatorConfiguration&) =delete;
         ReplicatorConfiguration& operator=(const ReplicatorConfiguration&) =delete;
 
@@ -333,11 +347,13 @@ namespace cbl_internal {
         using string = std::string;
         using alloc_slice = fleece::alloc_slice;
 
-        static slice copyString(slice str, alloc_slice &allocated) {
+        static slice copyString(slice str, alloc_slice &allocated)
+        {
             allocated = alloc_slice(str);
             return allocated;
         }
-        
+
+        string                                  _userAgent;
         std::vector<CBLReplicationCollection>   _collections;
         alloc_slice                             _pinnedServerCert, _trustedRootCerts;
         CBLProxySettings                        _proxy;

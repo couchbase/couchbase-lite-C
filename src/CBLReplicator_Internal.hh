@@ -306,6 +306,10 @@ public:
         return _docListeners.add(listener, context);
     }
 
+    slice getUserAgent() const {
+        return _conf.getUserAgent();
+    }
+
 private:
     
     struct CBLReplicatorStoppable : CBLStoppable {

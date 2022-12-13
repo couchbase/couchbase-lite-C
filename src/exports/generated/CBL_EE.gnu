@@ -178,6 +178,7 @@ CBL_C {
 		CBLReplicator_IsDocumentPending2;
 		CBLReplicator_AddChangeListener;
 		CBLReplicator_AddDocumentReplicationListener;
+		CBLReplicator_UserAgent;
 		CBLDefaultConflictResolver;
 		CBLCollection_Database;
 		CBLCollection_DeleteDocumentByID;

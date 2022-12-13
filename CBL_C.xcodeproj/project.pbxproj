@@ -101,6 +101,9 @@
 		93C70D3426D01B5A0093E927 /* BlobTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93C70D3326D01B5A0093E927 /* BlobTest.cc */; };
 		93C70D3526D01B5A0093E927 /* BlobTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93C70D3326D01B5A0093E927 /* BlobTest.cc */; };
 		93EC366226C49AF700182B02 /* CBLEncryptable_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 93EC365D26C498AB00182B02 /* CBLEncryptable_Internal.hh */; };
+		AE591AB829473A4500E4BDE8 /* CBLUserAgent.hh in Headers */ = {isa = PBXBuildFile; fileRef = AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */; };
+		AE591AB929473A4500E4BDE8 /* CBLUserAgent.hh in Headers */ = {isa = PBXBuildFile; fileRef = AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */; };
+		AE591ABA29473A4500E4BDE8 /* CBLUserAgent.hh in Headers */ = {isa = PBXBuildFile; fileRef = AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */; };
 		AED22E7D291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */; };
 		AED22E7E291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */; };
 		AED22E7F291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */; };
@@ -471,6 +474,7 @@
 		93D0AFF1262619B800777AFC /* generate_edition_header.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_edition_header.sh; sourceTree = "<group>"; };
 		93E490C326BDE10F0091B587 /* DatabaseTest_Android.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DatabaseTest_Android.cc; sourceTree = "<group>"; };
 		93EC365D26C498AB00182B02 /* CBLEncryptable_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLEncryptable_Internal.hh; sourceTree = "<group>"; };
+		AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CBLUserAgent.hh; sourceTree = "<group>"; };
 		AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = QueryTest_Cpp.cc; sourceTree = "<group>"; };
 		FC09077B28A5F3EF00201B07 /* CollectionTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CollectionTest_Cpp.cc; sourceTree = "<group>"; };
 		FC0907E628AD763600201B07 /* DocumentTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DocumentTest_Cpp.cc; sourceTree = "<group>"; };
@@ -653,6 +657,7 @@
 				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
 				FCC063C828588DA6000C5BD7 /* CBLScope.cc */,
 				FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */,
+				AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */,
 				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
 				27D11BED2351043B00C58A70 /* ConflictResolver.hh */,
 				271C2A7421CC4BD60045856E /* Internal.cc */,
@@ -883,6 +888,7 @@
 				277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */,
 				FC5FBBB72821E4970066157F /* CBLDatabase_Internal.hh in Headers */,
 				FCC064202862B850000C5BD7 /* CBLScope.h in Headers */,
+				AE591AB829473A4500E4BDE8 /* CBLUserAgent.hh in Headers */,
 				27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */,
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
 				FCC064232862B869000C5BD7 /* CouchbaseLite.h in Headers */,
@@ -906,6 +912,7 @@
 				FCB96E8429007D4F001C4DED /* CBLDefaults.h in Headers */,
 				27984E2A2249A240000FE777 /* CBLBase.h in Headers */,
 				27984E2B2249A240000FE777 /* CBLBlob.h in Headers */,
+				AE591ABA29473A4500E4BDE8 /* CBLUserAgent.hh in Headers */,
 				27984E2D2249A240000FE777 /* CBLDocument.h in Headers */,
 				27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */,
 				FCD988BC2821B10400512BBD /* CBLCollection.h in Headers */,
@@ -930,6 +937,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE591AB929473A4500E4BDE8 /* CBLUserAgent.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
