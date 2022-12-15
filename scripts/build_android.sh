@@ -31,7 +31,7 @@ fi
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 pushd $SCRIPT_DIR/..
 
-NDK_DEFAULT_VERSION="21.4.7075529"
+NDK_DEFAULT_VERSION="23.1.7779620"
 CMAKE_DEFAULT_VERSION="3.18.1"
 
 if [ -z "${ANDROID_SDK_ROOT}" ]; then
@@ -55,6 +55,7 @@ function build_variant {
         -DCMAKE_MAKE_PROGRAM=$ANDROID_SDK_ROOT/cmake/$ANDROID_CMAKE_VERSION/bin/ninja \
         -DANDROID_NATIVE_API_LEVEL=22 \
         -DANDROID_ABI=$1 \
+        -DCMAKE_BUILD_TYPE=MinSizeRel \
         -DCMAKE_INSTALL_PREFIX=`pwd`/../build_android_out \
         ..
     $ANDROID_SDK_ROOT/cmake/$ANDROID_CMAKE_VERSION/bin/cmake --build . --target install
