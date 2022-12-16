@@ -201,9 +201,13 @@ namespace cbl {
         /** The heartbeat interval in seconds.
             Specify 0 to use the default value of 300 seconds. */
         unsigned heartbeat                  = 0;
+        
+    #ifdef __CBL_REPLICATOR_NETWORK_INTERFACE__
         /** The specific network interface to be used by the replicator to connect to the remote server.
-            If not specified, an active network interface based on the OS's routing table will be used. */
+            If not specified, an active network interface based on the OS's routing table will be used.
+            @NOTE The networkInterface configuration is not supported. */
         std::string networkInterface;
+    #endif
 
         //-- HTTP settings:
         /** Authentication credentials, if needed. */
@@ -265,8 +269,10 @@ namespace cbl {
             conf.proxy = proxy;
             if (!headers.empty())
                 conf.headers = headers;
+        #ifdef __CBL_REPLICATOR_NETWORK_INTERFACE__
             if (!networkInterface.empty())
                 conf.networkInterface = slice(networkInterface);
+        #endif
             if (!pinnedServerCertificate.empty())
                 conf.pinnedServerCertificate = slice(pinnedServerCertificate);
             if (!trustedRootCertificates.empty())

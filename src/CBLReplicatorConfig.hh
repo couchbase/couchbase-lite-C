@@ -198,7 +198,11 @@ namespace cbl_internal
             documentIDs = FLArray_MutableCopy(documentIDs, kFLDeepCopyImmutables);
             pinnedServerCertificate = (_pinnedServerCert = pinnedServerCertificate);
             trustedRootCertificates = (_trustedRootCerts = trustedRootCertificates);
+        
+        #ifdef __CBL_REPLICATOR_NETWORK_INTERFACE__
             networkInterface = (_networkInterface = networkInterface);
+        #endif
+            
             if (proxy) {
                 _proxy = *proxy;
                 proxy = &_proxy;
@@ -325,10 +329,12 @@ namespace cbl_internal
                 enc.writeUInt(kCBLDefaultReplicatorHeartbeat);
             }
             
+        #ifdef __CBL_REPLICATOR_NETWORK_INTERFACE__
             if (networkInterface.buf) {
                 enc.writeKey(slice(kC4SocketOptionNetworkInterface));
                 enc.writeString(networkInterface);
             }
+        #endif
         }
         
         void writeCollectionOptions(CBLReplicationCollection& collection, Encoder &enc) const {
@@ -358,7 +364,9 @@ namespace cbl_internal
         alloc_slice                             _pinnedServerCert, _trustedRootCerts;
         CBLProxySettings                        _proxy;
         alloc_slice                             _proxyHostname, _proxyUsername, _proxyPassword;
+    #ifdef __CBL_REPLICATOR_NETWORK_INTERFACE__
         alloc_slice                             _networkInterface;
+    #endif
     };
 }
 

@@ -281,9 +281,13 @@ typedef struct {
         The default value is \ref kCBLDefaultReplicatorHeartbeat. */
     unsigned heartbeat;
     
+#ifdef __CBL_REPLICATOR_NETWORK_INTERFACE__
     /** The specific network interface to be used by the replicator to connect to the remote server.
-        If not specified, an active network interface based on the OS's routing table will be used. */
+        If not specified, an active network interface based on the OS's routing table will be used.
+        @NOTE The networkInterface configuration is not supported.
+     */
     FLString networkInterface;
+#endif
     
     //-- HTTP settings:
     
