@@ -22,8 +22,9 @@
 #include "CBLTest_Cpp.hh"
 #include "CBLPrivate.h"
 #include "fleece/slice.hh"
-#include <sstream>
 #include <fstream>
+#include <sstream>
+#include <thread>
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -123,9 +124,7 @@ CBLTest::~CBLTest() {
             WARN("Failed to close database: " << error.domain << "/" << error.code);
         CBLDatabase_Release(db);
     }
-    if (CBL_InstanceCount() > 0)
-        CBL_DumpInstances();
-    CHECK(CBL_InstanceCount() == 0);
+    CheckObjectLeaks();
 }
 
 #pragma mark - C++ TEST CLASS:
@@ -141,12 +140,7 @@ CBLTest_Cpp::~CBLTest_Cpp() {
         db.close();
         db = nullptr;
     }
-
-    if (CBL_InstanceCount() > 0) {
-        WARN("*** LEAKED OBJECTS: ***");
-        CBL_DumpInstances();
-    }
-    CHECK(CBL_InstanceCount() == 0);
+    CheckObjectLeaks();
 }
 
 cbl::Database CBLTest_Cpp::openDatabaseNamed(slice name, bool createEmpty){
@@ -331,4 +325,21 @@ void PurgeAllDocs(CBLCollection* collection) {
     
     CBLResultSet_Release(rs);
     CBLQuery_Release(query);
+}
+
+void CheckObjectLeaks() {
+    int count = 0;
+    for (int i = 0; i < 20; i++) {
+        count = CBL_InstanceCount();
+        if (count == 0) {
+            break;
+        } else {
+            this_thread::sleep_for(100ms);
+        }
+    }
+    if (count > 0) {
+        WARN("*** LEAKED OBJECTS: ***");
+        CBL_DumpInstances();
+    }
+    CHECK(count == 0);
 }

@@ -106,6 +106,8 @@ void CreateDoc(CBLCollection *col, std::string docID, std::string jsonContent);
 
 void PurgeAllDocs(CBLCollection* collection);
 
+void CheckObjectLeaks();
+
 
 // RAII utility to suppress reporting C++ exceptions (or breaking at them, in the Xcode debugger.)
 // Declare an instance when testing something that's expected to throw an exception internally.
