@@ -30,6 +30,10 @@
 #include <iostream>
 #include <mutex>
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 using namespace std;
 using namespace fleece;
 using namespace litecore;
@@ -139,11 +143,21 @@ static void c4LogCallback(C4LogDomain domain, C4LogLevel level, const char *msg,
     if (msgLevel >= consoleLogLevel) {
         auto domainName = c4log_getDomainName(domain);
         auto levelName = kLogLevelNames[(int)level];
-        
+    #ifdef __ANDROID__
+        string tag("CouchbaseLite");
+        string domainStr(domainName);
+        if (!domainStr.empty())
+            tag += " [" + domainStr + "]";
+        static const int androidLevels[5] = {ANDROID_LOG_DEBUG, ANDROID_LOG_INFO,
+                                             ANDROID_LOG_INFO, ANDROID_LOG_WARN,
+                                             ANDROID_LOG_ERROR};
+        __android_log_write(androidLevels[(int) level], tag.c_str(), msg);
+    #else
         ostream& os = msgLevel < kCBLLogWarning ? cout : cerr;
         LogDecoder::writeTimestamp(LogDecoder::now(), os);
         LogDecoder::writeHeader(levelName, domainName, os);
         os << msg << '\n';
+    #endif
     }
     
     // Log to custom callback if available:
