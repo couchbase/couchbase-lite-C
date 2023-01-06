@@ -11,11 +11,9 @@
 SCRIPT_DIR=`dirname $0`
 cd "$SCRIPT_DIR/.."
 
-src/exports/generate_exports.sh
-
 mkdir -p build_cmake
 cd build_cmake
 
 core_count=`getconf _NPROCESSORS_ONLN`
-cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+cmake -DCMAKE_BUILD_TYPE=MinSizeRel ..
 make -j `expr $core_count + 1`

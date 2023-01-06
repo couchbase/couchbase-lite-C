@@ -70,4 +70,4 @@ elseif(UNIX)
     target_link_libraries(CBL_C_Tests PUBLIC dl)
 endif()
 
-file(COPY assets/names_100.json DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test/assets)
+file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test)

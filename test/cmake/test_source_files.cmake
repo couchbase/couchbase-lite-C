@@ -25,6 +25,7 @@ function(set_test_source_files)
         ${T_DIR}/DocumentTest.cc
         ${T_DIR}/DocumentTest_Cpp.cc
         ${T_DIR}/LogTest.cc
+        ${T_DIR}/PerfTest.cc
         ${T_DIR}/QueryTest.cc
         ${T_DIR}/QueryTest_Cpp.cc
         ${T_DIR}/ReplicatorCollectionTest.cc
