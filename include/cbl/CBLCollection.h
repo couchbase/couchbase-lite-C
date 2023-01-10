@@ -156,7 +156,7 @@ CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db,
 /** Returns the default collection.
     @note  The default collection may not exist if it was deleted.
            Also, the default collection cannot be recreated after being deleted.
-    @note  You are responsible for releasing the returned scope.
+    @note  You are responsible for releasing the returned collection.
     @param db  The database.
     @param outError  On failure, the error will be written here.
     @return  A \ref CBLCollection instance, or NULL if the default collection doesn't exist or an error occurred. */
