@@ -228,9 +228,11 @@ typedef struct {
     CBLConflictResolver _cbl_nullable conflictResolver; ///< Optional conflict-resolver callback
     
     CBLReplicationFilter _cbl_nullable pushFilter;      ///< Optional callback to filter which docs are pushed
-    CBLReplicationFilter _cbl_nullable pullFilter;      ///< Optional callback to validate incoming docs
+    CBLReplicationFilter _cbl_nullable pullFilter;      ///< Optional callback to validate incoming docs.
     
-    FLArray _cbl_nullable channels;                     ///< Optional set of channels to pull from
+    /** Optional set of channels to pull from.
+        @note Channels are not supported in Peer-to-Peer and Database-to-Database replication. */
+    FLArray _cbl_nullable channels;
     FLArray _cbl_nullable documentIDs;                  ///< Optional set of document IDs to replicate
 } CBLReplicationCollection;
 
@@ -306,6 +308,7 @@ typedef struct {
     
     /** Optional set of channels to pull from when replicating with the default collection.
         @note This property can only be used when setting the config object with the database instead of collections.
+        @note Channels are not supported in Peer-to-Peer and Database-to-Database replication.
         @warning  <b>Deprecated :</b> Use CBLReplicationCollection.channels instead. */
     FLArray _cbl_nullable channels;
     
