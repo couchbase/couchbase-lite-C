@@ -45,7 +45,7 @@ public:
         va_start(args, fmt);
         string msg = vformat(fmt, args);
     #ifdef __ANDROID__
-        __android_log_write(ANDROID_LOG_INFO, "CBLTests [Perf]", msg.c_str());
+        __android_log_write(ANDROID_LOG_INFO, "CBLTests", msg.c_str());
     #else
         cout << msg << '\n';
     #endif
