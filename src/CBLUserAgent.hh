@@ -20,6 +20,8 @@
 #pragma once
 #include "CBL_Edition.h"
 #include <sstream>
+using string = std::string;
+
 #ifdef _MSC_VER
 #define NOMINMAX
 #include <windows.h>
@@ -31,8 +33,63 @@ extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetVersion(
 );
 #endif
 
+#if defined(__linux__) && !defined(__ANDROID__)
+#include <vector>
+#include <regex>
+#include <optional>
+#include <fstream>
+#include <sys/utsname.h>
 
-using string = std::string;
+static std::optional<string> tryKey(const char* filename, string&& key) {
+    static const std::regex r("(.*)=(.*)");
+    std::ifstream fin(filename);
+    if(!fin) {
+        return {};
+    }
+
+    fin.exceptions(std::ios_base::badbit);
+    string line;
+    std::smatch match;
+    while(std::getline(fin, line)) {
+        if(std::regex_match(line, match, r)) {
+            if(match[1] == key) {
+                return match[2];
+            }
+        }
+    }
+
+    return {};
+}
+
+static string getDistroInfo() {
+    // os-release is apparently the standard these days
+    if(auto os = tryKey("/etc/os-release", "PRETTY_NAME")) {
+        return *os;
+    }
+
+    if(auto os = tryKey("/usr/lib/os-release", "PRETTY_NAME")) {
+        return *os;
+    }
+
+    // Fall back to the non-standard lsb-release
+    if(auto lsb = tryKey("/etc/lsb-release", "DISTRIB_DESCRIPTION")) {
+        return *lsb;
+    }
+
+    if(auto lsb = tryKey("/etc/lsb-release", "DISTRIB_ID")) {
+        return *lsb;
+    }
+
+    // Last resort, use uname
+    utsname uts;
+    if(uname(&uts) != 0) {
+        return "Unknown Linux";
+    }
+
+    return string(uts.sysname) + ' ' + uts.release;
+}
+#endif
+
 using stringstream = std::stringstream;
 using alloc_slice = fleece::alloc_slice;
 
@@ -67,7 +124,7 @@ static string createUserAgentHeader(){
             os = osStream.str();
         }
 #elif __linux__
-        os = "Linux";
+        os = getDistroInfo();
 #else 
         os = "Unknown OS";
 #endif
