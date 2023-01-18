@@ -34,6 +34,22 @@ extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetVersion(
 );
 #endif
 
+#if __APPLE__
+#include <sys/utsname.h>
+#if TARGET_OS_IPHONE == 1
+static string getDeviceModel(const char* fallback) {
+    utsname uts;
+    if(uname(&uts) != 0) {
+        return fallback;
+    }
+    
+    return uts.machine;
+}
+
+#endif
+string getAppleVersion();
+#endif
+
 #if defined(__linux__) && !defined(__ANDROID__)
 #include <vector>
 #include <regex>
@@ -104,12 +120,12 @@ static string createUserAgentHeader(){
         alloc_slice coreBuild = c4_getBuildInfo();
 #if defined (__APPLE__) && defined (__MACH__)
     #if TARGET_IPHONE_SIMULATOR == 1
-        os = "Apple iOS Simulator";
-    #elif TARGET_OS_IPHONE == 1
-        os = "Apple iOS Device";
-    #elif TARGET_OS_MAC == 1
-        os = "Apple OSX";
-    #endif
+    os = "iOS Simulator " + getAppleVersion();
+#elif TARGET_OS_IPHONE == 1
+    os = getDeviceModel("iOS Device") + ' ' + getAppleVersion();
+#elif TARGET_OS_MAC == 1
+    os = "macOS " + getAppleVersion();
+#endif
 #elif __ANDROID__
         os = "Android" + std::to_string(__ANDROID_API__);
 #elif _MSC_VER
