@@ -110,13 +110,7 @@ static std::string getCCommit(){
 static string createUserAgentHeader(){
         stringstream header;
         string os;
-        std::string cCommit = getCCommit();
-
-        // std::smatch match;
-        // if(std::regex_search(CBLITE_SOURCE_ID, std::regex("[\\d-]+$"), cCommit, )){
-        //         const char cCommit = match[1];
-        //     }
-                                                    
+        std::string cCommit = getCCommit();                                        
         alloc_slice coreVersion = c4_getVersion();
         alloc_slice coreBuild = c4_getBuildInfo();
 #if defined (__APPLE__) && defined (__MACH__)
