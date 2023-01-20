@@ -104,7 +104,8 @@ bool CBL_DatabaseExists(FLString name, FLString inDirectory) CBLAPI;
     @param fromPath  The full filesystem path to the original database (including extension).
     @param toName  The new database name (without the ".cblite2" extension.)
     @param config  The database configuration (directory and encryption option.)
-    @param outError  On return, will be set to the error that occurred, if applicable.*/
+    @param outError  On return, will be set to the error that occurred, if applicable.
+    @note Database's files might remain in use if database is not closed before a call. Thus, we recommend closing it.*/
 bool CBL_CopyDatabase(FLString fromPath,
                       FLString toName,
                       const CBLDatabaseConfiguration* _cbl_nullable config,
