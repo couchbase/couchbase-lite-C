@@ -95,11 +95,10 @@ using alloc_slice = fleece::alloc_slice;
 
 static std::string getCCommit(){
     static const std::regex r(R"([\w-]+$)");
-    const string str = "2023-01-13T14:40:07 19df364";
     std::string s(CBLITE_SOURCE_ID);
     std::smatch match;
-    if(std::regex_match(str, match, r)) {
-            return match[1].str();
+    if(std::regex_search(s, match, r)) {
+            return match[0].str();
         }
     return "No information";
 
@@ -152,10 +151,10 @@ static string createUserAgentHeader(){
                 << CBLITE_BUILD_NUMBER
                 << " ("
                 << os
-                << "), "
-                << "Commit/ "
+                << ") "
+                << "Commit/"
                 << cCommit
-                << " Core/"
+                << " ---> Core/"
                 << coreVersion.asString();
 
         return header.str();
