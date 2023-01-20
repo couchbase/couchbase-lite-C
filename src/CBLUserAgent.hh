@@ -20,6 +20,7 @@
 #pragma once
 #include "CBL_Edition.h"
 #include <sstream>
+#include <regex>
 using string = std::string;
 
 #ifdef _MSC_VER
@@ -35,7 +36,6 @@ extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetVersion(
 
 #if defined(__linux__) && !defined(__ANDROID__)
 #include <vector>
-#include <regex>
 #include <optional>
 #include <fstream>
 #include <sys/utsname.h>
@@ -93,12 +93,31 @@ static string getDistroInfo() {
 using stringstream = std::stringstream;
 using alloc_slice = fleece::alloc_slice;
 
+static std::string getCCommit(){
+    static const std::regex r(R"([\w-]+$)");
+    const string str = "2023-01-13T14:40:07 19df364";
+    std::string s(CBLITE_SOURCE_ID);
+    std::smatch match;
+    if(std::regex_match(str, match, r)) {
+            return match[1].str();
+        }
+    return "No information";
+
+}
+
 // JAVA TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
 // JAVA OUTPUT   - CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
 
 static string createUserAgentHeader(){
         stringstream header;
         string os;
+        std::string cCommit = getCCommit();
+
+        // std::smatch match;
+        // if(std::regex_search(CBLITE_SOURCE_ID, std::regex("[\\d-]+$"), cCommit, )){
+        //         const char cCommit = match[1];
+        //     }
+                                                    
         alloc_slice coreVersion = c4_getVersion();
         alloc_slice coreBuild = c4_getBuildInfo();
 #if defined (__APPLE__) && defined (__MACH__)
@@ -119,23 +138,25 @@ static string createUserAgentHeader(){
         if (result < 0) {
             os = "Microsoft Windows (Version Fetch Failed)";
         } else {
-            osStream << "Microsoft Windows " << version.dwMajorVersion << "." <<
-                version.dwMinorVersion << "." << version.dwBuildNumber;
+            osStream << "Microsoft Windows " << version.dwMajorVersion << "." << version.dwMinorVersion << "." << version.dwBuildNumber;
             os = osStream.str();
         }
 #elif __linux__
         os = getDistroInfo();
-#else 
+#else
         os = "Unknown OS";
 #endif
-    header << "CouchbaseLite/"
-            << CBLITE_VERSION
-            << "-"
-            << CBLITE_BUILD_NUMBER
-            << " ("
-            << os
-            << ") Core/"
-            << coreVersion.asString();
-        
-    return header.str();
+        header << "CouchbaseLite/"
+                << CBLITE_VERSION
+                << "-"
+                << CBLITE_BUILD_NUMBER
+                << " ("
+                << os
+                << "), "
+                << "Commit/ "
+                << cCommit
+                << " Core/"
+                << coreVersion.asString();
+
+        return header.str();
 }
