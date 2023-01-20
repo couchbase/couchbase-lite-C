@@ -100,8 +100,8 @@ static std::string getCCommit(){
     if(std::regex_search(s, match, r)) {
             return match[0].str();
         }
-    return "No information";
 
+    return "No information";
 }
 
 // JAVA TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
