@@ -20,7 +20,7 @@
 #pragma once
 #include "CBL_Edition.h"
 #include <sstream>
-#include <regex>
+
 using string = std::string;
 
 #ifdef _MSC_VER
@@ -36,6 +36,7 @@ extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetVersion(
 
 #if defined(__linux__) && !defined(__ANDROID__)
 #include <vector>
+#include <regex>
 #include <optional>
 #include <fstream>
 #include <sys/utsname.h>
@@ -94,14 +95,12 @@ using stringstream = std::stringstream;
 using alloc_slice = fleece::alloc_slice;
 
 static std::string getCCommit(){
-    static const std::regex r(R"([\w-]+$)");
     std::string s(CBLITE_SOURCE_ID);
-    std::smatch match;
-    if(std::regex_search(s, match, r)) {
-            return match[0].str();
-        }
-
-    return "No information";
+    if (s.size() == 27){
+        return s.substr(20);
+    }else {
+        return "No information";
+    }
 }
 
 // JAVA TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
