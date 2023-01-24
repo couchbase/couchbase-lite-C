@@ -55,7 +55,6 @@ macro(generate_edition)
     endif()
 
     math(EXPR CouchbaseLite_C_VERNUM "${CouchbaseLite_C_VERSION_MAJOR} * 1000000 + ${CouchbaseLite_C_VERSION_MINOR} * 1000 + ${CouchbaseLite_C_VERSION_PATCH}")
-    string(TIMESTAMP CouchbaseLite_C_SOURCE_ID)
 
     find_package(Git)
     if(Git_FOUND)
@@ -90,9 +89,9 @@ macro(generate_edition)
 
             string(PREPEND HASH "${EE_HASH}+")
         endif()
-        string(APPEND CouchbaseLite_C_SOURCE_ID " ${HASH}")
+        string(APPEND CouchbaseLite_C_SOURCE_ID "${HASH}")
     else()
-        string(APPEND CouchbaseLite_C_SOURCE_ID " <unknown commit>")
+        string(APPEND CouchbaseLite_C_SOURCE_ID "<unknown commit>")
     endif()
     
     configure_file(

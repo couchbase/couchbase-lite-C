@@ -94,22 +94,12 @@ static string getDistroInfo() {
 using stringstream = std::stringstream;
 using alloc_slice = fleece::alloc_slice;
 
-static std::string getCCommit(){
-    std::string s(CBLITE_SOURCE_ID);
-    if (s.size() == 27){
-        return s.substr(20);
-    }else {
-        return "No information";
-    }
-}
-
 // JAVA TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
 // JAVA OUTPUT   - CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
 
 static string createUserAgentHeader(){
         stringstream header;
         string os;
-        std::string cCommit = getCCommit();                                        
         alloc_slice coreVersion = c4_getVersion();
         alloc_slice coreBuild = c4_getBuildInfo();
 #if defined (__APPLE__) && defined (__MACH__)
@@ -146,7 +136,7 @@ static string createUserAgentHeader(){
                 << os
                 << ") "
                 << "Commit/"
-                << cCommit
+                << CBLITE_SOURCE_ID
                 << " ---> Core/"
                 << coreVersion.asString();
 
