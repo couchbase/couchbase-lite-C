@@ -24,3 +24,4 @@
 #define CBLITE_VERSION_NUMBER @CouchbaseLite_C_VERNUM@
 #define CBLITE_BUILD_NUMBER @CouchbaseLite_C_BUILD@
 #define CBLITE_SOURCE_ID "@CouchbaseLite_C_SOURCE_ID@"
+#define CBLITE_BUILD_TIMESTAMP "@CouchbaseLite_C_BUILD_TIMESTAMP@"

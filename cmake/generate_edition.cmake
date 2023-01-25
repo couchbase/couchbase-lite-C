@@ -55,6 +55,7 @@ macro(generate_edition)
     endif()
 
     math(EXPR CouchbaseLite_C_VERNUM "${CouchbaseLite_C_VERSION_MAJOR} * 1000000 + ${CouchbaseLite_C_VERSION_MINOR} * 1000 + ${CouchbaseLite_C_VERSION_PATCH}")
+    string(TIMESTAMP CouchbaseLite_C_BUILD_TIMESTAMP)
 
     find_package(Git)
     if(Git_FOUND)
