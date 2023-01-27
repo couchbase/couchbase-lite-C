@@ -36,6 +36,7 @@ curl -LO https://raw.githubusercontent.com/couchbase/product-metadata/master/${P
 
 # Cross-compile based on desired ARCH
 BUILD_OS=$(cfgvar .build_arch_config.${ARCH}.build_os)
+TARGET_OSNAME=$(cfgvar .build_arch-config.${ARCH}.target_osname)
 STRIP_PREFIX=$(cfgvar .build_arch_config.${ARCH}.strip_prefix)
 TOOLCHAIN=$(cfgvar .build_arch_config.${ARCH}.toolchain)
 
@@ -57,15 +58,15 @@ else
     EDITION_INFIX="-community"
 fi
 
-for TARGET_OS in $(cfgvar ".build_arch_config.${ARCH}.target_os[]"); do
-    EXTRA_DEPS=$(cfgvar .package_distro_config.\"${TARGET_OS}\".extra_deps)
+for TARGET_DEB in $(cfgvar ".build_arch_config.${ARCH}.target_debs[]"); do
+    EXTRA_DEPS=$(cfgvar .package_distro_config.\"${TARGET_DEB}\".extra_deps)
     DEPENDENCIES="${BASE_DEPS},${EXTRA_DEPS}"
 
     ./package-deb.rb ${WORKSPACE}/build_release/libcblite-${VERSION} libcblite ${EDITION} ${VERSION}-${BLD_NUM} ${ARCH} ${DEPENDENCIES}
-    cp build/deb/libcblite${EDITION_INFIX}_${VERSION}-${BLD_NUM}_${ARCH}.deb ${WORKSPACE}/libcblite-${EDITION}_${VERSION}-${BLD_NUM}-${TARGET_OS}_${ARCH}.deb
+    cp build/deb/libcblite${EDITION_INFIX}_${VERSION}-${BLD_NUM}_${ARCH}.deb ${WORKSPACE}/libcblite-${EDITION}_${VERSION}-${BLD_NUM}-${TARGET_DEB}_${ARCH}.deb
     rm -rf build
 
     ./package-deb.rb ${WORKSPACE}/build_release/libcblite-${VERSION} libcblite-dev ${EDITION} ${VERSION}-${BLD_NUM} ${ARCH}
-    cp build/deb/libcblite-dev${EDITION_INFIX}_${VERSION}-${BLD_NUM}_${ARCH}.deb ${WORKSPACE}/libcblite-dev-${EDITION}_${VERSION}-${BLD_NUM}-${TARGET_OS}_${ARCH}.deb
+    cp build/deb/libcblite-dev${EDITION_INFIX}_${VERSION}-${BLD_NUM}_${ARCH}.deb ${WORKSPACE}/libcblite-dev-${EDITION}_${VERSION}-${BLD_NUM}-${TARGET_DEB}_${ARCH}.deb
     rm -rf build
 done

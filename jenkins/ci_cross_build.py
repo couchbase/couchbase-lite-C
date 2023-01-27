@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-# NOTE: This is for Couchbase internal CI usage.  
-# This room is full of dragons, so you *will* get confused.  
+# NOTE: This is for Couchbase internal CI usage.
+# This room is full of dragons, so you *will* get confused.
 # You have been warned.
 
 from genericpath import isdir
@@ -24,7 +24,7 @@ def read_manifest():
     if len(json_data) == 0:
         with open(str(Path(SCRIPT_DIR) / 'cross_manifest.json'), 'r') as fin:
             data=fin.read()
-        
+
         json_data=json.loads(data)
 
     return json_data
@@ -35,7 +35,7 @@ def show_download_progress(block_num, block_size, total_size):
     if pbar is None:
         pbar = ProgressBar(maxval=total_size)
         pbar.start()
-    
+
     downloaded = block_size * block_num
     if downloaded < total_size:
         pbar.update(downloaded)
@@ -91,7 +91,7 @@ def check_toolchain(name: str):
         print(f'Extracting {name} toolchain to {toolchain_path}...')
         with tarfile.open('toolchain.tar.gz', 'r:gz') as tar:
             safe_extract(tar, toolchain_path, members=tar_extract_callback(tar))
-        
+
         outer_dir = toolchain_path / os.listdir(toolchain_path)[0]
         files_to_move = outer_dir.glob("**/*")
         for file in files_to_move:
@@ -137,7 +137,7 @@ def check_sysroot(name: str):
                     os.symlink(linkpath, destpath)
                 else:
                     zip.extract(zipinfo, sysroot_path)
-                
+
                 zip_done += 1
                 pbar.update(zip_done)
     elif sysroot_name.endswith("tar.gz"):
@@ -155,19 +155,20 @@ if __name__ == '__main__':
     parser.add_argument('bld_num', type=int, help='The build number for this build')
     parser.add_argument('version', type=str, help='The version of the build')
     parser.add_argument('edition', type=str, choices=['enterprise', 'community'], help='The edition of the product to build')
-    parser.add_argument('os', type=str, help="The target OS to compile for")
+    parser.add_argument('build_os', type=str, help="The OS to compile for")
+    parser.add_argument('target_osname', type=str, help="OS name to use in deliverable .tar.gz files")
     parser.add_argument('strip_prefix', type=str, help='The prefix to use on the binary for stripping the final product')
     parser.add_argument('toolchain', type=str, help='The CMake toolchain file to use for building')
     args = parser.parse_args()
-    
-    toolchain_path = check_toolchain(args.os)
-    check_sysroot(args.os)
+
+    toolchain_path = check_toolchain(args.build_os)
+    check_sysroot(args.build_os)
 
     if 'WORKSPACE' in os.environ:
         workspace = os.environ['WORKSPACE']
     else:
         workspace = os.getcwd()
-    
+
     workspace_path = Path(workspace)
     os.makedirs(workspace_path / 'build_release', 0o755, True)
     prop_file = workspace_path / 'publish.prop'
@@ -175,13 +176,13 @@ if __name__ == '__main__':
     print(f'VERSION={args.version}')
 
     if args.edition == "enterprise":
-        os.symlink(str(workspace_path / 'couchbase-lite-c-ee' / 'couchbase-lite-core-EE'), 
+        os.symlink(str(workspace_path / 'couchbase-lite-c-ee' / 'couchbase-lite-core-EE'),
             str(workspace_path / 'couchbase-lite-c' /'vendor' / 'couchbase-lite-core-EE'))
-    
+
     print(f"====  Cross Building Release binary using {args.toolchain}  ===")
     os.chdir(str(workspace_path / 'build_release'))
 
-    sysroot_path = Path.home() / '.cbl_cross' / f'{args.os}-sysroot'
+    sysroot_path = Path.home() / '.cbl_cross' / f'{args.build_os}-sysroot'
     existing_path = os.environ['PATH']
     if toolchain_path:
         os.environ['PATH'] = f'{str(toolchain_path)}/bin:{existing_path}'
@@ -189,23 +190,23 @@ if __name__ == '__main__':
     os.environ['ROOTFS'] = str(sysroot_path)
     cmake_args=['cmake', '..', f'-DEDITION={args.edition}', f'-DCMAKE_INSTALL_PREFIX={os.getcwd()}/libcblite-{args.version}',
         '-DCMAKE_BUILD_TYPE=MinSizeRel', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}']
-    if args.os == "raspbian9" or args.os == "debian9-x86_64":
+    if args.build_os == "raspbian9" or args.build_os == "debian9-x86_64":
         cmake_args.append('-DCBL_STATIC_CXX=ON')
-    elif args.os == "raspios10-arm64":
+    elif args.build_os == "raspios10-arm64":
         cmake_args.append('-D64_BIT=ON')
 
     subprocess.run(cmake_args, check=True)
     subprocess.run(['make', '-j8'], check=True)
 
     print(f"==== Stripping binary using {args.strip_prefix}strip")
-    subprocess.run([str(workspace_path / 'couchbase-lite-c' / 'jenkins' / 'strip.sh'), project_dir, 
+    subprocess.run([str(workspace_path / 'couchbase-lite-c' / 'jenkins' / 'strip.sh'), project_dir,
         str(args.strip_prefix)], check=True)
     subprocess.run(['make', 'install'], check=True)
 
     shutil.copy2(Path(project_dir) / 'libcblite.so.sym', f'./libcblite-{args.version}')
     os.chdir(workspace)
 
-    package_name = f'{args.product}-{args.edition}-{args.version}-{args.bld_num}-{args.os}.tar.gz'
+    package_name = f'{args.product}-{args.edition}-{args.version}-{args.bld_num}-{args.target_osname}.tar.gz'
     print()
     print(f"=== Creating {workspace}/{package_name} package ===")
     print()
@@ -234,11 +235,11 @@ if __name__ == '__main__':
             tar.add(f'libcblite-{args.version}/notices.txt')
         pbar.finish()
 
-    symbols_package_name = f'{args.product}-{args.edition}-{args.version}-{args.bld_num}-{args.os}-symbols.tar.gz'
+    symbols_package_name = f'{args.product}-{args.edition}-{args.version}-{args.bld_num}-{args.target_osname}-symbols.tar.gz'
     with tarfile.open(f'{workspace}/{symbols_package_name}', 'w:gz') as tar:
         tar.add(f'libcblite-{args.version}/libcblite.so.sym')
 
-    
+
 
     os.chdir(workspace)
     with open(prop_file, 'w') as fout:

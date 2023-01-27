@@ -4,19 +4,22 @@
       "build_os": "debian9-x86_64",
       "strip_prefix": "x86_64-linux-gnu-",
       "toolchain": "Toolchain-cross-x64",
-      "target_os": [ "debian9", "debian10", "debian11", "ubuntu20.04", "ubuntu22.04" ]
+      "target_osname": "linux-x86_64",
+      "target_debs": [ "debian9", "debian10", "debian11", "ubuntu20.04", "ubuntu22.04" ]
     },
     "arm64": {
       "build_os": "raspios10-arm64",
       "strip_prefix": "aarch64-linux-gnu-",
       "toolchain": "Toolchain-pi64",
-      "target_os": [ "debian10", "debian11", "ubuntu20.04", "ubuntu22.04" ]
+      "target_osname": "linux-arm64",
+      "target_debs": [ "debian10", "debian11", "ubuntu20.04", "ubuntu22.04" ]
     },
     "armhf": {
         "build_os": "raspbian9",
         "strip_prefix": "arm-linux-gnueabihf-",
         "toolchain": "Toolchain-pi",
-        "target_os": [ "debian9", "debian10", "debian11", "ubuntu20.04", "ubuntu22.04" ]
+        "target_osname": "linux-armhf",
+        "target_debs": [ "debian9", "debian10", "debian11", "ubuntu20.04", "ubuntu22.04" ]
     }
   },
   "package_distro_config": {
