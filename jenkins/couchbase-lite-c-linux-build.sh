@@ -36,13 +36,13 @@ curl -LO https://raw.githubusercontent.com/couchbase/product-metadata/master/${P
 
 # Cross-compile based on desired ARCH
 BUILD_OS=$(cfgvar .build_arch_config.${ARCH}.build_os)
-TARGET_OSNAME=$(cfgvar .build_arch-config.${ARCH}.target_osname)
+TARGET_OSNAME=$(cfgvar .build_arch_config.${ARCH}.target_osname)
 STRIP_PREFIX=$(cfgvar .build_arch_config.${ARCH}.strip_prefix)
 TOOLCHAIN=$(cfgvar .build_arch_config.${ARCH}.toolchain)
 
 python3 -u ${script_dir}/ci_cross_build.py \
     ${PRODUCT} ${BLD_NUM} ${VERSION} ${EDITION} \
-    ${BUILD_OS} ${STRIP_PREFIX} \
+    ${BUILD_OS} ${TARGET_OSNAME} ${STRIP_PREFIX} \
     ${script_dir}/../cmake/${TOOLCHAIN}.cmake \
 || exit 1
 
