@@ -2,7 +2,7 @@
 //  CBLDefaults.h
 //  CouchbaseLite
 //
-//  Copyright (c) 2022-present Couchbase, Inc All rights reserved.
+//  Copyright (c) 2023-present Couchbase, Inc All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -84,10 +84,10 @@ CBL_PUBLIC extern const unsigned kCBLDefaultReplicatorMaxAttemptWaitTime;
 /** [false] Purge documents when a user loses access */
 CBL_PUBLIC extern const bool kCBLDefaultReplicatorDisableAutoPurge;
 
+/** [false] Whether or not a replicator only accepts cookies for the sender's parent domains */
+CBL_PUBLIC extern const bool kCBLDefaultReplicatorAcceptParentCookies;
 
 /** @} */
-
-
 
 /** @} */
 

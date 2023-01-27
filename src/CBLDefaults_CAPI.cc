@@ -2,7 +2,7 @@
 //  CBLDefaults_CAPI.cc
 //  CouchbaseLite
 //
-//  Copyright (c) 2022-present Couchbase, Inc All rights reserved.
+//  Copyright (c) 2023-present Couchbase, Inc All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -43,5 +43,4 @@ CBL_PUBLIC const unsigned kCBLDefaultReplicatorMaxAttemptsSingleShot = 10;
 CBL_PUBLIC const unsigned kCBLDefaultReplicatorMaxAttemptsContinuous = UINT_MAX;
 CBL_PUBLIC const unsigned kCBLDefaultReplicatorMaxAttemptWaitTime = 300;
 CBL_PUBLIC const bool kCBLDefaultReplicatorDisableAutoPurge = false;
-
-
+CBL_PUBLIC const bool kCBLDefaultReplicatorAcceptParentCookies = false;

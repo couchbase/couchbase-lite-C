@@ -203,6 +203,7 @@ CBL_C {
 		kCBLDefaultReplicatorMaxAttemptsContinuous;
 		kCBLDefaultReplicatorMaxAttemptWaitTime;
 		kCBLDefaultReplicatorDisableAutoPurge;
+		kCBLDefaultReplicatorAcceptParentCookies;
 		kFLNullValue;
 		kFLUndefinedValue;
 		kFLEmptyArray;

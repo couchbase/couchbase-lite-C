@@ -301,6 +301,9 @@ namespace cbl_internal
                 enc.endDict();
             }
             
+            enc.writeKey(slice(kC4ReplicatorOptionAcceptParentDomainCookies));
+            enc.writeBool(acceptParentDomainCookies);
+            
             enc.writeKey(slice(kC4ReplicatorOptionAutoPurge));
             enc.writeBool(!disableAutoPurge); 
             
