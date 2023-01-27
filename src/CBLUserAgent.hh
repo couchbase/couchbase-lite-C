@@ -20,6 +20,7 @@
 #pragma once
 #include "CBL_Edition.h"
 #include <sstream>
+
 using string = std::string;
 
 #ifdef _MSC_VER
@@ -119,23 +120,25 @@ static string createUserAgentHeader(){
         if (result < 0) {
             os = "Microsoft Windows (Version Fetch Failed)";
         } else {
-            osStream << "Microsoft Windows " << version.dwMajorVersion << "." <<
-                version.dwMinorVersion << "." << version.dwBuildNumber;
+            osStream << "Microsoft Windows " << version.dwMajorVersion << "." << version.dwMinorVersion << "." << version.dwBuildNumber;
             os = osStream.str();
         }
 #elif __linux__
         os = getDistroInfo();
-#else 
+#else
         os = "Unknown OS";
 #endif
-    header << "CouchbaseLite/"
-            << CBLITE_VERSION
-            << "-"
-            << CBLITE_BUILD_NUMBER
-            << " ("
-            << os
-            << ") Core/"
-            << coreVersion.asString();
-        
-    return header.str();
+        header << "CouchbaseLite/"
+                << CBLITE_VERSION
+                << "-"
+                << CBLITE_BUILD_NUMBER
+                << " ("
+                << os
+                << ") "
+                << "Commit/"
+                << CBLITE_SOURCE_ID
+                << " ---> Core/"
+                << coreVersion.asString();
+
+        return header.str();
 }
