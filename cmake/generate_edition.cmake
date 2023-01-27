@@ -90,9 +90,9 @@ macro(generate_edition)
 
             string(PREPEND HASH "${EE_HASH}+")
         endif()
-        string(APPEND CouchbaseLite_C_SOURCE_ID "${HASH}")
+        set(CouchbaseLite_C_SOURCE_ID "${HASH}")
     else()
-        string(APPEND CouchbaseLite_C_SOURCE_ID "<unknown commit>")
+        set(CouchbaseLite_C_SOURCE_ID "<unknown commit>")
     endif()
     
     configure_file(
