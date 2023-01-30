@@ -62,7 +62,7 @@ function Build() {
     New-Item -ItemType Directory -ErrorAction Ignore $directory
     Push-Location $directory
 
-    & "C:\Program Files\CMake\bin\cmake.exe" -G "Visual Studio 15 2017" -A "${Architecture}" -DEDITION="$Edition" -DCMAKE_INSTALL_PREFIX="$pwd/libcblite-${Version}" ..
+    & "C:\Program Files\CMake\bin\cmake.exe" -A "${Architecture}" -DEDITION="$Edition" -DCMAKE_INSTALL_PREFIX="$pwd/libcblite-${Version}" ..
     if($LASTEXITCODE -ne 0) {
         throw "CMake failed"
     }
