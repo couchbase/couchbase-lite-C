@@ -36,7 +36,7 @@ extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetVersion(
 
 #if __APPLE__
 #include <sys/utsname.h>
-#if TARGET_OS_IPHONE == 1
+#if TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
 static string getDeviceModel(const char* fallback) {
     utsname uts;
     if(uname(&uts) != 0) {
