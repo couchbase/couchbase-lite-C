@@ -165,9 +165,26 @@ TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     CHECK(n == 3);
 }
 
-TEST_CASE_METHOD(QueryTest, "Unicode Query JSON", "[Query]"){
+TEST_CASE_METHOD(QueryTest, "Unicode Query", "[Query]"){
     CBLError error;
     int errPos;
+
+    auto col = CBLDatabase_DefaultCollection(db, &error);
+
+    CBLDocument* doc = CBLDocument_CreateWithID("first"_sl);
+    REQUIRE(doc);
+    REQUIRE(CBLDocument_SetJSON(doc, "{\"name\":{\"first\": \"Melanie\", \"last\": \"Bochaard\" }, \"city\": \"Manchester\"}"_sl, &error));
+    REQUIRE(CBLCollection_SaveDocument(col, doc, &error));
+    CBLDocument_Release(doc);
+
+    CBLDocument* doc2 = CBLDocument_CreateWithID("second"_sl);
+    REQUIRE(doc2);
+    REQUIRE(CBLDocument_SetJSON(doc2, "{\"name\":{\"first\": \"Mélanie\", \"last\": \"Bochaard\" }, \"city\": \"Manchester\"}"_sl, &error));
+    REQUIRE(CBLCollection_SaveDocument(col, doc2, &error));
+    CBLDocument_Release(doc2);
+
+    CBLCollection_Release(col);
+
     string queryString, queryString2;
     int docsCount  = -1;
     int docsCount2 = -1;
