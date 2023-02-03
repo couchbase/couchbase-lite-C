@@ -127,7 +127,11 @@ static string createUserAgentHeader(){
     os = "macOS " + getAppleVersion();
 #endif
 #elif __ANDROID__
-        os = "Android" + std::to_string(__ANDROID_API__);
+        char rel_ver_str[3];
+        char sdk_ver_str[3];
+        __system_property_get("ro.build.version.sdk", sdk_ver_str);
+        __system_property_get("ro.build.version.release", rel_ver_str);
+        os = "Android " + std::string(rel_ver_str) + " - API " + std::string(sdk_ver_str);
 #elif _MSC_VER
         RTL_OSVERSIONINFOW version{};
         version.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
