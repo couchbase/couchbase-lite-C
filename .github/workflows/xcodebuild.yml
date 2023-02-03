@@ -27,10 +27,11 @@ jobs:
 #### BUILD
 
     - name: "Build Tests"
-      uses: sersoft-gmbh/xcodebuild-action@v1
+      uses: sersoft-gmbh/xcodebuild-action@v2
       with:
         project: CBL_C.xcodeproj
         scheme: CBL_Tests
         destination: platform=macOS
         configuration: $CONFIGURATION
         action: build
+        use-xcpretty: false
