@@ -10,28 +10,13 @@ on:
     branches:
       - '**'
 
-env:
-  # Customize the Xcode configuration here (Release or Debug)
-  # NOTE: If we decide to archive the build products we should build with RelWithDebInfo instead.
-  CONFIGURATION: Debug
-
 jobs:
   build:
     runs-on: macOS-latest
-
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
-
-#### BUILD
-
     - name: "Build Tests"
-      uses: sersoft-gmbh/xcodebuild-action@v2
-      with:
-        project: CBL_C.xcodeproj
-        scheme: CBL_Tests
-        destination: platform=macOS
-        configuration: $CONFIGURATION
-        action: build
-        use-xcpretty: false
+      run: |
+          xcodebuild build -project CBL_C.xcodeproj -configuration "Debug" -scheme "CBL_Tests" -destination "platform=macOS,arch=x86_64" | xcpretty
