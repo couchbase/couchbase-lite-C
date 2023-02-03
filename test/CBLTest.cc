@@ -50,6 +50,8 @@ static string databaseDir() {
 }
 
 
+static constexpr size_t kDocIDBufferSize = 20;
+
 alloc_slice const CBLTest::kDatabaseDir(databaseDir());
 slice       const CBLTest::kDatabaseName = "CBLtest";
 
@@ -181,7 +183,7 @@ unsigned ImportJSONLines(string&& path, CBLDatabase* database) {
     cbl::Transaction t(database);
     ReadFileByLines(path, [&](FLSlice line) {
         char docID[20];
-        sprintf(docID, "%07u", numDocs+1);
+        snprintf(docID, kDocIDBufferSize, "%07u", numDocs+1);
         auto doc = CBLDocument_CreateWithID(slice(docID));
         REQUIRE(CBLDocument_SetJSON(doc, line, &error));
         CHECK(CBLDatabase_SaveDocumentWithConcurrencyControl(database, doc, kCBLConcurrencyControlFailOnConflict, &error));
