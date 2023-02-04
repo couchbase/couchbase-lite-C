@@ -42,7 +42,6 @@ static string getDeviceModel(const char* fallback) {
     if(uname(&uts) != 0) {
         return fallback;
     }
-    
     return uts.machine;
 }
 
@@ -110,8 +109,8 @@ static string getDistroInfo() {
 using stringstream = std::stringstream;
 using alloc_slice = fleece::alloc_slice;
 
-// JAVA TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
-// JAVA OUTPUT   - CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
+// TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
+// OUTPUT   - CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
 
 static string createUserAgentHeader(){
         stringstream header;
@@ -119,11 +118,11 @@ static string createUserAgentHeader(){
         alloc_slice coreVersion = c4_getVersion();
         alloc_slice coreBuild = c4_getBuildInfo();
 #if defined (__APPLE__) && defined (__MACH__)
-    #if TARGET_IPHONE_SIMULATOR == 1
+#if TARGET_IPHONE_SIMULATOR
     os = "iOS Simulator " + getAppleVersion();
-#elif TARGET_OS_IPHONE == 1
+#elif TARGET_OS_IPHONE
     os = getDeviceModel("iOS Device") + ' ' + getAppleVersion();
-#elif TARGET_OS_MAC == 1
+#elif TARGET_OS_MAC
     os = "macOS " + getAppleVersion();
 #endif
 #elif __ANDROID__
