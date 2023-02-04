@@ -8,5 +8,9 @@
 
 HEADER_SEARCH_PATHS     = include Xcode/generated_headers/public/cbl $(FLEECE)/API  $(FLEECE)/Fleece/Support  $(FLEECE)/vendor/catch
 PRODUCT_NAME            = cbl_tests
+CODE_SIGNING_ALLOWED    = NO
+LLVM_LTO                = NO    // LTO makes tests very slow to link and confuses Instruments
 
-LLVM_LTO                    = NO    // LTO makes tests very slow to link and confuses Instruments
+CLANG_WARN__EXIT_TIME_DESTRUCTORS           = NO
+GCC_WARN_UNKNOWN_PRAGMAS                    = NO
+CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND    = NO
