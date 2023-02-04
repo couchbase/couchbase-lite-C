@@ -19,6 +19,7 @@
 #pragma once
 #include "cbl++/Document.hh"
 #include "cbl/CBLReplicator.h"
+#include "cbl/CBLDefaults.h"
 #include <functional>
 #include <string>
 #include <vector>
@@ -217,6 +218,17 @@ namespace cbl {
         /** Extra HTTP headers to add to the WebSocket request. */
         fleece::MutableDict headers         = fleece::MutableDict::newDict();
 
+        //-- Advance HTTP settings:
+        /** The option to remove the restriction that does not allow the replicator to save the parent-domain
+            cookies, the cookies whose domains are the parent domain of the remote host, from the HTTP
+            response. For example, when the option is set to true, the cookies whose domain are “.foo.com”
+            returned by “bar.foo.com” host will be permitted to save. This is only recommended if the host
+            issuing the cookie is well trusted.
+         
+            This option is disabled by default, which means that the parent-domain cookies are not permitted
+            to save by default. */
+        bool acceptParentDomainCookies      = kCBLDefaultReplicatorAcceptParentCookies;
+        
         //-- TLS settings:
         /** An X.509 cert (PEM or DER) to "pin" for TLS connections. The pinned cert will be evaluated against any certs
             in a cert chain, and the cert chain will be valid only if the cert chain contains the pinned cert. */
@@ -266,6 +278,7 @@ namespace cbl {
             conf.maxAttemptWaitTime = maxAttemptWaitTime;
             conf.heartbeat = heartbeat;
             conf.authenticator = authenticator.ref();
+            conf.acceptParentDomainCookies = acceptParentDomainCookies;
             conf.proxy = proxy;
             if (!headers.empty())
                 conf.headers = headers;

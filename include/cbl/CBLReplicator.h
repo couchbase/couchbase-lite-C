@@ -358,6 +358,18 @@ typedef struct {
     
     /** The number of collections (Required if the database is not set */
     size_t collectionCount;
+    
+    //-- Advanced HTTP settings:
+    
+    /** The option to remove the restriction that does not allow the replicator to save the parent-domain
+        cookies, the cookies whose domains are the parent domain of the remote host, from the HTTP
+        response. For example, when the option is set to true, the cookies whose domain are “.foo.com”
+        returned by “bar.foo.com” host will be permitted to save. This is only recommended if the host
+        issuing the cookie is well trusted.
+     
+        This option is disabled by default (see \ref kCBLDefaultReplicatorAcceptParentCookies) which means
+        that the parent-domain cookies are not permitted to save by default. */
+    bool acceptParentDomainCookies;
 } CBLReplicatorConfiguration;
 
 
