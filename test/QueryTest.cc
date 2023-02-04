@@ -165,6 +165,115 @@ TEST_CASE_METHOD(QueryTest, "Query", "[Query]") {
     CHECK(n == 3);
 }
 
+TEST_CASE_METHOD(QueryTest, "Unicode Query", "[Query]"){
+    CBLError error;
+    int errPos;
+
+    auto col = CBLDatabase_DefaultCollection(db, &error);
+
+    CBLDocument* doc = CBLDocument_CreateWithID("first"_sl);
+    REQUIRE(doc);
+    REQUIRE(CBLDocument_SetJSON(doc, "{\"name\":{\"first\": \"Melanie\", \"last\": \"Bochaard\" }, \"city\": \"Manchester\"}"_sl, &error));
+    REQUIRE(CBLCollection_SaveDocument(col, doc, &error));
+    CBLDocument_Release(doc);
+
+    CBLDocument* doc2 = CBLDocument_CreateWithID("second"_sl);
+    REQUIRE(doc2);
+    REQUIRE(CBLDocument_SetJSON(doc2, "{\"name\":{\"first\": \"Mélanie\", \"last\": \"Bochaard\" }, \"city\": \"Manchester\"}"_sl, &error));
+    REQUIRE(CBLCollection_SaveDocument(col, doc2, &error));
+    CBLDocument_Release(doc2);
+
+    CBLCollection_Release(col);
+
+    string queryString, queryString2;
+    int docsCount  = -1;
+    int docsCount2 = -1;
+
+    SECTION("General"){
+        SECTION("Simple"){
+            queryString2 = "{WHAT: [ ['.name'] ],\
+                            WHERE: ['COLLATE', {'unicode': true, 'case': false, 'diac': false},\
+                                ['=', ['.name.first'], 'Mélanie']],\
+                            ORDER_BY: [ ['COLLATE', {'unicode': true, 'case': false, 'diac': false},\
+                                ['.name']] ]}";
+            docsCount2   = 2;
+        }
+        SECTION("Aggregate"){
+            queryString2 = "{WHAT: [ ['COLLATE', {'unicode': true, 'case': false, 'diac': false},\
+                                ['.name']] ],\
+                            DISTINCT: true,\
+                            ORDER_BY: [ ['COLLATE', {'unicode': true, 'case': false, 'diac': false},\
+                                ['.name']] ]}";
+            docsCount2   = 102;
+        }
+    }
+
+    SECTION("Collated Case-Insensitive"){
+        SECTION("LIKE"){
+            queryString  = "['COLLATE', {'unicode': true, 'case': false, 'diac': true}, ['LIKE', ['.name.first'], 'mel%']]";
+            queryString2 = "['COLLATE', {'unicode': true, 'case': false, 'diac': true}, ['LIKE', ['.name.first'], 'mél%']]";
+            docsCount    = 1;
+            docsCount2   = 1;
+        }
+        SECTION("CONTAINS()"){
+            queryString  = "['COLLATE', {'unicode': true, 'case': false, 'diac': true}, ['CONTAINS()', ['.name.first'], 'mel']]";
+            queryString2 = "['COLLATE', {'unicode': true, 'case': false, 'diac': true}, ['CONTAINS()', ['.name.first'], 'mél']]";
+            docsCount    = 1;
+            docsCount2   = 1;
+        }
+    }
+
+    SECTION("Collated Diacritic-Insensitive"){
+        SECTION("LIKE"){
+            queryString  = "['COLLATE', {'unicode': true, 'case': true, 'diac': false}, ['LIKE', ['.name.first'], 'Mél%']]";
+            queryString2 = "['COLLATE', {'unicode': true, 'case': true, 'diac': false}, ['LIKE', ['.name.first'], 'mél%']]";
+            docsCount    = 2;
+            docsCount2   = 0;
+        }
+        SECTION("CONTAINS()"){
+            queryString  = "['COLLATE', {'unicode': true, 'case': true, 'diac': false}, ['CONTAINS()', ['.name.first'], 'Mél']]";
+            queryString2 = "['COLLATE', {'unicode': true, 'case': true, 'diac': false}, ['CONTAINS()', ['.name.first'], 'mél']]";
+            docsCount    = 2;
+            docsCount2   = 0;
+        }
+    }
+
+    SECTION("Everything insensitive") {
+        SECTION("LIKE"){
+            queryString2 = "['COLLATE', {'unicode': true, 'case': false, 'diac': false}, ['LIKE', ['.name.first'], 'mél%']]";
+            docsCount2   = 2;
+        }
+        SECTION("CONTAINS()"){
+            queryString2 = "['COLLATE', {'unicode': true, 'case': false, 'diac': false}, ['CONTAINS()', ['.name.first'], 'mél']]";
+            docsCount2   = 2;
+        }
+        
+    }
+
+    if(!queryString.empty() && docsCount != -1){
+        query = CBLDatabase_CreateQuery(db, kCBLJSONLanguage, slice(queryString), &errPos, &error);
+        REQUIRE(query);
+        results = CBLQuery_Execute(query, &error);
+        REQUIRE(results);
+        CHECK(countResults(results) == docsCount);
+
+        CBLQuery_Release(query);
+        CBLResultSet_Release(results);
+    }       
+    
+    if(!queryString2.empty() && docsCount2 != -1){
+        query = CBLDatabase_CreateQuery(db, kCBLJSONLanguage, slice(queryString2), &errPos, &error);
+        REQUIRE(query);
+        results = CBLQuery_Execute(query, &error);
+        REQUIRE(results);
+        CHECK(countResults(results) == docsCount2);
+
+        CBLQuery_Release(query);
+        query = nullptr;
+        CBLResultSet_Release(results);
+        results = nullptr;
+    }
+}
 
 TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
     CBLError error;
