@@ -1,7 +1,7 @@
 //
-// CBL_Edition.h
+// CBLuserAgent.mm
 //
-// Copyright (c) 2018 Couchbase, Inc All rights reserved.
+// Copyright (c) 2023 Couchbase, Inc All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 // limitations under the License.
 //
 
-#ifndef COUCHBASE_ENTERPRISE
-#cmakedefine COUCHBASE_ENTERPRISE
-#endif
+#import <Foundation/Foundation.h>
+#include <string>
+using namespace std;
 
-#define CBLITE_VERSION "@CouchbaseLite_C_VERSION@"
-#define CBLITE_VERSION_NUMBER @CouchbaseLite_C_VERNUM@
-#define CBLITE_BUILD_NUMBER @CouchbaseLite_C_BUILD@
-#define CBLITE_SOURCE_ID "@CouchbaseLite_C_SOURCE_ID@"
-#define CBLITE_BUILD_TIMESTAMP "@CouchbaseLite_C_BUILD_TIMESTAMP@"
+// Silence clang!  Including the CBLUserAgent header here just causes headaches
+string getAppleVersion();
+
+string getAppleVersion() {
+    return [[[NSProcessInfo processInfo] operatingSystemVersionString] cStringUsingEncoding:NSASCIIStringEncoding];
+}

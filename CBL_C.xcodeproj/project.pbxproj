@@ -85,6 +85,8 @@
 		27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */; };
 		27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		40EBC24F298D89CE00182F16 /* CBLUserAgent.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40EBC23E298D896D00182F16 /* CBLUserAgent.hh */; };
+		40EBC260298D8A9900182F16 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 40EBC252298D8A9900182F16 /* CBLUserAgent.mm */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 		932062DB26BC6B43006917A5 /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 932062DA26BC6B43006917A5 /* CBLQuery.cc */; };
 		9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 9320630126BDB340006917A5 /* CBLPlatform.h */; };
@@ -369,6 +371,8 @@
 		27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "LibC++Debug.cc"; sourceTree = "<group>"; };
 		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
 		27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+Apple.mm"; sourceTree = "<group>"; };
+		40EBC23E298D896D00182F16 /* CBLUserAgent.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = CBLUserAgent.hh; sourceTree = "<group>"; };
+		40EBC252298D8A9900182F16 /* CBLUserAgent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLUserAgent.mm; sourceTree = "<group>"; };
 		932062DA26BC6B43006917A5 /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
 		9320630126BDB340006917A5 /* CBLPlatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLPlatform.h; sourceTree = "<group>"; };
 		9320631126BDB5CA006917A5 /* CBLPlatform_CAPI+Android.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "CBLPlatform_CAPI+Android.cc"; sourceTree = "<group>"; };
@@ -503,6 +507,8 @@
 				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
+				40EBC23E298D896D00182F16 /* CBLUserAgent.hh */,
+				40EBC252298D8A9900182F16 /* CBLUserAgent.mm */,
 				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
 				27D11BED2351043B00C58A70 /* ConflictResolver.hh */,
 				271C2A7421CC4BD60045856E /* Internal.cc */,
@@ -667,6 +673,7 @@
 				271C2A3421CAC98F0045856E /* CBLDatabase.h in Headers */,
 				271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */,
 				271C2A3221CAC98F0045856E /* CBLBase.h in Headers */,
+				40EBC24F298D89CE00182F16 /* CBLUserAgent.hh in Headers */,
 				27886C8D21F64C1400069BEA /* Listener.hh in Headers */,
 				93EC366226C49AF700182B02 /* CBLEncryptable_Internal.hh in Headers */,
 			);
@@ -1171,6 +1178,7 @@
 				277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */,
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
+				40EBC260298D8A9900182F16 /* CBLUserAgent.mm in Sources */,
 				27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob_CAPI.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,

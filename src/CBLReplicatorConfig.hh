@@ -20,6 +20,7 @@
 
 #include "CBLReplicator.h"
 #include "CBLDatabase_Internal.hh"
+#include "CBLUserAgent.hh"
 #include "Internal.hh"
 #include "c4ReplicatorTypes.h"
 #include "c4Private.h"
@@ -162,6 +163,7 @@ namespace cbl_internal {
 
 #pragma mark - CONFIGURATION:
 
+#define kCBLReplicatorUserAgent "kCBLReplicatorUserAgent"
 
 namespace cbl_internal {
     // Managed config object that retains/releases its properties.
@@ -190,8 +192,11 @@ namespace cbl_internal {
                 _proxy.username = copyString(_proxy.username, _proxyUsername);
                 _proxy.password = copyString(_proxy.password, _proxyPassword);
             }
-        }
 
+            Dict headersDict = Dict(headers);
+            fleece::Value userAgent = headersDict[kCBLReplicatorUserAgent];
+            _userAgent = userAgent ? userAgent.asstring() : createUserAgentHeader();
+        }
 
         ~ReplicatorConfiguration() {
             release(database);
@@ -220,7 +225,11 @@ namespace cbl_internal {
 
         // Writes a LiteCore replicator optionsDict
         void writeOptions(Encoder &enc) const {
-            writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders,  Dict(headers));
+            fleece::MutableDict mHeaders = headers ? FLDict_AsMutable(headers) : FLMutableDict_New();
+            if (!mHeaders[kCBLReplicatorUserAgent]) {
+                mHeaders[kCBLReplicatorUserAgent] = _userAgent;
+            }
+            writeOptionalKey(enc, kC4ReplicatorOptionExtraHeaders, mHeaders);
             writeOptionalKey(enc, kC4ReplicatorOptionDocIDs,        Array(documentIDs));
             writeOptionalKey(enc, kC4ReplicatorOptionChannels,      Array(channels));
             if (pinnedServerCertificate.buf) {
@@ -272,6 +281,10 @@ namespace cbl_internal {
             }
         }
 
+        slice getUserAgent() const {
+            return slice(_userAgent);
+        }
+
         ReplicatorConfiguration(const ReplicatorConfiguration&) =delete;
         ReplicatorConfiguration& operator=(const ReplicatorConfiguration&) =delete;
 
@@ -287,6 +300,7 @@ namespace cbl_internal {
         alloc_slice      _pinnedServerCert, _trustedRootCerts;
         CBLProxySettings _proxy;
         alloc_slice      _proxyHostname, _proxyUsername, _proxyPassword;
+        string           _userAgent;
     };
 }
 

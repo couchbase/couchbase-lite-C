@@ -160,6 +160,7 @@ _CBLReplicator_PendingDocumentIDs
 _CBLReplicator_IsDocumentPending
 _CBLReplicator_AddChangeListener
 _CBLReplicator_AddDocumentReplicationListener
+_CBLReplicator_UserAgent
 _CBLDefaultConflictResolver
 _kFLNullValue
 _kFLUndefinedValue
