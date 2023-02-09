@@ -35,8 +35,8 @@ public:
     bool skipEncryption = false;
     bool skipDecryption = false;
     
-    bool encryptionError = false;
-    bool decryptionError = false;
+    CBLError encryptionError = { };
+    CBLError decryptionError = { };
     
     ReplicatorPropertyEncryptionTest()
     :otherDB(openEmptyDatabaseNamed("otherDB"))
@@ -94,13 +94,12 @@ public:
         encryptCount++;
         
         if (skipEncryption) { // Not allow and will result to an crypto error
-            return FLSliceResult(alloc_slice(kFLSliceNull));
+            return FLSliceResult_CreateWith(nullptr, 0);
         }
         
-        if (encryptionError) {
-            CBLError err = {kCBLDomain, kCBLErrorCrypto};
-            *error = err;
-            return FLSliceResult(alloc_slice(kFLSliceNull));
+        if (encryptionError.code > 0) {
+            *error = encryptionError;
+            return FLSliceResult_CreateWith(nullptr, 0);
         }
         
         alloc_slice encrypted(input);
@@ -123,13 +122,12 @@ public:
         decryptCount++;
         
         if (skipDecryption) { // Not allow and will result to an crypto error
-            return FLSliceResult(alloc_slice(kFLSliceNull));
+            return FLSliceResult_CreateWith(nullptr, 0);
         }
         
-        if (decryptionError) {
-            CBLError err = {kCBLDomain, kCBLErrorCrypto};
-            *error = err;
-            return FLSliceResult(alloc_slice(kFLSliceNull));
+        if (decryptionError.code > 0) {
+            *error = decryptionError;
+            return FLSliceResult_CreateWith(nullptr, 0);
         }
         
         alloc_slice decrypted(input);
@@ -626,6 +624,8 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Rep
 
 
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encryption error", "[Replicator][Encryptable]") {
+    CBLLog_SetConsoleLevel(kCBLLogVerbose);
+    
     auto doc = CBLDocument_CreateWithID("doc1"_sl);
     auto props = CBLDocument_MutableProperties(doc);
     
@@ -638,18 +638,60 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encryption error", "[Replica
     CBLDocument_Release(doc);
     CBLEncryptable_Release(secret1);
     
-    config.replicatorType = kCBLReplicatorTypePushAndPull;
+    config.replicatorType = kCBLReplicatorTypePush;
+    setupEncryptionCallback(true, false);
     
-    {
-        ExpectingExceptions x;
-        encryptionError = true;
-        replicate();
+    CBLError expectedError = { };
+    CBLError expectedDocReplError = { };
+    bool willRetryToSyncAgain = false;
+    
+    SECTION("503 Error") {
+        encryptionError = {kCBLWebSocketDomain, 503};
+        expectedDocReplError = encryptionError;
+        expectedError = encryptionError;
+        willRetryToSyncAgain = true; // The doc should be retried to sync again
     }
     
+    SECTION("Crypto Error") {
+        encryptionError = {kCBLDomain, kCBLErrorCrypto};
+        expectedDocReplError = encryptionError;
+        expectedError = { };
+    }
+    
+    SECTION("Other Error") {
+        encryptionError = {kCBLDomain, kCBLErrorUnexpectedError};
+        expectedDocReplError = encryptionError;
+        expectedError = { };
+    }
+    
+    ExpectingExceptions x;
+    replicate(expectedError);
+    
     CHECK(replicatedDocs.size() == 1);
-    CHECK(replicatedDocs[0].error.code == kCBLErrorCrypto);
-    CHECK(replicatedDocs[0].error.domain == kCBLDomain);
+    CHECK(replicatedDocs[0] .error.domain == expectedDocReplError.domain);
+    CHECK(replicatedDocs[0].error.code == expectedDocReplError.code);
     CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
+    
+    // Now try to replicate again with no error:
+    
+    replicatedDocs.clear();
+    encryptionError = { };
+    
+    expectedError = { };
+    replicate();
+    
+    if (willRetryToSyncAgain) {
+        CHECK(replicatedDocs.size() == 1);
+        CHECK(replicatedDocs[0].error.domain == 0);
+        CHECK(replicatedDocs[0].error.code == 0);
+        
+        const CBLDocument* doc1 = CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error);
+        CHECK(doc1);
+        CBLDocument_Release(doc1);
+    } else {
+        CHECK(replicatedDocs.size() == 0);
+        CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
+    }
 }
 
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Decryption error", "[Replicator][Encryptable]") {
@@ -679,18 +721,60 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Decryption error", "[Replica
         replicatedDocs.clear();
         resetDBAndReplicator();
         
-        {
-            ExpectingExceptions x;
-            decryptionError = true;
-            replicate();
+        CBLError expectedError = { };
+        CBLError expectedDocReplError = { };
+        bool willRetryToSyncAgain = false;
+        
+        SECTION("503 Error") {
+            decryptionError = {kCBLWebSocketDomain, 503};
+            expectedDocReplError = decryptionError;
+            expectedError = decryptionError;
+            willRetryToSyncAgain = true; // The doc should be retried to sync again
         }
-
+        
+        SECTION("Crypto Error") {
+            decryptionError = {kCBLDomain, kCBLErrorCrypto};
+            expectedDocReplError = decryptionError;
+            expectedError = { };
+        }
+        
+        SECTION("Other Error") {
+            decryptionError = {kCBLDomain, kCBLErrorUnexpectedError};
+            expectedDocReplError = decryptionError;
+            expectedError = { };
+        }
+        
+        CHECK(replicatedDocs.size() == 0);
+        ExpectingExceptions x;
+        replicate(expectedError);
+        
         CHECK(replicatedDocs.size() == 1);
-        CHECK(replicatedDocs[0].error.code == kCBLErrorCrypto);
-        CHECK(replicatedDocs[0].error.domain == kCBLDomain);
+        CHECK(replicatedDocs[0].error.domain == expectedDocReplError.domain);
+        CHECK(replicatedDocs[0].error.code == expectedDocReplError.code);
         
         CBLError error;
         CHECK(!CBLDatabase_GetDocument(db.ref(), "doc1"_sl, &error));
+        
+        // Now try to replicate again with no error:
+        
+        replicatedDocs.clear();
+        decryptionError = { };
+        
+        expectedError = { };
+        replicate();
+        
+        if (willRetryToSyncAgain) {
+            CHECK(replicatedDocs.size() == 1);
+            CHECK(replicatedDocs[0].error.domain == 0);
+            CHECK(replicatedDocs[0].error.code == 0);
+            
+            const CBLDocument* doc = CBLDatabase_GetDocument(db.ref(), "doc1"_sl, &error);
+            CHECK(doc);
+            CBLDocument_Release(doc);
+        } else {
+            CHECK(replicatedDocs.size() == 0);
+            CHECK(!CBLDatabase_GetDocument(db.ref(), "doc1"_sl, &error));
+        }
     }
 }
 
