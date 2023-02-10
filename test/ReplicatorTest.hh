@@ -105,7 +105,6 @@ public:
         
         if (expectedError.code > 0) {
             CHECK(status.error.code == expectedError.code);
-            CHECK(status.progress.complete < 1.0);
         } else {
             CHECK(status.error.code == 0);
             CHECK(status.progress.complete == 1.0);

@@ -151,10 +151,27 @@ typedef struct {
 
 #ifdef COUCHBASE_ENTERPRISE
 
-/** Callback that encrypts \ref CBLEncryptable properties in documents pushed by the replicator.
-    \note   If a null \ref FLSliceResult or an error is returned, the document will be failed to
-            replicate with the \ref kCBLErrorCrypto error when. For security reason, the encryption
-            cannot be skipped. */
+/** Callback that encrypts \ref CBLEncryptable properties in the documents pushed by the replicator.
+    The callback returns encrypted data as a FLSliceResult object, and the replicator will responsible
+    for releasing the returned FLSliceResult object.
+     
+    If an error occurred during encryption, return a null \ref FLSliceResult with an error set to the
+    out error parameter of the callback. There are two errors that are supported by the callback :
+ 
+    1. kCBLDomain / kCBLErrorCrypto : Permanent Crypto Error. When this error is set, the document
+      will fail to replicate, and the document will not be synced again unless the document is updated,
+      or the replicator is reset.
+
+    2. kCBLWebSocketDomain / 503 : Service Unavailable Error. This error is for mostly for a case
+      such as when a crypto service is temporarily unavailable during encryption. When this error
+      is set, the replicator will go into the offline state and will retry again according to the replicator
+      retry logic. As a result, the document will be retried to replicate again, and the encryption callback
+      will be called again to encrypt the properties of the document.
+
+    @note If an error besides the two errors above is set to the out error parameter of the callback,
+          or only a null \ref FLSliceResult object is returned without setting an error, the document
+          will be failed to replicate as the kCBLDomain / kCBLErrorCrypto error is sepecified.
+    @note A null \ref FLSliceResult can be created by calling FLSliceResult_CreateWith(nullptr, 0). */
 typedef FLSliceResult (*CBLPropertyEncryptor) (
     void* context,              ///< Replicator’s context
     FLString documentID,        ///< Document ID
@@ -167,9 +184,28 @@ typedef FLSliceResult (*CBLPropertyEncryptor) (
 );
 
 /** Callback that decrypts encrypted \ref CBLEncryptable properties in documents pulled by the replicator.
-    \note   The decryption will be skipped (the encrypted data will be kept) when a null \ref FLSliceResult
-            without an error is returned. If an error is returned, the document will be failed to replicate
-            with the \ref kCBLErrorCrypto error. */
+    The callback returns decrypted data as a FLSliceResult object, and the replicator will responsible for
+    releasing the returned FLSliceResult object.
+     
+    If an error occurred during decryption, return a null \ref FLSliceResult with an error set to the
+    out error parameter of the callback. There are two errors that are supported by the callback :
+
+    1. kCBLDomain / kCBLErrorCrypto : Permanent Crypto Error. When this error is set, the document
+      will fail to replicate, and the document will not be synced again unless the document is updated,
+      or the replicator is reset.
+
+    2. kCBLWebSocketDomain / 503 : Service Unavailable Error. This error is for mostly for a case
+      such as when a crypto service is temporarily unavailable during decryption. When this error
+      is set, the replicator will go into the offline state and will retry again according to the replicator
+      retry logic. As a result, the document will be retried to replicate again, and the decryption callback
+      will be called again to decrypt the properties of the document.
+ 
+    If the decryption should be skipped to retain the encrypted data as-is, return a null \ref FLSliceResult
+    object without setting an error set to the out error parameter.
+
+    @note If an error besides the two errors above is set to the out error parameter of the callback,
+          the document will be failed to replicate as getting the kCBLDomain / kCBLErrorCrypto error.
+    @note A null \ref FLSliceResult can be created by calling FLSliceResult_CreateWith(nullptr, 0). */
 typedef FLSliceResult (*CBLPropertyDecryptor) (
     void* context,              ///< Replicator’s context
     FLString documentID,        ///< Document ID
