@@ -11,5 +11,6 @@ var searchData=
   ['key_8',['key',['../struct_f_l_path_component.html#ab5ede4b7db1f077681b2230bfec8346c',1,'FLPathComponent']]],
   ['kflemptyarray_9',['kFLEmptyArray',['../group___f_l_array.html#gaa8f81e9b5d0801302532a09a1aa51465',1,'Fleece.h']]],
   ['kflemptydict_10',['kFLEmptyDict',['../group___f_l_dict.html#ga6f5ad9f2d7e517236534eec5262574a2',1,'Fleece.h']]],
-  ['kflnullvalue_11',['kFLNullValue',['../group___f_l_value.html#ga49e1400fb063717c297119931e15c501',1,'Fleece.h']]]
+  ['kflnullvalue_11',['kFLNullValue',['../group___f_l_value.html#ga49e1400fb063717c297119931e15c501',1,'Fleece.h']]],
+  ['kflundefinedvalue_12',['kFLUndefinedValue',['../group___f_l_value.html#ga8e4f6ccbc67fe5df8620b9dc1c780a22',1,'Fleece.h']]]
 ];

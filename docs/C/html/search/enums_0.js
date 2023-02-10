@@ -13,5 +13,6 @@ var searchData=
   ['cblproxytype_10',['CBLProxyType',['../group__replication.html#ga056d4816e170aa3629f94c028dcd142b',1,'CBLReplicator.h']]],
   ['cblquerylanguage_11',['CBLQueryLanguage',['../group__queries.html#ga5b419d879de00f45eb417c451e21ac82',1,'CBLQuery.h']]],
   ['cblreplicatoractivitylevel_12',['CBLReplicatorActivityLevel',['../group__replication.html#ga9421513c63f1d16bf4740c4d2515dd22',1,'CBLReplicator.h']]],
-  ['cblreplicatortype_13',['CBLReplicatorType',['../group__replication.html#gae4da222f876468553ef0c1dca113d0d3',1,'CBLReplicator.h']]]
+  ['cblreplicatortype_13',['CBLReplicatorType',['../group__replication.html#gae4da222f876468553ef0c1dca113d0d3',1,'CBLReplicator.h']]],
+  ['cblseekbase_14',['CBLSeekBase',['../group__blobs.html#ga72db016446ed88ae93924722f9c3e3e5',1,'CBLBlob.h']]]
 ];
