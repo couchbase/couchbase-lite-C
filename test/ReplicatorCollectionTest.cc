@@ -61,13 +61,15 @@ public:
     }
     
     void createDocs(CBLCollection *col, unsigned n, string idprefix ="doc") {
-        for (unsigned i = 0; i < n; i++) {
+        constexpr size_t contentBuf = 100;
+        for (unsigned i = 0; i < n; i++)
+        {
             string docID = idprefix.append("-").append(to_string(i+1));
             auto doc = CBLDocument_CreateWithID(slice(docID));
             
             MutableDict props = CBLDocument_MutableProperties(doc);
-            char content[100];
-            sprintf(content, "This is the document #%03u.", i+1);
+            char content[contentBuf];
+            snprintf(content, contentBuf, "This is the document #%03u.", i+1);
             FLSlot_SetString(FLMutableDict_Set(props, "content"_sl), slice(content));
             
             CBLError error {};
