@@ -896,6 +896,54 @@ TEST_CASE_METHOD(QueryTest, "Test Joins with Collections", "[Query]") {
     CHECK(n == 2);
 }
 
+TEST_CASE_METHOD(QueryTest, "Test Select All Result Key", "[Query]") {
+    CBLError error {};
+    auto flowers = CreateCollection(db, "flowers", "test");
+    auto defaultCol = CBLDatabase_DefaultCollection(db, &error);
+    
+    CreateDoc(flowers, "flower1", "{\"name\":\"rose\",\"cid\":\"c1\"}");
+    CreateDoc(defaultCol, "flower1", "{\"name\":\"rose\",\"cid\":\"c1\"}");
+    
+    CBLCollection_Release(flowers);
+    CBLCollection_Release(defaultCol);
+    
+    const string froms[5] = {
+        slice(CBLDatabase_Name(db)).asString(),
+        "_",
+        "_default._default",
+        "test.flowers",
+        "test.flowers as f"
+    };
+    
+    const string expectedKeyNames[5] = {
+        slice(CBLDatabase_Name(db)).asString(),
+        "_",
+        "_default",
+        "flowers",
+        "f"
+    };
+    
+    int i = 0;
+    for (string from : froms) {
+        error = {};
+        int errPos;
+        auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice("SELECT * FROM " + from),
+                                             &errPos, &error);
+        REQUIRE(query);
+        
+        auto results = CBLQuery_Execute(query, &error);
+        REQUIRE(results);
+        
+        CHECK(CBLResultSet_Next(results));
+        FLValue value = CBLResultSet_ValueForKey(results, slice(expectedKeyNames[i++]));
+        CHECK(value);
+        CHECK(FLValue_GetType(value) == kFLDict);
+        
+        CBLResultSet_Release(results);
+        CBLQuery_Release(query);
+    }
+}
+
 #ifdef COUCHBASE_ENTERPRISE
 
 TEST_CASE_METHOD(QueryTest, "Query Encryptable", "[Query]") {
