@@ -142,14 +142,16 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) noexcep
 
 uint64_t CBLDatabase_Count(const CBLDatabase* db) noexcept {
     try {
-        return db->count();
+        auto col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        return col->count();
     } catchAndWarn();
 }
 
 /** Private API */
 uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) noexcept {
     try {
-        return db->lastSequence();
+        auto col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        return col->lastSequence();
     } catchAndWarn()
 }
 
