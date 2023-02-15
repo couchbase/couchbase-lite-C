@@ -95,7 +95,7 @@ CBLCollection* CBLDatabase_DefaultCollection(const CBLDatabase* db, CBLError* ou
 
 CBLScope* CBLCollection_Scope(const CBLCollection* collection) noexcept {
     try {
-        return const_cast<CBLCollection*>(collection)->scope();
+        return const_cast<CBLCollection*>(collection)->scope().detach();
     } catchAndWarn()
 }
 
