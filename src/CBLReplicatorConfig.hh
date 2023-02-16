@@ -165,7 +165,7 @@ namespace cbl_internal {
 
 #pragma mark - CONFIGURATION:
 
-#define kCBLReplicatorUserAgent "kCBLReplicatorUserAgent"
+#define kCBLReplicatorUserAgent "User-Agent"
 
 namespace cbl_internal
 {
