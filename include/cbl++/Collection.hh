@@ -65,7 +65,12 @@ namespace cbl {
         std::string name() const                    {return asString(CBLCollection_Name(ref()));}
         
         /** The scope name. */
-        std::string scopeName() const               {return asString(CBLScope_Name(CBLCollection_Scope(ref())));}
+        std::string scopeName() const {
+            auto scope = CBLCollection_Scope(ref());
+            auto scopeName = asString(CBLScope_Name(scope));
+            CBLScope_Release(scope);
+            return scopeName;
+        }
         
         /** The number of documents in the collection. */
         uint64_t count() const                      {return CBLCollection_Count(ref());}
@@ -312,8 +317,10 @@ namespace cbl {
 template<> struct std::hash<cbl::Collection> {
     std::size_t operator() (cbl::Collection const& col) const {
         auto name = CBLCollection_Name(col.ref());
-        auto scope = CBLScope_Name(CBLCollection_Scope(col.ref()));
-        return fleece::slice(name).hash() ^ fleece::slice(scope).hash();
+        auto scope = CBLCollection_Scope(col.ref());
+        std::size_t hash = fleece::slice(name).hash() ^ fleece::slice(CBLScope_Name(scope)).hash();
+        CBLScope_Release(scope);
+        return hash;
     }
 };
 

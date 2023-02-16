@@ -253,8 +253,9 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Use invalid collections", "[Replicat
     
     CBLError error {};
     auto name = CBLCollection_Name(cx[1]);
-    auto scope = CBLScope_Name(CBLCollection_Scope(cx[1]));
-    REQUIRE(CBLDatabase_DeleteCollection(db.ref(), name, scope, &error));
+    auto scope = CBLCollection_Scope(cx[1]);
+    REQUIRE(CBLDatabase_DeleteCollection(db.ref(), name, CBLScope_Name(scope), &error));
+    CBLScope_Release(scope);
     
     CBLReplicator* r = CBLReplicator_Create(&config, &error);
     REQUIRE(!r);

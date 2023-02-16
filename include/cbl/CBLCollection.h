@@ -171,11 +171,7 @@ CBLCollection* _cbl_nullable CBLDatabase_DefaultCollection(const CBLDatabase* db
  */
 
 /** Returns the scope of the collection.
-    @note  The returned scope object is a property of the collection object, and therefore
-           its lifetime will depend on the lifetime of the collection object.
-           If the returned scope object needs to keep longer, it needs to be explicitly retain
-           using \ref CBLScope_Retain function, and the object will remain valid until it is
-           explicitly released by using \ref CBLScope_Release function.
+    @note You are responsible for releasing the returned scope.
     @param collection  The collection.
     @return A \ref CBLScope instance. */
 CBLScope* CBLCollection_Scope(const CBLCollection* collection) CBLAPI;

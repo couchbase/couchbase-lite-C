@@ -305,8 +305,10 @@ void CreateDoc(CBLCollection *col, std::string docID, std::string jsonContent) {
 }
 
 std::string CollectionPath(CBLCollection* collection) {
-   return slice(CBLScope_Name(CBLCollection_Scope(collection))).asString() + "." +
-          slice(CBLCollection_Name(collection)).asString();
+    CBLScope* scope = CBLCollection_Scope(collection);
+    string name = slice(CBLScope_Name(scope)).asString() + "." + slice(CBLCollection_Name(collection)).asString();
+    CBLScope_Release(scope);
+    return name;
 }
 
 void PurgeAllDocs(CBLCollection* collection) {
