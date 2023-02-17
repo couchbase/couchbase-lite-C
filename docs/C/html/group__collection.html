@@ -1195,7 +1195,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the scope of the collection. </p>
-<dl class="section note"><dt>Note</dt><dd>The returned scope object is a property of the collection object, and therefore its lifetime will depend on the lifetime of the collection object. If the returned scope object needs to keep longer, it needs to be explicitly retain using <a class="el" href="group__scope.html#ga8a1cfbd3954b34ce03cc0afe82b647cc">CBLScope_Retain</a> function, and the object will remain valid until it is explicitly released by using <a class="el" href="group__scope.html#ga8f0e3a7336e84088473da0245be99a9d">CBLScope_Release</a> function. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>You are responsible for releasing the returned scope. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">collection</td><td>The collection. </td></tr>

@@ -81,7 +81,7 @@ $(function() {
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">//  CBLDefaults.h</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">//  CouchbaseLite</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">//</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment">//  Copyright (c) 2022-present Couchbase, Inc All rights reserved.</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment">//  Copyright (c) 2023-present Couchbase, Inc All rights reserved.</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">//</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">//  Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">//  you may not use this file except in compliance with the License.</span></div>
@@ -130,7 +130,8 @@ $(function() {
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><a class="code hl_define" href="_c_b_l___compat_8h.html#aa34e56dcd765d498243337335370d321">CBL_PUBLIC</a> <span class="keyword">extern</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="group__constants.html#ga71de106b5bb06c80b3bc05a30093ca04">kCBLDefaultReplicatorDisableAutoPurge</a>;</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><a class="code hl_define" href="_c_b_l___compat_8h.html#aa34e56dcd765d498243337335370d321">CBL_PUBLIC</a> <span class="keyword">extern</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code hl_variable" href="group__constants.html#gaeffb3127c8228bed596591357a244081">kCBLDefaultReplicatorAcceptParentCookies</a>;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><a class="code hl_define" href="_c_b_l___compat_8h.html#a4a09b3dcfc8afc800052a53fcb4dc183">CBL_CAPI_END</a></div>
 <div class="ttc" id="a_c_b_l___compat_8h_html"><div class="ttname"><a href="_c_b_l___compat_8h.html">CBL_Compat.h</a></div></div>
 <div class="ttc" id="a_c_b_l___compat_8h_html_a1711f31a406fcb5d37b72827275ccd55"><div class="ttname"><a href="_c_b_l___compat_8h.html#a1711f31a406fcb5d37b72827275ccd55">CBL_CAPI_BEGIN</a></div><div class="ttdeci">#define CBL_CAPI_BEGIN</div><div class="ttdef"><b>Definition:</b> CBL_Compat.h:105</div></div>
@@ -148,6 +149,7 @@ $(function() {
 <div class="ttc" id="agroup__constants_html_gad2a44e70c60d2b4e971499a61d702a5a"><div class="ttname"><a href="group__constants.html#gad2a44e70c60d2b4e971499a61d702a5a">kCBLDefaultLogFileMaxSize</a></div><div class="ttdeci">CBL_PUBLIC const size_t kCBLDefaultLogFileMaxSize</div><div class="ttdoc">[524288] 512 KiB for the size of a log file</div></div>
 <div class="ttc" id="agroup__constants_html_gadf100f6a25211adf63ba7b157bc21c12"><div class="ttname"><a href="group__constants.html#gadf100f6a25211adf63ba7b157bc21c12">kCBLDefaultFullTextIndexIgnoreAccents</a></div><div class="ttdeci">CBL_PUBLIC const bool kCBLDefaultFullTextIndexIgnoreAccents</div><div class="ttdoc">[false] Accents and ligatures are not ignored when indexing via full text search</div></div>
 <div class="ttc" id="agroup__constants_html_gae6a0594f17626a035ac85c072bd766c4"><div class="ttname"><a href="group__constants.html#gae6a0594f17626a035ac85c072bd766c4">kCBLDefaultReplicatorContinuous</a></div><div class="ttdeci">CBL_PUBLIC const bool kCBLDefaultReplicatorContinuous</div><div class="ttdoc">[false] One-shot replication is used, and will stop once all initial changes are processed</div></div>
+<div class="ttc" id="agroup__constants_html_gaeffb3127c8228bed596591357a244081"><div class="ttname"><a href="group__constants.html#gaeffb3127c8228bed596591357a244081">kCBLDefaultReplicatorAcceptParentCookies</a></div><div class="ttdeci">CBL_PUBLIC const bool kCBLDefaultReplicatorAcceptParentCookies</div><div class="ttdoc">[false] Whether or not a replicator only accepts cookies for the sender's parent domains</div></div>
 <div class="ttc" id="agroup__replication_html_gae4da222f876468553ef0c1dca113d0d3"><div class="ttname"><a href="group__replication.html#gae4da222f876468553ef0c1dca113d0d3">CBLReplicatorType</a></div><div class="ttdeci">CBLReplicatorType</div><div class="ttdef"><b>Definition:</b> CBLReplicator.h:79</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
