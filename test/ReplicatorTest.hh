@@ -55,7 +55,7 @@ public:
     int64_t expectedDocumentCount = -1;
     
 
-    ReplicatorTest(): CBLTest_Cpp() {
+    ReplicatorTest() {
         config.database = db.ref();
         config.replicatorType = kCBLReplicatorTypePull;
         config.context = this;

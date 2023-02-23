@@ -29,7 +29,6 @@ static constexpr size_t kDocIDBufferSize = 20;
 class CollectionTest : public CBLTest {
     
 public:
-    CollectionTest() : CBLTest() { }
 
     void createNumberedDocs(CBLCollection *col, unsigned n, unsigned start = 1) {
         for (unsigned i = 0; i < n; i++) {
@@ -820,16 +819,16 @@ TEST_CASE_METHOD(CollectionTest, "Delete Scope from Different DB Instance then U
 
 TEST_CASE_METHOD(CollectionTest, "Close Database then Use Collection", "[Collection]") {
     CBLError error = {};
-    CBLCollection* newCol = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
-    REQUIRE(newCol);
+    CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col);
     
     REQUIRE(CBLDatabase_Close(db, &error));
     CBLDatabase_Release(db);
     db = nullptr;
     
-    testInvalidCollection(newCol);
+    testInvalidCollection(col);
     
-    CBLCollection_Release(newCol);
+    CBLCollection_Release(col);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Delete Database then Use Scope", "[Collection]") {
