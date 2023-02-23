@@ -32,7 +32,7 @@ using namespace fleece;
 class QueryTest : public CBLTest {
 public:
     QueryTest() {
-        ImportJSONLines("names_100.json", db);
+        ImportJSONLines("names_100.json", defaultCollection);
     }
 
     ~QueryTest() {
@@ -169,21 +169,17 @@ TEST_CASE_METHOD(QueryTest, "Unicode Query", "[Query]"){
     CBLError error;
     int errPos;
 
-    auto col = CBLDatabase_DefaultCollection(db, &error);
-
     CBLDocument* doc = CBLDocument_CreateWithID("first"_sl);
     REQUIRE(doc);
     REQUIRE(CBLDocument_SetJSON(doc, "{\"name\":{\"first\": \"Melanie\", \"last\": \"Bochaard\" }, \"city\": \"Manchester\"}"_sl, &error));
-    REQUIRE(CBLCollection_SaveDocument(col, doc, &error));
+    REQUIRE(CBLCollection_SaveDocument(defaultCollection, doc, &error));
     CBLDocument_Release(doc);
 
     CBLDocument* doc2 = CBLDocument_CreateWithID("second"_sl);
     REQUIRE(doc2);
     REQUIRE(CBLDocument_SetJSON(doc2, "{\"name\":{\"first\": \"Mélanie\", \"last\": \"Bochaard\" }, \"city\": \"Manchester\"}"_sl, &error));
-    REQUIRE(CBLCollection_SaveDocument(col, doc2, &error));
+    REQUIRE(CBLCollection_SaveDocument(defaultCollection, doc2, &error));
     CBLDocument_Release(doc2);
-
-    CBLCollection_Release(col);
 
     string queryString, queryString2;
     int docsCount  = -1;
@@ -283,7 +279,7 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
             CBLValueIndexConfiguration config = {};
             config.expressionLanguage = kCBLJSONLanguage;
             config.expressions = R"(["contact.address.zip"])"_sl;
-            CHECK(CBLDatabase_CreateValueIndex(db, "zips"_sl, config, &error));
+            CHECK(CBLCollection_CreateValueIndex(defaultCollection, "zips"_sl, config, &error));
         }
 
         int errPos;
@@ -332,14 +328,14 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Value Index", "[Query]") {
     CBLValueIndexConfiguration index1 = {};
     index1.expressionLanguage = kCBLN1QLLanguage;
     index1.expressions = "name.first"_sl;
-    CHECK(CBLDatabase_CreateValueIndex(db, "index1"_sl, index1, &error));
+    CHECK(CBLCollection_CreateValueIndex(defaultCollection, "index1"_sl, index1, &error));
     
     CBLValueIndexConfiguration index2 = {};
     index2.expressionLanguage = kCBLJSONLanguage;
     index2.expressions = R"([[".name.last"]])"_sl;
-    CHECK(CBLDatabase_CreateValueIndex(db, "index2"_sl, index2, &error));
+    CHECK(CBLCollection_CreateValueIndex(defaultCollection, "index2"_sl, index2, &error));
     
-    FLArray indexNames = CBLDatabase_GetIndexNames(db);
+    FLArray indexNames = CBLCollection_GetIndexNames(defaultCollection, &error);
     CHECK(FLArray_Count(indexNames) == 2);
     CHECK(Array(indexNames).toJSONString() == R"(["index1","index2"])");
     
@@ -360,10 +356,10 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Value Index", "[Query]") {
     CBLQuery_Release(query);
     query = nullptr;
     
-    CHECK(CBLDatabase_DeleteIndex(db, "index1"_sl, &error));
-    CHECK(CBLDatabase_DeleteIndex(db, "index2"_sl, &error));
+    CHECK(CBLCollection_DeleteIndex(defaultCollection, "index1"_sl, &error));
+    CHECK(CBLCollection_DeleteIndex(defaultCollection, "index2"_sl, &error));
     
-    indexNames = CBLDatabase_GetIndexNames(db);
+    indexNames = CBLCollection_GetIndexNames(defaultCollection, &error);
     CHECK(FLArray_Count(indexNames) == 0);
     CHECK(Array(indexNames).toJSONString() == R"([])");
 }
@@ -377,16 +373,16 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
     index1.expressionLanguage = kCBLN1QLLanguage;
     index1.expressions = "product.description"_sl;
     index1.ignoreAccents = true;
-    CHECK(CBLDatabase_CreateFullTextIndex(db, "index1"_sl, index1, &error));
+    CHECK(CBLCollection_CreateFullTextIndex(defaultCollection, "index1"_sl, index1, &error));
     
     CBLFullTextIndexConfiguration index2 = {};
     index2.expressionLanguage = kCBLJSONLanguage;
     index2.expressions = R"([[".product.summary"]])"_sl;
     index2.ignoreAccents = false;
     index2.language = "en/english"_sl;
-    CHECK(CBLDatabase_CreateFullTextIndex(db, "index2"_sl, index2, &error));
+    CHECK(CBLCollection_CreateFullTextIndex(defaultCollection, "index2"_sl, index2, &error));
     
-    FLArray indexNames = CBLDatabase_GetIndexNames(db);
+    FLArray indexNames = CBLCollection_GetIndexNames(defaultCollection, &error);
     CHECK(FLArray_Count(indexNames) == 2);
     CHECK(Array(indexNames).toJSONString() == R"(["index1","index2"])");
     
@@ -409,10 +405,10 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
     CBLQuery_Release(query);
     query = nullptr;
     
-    CHECK(CBLDatabase_DeleteIndex(db, "index1"_sl, &error));
-    CHECK(CBLDatabase_DeleteIndex(db, "index2"_sl, &error));
+    CHECK(CBLCollection_DeleteIndex(defaultCollection, "index1"_sl, &error));
+    CHECK(CBLCollection_DeleteIndex(defaultCollection, "index2"_sl, &error));
     
-    indexNames = CBLDatabase_GetIndexNames(db);
+    indexNames = CBLCollection_GetIndexNames(defaultCollection, &error);
     CHECK(FLArray_Count(indexNames) == 0);
     CHECK(Array(indexNames).toJSONString() == R"([])");
 }
@@ -519,9 +515,9 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query][LiveQuery]") {
     
     cerr << "Deleting a doc...\n";
     state.reset();
-    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
+    const CBLDocument *doc = CBLCollection_GetDocument(defaultCollection, "0000012"_sl, &error);
     REQUIRE(doc);
-    CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
+    CHECK(CBLCollection_DeleteDocument(defaultCollection, doc, &error));
     CBLDocument_Release(doc);
 
     cerr << "Waiting for listener again...\n";
@@ -559,9 +555,9 @@ TEST_CASE_METHOD(QueryTest, "Remove Query Listener", "[Query][LiveQuery]") {
     CBLListener_Remove(listenerToken);
     
     cerr << "Deleting a doc...\n";
-    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
+    const CBLDocument *doc = CBLCollection_GetDocument(defaultCollection, "0000012"_sl, &error);
     REQUIRE(doc);
-    CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
+    CHECK(CBLCollection_DeleteDocument(defaultCollection, doc, &error));
     CBLDocument_Release(doc);
     
     cerr << "Sleeping to ensure that the listener callback is not called..." << endl;
@@ -643,9 +639,9 @@ TEST_CASE_METHOD(QueryTest, "Multiple Query Listeners", "[Query][LiveQuery]") {
     cerr << "Deleting a doc...\n";
     state1.reset();
     state2.reset();
-    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
+    const CBLDocument *doc = CBLCollection_GetDocument(defaultCollection, "0000012"_sl, &error);
     REQUIRE(doc);
-    CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
+    CHECK(CBLCollection_DeleteDocument(defaultCollection, doc, &error));
     CBLDocument_Release(doc);
 
     cerr << "Waiting for listener 1 again...\n";
@@ -698,8 +694,8 @@ TEST_CASE_METHOD(QueryTest, "Query Listener and Coalescing notification", "[Quer
     
     cerr << "Deleting a doc...\n";
     state.reset();
-    REQUIRE(CBLDatabase_DeleteDocumentByID(db, "0000012"_sl, &error));
-    REQUIRE(CBLDatabase_DeleteDocumentByID(db, "0000046"_sl, &error));
+    REQUIRE(CBLCollection_DeleteDocumentByID(defaultCollection, "0000012"_sl, &error));
+    REQUIRE(CBLCollection_DeleteDocumentByID(defaultCollection, "0000046"_sl, &error));
 
     cerr << "Sleeping to see if the notification is coalesced ...\n";
     this_thread::sleep_for(1000ms); // Max delay before refreshing result in LiteCore is 500ms
@@ -961,7 +957,7 @@ TEST_CASE_METHOD(QueryTest, "Query Encryptable", "[Query]") {
     FLSlot_SetDict(FLMutableDict_Set(props, "nested"_sl), nestedDict);
     
     CBLError error;
-    REQUIRE(CBLDatabase_SaveDocument(db, doc, &error));
+    REQUIRE(CBLCollection_SaveDocument(defaultCollection, doc, &error));
     CBLEncryptable_Release(secret1);
     CBLEncryptable_Release(secret2);
     FLMutableDict_Release(nestedDict);
