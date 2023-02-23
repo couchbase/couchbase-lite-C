@@ -74,10 +74,10 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
         Blob cachedBlob(props);
         CHECK(cachedBlob == blob);
 
-        db.saveDocument(doc);
+        defaultCollection.saveDocument(doc);
     }
     {
-        Document doc = db.getDocument("blobbo");
+        Document doc = defaultCollection.getDocument("blobbo");
         CHECK(doc.properties().toJSON(true,true).asString() == "{picture:{\"@type\":\"blob\","
               "content_type:\"text/plain\",digest:\"sha1-gtf8MtnkloBRj0Od1CHA9LG69FM=\",length:32}}");
         CHECK(Blob::isBlob(doc["picture"].asDict()));
@@ -118,7 +118,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob", "[Blob]") {
         // Compact the db and make sure the blob still exists: (issue #73)
         db.performMaintenance(kCBLMaintenanceTypeCompact);
 
-        Document doc = db.getDocument("blobbo");
+        Document doc = defaultCollection.getDocument("blobbo");
         CHECK(Blob::isBlob(doc["picture"].asDict()));
         Blob blob(doc["picture"].asDict());
         REQUIRE(blob);
@@ -134,10 +134,10 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blob in mutable doc", "[Blob]") {
         blob = Blob(kBlobContentType, kBlobContents);
         Dict props = blob.properties();
         doc["picture"] = props;
-        db.saveDocument(doc);
+        defaultCollection.saveDocument(doc);
     }
 
-    Document doc = db.getDocument("blobbo");
+    Document doc = defaultCollection.getDocument("blobbo");
     Dict props = doc["picture"].asDict();
     checkBlob(props);
 
@@ -160,10 +160,10 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in arrays/dicts", "[Blob]") {
 
         doc["array"] = array;
         doc["dict"] = dict;
-        db.saveDocument(doc);
+        defaultCollection.saveDocument(doc);
     }
 
-    Document doc = db.getDocument("blobbo");
+    Document doc = defaultCollection.getDocument("blobbo");
     auto array = doc["array"].asArray();
     auto dict =  doc["dict"].asDict();
 
@@ -179,7 +179,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Blobs in ResultSet", "[Blob]") {
         MutableDocument doc(docID);
         Blob blob(kBlobContentType, kBlobContents);
         doc["picture"] = blob.properties();
-        db.saveDocument(doc);
+        defaultCollection.saveDocument(doc);
     }
 
     Query q(db, kCBLN1QLLanguage, "SELECT picture FROM _default");
