@@ -29,7 +29,8 @@ static constexpr size_t kDocIDBufferSize = 20;
 class CollectionTest : public CBLTest {
     
 public:
-    
+    CollectionTest() : CBLTest() { }
+
     void createNumberedDocs(CBLCollection *col, unsigned n, unsigned start = 1) {
         for (unsigned i = 0; i < n; i++) {
             char docID[kDocIDBufferSize];
@@ -163,27 +164,27 @@ public:
         ExpectingExceptions x;
         
         CBLError error = {};
-        CHECK(!CBLDatabase_DefaultScope(db, &error));
+        CHECK(!CBLDatabase_DefaultScope(database, &error));
         CheckNotOpenError(error);
         
         error = {};
-        CHECK(!CBLDatabase_DefaultCollection(db, &error));
+        CHECK(!CBLDatabase_DefaultCollection(database, &error));
         CheckNotOpenError(error);
         
         error = {};
-        CHECK(!CBLDatabase_ScopeNames(db, &error));
+        CHECK(!CBLDatabase_ScopeNames(database, &error));
         CheckNotOpenError(error);
         
         error = {};
-        CHECK(!CBLDatabase_CollectionNames(db, "_default"_sl,  &error));
+        CHECK(!CBLDatabase_CollectionNames(database, "_default"_sl,  &error));
         CheckNotOpenError(error);
         
         error = {};
-        CHECK(!CBLDatabase_Collection(db, "_default"_sl, "_default"_sl, &error));
+        CHECK(!CBLDatabase_Collection(database, "_default"_sl, "_default"_sl, &error));
         CheckNotOpenError(error);
         
         error = {};
-        CHECK(!CBLDatabase_Scope(db, "_default"_sl, &error));
+        CHECK(!CBLDatabase_Scope(database, "_default"_sl, &error));
         CheckNotOpenError(error);
     }
 };
@@ -191,28 +192,23 @@ public:
 #define NOT_DELETE_DEFAULT_COLLECTION
 
 TEST_CASE_METHOD(CollectionTest, "Default Collection", "[Collection]") {
-    CBLError error = {};
-    CBLCollection* col = CBLDatabase_DefaultCollection(db, &error);
-    REQUIRE(col);
-    CHECK(CBLCollection_Name(col) == kCBLDefaultCollectionName);
-    CHECK(CBLCollection_Count(col) == 0);
-    CBLCollection_Release(col);
+    REQUIRE(defaultCollection);
+    CHECK(CBLCollection_Name(defaultCollection) == kCBLDefaultCollectionName);
+    CHECK(CBLCollection_Count(defaultCollection) == 0);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Default Collection Exists By Default", "[Collection]") {
     CBLError error = {};
-    CBLCollection* col = CBLDatabase_DefaultCollection(db, &error);
-    REQUIRE(col);
-    CHECK(CBLCollection_Name(col) == kCBLDefaultCollectionName);
-    CHECK(CBLCollection_Count(col) == 0);
+    REQUIRE(defaultCollection);
+    CHECK(CBLCollection_Name(defaultCollection) == kCBLDefaultCollectionName);
+    CHECK(CBLCollection_Count(defaultCollection) == 0);
     
-    CBLScope* scope = CBLCollection_Scope(col);
+    CBLScope* scope = CBLCollection_Scope(defaultCollection);
     REQUIRE(scope);
     CHECK(CBLScope_Name(scope) == kCBLDefaultScopeName);
     CBLScope_Release(scope);
-    CBLCollection_Release(col);
     
-    col = CBLDatabase_Collection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error);
+    CBLCollection* col = CBLDatabase_Collection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error);
     REQUIRE(col);
     CHECK(CBLCollection_Name(col) == kCBLDefaultCollectionName);
     CHECK(CBLCollection_Count(col) == 0);
@@ -249,8 +245,7 @@ TEST_CASE_METHOD(CollectionTest, "Default Scope Exists By Default", "[Collection
 
 TEST_CASE_METHOD(CollectionTest, "Delete Default Collection", "[Collection]") {
     CBLError error = {};
-    CBLCollection* col = CBLDatabase_DefaultCollection(db, &error);
-    REQUIRE(col);
+    REQUIRE(defaultCollection);
     
     // Add some docs:
     createNumberedDocs(col, 100);
@@ -259,7 +254,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Default Collection", "[Collection]") {
     
     // Delete the default collection:
     REQUIRE(CBLDatabase_DeleteCollection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error));
-    CHECK(!CBLDatabase_DefaultCollection(db, &error));
+    CHECK(!defaultCollection);
     CHECK(error.code == 0);
     CHECK(!CBLDatabase_Collection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error));
     CHECK(error.code == 0);
@@ -273,9 +268,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Default Collection", "[Collection]") {
 
 TEST_CASE_METHOD(CollectionTest, "Get Default Scope After Delete Default Collection", "[Collection]") {
     CBLError error = {};
-    CBLCollection* col = CBLDatabase_DefaultCollection(db, &error);
-    REQUIRE(col);
-    CBLCollection_Release(col);
+    REQUIRE(defaultCollection);
     
     // Delete the default collection:
     REQUIRE(CBLDatabase_DeleteCollection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error));
@@ -295,14 +288,11 @@ TEST_CASE_METHOD(CollectionTest, "Get Default Scope After Delete Default Collect
 TEST_CASE_METHOD(CollectionTest, "Default Collection Cannot Be Deleted", "[Collection]") {
     ExpectingExceptions ex;
     CBLError error = {};
-    CBLCollection* col = CBLDatabase_DefaultCollection(db, &error);
-    REQUIRE(col);
+    REQUIRE(defaultCollection);
     
     // Try delete the default collection - should return false:
     REQUIRE(!CBLDatabase_DeleteCollection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error));
     CHECK((error.domain == kCBLDomain && error.code == kCBLErrorInvalidParameter ));
-
-    CBLCollection_Release(col);
 }
 
 #endif
@@ -398,8 +388,8 @@ TEST_CASE_METHOD(CollectionTest, "Create Existing Collection", "[Collection]") {
 
 TEST_CASE_METHOD(CollectionTest, "Get Non Existing Collection", "[Collection]") {
     CBLError error = {};
-    CBLCollection* col1 = CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error);
-    CHECK(col1 == nullptr);
+    CBLCollection* col = CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error);
+    CHECK(col == nullptr);
     CHECK(error.code == 0);
 }
 
@@ -830,16 +820,16 @@ TEST_CASE_METHOD(CollectionTest, "Delete Scope from Different DB Instance then U
 
 TEST_CASE_METHOD(CollectionTest, "Close Database then Use Collection", "[Collection]") {
     CBLError error = {};
-    CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
-    REQUIRE(col);
+    CBLCollection* newCol = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(newCol);
     
     REQUIRE(CBLDatabase_Close(db, &error));
     CBLDatabase_Release(db);
     db = nullptr;
     
-    testInvalidCollection(col);
+    testInvalidCollection(newCol);
     
-    CBLCollection_Release(col);
+    CBLCollection_Release(newCol);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Delete Database then Use Scope", "[Collection]") {
@@ -907,9 +897,9 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection and Close Database then Use 
 
 TEST_CASE_METHOD(CollectionTest, "Delete Scope and Close Database then Use Scope", "[Collection]") {
     CBLError error = {};
-    CBLCollection* colA = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
-    REQUIRE(colA);
-    CBLCollection_Release(colA);
+    CBLCollection* col = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col);
+    CBLCollection_Release(col);
     
     CBLScope* scope = CBLDatabase_Scope(db, "scopeA"_sl, &error);
     REQUIRE(scope);
