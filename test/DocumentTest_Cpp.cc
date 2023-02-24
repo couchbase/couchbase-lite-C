@@ -45,7 +45,7 @@ public:
         CHECK(otherCol.count() == 0);
     }
     
-    MutableDocument createDocumentInCollection(Collection& collection, slice docID, slice property, slice value) {
+    MutableDocument createDocument(Collection& collection, slice docID, slice property, slice value) {
         MutableDocument doc(docID);
         doc[property] = value;
         collection.saveDocument(doc);
@@ -291,7 +291,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Document with Conflict Handler", "[
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Document into Different Collection", "[Document]") {
-    createDocumentInCollection(defaultCollection, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
     MutableDocument doc = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc);
@@ -314,7 +314,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Non Existing Doc", "[Document]") 
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Doc", "[Document]") {
-    createDocumentInCollection(defaultCollection, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
     Document doc = defaultCollection.getDocument("foo");
     CHECK(doc);
@@ -326,7 +326,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Doc", "[Document]") {
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Doc with LastWriteWin", "[Document]") {
-    createDocumentInCollection(defaultCollection, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
     MutableDocument doc1 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc1);
@@ -349,7 +349,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Doc with LastWriteWin", "[Documen
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Doc with FailOnConflict", "[Document]") {
-    createDocumentInCollection(defaultCollection, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
     MutableDocument doc1 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc1);
@@ -373,7 +373,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Doc with FailOnConflict", "[Docum
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Document into Different Collection", "[Document]") {
-    MutableDocument doc = createDocumentInCollection(defaultCollection, "foo", "greeting", "Howdy");
+    MutableDocument doc = createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
     ExpectingExceptions ex;
     CBLError error {};
@@ -398,7 +398,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Non Existing Doc", "[Document]") {
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Doc", "[Document]") {
-    createDocumentInCollection(defaultCollection, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
     Document doc = defaultCollection.getDocument("foo");
     REQUIRE(doc);
@@ -416,7 +416,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Doc", "[Document]") {
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Already Purged Document", "[Document]") {
-    createDocumentInCollection(defaultCollection, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
     Document doc = defaultCollection.getDocument("foo");
     REQUIRE(doc);
@@ -432,7 +432,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Already Purged Document", "[Docume
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Doc from Different Collection", "[Document]") {
-    createDocumentInCollection(defaultCollection, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
     Document doc = defaultCollection.getDocument("foo");
     REQUIRE(doc);
@@ -446,9 +446,9 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Doc from Different Collection", "[
 #pragma mark - Document Expiry:
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Document Expiration", "[Document][Expiry]") {
-    createDocumentInCollection(defaultCollection, "doc1", "foo", "bar");
-    createDocumentInCollection(defaultCollection, "doc2", "foo", "bar");
-    createDocumentInCollection(defaultCollection, "doc3", "foo", "bar");
+    createDocument(defaultCollection, "doc1", "foo", "bar");
+    createDocument(defaultCollection, "doc2", "foo", "bar");
+    createDocument(defaultCollection, "doc3", "foo", "bar");
 
     CBLTimestamp future = CBL_Now() + 1000;
     defaultCollection.setDocumentExpiration("doc1", future);
@@ -509,7 +509,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Change Listeners", "[Document]") {
     });
     
     // Create a doc, check that the listener was called:
-    createDocumentInCollection(defaultCollection, "foo", "greeting", "Howdy!");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy!");
     CHECK(listenerCalls == 1);
     CHECK(docListenerCalls == 1);
     
@@ -517,7 +517,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Change Listeners", "[Document]") {
     listener.remove();
     docListener.remove();
     listenerCalls = docListenerCalls = 0;
-    createDocumentInCollection(defaultCollection, "bar", "greeting", "yo.");
+    createDocument(defaultCollection, "bar", "greeting", "yo.");
     
     this_thread::sleep_for(1000ms);
     CHECK(listenerCalls == 0);

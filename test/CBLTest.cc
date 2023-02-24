@@ -118,8 +118,7 @@ CBLTest::CBLTest() {
 
 CBLTest::~CBLTest() {
     CBLCollection_Release(defaultCollection);
-    if (db)
-    {
+    if (db){
         ExpectingExceptions x; // Database might have been closed by the test:
         CBLError error;
         if (!CBLDatabase_Close(db, &error))
@@ -139,6 +138,7 @@ CBLTest_Cpp::CBLTest_Cpp()
 :db(openDatabaseNamed(kDatabaseName, true)) // empty
 { 
     defaultCollection = db.getDefaultCollection();
+    REQUIRE(defaultCollection);
 }
 
 CBLTest_Cpp::~CBLTest_Cpp() {

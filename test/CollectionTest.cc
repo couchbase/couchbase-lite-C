@@ -191,7 +191,6 @@ public:
 #define NOT_DELETE_DEFAULT_COLLECTION
 
 TEST_CASE_METHOD(CollectionTest, "Default Collection", "[Collection]") {
-    REQUIRE(defaultCollection);
     CHECK(CBLCollection_Name(defaultCollection) == kCBLDefaultCollectionName);
     CHECK(CBLCollection_Count(defaultCollection) == 0);
 }
@@ -253,7 +252,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Default Collection", "[Collection]") {
     
     // Delete the default collection:
     REQUIRE(CBLDatabase_DeleteCollection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error));
-    CHECK(!defaultCollection);
+    CHECK(!CBLDatabase_DefaultCollection(db, &error));
     CHECK(error.code == 0);
     CHECK(!CBLDatabase_Collection(db, kCBLDefaultCollectionName, kCBLDefaultScopeName, &error));
     CHECK(error.code == 0);

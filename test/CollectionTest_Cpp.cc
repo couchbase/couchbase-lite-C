@@ -113,7 +113,6 @@ public:
 #define NOT_DELETE_DEFAULT_COLLECTION
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Collection", "[Collection]") {
-    REQUIRE(defaultCollection);
     CHECK(defaultCollection.name() == "_default");
     CHECK(defaultCollection.scopeName() == "_default");
     
@@ -124,9 +123,10 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Collection", "[Collection]") {
 
 #ifndef NOT_DELETE_DEFAULT_COLLECTION
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Default Collection", "[Collection]") {
-    CHECK(defaultCollection);
     db.deleteCollection(kCBLDefaultCollectionName);
-    CHECK(!defaultCollection);
+    
+    Collection col = db.getDefaultCollection();
+    CHECK(col);
     
     MutableArray names = db.getCollectionNames();
     REQUIRE(names);
@@ -150,7 +150,8 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Scope", "[Collection]") {
     
     // Delete Default Collection:
     db.deleteCollection(kCBLDefaultCollectionName);
-    CHECK(!defaultCollection);
+    col = db.getDefaultCollection();
+    CHECK(!col);
     
     names = db.getScopeNames();
     REQUIRE(names);
@@ -161,7 +162,6 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Scope", "[Collection]") {
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Collection Cannot Be Deleted", "[Collection]") {
 
     ExpectingExceptions ex;
-    REQUIRE(defaultCollection);
 
     // Try delete the default collection - should fail and catch error:
     try {
