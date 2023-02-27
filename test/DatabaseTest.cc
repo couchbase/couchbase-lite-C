@@ -28,7 +28,7 @@ using namespace fleece;
 
 static constexpr const slice kOtherDBName = "CBLTest_OtherDB";
 
-static int defaultListenerCalls = 0;
+static int dbListenerCalls = 0;
 static int fooListenerCalls = 0;
 static int barListenerCalls = 0;
 static int notificationsReadyCalls = 0;
@@ -52,35 +52,35 @@ static void notificationsReady(void *context, CBLDatabase* db) {
     CHECK(test->db == db);
 }
 
-static void defaultListener(void *context, const CBLCollectionChange* change) {
-    ++defaultListenerCalls;
+static void dbListener(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
+    ++dbListenerCalls;
     auto test = (CBLTest*)context;
-    CHECK(test->defaultCollection == change->collection);
-    CHECK(change -> numDocs == 1);
-    CHECK(slice(change->docIDs[0]) == "foo"_sl);
+    CHECK(test->db == db);
+    CHECK(nDocs == 1);
+    CHECK(slice(docIDs[0]) == "foo"_sl);
 }
 
-static void defaultListener2(void *context, const CBLCollectionChange* change) {
-    ++defaultListenerCalls;
+static void dbListener2(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
+    ++dbListenerCalls;
     auto test = (CBLTest*)context;
-    CHECK(test->defaultCollection == change->collection);
-    CHECK(change -> numDocs == 2);
-    CHECK(slice(change->docIDs[0]) == "foo"_sl);
-    CHECK(slice(change->docIDs[1]) == "bar"_sl);
+    CHECK(test->db == db);
+    CHECK(nDocs == 2);
+    CHECK(docIDs[0] == "foo"_sl);
+    CHECK(docIDs[1] == "bar"_sl);
 }
 
-static void fooListener(void *context, const CBLDocumentChange *change) {
+static void fooListener(void *context, const CBLDatabase *db, FLString docID) {
     ++fooListenerCalls;
     auto test = (CBLTest*)context;
-    CHECK(test->defaultCollection == change->collection);
-    CHECK(slice(change->docID) == "foo"_sl);
+    CHECK(test->db == db);
+    CHECK(slice(docID) == "foo"_sl);
 }
 
-static void barListener(void *context, const CBLDocumentChange *change) {
+static void barListener(void *context, const CBLDatabase *db, FLString docID) {
     ++barListenerCalls;
     auto test = (CBLTest*)context;
-    CHECK(test->defaultCollection == change->collection);
-    CHECK(slice(change->docID) == "bar"_sl);
+    CHECK(test->db == db);
+    CHECK(docID == "bar"_sl);
 }
 
 class DatabaseTest : public CBLTest {
@@ -213,13 +213,11 @@ public:
         CHECK(!CBLCollection_GetIndexNames(defaultCollection, &error));
         CheckNotOpenError(error);
         
-        // revisit
-        auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, this);
+        auto token = CBLDatabase_AddChangeListener(db, dbListener, this);
         CHECK(token);
         CBLListener_Remove(token);
         
-        // revisit
-        auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+        auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
         CHECK(docToken);
         CBLListener_Remove(docToken);
         
@@ -587,34 +585,34 @@ TEST_CASE_METHOD(DatabaseTest, "Transaction Abort") {
 
 TEST_CASE_METHOD(DatabaseTest, "Database notifications") {
     // Add a listener:
-    defaultListenerCalls = fooListenerCalls = 0;
-    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, this);
-    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+   dbListenerCalls = fooListenerCalls = 0;
+    auto token = CBLDatabase_AddChangeListener(db, dbListener, this);
+    auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
 
     // Create a doc, check that the listener was called:
     createDocumentInDefault(db, "foo", "greeting", "Howdy!");
-    CHECK(defaultListenerCalls == 1);
+    CHECK(dbListenerCalls == 1);
     CHECK(fooListenerCalls == 1);
 
     CBLListener_Remove(token);
     CBLListener_Remove(docToken);
 
     // After being removed, the listener should not be called:
-    defaultListenerCalls = fooListenerCalls = 0;
+    dbListenerCalls = fooListenerCalls = 0;
     createDocumentInDefault(db, "bar", "greeting", "yo.");
-    CHECK(defaultListenerCalls == 0);
+    CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
 }
 
 TEST_CASE_METHOD(DatabaseTest, "Remove Database Listener after releasing database") {
     // Add a listener:
-    defaultListenerCalls = fooListenerCalls = 0;
-    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, this);
-    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+    dbListenerCalls = fooListenerCalls = 0;
+    auto token = CBLDatabase_AddChangeListener(db, dbListener, this);
+    auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
 
     // Create a doc, check that the listener was called:
     createDocumentInDefault(db, "foo", "greeting", "Howdy!");
-    CHECK(defaultListenerCalls == 1);
+    CHECK(dbListenerCalls == 1);
     CHECK(fooListenerCalls == 1);
 
     // Close and release the database:
@@ -632,36 +630,36 @@ TEST_CASE_METHOD(DatabaseTest, "Remove Database Listener after releasing databas
 
 TEST_CASE_METHOD(DatabaseTest, "Scheduled database notifications") {
     // Add a listener:
-    defaultListenerCalls = fooListenerCalls = barListenerCalls = 0;
+    dbListenerCalls = fooListenerCalls = barListenerCalls = 0;
 
-    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener2, this);
-    auto fooToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
-    auto barToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "bar"_sl, barListener, this);
+    auto token = CBLDatabase_AddChangeListener(db, dbListener2, this);
+    auto fooToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
+    auto barToken = CBLDatabase_AddDocumentChangeListener(db, "bar"_sl, barListener, this);
 
     CBLDatabase_BufferNotifications(db, notificationsReady, this);
 
     // Create two docs; no listeners should be called yet:
     createDocumentInDefault(db, "foo", "greeting", "Howdy!");
     CHECK(notificationsReadyCalls == 1);
-    CHECK(defaultListenerCalls == 0);
+    CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);
 
     createDocumentInDefault(db, "bar", "greeting", "yo.");
     CHECK(notificationsReadyCalls == 1);
-    CHECK(defaultListenerCalls == 0);
+    CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);
 
     // Now the listeners will be called:
     CBLDatabase_SendNotifications(db);
-    CHECK(defaultListenerCalls == 1);
+    CHECK(dbListenerCalls == 1);
     CHECK(fooListenerCalls == 1);
     CHECK(barListenerCalls == 1);
 
     // There should be no more notifications:
     CBLDatabase_SendNotifications(db);
-    CHECK(defaultListenerCalls == 1);
+    CHECK(dbListenerCalls == 1);
     CHECK(fooListenerCalls == 1);
     CHECK(barListenerCalls == 1);
 

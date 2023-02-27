@@ -180,52 +180,52 @@ static void createDocumentInDefault(Database db, const char *docID,
 }
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
-    int colListenerCalls = 0, fooListenerCalls = 0;
+    int dbListenerCalls = 0, fooListenerCalls = 0;
     {
         // Add a listener:
-        auto colListener = defaultCollection.addChangeListener([&](CollectionChange* callbackcol) {
-            ++colListenerCalls;
-            CHECK(callbackcol->collection() == defaultCollection);
-            CHECK(callbackcol->docIDs().size() == 1);
-            CHECK(callbackcol->docIDs()[0] == "foo");
+        auto dbListener = db.addChangeListener([&](Database callbackdb, vector<slice> docIDs) {
+            ++dbListenerCalls;
+            CHECK(callbackdb == db);
+            CHECK(docIDs.size() == 1);
+            CHECK(docIDs[0] == "foo");
         });
-        auto fooListener = defaultCollection.addDocumentChangeListener("foo", [&](DocumentChange* callbackcol) {
+        auto fooListener = db.addDocumentChangeListener("foo", [&](Database callbackdb, slice docID) {
             ++fooListenerCalls;
-            CHECK(callbackcol->collection() == defaultCollection);
-            CHECK(callbackcol->docID() == "foo");
+            CHECK(callbackdb == db);
+            CHECK(docID == "foo");
         });
         // Create a doc, check that the listener was called:
         createDocumentInDefault(db, "foo", "greeting", "Howdy!");
-        CHECK(colListenerCalls == 1);
+        CHECK(dbListenerCalls == 1);
         CHECK(fooListenerCalls == 1);
     }
     // After being removed, the listener should not be called:
-    colListenerCalls = fooListenerCalls = 0;
+    dbListenerCalls = fooListenerCalls = 0;
     createDocumentInDefault(db, "bar", "greeting", "yo.");
-    CHECK(colListenerCalls == 0);
+    CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
 }
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
     // Add a listener:
-    int colListenerCalls = 0, fooListenerCalls = 0, barListenerCalls = 0, notificationsReadyCalls = 0;
-    auto colListener = defaultCollection.addChangeListener([&](CollectionChange *callbackcol) {
-            ++colListenerCalls;
-            CHECK(callbackcol->collection() == defaultCollection);
-            CHECK(callbackcol->docIDs().size() == 2);
-            CHECK(callbackcol->docIDs()[0] == "foo");
-            CHECK(callbackcol->docIDs()[1] == "bar");
-        });
-    auto fooListener = defaultCollection.addDocumentChangeListener("foo", [&](DocumentChange* callbackcol) {
-            ++fooListenerCalls;
-            CHECK(callbackcol->collection() == defaultCollection);
-            CHECK(callbackcol->docID() == "foo");
-        });
-    auto barListener = defaultCollection.addDocumentChangeListener("bar", [&](DocumentChange* callbackcol) {
+    int dbListenerCalls = 0, fooListenerCalls = 0, barListenerCalls = 0, notificationsReadyCalls = 0;
+    auto dbListener = db.addChangeListener([&](Database callbackdb, vector<slice> docIDs) {
+        ++dbListenerCalls;
+        CHECK(callbackdb == db);
+        CHECK(docIDs.size() == 2);
+        CHECK(docIDs[0] == "foo");
+        CHECK(docIDs[1] == "bar");
+    });
+    auto fooListener = db.addDocumentChangeListener("foo", [&](Database callbackdb, slice docID) {
+        ++fooListenerCalls;
+        CHECK(callbackdb == db);
+        CHECK(docID == "foo");
+    });
+    auto barListener = db.addDocumentChangeListener("bar", [&](Database callbackdb, slice docID) {
         ++barListenerCalls;
-        CHECK(callbackcol->collection() == defaultCollection);
-        CHECK(callbackcol->docID() == "bar");
-        });
+        CHECK(callbackdb == db);
+        CHECK(docID == "bar");
+    });
 
     db.bufferNotifications([&](Database callbackdb) {
         ++notificationsReadyCalls;
@@ -234,24 +234,24 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
 
     // Create two docs; no listeners should be called yet:
     createDocumentInDefault(db, "foo", "greeting", "Howdy!");
-    CHECK(colListenerCalls == 0);
+    CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);
 
     createDocumentInDefault(db, "bar", "greeting", "yo.");
-    CHECK(colListenerCalls == 0);
+    CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);
 
     // Now the listeners will be called:
     db.sendNotifications();
-    CHECK(colListenerCalls == 1);
+    CHECK(dbListenerCalls == 1);
     CHECK(fooListenerCalls == 1);
     CHECK(barListenerCalls == 1);
 
     // There should be no more notifications:
     db.sendNotifications();
-    CHECK(colListenerCalls == 1);
+    CHECK(dbListenerCalls == 1);
     CHECK(fooListenerCalls == 1);
     CHECK(barListenerCalls == 1);
 }
@@ -387,8 +387,8 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Listener Token") {
     
     // Token:
     CHECK(!listenerToken.token());
-    auto dummy = [](void* context, const CBLCollectionChange* change){ };
-    auto listener = CBLCollection_AddChangeListener(defaultCollection.ref(), dummy, nullptr);
+    auto dummy = [](void* context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs){ };
+    auto listener = CBLDatabase_AddChangeListener(db.ref(), dummy, nullptr);
     listenerToken.setToken(listener);
     CHECK(listenerToken.token() == listener);
     
