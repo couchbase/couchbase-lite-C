@@ -127,7 +127,7 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Default Collection", "[Collecti
     
     Collection col = db.getDefaultCollection();
     CHECK(col);
-    
+
     MutableArray names = db.getCollectionNames();
     REQUIRE(names);
     CHECK(names.toJSONString() == R"([])");
@@ -282,8 +282,8 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Collection", "[Collection]") {
 }
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Use Invalid Collection", "[Collection]") {
-    Collection newCol = db.createCollection("colA", "scopeA");
-    REQUIRE(newCol);
+    Collection col = db.createCollection("colA", "scopeA");
+    REQUIRE(col);
     
     SECTION("Delete Collection") {
         db.deleteCollection("colA", "scopeA");
@@ -305,7 +305,7 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Use Invalid Collection", "[Collection]
         db = nullptr;
     }
     
-    testInvalidCollection(newCol);
+    testInvalidCollection(col);
 }
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Create Indexes and Get Index Names", "[Collection]") {

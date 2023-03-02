@@ -585,7 +585,7 @@ TEST_CASE_METHOD(DatabaseTest, "Transaction Abort") {
 
 TEST_CASE_METHOD(DatabaseTest, "Database notifications") {
     // Add a listener:
-   dbListenerCalls = fooListenerCalls = 0;
+    dbListenerCalls = fooListenerCalls = 0;
     auto token = CBLDatabase_AddChangeListener(db, dbListener, this);
     auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
 
