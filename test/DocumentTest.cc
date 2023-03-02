@@ -46,11 +46,12 @@ static void docListener(void *context, const CBLDocumentChange* change) {
 
 class DocumentTest : public CBLTest {
 public:
-    CBLCollection* col = nullptr;
     CBLCollection* otherCol = nullptr;
+    CBLCollection* col = nullptr;
     
     DocumentTest() {
         CBLError error = {};
+        
         col = CBLDatabase_CreateCollection(db, kCollectionName, kCBLDefaultScopeName, &error);
         if (!col) {
             FAIL("Can't create test collection: " << error.domain << "/" << error.code);
@@ -91,6 +92,10 @@ TEST_CASE_METHOD(DocumentTest, "Missing Document", "[Document]") {
     CBLDocument* mdoc = CBLCollection_GetMutableDocument(col, "foo"_sl, &error);
     CHECK(mdoc == nullptr);
     CHECK(error.code == 0);
+
+    CHECK(!CBLCollection_PurgeDocumentByID(col, "foo"_sl, &error));
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorNotFound);
 }
 
 TEST_CASE_METHOD(DocumentTest, "New Document", "[Document]") {
@@ -308,6 +313,13 @@ TEST_CASE_METHOD(DocumentTest, "Set Properties", "[Document]") {
     CBLDocument_Release(doc1);
     CHECK(FLValue_AsString(FLDict_Get(prop2, "greeting"_sl)) == "hello"_sl );
     CBLDocument_Release(doc2);
+}
+
+TEST_CASE_METHOD(DocumentTest, "Get Non Existing Document") {
+    CBLError error;
+    const CBLDocument* doc = CBLCollection_GetDocument(col, "foo"_sl, &error);
+    REQUIRE(doc == nullptr);
+    CHECK(error.code == 0);
 }
 
 TEST_CASE_METHOD(DocumentTest, "Get Document with Empty ID", "[Document]") {
@@ -967,12 +979,12 @@ TEST_CASE_METHOD(DocumentTest, "Set blob in document", "[Document][Blob]") {
     CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
     FLMutableDict docProps = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetBlob(docProps, FLSTR("blob"), blob);
-    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    CHECK(CBLCollection_SaveDocument(col, doc, &error));
     CBLDocument_Release(doc);
     CBLBlob_Release(blob);
     
     // Get blob from the saved doc and check:
-    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    doc = CBLCollection_GetMutableDocument(col, "doc1"_sl, &error);
     docProps = CBLDocument_MutableProperties(doc);
     const CBLBlob* blob2 = FLValue_GetBlob(FLDict_Get(docProps, "blob"_sl));
     REQUIRE(blob2);
@@ -1095,7 +1107,7 @@ TEST_CASE_METHOD(DocumentTest, "Set blob in array", "[Document][Blob]") {
     CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
     FLMutableDict docProps = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetArray(docProps, "blobs"_sl, blobs);
-    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    CHECK(CBLCollection_SaveDocument(col, doc, &error));
     CBLDocument_Release(doc);
     
     CBLBlob_Release(blob1);
@@ -1103,7 +1115,7 @@ TEST_CASE_METHOD(DocumentTest, "Set blob in array", "[Document][Blob]") {
     FLArray_Release(blobs);
     
     // Get blobs from the saved doc and check:
-    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    doc = CBLCollection_GetMutableDocument(col, "doc1"_sl, &error);
     docProps = CBLDocument_MutableProperties(doc);
     FLArray blobArray = FLValue_AsArray(FLDict_Get(docProps, "blobs"_sl));
     REQUIRE(blobArray);

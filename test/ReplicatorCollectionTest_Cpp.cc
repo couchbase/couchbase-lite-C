@@ -540,7 +540,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Conflict Resolver with Colle
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents", "[Replicator]") {
-    createConfigWithCollections({db.getDefaultCollection()});
+    createConfigWithCollections({defaultCollection});
     config.replicatorType = kCBLReplicatorTypePush;
     replicate();
     
@@ -549,11 +549,11 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents", "[Replic
     
     MutableDocument doc1("foo1");
     doc1["greeting"] = "Howdy!";
-    db.saveDocument(doc1);
+    defaultCollection.saveDocument(doc1);
     
     MutableDocument doc2("foo2");
     doc2["greeting"] = "Hello!";
-    db.saveDocument(doc2);
+    defaultCollection.saveDocument(doc2);
     
     ids = repl.pendingDocumentIDs();
     CHECK(ids.count() == 2);
@@ -564,9 +564,11 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents", "[Replic
     CHECK(repl.isDocumentPending("foo2"));
     
     replicate();
-    
-    CHECK(db2.getDocument("foo1"));
-    CHECK(db2.getDocument("foo2"));
+
+    Collection col2 = db2.getDefaultCollection();
+
+    CHECK(col2.getDocument("foo1"));
+    CHECK(col2.getDocument("foo2"));
     
     ids = repl.pendingDocumentIDs();
     CHECK(ids.count() == 0);

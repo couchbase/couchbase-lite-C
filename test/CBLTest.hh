@@ -84,6 +84,7 @@ public:
     ~CBLTest();
     
     CBLDatabase *db {nullptr};
+    CBLCollection *defaultCollection {nullptr};
 };
 
 std::string GetTestFilePath(const std::string &filename);

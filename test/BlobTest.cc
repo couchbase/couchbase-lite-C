@@ -85,7 +85,7 @@ TEST_CASE_METHOD(BlobTest, "Create blob with stream", "[Blob]") {
     auto doc = CBLDocument_CreateWithID("doc1"_sl);
     auto props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetBlob(props, "blob"_sl, blob);
-    CHECK(CBLDatabase_SaveDocument(db, doc, &error));
+    CHECK(CBLCollection_SaveDocument(defaultCollection, doc, &error));
     
     // Read content as a slice:
     {
@@ -141,7 +141,6 @@ TEST_CASE_METHOD(BlobTest, "Create blob with stream", "[Blob]") {
     CBLDocument_Release(doc);
 }
 
-
 TEST_CASE_METHOD(BlobTest, "Create JSON from Blob", "[Blob]") {
     alloc_slice content1("This is the content of the blob 1.");
     CBLBlob* blob = CBLBlob_CreateWithData("text/plain"_sl, content1);
@@ -151,11 +150,11 @@ TEST_CASE_METHOD(BlobTest, "Create JSON from Blob", "[Blob]") {
     auto doc = CBLDocument_CreateWithID("doc1"_sl);
     auto props = CBLDocument_MutableProperties(doc);
     FLMutableDict_SetBlob(props, "blob"_sl, blob);
-    REQUIRE(CBLDatabase_SaveDocument(db, doc, &error));
+    REQUIRE(CBLCollection_SaveDocument(defaultCollection, doc, &error));
     CBLBlob_Release(blob);
     CBLDocument_Release(doc);
     
-    doc = CBLDatabase_GetMutableDocument(db, "doc1"_sl, &error);
+    doc = CBLCollection_GetMutableDocument(defaultCollection, "doc1"_sl, &error);
     REQUIRE(doc);
     FLValue value = FLDict_Get(CBLDocument_Properties(doc), "blob"_sl);
     const CBLBlob* gotBlob = FLValue_GetBlob(value);
@@ -163,7 +162,6 @@ TEST_CASE_METHOD(BlobTest, "Create JSON from Blob", "[Blob]") {
     CHECK(alloc_slice(CBLBlob_CreateJSON(gotBlob)) == "{\"content_type\":\"text/plain\",\"digest\":\"sha1-dXNgUcxC3n7lxfrYkbLUG4gOKRw=\",\"length\":34,\"@type\":\"blob\"}"_sl);
     CBLDocument_Release(doc);
 }
-
 
 TEST_CASE_METHOD(BlobTest, "Check Is Blob", "[Blob]") {
     CBLError error {};

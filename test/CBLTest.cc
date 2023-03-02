@@ -112,11 +112,13 @@ CBLTest::CBLTest() {
         FAIL("Can't delete temp database: " << error.domain << "/" << error.code);
     db = CBLDatabase_Open(kDatabaseName, &config, &error);
     REQUIRE(db);
+    defaultCollection = CBLDatabase_DefaultCollection(db, &error);
+    REQUIRE(defaultCollection);
 }
 
-
 CBLTest::~CBLTest() {
-    if (db) {
+    CBLCollection_Release(defaultCollection);
+    if (db){
         ExpectingExceptions x; // Database might have been closed by the test:
         CBLError error;
         if (!CBLDatabase_Close(db, &error))
@@ -134,9 +136,13 @@ slice const CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
 
 CBLTest_Cpp::CBLTest_Cpp()
 :db(openDatabaseNamed(kDatabaseName, true)) // empty
-{ }
+{ 
+    defaultCollection = db.getDefaultCollection();
+    REQUIRE(defaultCollection);
+}
 
 CBLTest_Cpp::~CBLTest_Cpp() {
+    defaultCollection = nullptr;
     if (db) {
         db.close();
         db = nullptr;

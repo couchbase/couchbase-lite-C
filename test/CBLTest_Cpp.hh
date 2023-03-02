@@ -53,4 +53,5 @@ public:
     void createDocs(cbl::Collection& collection, unsigned n, std::string idprefix ="doc");
 
     cbl::Database db;
+    cbl::Collection defaultCollection;
 };

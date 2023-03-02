@@ -25,7 +25,7 @@
 class ReplicatorPropertyEncryptionTest : public ReplicatorTest {
 public:
     Database otherDB;
-    
+    Collection otherDBDefaultCol = otherDB.getDefaultCollection();
     int encryptCount = 0;
     int decryptCount = 0;
     
@@ -40,6 +40,7 @@ public:
     
     ReplicatorPropertyEncryptionTest()
     :otherDB(openDatabaseNamed("otherDB", true)) // empty
+    ,ReplicatorTest()
     {
         config.endpoint = CBLEndpoint_CreateWithLocalDB(otherDB.ref());
     }
@@ -53,7 +54,8 @@ public:
         db.close();
         db = nullptr;
         db = openDatabaseNamed(kDatabaseName, true); // empty
-        
+        defaultCollection = db.getDefaultCollection();
+
         config.database = db.ref();
         resetReplicator();
     }
@@ -268,12 +270,12 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Save and Get document with E
     
     // Save doc:
     CBLError error;
-    CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
     CBLDocument_Release(doc);
     CBLEncryptable_Release(encryptable);
     
     // Get doc:
-    doc = CBLDatabase_GetMutableDocument(db.ref(), "doc1"_sl, &error);
+    doc = CBLCollection_GetMutableDocument(defaultCollection.ref(), "doc1"_sl, &error);
     props = CBLDocument_MutableProperties(doc);
     
     FLValue value = FLDict_Get(props, "encryptable"_sl);
@@ -314,7 +316,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Unsupport : Encryptables in 
  
     // Save doc:
     ExpectingExceptions x;
-    REQUIRE(!CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    REQUIRE(!CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
     CHECK(error.domain == kCBLDomain);
     CHECK(error.code == kCBLErrorUnsupported);
     CBLDocument_Release(doc);
@@ -349,7 +351,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Unsupport : Encryptables in 
  
     // Save doc:
     ExpectingExceptions x;
-    REQUIRE(!CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    REQUIRE(!CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
     CHECK(error.domain == kCBLDomain);
     CHECK(error.code == kCBLErrorUnsupported);
     CBLDocument_Release(doc);
@@ -387,7 +389,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Unsupport : Encryptables in 
  
     // Save doc:
     ExpectingExceptions x;
-    REQUIRE(!CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    REQUIRE(!CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
     CHECK(error.domain == kCBLDomain);
     CHECK(error.code == kCBLErrorUnsupported);
     CBLDocument_Release(doc);
@@ -406,7 +408,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt one prop
         FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret);
         
         CBLError error;
-        CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+        CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
         
         CBLDocument_Release(doc);
         CBLEncryptable_Release(secret);
@@ -415,7 +417,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt one prop
         setupEncryptionCallback();
         replicate();
         
-        doc = CBLDatabase_GetMutableDocument(otherDB.ref(), "doc1"_sl, &error);
+        doc = CBLCollection_GetMutableDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error);
         CHECK(Dict(CBLDocument_Properties(doc)).toJSON(false, true) ==
               "{\"encrypted$secret1\":{\"alg\":\"CB_MOBILE_CUSTOM\",\"ciphertext\":\"aRguKDkuP2t6aQ==\"}}");
         CHECK(encryptCount == 1);
@@ -427,7 +429,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt one prop
         replicate();
         
         CBLError error;
-        auto doc = CBLDatabase_GetMutableDocument(db.ref(), "doc1"_sl, &error);
+        auto doc = CBLCollection_GetMutableDocument(defaultCollection.ref(), "doc1"_sl, &error);
         CHECK(Dict(CBLDocument_Properties(doc)).toJSON(false, true) ==
               "{\"secret1\":{\"@type\":\"encryptable\",\"value\":\"Secret 1\"}}");
         CHECK(decryptCount == 1);
@@ -453,7 +455,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt multiple
         FLSlot_SetDict(FLMutableDict_Set(props, "nested"_sl), nestedDict);
         
         CBLError error;
-        CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+        CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
         
         CBLDocument_Release(doc);
         FLMutableDict_Release(nestedDict);
@@ -465,7 +467,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt multiple
         setupEncryptionCallback();
         replicate();
         
-        doc = CBLDatabase_GetMutableDocument(otherDB.ref(), "doc1"_sl, &error);
+        doc = CBLCollection_GetMutableDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error);
         props = CBLDocument_MutableProperties(doc);
 
         CHECK(Dict(FLValue_AsDict(FLDict_Get(props, "encrypted$secret1"_sl))).toJSON(false, true) ==
@@ -487,7 +489,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt multiple
         replicate();
 
         CBLError error;
-        auto doc = CBLDatabase_GetMutableDocument(db.ref(), "doc1"_sl, &error);
+        auto doc = CBLCollection_GetMutableDocument(defaultCollection.ref(), "doc1"_sl, &error);
         auto props = CBLDocument_Properties(doc);
 
         CHECK(Dict(FLValue_AsDict(FLDict_Get(props, "secret1"_sl))).toJSON(false, true) ==
@@ -513,7 +515,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No encryptor : crypto error"
     FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
     
     CBLError error;
-    CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
     
     CBLDocument_Release(doc);
     CBLEncryptable_Release(secret1);
@@ -527,7 +529,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No encryptor : crypto error"
     CHECK(replicatedDocs.size() == 1);
     CHECK(replicatedDocs["doc1"].error.code == kCBLErrorCrypto);
     CHECK(replicatedDocs["doc1"].error.domain == kCBLDomain);
-    CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
+    CHECK(!CBLCollection_GetDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error));
 }
 
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No decryptor : ok", "[Replicator][Encryptable]") {
@@ -539,7 +541,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No decryptor : ok", "[Replic
         FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
         
         CBLError error;
-        CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+        CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
         
         CBLDocument_Release(doc);
         CBLEncryptable_Release(secret1);
@@ -555,7 +557,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No decryptor : ok", "[Replic
         replicate();
 
         CBLError error;
-        auto doc = CBLDatabase_GetMutableDocument(db.ref(), "doc1"_sl, &error);
+        auto doc = CBLCollection_GetMutableDocument(defaultCollection.ref(), "doc1"_sl, &error);
         auto props = CBLDocument_Properties(doc);
 
         CHECK(Dict(FLValue_AsDict(FLDict_Get(props, "encrypted$secret1"_sl))).toJSON(false, true) ==
@@ -573,7 +575,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip encryption : crypto err
     FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
     
     CBLError error;
-    CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
     
     CBLDocument_Release(doc);
     CBLEncryptable_Release(secret1);
@@ -591,7 +593,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip encryption : crypto err
     CHECK(replicatedDocs.size() == 1);
     CHECK(replicatedDocs["doc1"].error.code == kCBLErrorCrypto);
     CHECK(replicatedDocs["doc1"].error.domain == kCBLDomain);
-    CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
+    CHECK(!CBLCollection_GetDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error));
 }
 
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Replicator][Encryptable]") {
@@ -603,7 +605,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Rep
         FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
         
         CBLError error;
-        CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+        CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
         
         CBLDocument_Release(doc);
         CBLEncryptable_Release(secret1);
@@ -613,7 +615,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Rep
         setupEncryptionCallback();
         replicate();
         
-        doc = CBLDatabase_GetMutableDocument(otherDB.ref(), "doc1"_sl, &error);
+        doc = CBLCollection_GetMutableDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error);
         CHECK(Dict(CBLDocument_Properties(doc)).toJSON(false, true) ==
               "{\"encrypted$secret1\":{\"alg\":\"CB_MOBILE_CUSTOM\",\"ciphertext\":\"aRguKDkuP2t6aQ==\"}}");
         CHECK(encryptCount == 1);
@@ -626,7 +628,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Rep
         replicate();
         
         CBLError error;
-        auto doc = CBLDatabase_GetMutableDocument(db.ref(), "doc1"_sl, &error);
+        auto doc = CBLCollection_GetMutableDocument(defaultCollection.ref(), "doc1"_sl, &error);
         CHECK(doc);
         CHECK(Dict(CBLDocument_Properties(doc)).toJSON(false, true) ==
               "{\"encrypted$secret1\":{\"alg\":\"CB_MOBILE_CUSTOM\",\"ciphertext\":\"aRguKDkuP2t6aQ==\"}}");
@@ -644,7 +646,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encryption error", "[Replica
     FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
     
     CBLError error;
-    CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+    CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
     
     CBLDocument_Release(doc);
     CBLEncryptable_Release(secret1);
@@ -680,7 +682,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encryption error", "[Replica
     CHECK(replicatedDocs.size() == 1);
     CHECK(replicatedDocs["doc1"].error.domain == expectedDocReplError.domain);
     CHECK(replicatedDocs["doc1"].error.code == expectedDocReplError.code);
-    CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
+    CHECK(!CBLCollection_GetDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error));
     
     // Now try to replicate again with no error:
     
@@ -695,12 +697,12 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encryption error", "[Replica
         CHECK(replicatedDocs["doc1"].error.domain == 0);
         CHECK(replicatedDocs["doc1"].error.code == 0);
         
-        const CBLDocument* doc1 = CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error);
+        const CBLDocument* doc1 = CBLCollection_GetDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error);
         CHECK(doc1);
         CBLDocument_Release(doc1);
     } else {
         CHECK(replicatedDocs.size() == 0);
-        CHECK(!CBLDatabase_GetDocument(otherDB.ref(), "doc1"_sl, &error));
+        CHECK(!CBLCollection_GetDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error));
     }
 }
 
@@ -713,7 +715,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Decryption error", "[Replica
         FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret1);
         
         CBLError error;
-        CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+        CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
         
         CBLDocument_Release(doc);
         CBLEncryptable_Release(secret1);
@@ -722,7 +724,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Decryption error", "[Replica
         setupEncryptionCallback();
         replicate();
         
-        doc = CBLDatabase_GetMutableDocument(otherDB.ref(), "doc1"_sl, &error);
+        doc = CBLCollection_GetMutableDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error);
         CHECK(doc);
         CBLDocument_Release(doc);
     }
@@ -762,10 +764,9 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Decryption error", "[Replica
         CHECK(replicatedDocs["doc1"].error.code == expectedDocReplError.code);
         
         CBLError error;
-        CHECK(!CBLDatabase_GetDocument(db.ref(), "doc1"_sl, &error));
-        
+        CHECK(!CBLCollection_GetDocument(defaultCollection.ref(), "doc1"_sl, &error));
+
         // Now try to replicate again with no error:
-        
         replicatedDocs.clear();
         decryptionError = { };
         
@@ -777,12 +778,12 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Decryption error", "[Replica
             CHECK(replicatedDocs["doc1"].error.domain == 0);
             CHECK(replicatedDocs["doc1"].error.code == 0);
             
-            const CBLDocument* doc = CBLDatabase_GetDocument(db.ref(), "doc1"_sl, &error);
+            const CBLDocument* doc = CBLCollection_GetDocument(defaultCollection.ref(), "doc1"_sl, &error);
             CHECK(doc);
             CBLDocument_Release(doc);
         } else {
             CHECK(replicatedDocs.size() == 0);
-            CHECK(!CBLDatabase_GetDocument(db.ref(), "doc1"_sl, &error));
+            CHECK(!CBLCollection_GetDocument(defaultCollection.ref(), "doc1"_sl, &error));
         }
     }
 }
@@ -798,7 +799,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt already encrypted va
         FLSlot_SetDict(FLMutableDict_Set(props, "encrypted$secret"_sl), secret);
         
         CBLError error;
-        CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+        CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
         
         CBLDocument_Release(doc);
         FLMutableDict_Release(secret);
@@ -807,7 +808,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt already encrypted va
         setupEncryptionCallback();
         replicate();
         
-        doc = CBLDatabase_GetMutableDocument(otherDB.ref(), "doc1"_sl, &error);
+        doc = CBLCollection_GetMutableDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error);
         props = CBLDocument_MutableProperties(doc);
         
         CHECK(Dict(FLValue_AsDict(FLDict_Get(props, "encrypted$secret"_sl))).toJSON(false, true) ==
@@ -828,7 +829,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Key ID and Algorithm", "[Rep
         FLMutableDict_SetEncryptableValue(props, "secret1"_sl, secret);
         
         CBLError error;
-        CHECK(CBLDatabase_SaveDocument(db.ref(), doc, &error));
+        CHECK(CBLCollection_SaveDocument(defaultCollection.ref(), doc, &error));
         
         CBLDocument_Release(doc);
         CBLEncryptable_Release(secret);
@@ -841,7 +842,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Key ID and Algorithm", "[Rep
         
         replicate();
         
-        doc = CBLDatabase_GetMutableDocument(otherDB.ref(), "doc1"_sl, &error);
+        doc = CBLCollection_GetMutableDocument(otherDBDefaultCol.ref(), "doc1"_sl, &error);
         CHECK(Dict(CBLDocument_Properties(doc)).toJSON(false, true) ==
               "{\"encrypted$secret1\":{\"alg\":\"XOR_ALG\",\"ciphertext\":\"aRguKDkuP2t6aQ==\",\"kid\":\"MY_KEY_ID\"}}");
         CHECK(encryptCount == 1);
@@ -853,7 +854,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Key ID and Algorithm", "[Rep
         replicate();
         
         CBLError error;
-        auto doc = CBLDatabase_GetMutableDocument(db.ref(), "doc1"_sl, &error);
+        auto doc = CBLCollection_GetMutableDocument(defaultCollection.ref(), "doc1"_sl, &error);
         CHECK(Dict(CBLDocument_Properties(doc)).toJSON(false, true) ==
               "{\"secret1\":{\"@type\":\"encryptable\",\"value\":\"Secret 1\"}}");
         CHECK(decryptCount == 1);

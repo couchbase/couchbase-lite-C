@@ -113,15 +113,8 @@ public:
 #define NOT_DELETE_DEFAULT_COLLECTION
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Collection", "[Collection]") {
-    Collection col = db.getDefaultCollection();
-    REQUIRE(col);
-    CHECK(col.name() == "_default");
-    CHECK(col.scopeName() == "_default");
-    
-    col = db.getCollection(kCBLDefaultCollectionName);
-    REQUIRE(col);
-    CHECK(col.name() == "_default");
-    CHECK(col.scopeName() == "_default");
+    CHECK(defaultCollection.name() == "_default");
+    CHECK(defaultCollection.scopeName() == "_default");
     
     MutableArray names = db.getCollectionNames();
     REQUIRE(names);
@@ -130,14 +123,11 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Collection", "[Collection]") {
 
 #ifndef NOT_DELETE_DEFAULT_COLLECTION
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Default Collection", "[Collection]") {
-    Collection col = db.getDefaultCollection();
-    CHECK(col);
-    
     db.deleteCollection(kCBLDefaultCollectionName);
     
-    col = db.getDefaultCollection();
-    CHECK(!col);
-    
+    Collection col = db.getDefaultCollection();
+    CHECK(col);
+
     MutableArray names = db.getCollectionNames();
     REQUIRE(names);
     CHECK(names.toJSONString() == R"([])");
@@ -160,7 +150,7 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Scope", "[Collection]") {
     
     // Delete Default Collection:
     db.deleteCollection(kCBLDefaultCollectionName);
-    Collection col = db.getDefaultCollection();
+    col = db.getDefaultCollection();
     CHECK(!col);
     
     names = db.getScopeNames();
@@ -172,8 +162,6 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Scope", "[Collection]") {
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Default Collection Cannot Be Deleted", "[Collection]") {
 
     ExpectingExceptions ex;
-    Collection col = db.getDefaultCollection();
-    REQUIRE(col);
 
     // Try delete the default collection - should fail and catch error:
     try {

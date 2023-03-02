@@ -31,6 +31,12 @@ using namespace fleece;
 
 class PerfTest : public CBLTest_Cpp {
 public:
+
+    PerfTest()
+            : CBLTest_Cpp()
+    {
+    }
+
     std::string vformat(const char *fmt, va_list args) const __printflike(2, 0) {
         char *cstr = nullptr;
         if (vasprintf(&cstr, fmt, args) < 0)
@@ -126,13 +132,12 @@ public:
 TEST_CASE_METHOD(PerfTest, "Benchmark Import iTunesMusicLibrary", "[Perf][.slow]") {
     printLog("Importing docs ...");
     Stopwatch st;
-    
-    auto coll = db.getDefaultCollection();
-    auto numDocs = ImportJSONLines("iTunesMusicLibrary.json", coll.ref());
+
+    auto numDocs = ImportJSONLines("iTunesMusicLibrary.json", defaultCollection.ref());
     st.stop();
     CHECK(numDocs == 12189);
     printReport(st, "Importing Result", numDocs, "doc");
-    readRandomDocs(coll.ref(), numDocs, 100000);
+    readRandomDocs(defaultCollection.ref(), numDocs, 100000);
 }
 
 // NOTE:
@@ -140,8 +145,7 @@ TEST_CASE_METHOD(PerfTest, "Benchmark Import iTunesMusicLibrary", "[Perf][.slow]
 // to tests/assets before building and running this test.
 TEST_CASE_METHOD(PerfTest, "Benchmark Query Names", "[Perf][.slow]") {
     printLog("Importing docs ...");
-    auto coll = db.getDefaultCollection();
-    auto numDocs = ImportJSONLines("names_300000.json", coll.ref());
+    auto numDocs = ImportJSONLines("names_300000.json", defaultCollection.ref());
     CHECK(numDocs == 300000);
     
     for (int pass = 0; pass < 2; ++pass) {
@@ -157,7 +161,7 @@ TEST_CASE_METHOD(PerfTest, "Benchmark Query Names", "[Perf][.slow]") {
             index.expressions = FLStr("contact.address.state");
             CBLError error {};
             Stopwatch st2;
-            CHECK(CBLCollection_CreateValueIndex(coll.ref(), FLStr("byState"), index, &error));
+            CHECK(CBLCollection_CreateValueIndex(defaultCollection.ref(), FLStr("byState"), index, &error));
             st2.stop();
             printReport(st2, "Creating Index Result", 1, "index");
         }

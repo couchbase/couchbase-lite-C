@@ -330,7 +330,7 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG", "[Replicator
     config.replicatorType = kCBLReplicatorTypePull;
     replicate();
     CHECK(replError.code == 0);
-    CHECK(db.count() == 12189);
+    CHECK(defaultCollection.count() == 12189);
 }
 
 
@@ -348,6 +348,6 @@ TEST_CASE_METHOD(ClientServerReplicatorTest, "Pull itunes from SG w/TLS", "[Repl
         config.pinnedServerCertificate = serverCert;
         replicate();
         CHECK(replError.code == 0);
-        CHECK(db.count() == 12189);
+        CHECK(defaultCollection.count() == 12189);
     }
 }

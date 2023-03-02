@@ -27,9 +27,11 @@
 class ReplicatorLocalTest : public ReplicatorTest {
 public:
     Database otherDB;
+    Collection otherDBDefaultCol = otherDB.getDefaultCollection();
 
     ReplicatorLocalTest()
     :otherDB(openDatabaseNamed("otherDB", true)) // empty
+    ,ReplicatorTest()
     {
         config.endpoint = CBLEndpoint_CreateWithLocalDB(otherDB.ref());
     }
@@ -67,7 +69,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Push to local db", "[Replicator]") {
     
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
 
     replicate();
 
@@ -85,13 +87,13 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Continuous Push to local db", "[Replicato
     
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
 
     replicate();
 
     CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
 
-    Document copiedDoc = otherDB.getDocument("foo");
+    Document copiedDoc = otherDBDefaultCol.getDocument("foo");
     REQUIRE(copiedDoc);
     CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
 }
@@ -129,11 +131,11 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Pending Documents", "[Replicator]") {
     
     MutableDocument doc1("foo1");
     doc1["greeting"] = "Howdy!";
-    db.saveDocument(doc1);
+    defaultCollection.saveDocument(doc1);
     
     MutableDocument doc2("foo2");
     doc2["greeting"] = "Hello!";
-    db.saveDocument(doc2);
+    defaultCollection.saveDocument(doc2);
     
     ids = CBLReplicator_PendingDocumentIDs(repl, &error);
     CHECK(FLDict_Count(ids) == 2);
@@ -174,19 +176,19 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
     // Delete Doc:
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
-    db.deleteDocument(doc);
+    defaultCollection.saveDocument(doc);
+    defaultCollection.deleteDocument(doc);
 
     // Update multiple times:
     MutableDocument doc2("foo");
     doc2["greeting"] = "Salaam Alaykum";
-    otherDB.saveDocument(doc2);
+    otherDBDefaultCol.saveDocument(doc2);
 
     doc2["greeting"] = "Hello";
-    otherDB.saveDocument(doc2);
+    otherDBDefaultCol.saveDocument(doc2);
     
     doc2["greeting"] = "Konichiwa";
-    otherDB.saveDocument(doc2);
+    otherDBDefaultCol.saveDocument(doc2);
     
     // Pull:
     resetReplicator();
@@ -194,7 +196,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
 
     // Deleted doc should win:
     CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
-    Document localDoc = db.getDocument("foo");
+    Document localDoc = defaultCollection.getDocument("foo");
     REQUIRE(!localDoc);
     
     // Push
@@ -205,7 +207,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
     
     // Resolved doc should be pushed:
     CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
-    Document remoteDoc = otherDB.getDocument("foo");
+    Document remoteDoc = otherDBDefaultCol.getDocument("foo");
     REQUIRE(!remoteDoc);
 }
 
@@ -224,15 +226,15 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
     // Create:
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
     
     // Create and Update:
     MutableDocument doc2("foo");
     doc2["greeting"] = "Salaam Alaykum";
-    otherDB.saveDocument(doc2);
+    otherDBDefaultCol.saveDocument(doc2);
     
     doc2["greeting"] = "Konichiwa";
-    otherDB.saveDocument(doc2);
+    otherDBDefaultCol.saveDocument(doc2);
     
     REQUIRE(CBLDocument_Generation(doc2.ref()) > CBLDocument_Generation(doc.ref()));
 
@@ -242,7 +244,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
 
     // Higher generation should win:
     CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
-    Document localDoc = db.getDocument("foo");
+    Document localDoc = defaultCollection.getDocument("foo");
     REQUIRE(localDoc);
     CHECK(localDoc["greeting"].asString() == "Konichiwa"_sl);
     CHECK(localDoc.revisionID() == doc2.revisionID());
@@ -255,7 +257,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
     
     // Resolved doc, same as remote doc, should not be pushed.
     CHECK(asVector(replicatedDocIDs) == vector<string>{});
-    Document remoteDoc = db.getDocument("foo");
+    Document remoteDoc = defaultCollection.getDocument("foo");
     REQUIRE(remoteDoc);
     CHECK(remoteDoc["greeting"].asString() == "Konichiwa"_sl);
     CHECK(remoteDoc.revisionID() == doc2.revisionID());
@@ -276,12 +278,12 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
     // Create:
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
 
     // Create:
     MutableDocument doc2("foo");
     doc2["greeting"] = "Salaam Alaykum";
-    otherDB.saveDocument(doc2);
+    otherDBDefaultCol.saveDocument(doc2);
     
     REQUIRE(doc2.revisionID().compare(doc.revisionID()) > 0);
     
@@ -291,7 +293,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
 
     // Higher revOD should win:
     CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
-    Document localDoc = db.getDocument("foo");
+    Document localDoc = defaultCollection.getDocument("foo");
     REQUIRE(localDoc);
     CHECK(localDoc["greeting"].asString() == "Salaam Alaykum"_sl);
     CHECK(localDoc.revisionID() == doc2.revisionID());
@@ -305,7 +307,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
     // Resolved doc should be the same:
     // Resolved doc, same as remote doc, should not be pushed.
     CHECK(asVector(replicatedDocIDs) == vector<string>{});
-    Document remoteDoc = db.getDocument("foo");
+    Document remoteDoc = defaultCollection.getDocument("foo");
     REQUIRE(remoteDoc);
     CHECK(remoteDoc["greeting"].asString() == "Salaam Alaykum"_sl);
     CHECK(remoteDoc.revisionID() == doc2.revisionID());
@@ -323,6 +325,8 @@ public:
     
     string docID;
     unsigned count {0};
+
+    Collection otherDBDefaultCol = otherDB.getDefaultCollection();
     
     // Can be called multiple times; different document id will be used each time.
     void testConflict(bool delLocal, bool delRemote, bool delMerged, ResolverMode resMode) {
@@ -339,27 +343,27 @@ public:
         // Save the same doc to each db (will have the same revision),
         MutableDocument doc(docID);
         doc["greeting"] = "Howdy!";
-        db.saveDocument(doc);
+        defaultCollection.saveDocument(doc);
         if (deleteLocal) {
-            db.deleteDocument(doc);
+            defaultCollection.deleteDocument(doc);
         } else {
             doc["expletive"] = "Shazbatt!";
             auto blob = Blob("text/plain"_sl, "Blob!"_sl);
             doc["signature"] = blob.properties();
-            db.saveDocument(doc);
+            defaultCollection.saveDocument(doc);
             expectedLocalRevID = doc.revisionID();
         }
 
         doc = MutableDocument(docID);
         doc["greeting"] = "Howdy!";
-        otherDB.saveDocument(doc);
+        otherDBDefaultCol.saveDocument(doc);
         if (deleteRemote) {
-            otherDB.deleteDocument(doc);
+            otherDBDefaultCol.deleteDocument(doc);
         } else {
             doc["expletive"] = "Frak!";
             auto blob = Blob("text/plain"_sl, "Pop!"_sl);
             doc["signature"] = blob.properties();
-            otherDB.saveDocument(doc);
+            otherDBDefaultCol.saveDocument(doc);
             expectedRemoteRevID = CBLDocument_CanonicalRevisionID(doc.ref());
         }
 
@@ -385,7 +389,7 @@ public:
         // Check:
         CHECK(asVector(replicatedDocIDs) == vector<string>{docID});
         
-        Document localDoc = db.getDocument(docID);
+        Document localDoc = defaultCollection.getDocument(docID);
         if (resolverMode == ResolverMode::kLocalWins) {
             if (deleteLocal) {
                 REQUIRE(!localDoc);
@@ -425,7 +429,7 @@ public:
         resetReplicator();
         replicate();
         
-        Document remoteDoc = otherDB.getDocument(docID);
+        Document remoteDoc = otherDBDefaultCol.getDocument(docID);
         if (resolverMode == ResolverMode::kLocalWins) {
             if (deleteLocal) {
                 REQUIRE(!remoteDoc);
@@ -578,7 +582,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Document Replication Listener", "[Replica
     // No listener:
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
-    db.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
     
     config.replicatorType = kCBLReplicatorTypePush;
     enableDocReplicationListener = false;
@@ -587,14 +591,14 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Document Replication Listener", "[Replica
     
     // Add listener:
     doc["greeting"] = "Hello!";
-    db.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
     enableDocReplicationListener = true;
     replicate();
     CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
     
     // Remove listener:
     doc["greeting"] = "Hi!";
-    db.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
     enableDocReplicationListener = false;
     replicatedDocIDs.clear();
     replicate();
@@ -611,7 +615,8 @@ public:
     
     void testFilter(bool isPush, bool rejectAllChanges) {
         cbl::Database theDB;
-        
+        cbl::Collection theCol;
+
         if (isPush) {
             theDB = db;
             config.replicatorType = kCBLReplicatorTypePush;
@@ -619,28 +624,32 @@ public:
                 ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
                 return test->filter(context, doc, flags);
             };
-        } else {
+            theCol = theDB.getDefaultCollection();
+        }
+        else
+        {
             theDB = otherDB;
             config.replicatorType = kCBLReplicatorTypePull;
             config.pullFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
                 ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
                 return test->filter(context, doc, flags);
             };
+            theCol = theDB.getDefaultCollection();
             
             // Make local db non-empty for pulling a deleted doc:
             MutableDocument doc0("doc0");
-            db.saveDocument(doc0);
+            defaultCollection.saveDocument(doc0);
         }
-        
+
         MutableDocument doc1("doc1");
-        theDB.saveDocument(doc1);
+        theCol.saveDocument(doc1);
         
         MutableDocument doc2("doc2");
-        theDB.saveDocument(doc2);
+        theCol.saveDocument(doc2);
         
         MutableDocument doc3("doc3");
-        theDB.saveDocument(doc3);
-        theDB.deleteDocument(doc3);
+        theCol.saveDocument(doc3);
+        theCol.deleteDocument(doc3);
         
         count = 0;
         deletedCount = 0;

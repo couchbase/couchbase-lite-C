@@ -33,7 +33,7 @@ using namespace cbl;
 class QueryTest_Cpp : public CBLTest_Cpp {
 public:
     QueryTest_Cpp() {
-        ImportJSONLines("names_100.json", db.ref());
+        ImportJSONLines("names_100.json", defaultCollection.ref());
     }
 };
 
@@ -105,9 +105,9 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ API", "[Query][QueryCpp]") {
         resultCount = -1;
 
         cerr << "Deleting a doc...\n";
-        Document doc = db.getDocument("0000012");
+        Document doc = defaultCollection.getDocument("0000012");
         REQUIRE(doc);
-        REQUIRE(db.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
+        REQUIRE(defaultCollection.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
 
         cerr << "Waiting for listener again...\n";
         while (resultCount < 0)
@@ -175,9 +175,9 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ Move Operation", "[Query][Qu
 #endif
 
     cerr << "Deleting a doc...\n";
-    Document doc = db.getDocument("0000012");
+    Document doc = defaultCollection.getDocument("0000012");
     REQUIRE(doc);
-    REQUIRE(db.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
+    REQUIRE(defaultCollection.deleteDocument(doc, kCBLConcurrencyControlLastWriteWins));
 
     cerr << "Waiting for listener again...\n";
     while (resultCount < 0)

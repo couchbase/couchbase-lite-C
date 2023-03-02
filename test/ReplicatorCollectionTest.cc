@@ -188,8 +188,6 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Use outer level conflict resolver wi
     FLArray_Release(config.channels);
 }
 
-#ifdef COUCHBASE_ENTERPRISE
-
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Use property encryption with collections", "[Replicator]") {
     ExpectingExceptions x;
     
@@ -228,8 +226,6 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Use property encryption with collect
     CHECK(!r);
     CheckError(error, kCBLErrorInvalidParameter);
 }
-
-#endif
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Use collections from different databases", "[Replicator]") {
     ExpectingExceptions x;

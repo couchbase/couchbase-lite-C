@@ -33,13 +33,12 @@ static constexpr const slice kOtherCollectionCppName = "CBLTestOtherCollectionCp
 
 class DocumentTest_Cpp : public CBLTest_Cpp {
 public:
-    Collection col;
     Collection otherCol;
     
     DocumentTest_Cpp() {
-        col = db.createCollection(kCollectionCppName);
-        REQUIRE(col);
-        CHECK(col.count() == 0);
+        defaultCollection = db.createCollection(kCollectionCppName);
+        REQUIRE(defaultCollection);
+        CHECK(defaultCollection.count() == 0);
         
         otherCol = db.createCollection(kOtherCollectionCppName);
         REQUIRE(otherCol);
@@ -55,10 +54,10 @@ public:
 };
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Missing Document", "[Document]") {
-    Document doc = col.getDocument("foo");
+    Document doc = defaultCollection.getDocument("foo");
     CHECK(!doc);
     
-    MutableDocument mdoc = col.getMutableDocument("foo");
+    MutableDocument mdoc = defaultCollection.getMutableDocument("foo");
     CHECK(!mdoc);
 }
 
@@ -107,13 +106,13 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Mutable Copy Mutable Document", "[Docume
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Mutable Copy Immutable Document", "[Document]") {
     MutableDocument newdoc("foo");
     newdoc["greeting"] = "Howdy!";
-    col.saveDocument(newdoc);
-    CHECK(newdoc.collection() == col);
+    defaultCollection.saveDocument(newdoc);
+    CHECK(newdoc.collection() == defaultCollection);
     
-    Document doc = col.getDocument("foo");
+    Document doc = defaultCollection.getDocument("foo");
     REQUIRE(doc);
     CHECK(doc.sequence() == 1);
-    CHECK(doc.collection() == col);
+    CHECK(doc.collection() == defaultCollection);
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
     
     MutableDocument copiedDoc = doc.mutableCopy();
@@ -121,7 +120,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Mutable Copy Immutable Document", "[Docu
     
     CHECK(copiedDoc.id() == "foo");
     CHECK(copiedDoc.sequence() == 1);
-    CHECK(copiedDoc.collection() == col);
+    CHECK(copiedDoc.collection() == defaultCollection);
     CHECK(copiedDoc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
 }
 
@@ -136,15 +135,15 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Set Properties", "[Document]") {
     doc.setProperties(newProps);
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Hello!\"}");
     
-    col.saveDocument(doc);
-    doc = col.getMutableDocument("foo");
+    defaultCollection.saveDocument(doc);
+    doc = defaultCollection.getMutableDocument("foo");
     CHECK(doc.id() == "foo");
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Hello!\"}");
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Get Document with Empty ID", "[Document]") {
     ExpectingExceptions x;
-    Document doc = col.getDocument("");
+    Document doc = defaultCollection.getDocument("");
     REQUIRE(!doc);
 }
 
@@ -152,13 +151,13 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Get Document with Empty ID", "[Document]
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Empty Document", "[Document]") {
     MutableDocument doc("foo");
-    col.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
     CHECK(doc.id()== "foo");
     CHECK(doc.sequence() == 1);
     CHECK(!doc.revisionID().empty());
     CHECK(doc.properties().toJSONString() == "{}");
 
-    MutableDocument doc2 = col.getMutableDocument("foo");
+    MutableDocument doc2 = defaultCollection.getMutableDocument("foo");
     CHECK(doc2.id() == "foo");
     CHECK(doc2.sequence() == 1);
     CHECK(doc2.revisionID() == doc.revisionID());
@@ -171,13 +170,13 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Document With Properties", "[Docume
     CHECK(doc["greeting"].asString() == "Howdy!");
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
-    col.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
     CHECK(doc.id() == "foo");
     CHECK(doc.sequence() == 1);
     CHECK(!doc.revisionID().empty());
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\"}");
 
-    MutableDocument doc2 = col.getMutableDocument("foo");
+    MutableDocument doc2 = defaultCollection.getMutableDocument("foo");
     CHECK(doc2.id() == "foo");
     CHECK(doc2.sequence() == 1);
     CHECK(doc2.revisionID() == doc.revisionID());
@@ -188,28 +187,28 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Document with LastWriteWin", "[Docu
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
     CHECK(doc["greeting"].asString() == "Howdy!");
-    REQUIRE(col.saveDocument(doc, kCBLConcurrencyControlLastWriteWins));
+    REQUIRE(defaultCollection.saveDocument(doc, kCBLConcurrencyControlLastWriteWins));
     CHECK(doc.sequence() == 1);
     
-    MutableDocument doc1 = col.getMutableDocument("foo");
+    MutableDocument doc1 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc1);
     CHECK(doc1.id() == "foo");
     CHECK(doc1.sequence() == 1);
     
-    MutableDocument doc2 = col.getMutableDocument("foo");
+    MutableDocument doc2 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc2);
     CHECK(doc2.id() == "foo");
     CHECK(doc2.sequence() == 1);
 
     doc1["name"] = "bob";
-    REQUIRE(col.saveDocument(doc1, kCBLConcurrencyControlLastWriteWins));
+    REQUIRE(defaultCollection.saveDocument(doc1, kCBLConcurrencyControlLastWriteWins));
     CHECK(doc1.sequence() == 2);
     
     doc2["name"] = "sally";
-    REQUIRE(col.saveDocument(doc2, kCBLConcurrencyControlLastWriteWins));
+    REQUIRE(defaultCollection.saveDocument(doc2, kCBLConcurrencyControlLastWriteWins));
     CHECK(doc2.sequence() == 3);
     
-    MutableDocument doc3 = col.getMutableDocument("foo");
+    MutableDocument doc3 = defaultCollection.getMutableDocument("foo");
     CHECK(doc3.sequence() == 3);
     CHECK(doc3.properties().toJSONString() == "{\"greeting\":\"Howdy!\",\"name\":\"sally\"}");
 }
@@ -218,28 +217,28 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Document with FailOnConflict", "[Do
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
     CHECK(doc["greeting"].asString() == "Howdy!");
-    REQUIRE(col.saveDocument(doc, kCBLConcurrencyControlFailOnConflict));
+    REQUIRE(defaultCollection.saveDocument(doc, kCBLConcurrencyControlFailOnConflict));
     CHECK(doc.sequence() == 1);
     
-    MutableDocument doc1 = col.getMutableDocument("foo");
+    MutableDocument doc1 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc1);
     CHECK(doc1.id() == "foo");
     CHECK(doc1.sequence() == 1);
     
-    MutableDocument doc2 = col.getMutableDocument("foo");
+    MutableDocument doc2 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc2);
     CHECK(doc2.id() == "foo");
     CHECK(doc2.sequence() == 1);
 
     doc1["name"] = "bob";
-    REQUIRE(col.saveDocument(doc1, kCBLConcurrencyControlFailOnConflict));
+    REQUIRE(defaultCollection.saveDocument(doc1, kCBLConcurrencyControlFailOnConflict));
     CHECK(doc1.sequence() == 2);
     
     doc2["name"] = "sally";
-    REQUIRE(!col.saveDocument(doc2, kCBLConcurrencyControlFailOnConflict));
+    REQUIRE(!defaultCollection.saveDocument(doc2, kCBLConcurrencyControlFailOnConflict));
     CHECK(doc2.sequence() == 1);
     
-    doc = col.getMutableDocument("foo");
+    doc = defaultCollection.getMutableDocument("foo");
     CHECK(doc.sequence() == 2);
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\",\"name\":\"bob\"}");
 }
@@ -248,7 +247,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Document with Conflict Handler", "[
     MutableDocument doc("foo");
     doc["greeting"] = "Howdy!";
     CHECK(doc["greeting"].asString() == "Howdy!");
-    REQUIRE(col.saveDocument(doc, kCBLConcurrencyControlFailOnConflict));
+    REQUIRE(defaultCollection.saveDocument(doc, kCBLConcurrencyControlFailOnConflict));
     CHECK(doc.sequence() == 1);
     
     CollectionConflictHandler failConflict = [](MutableDocument mine, Document other) -> bool {
@@ -260,41 +259,41 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Document with Conflict Handler", "[
         return true;
     };
     
-    MutableDocument doc1 = col.getMutableDocument("foo");
+    MutableDocument doc1 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc1);
     CHECK(doc1.id() == "foo");
     CHECK(doc1.sequence() == 1);
     
-    MutableDocument doc2 = col.getMutableDocument("foo");
+    MutableDocument doc2 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc2);
     CHECK(doc2.id() == "foo");
     CHECK(doc2.sequence() == 1);
 
     doc1["name"] = "bob";
-    REQUIRE(col.saveDocument(doc1, failConflict));
+    REQUIRE(defaultCollection.saveDocument(doc1, failConflict));
     CHECK(doc1.sequence() == 2);
     
     doc2["name"] = "sally";
-    REQUIRE(!col.saveDocument(doc2, failConflict));
+    REQUIRE(!defaultCollection.saveDocument(doc2, failConflict));
     CHECK(doc2.sequence() == 1);
     
-    doc = col.getMutableDocument("foo");
+    doc = defaultCollection.getMutableDocument("foo");
     CHECK(doc.sequence() == 2);
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\",\"name\":\"bob\"}");
     
     doc2["name"] = "sally";
-    REQUIRE(col.saveDocument(doc2, mergeConflict));
+    REQUIRE(defaultCollection.saveDocument(doc2, mergeConflict));
     CHECK(doc2.sequence() == 3);
     
-    doc = col.getMutableDocument("foo");
+    doc = defaultCollection.getMutableDocument("foo");
     CHECK(doc.sequence() == 3);
     CHECK(doc.properties().toJSONString() == "{\"greeting\":\"Howdy!\",\"name\":\"sally\",\"anotherName\":\"bob\"}");
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Document into Different Collection", "[Document]") {
-    createDocument(col, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
-    MutableDocument doc = col.getMutableDocument("foo");
+    MutableDocument doc = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc);
     
     ExpectingExceptions ex;
@@ -310,71 +309,71 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Non Existing Doc", "[Document]") 
     
     ExpectingExceptions x;
     CBLError error {};
-    try { col.deleteDocument(doc); } catch (CBLError e) { error = e; }
+    try { defaultCollection.deleteDocument(doc); } catch (CBLError e) { error = e; }
     CheckError(error, kCBLErrorNotFound);
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Doc", "[Document]") {
-    createDocument(col, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
-    Document doc = col.getDocument("foo");
+    Document doc = defaultCollection.getDocument("foo");
     CHECK(doc);
     
-    col.deleteDocument(doc);
+    defaultCollection.deleteDocument(doc);
     
-    doc = col.getDocument("foo");
+    doc = defaultCollection.getDocument("foo");
     CHECK(!doc);
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Doc with LastWriteWin", "[Document]") {
-    createDocument(col, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
-    MutableDocument doc1 = col.getMutableDocument("foo");
+    MutableDocument doc1 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc1);
     CHECK(doc1.id() == "foo");
     CHECK(doc1.sequence() == 1);
     
-    MutableDocument doc2 = col.getMutableDocument("foo");
+    MutableDocument doc2 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc2);
     CHECK(doc2.id() == "foo");
     CHECK(doc2.sequence() == 1);
     
     doc1["name"] = "bob";
-    REQUIRE(col.saveDocument(doc1, kCBLConcurrencyControlLastWriteWins));
+    REQUIRE(defaultCollection.saveDocument(doc1, kCBLConcurrencyControlLastWriteWins));
     CHECK(doc1.sequence() == 2);
     
-    REQUIRE(col.deleteDocument(doc2, kCBLConcurrencyControlLastWriteWins));
+    REQUIRE(defaultCollection.deleteDocument(doc2, kCBLConcurrencyControlLastWriteWins));
     
-    Document doc = col.getDocument("foo");
+    Document doc = defaultCollection.getDocument("foo");
     REQUIRE(!doc);
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Doc with FailOnConflict", "[Document]") {
-    createDocument(col, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
-    MutableDocument doc1 = col.getMutableDocument("foo");
+    MutableDocument doc1 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc1);
     CHECK(doc1.id() == "foo");
     CHECK(doc1.sequence() == 1);
     
-    MutableDocument doc2 = col.getMutableDocument("foo");
+    MutableDocument doc2 = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc2);
     CHECK(doc2.id() == "foo");
     CHECK(doc2.sequence() == 1);
     
     doc1["name"] = "bob";
-    REQUIRE(col.saveDocument(doc1, kCBLConcurrencyControlFailOnConflict));
+    REQUIRE(defaultCollection.saveDocument(doc1, kCBLConcurrencyControlFailOnConflict));
     CHECK(doc1.sequence() == 2);
     
-    REQUIRE(!col.deleteDocument(doc2, kCBLConcurrencyControlFailOnConflict));
+    REQUIRE(!defaultCollection.deleteDocument(doc2, kCBLConcurrencyControlFailOnConflict));
     
-    Document readDoc = col.getDocument("foo");
+    Document readDoc = defaultCollection.getDocument("foo");
     REQUIRE(readDoc);
     CHECK(readDoc.properties().toJSONString() == "{\"greeting\":\"Howdy\",\"name\":\"bob\"}");
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Document into Different Collection", "[Document]") {
-    MutableDocument doc = createDocument(col, "foo", "greeting", "Howdy");
+    MutableDocument doc = createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
     ExpectingExceptions ex;
     CBLError error {};
@@ -390,52 +389,52 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Non Existing Doc", "[Document]") {
     ExpectingExceptions x;
     
     CBLError error {};
-    try { col.purgeDocument(doc); } catch (CBLError e) { error = e; }
+    try { defaultCollection.purgeDocument(doc); } catch (CBLError e) { error = e; }
     CheckError(error, kCBLErrorNotFound);
     
     error = {};
-    try { col.purgeDocument("foo"); } catch (CBLError e) { error = e; }
+    try { defaultCollection.purgeDocument("foo"); } catch (CBLError e) { error = e; }
     CheckError(error, kCBLErrorNotFound);
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Doc", "[Document]") {
-    createDocument(col, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
-    Document doc = col.getDocument("foo");
+    Document doc = defaultCollection.getDocument("foo");
     REQUIRE(doc);
     
     SECTION("Purge with Doc") {
-        col.purgeDocument(doc);
+        defaultCollection.purgeDocument(doc);
     }
     
     SECTION("Purge with ID") {
-        col.purgeDocument("foo");
+        defaultCollection.purgeDocument("foo");
     }
     
-    doc = col.getDocument("foo");
+    doc = defaultCollection.getDocument("foo");
     CHECK(!doc);
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Already Purged Document", "[Document]") {
-    createDocument(col, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
-    Document doc = col.getDocument("foo");
+    Document doc = defaultCollection.getDocument("foo");
     REQUIRE(doc);
     
-    col.purgeDocument(doc);
-    doc = col.getDocument("foo");
+    defaultCollection.purgeDocument(doc);
+    doc = defaultCollection.getDocument("foo");
     CHECK(!doc);
     
     ExpectingExceptions ex;
     CBLError error {};
-    try { col.purgeDocument("foo"); } catch (CBLError e) { error = e; }
+    try { defaultCollection.purgeDocument("foo"); } catch (CBLError e) { error = e; }
     CheckError(error, kCBLErrorNotFound);
 }
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Doc from Different Collection", "[Document]") {
-    createDocument(col, "foo", "greeting", "Howdy");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy");
     
-    Document doc = col.getDocument("foo");
+    Document doc = defaultCollection.getDocument("foo");
     REQUIRE(doc);
     
     ExpectingExceptions ex;
@@ -447,22 +446,22 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Purge Doc from Different Collection", "[
 #pragma mark - Document Expiry:
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Document Expiration", "[Document][Expiry]") {
-    createDocument(col, "doc1", "foo", "bar");
-    createDocument(col, "doc2", "foo", "bar");
-    createDocument(col, "doc3", "foo", "bar");
+    createDocument(defaultCollection, "doc1", "foo", "bar");
+    createDocument(defaultCollection, "doc2", "foo", "bar");
+    createDocument(defaultCollection, "doc3", "foo", "bar");
 
     CBLTimestamp future = CBL_Now() + 1000;
-    col.setDocumentExpiration("doc1", future);
-    col.setDocumentExpiration("doc3", future);
+    defaultCollection.setDocumentExpiration("doc1", future);
+    defaultCollection.setDocumentExpiration("doc3", future);
     
-    CHECK(col.count() == 3);
-    CHECK(col.getDocumentExpiration("doc1") == future);
-    CHECK(col.getDocumentExpiration("doc3") == future);
-    CHECK(col.getDocumentExpiration("doc2") == 0);
-    CHECK(col.getDocumentExpiration("docx") == 0);
+    CHECK(defaultCollection.count() == 3);
+    CHECK(defaultCollection.getDocumentExpiration("doc1") == future);
+    CHECK(defaultCollection.getDocumentExpiration("doc3") == future);
+    CHECK(defaultCollection.getDocumentExpiration("doc2") == 0);
+    CHECK(defaultCollection.getDocumentExpiration("docx") == 0);
 
     this_thread::sleep_for(2000ms);
-    CHECK(col.count() == 1);
+    CHECK(defaultCollection.count() == 1);
 }
 
 #pragma mark - Blobs:
@@ -475,9 +474,9 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Blob with Collection", "[Document][Blob]
     
     MutableDocument doc("foo");
     doc["picture"] = blob.properties();
-    col.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
     
-    doc = col.getMutableDocument("foo");
+    doc = defaultCollection.getMutableDocument("foo");
     REQUIRE(doc);
     
     CHECK(doc.properties().toJSON(true,true).asString() == "{picture:{\"@type\":\"blob\","
@@ -495,22 +494,22 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Change Listeners", "[Document]") {
     int listenerCalls = 0, docListenerCalls = 0;
     
     // Add chage listener:
-    auto listener = col.addChangeListener([&](CollectionChange* change) {
+    auto listener = defaultCollection.addChangeListener([&](CollectionChange* change) {
         ++listenerCalls;
-        CHECK(change->collection() == col);
+        CHECK(change->collection() == defaultCollection);
         CHECK(change->docIDs().size() == 1);
         CHECK(change->docIDs()[0] == "foo");
     });
     
     // Add doc listener:
-    auto docListener = col.addDocumentChangeListener("foo", [&](DocumentChange* change) {
+    auto docListener = defaultCollection.addDocumentChangeListener("foo", [&](DocumentChange* change) {
         ++docListenerCalls;
-        CHECK(change->collection() == col);
+        CHECK(change->collection() == defaultCollection);
         CHECK(change->docID() == "foo");
     });
     
     // Create a doc, check that the listener was called:
-    createDocument(col, "foo", "greeting", "Howdy!");
+    createDocument(defaultCollection, "foo", "greeting", "Howdy!");
     CHECK(listenerCalls == 1);
     CHECK(docListenerCalls == 1);
     
@@ -518,7 +517,7 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Change Listeners", "[Document]") {
     listener.remove();
     docListener.remove();
     listenerCalls = docListenerCalls = 0;
-    createDocument(col, "bar", "greeting", "yo.");
+    createDocument(defaultCollection, "bar", "greeting", "yo.");
     
     this_thread::sleep_for(1000ms);
     CHECK(listenerCalls == 0);
