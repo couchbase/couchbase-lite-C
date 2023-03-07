@@ -16,11 +16,19 @@ framework module CouchbaseLite {
     header "CBLScope.h"
     
     module Fleece {
-        header "Base.h"
         header "Fleece.h"
-        header "FLSlice.h"
+        header "FLBase.h"
+        header "FLCollections.h"
+        header "FLDeepIterator.h"
+        header "FLDoc.h"
         header "Fleece+CoreFoundation.h"
+        header "FLEncoder.h"
+        header "FLExpert.h"
+        header "FLJSON.h"
+        header "FLKeyPath.h"
+        header "FLMutable.h"
+        header "FLSlice.h"
+        header "FLValue.h"
+        header "CompilerSupport.h"
     }
-
-    link "couchbase_lite"
 }

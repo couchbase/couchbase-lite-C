@@ -20,7 +20,6 @@
 #include "CBLBase.h"
 #include "CBLDocument.h"
 #include "CBLQuery.h"
-#include "fleece/Fleece.h"
 
 CBL_CAPI_BEGIN
 
