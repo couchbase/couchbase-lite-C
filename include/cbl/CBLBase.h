@@ -23,7 +23,7 @@
 
 #include "CBL_Edition.h"
 #include "CBL_Compat.h"
-#include "fleece/FLSlice.h"
+#include "fleece/Fleece.h"
 #include <stdbool.h>
 #include <stdint.h>
 

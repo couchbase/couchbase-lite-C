@@ -18,7 +18,6 @@
 
 #pragma once
 #include "CBLBase.h"
-#include "fleece/FLSlice.h"
 
 CBL_CAPI_BEGIN
 

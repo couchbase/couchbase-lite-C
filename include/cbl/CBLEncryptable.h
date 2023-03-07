@@ -18,7 +18,6 @@
 
 #pragma once
 #include "CBLBase.h"
-#include "fleece/Fleece.h"
 
 #ifdef COUCHBASE_ENTERPRISE
 
