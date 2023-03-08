@@ -57,14 +57,13 @@
 		27984E2E2249A240000FE777 /* CBLQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A3021CAC98F0045856E /* CBLQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E2F2249A240000FE777 /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2C21CAC98F0045856E /* CBLReplicator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27984E302249A240000FE777 /* CBL_Compat.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A7021CAD6440045856E /* CBL_Compat.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		27984E322249A247000FE777 /* Base.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE3D21DEF0C700B60E3C /* Base.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		27984E332249A247000FE777 /* Blob.hh in Headers */ = {isa = PBXBuildFile; fileRef = 275BC4E22204E6A800DBE7D2 /* Blob.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		27984E342249A247000FE777 /* Database.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61DD821DEEC540027CCDB /* Database.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		27984E352249A247000FE777 /* Document.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4E21DEF54D00B60E3C /* Document.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		27984E362249A247000FE777 /* Query.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4F21E6AB1100B60E3C /* Query.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		27984E372249A247000FE777 /* Replicator.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27C9B5F121F7D74A0040BC45 /* Replicator.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27984E3F2249A85E000FE777 /* CouchbaseLite_Umbrella.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE5021E6BC2100B60E3C /* CouchbaseLite.hh */; };
+		27984E322249A247000FE777 /* Base.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE3D21DEF0C700B60E3C /* Base.hh */; };
+		27984E332249A247000FE777 /* Blob.hh in Headers */ = {isa = PBXBuildFile; fileRef = 275BC4E22204E6A800DBE7D2 /* Blob.hh */; };
+		27984E342249A247000FE777 /* Database.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61DD821DEEC540027CCDB /* Database.hh */; };
+		27984E352249A247000FE777 /* Document.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4E21DEF54D00B60E3C /* Document.hh */; };
+		27984E362249A247000FE777 /* Query.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277FEE4F21E6AB1100B60E3C /* Query.hh */; };
+		27984E372249A247000FE777 /* Replicator.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27C9B5F121F7D74A0040BC45 /* Replicator.hh */; };
 		27B61D5621D5ABA60027CCDB /* CBLQuery_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */; };
 		27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B61D6821D6B60D0027CCDB /* CBLTest.hh */; };
 		27B61D7D21D6B66F0027CCDB /* libcblite-static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 271C2A2321CAC8920045856E /* libcblite-static.a */; };
@@ -87,6 +86,7 @@
 		4022546E29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		4022546F29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		4022547029355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
+		40D1862529B6D1A50061AA85 /* Collection.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCC064BD287CBD95000C5BD7 /* Collection.hh */; };
 		42D1B69D2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
 		42D1B69E2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
 		42D1B69F2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
@@ -424,7 +424,6 @@
 		27984DF422499ED4000FE777 /* CouchbaseLite.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = CouchbaseLite.modulemap; sourceTree = "<group>"; };
 		27984E0A2249A126000FE777 /* CouchbaseLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CouchbaseLite.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		27984E0D2249A127000FE777 /* Framework-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Framework-Info.plist"; sourceTree = "<group>"; };
-		27984E3F2249A85E000FE777 /* CouchbaseLite_Umbrella.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CouchbaseLite_Umbrella.hh; sourceTree = "<group>"; };
 		27984E412249ACD2000FE777 /* CBL_Framework.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework.xcconfig; sourceTree = "<group>"; };
 		27984E482249AF44000FE777 /* CBL_Dylib_Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Dylib_Release.xcconfig; sourceTree = "<group>"; };
 		27984E492249AF61000FE777 /* CBL_Framework_Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CBL_Framework_Release.xcconfig; sourceTree = "<group>"; };
@@ -790,7 +789,6 @@
 		27B61D8321D6B9F60027CCDB /* Xcode */ = {
 			isa = PBXGroup;
 			children = (
-				27984E3F2249A85E000FE777 /* CouchbaseLite_Umbrella.hh */,
 				27984DF422499ED4000FE777 /* CouchbaseLite.modulemap */,
 				27984E0D2249A127000FE777 /* Framework-Info.plist */,
 				27B61D8421D6BA060027CCDB /* xcconfigs */,
@@ -919,7 +917,7 @@
 				27984E2B2249A240000FE777 /* CBLBlob.h in Headers */,
 				AE591ABA29473A4500E4BDE8 /* CBLUserAgent.hh in Headers */,
 				27984E2D2249A240000FE777 /* CBLDocument.h in Headers */,
-				27984E402249A85E000FE777 /* CouchbaseLite_Umbrella.hh in Headers */,
+				40D1862529B6D1A50061AA85 /* Collection.hh in Headers */,
 				FCD988BC2821B10400512BBD /* CBLCollection.h in Headers */,
 				27984E2C2249A240000FE777 /* CBLDatabase.h in Headers */,
 				27984E2E2249A240000FE777 /* CBLQuery.h in Headers */,
@@ -1355,7 +1353,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n# Copy Fleece Headers:\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n";
+			shellScript = "set -e\n# Copy Fleece Headers:\ncp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n\n# Remove C++ Headers (Go to the folder to workaroud rm cmd issue with path including spaces): \npushd \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\nrm -f *.hh\n";
 		};
 		27DBD088246C94B2002FD7A7 /* Merge static libs */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1397,7 +1395,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\npushd \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n\nsed -i '' 's/#include \"fleece\\/\\(.*\\)\"/#include <CouchbaseLite\\/\\1>/' * \nsed -i '' 's/#include \"CBL\\(.*\\)\"/#include <CouchbaseLite\\/CBL\\1>/' *\nsed -i '' 's/#include \"FLSlice.h\"/#include <CouchbaseLite\\/FLSlice.h>/' *\nsed -i '' 's/#include \"Base.h\"/#include <CouchbaseLite\\/Base.h>/' *\n";
+			shellScript = "set -e\n\npushd \"$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/\"\n\nsed -i '' 's/#include \"fleece\\/\\(.*\\)\"/#include <CouchbaseLite\\/\\1>/' * \nsed -i '' 's/#include \"CBL\\(.*\\)\"/#include <CouchbaseLite\\/CBL\\1>/' *\nsed -i '' 's/#include \"FL\\(.*\\)\"/#include <CouchbaseLite\\/FL\\1>/' *\nsed -i '' 's/#include \"CompilerSupport.h\"/#include <CouchbaseLite\\/CompilerSupport.h>/' *\nsed -i '' 's/#.*include \"Fleece+CoreFoundation.h\"/#include <CouchbaseLite\\/Fleece+CoreFoundation.h>/' * \n";
 		};
 		93D0AF88262557D200777AFC /* Generate CBL_Edition.h */ = {
 			isa = PBXShellScriptBuildPhase;
