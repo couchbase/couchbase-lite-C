@@ -375,7 +375,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Empty Listener Token") {
     listenerToken.remove(); // Noops
 }
 
-TEST_CASE_METHOD(CBLTest_Cpp, "Listener Token") {
+TEST_CASE_METHOD(CBLTest_Cpp, "Database Listener Token") {
     int num = 0;
     auto cb = [&num]() { num++; };
     ListenerToken<> listenerToken = ListenerToken<>(cb);

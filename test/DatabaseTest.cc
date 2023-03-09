@@ -33,19 +33,6 @@ static int fooListenerCalls = 0;
 static int barListenerCalls = 0;
 static int notificationsReadyCalls = 0;
 
-static void createDocumentInDefault(CBLDatabase *db, slice docID, slice property, slice value){
-    CBLDocument* doc = CBLDocument_CreateWithID(docID);
-    MutableDict props = CBLDocument_MutableProperties(doc);
-    FLSlot_SetString(FLMutableDict_Set(props, property), value);
-
-    CBLError error;
-    CBLCollection *col = CBLDatabase_DefaultCollection(db, &error);
-    bool saved = CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, kCBLConcurrencyControlFailOnConflict, &error);
-    CBLDocument_Release(doc);
-    REQUIRE(saved);
-    CBLCollection_Release(col);
-}
-
 static void notificationsReady(void *context, CBLDatabase* db) {
     ++notificationsReadyCalls;
     auto test = (CBLTest*)context;
@@ -347,7 +334,7 @@ TEST_CASE_METHOD(DatabaseTest, "Save Document into Different DB Instance") {
 #pragma mark - Delete Document:
 
 TEST_CASE_METHOD(DatabaseTest, "Delete Document from Different DB Instance") {
-    createDocumentInDefault(db, "doc1", "foo", "bar");
+    createDocWithPair(db, "doc1", "foo", "bar");
     CBLError error;
     const CBLDocument* doc = CBLCollection_GetDocument(defaultCollection, "doc1"_sl, &error);
     REQUIRE(doc);
@@ -362,7 +349,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Document from Different DB Instance") {
 #pragma mark - Purge Document:
 
 TEST_CASE_METHOD(DatabaseTest, "Purge Document from Different DB Instance") {
-    createDocumentInDefault(db, "doc1", "foo", "bar");
+    createDocWithPair(db, "doc1", "foo", "bar");
     
     CBLError error;
     const CBLDocument* doc = CBLCollection_GetDocument(defaultCollection, "doc1"_sl, &error);
@@ -379,7 +366,7 @@ TEST_CASE_METHOD(DatabaseTest, "Purge Document from Different DB Instance") {
 
 
 TEST_CASE_METHOD(DatabaseTest, "Copy Database") {
-    createDocumentInDefault(db, "foo", "greeting", "Howdy!");
+    createDocWithPair(db, "foo", "greeting", "Howdy!");
 
     CBLError error;
     auto config = databaseConfig();
@@ -459,9 +446,9 @@ TEST_CASE_METHOD(DatabaseTest, "Maintenance : Reindex") {
     config.expressions = R"(["foo"])"_sl;
     CHECK(CBLCollection_CreateValueIndex(defaultCollection, "foo"_sl, config, &error));
     
-    createDocumentInDefault(db, "doc1", "foo", "bar1");
-    createDocumentInDefault(db, "doc2", "foo", "bar2");
-    createDocumentInDefault(db, "doc3", "foo", "bar3");
+    createDocWithPair(db, "doc1", "foo", "bar1");
+    createDocWithPair(db, "doc2", "foo", "bar2");
+    createDocWithPair(db, "doc3", "foo", "bar3");
     
     CHECK(CBLDatabase_PerformMaintenance(db, kCBLMaintenanceTypeReindex, &error));
     
@@ -503,8 +490,8 @@ TEST_CASE_METHOD(DatabaseTest, "Maintenance : FullOptimize") {
 
 
 TEST_CASE_METHOD(DatabaseTest, "Transaction Commit") {
-    createDocumentInDefault(db, "doc1", "foo", "bar1");
-    createDocumentInDefault(db, "doc2", "foo", "bar2");
+    createDocWithPair(db, "doc1", "foo", "bar1");
+    createDocWithPair(db, "doc2", "foo", "bar2");
 
     CHECK(CBLCollection_Count(defaultCollection) == 2);
 
@@ -513,7 +500,7 @@ TEST_CASE_METHOD(DatabaseTest, "Transaction Commit") {
     REQUIRE(CBLDatabase_BeginTransaction(db, &error));
 
     // Create:
-    createDocumentInDefault(db, "doc3", "foo", "bar3");
+    createDocWithPair(db, "doc3", "foo", "bar3");
 
     // Delete:
     const CBLDocument* doc1 = CBLCollection_GetDocument(defaultCollection, "doc1"_sl, &error);
@@ -545,15 +532,15 @@ TEST_CASE_METHOD(DatabaseTest, "Transaction Commit") {
 
 
 TEST_CASE_METHOD(DatabaseTest, "Transaction Abort") {
-    createDocumentInDefault(db, "doc1", "foo", "bar1");
-    createDocumentInDefault(db, "doc2", "foo", "bar2");
+    createDocWithPair(db, "doc1", "foo", "bar1");
+    createDocWithPair(db, "doc2", "foo", "bar2");
     
     // Begin Transaction:
     CBLError error;
     REQUIRE(CBLDatabase_BeginTransaction(db, &error));
 
     // Create:
-    createDocumentInDefault(db, "doc3", "foo", "bar3");
+    createDocWithPair(db, "doc3", "foo", "bar3");
 
     // Delete:
     const CBLDocument* doc1 = CBLCollection_GetDocument(defaultCollection, "doc1"_sl, &error);
@@ -590,7 +577,7 @@ TEST_CASE_METHOD(DatabaseTest, "Database notifications") {
     auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
 
     // Create a doc, check that the listener was called:
-    createDocumentInDefault(db, "foo", "greeting", "Howdy!");
+    createDocWithPair(db, "foo", "greeting", "Howdy!");
     CHECK(dbListenerCalls == 1);
     CHECK(fooListenerCalls == 1);
 
@@ -599,7 +586,7 @@ TEST_CASE_METHOD(DatabaseTest, "Database notifications") {
 
     // After being removed, the listener should not be called:
     dbListenerCalls = fooListenerCalls = 0;
-    createDocumentInDefault(db, "bar", "greeting", "yo.");
+    createDocWithPair(db, "bar", "greeting", "yo.");
     CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
 }
@@ -611,7 +598,7 @@ TEST_CASE_METHOD(DatabaseTest, "Remove Database Listener after releasing databas
     auto docToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
 
     // Create a doc, check that the listener was called:
-    createDocumentInDefault(db, "foo", "greeting", "Howdy!");
+    createDocWithPair(db, "foo", "greeting", "Howdy!");
     CHECK(dbListenerCalls == 1);
     CHECK(fooListenerCalls == 1);
 
@@ -639,13 +626,13 @@ TEST_CASE_METHOD(DatabaseTest, "Scheduled database notifications") {
     CBLDatabase_BufferNotifications(db, notificationsReady, this);
 
     // Create two docs; no listeners should be called yet:
-    createDocumentInDefault(db, "foo", "greeting", "Howdy!");
+    createDocWithPair(db, "foo", "greeting", "Howdy!");
     CHECK(notificationsReadyCalls == 1);
     CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);
 
-    createDocumentInDefault(db, "bar", "greeting", "yo.");
+    createDocWithPair(db, "bar", "greeting", "yo.");
     CHECK(notificationsReadyCalls == 1);
     CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);

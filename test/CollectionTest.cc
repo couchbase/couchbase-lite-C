@@ -270,7 +270,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Default Collection", "[Collection]") {
     REQUIRE(defaultCollection);
     
     // Add some docs:
-    createNumberedDocs(col, 100);
+    createNumberedDocsWithPrefix(col, 100, "doc");
     CHECK(CBLCollection_Count(col) == 100);
     CBLCollection_Release(col);
     
@@ -427,7 +427,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[Collection]") {
     CHECK(CBLCollection_Name(col) == "colA"_sl);
     
     // Add some docs:
-    createNumberedDocs(col, 100);
+    createNumberedDocsWithPrefix(col, 100, "doc");
     CHECK(CBLCollection_Count(col) == 100);
     CBLCollection_Release(col);
     
@@ -642,7 +642,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB 
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
-    createNumberedDocs(col1a, 10);
+    createNumberedDocsWithPrefix(col1a, 10, "doc");
     CHECK(CBLCollection_Count(col1a) == 10);
     
     // Using another instance to get the collection:
@@ -653,7 +653,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB 
     CHECK(CBLCollection_Count(col1b) == 10);
     
     // Create another 10 docs in col1b:
-    createNumberedDocs(col1b, 10, 100);
+    createNumberedDocsWithPrefix(col1b, 10, "doc", 100);
     CHECK(CBLCollection_Count(col1b) == 20);
     CHECK(CBLCollection_Count(col1a) == 20);
     
@@ -667,7 +667,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Create Collection using Different 
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
-    createNumberedDocs(col1a, 10);
+    createNumberedDocsWithPrefix(col1a, 10, "doc");
     CHECK(CBLCollection_Count(col1a) == 10);
     
     // Using another instance to create the collection again:
@@ -678,7 +678,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Create Collection using Different 
     CHECK(CBLCollection_Count(col1b) == 10);
     
     // Create another 10 docs in col1b:
-    createNumberedDocs(col1b, 10, 100);
+    createNumberedDocsWithPrefix(col1b, 10, "doc", 100);
     CHECK(CBLCollection_Count(col1b) == 20);
     CHECK(CBLCollection_Count(col1a) == 20);
     
@@ -691,7 +691,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB I
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
-    createNumberedDocs(col1a, 10);
+    createNumberedDocsWithPrefix(col1a, 10, "doc");
     CHECK(CBLCollection_Count(col1a) == 10);
     
     CBLDatabase* db2 = openDB();
@@ -722,7 +722,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete and Recreate then Get Collection from D
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
-    createNumberedDocs(col1a, 10);
+    createNumberedDocsWithPrefix(col1a, 10, "doc");
     CHECK(CBLCollection_Count(col1a) == 10);
     
     CBLDatabase* db2 = openDB();

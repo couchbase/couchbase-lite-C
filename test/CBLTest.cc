@@ -110,8 +110,10 @@ CBLTest::CBLTest() {
     auto config = databaseConfig();
     if (!CBL_DeleteDatabase(kDatabaseName, config.directory, &error) && error.code != 0)
         FAIL("Can't delete temp database: " << error.domain << "/" << error.code);
+    
     db = CBLDatabase_Open(kDatabaseName, &config, &error);
     REQUIRE(db);
+
     defaultCollection = CBLDatabase_DefaultCollection(db, &error);
     REQUIRE(defaultCollection);
 }
@@ -165,38 +167,16 @@ cbl::Database CBLTest_Cpp::openDatabaseNamed(slice name, bool createEmpty){
     return database;
 }
 
-void CBLTest_Cpp::createNumberedDocs(cbl::Collection& collection, unsigned n, unsigned start) {
-    for (unsigned i = 0; i < n; i++) {
-        char docID[kDocIDBufferSize];
-        snprintf(docID, kDocIDBufferSize, "doc-%03u", start + i);
-        
-        char content[kDocContentBufferSize];
-        snprintf(content, kDocContentBufferSize, "This is the document #%03u.", start + i);
-        cbl::MutableDocument doc(docID);
-        doc["content"] = content;
-        collection.saveDocument(doc);
-    }
-}
-
-void CBLTest_Cpp::createDoc(cbl::Collection& collection, std::string docID, std::string jsonContent) {
+void CBLTest_Cpp::createDocumentInDefault(cbl::Database &db, std::string docID, std::string property, std::string value) {
+    cbl::Collection col = db.getDefaultCollection();
     cbl::MutableDocument doc(docID);
-    doc.setPropertiesAsJSON(jsonContent);
-    collection.saveDocument(doc);
+    MutableDict newProps = MutableDict::newDict();
+    newProps[property] = value;
+    doc.setProperties(newProps);
+    col.saveDocument(doc);
 }
 
-void CBLTest_Cpp::createDocs(cbl::Collection& collection, unsigned n, std::string idprefix) {
-    for (unsigned i = 0; i < n; i++) {
-        string docID = idprefix.append("-").append(to_string(i+1));
-        
-        char content[kDocContentBufferSize];
-        snprintf(content, kDocContentBufferSize, "This is the document #%03u.", i+1);
-        cbl::MutableDocument doc(docID);
-        doc["content"] = content;
-        collection.saveDocument(doc);
-    }
-}
-
-#pragma mark - Test Utils :
+#pragma mark - Test Utils C :
 
 string GetTestFilePath(const std::string &filename) {
     static string sTestFilesPath;
@@ -302,12 +282,53 @@ CBLCollection* CreateCollection(CBLDatabase* database, string collection, string
     return col;
 }
 
-void CreateDoc(CBLCollection *col, std::string docID, std::string jsonContent) {
+void createDocWithJSON(CBLCollection *col, std::string docID, std::string jsonContent) {
     CBLError error {};
     CBLDocument* doc = docID.empty() ? CBLDocument_Create() : CBLDocument_CreateWithID(slice(docID));
     REQUIRE(CBLDocument_SetJSON(doc, slice(jsonContent), &error));
     REQUIRE(CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, kCBLConcurrencyControlFailOnConflict, &error));
     CBLDocument_Release(doc);
+}
+
+void createDocWithPair(CBLCollection *col, fleece::slice docID, fleece::slice property, fleece::slice value) {
+    CBLDocument* doc = CBLDocument_CreateWithID(docID);
+    MutableDict props = CBLDocument_MutableProperties(doc);
+    FLSlot_SetString(FLMutableDict_Set(props, property), value);
+
+    CBLError error;
+    bool saved = CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, kCBLConcurrencyControlFailOnConflict, &error);
+    CBLDocument_Release(doc);
+    REQUIRE(saved);
+}
+
+void createDocWithPair(CBLDatabase *db, fleece::slice docID, fleece::slice property, fleece::slice value) {
+    CBLDocument* doc = CBLDocument_CreateWithID(docID);
+    MutableDict props = CBLDocument_MutableProperties(doc);
+    FLSlot_SetString(FLMutableDict_Set(props, property), value);
+
+    CBLError error;
+    CBLCollection *col = CBLDatabase_DefaultCollection(db, &error);
+    bool saved = CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, kCBLConcurrencyControlFailOnConflict, &error);
+    CBLDocument_Release(doc);
+    REQUIRE(saved);
+    CBLCollection_Release(col);
+}
+
+void createNumberedDocsWithPrefix(CBLCollection *col, unsigned n, const std::string& idprefix, unsigned start) {
+    for (unsigned i = 0; i < n; i++) {
+        string docID = idprefix + '-' + to_string(start + i);
+        auto doc = CBLDocument_CreateWithID(slice(docID));
+        
+        MutableDict props = CBLDocument_MutableProperties(doc);
+        char content[100];
+        snprintf(content, 100, "This is the document #%03u.", start + i);
+        FLSlot_SetString(FLMutableDict_Set(props, "content"_sl), slice(content));
+        
+        CBLError error = {};
+        bool saved = CBLCollection_SaveDocument(col, doc, &error);
+        CBLDocument_Release(doc);
+        REQUIRE(saved);
+    }
 }
 
 std::string CollectionPath(CBLCollection* collection) {
@@ -339,4 +360,24 @@ void PurgeAllDocs(CBLCollection* collection) {
     
     CBLResultSet_Release(rs);
     CBLQuery_Release(query);
+}
+
+#pragma mark - Test Utils C++:
+
+void createNumberedDocsWithPrefix(cbl::Collection& collection, unsigned n, const std::string& idprefix, unsigned start) {
+    for (unsigned i = 0; i < n; i++){
+        string docID = idprefix + '-' + to_string(start + i);
+
+        char content[kDocContentBufferSize];
+        snprintf(content, kDocContentBufferSize, "This is the document #%03u.", i+1);
+        cbl::MutableDocument doc(docID);
+        doc["content"] = content;
+        collection.saveDocument(doc);
+    }
+}
+
+void createDocWithJSON(cbl::Collection& collection, std::string docID, std::string jsonContent) {
+    cbl::MutableDocument doc(docID);
+    doc.setPropertiesAsJSON(jsonContent);
+    collection.saveDocument(doc);
 }

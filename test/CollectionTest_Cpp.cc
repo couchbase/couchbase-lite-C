@@ -247,7 +247,7 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Collection", "[Collection]") {
     CHECK(col.scopeName() == "scopeA");
     
     // Add some docs:
-    createNumberedDocs(col, 100);
+    createNumberedDocsWithPrefix(col, 100, "doc");
     CHECK(col.count() == 100);
     
     MutableArray scopeNames = db.getScopeNames();

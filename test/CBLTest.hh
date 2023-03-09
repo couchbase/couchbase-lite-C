@@ -103,7 +103,13 @@ std::string CollectionPath(CBLCollection* collection);
 
 CBLCollection* CreateCollection(CBLDatabase* database, std::string collection, std::string scope ="_default");
 
-void CreateDoc(CBLCollection *col, std::string docID, std::string jsonContent);
+void createDocWithJSON(CBLCollection *col, std::string docID, std::string jsonContent);
+
+void createDocWithPair(CBLCollection *col, fleece::slice docID, fleece::slice property, fleece::slice value);
+
+void createDocWithPair(CBLDatabase *db, fleece::slice docID, fleece::slice property, fleece::slice value);
+
+void createNumberedDocsWithPrefix(CBLCollection *col, unsigned n, const std::string& idprefix, unsigned start = 1);
 
 void PurgeAllDocs(CBLCollection* collection);
 
