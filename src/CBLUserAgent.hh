@@ -106,6 +106,10 @@ static string getDistroInfo() {
 }
 #endif
 
+#ifdef __ANDROID__
+#include <sys/system_properties.h>
+#endif
+
 using stringstream = std::stringstream;
 using alloc_slice = fleece::alloc_slice;
 
@@ -126,8 +130,8 @@ static string createUserAgentHeader(){
     os = "macOS " + getAppleVersion();
 #endif
 #elif __ANDROID__
-        char rel_ver_str[3];
-        char sdk_ver_str[3];
+        char rel_ver_str[PROP_VALUE_MAX];
+        char sdk_ver_str[PROP_VALUE_MAX];
         __system_property_get("ro.build.version.sdk", sdk_ver_str);
         __system_property_get("ro.build.version.release", rel_ver_str);
         os = "Android " + std::string(rel_ver_str) + " - API " + std::string(sdk_ver_str);
