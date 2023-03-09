@@ -370,13 +370,13 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Collection notifications", "[Collectio
             CHECK(callbackcol->docID() == "foo");
         });
         // Create a doc, check that the listener was called:
-        createDocumentInDefault(db, "foo", "greeting", "Howdy!");
+        createDocumentInDefault("foo", "greeting", "Howdy!");
         CHECK(colListenerCalls == 1);
         CHECK(fooListenerCalls == 1);
     }
     // After being removed, the listener should not be called:
     colListenerCalls = fooListenerCalls = 0;
-    createDocumentInDefault(db, "bar", "greeting", "yo.");
+    createDocumentInDefault("bar", "greeting", "yo.");
     CHECK(colListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
 }
@@ -408,12 +408,12 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Scheduled collection notifications at 
     });
 
     // Create two docs; no listeners should be called yet:
-    createDocumentInDefault(db, "foo", "greeting", "Howdy!");
+    createDocumentInDefault("foo", "greeting", "Howdy!");
     CHECK(colListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);
 
-    createDocumentInDefault(db, "bar", "greeting", "yo.");
+    createDocumentInDefault("bar", "greeting", "yo.");
     CHECK(colListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);

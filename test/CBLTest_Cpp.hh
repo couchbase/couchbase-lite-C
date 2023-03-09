@@ -49,7 +49,7 @@ public:
     cbl::Database db;
     cbl::Collection defaultCollection;
 
-    void createDocumentInDefault(cbl::Database &db, std::string docID, std::string property, std::string value);
+    void createDocumentInDefault(std::string docID, std::string property, std::string value);
 };
 
 void createDocWithJSON(cbl::Collection& collection, std::string docID, std::string jsonContent);

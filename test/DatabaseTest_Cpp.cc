@@ -169,16 +169,6 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction With Exception", "[!throws]") {
     CHECK(doc["meeting"] == nullptr);
 }
 
-// db utility function using default collection - collection api
-static void createDocumentInDefault(Database db, const char *docID,
-                           const char *property, const char *value)
-{
-    Collection col = db.getDefaultCollection();
-    MutableDocument doc(docID);
-    doc[property] = value;
-    col.saveDocument(doc);
-}
-
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
     int dbListenerCalls = 0, fooListenerCalls = 0;
     {
@@ -195,13 +185,13 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
             CHECK(docID == "foo");
         });
         // Create a doc, check that the listener was called:
-        createDocumentInDefault(db, "foo", "greeting", "Howdy!");
+        createDocumentInDefault("foo", "greeting", "Howdy!");
         CHECK(dbListenerCalls == 1);
         CHECK(fooListenerCalls == 1);
     }
     // After being removed, the listener should not be called:
     dbListenerCalls = fooListenerCalls = 0;
-    createDocumentInDefault(db, "bar", "greeting", "yo.");
+    createDocumentInDefault("bar", "greeting", "yo.");
     CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
 }
@@ -233,12 +223,12 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
     });
 
     // Create two docs; no listeners should be called yet:
-    createDocumentInDefault(db, "foo", "greeting", "Howdy!");
+    createDocumentInDefault("foo", "greeting", "Howdy!");
     CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);
 
-    createDocumentInDefault(db, "bar", "greeting", "yo.");
+    createDocumentInDefault("bar", "greeting", "yo.");
     CHECK(dbListenerCalls == 0);
     CHECK(fooListenerCalls == 0);
     CHECK(barListenerCalls == 0);

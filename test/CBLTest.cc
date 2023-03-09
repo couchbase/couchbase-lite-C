@@ -167,13 +167,12 @@ cbl::Database CBLTest_Cpp::openDatabaseNamed(slice name, bool createEmpty){
     return database;
 }
 
-void CBLTest_Cpp::createDocumentInDefault(cbl::Database &db, std::string docID, std::string property, std::string value) {
-    cbl::Collection col = db.getDefaultCollection();
+void CBLTest_Cpp::createDocumentInDefault(std::string docID, std::string property, std::string value) {
     cbl::MutableDocument doc(docID);
     MutableDict newProps = MutableDict::newDict();
     newProps[property] = value;
     doc.setProperties(newProps);
-    col.saveDocument(doc);
+    defaultCollection.saveDocument(doc);
 }
 
 #pragma mark - Test Utils C :

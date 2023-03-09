@@ -24,10 +24,7 @@
 using namespace fleece;
 using namespace std;
 
-static constexpr size_t kDocIDBufferSize = 20;
-
 static int defaultListenerCalls = 0;
-static int colListenerCalls = 0;
 static int fooListenerCalls = 0;
 static int barListenerCalls = 0;
 static int notificationsReadyCalls = 0;
