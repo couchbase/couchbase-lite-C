@@ -302,6 +302,44 @@ TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Save Document into Different Collection"
     CheckError(error, kCBLErrorInvalidParameter);
 }
 
+TEST_CASE_METHOD(DocumentTest_Cpp, "Add new key") {
+    // Regression test for <https://github.com/couchbaselabs/couchbase-lite-C/issues/18>
+    // Add doc to col:
+    MutableDocument doc("foo");
+    doc["greeting"] = "Howdy!";
+    defaultCollection.saveDocument(doc);
+
+    // Add a new, shareable key:
+    doc.set("new", 10);
+    defaultCollection.saveDocument(doc);
+
+    CHECK(doc["new"].asInt() == 10);
+    doc["new"] = 999;
+    CHECK(doc["new"].asInt() == 999);
+    CHECK(doc.properties().count() == 2);
+
+    doc = defaultCollection.getMutableDocument("foo");
+    CHECK(doc["new"].asInt() == 10);
+}
+
+TEST_CASE_METHOD(DocumentTest_Cpp, "Data disappears") {
+    // Regression test for <https://github.com/couchbaselabs/couchbase-lite-C/issues/19>
+    MutableDocument doc = MutableDocument("foo");
+    doc["var1"]= 1;
+    defaultCollection.saveDocument(doc);
+    CHECK(doc.properties().toJSONString() == "{\"var1\":1}");
+
+    doc = defaultCollection.getMutableDocument("foo");
+    doc["var2"]= 2;
+    defaultCollection.saveDocument(doc);
+    CHECK(doc.properties().toJSONString() == "{\"var1\":1,\"var2\":2}");
+
+    doc = defaultCollection.getMutableDocument("foo");
+    doc["var3"]= 3;
+    defaultCollection.saveDocument(doc);
+    CHECK(doc.properties().toJSONString() == "{\"var1\":1,\"var2\":2,\"var3\":3}");
+}
+
 #pragma mark - Delete Document:
 
 TEST_CASE_METHOD(DocumentTest_Cpp, "C++ Delete Non Existing Doc", "[Document]") {

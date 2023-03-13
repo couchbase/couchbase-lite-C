@@ -308,25 +308,34 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Use Invalid Collection", "[Collection]
     testInvalidCollection(col);
 }
 
-TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Create Indexes and Get Index Names", "[Collection]") {
-    Collection col = db.createCollection("colA", "scopeA");
-    REQUIRE(col);
-    
-    RetainedArray names = col.getIndexNames();
+TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Create, Get and Delete Index", "[Collection]") {
+    RetainedArray names = defaultCollection.getIndexNames();
     REQUIRE(names);
     REQUIRE(names.count() == 0);
     
     CBLValueIndexConfiguration index1 = {kCBLN1QLLanguage, "id"_sl};
-    col.createValueIndex("index1", index1);
+    defaultCollection.createValueIndex("index1", index1);
     
     CBLValueIndexConfiguration index2 = {kCBLN1QLLanguage, "firstname, lastname"_sl};
-    col.createValueIndex("index2", index2);
+    defaultCollection.createValueIndex("index2", index2);
     
-    names = col.getIndexNames();
+    CBLFullTextIndexConfiguration index3 = {kCBLN1QLLanguage, "product.description"_sl, true};
+    defaultCollection.createFullTextIndex("index3", index3);
+    
+    names = defaultCollection.getIndexNames();
     REQUIRE(names);
-    REQUIRE(names.count() == 2);
+    REQUIRE(names.count() == 3);
     CHECK(names[0].asString() == "index1");
     CHECK(names[1].asString() == "index2");
+    CHECK(names[2].asString() == "index3");
+    
+    defaultCollection.deleteIndex("index1");
+    defaultCollection.deleteIndex("index3");
+    
+    names = defaultCollection.getIndexNames();
+    REQUIRE(names);
+    REQUIRE(names.count() == 1);
+    CHECK(names[0].asString() == "index2");
 }
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Indexes", "[Collection]") {
