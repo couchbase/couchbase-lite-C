@@ -45,13 +45,13 @@ public:
     ~CBLTest_Cpp();
     
     cbl::Database openDatabaseNamed(fleece::slice name, bool createEmpty = 0);
-    
-    void createNumberedDocs(cbl::Collection& collection, unsigned n, unsigned start = 1);
-    
-    void createDoc(cbl::Collection& collection, std::string docID, std::string jsonContent);
-    
-    void createDocs(cbl::Collection& collection, unsigned n, std::string idprefix ="doc");
 
     cbl::Database db;
     cbl::Collection defaultCollection;
+
+    void createDocumentInDefault(std::string docID, std::string property, std::string value);
 };
+
+void createDocWithJSON(cbl::Collection& collection, std::string docID, std::string jsonContent);
+
+void createNumberedDocsWithPrefix(cbl::Collection& collection, unsigned n, const std::string& idprefix, unsigned start = 1);

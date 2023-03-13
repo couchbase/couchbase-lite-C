@@ -247,7 +247,7 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Collection", "[Collection]") {
     CHECK(col.scopeName() == "scopeA");
     
     // Add some docs:
-    createNumberedDocs(col, 100);
+    createNumberedDocsWithPrefix(col, 100, "doc");
     CHECK(col.count() == 100);
     
     MutableArray scopeNames = db.getScopeNames();
@@ -352,4 +352,131 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Indexes", "[Collection]") {
     names = col.getIndexNames();
     REQUIRE(names);
     CHECK(names.toJSONString() == R"([])");
+}
+
+TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Collection notifications", "[Collection]") {
+    int colListenerCalls = 0, fooListenerCalls = 0;
+    {
+        // Add a listener:
+        auto colListener = defaultCollection.addChangeListener([&](CollectionChange* callbackcol) {
+            ++colListenerCalls;
+            CHECK(callbackcol->collection() == defaultCollection);
+            CHECK(callbackcol->docIDs().size() == 1);
+            CHECK(callbackcol->docIDs()[0] == "foo");
+        });
+        auto fooListener = defaultCollection.addDocumentChangeListener("foo", [&](DocumentChange* callbackcol) {
+            ++fooListenerCalls;
+            CHECK(callbackcol->collection() == defaultCollection);
+            CHECK(callbackcol->docID() == "foo");
+        });
+        // Create a doc, check that the listener was called:
+        createDocumentInDefault("foo", "greeting", "Howdy!");
+        CHECK(colListenerCalls == 1);
+        CHECK(fooListenerCalls == 1);
+    }
+    // After being removed, the listener should not be called:
+    colListenerCalls = fooListenerCalls = 0;
+    createDocumentInDefault("bar", "greeting", "yo.");
+    CHECK(colListenerCalls == 0);
+    CHECK(fooListenerCalls == 0);
+}
+
+TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Scheduled collection notifications at database level", "[Collection]") {
+    // Add a listener:
+    int colListenerCalls = 0, fooListenerCalls = 0, barListenerCalls = 0, notificationsReadyCalls = 0;
+    auto colListener = defaultCollection.addChangeListener([&](CollectionChange *callbackcol) {
+            ++colListenerCalls;
+            CHECK(callbackcol->collection() == defaultCollection);
+            CHECK(callbackcol->docIDs().size() == 2);
+            CHECK(callbackcol->docIDs()[0] == "foo");
+            CHECK(callbackcol->docIDs()[1] == "bar");
+        });
+    auto fooListener = defaultCollection.addDocumentChangeListener("foo", [&](DocumentChange* callbackcol) {
+            ++fooListenerCalls;
+            CHECK(callbackcol->collection() == defaultCollection);
+            CHECK(callbackcol->docID() == "foo");
+        });
+    auto barListener = defaultCollection.addDocumentChangeListener("bar", [&](DocumentChange* callbackcol) {
+        ++barListenerCalls;
+        CHECK(callbackcol->collection() == defaultCollection);
+        CHECK(callbackcol->docID() == "bar");
+        });
+
+    db.bufferNotifications([&](Database callbackdb) {
+        ++notificationsReadyCalls;
+        CHECK(callbackdb == db);
+    });
+
+    // Create two docs; no listeners should be called yet:
+    createDocumentInDefault("foo", "greeting", "Howdy!");
+    CHECK(colListenerCalls == 0);
+    CHECK(fooListenerCalls == 0);
+    CHECK(barListenerCalls == 0);
+
+    createDocumentInDefault("bar", "greeting", "yo.");
+    CHECK(colListenerCalls == 0);
+    CHECK(fooListenerCalls == 0);
+    CHECK(barListenerCalls == 0);
+
+    // Now the listeners will be called:
+    db.sendNotifications();
+    CHECK(colListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+    CHECK(barListenerCalls == 1);
+
+    // There should be no more notifications:
+    db.sendNotifications();
+    CHECK(colListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+    CHECK(barListenerCalls == 1);
+}
+
+TEST_CASE_METHOD(CBLTest_Cpp, "Collection Listener Token") {
+    int num = 0;
+    auto cb = [&num]() { num++; };
+    ListenerToken<> listenerToken = ListenerToken<>(cb);
+    
+    // Context / Callback:
+    REQUIRE(listenerToken.context());
+    (*(ListenerToken<>::Callback*)listenerToken.context())();
+    CHECK(num == 1);
+    
+    // Token:
+    CHECK(!listenerToken.token());
+    auto dummy = [](void* context, const CBLCollectionChange* change){ };
+    auto listener = CBLCollection_AddChangeListener(defaultCollection.ref(), dummy, nullptr);
+    listenerToken.setToken(listener);
+    CHECK(listenerToken.token() == listener);
+    
+    // Move Constructor:
+    ListenerToken<> listenerToken2 = move(listenerToken);
+    REQUIRE(listenerToken2.context());
+    (*(ListenerToken<>::Callback*)listenerToken2.context())();
+    CHECK(num == 2);
+    CHECK(listenerToken2.token() == listener);
+    
+#ifndef __clang_analyzer__ // Exclude the code from being compiled for analyzer
+    CHECK(!listenerToken.context());
+    CHECK(!listenerToken.token());
+    listenerToken.remove(); // Noops
+#endif
+    
+    // Move Assignment:
+    listenerToken = move(listenerToken2);
+    REQUIRE(listenerToken.context());
+    (*(ListenerToken<>::Callback*)listenerToken.context())();
+    CHECK(num == 3);
+    CHECK(listenerToken.token() == listener);
+    
+#ifndef __clang_analyzer__ // Exclude the code from being compiled for analyzer
+    CHECK(!listenerToken2.context());
+    CHECK(!listenerToken2.token());
+    listenerToken2.remove(); // Noops
+#endif
+    
+    // Remove:
+    listenerToken.remove();
+    CHECK(!listenerToken.context());
+    CHECK(!listenerToken.context());
+    listenerToken.remove(); // Noops
 }

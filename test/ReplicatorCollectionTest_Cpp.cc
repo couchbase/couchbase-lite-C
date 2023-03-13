@@ -32,6 +32,8 @@ using namespace cbl;
 
 #ifdef COUCHBASE_ENTERPRISE
 
+static const string kDefaultDocContent = "{\"greeting\":\"hello\"}";
+
 class ReplicatorCollectionTest_Cpp : public CBLTest_Cpp {
 public:
     using clock    = chrono::high_resolution_clock;
@@ -173,10 +175,6 @@ public:
         }
     }
     
-    void createDoc(cbl::Collection& collection, std::string docID) {
-        CBLTest_Cpp::createDoc(collection, docID, "{\"greeting\":\"hello\"}");
-    }
-    
     Database db2;
     vector<Collection> cx;
     vector<Collection> cy;
@@ -264,10 +262,10 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Authenticator", "[Replicator
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Single Shot Replication", "[Replicator]") {
-    createDocs(cx[0], 10);
-    createDocs(cx[1], 10);
-    createDocs(cy[0], 20, "doc2");
-    createDocs(cy[1], 20, "doc2");
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
     
     createConfigWithCollections({cx[0], cx[1]});
     
@@ -291,10 +289,10 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Single Shot Replication", "[
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Continuous Replication", "[Replicator]") {
-    createDocs(cx[0], 10);
-    createDocs(cx[1], 10);
-    createDocs(cy[0], 20, "doc2");
-    createDocs(cy[1], 20, "doc2");
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
     
     createConfigWithCollections({cx[0], cx[1]});
     config.continuous = true;
@@ -319,13 +317,13 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Continuous Replication", "[R
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Push Filters", "[Replicator]") {
-    createDoc(cx[0], "foo1");
-    createDoc(cx[0], "foo2");
-    createDoc(cx[0], "foo3");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo2", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo3", kDefaultDocContent);
     
-    createDoc(cx[1], "bar1");
-    createDoc(cx[1], "bar2");
-    createDoc(cx[1], "bar3");
+    createDocWithJSON(cx[1], "bar1", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar2", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar3", kDefaultDocContent);
     
     auto rcol1 = ReplicationCollection(cx[0]);
     rcol1.pushFilter = [](Document doc, CBLDocumentFlags flags) -> bool {
@@ -373,13 +371,13 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Push Filters", "[
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Pull Filters", "[Replicator]") {
-    createDoc(cy[0], "foo1");
-    createDoc(cy[0], "foo2");
-    createDoc(cy[0], "foo3");
+    createDocWithJSON(cy[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cy[0], "foo2", kDefaultDocContent);
+    createDocWithJSON(cy[0], "foo3", kDefaultDocContent);
     
-    createDoc(cy[1], "bar1");
-    createDoc(cy[1], "bar2");
-    createDoc(cy[1], "bar3");
+    createDocWithJSON(cy[1], "bar1", kDefaultDocContent);
+    createDocWithJSON(cy[1], "bar2", kDefaultDocContent);
+    createDocWithJSON(cy[1], "bar3", kDefaultDocContent);
     
     auto rcol1 = ReplicationCollection(cx[0]);
     rcol1.pullFilter = [](Document doc, CBLDocumentFlags flags) -> bool {
@@ -427,13 +425,13 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Pull Filters", "[
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection DocIDs Push Filters", "[Replicator]") {
-    createDoc(cx[0], "foo1");
-    createDoc(cx[0], "foo2");
-    createDoc(cx[0], "foo3");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo2", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo3", kDefaultDocContent);
     
-    createDoc(cx[1], "bar1");
-    createDoc(cx[1], "bar2");
-    createDoc(cx[1], "bar3");
+    createDocWithJSON(cx[1], "bar1", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar2", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar3", kDefaultDocContent);
     
     auto rcol1 = ReplicationCollection(cx[0]);
     rcol1.documentIDs = MutableArray::newArray();
@@ -474,8 +472,8 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection DocIDs Push Filte
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Conflict Resolver with Collections", "[Replicator]") {
-    createDoc(cx[0], "foo1");
-    createDoc(cx[1], "bar1");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar1", kDefaultDocContent);
     
     auto conflictResolver = [](slice docID, const Document localDoc, const Document remoteDoc) -> Document
     {

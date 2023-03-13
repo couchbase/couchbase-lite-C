@@ -24,30 +24,51 @@
 using namespace fleece;
 using namespace std;
 
-static constexpr size_t kDocIDBufferSize = 20;
+static int defaultListenerCalls = 0;
+static int fooListenerCalls = 0;
+static int barListenerCalls = 0;
+static int notificationsReadyCalls = 0;
+
+static void defaultListener(void *context, const CBLCollectionChange* change) {
+    ++defaultListenerCalls;
+    auto test = (CBLTest*)context;
+    CHECK(test->defaultCollection == change->collection);
+    CHECK(change -> numDocs == 1);
+    CHECK(slice(change->docIDs[0]) == "foo"_sl);
+}
+
+static void defaultListener2(void *context, const CBLCollectionChange* change) {
+    ++defaultListenerCalls;
+    auto test = (CBLTest*)context;
+    CHECK(test->defaultCollection == change->collection);
+    CHECK(change -> numDocs == 2);
+    CHECK(slice(change->docIDs[0]) == "foo"_sl);
+    CHECK(slice(change->docIDs[1]) == "bar"_sl);
+}
+
+static void fooListener(void *context, const CBLDocumentChange *change) {
+    ++fooListenerCalls;
+    auto test = (CBLTest*)context;
+    CHECK(test->defaultCollection == change->collection);
+    CHECK(slice(change->docID) == "foo"_sl);
+}
+
+static void barListener(void *context, const CBLDocumentChange *change) {
+    ++barListenerCalls;
+    auto test = (CBLTest*)context;
+    CHECK(test->defaultCollection == change->collection);
+    CHECK(slice(change->docID) == "bar"_sl);
+}
+
+static void notificationsReady(void *context, CBLDatabase* db) {
+    ++notificationsReadyCalls;
+    auto test = (CBLTest*)context;
+    CHECK(test->db == db);
+}
 
 class CollectionTest : public CBLTest {
     
 public:
-
-    void createNumberedDocs(CBLCollection *col, unsigned n, unsigned start = 1) {
-        for (unsigned i = 0; i < n; i++) {
-            char docID[kDocIDBufferSize];
-            snprintf(docID, kDocIDBufferSize, "doc-%03u", start + i);
-            auto doc = CBLDocument_CreateWithID(slice(docID));
-            
-            MutableDict props = CBLDocument_MutableProperties(doc);
-            char content[100];
-            snprintf(content, 100, "This is the document #%03u.", start + i);
-            FLSlot_SetString(FLMutableDict_Set(props, "content"_sl), slice(content));
-            
-            CBLError error = {};
-            bool saved = CBLCollection_SaveDocument(col, doc, &error);
-            CBLDocument_Release(doc);
-            REQUIRE(saved);
-        }
-    }
-    
     CBLDatabase* openDB() {
         CBLError error = {};
         auto config = databaseConfig();
@@ -246,7 +267,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Default Collection", "[Collection]") {
     REQUIRE(defaultCollection);
     
     // Add some docs:
-    createNumberedDocs(col, 100);
+    createNumberedDocsWithPrefix(col, 100, "doc");
     CHECK(CBLCollection_Count(col) == 100);
     CBLCollection_Release(col);
     
@@ -403,7 +424,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete Collection", "[Collection]") {
     CHECK(CBLCollection_Name(col) == "colA"_sl);
     
     // Add some docs:
-    createNumberedDocs(col, 100);
+    createNumberedDocsWithPrefix(col, 100, "doc");
     CHECK(CBLCollection_Count(col) == 100);
     CBLCollection_Release(col);
     
@@ -618,7 +639,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB 
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
-    createNumberedDocs(col1a, 10);
+    createNumberedDocsWithPrefix(col1a, 10, "doc");
     CHECK(CBLCollection_Count(col1a) == 10);
     
     // Using another instance to get the collection:
@@ -629,7 +650,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB 
     CHECK(CBLCollection_Count(col1b) == 10);
     
     // Create another 10 docs in col1b:
-    createNumberedDocs(col1b, 10, 100);
+    createNumberedDocsWithPrefix(col1b, 10, "doc", 100);
     CHECK(CBLCollection_Count(col1b) == 20);
     CHECK(CBLCollection_Count(col1a) == 20);
     
@@ -643,7 +664,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Create Collection using Different 
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
-    createNumberedDocs(col1a, 10);
+    createNumberedDocsWithPrefix(col1a, 10, "doc");
     CHECK(CBLCollection_Count(col1a) == 10);
     
     // Using another instance to create the collection again:
@@ -654,7 +675,7 @@ TEST_CASE_METHOD(CollectionTest, "Create then Create Collection using Different 
     CHECK(CBLCollection_Count(col1b) == 10);
     
     // Create another 10 docs in col1b:
-    createNumberedDocs(col1b, 10, 100);
+    createNumberedDocsWithPrefix(col1b, 10, "doc", 100);
     CHECK(CBLCollection_Count(col1b) == 20);
     CHECK(CBLCollection_Count(col1a) == 20);
     
@@ -667,7 +688,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete then Get Collection from Different DB I
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
-    createNumberedDocs(col1a, 10);
+    createNumberedDocsWithPrefix(col1a, 10, "doc");
     CHECK(CBLCollection_Count(col1a) == 10);
     
     CBLDatabase* db2 = openDB();
@@ -698,7 +719,7 @@ TEST_CASE_METHOD(CollectionTest, "Delete and Recreate then Get Collection from D
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
     REQUIRE(col1a);
-    createNumberedDocs(col1a, 10);
+    createNumberedDocsWithPrefix(col1a, 10, "doc");
     CHECK(CBLCollection_Count(col1a) == 10);
     
     CBLDatabase* db2 = openDB();
@@ -915,3 +936,85 @@ TEST_CASE_METHOD(CollectionTest, "Delete Scope and Close Database then Use Scope
     
     CBLScope_Release(scope);
 }
+
+#pragma mark - LISTENERS:
+
+TEST_CASE_METHOD(CollectionTest, "Collection notifications") {
+    // Add a listener:
+    defaultListenerCalls = fooListenerCalls = 0;
+    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, this);
+    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+
+    // Create a doc, check that the listener was called:
+    createDocWithPair(defaultCollection, "foo", "greeting", "Howdy!");
+    CHECK(defaultListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+
+    CBLListener_Remove(token);
+    CBLListener_Remove(docToken);
+
+    // After being removed, the listener should not be called:
+    defaultListenerCalls = fooListenerCalls = 0;
+    createDocWithPair(defaultCollection, "bar", "greeting", "yo.");
+    CHECK(defaultListenerCalls == 0);
+    CHECK(fooListenerCalls == 0);
+}
+
+TEST_CASE_METHOD(CollectionTest, "Remove Collection Listener after releasing collection") {
+    // Add a listener:
+    defaultListenerCalls = fooListenerCalls = 0;
+    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, this);
+    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+
+    // Create a doc, check that the listener was called:
+    createDocWithPair(defaultCollection, "foo", "greeting", "Howdy!");
+    CHECK(defaultListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+
+    CBLCollection_Release(defaultCollection);
+    defaultCollection = nullptr;
+
+    CBLListener_Remove(token);
+    CBLListener_Remove(docToken);
+}
+
+TEST_CASE_METHOD(CollectionTest, "Scheduled collection notifications at database level") {
+    // Add a listener:
+    defaultListenerCalls = fooListenerCalls = barListenerCalls = 0;
+
+    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener2, this);
+    auto fooToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+    auto barToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "bar"_sl, barListener, this);
+
+    CBLDatabase_BufferNotifications(db, notificationsReady, this);
+
+    // Create two docs; no listeners should be called yet:
+    createDocWithPair(defaultCollection, "foo", "greeting", "Howdy!");
+    CHECK(notificationsReadyCalls == 1);
+    CHECK(defaultListenerCalls == 0);
+    CHECK(fooListenerCalls == 0);
+    CHECK(barListenerCalls == 0);
+
+    createDocWithPair(defaultCollection, "bar", "greeting", "yo.");
+    CHECK(notificationsReadyCalls == 1);
+    CHECK(defaultListenerCalls == 0);
+    CHECK(fooListenerCalls == 0);
+    CHECK(barListenerCalls == 0);
+
+    // Now the listeners will be called:
+    CBLDatabase_SendNotifications(db);
+    CHECK(defaultListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+    CHECK(barListenerCalls == 1);
+
+    // There should be no more notifications:
+    CBLDatabase_SendNotifications(db);
+    CHECK(defaultListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+    CHECK(barListenerCalls == 1);
+
+    CBLListener_Remove(token);
+    CBLListener_Remove(fooToken);
+    CBLListener_Remove(barToken);
+}
+

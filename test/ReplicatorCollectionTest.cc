@@ -60,29 +60,6 @@ public:
         return configs;
     }
     
-    void createDocs(CBLCollection *col, unsigned n, string idprefix ="doc") {
-        constexpr size_t contentBuf = 100;
-        for (unsigned i = 0; i < n; i++)
-        {
-            string docID = idprefix.append("-").append(to_string(i+1));
-            auto doc = CBLDocument_CreateWithID(slice(docID));
-            
-            MutableDict props = CBLDocument_MutableProperties(doc);
-            char content[contentBuf];
-            snprintf(content, contentBuf, "This is the document #%03u.", i+1);
-            FLSlot_SetString(FLMutableDict_Set(props, "content"_sl), slice(content));
-            
-            CBLError error {};
-            bool saved = CBLCollection_SaveDocument(col, doc, &error);
-            CBLDocument_Release(doc);
-            REQUIRE(saved);
-        }
-    }
-    
-    void createDoc(CBLCollection *col, string docID, string jsonContent =kDefaultDocContent) {
-        CreateDoc(col, docID, jsonContent);
-    }
-    
     static string docKey(CBLCollection* collection, string docID) {
         return CollectionPath(collection) + "." + docID;
     }
@@ -259,10 +236,10 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Use invalid collections", "[Replicat
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Single Shot Replication", "[Replicator]") {
-    createDocs(cx[0], 10);
-    createDocs(cx[1], 10);
-    createDocs(cy[0], 20, "doc2");
-    createDocs(cy[1], 20, "doc2");
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
     
     auto cols = collectionConfigs({cx[0], cx[1]});
     config.collections = cols.data();
@@ -288,10 +265,10 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Single Shot Replication", "[Replicat
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Continuous Replication", "[Replicator]") {
-    createDocs(cx[0], 10);
-    createDocs(cx[1], 10);
-    createDocs(cy[0], 20, "doc2");
-    createDocs(cy[1], 20, "doc2");
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
     
     auto cols = collectionConfigs({cx[0], cx[1]});
     config.continuous = true;
@@ -318,10 +295,10 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Continuous Replication", "[Replicato
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Incremental Continuous Replication", "[Replicator]") {
-    createDocs(cx[0], 10);
-    createDocs(cx[1], 10);
-    createDocs(cy[0], 20, "doc2");
-    createDocs(cy[1], 20, "doc2");
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
     
     auto cols = collectionConfigs({cx[0], cx[1]});
     config.continuous = true;
@@ -337,8 +314,8 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Incremental Continuous Replication",
         CBLReplicatorStatus status = CBLReplicator_Status(repl);
         CHECK(status.progress.documentCount == 20);
 
-        createDocs(cx[0], 5, "doc3");
-        createDocs(cx[1], 5, "doc3");
+        createNumberedDocsWithPrefix(cx[0], 5, "doc3");
+        createNumberedDocsWithPrefix(cx[1], 5, "doc3");
         REQUIRE(waitForActivityLevelAndDocumentCount(kCBLReplicatorIdle, 30, 10.0));
         status = CBLReplicator_Status(repl);
         CHECK(status.activity == kCBLReplicatorIdle);
@@ -354,8 +331,8 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Incremental Continuous Replication",
         CBLReplicatorStatus status = CBLReplicator_Status(repl);
         CHECK(status.progress.documentCount == 40);
         
-        createDocs(cy[0], 5, "doc3");
-        createDocs(cy[1], 5, "doc3");
+        createNumberedDocsWithPrefix(cy[0], 5, "doc3");
+        createNumberedDocsWithPrefix(cy[1], 5, "doc3");
         REQUIRE(waitForActivityLevelAndDocumentCount(kCBLReplicatorIdle, 50, 10.0));
         status = CBLReplicator_Status(repl);
         CHECK(status.activity == kCBLReplicatorIdle);
@@ -371,10 +348,10 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Incremental Continuous Replication",
         CBLReplicatorStatus status = CBLReplicator_Status(repl);
         CHECK(status.progress.documentCount == 60);
 
-        createDocs(cy[0], 5, "doc3");
-        createDocs(cy[1], 5, "doc3");
-        createDocs(cy[0], 10, "doc4");
-        createDocs(cy[1], 10, "doc4");
+        createNumberedDocsWithPrefix(cy[0], 5, "doc3");
+        createNumberedDocsWithPrefix(cy[1], 5, "doc3");
+        createNumberedDocsWithPrefix(cy[0], 10, "doc4");
+        createNumberedDocsWithPrefix(cy[1], 10, "doc4");
         REQUIRE(waitForActivityLevelAndDocumentCount(kCBLReplicatorIdle, 90, 10.0));
         status = CBLReplicator_Status(repl);
         CHECK(status.activity == kCBLReplicatorIdle);
@@ -388,8 +365,8 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Incremental Continuous Replication",
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Reset Pull Replication", "[Replicator]") {
-    createDocs(cy[0], 20, "doc2");
-    createDocs(cy[1], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
     
     auto cols = collectionConfigs({cx[0], cx[1]});
     config.collections = cols.data();
@@ -409,11 +386,11 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Reset Pull Replication", "[Replicato
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Document Replication Event", "[Replicator]") {
-    createDoc(cx[0], "foo1");
-    createDoc(cx[1], "foo2");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cx[1], "foo2", kDefaultDocContent);
     
-    createDoc(cy[0], "bar1");
-    createDoc(cy[1], "bar2");
+    createDocWithJSON(cy[0], "bar1", kDefaultDocContent);
+    createDocWithJSON(cy[1], "bar2", kDefaultDocContent);
     
     auto cols = collectionConfigs({cx[0], cx[1]});
     config.collections = cols.data();
@@ -472,8 +449,8 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Document Replication Event", "[Repli
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Default Conflict Resolver with Collections", "[Replicator]") {
-    createDoc(cx[0], "foo1");
-    createDoc(cx[1], "bar1");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar1", kDefaultDocContent);
     
     auto cols = collectionConfigs({cx[0], cx[1]});
     config.collections = cols.data();
@@ -545,8 +522,8 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Default Conflict Resolver with Colle
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Conflict Resolver with Collections", "[Replicator]") {
-    createDoc(cx[0], "foo1");
-    createDoc(cx[1], "bar1");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar1", kDefaultDocContent);
     
     auto conflictResolver = [](void *context,
                                FLString documentID,
@@ -624,7 +601,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Conflict Resolver with Collections",
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Resolve Pending Conflicts", "[Replicator]") {
-    createDoc(cx[0], "foo1");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
     
     auto badConflictResolver = [](void *context,
                                   FLString documentID,
@@ -685,13 +662,13 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Resolve Pending Conflicts", "[Replic
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection DocIDs Push Filters", "[Replicator]") {
-    createDoc(cx[0], "foo1");
-    createDoc(cx[0], "foo2");
-    createDoc(cx[0], "foo3");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo2", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo3", kDefaultDocContent);
     
-    createDoc(cx[1], "bar1");
-    createDoc(cx[1], "bar2");
-    createDoc(cx[1], "bar3");
+    createDocWithJSON(cx[1], "bar1", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar2", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar3", kDefaultDocContent);
     
     auto cols = collectionConfigs({cx[0], cx[1]});
     config.collections = cols.data();
@@ -737,13 +714,13 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection DocIDs Push Filters", "[R
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection DocIDs Pull Filters", "[Replicator]") {
-    createDoc(cy[0], "foo1");
-    createDoc(cy[0], "foo2");
-    createDoc(cy[0], "foo3");
+    createDocWithJSON(cy[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cy[0], "foo2", kDefaultDocContent);
+    createDocWithJSON(cy[0], "foo3", kDefaultDocContent);
     
-    createDoc(cy[1], "bar1");
-    createDoc(cy[1], "bar2");
-    createDoc(cy[1], "bar3");
+    createDocWithJSON(cy[1], "bar1", kDefaultDocContent);
+    createDocWithJSON(cy[1], "bar2", kDefaultDocContent);
+    createDocWithJSON(cy[1], "bar3", kDefaultDocContent);
     
     auto cols = collectionConfigs({cx[0], cx[1]});
     config.collections = cols.data();
@@ -789,13 +766,13 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection DocIDs Pull Filters", "[R
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Push Filters", "[Replicator]") {
-    createDoc(cx[0], "foo1");
-    createDoc(cx[0], "foo2");
-    createDoc(cx[0], "foo3");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo2", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo3", kDefaultDocContent);
     
-    createDoc(cx[1], "bar1");
-    createDoc(cx[1], "bar2");
-    createDoc(cx[1], "bar3");
+    createDocWithJSON(cx[1], "bar1", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar2", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar3", kDefaultDocContent);
     
     auto pushFilter1 = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
         slice id = slice(CBLDocument_ID(doc));
@@ -848,13 +825,13 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Push Filters", "[Replicat
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Pull Filters", "[Replicator]") {
-    createDoc(cy[0], "foo1");
-    createDoc(cy[0], "foo2");
-    createDoc(cy[0], "foo3");
+    createDocWithJSON(cy[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cy[0], "foo2", kDefaultDocContent);
+    createDocWithJSON(cy[0], "foo3", kDefaultDocContent);
     
-    createDoc(cy[1], "bar1");
-    createDoc(cy[1], "bar2");
-    createDoc(cy[1], "bar3");
+    createDocWithJSON(cy[1], "bar1", kDefaultDocContent);
+    createDocWithJSON(cy[1], "bar2", kDefaultDocContent);
+    createDocWithJSON(cy[1], "bar3", kDefaultDocContent);
     
     auto pullFilter1 = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
         slice id = slice(CBLDocument_ID(doc));
@@ -907,12 +884,12 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Pull Filters", "[Replicat
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Document Pending", "[Replicator]") {
-    createDoc(cx[0], "foo1");
-    createDoc(cx[0], "foo2");
-    createDoc(cx[0], "foo3");
+    createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo2", kDefaultDocContent);
+    createDocWithJSON(cx[0], "foo3", kDefaultDocContent);
     
-    createDoc(cx[1], "bar1");
-    createDoc(cx[1], "bar2");
+    createDocWithJSON(cx[1], "bar1", kDefaultDocContent);
+    createDocWithJSON(cx[1], "bar2", kDefaultDocContent);
     
     auto cols = collectionConfigs({cx[0], cx[1]});
     config.collections = cols.data();

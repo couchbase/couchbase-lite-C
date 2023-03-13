@@ -838,12 +838,12 @@ TEST_CASE_METHOD(QueryTest, "Test Joins with Collections", "[Query]") {
     auto flowers = CreateCollection(db, "flowers", "test");
     auto colors = CreateCollection(db, "colors", "test");
     
-    CreateDoc(flowers, "flower1", "{\"name\":\"rose\",\"cid\":\"c1\"}");
-    CreateDoc(flowers, "flower2", "{\"name\":\"hydrangea\",\"cid\":\"c2\"}");
+    createDocWithJSON(flowers, "flower1", "{\"name\":\"rose\",\"cid\":\"c1\"}");
+    createDocWithJSON(flowers, "flower2", "{\"name\":\"hydrangea\",\"cid\":\"c2\"}");
     
-    CreateDoc(colors, "color1", "{\"cid\":\"c1\",\"color\":\"red\"}");
-    CreateDoc(colors, "color2", "{\"cid\":\"c2\",\"color\":\"blue\"}");
-    CreateDoc(colors, "color3", "{\"cid\":\"c3\",\"color\":\"white\"}");
+    createDocWithJSON(colors, "color1", "{\"cid\":\"c1\",\"color\":\"red\"}");
+    createDocWithJSON(colors, "color2", "{\"cid\":\"c2\",\"color\":\"blue\"}");
+    createDocWithJSON(colors, "color3", "{\"cid\":\"c3\",\"color\":\"white\"}");
     
     CBLCollection_Release(flowers);
     CBLCollection_Release(colors);
@@ -897,8 +897,8 @@ TEST_CASE_METHOD(QueryTest, "Test Select All Result Key", "[Query]") {
     auto flowers = CreateCollection(db, "flowers", "test");
     auto defaultCol = CBLDatabase_DefaultCollection(db, &error);
     
-    CreateDoc(flowers, "flower1", "{\"name\":\"rose\",\"cid\":\"c1\"}");
-    CreateDoc(defaultCol, "flower1", "{\"name\":\"rose\",\"cid\":\"c1\"}");
+    createDocWithJSON(flowers, "flower1", "{\"name\":\"rose\",\"cid\":\"c1\"}");
+    createDocWithJSON(defaultCol, "flower1", "{\"name\":\"rose\",\"cid\":\"c1\"}");
     
     CBLCollection_Release(flowers);
     CBLCollection_Release(defaultCol);
