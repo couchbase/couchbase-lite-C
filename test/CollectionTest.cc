@@ -978,6 +978,31 @@ TEST_CASE_METHOD(CollectionTest, "Remove Collection Listener after releasing col
     CBLListener_Remove(docToken);
 }
 
+TEST_CASE_METHOD(CollectionTest, "Remove Listeners After Closing Database", "[Document]") {
+    // Add a listener:
+    defaultListenerCalls  = fooListenerCalls = 0;
+    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, this);
+    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+    
+    // Create a doc, check that the listener was called:
+    createDocWithPair(defaultCollection, "foo", "greeting", "Howdy!");
+    CHECK(defaultListenerCalls == 1);
+    CHECK(fooListenerCalls == 1);
+
+    // Close and release the database:
+    CBLError error;
+    if (!CBLDatabase_Close(db, &error))
+        WARN("Failed to close database: " << error.domain << "/" << error.code);
+    CBLDatabase_Release(db);
+    db = nullptr;
+
+    // Remove and release the token:
+    ExpectingExceptions x;
+    CBLListener_Remove(token);
+    CBLListener_Remove(docToken);
+}
+
+
 TEST_CASE_METHOD(CollectionTest, "Scheduled collection notifications at database level") {
     // Add a listener:
     defaultListenerCalls = fooListenerCalls = barListenerCalls = 0;

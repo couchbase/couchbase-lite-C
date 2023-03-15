@@ -1157,27 +1157,3 @@ TEST_CASE_METHOD(DocumentTest, "Collection Change Notifications", "[Document]") 
     CHECK(collectionListenerCalls == 0);
     CHECK(docListenerCalls == 0);
 }
-
-TEST_CASE_METHOD(DocumentTest, "Remove Listeners After Closing Database", "[Document]") {
-    // Add a listener:
-    collectionListenerCalls = docListenerCalls = 0;
-    auto token = CBLCollection_AddChangeListener(col, collectionListener, col);
-    auto docToken = CBLCollection_AddDocumentChangeListener(col, "foo"_sl, docListener, col);
-
-    // Create a doc, check that the listener was called:
-    createDocument(col, "foo", "greeting", "Howdy!");
-    CHECK(collectionListenerCalls == 1);
-    CHECK(docListenerCalls == 1);
-
-    // Close and release the database:
-    CBLError error;
-    if (!CBLDatabase_Close(db, &error))
-        WARN("Failed to close database: " << error.domain << "/" << error.code);
-    CBLDatabase_Release(db);
-    db = nullptr;
-
-    // Remove and release the token:
-    ExpectingExceptions x;
-    CBLListener_Remove(token);
-    CBLListener_Remove(docToken);
-}
