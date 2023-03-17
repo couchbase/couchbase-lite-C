@@ -223,7 +223,8 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>A <a class="el" href="group__collection.html#gac727fdac1c7bc97140061c71133c913d">CBLCollection</a> represent a collection which is a container for documents. </p>
 <p>A collection can be thought as a table in the relational database. Each collection belongs to a scope which is simply a namespce, and has a name which is unique within its scope.</p>
-<p>When a new database is created, a default collection named "_default" will be automatically created. The default collection is created under the default scope named "_default". You may decide to delete the default collection, but noted that the default collection cannot be re-created. The name of the default collection and scope can be referenced by using <a class="el" href="group__collection.html#ga19432ebc23910b6e5d79a412e90e813f">kCBLDefaultCollectionName</a> and <a class="el" href="group__scope.html#ga2d88c22473affd1e9bc8683212a064e5">kCBLDefaultScopeName</a> constant.</p>
+<p>When a new database is created, a default collection named "_default" will be automatically created. The default collection is created under the default scope named "_default". The name of the default collection and scope can be referenced by using <a class="el" href="group__collection.html#ga19432ebc23910b6e5d79a412e90e813f">kCBLDefaultCollectionName</a> and <a class="el" href="group__scope.html#ga2d88c22473affd1e9bc8683212a064e5">kCBLDefaultScopeName</a> constant.</p>
+<dl class="section note"><dt>Note</dt><dd>The default collection cannot be deleted.</dd></dl>
 <p>When creating a new collection, the collection name, and the scope name are required. The naming rules of the collections and scopes are as follows:</p><ul>
 <li>Must be between 1 and 251 characters in length.</li>
 <li>Can only contain the characters A-Z, a-z, 0-9, and the symbols _, -, and %.</li>
@@ -1539,6 +1540,7 @@ You are responsible for releasing the returned scope. </dd></dl>
 </div><div class="memdoc">
 
 <p>Delete an existing collection. </p>
+<dl class="section note"><dt>Note</dt><dd>The default collection cannot be deleted. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">db</td><td>The database. </td></tr>
