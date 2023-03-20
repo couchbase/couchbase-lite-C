@@ -32,9 +32,10 @@ CBL_CAPI_BEGIN
  
     When a new database is created, a default collection named "_default" will be automatically
     created. The default collection is created under the default scope named "_default".
-    You may decide to delete the default collection, but noted that the default collection cannot
-    be re-created. The name of the default collection and scope can be referenced by using
+    The name of the default collection and scope can be referenced by using
     \ref kCBLDefaultCollectionName and \ref kCBLDefaultScopeName constant.
+ 
+    @note The default collection cannot be deleted.
  
     When creating a new collection, the collection name, and the scope name are required.
     The naming rules of the collections and scopes are as follows:
@@ -133,6 +134,7 @@ CBLCollection* _cbl_nullable CBLDatabase_CreateCollection(CBLDatabase* db,
                                                           CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Delete an existing collection.
+    @note  The default collection cannot be deleted.
     @param db  The database.
     @param collectionName  The name of the collection.
     @param scopeName  The name of the scope.
