@@ -411,15 +411,15 @@ typedef struct {
     /** Optional callback to encrypt \ref CBLEncryptable values of the documents in the default collection.
         @note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use documentPropertyEncryptor instead. */
-    CBLPropertyEncryptor propertyEncryptor;
+    CBLPropertyEncryptor _cbl_nullable propertyEncryptor;
     
     /** Optional callback to decrypt encrypted \ref CBLEncryptable values of the documents in the default collection.
         @note This property can only be used when setting the config object with the database instead of collections.
         @warning  <b>Deprecated :</b> Use documentPropertyDecryptor instead. */
-    CBLPropertyDecryptor propertyDecryptor;
+    CBLPropertyDecryptor _cbl_nullable propertyDecryptor;
     
-    CBLDocumentPropertyEncryptor documentPropertyEncryptor;     ///< Optional callback to encrypt \ref CBLEncryptable values.
-    CBLDocumentPropertyDecryptor documentPropertyDecryptor;     ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
+    CBLDocumentPropertyEncryptor _cbl_nullable documentPropertyEncryptor;     ///< Optional callback to encrypt \ref CBLEncryptable values.
+    CBLDocumentPropertyDecryptor _cbl_nullable documentPropertyDecryptor;     ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
 #endif
     
     /** The collections to replicate with the target's endpoint (Required if the database is not set). */
