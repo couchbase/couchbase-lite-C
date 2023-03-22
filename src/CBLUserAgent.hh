@@ -160,7 +160,7 @@ static string createUserAgentHeader(){
                 << ") "
                 << "Commit/"
                 << CBLITE_SOURCE_ID
-                << " ---> Core/"
+                << " Core/"
                 << coreVersion.asString();
 
         return header.str();
