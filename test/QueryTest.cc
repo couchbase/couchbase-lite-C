@@ -891,6 +891,175 @@ TEST_CASE_METHOD(QueryTest, "Test Joins with Collections", "[Query]") {
     }
     CHECK(n == 2);
 }
+TEST_CASE_METHOD(QueryTest, "FTS with FTS Index in Default Collection", "[Query]"){
+    CBLError error;
+    int errPos;
+    int n = 0;
+    string queryString;
+
+    CBLFullTextIndexConfiguration index = {};
+    index.expressionLanguage = kCBLN1QLLanguage;
+    index.expressions = "name.first"_sl;
+    index.ignoreAccents = false;
+    CHECK(CBLCollection_CreateFullTextIndex(defaultCollection, "index"_sl, index, &error));
+
+    SECTION("name"){
+        queryString = "SELECT name "
+                      "FROM _default "
+                      "WHERE match(index, 'Jasper') "
+                      "ORDER BY rank(index) ";
+    }
+    SECTION("_.name"){
+        queryString = "SELECT name "
+                      "FROM _ "
+                      "WHERE match(_.index, 'Jasper') "
+                      "ORDER BY rank(_.index) ";
+    }
+    SECTION("_default.name"){
+        queryString = "SELECT name "
+                      "FROM _default "
+                      "WHERE match(_default.index, 'Jasper') "
+                      "ORDER BY rank(_default.index) ";
+    }
+    SECTION("db.name"){
+        string dbName = slice(CBLDatabase_Name(db)).asString();
+        queryString = "SELECT name FROM ";
+        queryString += dbName;
+        queryString += " WHERE match(";
+        queryString += dbName;
+        queryString += ".index, 'Jasper') "
+                       "ORDER BY rank(";
+        queryString += dbName;
+        queryString += ".index) ";
+    }
+    SECTION("alias.name"){
+        queryString = "SELECT name "
+                      "FROM _default as d "
+                      "WHERE match(d.index, 'Jasper') "
+                      "ORDER BY rank(d.index) ";
+    }
+
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), &errPos, &error);
+    REQUIRE(query);
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+
+    static const slice kExpectedLast[2] = {"Grebel", "Okorududu"};
+    while (CBLResultSet_Next(results))
+    {
+        FLDict result = CBLResultSet_ResultDict(results);
+        FLValue name = FLDict_Get(result, "name"_sl);
+        FLDict dict = FLValue_AsDict(name);
+        CHECK(dict);
+        slice last   = FLValue_AsString(FLDict_Get(dict, "last"_sl));
+        CHECK(last == kExpectedLast[n]);
+        cerr << last << "\n";
+        ++n;
+    }
+    CHECK(n == 2);
+}
+
+TEST_CASE_METHOD(QueryTest, "FTS with FTS Index in Named Collection", "[Query]"){
+    CBLError error;
+    int errPos;
+    int n = 0;
+    string queryString;
+
+    auto people = CreateCollection(db, "people", "test");
+    createDocWithJSON(people, "person1", "{\"name\": { \"first\": \"Jasper\",\"last\":\"Grebel\"}, \"random\": \"4\"}");
+    createDocWithJSON(people, "person2", "{\"name\": { \"first\": \"Jasper\",\"last\":\"Okorududu\"}, \"random\": \"1\"}");
+    createDocWithJSON(people, "person3", "{\"name\": { \"first\": \"Monica\",\"last\":\"Polina\"}, \"random\": \"2\"}");
+
+    CBLCollection_Release(people);
+
+    CBLFullTextIndexConfiguration index = {};
+    index.expressionLanguage = kCBLN1QLLanguage;
+    index.expressions = "name.first"_sl;
+    index.ignoreAccents = false;
+    CHECK(CBLCollection_CreateFullTextIndex(people, "index"_sl, index, &error));
+
+    SECTION("name"){
+        queryString = "SELECT name "
+                      "FROM test.people "
+                      "WHERE match(index, 'Jasper') "
+                      "ORDER BY rank(index) ";
+    }
+    SECTION("collection.name"){
+        queryString = "SELECT name "
+                      "FROM test.people "
+                      "WHERE match(people.index, 'Jasper') "
+                      "ORDER BY rank(people.index) ";
+    }
+    SECTION("alias.name"){
+        queryString = "SELECT name "
+                      "FROM test.people as p "
+                      "WHERE match(p.index, 'Jasper') "
+                      "ORDER BY rank(p.index) ";
+    }
+
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), &errPos, &error);
+    REQUIRE(query);
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+
+    static const slice kExpectedLast[2] = {"Grebel", "Okorududu"};
+    while (CBLResultSet_Next(results))
+    {
+        FLDict result = CBLResultSet_ResultDict(results);
+        FLValue name = FLDict_Get(result, "name"_sl);
+        FLDict dict = FLValue_AsDict(name);
+        CHECK(dict);
+        slice last   = FLValue_AsString(FLDict_Get(dict, "last"_sl));
+        CHECK(last == kExpectedLast[n]);
+        cerr << last << "\n";
+        ++n;
+    }
+    CHECK(n == 2);
+}
+
+TEST_CASE_METHOD(QueryTest, "FTS Join with Collections", "[Query]"){
+    CBLError error;
+    int errPos;
+    int n = 0;
+    
+    auto flowers = CreateCollection(db, "flowers", "test");
+    auto colors = CreateCollection(db, "colors", "test");
+
+    createDocWithJSON(flowers, "flower1", "{\"name\":\"rose\",\"description\":\"Red flowers\",\"cid\":\"c1\"}");
+    createDocWithJSON(flowers, "flower2", "{\"name\":\"hydrangea\",\"description\":\"Blue flowers\",\"cid\":\"c2\"}");
+    createDocWithJSON(colors, "color1", "{\"cid\":\"c1\",\"color\":\"red\"}");
+    createDocWithJSON(colors, "color2", "{\"cid\":\"c2\",\"color\":\"blue\"}");
+    createDocWithJSON(colors, "color3", "{\"cid\":\"c3\",\"color\":\"white\"}");
+
+    CBLFullTextIndexConfiguration descIndex = {};
+    descIndex.expressionLanguage = kCBLN1QLLanguage;
+    descIndex.expressions = "description"_sl;
+    descIndex.ignoreAccents = false;
+    CHECK(CBLCollection_CreateFullTextIndex(flowers, "descIndex"_sl, descIndex, &error));
+    
+    CBLCollection_Release(flowers);
+    CBLCollection_Release(colors);
+
+    string queryString = "SELECT f.name, f.description, c.color "
+                         "FROM test.flowers as f "
+                         "JOIN test.colors as c "
+                         "ON f.cid = c.cid "
+                         "WHERE match(f.descIndex, 'red') "
+                         "ORDER BY f.name ";
+    
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), &errPos, &error);
+    REQUIRE(query);
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+    
+    while (CBLResultSet_Next(results))
+    {
+        auto result = CBLResultSet_ResultDict(results);
+        CHECK(Dict(result).toJSONString() == "{\"color\":\"red\",\"description\":\"Red flowers\",\"name\":\"rose\"}");
+        ++n;
+    }
+    CHECK(n == 1);
+}
 
 TEST_CASE_METHOD(QueryTest, "Test Select All Result Key", "[Query]") {
     CBLError error {};
@@ -999,11 +1168,3 @@ TEST_CASE_METHOD(QueryTest, "Query Encryptable", "[Query]") {
 }
 
 #endif
-
-
-#pragma mark - C++ API:
-
-
-
-
-
