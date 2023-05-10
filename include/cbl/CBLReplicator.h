@@ -259,8 +259,8 @@ typedef struct {
     
 #ifdef COUCHBASE_ENTERPRISE
     //-- Property Encryption
-    CBLPropertyEncryptor propertyEncryptor;           ///< Optional callback to encrypt \ref CBLEncryptable values.
-    CBLPropertyDecryptor propertyDecryptor;           ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
+    CBLPropertyEncryptor _cbl_nullable propertyEncryptor; ///< Optional callback to encrypt \ref CBLEncryptable values.
+    CBLPropertyDecryptor _cbl_nullable propertyDecryptor; ///< Optional callback to decrypt encrypted \ref CBLEncryptable values.
 #endif
 
 } CBLReplicatorConfiguration;
