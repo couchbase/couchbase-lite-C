@@ -73,7 +73,7 @@ function xcarchive
     -destination "${DESTINATION}" \
     ${XCODE_BUILD_VERSION} ${XCODE_BUILD_NUMBER} \
     -archivePath "${ARCHIVE_PATH}/${FRAMEWORK_NAME}.xcarchive" \
-    "ONLY_ACTIVE_ARCH=NO" "BITCODE_GENERATION_MODE=bitcode" \
+    "ONLY_ACTIVE_ARCH=NO" \
     "CODE_SIGNING_REQUIRED=NO" "CODE_SIGN_IDENTITY=" \
     "SKIP_INSTALL=NO" | xcpretty
 
