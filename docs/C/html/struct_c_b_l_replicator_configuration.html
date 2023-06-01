@@ -140,16 +140,37 @@ Data Fields</h2></td></tr>
 <tr class="memitem:a18ac22ab6df0a1fa354ab0c228b6e00b"><td class="memItemLeft" align="right" valign="top">void *<a class="el" href="_c_b_l___compat_8h.html#a11b365d966cc268be54e8f6cfd1906f8">_cbl_nullable</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#a18ac22ab6df0a1fa354ab0c228b6e00b">context</a></td></tr>
 <tr class="memdesc:a18ac22ab6df0a1fa354ab0c228b6e00b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Arbitrary value that will be passed to callbacks.  <br /></td></tr>
 <tr class="separator:a18ac22ab6df0a1fa354ab0c228b6e00b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab731bf9f140158d6967c1af645d8744a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#gab116a23be8bd24b86349379f370ef60c">CBLPropertyEncryptor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#ab731bf9f140158d6967c1af645d8744a">propertyEncryptor</a></td></tr>
-<tr class="memdesc:ab731bf9f140158d6967c1af645d8744a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional callback to encrypt <a class="el" href="group__encryptables.html#gaaf20d661f9684632a005f0a4e52656b3">CBLEncryptable</a> values.  <br /></td></tr>
-<tr class="separator:ab731bf9f140158d6967c1af645d8744a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac9f9fa1cbf03b5e7a5a75da8c632b6b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#ga24a60a3d6f9816e1d32464cc31a15c0c">CBLPropertyDecryptor</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#aac9f9fa1cbf03b5e7a5a75da8c632b6b">propertyDecryptor</a></td></tr>
-<tr class="memdesc:aac9f9fa1cbf03b5e7a5a75da8c632b6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional callback to decrypt encrypted <a class="el" href="group__encryptables.html#gaaf20d661f9684632a005f0a4e52656b3">CBLEncryptable</a> values.  <br /></td></tr>
-<tr class="separator:aac9f9fa1cbf03b5e7a5a75da8c632b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9824f48ee3ba3c8fb72bc06e3605429e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#gab116a23be8bd24b86349379f370ef60c">CBLPropertyEncryptor</a> <a class="el" href="_c_b_l___compat_8h.html#a11b365d966cc268be54e8f6cfd1906f8">_cbl_nullable</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#a9824f48ee3ba3c8fb72bc06e3605429e">propertyEncryptor</a></td></tr>
+<tr class="memdesc:a9824f48ee3ba3c8fb72bc06e3605429e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional callback to encrypt <a class="el" href="group__encryptables.html#gaaf20d661f9684632a005f0a4e52656b3">CBLEncryptable</a> values.  <br /></td></tr>
+<tr class="separator:a9824f48ee3ba3c8fb72bc06e3605429e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a957033d12bbe8ebf1b583a490fcac414"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__replication.html#ga24a60a3d6f9816e1d32464cc31a15c0c">CBLPropertyDecryptor</a> <a class="el" href="_c_b_l___compat_8h.html#a11b365d966cc268be54e8f6cfd1906f8">_cbl_nullable</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#a957033d12bbe8ebf1b583a490fcac414">propertyDecryptor</a></td></tr>
+<tr class="memdesc:a957033d12bbe8ebf1b583a490fcac414"><td class="mdescLeft">&#160;</td><td class="mdescRight">Optional callback to decrypt encrypted <a class="el" href="group__encryptables.html#gaaf20d661f9684632a005f0a4e52656b3">CBLEncryptable</a> values.  <br /></td></tr>
+<tr class="separator:a957033d12bbe8ebf1b583a490fcac414"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cebe3c2e7e4ce41d875ce4bc4de1e75"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_c_b_l_replicator_configuration.html#a5cebe3c2e7e4ce41d875ce4bc4de1e75">acceptParentDomainCookies</a></td></tr>
+<tr class="memdesc:a5cebe3c2e7e4ce41d875ce4bc4de1e75"><td class="mdescLeft">&#160;</td><td class="mdescRight">The option to remove the restriction that does not allow the replicator to save the parent-domain cookies, the cookies whose domains are the parent domain of the remote host, from the HTTP response.  <br /></td></tr>
+<tr class="separator:a5cebe3c2e7e4ce41d875ce4bc4de1e75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The configuration of a replicator. </p>
 </div><h2 class="groupheader">Field Documentation</h2>
+<a id="a5cebe3c2e7e4ce41d875ce4bc4de1e75" name="a5cebe3c2e7e4ce41d875ce4bc4de1e75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cebe3c2e7e4ce41d875ce4bc4de1e75">&#9670;&#160;</a></span>acceptParentDomainCookies</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool CBLReplicatorConfiguration::acceptParentDomainCookies</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The option to remove the restriction that does not allow the replicator to save the parent-domain cookies, the cookies whose domains are the parent domain of the remote host, from the HTTP response. </p>
+<p>For example, when the option is set to true, the cookies whose domain are “.foo.com” returned by “bar.foo.com” host will be permitted to save. This is only recommended if the host issuing the cookie is well trusted.</p>
+<p>This option is disabled by default, which means that the parent-domain cookies are not permitted to save by default. </p>
+
+</div>
+</div>
 <a id="aa2cd20835cc4e6b516510d441d419d60" name="aa2cd20835cc4e6b516510d441d419d60"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa2cd20835cc4e6b516510d441d419d60">&#9670;&#160;</a></span>authenticator</h2>
 
@@ -377,14 +398,14 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
-<a id="aac9f9fa1cbf03b5e7a5a75da8c632b6b" name="aac9f9fa1cbf03b5e7a5a75da8c632b6b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac9f9fa1cbf03b5e7a5a75da8c632b6b">&#9670;&#160;</a></span>propertyDecryptor</h2>
+<a id="a957033d12bbe8ebf1b583a490fcac414" name="a957033d12bbe8ebf1b583a490fcac414"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a957033d12bbe8ebf1b583a490fcac414">&#9670;&#160;</a></span>propertyDecryptor</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__replication.html#ga24a60a3d6f9816e1d32464cc31a15c0c">CBLPropertyDecryptor</a> CBLReplicatorConfiguration::propertyDecryptor</td>
+          <td class="memname"><a class="el" href="group__replication.html#ga24a60a3d6f9816e1d32464cc31a15c0c">CBLPropertyDecryptor</a> <a class="el" href="_c_b_l___compat_8h.html#a11b365d966cc268be54e8f6cfd1906f8">_cbl_nullable</a> CBLReplicatorConfiguration::propertyDecryptor</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -393,14 +414,14 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
-<a id="ab731bf9f140158d6967c1af645d8744a" name="ab731bf9f140158d6967c1af645d8744a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab731bf9f140158d6967c1af645d8744a">&#9670;&#160;</a></span>propertyEncryptor</h2>
+<a id="a9824f48ee3ba3c8fb72bc06e3605429e" name="a9824f48ee3ba3c8fb72bc06e3605429e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9824f48ee3ba3c8fb72bc06e3605429e">&#9670;&#160;</a></span>propertyEncryptor</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__replication.html#gab116a23be8bd24b86349379f370ef60c">CBLPropertyEncryptor</a> CBLReplicatorConfiguration::propertyEncryptor</td>
+          <td class="memname"><a class="el" href="group__replication.html#gab116a23be8bd24b86349379f370ef60c">CBLPropertyEncryptor</a> <a class="el" href="_c_b_l___compat_8h.html#a11b365d966cc268be54e8f6cfd1906f8">_cbl_nullable</a> CBLReplicatorConfiguration::propertyEncryptor</td>
         </tr>
       </table>
 </div><div class="memdoc">
