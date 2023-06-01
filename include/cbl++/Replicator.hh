@@ -87,7 +87,9 @@ namespace cbl {
         Authenticator authenticator;
         CBLProxySettings* proxy             = nullptr;
         fleece::MutableDict headers         = fleece::MutableDict::newDict();
-
+        
+        bool acceptParentDomainCookies      = false;
+        
         std::string pinnedServerCertificate;
         std::string trustedRootCertificates;
 
@@ -108,6 +110,7 @@ namespace cbl {
             conf.maxAttemptWaitTime = maxAttemptWaitTime;
             conf.heartbeat = heartbeat;
             conf.authenticator = authenticator.ref();
+            conf.acceptParentDomainCookies = acceptParentDomainCookies;
             conf.proxy = proxy;
             if (!headers.empty())
                 conf.headers = headers;

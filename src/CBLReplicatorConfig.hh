@@ -265,6 +265,9 @@ namespace cbl_internal {
                 enc.writeBool(!disableAutoPurge);
             }
             
+            enc.writeKey(slice(kC4ReplicatorOptionAcceptParentDomainCookies));
+            enc.writeBool(acceptParentDomainCookies);
+            
             if (maxAttempts > 0) {
                 enc.writeKey(slice(kC4ReplicatorOptionMaxRetries));
                 enc.writeUInt(maxAttempts - 1);
