@@ -7,6 +7,7 @@
 from genericpath import isdir
 from pathlib import Path
 from progressbar import ProgressBar
+from tempfile import TemporaryDirectory
 import json
 import argparse
 import urllib.request
@@ -87,20 +88,23 @@ def check_toolchain(name: str):
         # For now, assume that the toolchain is tar.gz
         print(f'Downloading {name} toolchain...')
         urllib.request.urlretrieve(json_data[name]['toolchain'], "toolchain.tar.gz", show_download_progress)
-        os.makedirs(toolchain_path, 0o755, True)
-        print(f'Extracting {name} toolchain to {toolchain_path}...')
-        with tarfile.open('toolchain.tar.gz', 'r:gz') as tar:
-            safe_extract(tar, toolchain_path, members=tar_extract_callback(tar))
+        with TemporaryDirectory() as tmpdir:
+            tmppath = Path(tmpdir)
+            print(f'Extracting {name} toolchain to {toolchain_path}...')
+            with tarfile.open('toolchain.tar.gz', 'r:gz') as tar:
+                safe_extract(tar, tmpdir, members=tar_extract_callback(tar))
 
-        outer_dir = toolchain_path / os.listdir(toolchain_path)[0]
-        files_to_move = outer_dir.glob("**/*")
-        for file in files_to_move:
-            relative = file.relative_to(outer_dir)
-            os.makedirs(toolchain_path / relative.parent, 0o755, True)
-            shutil.move(str(file), toolchain_path / relative.parent)
+            outer_dir = tmppath / os.listdir(tmpdir)[0]
+            files_to_move = outer_dir.glob("**/*")
+            for file in files_to_move:
+                relative = file.relative_to(outer_dir)
+                os.makedirs(tmppath / relative.parent, 0o755, True)
+                shutil.move(str(file), tmppath / relative.parent)
 
-        os.rmdir(outer_dir)
-        os.remove("toolchain.tar.gz")
+            os.rmdir(outer_dir)
+            os.remove("toolchain.tar.gz")
+            if not toolchain_path.exists():
+                shutil.move(tmpdir, toolchain_path)
         return toolchain_path
     else:
         print("No toolchain specified, using generic installed...")
@@ -120,34 +124,36 @@ def check_sysroot(name: str):
     print(f'Downloading {name} sysroot...')
     sysroot_name=json_data[name]['sysroot']
     urllib.request.urlretrieve(f'http://downloads.build.couchbase.com/mobile/sysroot/{sysroot_name}', f'{sysroot_name}', show_download_progress)
-    os.makedirs(sysroot_path, 0o755, True)
-    print(f'Extracting {name} sysroot to {sysroot_path}...')
-    if sysroot_name.endswith("zip"):
-        with zipfile.ZipFile('sysroot.zip', 'r') as zip:
-            # Python doesn't have support for zipped symlinks?!
-            SYMLINK_TYPE  = 0xA
-            zip_total = len(zip.infolist())
-            zip_done = 0
-            pbar = ProgressBar(maxval=zip_total)
-            pbar.start()
-            for zipinfo in zip.infolist():
-                if (zipinfo.external_attr >> 28) == SYMLINK_TYPE:
-                    linkpath = zip.read(zipinfo.filename).decode('utf-8')
-                    destpath = os.path.join(sysroot_path, zipinfo.filename)
-                    os.symlink(linkpath, destpath)
-                else:
-                    zip.extract(zipinfo, sysroot_path)
+    with TemporaryDirectory() as tmpdir:
+        print(f'Extracting {name} sysroot to {sysroot_path}...')
+        if sysroot_name.endswith("zip"):
+            with zipfile.ZipFile('sysroot.zip', 'r') as zip:
+                # Python doesn't have support for zipped symlinks?!
+                SYMLINK_TYPE  = 0xA
+                zip_total = len(zip.infolist())
+                zip_done = 0
+                pbar = ProgressBar(maxval=zip_total)
+                pbar.start()
+                for zipinfo in zip.infolist():
+                    if (zipinfo.external_attr >> 28) == SYMLINK_TYPE:
+                        linkpath = zip.read(zipinfo.filename).decode('utf-8')
+                        destpath = os.path.join(tmpdir, zipinfo.filename)
+                        os.symlink(linkpath, destpath)
+                    else:
+                        zip.extract(zipinfo, tmpdir)
 
-                zip_done += 1
-                pbar.update(zip_done)
-    elif sysroot_name.endswith("tar.gz"):
-        # Eventually let's make them all tarball
-        with tarfile.open(sysroot_name, 'r:gz') as tar:
-            safe_extract(tar, sysroot_path, members=tar_extract_callback(tar))
-    else:
-        raise NotImplementedError("Unknown file type for sysroot")
+                    zip_done += 1
+                    pbar.update(zip_done)
+        elif sysroot_name.endswith("tar.gz"):
+            # Eventually let's make them all tarball
+            with tarfile.open(sysroot_name, 'r:gz') as tar:
+                safe_extract(tar, tmpdir, members=tar_extract_callback(tar))
+        else:
+            raise NotImplementedError("Unknown file type for sysroot")
 
-    os.remove(sysroot_name)
+        os.remove(sysroot_name)
+        if not sysroot_path.exists():
+            shutil.move(tmpdir, sysroot_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Perform a cross compilation of Couchbase Lite C')
