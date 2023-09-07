@@ -19,6 +19,7 @@
 #pragma once
 #include "CBLBase.h"
 #include "CBLPlatform.h"
+#include "c4Base.h"
 #include "c4Base.hh"
 #include "fleece/slice.hh"
 #include "fleece/Fleece.hh"

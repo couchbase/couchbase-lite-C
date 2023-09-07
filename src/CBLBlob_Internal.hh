@@ -27,6 +27,7 @@
 #include "c4Document.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <algorithm>
 #include <mutex>
 #include "betterassert.hh"
 
@@ -225,7 +226,7 @@ struct CBLBlobReadStream {
         }
         if (pos < 0)
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Seek to negative position");
-        pos = std::min(pos, _c4stream.getLength());
+        pos = std::min(pos, (int64_t) _c4stream.getLength());
         _c4stream.seek(pos);
         _pos = pos;
         return pos;

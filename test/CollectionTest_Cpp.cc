@@ -458,7 +458,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Collection Listener Token") {
     CHECK(listenerToken.token() == listener);
     
     // Move Constructor:
-    ListenerToken<> listenerToken2 = move(listenerToken);
+    ListenerToken<> listenerToken2 = std::move(listenerToken);
     REQUIRE(listenerToken2.context());
     (*(ListenerToken<>::Callback*)listenerToken2.context())();
     CHECK(num == 2);
@@ -471,7 +471,7 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Collection Listener Token") {
 #endif
     
     // Move Assignment:
-    listenerToken = move(listenerToken2);
+    listenerToken = std::move(listenerToken2);
     REQUIRE(listenerToken.context());
     (*(ListenerToken<>::Callback*)listenerToken.context())();
     CHECK(num == 3);
