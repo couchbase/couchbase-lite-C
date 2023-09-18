@@ -164,7 +164,7 @@ TEST_CASE_METHOD(QueryTest_Cpp, "Query Listener C++ Move Operation", "[Query][Qu
     resultCount = -1;
     
     // Move constructor:
-    Query::ChangeListener listenerToken2 = move(listenerToken);
+    Query::ChangeListener listenerToken2 = std::move(listenerToken);
     CHECK(listenerToken2.context());
     CHECK(listenerToken2.token());
     

@@ -144,7 +144,7 @@ bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt) {
                 t.commit();
                 _collection = collection;
                 // HACK: Replace the inner reference of the c4doc with the one from newDoc.
-                c4doc.get() = move(newDoc);
+                c4doc.get() = std::move(newDoc);
                 _revID = c4doc->selectedRev().revID;
                 success = true;
             } else {

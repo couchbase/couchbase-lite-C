@@ -108,7 +108,7 @@ CBLBlob* CBLBlob_CreateWithStream(FLString contentType,
                                   CBLBlobWriteStream* writer) noexcept
 {
     try {
-        return retain(new CBLNewBlob(contentType, move(*writer)));
+        return retain(new CBLNewBlob(contentType, std::move(*writer)));
     } catchAndWarn()
 }
 

@@ -175,7 +175,7 @@ Retained<CBLScope> CBLDatabase::getScope(slice scopeName) {
     if (!scope && exist) {
         auto retainedScope = make_retained<CBLScope>(scopeName, this);
         scope = retainedScope.get();
-        _scopes.insert({scope->name(), move(retainedScope)});
+        _scopes.insert({scope->name(), std::move(retainedScope)});
     }
     
     return scope;
@@ -289,7 +289,7 @@ Retained<CBLCollection> CBLDatabase::createCBLCollection(C4Collection* c4col, CB
     auto retainedCollection = make_retained<CBLCollection>(c4col, scope, const_cast<CBLDatabase*>(this));
     auto collection = retainedCollection.get();
     if (cache) {
-        _collections.insert({C4Database::CollectionSpec(c4col->getSpec()), move(retainedCollection)});
+        _collections.insert({C4Database::CollectionSpec(c4col->getSpec()), std::move(retainedCollection)});
     }
     return collection;
 }
