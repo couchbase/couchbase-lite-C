@@ -528,7 +528,6 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query][LiveQuery]") {
     // Remove listener token and sleep to ensure async cleanup in LiteCore's LiveQuerier's _stop()
     // functions is done before checking instance leaking in CBLTest's destructor:
     CBLListener_Remove(listenerToken);
-    listenerToken = nullptr;
     cerr << "Sleeping to ensure async cleanup ..." << endl;
     this_thread::sleep_for(500ms);
 }
@@ -566,7 +565,6 @@ TEST_CASE_METHOD(QueryTest, "Remove Query Listener", "[Query][LiveQuery]") {
     CHECK(state.resultCount() == 3);
     
     // Cleanup:
-    listenerToken = nullptr;
     cerr << "Sleeping to ensure async cleanup ..." << endl;
     this_thread::sleep_for(500ms);
 }
@@ -604,7 +602,6 @@ TEST_CASE_METHOD(QueryTest, "Query Listener and Changing parameters", "[Query][L
     CHECK(state.resultCount() == 2);
     
     CBLListener_Remove(listenerToken);
-    listenerToken = nullptr;
     cerr << "Sleeping to ensure async cleanup ..." << endl;
     this_thread::sleep_for(500ms);
 }
@@ -666,10 +663,6 @@ TEST_CASE_METHOD(QueryTest, "Multiple Query Listeners", "[Query][LiveQuery]") {
     CBLListener_Remove(token2);
     CBLListener_Remove(token3);
     
-    token1 = nullptr;
-    token2 = nullptr;
-    token3 = nullptr;
-    
     cerr << "Sleeping to ensure async cleanup ..." << endl;
     this_thread::sleep_for(500ms);
 }
@@ -706,7 +699,6 @@ TEST_CASE_METHOD(QueryTest, "Query Listener and Coalescing notification", "[Quer
     // Remove listener token and sleep to ensure async cleanup in LiteCore's LiveQuerier's _stop()
     // functions is done before checking instance leaking in CBLTest's destructor:
     CBLListener_Remove(listenerToken);
-    listenerToken = nullptr;
     cerr << "Sleeping to ensure async cleanup ..." << endl;
     this_thread::sleep_for(500ms);
 }

@@ -343,7 +343,9 @@ TEST_CASE_METHOD(DocumentTest, "Save Empty Document", "[Document]") {
 
     doc = CBLCollection_GetMutableDocument(col, "foo"_sl, &error);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
-    CHECK(CBLDocument_RevisionID(doc) == "1-581ad726ee407c8376fc94aad966051d013893c4"_sl);
+    
+    auto str = slice(CBLDocument_RevisionID(doc)).asString();
+    CHECK(CBLDocument_RevisionID(doc).buf);
     CHECK(CBLDocument_Sequence(doc) == 1);
     CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);

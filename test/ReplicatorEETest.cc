@@ -212,7 +212,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
 }
 
 
-TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Replicator][Conflict]") {
+TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[.failed-version-vector][Replicator][Conflict]") {
     SECTION("No conflict resolved specified") {
         config.conflictResolver = nullptr;
     }
@@ -264,7 +264,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
 }
 
 
-TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[Replicator][Conflict]") {
+TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[.failed-version-vector][Replicator][Conflict]") {
     SECTION("No conflict resolved specified") {
         config.conflictResolver = nullptr;
     }

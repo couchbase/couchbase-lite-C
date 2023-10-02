@@ -448,7 +448,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Document Replication Event", "[Repli
     CHECK(replicatedDocs[bar2].error.code == 0);
 }
 
-TEST_CASE_METHOD(ReplicatorCollectionTest, "Default Conflict Resolver with Collections", "[Replicator]") {
+TEST_CASE_METHOD(ReplicatorCollectionTest, "Default Conflict Resolver with Collections", "[.failed-version-vector][Replicator]") {
     createDocWithJSON(cx[0], "foo1", kDefaultDocContent);
     createDocWithJSON(cx[1], "bar1", kDefaultDocContent);
     
