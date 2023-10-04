@@ -36,9 +36,9 @@ static const CBLDocument* defaultConflictResolver(void *context,
     const CBLDocument* resolved;
     if (remoteDoc == nullptr || localDoc == nullptr)
         resolved = nullptr;
-    else if (remoteDoc->generation() > localDoc->generation())
+    else if (remoteDoc->timestamp() > localDoc->timestamp())
         resolved = remoteDoc;
-    else if (localDoc->generation() > remoteDoc->generation())
+    else if (localDoc->timestamp() > remoteDoc->timestamp())
         resolved = localDoc;
     else if (FLSlice_Compare(localDoc->revisionID(), remoteDoc->revisionID()) > 0)
         resolved = localDoc;

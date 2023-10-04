@@ -88,6 +88,7 @@ public:
     slice docID() const                         {return _docID;}
     slice revisionID() const                    {return _revID;}
     unsigned generation() const                 {return C4Document::getRevIDGeneration(_revID);}
+    uint64_t timestamp() const                  {return C4Document::getRevIDTimestamp(_revID);}
 
     uint64_t sequence() const {
         auto c4doc = _c4doc.useLocked();
