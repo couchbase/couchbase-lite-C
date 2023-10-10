@@ -76,7 +76,7 @@ CBLDatabase* _cbl_nullable CBLDocument::database() const {
 #pragma mark - SAVING:
 
 
-bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt) {
+bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt, uint32_t maxRevTreeDepth = 0) {
     Retained<C4Document> orignalDoc = nullptr, savingDoc = nullptr;
     bool success = false, retrying = false;
     
@@ -125,7 +125,7 @@ bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt) {
             
             if (savingDoc) {
                 // Update existing doc:
-                newDoc = savingDoc->update(body, revFlags);
+                newDoc = savingDoc->update(body, revFlags, maxRevTreeDepth);
             } else {
                 // Create new doc:
                 C4DocPutRequest rq = {};

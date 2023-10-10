@@ -153,20 +153,22 @@ CBLDocument* CBLCollection_GetMutableDocument(CBLCollection* collection, FLStrin
 
 bool CBLCollection_SaveDocument(CBLCollection* collection,
                                 CBLDocument* doc,
-                                CBLError* outError) noexcept
+                                CBLError* outError,
+                                uint32_t maxRevTreeDepth = 0) noexcept
 {
     return CBLCollection_SaveDocumentWithConcurrencyControl(collection, doc,
                                                             kCBLConcurrencyControlLastWriteWins,
-                                                            outError);
+                                                            outError, maxRevTreeDepth);
 }
 
 bool CBLCollection_SaveDocumentWithConcurrencyControl(CBLCollection* collection,
                                                       CBLDocument* doc,
                                                       CBLConcurrencyControl concurrency,
-                                                      CBLError* outError) noexcept
+                                                      CBLError* outError,
+                                                      uint32_t maxRevTreeDepth = 0) noexcept
 {
     try {
-        if (doc->save(collection, {concurrency}))
+        if (doc->save(collection, {concurrency}, maxRevTreeDepth))
             return true;
         C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
         return false;
@@ -177,10 +179,11 @@ bool CBLCollection_SaveDocumentWithConflictHandler(CBLCollection* collection,
                                                    CBLDocument* doc,
                                                    CBLConflictHandler conflictHandler,
                                                    void *context,
-                                                   CBLError* outError) noexcept
+                                                   CBLError* outError,
+                                                   uint32_t maxRevTreeDepth = 0) noexcept
 {
     try {
-        if (doc->save(collection, {conflictHandler, context}))
+        if (doc->save(collection, {conflictHandler, context}, maxRevTreeDepth))
             return true;
         C4Error::set(LiteCoreDomain, kC4ErrorConflict, {}, internal(outError));
         return false;

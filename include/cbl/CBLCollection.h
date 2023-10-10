@@ -217,7 +217,8 @@ const CBLDocument* _cbl_nullable CBLCollection_GetDocument(const CBLCollection* 
     @return  True on success, false on failure. */
 bool CBLCollection_SaveDocument(CBLCollection* collection,
                                 CBLDocument* doc,
-                                CBLError* _cbl_nullable outError) CBLAPI;
+                                CBLError* _cbl_nullable outError,
+                                uint32_t maxRevTreeDepth = 0) CBLAPI;
 
 /** Saves a (mutable) document to the collection.
     If a conflicting revision has been saved since \p doc was loaded, the \p concurrency
@@ -232,7 +233,8 @@ bool CBLCollection_SaveDocument(CBLCollection* collection,
 bool CBLCollection_SaveDocumentWithConcurrencyControl(CBLCollection* collection,
                                                       CBLDocument* doc,
                                                       CBLConcurrencyControl concurrency,
-                                                      CBLError* _cbl_nullable outError) CBLAPI;
+                                                      CBLError* _cbl_nullable outError,
+                                                      uint32_t maxRevTreeDepth = 0) CBLAPI;
 
 /** Saves a (mutable) document to the collection, allowing for custom conflict handling in the event
     that the document has been updated since \p doc was loaded.
@@ -246,7 +248,8 @@ bool CBLCollection_SaveDocumentWithConflictHandler(CBLCollection* collection,
                                                    CBLDocument* doc,
                                                    CBLConflictHandler conflictHandler,
                                                    void* _cbl_nullable context,
-                                                   CBLError* _cbl_nullable outError) CBLAPI;
+                                                   CBLError* _cbl_nullable outError,
+                                                   uint32_t maxRevTreeDepth = 0) CBLAPI;
 
 /** Deletes a document from the collection. Deletions are replicated.
     @warning  You are still responsible for releasing the CBLDocument.

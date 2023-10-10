@@ -181,20 +181,22 @@ CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID,
 
 bool CBLDatabase_SaveDocument(CBLDatabase* db,
                               CBLDocument* doc,
-                              CBLError* outError) noexcept
+                              CBLError* outError,
+                              uint32_t maxRevTreeDepth = 0) noexcept
 {
     return CBLDatabase_SaveDocumentWithConcurrencyControl
-        (db, doc, kCBLConcurrencyControlLastWriteWins, outError);
+        (db, doc, kCBLConcurrencyControlLastWriteWins, outError, maxRevTreeDepth);
 }
 
 bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
                                                     CBLDocument* doc,
                                                     CBLConcurrencyControl concurrency,
-                                                    CBLError* outError) noexcept
+                                                    CBLError* outError,
+                                                    uint32_t maxRevTreeDepth = 0) noexcept
 {
     try {
         auto col = db->getDefaultCollection(true);
-        return CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, concurrency, outError);
+        return CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, concurrency, outError, maxRevTreeDepth);
     } catchAndBridge(outError)
 }
 
@@ -202,12 +204,13 @@ bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
                                                  CBLDocument* doc,
                                                  CBLConflictHandler conflictHandler,
                                                  void *context,
-                                                 CBLError* outError) noexcept
+                                                 CBLError* outError,
+                                                 uint32_t maxRevTreeDepth = 0) noexcept
 {
     try {
         auto col = db->getDefaultCollection(true);
         return CBLCollection_SaveDocumentWithConflictHandler(col, doc, conflictHandler,
-                                                             context, outError);
+                                                             context, outError, maxRevTreeDepth);
     } catchAndBridge(outError)
 }
 

@@ -210,7 +210,7 @@ public:
         bool deleting = false;
     };
     
-    bool save(CBLCollection* collection, const SaveOptions &opt);
+    bool save(CBLCollection* collection, const SaveOptions &opt, uint32_t maxRevTreeDepth = 0);
     
 
 #pragma mark - Conflict resolution:

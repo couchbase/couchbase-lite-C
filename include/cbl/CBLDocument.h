@@ -87,7 +87,8 @@ CBL_REFCOUNTED(CBLDocument*, Document);
     @return  True on success, false on failure. */
 bool CBLDatabase_SaveDocument(CBLDatabase* db,
                               CBLDocument* doc,
-                              CBLError* _cbl_nullable outError) CBLAPI;
+                              CBLError* _cbl_nullable outError,
+                              uint32_t maxRevTreeDepth = 0) CBLAPI;
 
 /** Saves a (mutable) document to the default collection.
     If a conflicting revision has been saved since \p doc was loaded, the \p concurrency
@@ -103,7 +104,8 @@ bool CBLDatabase_SaveDocument(CBLDatabase* db,
 bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
                                                     CBLDocument* doc,
                                                     CBLConcurrencyControl concurrency,
-                                                    CBLError* _cbl_nullable outError) CBLAPI;
+                                                    CBLError* _cbl_nullable outError,
+                                                    uint32_t maxRevTreeDepth = 0) CBLAPI;
 
 /** Saves a (mutable) document to the default collection, allowing for custom conflict handling in the event
     that the document has been updated since \p doc was loaded.
@@ -118,7 +120,8 @@ bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
                                                  CBLDocument* doc,
                                                  CBLConflictHandler conflictHandler,
                                                  void* _cbl_nullable context,
-                                                 CBLError* _cbl_nullable outError) CBLAPI;
+                                                 CBLError* _cbl_nullable outError,
+                                                 uint32_t maxRevTreeDepth = 0) CBLAPI;
 
 /** Deletes a document from the default collection. Deletions are replicated.
     @warning  You are still responsible for releasing the CBLDocument.
