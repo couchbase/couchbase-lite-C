@@ -624,8 +624,6 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Rep
 
 
 TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encryption error", "[Replicator][Encryptable]") {
-    CBLLog_SetConsoleLevel(kCBLLogVerbose);
-    
     auto doc = CBLDocument_CreateWithID("doc1"_sl);
     auto props = CBLDocument_MutableProperties(doc);
     

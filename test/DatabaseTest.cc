@@ -1664,6 +1664,8 @@ TEST_CASE_METHOD(DatabaseTest, "Get blob", "[Blob]") {
 #ifdef COUCHBASE_ENTERPRISE
 
 TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator") {
+    CBLLog_SetConsoleLevel(kCBLLogVerbose);
+    
     CBLError error;
     otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
     REQUIRE(otherDB);
@@ -1699,6 +1701,8 @@ TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Replicator") {
 }
 
 TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Replicator") {
+    CBLLog_SetConsoleLevel(kCBLLogVerbose);
+    
     CBLError error;
     otherDB = CBLDatabase_Open(kOtherDBName, &kDatabaseConfiguration, &error);
     REQUIRE(otherDB);
