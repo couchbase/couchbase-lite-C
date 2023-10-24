@@ -85,6 +85,10 @@ CBLTest::~CBLTest() {
             WARN("Failed to close database: " << error.domain << "/" << error.code);
         CBLDatabase_Release(db);
     }
+    
+    // Reset to the default warning level:
+    CBLLog_SetConsoleLevel(kCBLLogWarning);
+    
     if (CBL_InstanceCount() > 0)
         CBL_DumpInstances();
     CHECK(CBL_InstanceCount() == 0);
