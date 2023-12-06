@@ -70,18 +70,8 @@ namespace cbl_internal {
             change.collection = _collection;
             change.docID = _docID;
 
-            Retained<CBLDatabase> db;
-            try {
-                db = _collection->database();
-            } catch (...) {
-                C4Error error = C4Error::fromCurrentException();
-                CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
-                        "Document changed notification failed: %s", error.description().c_str());
-            }
-
-            if (db) {
-                db->notify(this, change);
-            }
+            Retained<CBLDatabase> db = _collection->database();
+            db->notify(this, change);
         }
 
         Retained<CBLCollection> _collection;

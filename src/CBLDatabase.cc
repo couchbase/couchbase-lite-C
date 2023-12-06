@@ -88,7 +88,6 @@ CBLDatabase::CBLDatabase(C4Database* _cbl_nonnull db, slice name_, slice dir_)
 ,_notificationQueue(this)
 {
     _c4db = std::make_shared<C4DatabaseAccessLock>(db);
-    _defaultCollection = getCollection(kC4DefaultCollectionName, kC4DefaultScopeID);
 }
 
 
@@ -129,14 +128,6 @@ void CBLDatabase::closeAndDelete() {
 
 /** Must called under _c4db lock. */
 void CBLDatabase::_closed() {
-    // Close scopes:
-    for (auto& i : _scopes) {
-        i.second->close();
-    }
-    // Close collections:
-    for (auto& i : _collections) {
-        i.second->close();
-    }
     // Close the access lock:
     _c4db->close();
 }
@@ -151,34 +142,11 @@ Retained<CBLScope> CBLDatabase::getScope(slice scopeName) {
     
     auto c4db = _c4db->useLocked();
     
-    CBLScope* scope = nullptr;
-    
     bool exist = c4db->hasScope(scopeName);
-    if (auto i = _scopes.find(scopeName); i != _scopes.end()) {
-        if (!exist) {
-            // Detach instead of close so that the retained scope
-            // object can retain the database and can be valid to use.
-            i->second->detach();
-            
-            // Remove from the _scopes map.
-            _scopes.erase(i);
-            
-            // Remove all collections in the scope from the _collections map:
-            // This is techically required to prevent circular reference
-            // (db->collection->scope->db) when the scope is detached.
-            removeCBLCollections(scopeName);
-            return nullptr;
-        }
-        scope = i->second.get();
+    if (!exist) {
+        return nullptr;
     }
-    
-    if (!scope && exist) {
-        auto retainedScope = make_retained<CBLScope>(scopeName, this);
-        scope = retainedScope.get();
-        _scopes.insert({scope->name(), std::move(retainedScope)});
-    }
-    
-    return scope;
+    return new CBLScope(scopeName, this);
 }
 
 
@@ -191,21 +159,9 @@ Retained<CBLCollection> CBLDatabase::getCollection(slice collectionName, slice s
     
     auto c4db = _c4db->useLocked();
     
-    CBLCollection* collection = nullptr;
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
-    if (auto i = _collections.find(spec); i != _collections.end()) {
-        collection = i->second.get();
-    }
-    
-    if (collection && collection->isValid()) {
-        return collection;
-    }
-    
     auto c4col = c4db->getCollection(spec);
     if (!c4col) {
-        if (collection) {
-            removeCBLCollection(spec); // Invalidate cache
-        }
         return nullptr;
     }
     
@@ -216,7 +172,6 @@ Retained<CBLCollection> CBLDatabase::getCollection(slice collectionName, slice s
         // the one just created were deleted on a different thread using another database.
         return nullptr;
     }
-    
     return createCBLCollection(c4col, scope.get());
 }
 
@@ -227,26 +182,11 @@ Retained<CBLCollection> CBLDatabase::createCollection(slice collectionName, slic
     
     auto c4db = _c4db->useLocked();
     
-    auto col = getCollection(collectionName, scopeName);
-    if (col) {
-        return col;
-    }
-    
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
     auto c4col = c4db->createCollection(spec);
     
-    bool cache = true;
-    auto scope = getScope(scopeName);
-    if (!scope) {
-        // Note (Edge Case):
-        // The scope is NULL because at the same time, its all collections including the
-        // the one just created were deleted on a different thread using another database.
-        // So create the scope in non-cached mode, and the returned collection will not
-        // be cached.
-        cache = false;
-        scope = new CBLScope(scopeName, this, cache);
-    }
-    return createCBLCollection(c4col, scope.get(), cache);
+    auto scope = new CBLScope(scopeName, this);
+    return createCBLCollection(c4col, scope);
 }
 
 
@@ -258,60 +198,31 @@ bool CBLDatabase::deleteCollection(slice collectionName, slice scopeName) {
     
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
     c4db->deleteCollection(spec);
-    removeCBLCollection(spec);
     return true;
 }
 
 
 Retained<CBLScope> CBLDatabase::getDefaultScope() {
-    _c4db->useLocked();
     return getScope(kC4DefaultScopeID);
 }
 
 
-Retained<CBLCollection> CBLDatabase::getDefaultCollection(bool mustExist) {
-    auto db = _c4db->useLocked();
-    
-    if (_defaultCollection && !_defaultCollection->isValid()) {
-        _defaultCollection = nullptr;
+Retained<CBLCollection> CBLDatabase::getDefaultCollection() {
+    return getCollection(kC4DefaultCollectionName, kC4DefaultScopeID);
+}
+
+
+Retained<CBLCollection> CBLDatabase::createCBLCollection(C4Collection* c4col, CBLScope* scope) {
+    return new CBLCollection(c4col, scope, const_cast<CBLDatabase*>(this));
+}
+
+
+Retained<CBLCollection> CBLDatabase::getInternalDefaultCollection() {
+    if (!_defaultCollection) {
+        _defaultCollection = getCollection(kC4DefaultCollectionName, kC4DefaultScopeID);
+        _defaultCollection->adopt(this); // Prevent the retain cycle
     }
-    
-    if (!_defaultCollection && mustExist) {
-        C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
-                       "Invalid collection: either deleted, or db closed");
-    }
-    
     return _defaultCollection;
-}
-
-
-Retained<CBLCollection> CBLDatabase::createCBLCollection(C4Collection* c4col, CBLScope* scope, bool cache) {
-    auto retainedCollection = make_retained<CBLCollection>(c4col, scope, const_cast<CBLDatabase*>(this));
-    auto collection = retainedCollection.get();
-    if (cache) {
-        _collections.insert({C4Database::CollectionSpec(c4col->getSpec()), std::move(retainedCollection)});
-    }
-    return collection;
-}
-
-
-void CBLDatabase::removeCBLCollection(C4Database::CollectionSpec spec) {
-    if (auto i = _collections.find(spec); i != _collections.end()) {
-        i->second.get()->close();
-        _collections.erase(i);
-    }
-}
-
-void CBLDatabase::removeCBLCollections(slice scopeName) {
-    auto i = _collections.begin();
-    while (i != _collections.end()) {
-        if (i->first.scope == scopeName) {
-            i->second->close();
-            i = _collections.erase(i);
-        } else {
-            i++;
-        }
-    }
 }
 
 

@@ -399,8 +399,6 @@ TEST_CASE_METHOD(CollectionTest, "Create Existing Collection", "[Collection]") {
     REQUIRE(col2);
     CHECK(CBLCollection_Name(col2) == "colA"_sl);
     
-    CHECK(col1 == col2);
-    
     CBLCollection_Release(col1);
     CBLCollection_Release(col2);
 }
@@ -462,10 +460,10 @@ TEST_CASE_METHOD(CollectionTest, "Get Collections from Scope", "[Collection]") {
     CHECK(CBLScope_Name(scope) == "scopeA"_sl);
     
     CBLCollection* colA2 = CBLScope_Collection(scope, "colA"_sl, &error);
-    CHECK(colA == colA2);
+    CHECK(CBLCollection_Name(colA2) == "colA"_sl);
     
     CBLCollection* colB2 = CBLScope_Collection(scope, "colB"_sl, &error);
-    CHECK(colB == colB2);
+    CHECK(CBLCollection_Name(colB2) == "colB"_sl);
     
     CHECK(!CBLScope_Collection(scope, "colC"_sl, &error));
     CHECK(error.code == 0);
@@ -539,8 +537,6 @@ TEST_CASE_METHOD(CollectionTest, "Valid Collection and Scope Names", "[Collectio
         
         CBLCollection* col2 = CBLDatabase_Collection(db, slice(name), slice(name), &error);
         REQUIRE(col2);
-        
-        CHECK(col1 == col2);
         
         CBLCollection_Release(col1);
         CBLCollection_Release(col2);

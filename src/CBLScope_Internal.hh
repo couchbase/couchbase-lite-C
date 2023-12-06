@@ -29,18 +29,14 @@ public:
     
 #pragma mark - CONSTRUCTORS:
     
-    CBLScope(slice name, CBLDatabase* database, bool cached= true)
+    CBLScope(slice name, CBLDatabase* database)
     :_name(name)
-    ,_database(database)
-    {
-        if (!cached) {
-            _detach();
-        }
-    }
+    ,_database(retain(database))
+    { }
     
     ~CBLScope() {
         LOCK(_mutex);
-        if (_detached) {
+        if (!_adopted) {
             release(_database);
         }
     }
@@ -52,8 +48,6 @@ public:
 #pragma mark - COLLECTIONS:
     
     fleece::MutableArray collectionNames() const {
-        LOCK(_mutex);
-        checkOpen();
         return _database->collectionNames(_name);
     }
     
@@ -61,45 +55,27 @@ public:
     
 protected:
     
-    friend struct CBLDatabase;
+    friend struct CBLCollection;
     
-    // Need to call under the _mutex lock
-    void checkOpen() const {
-        if (!_database) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
-                           "Invalid scope: scope deleted or db closed");
+    // Called by the collection to give the ownership to the database
+    // when the collection is adopted by the database.
+    // Release the database to avoid the circular reference
+    void adopt(CBLDatabase* db) {
+        assert(_database == db);
+        LOCK(_mutex);
+        if (!_adopted) {
+            release(_database);
+            _adopted = true;
         }
-    }
-    
-    // Called by database when the database is closed or released
-    // to invalidate the database pointer.
-    void close() {
-        LOCK(_mutex);
-        assert(!_detached);
-        _database = nullptr;
-    }
-    
-    // Called by the database when the scope is removed from
-    // the database cache (e.g. when no collections are in the scope).
-    // The detach() allows the scope to retain and keep using the database.
-    void detach() {
-        LOCK(_mutex);
-        _detach();
     }
     
 private:
     
-    void _detach() {
-        assert(!_detached);
-        retain(_database);
-        _detached = true;
-    }
-    
-    CBLDatabase* _cbl_nullable              _database;
-    bool                                    _detached {false};  // Detached mode in which database is retained
+    CBLDatabase*                            _database;          // Retained unless being adopted
+    bool                                    _adopted {false};   // Adopted by the database
     
     alloc_slice const                       _name;              // Name (never empty)
-    mutable std::recursive_mutex            _mutex;
+    mutable std::mutex                      _mutex;
 };
 
 CBL_ASSUME_NONNULL_END

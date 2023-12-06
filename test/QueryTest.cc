@@ -505,7 +505,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener", "[Query][LiveQuery]") {
     
     cerr << "Adding listener\n";
     ListenerState state;
-    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+    CBLListenerToken* listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
         ((ListenerState*)context)->receivedCallback(context, query, token);
     }, &state);
 
@@ -543,7 +543,7 @@ TEST_CASE_METHOD(QueryTest, "Remove Query Listener", "[Query][LiveQuery]") {
     
     cerr << "Adding listener\n";
     ListenerState state;
-    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+    CBLListenerToken*  listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
         ((ListenerState*)context)->receivedCallback(context, query, token);
     }, &state);
 
@@ -585,7 +585,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener and Changing parameters", "[Query][L
 
     cerr << "Adding listener\n";
     ListenerState state;
-    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+    CBLListenerToken* listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
         ((ListenerState*)context)->receivedCallback(context, query, token);
     }, &state);
 
@@ -623,10 +623,10 @@ TEST_CASE_METHOD(QueryTest, "Multiple Query Listeners", "[Query][LiveQuery]") {
     
     cerr << "Adding listener\n";
     ListenerState state1;
-    auto token1 = CBLQuery_AddChangeListener(query, callback, &state1);
+    CBLListenerToken* token1 = CBLQuery_AddChangeListener(query, callback, &state1);
     
     ListenerState state2;
-    auto token2 = CBLQuery_AddChangeListener(query, callback, &state2);
+    CBLListenerToken* token2 = CBLQuery_AddChangeListener(query, callback, &state2);
 
     cerr << "Waiting for listener 1...\n";
     state1.waitForCount(1);
@@ -654,7 +654,7 @@ TEST_CASE_METHOD(QueryTest, "Multiple Query Listeners", "[Query][LiveQuery]") {
     
     cerr << "Adding another listener\n";
     ListenerState state3;
-    auto token3 = CBLQuery_AddChangeListener(query, callback, &state3);
+    CBLListenerToken* token3 = CBLQuery_AddChangeListener(query, callback, &state3);
     
     cerr << "Waiting for the listener 3...\n";
     state3.waitForCount(1);
@@ -684,7 +684,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener and Coalescing notification", "[Quer
     
     cerr << "Adding listener\n";
     ListenerState state;
-    auto listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+    CBLListenerToken* listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
         ((ListenerState*)context)->receivedCallback(context, query, token);
     }, &state);
 
@@ -970,14 +970,14 @@ TEST_CASE_METHOD(QueryTest, "FTS with FTS Index in Named Collection", "[Query]")
     createDocWithJSON(people, "person2", "{\"name\": { \"first\": \"Jasper\",\"last\":\"Okorududu\"}, \"random\": \"1\"}");
     createDocWithJSON(people, "person3", "{\"name\": { \"first\": \"Monica\",\"last\":\"Polina\"}, \"random\": \"2\"}");
 
-    CBLCollection_Release(people);
-
     CBLFullTextIndexConfiguration index = {};
     index.expressionLanguage = kCBLN1QLLanguage;
     index.expressions = "name.first"_sl;
     index.ignoreAccents = false;
     CHECK(CBLCollection_CreateFullTextIndex(people, "index"_sl, index, &error));
 
+    CBLCollection_Release(people);
+    
     SECTION("name"){
         queryString = "SELECT name "
                       "FROM test.people "

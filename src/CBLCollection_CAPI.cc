@@ -87,7 +87,7 @@ CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db, CBLError* outError) no
 
 CBLCollection* CBLDatabase_DefaultCollection(const CBLDatabase* db, CBLError* outError) noexcept {
     try {
-        return const_cast<CBLDatabase*>(db)->getDefaultCollection(false).detach();
+        return const_cast<CBLDatabase*>(db)->getDefaultCollection().detach();
     } catchAndBridge(outError)
 }
 
@@ -115,9 +115,7 @@ uint64_t CBLCollection_Count(const CBLCollection* collection) noexcept {
 
 /** Private API */
 CBLDatabase* CBLCollection_Database(const CBLCollection* collection) noexcept {
-    try {
-        return collection->database();
-    } catchAndWarn()
+    return collection->database();
 }
 
 /** Private API */

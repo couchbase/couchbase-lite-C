@@ -154,11 +154,12 @@ public:
     
     Retained<CBLScope> getDefaultScope();
     
+    Retained<CBLCollection> getDefaultCollection();
+    
     /**
-     * Returned the default collection retained by the database. It will be used for any database's operations
-     * that refer to the default collection. If the default collection doesn't exist when getting from the database,
-     * the method will throw kC4ErrorNotOpen exception. */
-    Retained<CBLCollection> getDefaultCollection(bool mustExist);
+     * The cached default collection for internal use only.
+     */
+    Retained<CBLCollection> getInternalDefaultCollection();
     
 
 #pragma mark - Queries & Indexes:
@@ -215,7 +216,7 @@ protected:
         :access_lock(std::move(db))
         {
             _sentry = [this](C4Database* db) {
-                if (_closed) {
+                if (isClosedNoLock()) {
                     C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen, "Database is closed or deleted");
                 }
             };
@@ -224,6 +225,10 @@ protected:
         void close() {
             LOCK_GUARD lock(getMutex());
             _closed = true;
+        }
+        
+        bool isClosedNoLock() {
+            return _closed;
         }
         
         template <class CALLBACK>
@@ -314,17 +319,9 @@ private:
             return slice(kDir);
         }
     }
-
-    /**
-     Create a CBLCollection from the C4Collection.
-     The created CBLCollection will be retained and cached in the _collections map. */
-    Retained<CBLCollection> createCBLCollection(C4Collection* c4col, CBLScope* scope, bool cache= true);
     
-    /** Remove and close the collection from the _collections map */
-    void removeCBLCollection(C4Database::CollectionSpec spec);
-    
-    /** Remove and close all collections in the specify scope the _collections map */
-    void removeCBLCollections(slice scopeName);
+    /** Create a CBLCollection from the C4Collection. */
+    Retained<CBLCollection> createCBLCollection(C4Collection* c4col, CBLScope* scope);
 
     void callDocListeners();
     
@@ -386,9 +383,7 @@ private:
     alloc_slice const                           _name;
     alloc_slice const                           _dir;
     
-    mutable ScopesMap                           _scopes;
-    mutable CollectionsMap                      _collections;
-    Retained<CBLCollection>                     _defaultCollection;
+    Retained<CBLCollection>                     _defaultCollection;     // Internal default collection
     
     // For sending notifications:
     NotificationQueue                           _notificationQueue;

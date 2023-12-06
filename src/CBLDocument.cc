@@ -68,7 +68,6 @@ CBLDocument::~CBLDocument() {
 
 
 CBLDatabase* _cbl_nullable CBLDocument::database() const {
-    // Could throw kC4ErrorNotOpen if the collection is deleted, or database is released.
     return _collection ? _collection->database() : nullptr;
 }
 

@@ -142,7 +142,7 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase* db) noexcep
 
 uint64_t CBLDatabase_Count(const CBLDatabase* db) noexcept {
     try {
-        auto col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        auto col = const_cast<CBLDatabase*>(db)->getInternalDefaultCollection();
         return col->count();
     } catchAndWarn();
 }
@@ -150,7 +150,7 @@ uint64_t CBLDatabase_Count(const CBLDatabase* db) noexcept {
 /** Private API */
 uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) noexcept {
     try {
-        auto col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        auto col = const_cast<CBLDatabase*>(db)->getInternalDefaultCollection();
         return col->lastSequence();
     } catchAndWarn()
 }
@@ -163,7 +163,7 @@ const CBLDocument* CBLDatabase_GetDocument(const CBLDatabase* db, FLString docID
                                            CBLError* outError) noexcept
 {
     try {
-        auto col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true);
+        auto col = const_cast<CBLDatabase*>(db)->getInternalDefaultCollection();
         return CBLCollection_GetDocument(col, docID, outError);
     } catchAndBridge(outError)
 }
@@ -173,7 +173,7 @@ CBLDocument* CBLDatabase_GetMutableDocument(CBLDatabase* db, FLString docID,
                                             CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_GetMutableDocument(col, docID, outError);
     } catchAndBridge(outError)
 }
@@ -193,7 +193,7 @@ bool CBLDatabase_SaveDocumentWithConcurrencyControl(CBLDatabase* db,
                                                     CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_SaveDocumentWithConcurrencyControl(col, doc, concurrency, outError);
     } catchAndBridge(outError)
 }
@@ -205,7 +205,7 @@ bool CBLDatabase_SaveDocumentWithConflictHandler(CBLDatabase* db,
                                                  CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_SaveDocumentWithConflictHandler(col, doc, conflictHandler,
                                                              context, outError);
     } catchAndBridge(outError)
@@ -216,7 +216,7 @@ bool CBLDatabase_DeleteDocument(CBLDatabase *db,
                                 CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_DeleteDocument(col, doc, outError);
     } catchAndBridge(outError)
 }
@@ -227,7 +227,7 @@ bool CBLDatabase_DeleteDocumentWithConcurrencyControl(CBLDatabase *db,
                                                       CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_DeleteDocumentWithConcurrencyControl(col, doc, concurrency, outError);
     } catchAndBridge(outError)
 }
@@ -238,7 +238,7 @@ bool CBLDatabase_DeleteDocumentByID(CBLDatabase* db,
                                     CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_DeleteDocumentByID(col, docID, outError);
     } catchAndBridge(outError)
 }
@@ -248,7 +248,7 @@ bool CBLDatabase_PurgeDocument(CBLDatabase* db,
                                CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         CBLDocument::checkCollectionMatches(doc->collection(), col);
         return CBLCollection_PurgeDocumentByID(col, doc->docID(), outError);
     } catchAndBridge(outError)
@@ -260,7 +260,7 @@ bool CBLDatabase_PurgeDocumentByID(CBLDatabase* db,
                                    CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_PurgeDocumentByID(col, docID, outError);
     } catchAndBridge(outError)
 }
@@ -270,7 +270,7 @@ CBLTimestamp CBLDatabase_GetDocumentExpiration(CBLDatabase* db,
                                                CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_GetDocumentExpiration(col, docID, outError);
     } catchAndBridge(outError)
 }
@@ -281,7 +281,7 @@ bool CBLDatabase_SetDocumentExpiration(CBLDatabase* db,
                                        CBLError* outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_SetDocumentExpiration(col, docID, expiration, outError);
     } catchAndBridge(outError)
 }
@@ -296,7 +296,7 @@ bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
                                   CBLError *outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_CreateValueIndex(col, name, config, outError);
     } catchAndBridge(outError)
 }
@@ -308,7 +308,7 @@ bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
                                      CBLError *outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_CreateFullTextIndex(col, name, config, outError);
     } catchAndBridge(outError)
 }
@@ -319,7 +319,7 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db,
                              CBLError *outError) noexcept
 {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         return CBLCollection_DeleteIndex(col, name, outError);
     } catchAndBridge(outError)
 }
@@ -327,7 +327,7 @@ bool CBLDatabase_DeleteIndex(CBLDatabase *db,
 
 FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) noexcept {
     try {
-        auto col = db->getDefaultCollection(true);
+        auto col = db->getInternalDefaultCollection();
         
         CBLError error;
         auto result = CBLCollection_GetIndexNames(col, &error);
@@ -380,7 +380,7 @@ CBLListenerToken* CBLDatabase_AddChangeListener(const CBLDatabase* db,
     };
 
     try {
-        CBLCollection* col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true).detach();
+        CBLCollection* col = const_cast<CBLDatabase*>(db)->getInternalDefaultCollection().detach();
         wrappedContext->collection = col;
         
         auto token = CBLCollection_AddChangeListener(col, wrappedListener, wrappedContext);
@@ -421,7 +421,7 @@ CBLListenerToken* CBLDatabase_AddDocumentChangeListener(const CBLDatabase* db,
     };
     
     try {
-        CBLCollection* col = const_cast<CBLDatabase*>(db)->getDefaultCollection(true).detach();
+        CBLCollection* col = const_cast<CBLDatabase*>(db)->getInternalDefaultCollection().detach();
         wrappedContext->collection = col;
         
         auto token = CBLCollection_AddDocumentChangeListener(col, docID, wrappedListener, wrappedContext);
