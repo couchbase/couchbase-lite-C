@@ -70,7 +70,7 @@ namespace cbl_internal {
             change.collection = _collection;
             change.docID = _docID;
 
-            Retained<CBLDatabase> db = _collection->database();
+            auto db = _collection->database();
             db->notify(this, change);
         }
 

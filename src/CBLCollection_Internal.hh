@@ -217,8 +217,7 @@ private:
     }
     
     void collectionChanged() {
-        Retained<CBLDatabase> db = database();    
-        db->notify(std::bind(&CBLCollection::callCollectionChangeListeners, this));
+        _database->notify(std::bind(&CBLCollection::callCollectionChangeListeners, this));
     }
 
     void callCollectionChangeListeners() {
