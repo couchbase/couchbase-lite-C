@@ -319,9 +319,6 @@ private:
             return slice(kDir);
         }
     }
-    
-    /** Create a CBLCollection from the C4Collection. */
-    Retained<CBLCollection> createCBLCollection(C4Collection* c4col, CBLScope* scope);
 
     void callDocListeners();
     

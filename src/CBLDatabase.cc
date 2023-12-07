@@ -164,15 +164,8 @@ Retained<CBLCollection> CBLDatabase::getCollection(slice collectionName, slice s
     if (!c4col) {
         return nullptr;
     }
-    
-    auto scope = getScope(scopeName);
-    if (!scope) {
-        // Note (Edge Case):
-        // The scope is NULL because at the same time, its all collections including the
-        // the one just created were deleted on a different thread using another database.
-        return nullptr;
-    }
-    return createCBLCollection(c4col, scope.get());
+    auto scope = new CBLScope(scopeName, this);
+    return new CBLCollection(c4col, scope, this);
 }
 
 
@@ -184,9 +177,8 @@ Retained<CBLCollection> CBLDatabase::createCollection(slice collectionName, slic
     
     auto spec = C4Database::CollectionSpec(collectionName, scopeName);
     auto c4col = c4db->createCollection(spec);
-    
     auto scope = new CBLScope(scopeName, this);
-    return createCBLCollection(c4col, scope);
+    return new CBLCollection(c4col, scope, this);
 }
 
 
@@ -209,11 +201,6 @@ Retained<CBLScope> CBLDatabase::getDefaultScope() {
 
 Retained<CBLCollection> CBLDatabase::getDefaultCollection() {
     return getCollection(kC4DefaultCollectionName, kC4DefaultScopeID);
-}
-
-
-Retained<CBLCollection> CBLDatabase::createCBLCollection(C4Collection* c4col, CBLScope* scope) {
-    return new CBLCollection(c4col, scope, const_cast<CBLDatabase*>(this));
 }
 
 
