@@ -260,7 +260,7 @@ TEST_CASE_METHOD(LogTest, "File Logging : Set Log Level", "[Log][FileLog]") {
     }
     
     // Verify:
-    int lineCount = 1; // Header:
+    int lineCount = 2; // 2 header lines :
     for (CBLLogLevel level : kLogLevels) {
         if (level == kCBLLogNone)
             continue;

@@ -23,6 +23,5 @@ using namespace fleece;
 
 Retained<CBLCollection> CBLScope::getCollection(slice collectionName) const {
     LOCK(_mutex);
-    checkOpen();
     return _database->getCollection(collectionName, _name);
 }

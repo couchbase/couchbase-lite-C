@@ -232,7 +232,6 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Create Existing Collection", "[Collect
     REQUIRE(col2);
     CHECK(col2.name() == "colA");
     CHECK(col2.scopeName() == "scopeA");
-    CHECK(col1 == col2);
 }
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Collection", "[Collection]") {

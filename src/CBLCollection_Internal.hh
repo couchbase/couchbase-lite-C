@@ -36,8 +36,16 @@ public:
     CBLCollection(C4Collection* c4col, CBLScope* scope, CBLDatabase* database)
     :_c4col(c4col, database)
     ,_scope(scope)
+    ,_database(retain(database))
     ,_name(c4col->getName())
     { }
+    
+    ~CBLCollection() {
+        LOCK(_adoptMutex);
+        if (!_adopted) {
+            release(_database);
+        }
+    }
     
 #pragma mark - ACCESSORS:
     
@@ -47,9 +55,7 @@ public:
     bool isValid() const noexcept               {return _c4col.isValid();}
     uint64_t count() const                      {return _c4col.useLocked()->getDocumentCount();}
     uint64_t lastSequence() const               {return static_cast<uint64_t>(_c4col.useLocked()->getLastSequence());}
-    
-    /** Throw NotOpen if the collection or database is invalid */
-    CBLDatabase* database() const           {return _c4col.database();}
+    CBLDatabase* database() const               {return _database; }
     
 #pragma mark - DOCUMENTS:
     
@@ -161,16 +167,23 @@ protected:
     friend struct CBLDocument;
     friend struct cbl_internal::ListenerToken<CBLCollectionDocumentChangeListener>;
     
+    // Called by the database to take an ownership.
+    // Release the database to avoid the circular reference
+    void adopt(CBLDatabase* db) {
+        assert(_database == db);
+        LOCK(_adoptMutex);
+        if (!_adopted) {
+            _scope->adopt(db);
+            release(_database);
+            _adopted = true;
+        }
+    }
+    
     auto useLocked()                        { return _c4col.useLocked(); }
     template <class LAMBDA>
     void useLocked(LAMBDA callback)         { _c4col.useLocked(callback); }
     template <class RESULT, class LAMBDA>
     RESULT useLocked(LAMBDA callback)       { return _c4col.useLocked<RESULT>(callback); }
-    
-    /** Called by the database when the database is released. */
-    void close() {
-        _c4col.close(); // This will invalidate the database pointer in the access lock
-    }
     
 private:
     
@@ -204,18 +217,7 @@ private:
     }
     
     void collectionChanged() {
-        Retained<CBLDatabase> db;
-        try {
-            db = database();
-        } catch (...) {
-            C4Error error = C4Error::fromCurrentException();
-            CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
-                    "Collection changed notification failed: %s", error.description().c_str());
-        }
-        
-        if (db) {
-            db->notify(std::bind(&CBLCollection::callCollectionChangeListeners, this));
-        }
+        _database->notify(std::bind(&CBLCollection::callCollectionChangeListeners, this));
     }
 
     void callCollectionChangeListeners() {
@@ -253,12 +255,10 @@ private:
         :shared_access_lock(std::move(c4col), *database->c4db())
         ,_c4db(database->c4db())
         ,_col(c4col)
-        ,_db(database)
         {
             _sentry = [this](C4Collection* c4col) {
                 if (!_isValid()) {
-                    C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen,
-                                   "Invalid collection: either deleted, or db closed");
+                    C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen, "Invalid collection: either deleted or db closed");
                 }
             };
         }
@@ -268,22 +268,11 @@ private:
             return _isValid();
         }
         
-        CBLDatabase* database() const {
-            auto lock = useLocked();
-            return _db;
-        }
-        
-        /** Invalidate the database pointer */
-        void close() noexcept {
-            LOCK_GUARD lock(getMutex());
-            _db = nullptr;
-        }
-        
     private:
-        bool _isValid() const noexcept                  { return _db && _col->isValid(); }
+        // Unsafe: need to call under lock:
+        bool _isValid() const noexcept                  { return !_c4db->isClosedNoLock() && _col->isValid(); }
         
         CBLDatabase::SharedC4DatabaseAccessLock _c4db;  // For retaining the shared lock
-        CBLDatabase* _cbl_nullable              _db;
         C4Collection*                           _col;
     };
     
@@ -293,6 +282,10 @@ private:
     
     alloc_slice                                             _name;
     Retained<CBLScope>                                      _scope;
+    
+    CBLDatabase*                                            _database;         // Retained unless being adopted
+    bool                                                    _adopted {false};  // Adopted by the database
+    mutable std::mutex                                      _adoptMutex;
     
     std::unique_ptr<C4CollectionObserver>                   _observer;
     Listeners<CBLCollectionChangeListener>                  _listeners;

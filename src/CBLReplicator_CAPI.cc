@@ -84,14 +84,22 @@ void CBLReplicator_SetSuspended(CBLReplicator* repl, bool sus) noexcept   {repl-
 
 FLDict CBLReplicator_PendingDocumentIDs(CBLReplicator *repl, CBLError *outError) noexcept {
     try {
-        auto col = repl->database()->getDefaultCollection(true);
+        auto col = repl->defaultCollection();
+        if (!col) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                           "The default collection is not included in the replicator config.");
+        }
         return CBLReplicator_PendingDocumentIDs2(repl, col, outError);
     } catchAndBridge(outError)
 }
 
 bool CBLReplicator_IsDocumentPending(CBLReplicator *repl, FLString docID, CBLError *outError) noexcept {
     try {
-        auto col = repl->database()->getDefaultCollection(true);
+        auto col = repl->defaultCollection();
+        if (!col) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                           "The default collection is not included in the replicator config.");
+        }
         return CBLReplicator_IsDocumentPending2(repl, docID, col, outError);
     } catchAndBridge(outError)
 }

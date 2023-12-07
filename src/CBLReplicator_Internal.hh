@@ -72,7 +72,7 @@ public:
         call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
         
         if (_conf.database) {
-            _defaultCollection = _conf.database->getDefaultCollection(true);
+            _defaultCollection = _conf.database->getInternalDefaultCollection();
         }
 
         _conf.validate();
@@ -237,9 +237,21 @@ public:
         _stoppable = make_unique<CBLReplicatorStoppable>(this);
     }
     
+    CBLCollection* _cbl_nullable defaultCollection() {
+        if (_defaultCollection) {
+            return _defaultCollection;
+        }
+        
+        if (auto i = _collections.find(kC4DefaultCollectionSpec); i != _collections.end()) {
+            return i->second.collection;
+        }
+        
+        return nullptr;
+    }
 
     const ReplicatorConfiguration* configuration() const    {return &_conf;}
     CBLDatabase* database() const                           {return _db;}
+    
     void setHostReachable(bool reachable)                   {_c4repl->setHostReachable(reachable);}
     void setSuspended(bool suspended)                       {_c4repl->setSuspended(suspended);}
     void stop()                                             {_c4repl->stop();}
