@@ -334,6 +334,18 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Collection Full Name", "[Collection]")
     CHECK(col5.fullName() == "scopeA.colA");
 }
 
+TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Collection Database", "[Collection]") {
+    // 3.1 TestGetDatabaseFromNewCollection
+    Collection col1 = db.createCollection("colA", "scopeA");
+    REQUIRE(col1);
+    CHECK(col1.database().ref() == db.ref());
+    
+    // 3.2 TestGetDatabaseFromExistingCollection
+    Collection col2 = db.getCollection("colA", "scopeA");
+    REQUIRE(col2);
+    CHECK(col2.database().ref() == db.ref());
+}
+
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Create, Get and Delete Index", "[Collection]") {
     RetainedArray names = defaultCollection.getIndexNames();
     REQUIRE(names);

@@ -43,13 +43,13 @@ public:
     
 #pragma mark - ACCESSORS:
     
-    slice name() const noexcept             {return _name;}
+    slice name() const noexcept                         {return _name;}
+    
+    CBLDatabase* database() const noexcept              {return _database;}
 
 #pragma mark - COLLECTIONS:
     
-    fleece::MutableArray collectionNames() const {
-        return _database->collectionNames(_name);
-    }
+    fleece::MutableArray collectionNames() const        {return _database->collectionNames(_name);}
     
     Retained<CBLCollection> getCollection(slice collectionName) const;
     

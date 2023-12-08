@@ -111,15 +111,14 @@ FLString CBLCollection_FullName(const CBLCollection* collection) noexcept {
     } catchAndWarn()
 }
 
+CBLDatabase* CBLCollection_Database(const CBLCollection* collection) noexcept {
+    return collection->database();
+}
+
 uint64_t CBLCollection_Count(const CBLCollection* collection) noexcept {
     try {
         return collection->count();
     } catchAndWarn()
-}
-
-/** Private API */
-CBLDatabase* CBLCollection_Database(const CBLCollection* collection) noexcept {
-    return collection->database();
 }
 
 /** Private API */
