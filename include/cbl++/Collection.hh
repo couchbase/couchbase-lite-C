@@ -61,10 +61,13 @@ namespace cbl {
     public:
         // Accessors:
         
-        /** The collection name. */
+        /** The collection's name. */
         std::string name() const                    {return asString(CBLCollection_Name(ref()));}
         
-        /** The scope name. */
+        /** The collection's fully qualified name in the '<scope-name>.<collection-name>' format. */
+        std::string fullName() const                    {return asString(CBLCollection_FullName(ref()));}
+        
+        /** The scope's name. */
         std::string scopeName() const {
             auto scope = CBLCollection_Scope(ref());
             auto scopeName = asString(CBLScope_Name(scope));

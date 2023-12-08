@@ -88,8 +88,9 @@ CBL_C {
 		CBLDatabase_Scope;
 		CBLDatabase_ScopeNames;
 		kCBLDefaultCollectionName;
-		CBLCollection_Name;
 		CBLCollection_Scope;
+		CBLCollection_Name;
+		CBLCollection_FullName;
 		CBLCollection_Count;
 		CBLCollection_GetDocument;
 		CBLCollection_SaveDocument;
