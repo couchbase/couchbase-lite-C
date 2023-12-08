@@ -99,14 +99,18 @@ CBLScope* CBLCollection_Scope(const CBLCollection* collection) noexcept {
     } catchAndWarn()
 }
 
-/** Returns the collection name. */
 FLString CBLCollection_Name(const CBLCollection* collection) noexcept {
     try {
         return collection->name();
     } catchAndWarn()
 }
 
-/** Returns the number of documents in the collection. */
+FLString CBLCollection_FullName(const CBLCollection* collection) noexcept {
+    try {
+        return collection->fullName();
+    } catchAndWarn()
+}
+
 uint64_t CBLCollection_Count(const CBLCollection* collection) noexcept {
     try {
         return collection->count();

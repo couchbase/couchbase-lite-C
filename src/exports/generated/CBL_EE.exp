@@ -97,8 +97,9 @@ _CBLDatabase_DefaultScope
 _CBLDatabase_Scope
 _CBLDatabase_ScopeNames
 _kCBLDefaultCollectionName
-_CBLCollection_Name
 _CBLCollection_Scope
+_CBLCollection_Name
+_CBLCollection_FullName
 _CBLCollection_Count
 _CBLCollection_GetDocument
 _CBLCollection_SaveDocument

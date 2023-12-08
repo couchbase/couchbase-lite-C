@@ -38,7 +38,11 @@ public:
     ,_scope(scope)
     ,_database(retain(database))
     ,_name(c4col->getName())
-    { }
+    {
+        _fullName = alloc_slice(_scope->name());
+        _fullName.append(".");
+        _fullName.append(_name);
+    }
     
     ~CBLCollection() {
         LOCK(_adoptMutex);
@@ -51,6 +55,7 @@ public:
     
     Retained<CBLScope> scope() const noexcept   {return _scope;}
     slice name() const noexcept                 {return _name;}
+    slice fullName() const noexcept             {return _fullName;}
     C4CollectionSpec spec() const noexcept      {return {_name, _scope->name()};}
     bool isValid() const noexcept               {return _c4col.isValid();}
     uint64_t count() const                      {return _c4col.useLocked()->getDocumentCount();}
@@ -281,6 +286,7 @@ private:
     C4CollectionAccessLock                                  _c4col;     // Shared lock with _c4db
     
     alloc_slice                                             _name;
+    alloc_slice                                             _fullName;
     Retained<CBLScope>                                      _scope;
     
     CBLDatabase*                                            _database;         // Retained unless being adopted

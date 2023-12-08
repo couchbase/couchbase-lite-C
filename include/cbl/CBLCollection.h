@@ -175,10 +175,15 @@ CBLCollection* _cbl_nullable CBLDatabase_DefaultCollection(const CBLDatabase* db
     @return A \ref CBLScope instance. */
 CBLScope* CBLCollection_Scope(const CBLCollection* collection) CBLAPI;
 
-/** Returns the collection name.
+/** Returns the collection's name.
     @param collection  The collection.
     @return The name of the collection. */
 FLString CBLCollection_Name(const CBLCollection* collection) CBLAPI;
+
+/** Returns the collection's fully qualified name in the '<scope-name>.<collection-name>' format.
+    @param collection  The collection.
+    @return The fully qualified name of the collection. */
+FLString CBLCollection_FullName(const CBLCollection* collection) CBLAPI;
 
 /** Returns the number of documents in the collection.
     @param collection  The collection.

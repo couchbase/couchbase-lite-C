@@ -631,6 +631,40 @@ TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[Collection]") {
     CBLCollection_Release(col1b);
 }
 
+TEST_CASE_METHOD(CollectionTest, "Collection Full Name", "[Collection]") {
+    CBLError error = {};
+    
+    // 3.1 TestGetFullNameFromDefaultCollection
+    CBLCollection* col1 = CBLDatabase_DefaultCollection(db, &error);
+    REQUIRE(col1);
+    CHECK(CBLCollection_FullName(col1) == "_default._default"_sl);
+    CBLCollection_Release(col1);
+    
+    // 3.2 TestGetFullNameFromNewCollectionInDefaultScope
+    CBLCollection* col2 = CBLDatabase_CreateCollection(db, "colA"_sl, kCBLDefaultScopeName, &error);
+    REQUIRE(col2);
+    CHECK(CBLCollection_FullName(col2) == "_default.colA"_sl);
+    CBLCollection_Release(col2);
+    
+    // 3.3 TestGetFullNameFromNewCollectionInCustomScope
+    CBLCollection* col3 = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col3);
+    CHECK(CBLCollection_FullName(col3) == "scopeA.colA"_sl);
+    CBLCollection_Release(col3);
+    
+    // 3.4 TestGetFullNameFromExistingCollectionInDefaultScope
+    CBLCollection* col4 = CBLDatabase_Collection(db, "colA"_sl, kCBLDefaultScopeName, &error);
+    REQUIRE(col4);
+    CHECK(CBLCollection_FullName(col4) == "_default.colA"_sl);
+    CBLCollection_Release(col4);
+    
+    // 3.5 TestGetFullNameFromExistingCollectionInCustomScope
+    CBLCollection* col5 = CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col5);
+    CHECK(CBLCollection_FullName(col5) == "scopeA.colA"_sl);
+    CBLCollection_Release(col5);
+}
+
 TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB Instances", "[Collection]") {
     CBLError error = {};
     CBLCollection* col1a = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
