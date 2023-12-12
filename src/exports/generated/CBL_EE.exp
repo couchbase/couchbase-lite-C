@@ -100,6 +100,7 @@ _kCBLDefaultCollectionName
 _CBLCollection_Scope
 _CBLCollection_Name
 _CBLCollection_FullName
+_CBLCollection_Database
 _CBLCollection_Count
 _CBLCollection_GetDocument
 _CBLCollection_SaveDocument
@@ -120,6 +121,7 @@ _CBLCollection_DeleteIndex
 _CBLCollection_GetIndexNames
 _kCBLDefaultScopeName
 _CBLScope_Name
+_CBLScope_Database
 _CBLScope_Collection
 _CBLScope_CollectionNames
 _CBLDocument_ID

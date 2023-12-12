@@ -186,10 +186,7 @@ namespace cbl {
             @param collectionName  The name of the collection.
             @param scopeName  The name of the scope.
             @return A \ref Collection instance, or NULL if the collection doesn't exist, or throws if an error occurred. */
-        inline Collection getCollection(slice collectionName, slice scopeName =kCBLDefaultScopeName) const {
-            CBLError error {};
-            return Collection::adopt(CBLDatabase_Collection(ref(), collectionName, scopeName, &error), &error) ;
-        }
+        inline Collection getCollection(slice collectionName, slice scopeName =kCBLDefaultScopeName) const;
         
         /** Create a new collection.
             The naming rules of the collections and scopes are as follows:
@@ -201,10 +198,7 @@ namespace cbl {
             @param collectionName  The name of the collection.
             @param scopeName  The name of the scope.
             @return A \ref Collection instance, or throws if an error occurred. */
-        inline Collection createCollection(slice collectionName, slice scopeName =kCBLDefaultScopeName) {
-            CBLError error {};
-            return Collection::adopt(CBLDatabase_CreateCollection(ref(), collectionName, scopeName, &error), &error) ;
-        }
+        inline Collection createCollection(slice collectionName, slice scopeName =kCBLDefaultScopeName);
         
         /** Delete an existing collection.
             @param collectionName  The name of the collection.
@@ -218,10 +212,7 @@ namespace cbl {
             @note The default collection may not exist if it was deleted.
                   Also, the default collection cannot be recreated after being deleted.
             @return A \ref Collection instance, or NULL if the default collection doesn't exist, or throws if an error occurred. */
-        inline Collection getDefaultCollection() const {
-            CBLError error {};
-            return Collection::adopt(CBLDatabase_DefaultCollection(ref(), &error), &error) ;
-        }
+        inline Collection getDefaultCollection() const;
         
         // Documents:
 
@@ -448,6 +439,12 @@ namespace cbl {
         ~Database() {
             clear();
         }
+        
+    protected:
+        friend class Collection;
+        friend class Scope;
+        
+        CBL_REFCOUNTED_WITHOUT_COPY_MOVE_BOILERPLATE(Database, RefCounted, CBLDatabase)
 
     private:
         void open(slice& name, const CBLDatabaseConfiguration* _cbl_nullable config) {
@@ -493,8 +490,6 @@ namespace cbl {
         }
         
         std::shared_ptr<NotificationsReadyCallbackAccess> _notificationReadyCallbackAccess;
-        
-        CBL_REFCOUNTED_WITHOUT_COPY_MOVE_BOILERPLATE(Database, RefCounted, CBLDatabase)
         
     public:
         Database(const Database &other) noexcept

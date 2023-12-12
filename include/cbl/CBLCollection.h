@@ -169,10 +169,10 @@ CBLCollection* _cbl_nullable CBLDatabase_DefaultCollection(const CBLDatabase* db
     Getting information about a collection.
  */
 
-/** Returns the scope of the collection.
+/** Returns the collection's scope.
     @note You are responsible for releasing the returned scope.
     @param collection  The collection.
-    @return A \ref CBLScope instance. */
+    @return The scope of the collection. */
 CBLScope* CBLCollection_Scope(const CBLCollection* collection) CBLAPI;
 
 /** Returns the collection's name.
@@ -184,6 +184,12 @@ FLString CBLCollection_Name(const CBLCollection* collection) CBLAPI;
     @param collection  The collection.
     @return The fully qualified name of the collection. */
 FLString CBLCollection_FullName(const CBLCollection* collection) CBLAPI;
+
+/** Returns the collection's database.
+    @note The database object is owned by the collection object; you do not need to release it.
+    @param collection  The collection.
+    @return The database of the collection. */
+CBLDatabase* CBLCollection_Database(const CBLCollection* collection) CBLAPI;
 
 /** Returns the number of documents in the collection.
     @param collection  The collection.
