@@ -87,7 +87,7 @@ CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db, CBLError* outError) no
 
 CBLCollection* CBLDatabase_DefaultCollection(const CBLDatabase* db, CBLError* outError) noexcept {
     try {
-        return const_cast<CBLDatabase*>(db)->getDefaultCollection(false).detach();
+        return const_cast<CBLDatabase*>(db)->getDefaultCollection().detach();
     } catchAndBridge(outError)
 }
 
@@ -99,24 +99,25 @@ CBLScope* CBLCollection_Scope(const CBLCollection* collection) noexcept {
     } catchAndWarn()
 }
 
-/** Returns the collection name. */
 FLString CBLCollection_Name(const CBLCollection* collection) noexcept {
     try {
         return collection->name();
     } catchAndWarn()
 }
 
-/** Returns the number of documents in the collection. */
-uint64_t CBLCollection_Count(const CBLCollection* collection) noexcept {
+FLString CBLCollection_FullName(const CBLCollection* collection) noexcept {
     try {
-        return collection->count();
+        return collection->fullName();
     } catchAndWarn()
 }
 
-/** Private API */
 CBLDatabase* CBLCollection_Database(const CBLCollection* collection) noexcept {
+    return collection->database();
+}
+
+uint64_t CBLCollection_Count(const CBLCollection* collection) noexcept {
     try {
-        return collection->database();
+        return collection->count();
     } catchAndWarn()
 }
 

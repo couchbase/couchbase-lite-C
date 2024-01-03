@@ -155,12 +155,10 @@ CBLScope* CBLDatabase_DefaultScope(const CBLDatabase* db,
                                    CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the default collection.
-    @note  The default collection may not exist if it was deleted.
-           Also, the default collection cannot be recreated after being deleted.
     @note  You are responsible for releasing the returned collection.
     @param db  The database.
     @param outError  On failure, the error will be written here.
-    @return  A \ref CBLCollection instance, or NULL if the default collection doesn't exist or an error occurred. */
+    @return  A \ref CBLCollection instance, or NULL if an error occurred. */
 CBLCollection* _cbl_nullable CBLDatabase_DefaultCollection(const CBLDatabase* db,
                                                            CBLError* _cbl_nullable outError) CBLAPI;
 
@@ -171,16 +169,27 @@ CBLCollection* _cbl_nullable CBLDatabase_DefaultCollection(const CBLDatabase* db
     Getting information about a collection.
  */
 
-/** Returns the scope of the collection.
+/** Returns the collection's scope.
     @note You are responsible for releasing the returned scope.
     @param collection  The collection.
-    @return A \ref CBLScope instance. */
+    @return The scope of the collection. */
 CBLScope* CBLCollection_Scope(const CBLCollection* collection) CBLAPI;
 
-/** Returns the collection name.
+/** Returns the collection's name.
     @param collection  The collection.
     @return The name of the collection. */
 FLString CBLCollection_Name(const CBLCollection* collection) CBLAPI;
+
+/** Returns the collection's fully qualified name in the '<scope-name>.<collection-name>' format.
+    @param collection  The collection.
+    @return The fully qualified name of the collection. */
+FLString CBLCollection_FullName(const CBLCollection* collection) CBLAPI;
+
+/** Returns the collection's database.
+    @note The database object is owned by the collection object; you do not need to release it.
+    @param collection  The collection.
+    @return The database of the collection. */
+CBLDatabase* CBLCollection_Database(const CBLCollection* collection) CBLAPI;
 
 /** Returns the number of documents in the collection.
     @param collection  The collection.

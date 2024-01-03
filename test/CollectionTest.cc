@@ -399,8 +399,6 @@ TEST_CASE_METHOD(CollectionTest, "Create Existing Collection", "[Collection]") {
     REQUIRE(col2);
     CHECK(CBLCollection_Name(col2) == "colA"_sl);
     
-    CHECK(col1 == col2);
-    
     CBLCollection_Release(col1);
     CBLCollection_Release(col2);
 }
@@ -462,10 +460,10 @@ TEST_CASE_METHOD(CollectionTest, "Get Collections from Scope", "[Collection]") {
     CHECK(CBLScope_Name(scope) == "scopeA"_sl);
     
     CBLCollection* colA2 = CBLScope_Collection(scope, "colA"_sl, &error);
-    CHECK(colA == colA2);
+    CHECK(CBLCollection_Name(colA2) == "colA"_sl);
     
     CBLCollection* colB2 = CBLScope_Collection(scope, "colB"_sl, &error);
-    CHECK(colB == colB2);
+    CHECK(CBLCollection_Name(colB2) == "colB"_sl);
     
     CHECK(!CBLScope_Collection(scope, "colC"_sl, &error));
     CHECK(error.code == 0);
@@ -539,8 +537,6 @@ TEST_CASE_METHOD(CollectionTest, "Valid Collection and Scope Names", "[Collectio
         
         CBLCollection* col2 = CBLDatabase_Collection(db, slice(name), slice(name), &error);
         REQUIRE(col2);
-        
-        CHECK(col1 == col2);
         
         CBLCollection_Release(col1);
         CBLCollection_Release(col2);
@@ -633,6 +629,74 @@ TEST_CASE_METHOD(CollectionTest, "Scope Name Case Sensitive", "[Collection]") {
     
     CBLCollection_Release(col1a);
     CBLCollection_Release(col1b);
+}
+
+TEST_CASE_METHOD(CollectionTest, "Collection Full Name", "[Collection]") {
+    CBLError error = {};
+    
+    // 3.1 TestGetFullNameFromDefaultCollection
+    CBLCollection* col1 = CBLDatabase_DefaultCollection(db, &error);
+    REQUIRE(col1);
+    CHECK(CBLCollection_FullName(col1) == "_default._default"_sl);
+    CBLCollection_Release(col1);
+    
+    // 3.2 TestGetFullNameFromNewCollectionInDefaultScope
+    CBLCollection* col2 = CBLDatabase_CreateCollection(db, "colA"_sl, kCBLDefaultScopeName, &error);
+    REQUIRE(col2);
+    CHECK(CBLCollection_FullName(col2) == "_default.colA"_sl);
+    CBLCollection_Release(col2);
+    
+    // 3.3 TestGetFullNameFromNewCollectionInCustomScope
+    CBLCollection* col3 = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col3);
+    CHECK(CBLCollection_FullName(col3) == "scopeA.colA"_sl);
+    CBLCollection_Release(col3);
+    
+    // 3.4 TestGetFullNameFromExistingCollectionInDefaultScope
+    CBLCollection* col4 = CBLDatabase_Collection(db, "colA"_sl, kCBLDefaultScopeName, &error);
+    REQUIRE(col4);
+    CHECK(CBLCollection_FullName(col4) == "_default.colA"_sl);
+    CBLCollection_Release(col4);
+    
+    // 3.5 TestGetFullNameFromExistingCollectionInCustomScope
+    CBLCollection* col5 = CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col5);
+    CHECK(CBLCollection_FullName(col5) == "scopeA.colA"_sl);
+    CBLCollection_Release(col5);
+}
+
+TEST_CASE_METHOD(CollectionTest, "Collection Database", "[Collection]") {
+    CBLError error = {};
+    
+    // 3.1 TestGetDatabaseFromNewCollection
+    CBLCollection* col1 = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col1);
+    CHECK(CBLCollection_Database(col1) == db);
+    CBLCollection_Release(col1);
+    
+    // 3.2 TestGetDatabaseFromExistingCollection
+    CBLCollection* col2 = CBLDatabase_Collection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col2);
+    CHECK(CBLCollection_Database(col2) == db);
+    CBLCollection_Release(col2);
+}
+
+TEST_CASE_METHOD(CollectionTest, "Scope Database", "[Collection]") {
+    CBLError error = {};
+    
+    // 3.3 TestGetDatabaseFromNewCollection
+    CBLCollection* col1 = CBLDatabase_CreateCollection(db, "colA"_sl, "scopeA"_sl, &error);
+    REQUIRE(col1);
+    CBLScope* scope1 = CBLCollection_Scope(col1);
+    CHECK(CBLScope_Database(scope1) == db);
+    CHECK(CBLScope_Database(scope1) == CBLCollection_Database(col1));
+    CBLScope_Release(scope1);
+    CBLCollection_Release(col1);
+    
+    // 3.4 TestGetDatabaseFromScopeObtainedFromDatabase
+    CBLScope* scope2 = CBLDatabase_Scope(db, "scopeA"_sl, &error);
+    CHECK(CBLScope_Database(scope2) == db);
+    CBLScope_Release(scope2);
 }
 
 TEST_CASE_METHOD(CollectionTest, "Create then Get Collection using Different DB Instances", "[Collection]") {

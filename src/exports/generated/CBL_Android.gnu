@@ -67,8 +67,10 @@ CBL_C {
 		CBLDatabase_Scope;
 		CBLDatabase_ScopeNames;
 		kCBLDefaultCollectionName;
-		CBLCollection_Name;
 		CBLCollection_Scope;
+		CBLCollection_Name;
+		CBLCollection_FullName;
+		CBLCollection_Database;
 		CBLCollection_Count;
 		CBLCollection_GetDocument;
 		CBLCollection_SaveDocument;
@@ -89,6 +91,7 @@ CBL_C {
 		CBLCollection_GetIndexNames;
 		kCBLDefaultScopeName;
 		CBLScope_Name;
+		CBLScope_Database;
 		CBLScope_Collection;
 		CBLScope_CollectionNames;
 		CBLDocument_ID;

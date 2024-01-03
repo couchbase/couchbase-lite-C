@@ -29,6 +29,10 @@ FLString CBLScope_Name(const CBLScope* scope) noexcept {
     return scope->name();
 }
 
+CBLDatabase* CBLScope_Database(const CBLScope* scope) noexcept {
+    return scope->database();
+}
+
 #pragma mark - COLLECTIONS
 
 FLMutableArray CBLScope_CollectionNames(const CBLScope* scope,

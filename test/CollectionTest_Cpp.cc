@@ -232,7 +232,6 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Create Existing Collection", "[Collect
     REQUIRE(col2);
     CHECK(col2.name() == "colA");
     CHECK(col2.scopeName() == "scopeA");
-    CHECK(col1 == col2);
 }
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Delete Collection", "[Collection]") {
@@ -306,6 +305,45 @@ TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Use Invalid Collection", "[Collection]
     }
     
     testInvalidCollection(col);
+}
+
+TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Collection Full Name", "[Collection]") {
+    // 3.1 TestGetFullNameFromDefaultCollection
+    Collection col1 = db.getDefaultCollection();
+    REQUIRE(col1);
+    CHECK(col1.fullName() == "_default._default");
+    
+    // 3.2 TestGetFullNameFromNewCollectionInDefaultScope
+    Collection col2 = db.createCollection("colA");
+    REQUIRE(col2);
+    CHECK(col2.fullName() == "_default.colA");
+    
+    // 3.3 TestGetFullNameFromNewCollectionInCustomScope
+    Collection col3 = db.createCollection("colA", "scopeA");
+    REQUIRE(col3);
+    CHECK(col3.fullName() == "scopeA.colA");
+    
+    // 3.4 TestGetFullNameFromExistingCollectionInDefaultScope
+    Collection col4 = db.getCollection("colA");
+    REQUIRE(col4);
+    CHECK(col4.fullName() == "_default.colA");
+    
+    // 3.5 TestGetFullNameFromExistingCollectionInCustomScope
+    Collection col5 = db.getCollection("colA", "scopeA");
+    REQUIRE(col5);
+    CHECK(col5.fullName() == "scopeA.colA");
+}
+
+TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Collection Database", "[Collection]") {
+    // 3.1 TestGetDatabaseFromNewCollection
+    Collection col1 = db.createCollection("colA", "scopeA");
+    REQUIRE(col1);
+    CHECK(col1.database().ref() == db.ref());
+    
+    // 3.2 TestGetDatabaseFromExistingCollection
+    Collection col2 = db.getCollection("colA", "scopeA");
+    REQUIRE(col2);
+    CHECK(col2.database().ref() == db.ref());
 }
 
 TEST_CASE_METHOD(CollectionTest_Cpp, "C++ Create, Get and Delete Index", "[Collection]") {
