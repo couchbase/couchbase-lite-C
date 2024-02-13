@@ -61,7 +61,7 @@ namespace cbl_internal {
     :_collection(collection)
     ,_clientResolver(customResolver)
     ,_clientResolverContext(context)
-    ,_docID(move(docID))
+    ,_docID(std::move(docID))
     {
         //SyncLog(Info, "ConflictResolver %p on %.*s", this, _docID.c_str());
     }
