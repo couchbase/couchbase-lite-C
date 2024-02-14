@@ -40,7 +40,7 @@ void NotificationQueue::setCallback(CBLNotificationsReadyCallback callback, void
     auto pending = _state.useLocked<Notifications>([&](State &state) {
         state.callback = callback;
         state.context = context;
-        return callback ? nullptr : move(state.queue);
+        return callback ? nullptr : std::move(state.queue);
     });
     call(pending);
 }
@@ -74,7 +74,7 @@ void NotificationQueue::add(Notification notification) {
 
 
 void NotificationQueue::notifyAll() {
-    auto queue = move(_state.useLocked()->queue);
+    auto queue = std::move(_state.useLocked()->queue);
     call(queue);
 }
 

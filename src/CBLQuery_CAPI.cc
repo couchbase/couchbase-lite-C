@@ -36,7 +36,7 @@ CBLQuery* CBLDatabase_CreateQuery(const CBLDatabase* db,
             C4Error::set(LiteCoreDomain, kC4ErrorInvalidQuery, {}, internal(outError));
             return nullptr;
         }
-        return move(query).detach();
+        return std::move(query).detach();
     } catchAndBridge(outError)
 }
 
