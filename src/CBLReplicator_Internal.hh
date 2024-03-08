@@ -215,19 +215,27 @@ public:
         // Encode replicator options dict:
         alloc_slice options = encodeOptions();
         params.optionsDictFleece = options;
+        
+        // Generate replicator id for logging purpose:
+        std::stringstream ss;
+        ss << "CBLRepl@" << (void*)this;
+        auto replID = ss.str();
+        _replicatorID = alloc_slice(replID);
 
         // Create the LiteCore replicator:
         _db->useLocked([&](C4Database *c4db) {
 #ifdef COUCHBASE_ENTERPRISE
             if (_conf.endpoint->otherLocalDB()) {
                 _c4repl = c4db->newLocalReplicator(_conf.endpoint->otherLocalDB()->useLocked().get(),
-                                                   params);
+                                                   params, 
+                                                   _replicatorID);
             } else
 #endif
             {
                 _c4repl = c4db->newReplicator(_conf.endpoint->remoteAddress(),
                                               _conf.endpoint->remoteDatabaseName(),
-                                              params);
+                                              params,
+                                              _replicatorID);
             }
         });
         
@@ -542,6 +550,7 @@ private:
     Retained<CBLDatabase>                       _db;
     Retained<CBLCollection>                     _defaultCollection;
     Retained<C4Replicator>                      _c4repl;
+    alloc_slice                                 _replicatorID;
     unique_ptr<CBLReplicatorStoppable>          _stoppable;
     ReplicationCollectionsMap                   _collections;       // For filters and conflict resolver
     bool                                        _useInitialStatus;  // For returning status before first start
