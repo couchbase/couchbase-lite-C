@@ -87,6 +87,7 @@
 		4022546F29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		4022547029355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		40D1862529B6D1A50061AA85 /* Collection.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCC064BD287CBD95000C5BD7 /* Collection.hh */; };
+		40F902D82B9F7B12002EA0A0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */; };
 		42D1B69D2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
 		42D1B69E2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
 		42D1B69F2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
@@ -463,6 +464,7 @@
 		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
 		27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+Apple.mm"; sourceTree = "<group>"; };
 		4022546D29355576000FBAC8 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
+		40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLUserAgent.mm; sourceTree = "<group>"; };
 		932062DA26BC6B43006917A5 /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
 		9320630126BDB340006917A5 /* CBLPlatform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLPlatform.h; sourceTree = "<group>"; };
@@ -791,6 +793,7 @@
 			children = (
 				27984DF422499ED4000FE777 /* CouchbaseLite.modulemap */,
 				27984E0D2249A127000FE777 /* Framework-Info.plist */,
+				40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */,
 				27B61D8421D6BA060027CCDB /* xcconfigs */,
 				27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */,
 				93D0AFF1262619B800777AFC /* generate_edition_header.sh */,
@@ -1015,6 +1018,7 @@
 				27984E072249A126000FE777 /* Frameworks */,
 				27984E382249A36A000FE777 /* Copy Fleece Headers */,
 				93D0AFB626255E7300777AFC /* Copy CBL_Editionh */,
+				40F902D72B9F7B09002EA0A0 /* Resources */,
 				42F2DAB72655DC4B001C9EC3 /* Fix Header References */,
 			);
 			buildRules = (
@@ -1271,6 +1275,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4022546E29355577000FBAC8 /* assets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40F902D72B9F7B09002EA0A0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				40F902D82B9F7B12002EA0A0 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
