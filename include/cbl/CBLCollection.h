@@ -381,6 +381,20 @@ bool CBLCollection_CreateFullTextIndex(CBLCollection *collection,
                                        CBLFullTextIndexConfiguration config,
                                        CBLError* _cbl_nullable outError) CBLAPI;
 
+#ifdef COUCHBASE_ENTERPRISE
+/** ENTERPRISE EDITION ONLY
+ 
+    Creatres a vector index in the collection.
+    If an identical index with that name already exists, nothing happens (and no error is returned.)
+    If a non-identical index with that name already exists, it is deleted and re-created.
+ */
+bool CBLCollection_CreateVectorIndex(CBLCollection *collection,
+                                     FLString name,
+                                     CBLVectorIndexConfiguration config,
+                                     CBLError* _cbl_nullable outError) CBLAPI;
+
+#endif
+
 /** Deletes an index in the collection by name.
     @param collection  The collection.
     @param name  The name of the index.

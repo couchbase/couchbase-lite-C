@@ -20,12 +20,16 @@
 #include "CBLCollection.h"
 #include "CBLDatabase_Internal.hh"
 #include "CBLDocument_Internal.hh"
-#include "CBLScope_Internal.hh"
 #include "CBLPrivate.h"
+#include "CBLScope_Internal.hh"
+#include "CBLVectorIndexConfig.hh"
+#include "Defer.hh"
 
 CBL_ASSUME_NONNULL_BEGIN
 
 using CollectionSpec = C4Database::CollectionSpec;
+
+using namespace litecore;
 
 struct CBLCollection final : public CBLRefCounted {
     
@@ -127,7 +131,82 @@ public:
                                         (C4QueryLanguage)config.expressionLanguage,
                                         kC4FullTextIndex, &options);
     }
+    
+#ifdef COUCHBASE_ENTERPRISE
+    
+    void createVectorIndex(slice name, CBLVectorIndexConfiguration config) {
+        if (!config.expression.buf) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "expression is required.");
+        }
+            
+        if (config.dimensions < 2 || config.dimensions > 2048) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "dimensions must be >= 2 and <= 2048.");
+        }
+        
+        if (config.centroids < 1 || config.centroids > 64000) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "centroids must be >= 1 and <= 64000.");
+        }
+        
+        // Use default minTrainingSize if minTrainingSize is not specified:
+        if (config.minTrainingSize == 0) {
+            config.minTrainingSize = 25 * config.centroids;
+        }
+        
+        // Use default maxTrainingSize if maxTrainingSize is not specified:
+        if (config.maxTrainingSize == 0) {
+            config.maxTrainingSize = 250 * config.centroids;
+        }
+        
+        if (config.minTrainingSize < 1) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "minTrainingSize must be > 1.");
+        } else if (config.maxTrainingSize < 1) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "maxTrainingSize must be > 1.");
+        } else if (config.minTrainingSize > config.maxTrainingSize) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "minTrainingSize must be <= maxTrainingSize.");
+        }
+        
+        // Use default encoding if encoding is not specified:
+        CBLVectorEncoding* enc = nullptr;
+        if (!config.encoding) {
+            enc = CBLVectorEncoding_CreateScalarQuantizer(kCBLSQ8);
+            config.encoding = enc;
+        }
+        DEFER {
+            CBLVectorEncoding_Free(enc);
+        };
+        
+        C4VectorEncoding c4enc =  config.encoding->c4encoding();
+        if (c4enc.type == kC4VectorEncodingPQ) {
+            if (c4enc.pq_subquantizers < 2) {
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Product Quantizer's subquantizers must be > 1.");
+            } else if (config.dimensions % c4enc.pq_subquantizers != 0) {
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Product Quantizer's subquantizers must be a factor of dimensions.");
+            } else if (c4enc.bits < 4 || c4enc.bits > 12){
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Product Quantizer's bits must be >= 4 and <= 12.");
+            }
+        }
+        
+        C4VectorIndexOptions vector {};
+        vector.clustering = {};
+        vector.clustering.type = kC4VectorClusteringFlat;
+        vector.clustering.flat_centroids = config.centroids;
+        vector.dimensions = config.dimensions;
+        vector.metric = config.metric == kCBLDistanceMetricCosine ? kC4VectorMetricCosine : kC4VectorMetricEuclidean;
+        vector.encoding = c4enc;
+        vector.minTrainingSize = config.minTrainingSize;
+        vector.maxTrainingSize = config.maxTrainingSize;
+        vector.numProbes = 0;
+        
+        C4IndexOptions options {};
+        options.vector = vector;
+        
+        _c4col.useLocked()->createIndex(name, config.expression,
+                                        (C4QueryLanguage)config.expressionLanguage,
+                                        kC4VectorIndex, &options);
+    }
 
+#endif
+    
     void deleteIndex(slice name) {
         _c4col.useLocked()->deleteIndex(name);
     }

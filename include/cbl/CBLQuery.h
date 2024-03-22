@@ -250,16 +250,19 @@ CBLResultSet* _cbl_nullable CBLQuery_CopyCurrentResults(const CBLQuery* query,
     You may find SQLite's documentation particularly helpful since Couchbase Lite's querying is
     based on SQLite.
 
-    Two types of indexes are currently supported:
+    Three types of indexes are currently supported:
         * Value indexes speed up queries by making it possible to look up property (or expression)
           values without scanning every document. They're just like regular indexes in SQL or N1QL.
           Multiple expressions are supported; the first is the primary key, second is secondary.
           Expressions must evaluate to scalar types (boolean, number, string).
         * Full-Text Search (FTS) indexes enable fast search of natural-language words or phrases
-          by using the `MATCH` operator in a query. A FTS index is **required** for full-text
-          search: a query with a `MATCH` operator will fail to compile unless there is already a
-          FTS index for the property/expression being matched. Only a single expression is
-          currently allowed, and it must evaluate to a string. */
+          by using the `MATCH()` function in a query. A FTS index is **required** for full-text
+          search: a query with a `MATCH()` function will fail to compile unless there is already a
+          FTS index for the property/expression being matched.
+        * (Enterprise Edition Only) Vector indexes allows efficient search of ML vectors by using
+          the `VECTOR_MATCH()` function in a query. The `CouchbaseLiteVectorSearch`
+          extension library is **required** to use the functionality. Use \ref CBL_SetExtensionPath
+          function to set the directoary path containing the extension library. */
 
 /** Value Index Configuration. */
 typedef struct {
@@ -309,6 +312,78 @@ typedef struct {
         such as stemming and stop-word removal occur. */
     FLString language;
 } CBLFullTextIndexConfiguration;
+
+#ifdef COUCHBASE_ENTERPRISE
+
+/** An opaque object representing vector encoding config to use in CBLVectorIndexConfiguration. */
+typedef struct CBLVectorEncoding CBLVectorEncoding;
+
+/** Creates a no-encoding config to use in CBLVectorIndexConfiguration; 4 bytes per dimension, no data loss.  */
+_cbl_warn_unused
+CBLVectorEncoding* CBLVectorEncoding_CreateNone(void) CBLAPI;
+
+/** Scalar Quantizer encoding type */
+typedef CBL_ENUM(uint32_t, CBLScalarQuantizerType) {
+    kCBLSQ4 = 0,                            ///< 4 bits per dimension
+    kCBLSQ6,                                ///< 6 bits per dimension
+    kCBLSQ8                                 ///< 8 bits per dimension
+};
+
+/** Creates a Scalar Quantizer encoding config to use in CBLVectorIndexConfiguration. */
+_cbl_warn_unused
+CBLVectorEncoding* CBLVectorEncoding_CreateScalarQuantizer(CBLScalarQuantizerType type) CBLAPI;
+
+/** Creates a Product Quantizer encoding config to use in CBLVectorIndexConfiguration. */
+_cbl_warn_unused
+CBLVectorEncoding* CBLVectorEncoding_CreateProductQuantizer(unsigned subquantizers, unsigned bits) CBLAPI;
+
+/** Frees a CBLVectorEncoding object. The encoding object can be freed after the index is created. */
+void CBLVectorEncoding_Free(CBLVectorEncoding* _cbl_nullable) CBLAPI;
+
+/** Distance metric to use in CBLVectorIndexConfiguration. */
+typedef CBL_ENUM(uint32_t, CBLDistanceMetric) {
+    kCBLDistanceMetricEuclidean = 0,        ///< Euclidean distance
+    kCBLDistanceMetricCosine,               ///< Cosine distance (1.0 - Cosine Similarity)
+};
+
+/** ENTERPRISE EDITION ONLY
+    
+    Vector Index Configuration. */
+typedef struct {
+    /** The language used in the expressions (Required). */
+    CBLQueryLanguage expressionLanguage;
+    
+    /** An expression returning a vector which is an array of numbers. The expression could be specified
+        in a JSON Array or in N1QL syntax depending on the expressionLanguage. (Required) */
+    FLString expression;
+    
+    /** The number of vector dimensions. (Required) */
+    unsigned dimensions;
+    
+    /** The number of centroids which is the number buckets to partition the vectors in the index. (Required) */
+    unsigned centroids;
+    
+    /** Vector encoding type. The default value is 8-bits Scalar Quantizer. */
+    CBLVectorEncoding* encoding;
+    
+    /** Distance Metric type. The default value is euclidean distance. */
+    CBLDistanceMetric metric;
+    
+    /** The minium number of vectors for training the index, an initial process for preparing an index based on the characteristics of the vectors to be indexed.
+        Prior training, the full table scan will be peformed when the vector_match() function is used in the query.
+        
+        The default value is 25 times number of centroids.The number must be more than zero and not greater than maxTrainingSize.
+        An invalid argument error will be thrown when creating the index if an invalid value is used. */
+    unsigned minTrainingSize;
+    
+    /** The max number of vectors used when trainning the index. The default
+        value is 256 times number of centroids. The number must be more than zero
+        and not less than minTrainingSize. An invalid argument will be thrown
+        when creating the index if an invalid value is used. */
+    unsigned maxTrainingSize;
+} CBLVectorIndexConfiguration;
+
+#endif
 
 /** Creates a full-text index.
     Indexes are persistent.

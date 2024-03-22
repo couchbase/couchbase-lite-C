@@ -288,6 +288,21 @@ bool CBLCollection_CreateFullTextIndex(CBLCollection *collection,
     } catchAndBridge(outError)
 }
 
+#ifdef COUCHBASE_ENTERPRISE
+
+bool CBLCollection_CreateVectorIndex(CBLCollection *collection,
+                                     FLString name,
+                                     CBLVectorIndexConfiguration config,
+                                     CBLError *outError) noexcept
+{
+    try {
+        collection->createVectorIndex(name, config);
+        return true;
+    } catchAndBridge(outError)
+}
+
+#endif
+
 bool CBLCollection_DeleteIndex(CBLCollection *collection,
                                FLString name,
                                CBLError *outError) noexcept

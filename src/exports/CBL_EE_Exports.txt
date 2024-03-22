@@ -30,3 +30,10 @@ CBLEncryptable_Value
 FLDict_IsEncryptableValue
 FLDict_GetEncryptableValue
 FLSlot_SetEncryptableValue
+
+CBL_SetExtensionPath
+CBLCollection_CreateVectorIndex
+CBLVectorEncoding_CreateNone
+CBLVectorEncoding_CreateProductQuantizer
+CBLVectorEncoding_CreateScalarQuantizer
+CBLVectorEncoding_Free

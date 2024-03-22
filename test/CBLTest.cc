@@ -51,6 +51,27 @@ using namespace fleece;
     }
 #endif
 
+#ifdef COUCHBASE_ENTERPRISE
+
+static string sExtensionPath;
+
+void CBLTest::initVectorSearchExtension() {
+    std::once_flag sOnce;
+    std::call_once(sOnce, [] {
+        auto path = GetExtensionPath();
+        if (!path.empty()) {
+            CBL_SetExtensionPath(slice(path));
+            sExtensionPath = path;
+        }
+    });
+}
+
+bool CBLTest::hasVectorSearchExtension() {
+    return !sExtensionPath.empty();
+}
+
+#endif
+
 static alloc_slice sDatabaseDir;
 
 alloc_slice CBLTest::databaseDir() {
@@ -105,6 +126,10 @@ CBLTest::CBLTest() {
     CHECK(FLValue_GetType(kFLUndefinedValue) == kFLUndefined);
     CHECK(FLValue_GetType((FLValue)kFLEmptyArray) == kFLArray);
     CHECK(FLValue_GetType((FLValue)kFLEmptyDict) == kFLDict);
+    
+#ifdef COUCHBASE_ENTERPRISE
+    initVectorSearchExtension();
+#endif
 
     CBLError error;
     auto config = databaseConfig();
@@ -210,6 +235,25 @@ string GetTestFilePath(const std::string &filename) {
     }
     return sTestFilesPath + filename;
 }
+
+#ifdef COUCHBASE_ENTERPRISE
+
+string GetExtensionPath() {
+#ifdef __APPLE__
+    auto bundle = CFBundleGetBundleWithIdentifier(CFSTR("com.couchbase.CouchbaseLiteTests"));
+    if (!bundle) {
+        string dir = "test/extensions/";
+        string libPath = dir + "CouchbaseLiteVectorSearch";
+        ifstream fin(libPath);
+        if (fin.good()) {
+            return dir;
+        }
+    }
+#endif // __APPLE__
+    return "";
+}
+
+#endif
 
 bool ReadFileByLines(const string &path, const function<bool(FLSlice)> &callback) {
     INFO("Reading lines from " << path);

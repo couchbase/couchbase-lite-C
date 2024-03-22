@@ -21,6 +21,12 @@ CBL_C {
 		FLDict_IsEncryptableValue;
 		FLDict_GetEncryptableValue;
 		FLSlot_SetEncryptableValue;
+		CBL_SetExtensionPath;
+		CBLCollection_CreateVectorIndex;
+		CBLVectorEncoding_CreateNone;
+		CBLVectorEncoding_CreateProductQuantizer;
+		CBLVectorEncoding_CreateScalarQuantizer;
+		CBLVectorEncoding_Free;
 		CBL_Retain;
 		CBL_Release;
 		CBL_InstanceCount;
