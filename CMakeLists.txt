@@ -125,11 +125,14 @@ set(
     src/CBLDocument_CAPI.cc
     src/CBLEncryptable_CAPI.cc
     src/CBLLog.cc
+    src/CBLPrediction.cc
+    src/CBLPrediction_CAPI.cc
     src/CBLQuery.cc
     src/CBLQuery_CAPI.cc
     src/CBLReplicator_CAPI.cc
     src/CBLScope.cc
     src/CBLScope_CAPI.cc
+    src/CBLVectorIndexConfig_CAPI.cc
     src/ConflictResolver.cc
     src/Internal.cc
     src/Listener.cc

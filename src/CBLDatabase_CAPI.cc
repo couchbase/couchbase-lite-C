@@ -458,3 +458,13 @@ bool CBLDatabase_SaveBlob(CBLDatabase* db, CBLBlob* blob,
         return true;
     } catchAndBridge(outError)
 }
+
+#pragma mark - EXTENSION:
+
+#ifdef COUCHBASE_ENTERPRISE
+
+void CBL_SetExtensionPath(FLString path) noexcept {
+    CBLDatabase::setExtensionPath(path);
+}
+
+#endif

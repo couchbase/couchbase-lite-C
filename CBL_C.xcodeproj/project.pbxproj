@@ -86,6 +86,12 @@
 		4022546E29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		4022546F29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		4022547029355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
+		406E46E42BACC4BF0088198C /* VectorSearchTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 406E46D22BACAEFF0088198C /* VectorSearchTest.cc */; };
+		4083FCAF2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */; };
+		4083FCB02BA3B8C50061509D /* CBLVectorIndexConfig.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */; };
+		4083FCBC2BA8DE200061509D /* CBLPrediction_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */; };
+		4083FCC02BAA235F0061509D /* CBLPrediction_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */; };
+		4083FCC22BAA38F30061509D /* CBLPrediction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCC12BAA38F30061509D /* CBLPrediction.cc */; };
 		40D1862529B6D1A50061AA85 /* Collection.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCC064BD287CBD95000C5BD7 /* Collection.hh */; };
 		40F902D82B9F7B12002EA0A0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */; };
 		42D1B69D2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
@@ -464,6 +470,14 @@
 		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
 		27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+Apple.mm"; sourceTree = "<group>"; };
 		4022546D29355576000FBAC8 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
+		406E46D22BACAEFF0088198C /* VectorSearchTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VectorSearchTest.cc; sourceTree = "<group>"; };
+		406E46E72BAD3BB30088198C /* cmake */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cmake; sourceTree = "<group>"; };
+		4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLVectorIndexConfig.hh; sourceTree = "<group>"; };
+		4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLVectorIndexConfig_CAPI.cc; sourceTree = "<group>"; };
+		4083FCB62BA3F6930061509D /* CBLPrediction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLPrediction.h; sourceTree = "<group>"; };
+		4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction_CAPI.cc; sourceTree = "<group>"; };
+		4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLPrediction_Internal.hh; sourceTree = "<group>"; };
+		4083FCC12BAA38F30061509D /* CBLPrediction.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction.cc; sourceTree = "<group>"; };
 		40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLUserAgent.mm; sourceTree = "<group>"; };
 		932062DA26BC6B43006917A5 /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
@@ -633,6 +647,7 @@
 				93C70CD226C4D3F20093E927 /* CBLEncryptable.h */,
 				277B77C6245B44BE00B222D3 /* CBLLog.h */,
 				9320630126BDB340006917A5 /* CBLPlatform.h */,
+				4083FCB62BA3F6930061509D /* CBLPrediction.h */,
 				271C2A3021CAC98F0045856E /* CBLQuery.h */,
 				271C2A2C21CAC98F0045856E /* CBLReplicator.h */,
 				FCD829B12835ECE0004AA814 /* CBLScope.h */,
@@ -654,12 +669,15 @@
 				271C2A7721CC750E0045856E /* CBLDocument.cc */,
 				277FEE7A21ED6C0000B60E3C /* CBLDocument_Internal.hh */,
 				93EC365D26C498AB00182B02 /* CBLEncryptable_Internal.hh */,
+				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
 				934AD381270E797D0038D62E /* CBLLog_Internal.hh */,
 				277B77D4245B44E900B222D3 /* CBLLog.cc */,
+				4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */,
+				4083FCC12BAA38F30061509D /* CBLPrediction.cc */,
 				932062DA26BC6B43006917A5 /* CBLQuery.cc */,
 				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
+				4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
-				277FEE7621ED62AA00B60E3C /* CBLReplicatorConfig.hh */,
 				FCC063C828588DA6000C5BD7 /* CBLScope.cc */,
 				FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */,
 				AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */,
@@ -729,9 +747,11 @@
 				276634182605338300B9BD36 /* CBLDocument_CAPI.cc */,
 				93C70CE226C5B4BC0093E927 /* CBLEncryptable_CAPI.cc */,
 				9320631126BDB5CA006917A5 /* CBLPlatform_CAPI+Android.cc */,
+				4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */,
 				27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */,
 				277FEE7421ED3C4900B60E3C /* CBLReplicator_CAPI.cc */,
 				FCD829B22835EE39004AA814 /* CBLScope_CAPI.cc */,
+				4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */,
 			);
 			name = "C Glue";
 			sourceTree = "<group>";
@@ -758,6 +778,7 @@
 				FC645E1F29085CE5007D5536 /* supports */,
 				27B61D6821D6B60D0027CCDB /* CBLTest.hh */,
 				27B61D6921D6B60D0027CCDB /* CBLTest.cc */,
+				27C9B5F221F7EE670040BC45 /* CBLTest.c */,
 				27A63F252633408000634F7B /* CBLTest_Cpp.hh */,
 				275B3593234BDB2700FE9CF0 /* CBLTestsMain.cpp */,
 				93C70D3326D01B5A0093E927 /* BlobTest.cc */,
@@ -778,11 +799,12 @@
 				FC82CE0428C6E2BD001FA083 /* ReplicatorCollectionTest_Cpp.cc */,
 				2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */,
 				93C70D1626CB334D0093E927 /* ReplicatorPropEncTest.cc */,
+				406E46D22BACAEFF0088198C /* VectorSearchTest.cc */,
 				27D30F9123A2D30500392107 /* PerfTest.cc */,
-				27C9B5F221F7EE670040BC45 /* CBLTest.c */,
 				275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */,
 				27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */,
 				27B61DD421DEE5DC0027CCDB /* CMakeLists.txt */,
+				406E46E72BAD3BB30088198C /* cmake */,
 				4022546D29355576000FBAC8 /* assets */,
 			);
 			path = test;
@@ -884,12 +906,14 @@
 			files = (
 				277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */,
 				9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */,
+				4083FCB02BA3B8C50061509D /* CBLVectorIndexConfig.hh in Headers */,
 				27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */,
 				27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */,
 				FC5FBBA62821B3450066157F /* CBLCollection_Internal.hh in Headers */,
 				93C70CE026C4D3F80093E927 /* CBLEncryptable.h in Headers */,
 				271C2A3321CAC98F0045856E /* CBLDocument.h in Headers */,
 				FCD988BB2821B10300512BBD /* CBLCollection.h in Headers */,
+				4083FCC02BAA235F0061509D /* CBLPrediction_Internal.hh in Headers */,
 				FCD8299D2835AC3F004AA814 /* CBLScope_Internal.hh in Headers */,
 				277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */,
 				FC5FBBB72821E4970066157F /* CBLDatabase_Internal.hh in Headers */,
@@ -1506,7 +1530,9 @@
 				27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */,
 				FC5FBBB52821CC2E0066157F /* CBLCollection_CAPI.cc in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob_CAPI.cc in Sources */,
+				4083FCAF2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
+				4083FCBC2BA8DE200061509D /* CBLPrediction_CAPI.cc in Sources */,
 				276634192605338300B9BD36 /* CBLDocument_CAPI.cc in Sources */,
 				27B61D5621D5ABA60027CCDB /* CBLQuery_CAPI.cc in Sources */,
 				277FEE7521ED3C4900B60E3C /* CBLReplicator_CAPI.cc in Sources */,
@@ -1514,6 +1540,7 @@
 				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
 				FCB96E8329007D37001C4DED /* CBLDefaults_CAPI.cc in Sources */,
+				4083FCC22BAA38F30061509D /* CBLPrediction.cc in Sources */,
 				271C2A7621CC4BD60045856E /* Internal.cc in Sources */,
 				FCC063C928588DA6000C5BD7 /* CBLScope.cc in Sources */,
 				FC5FBBA52821B3450066157F /* CBLCollection.cc in Sources */,
@@ -1591,6 +1618,7 @@
 				FC09078A28A5F40200201B07 /* CollectionTest_Cpp.cc in Sources */,
 				27D30F9F23A2D30500392107 /* PerfTest.cc in Sources */,
 				FC82CE1328C6E2FD001FA083 /* ReplicatorCollectionTest_Cpp.cc in Sources */,
+				406E46E42BACC4BF0088198C /* VectorSearchTest.cc in Sources */,
 				27DBCF42246B81EE002FD7A7 /* LibC++Debug.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

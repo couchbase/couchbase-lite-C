@@ -45,6 +45,17 @@ namespace cbl_internal {
 struct CBLDatabase final : public CBLRefCounted {
 public:
 
+#ifdef COUCHBASE_ENTERPRISE
+    
+#pragma mark - Database Extension:
+    
+    static void setExtensionPath(slice path) {
+        CBLLog_Init();
+        C4Database::setExtensionPath(path);
+    }
+    
+#endif
+
 #pragma mark - Lifecycle:
 
     static CBLDatabaseConfiguration defaultConfiguration() {

@@ -80,6 +80,12 @@ public:
     
     static CBLDatabaseConfiguration databaseConfig();
     
+#ifdef COUCHBASE_ENTERPRISE
+    static void initVectorSearchExtension();
+    
+    bool hasVectorSearchExtension();
+#endif
+    
     CBLTest();
     ~CBLTest();
     
@@ -88,6 +94,10 @@ public:
 };
 
 std::string GetTestFilePath(const std::string &filename);
+
+#ifdef COUCHBASE_ENTERPRISE
+std::string GetExtensionPath();
+#endif
 
 bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)> &callback);
 

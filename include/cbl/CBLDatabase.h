@@ -26,6 +26,25 @@ CBL_CAPI_BEGIN
     A \ref CBLDatabase is both a filesystem object and a container for documents.
  */
 
+#ifdef COUCHBASE_ENTERPRISE
+
+#ifdef __APPLE__
+#pragma mark - Database Extension
+#endif
+
+/** \name  Database Extension
+    @{ */
+
+/** ENTERPRISE EDITION ONLY
+ 
+    Registers a directory path to load extension libraries from, such as Vector Search.
+    Must be called before opening a database that will use an extension. */
+void CBL_SetExtensionPath(FLString path) CBLAPI;
+
+/** @} */
+
+#endif
+
 #ifdef __APPLE__
 #pragma mark - CONFIGURATION
 #endif
