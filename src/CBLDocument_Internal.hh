@@ -319,6 +319,7 @@ private:
 #endif
 
     Retained<CBLCollection>       _collection;      // Collection (null for new doc)
+    Retained<CBLDatabase>         _database;        // Database (null for new doc)
     litecore::access_lock<Retained<C4Document>>  _c4doc; // LiteCore doc (null for new doc)
     alloc_slice const             _docID;           // Document ID (never empty)
     mutable alloc_slice           _revID;           // Revision ID

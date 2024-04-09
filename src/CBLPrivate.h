@@ -28,8 +28,8 @@ CBL_CAPI_BEGIN
     void CBLLog_BeginExpectingExceptions() CBLAPI;
     void CBLLog_EndExpectingExceptions() CBLAPI;
 
-/** Returns the collection's database, or NULL if the collection is invalid, or the database is released. */
-    CBLDatabase* _cbl_nullable CBLCollection_Database(const CBLCollection*) CBLAPI;
+/** Returns the collection's database pointer which is unretained. This is used by tests. */
+    CBLDatabase* CBLCollection_Database(const CBLCollection*) CBLAPI;
 
 /** Returns the last sequence number assigned in the database (default collection).
     This starts at zero and increments every time a document is saved or deleted. */

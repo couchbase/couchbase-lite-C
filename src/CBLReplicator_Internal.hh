@@ -71,55 +71,20 @@ public:
         static once_flag once;
         call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
         
-        if (_conf.database) {
-            _defaultCollection = _conf.database->getDefaultCollection(true);
-        }
-
-        _conf.validate();
-        
         // Set up the LiteCore replicator parameters:
         C4ReplicatorParameters params = { };
         
-        // Construct params.collections and validate if collections
-        // are from the same database instance:
         auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
         
-        size_t colsCount =  _conf.collections ? _conf.collectionCount : 1;
+        auto effectiveCollections = _conf.effectiveCollections();
         
         std::vector<C4ReplicationCollection> c4ReplCols;
-        c4ReplCols.reserve(colsCount);
+        c4ReplCols.reserve(effectiveCollections.size());
         
         std::vector<alloc_slice> optionDicts;
-        optionDicts.reserve(colsCount);
+        optionDicts.reserve(effectiveCollections.size());
         
-        for (int i = 0; i < colsCount; i++) {
-            CBLReplicationCollection replCol;
-            if (_conf.database) {
-                // If using .database, a C4ReplicationCollection with the default collection
-                // and the outer conflict resolver and filters will be construct:
-                assert(colsCount == 1);
-                replCol.collection = _defaultCollection.get();
-                replCol.conflictResolver = _conf.conflictResolver;
-                replCol.pushFilter = _conf.pushFilter;
-                replCol.pullFilter = _conf.pullFilter;
-                replCol.channels = _conf.channels;
-                replCol.documentIDs = _conf.documentIDs;
-            } else {
-                replCol = _conf.collections[i];
-            }
-            
-            if (!replCol.collection->isValid()) {
-                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
-                               "An invalid collection was found in the configuration.");
-            }
-            
-            if (!_db) {
-                _db = replCol.collection->database();
-            } else if (_db != replCol.collection->database()) {
-                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
-                               "The collections are not from the same database object.");
-            }
-            
+        for (CBLReplicationCollection& replCol : effectiveCollections) {
             auto& col = c4ReplCols.emplace_back();
             
             auto spec = replCol.collection->spec();
@@ -164,7 +129,7 @@ public:
         }
         
         params.collections = c4ReplCols.data();
-        params.collectionCount = colsCount;
+        params.collectionCount = c4ReplCols.size();
         
         params.callbackContext = this;
         params.onStatusChanged = [](C4Replicator* c4repl, C4ReplicatorStatus status, void *ctx) {
@@ -217,6 +182,7 @@ public:
         params.optionsDictFleece = options;
 
         // Create the LiteCore replicator:
+        _db = _conf.effectiveDatabase();
         _db->useLocked([&](C4Database *c4db) {
 #ifdef COUCHBASE_ENTERPRISE
             if (_conf.endpoint->otherLocalDB()) {
@@ -527,8 +493,7 @@ private:
 
     recursive_mutex                             _mutex;
     ReplicatorConfiguration const               _conf;
-    Retained<CBLDatabase>                       _db;
-    Retained<CBLCollection>                     _defaultCollection;
+    CBLDatabase*                                _db;                // Retained by _conf
     Retained<C4Replicator>                      _c4repl;
     unique_ptr<CBLReplicatorStoppable>          _stoppable;
     ReplicationCollectionsMap                   _collections;       // For filters and conflict resolver

@@ -36,6 +36,7 @@ public:
     CBLCollection(C4Collection* c4col, CBLScope* scope, CBLDatabase* database)
     :_c4col(c4col, database)
     ,_scope(scope)
+    ,_db(database)
     ,_name(c4col->getName())
     { }
     
@@ -47,9 +48,7 @@ public:
     bool isValid() const noexcept               {return _c4col.isValid();}
     uint64_t count() const                      {return _c4col.useLocked()->getDocumentCount();}
     uint64_t lastSequence() const               {return static_cast<uint64_t>(_c4col.useLocked()->getLastSequence());}
-    
-    /** Throw NotOpen if the collection or database is invalid */
-    CBLDatabase* database() const           {return _c4col.database();}
+    CBLDatabase* database() const               {return _db;}
     
 #pragma mark - DOCUMENTS:
     
@@ -134,10 +133,7 @@ public:
 #pragma mark - LISTENERS
     
     Retained<CBLListenerToken> addChangeListener(CBLCollectionChangeListener listener,
-                                                 void* _cbl_nullable ctx)
-    {
-        return addListener([&]{ return _listeners.add(listener, ctx); });
-    }
+                                                 void* _cbl_nullable ctx);
     
     Retained<CBLListenerToken> addDocumentListener(slice docID,
                                                    CBLCollectionDocumentChangeListener listener,
@@ -196,26 +192,16 @@ private:
     
     Retained<CBLListenerToken> addListener(fleece::function_ref<Retained<CBLListenerToken>()> cb) {
         Retained<CBLListenerToken> token = cb();
-        if (!_observer)
+        if (!_observer) {
             _observer = _c4col.useLocked()->observe([this](C4CollectionObserver*) {
                 this->collectionChanged();
             });
+        }
         return token;
     }
     
     void collectionChanged() {
-        Retained<CBLDatabase> db;
-        try {
-            db = database();
-        } catch (...) {
-            C4Error error = C4Error::fromCurrentException();
-            CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
-                    "Collection changed notification failed: %s", error.description().c_str());
-        }
-        
-        if (db) {
-            db->notify(std::bind(&CBLCollection::callCollectionChangeListeners, this));
-        }
+        _db->notify(std::bind(&CBLCollection::callCollectionChangeListeners, this));
     }
 
     void callCollectionChangeListeners() {
@@ -253,7 +239,6 @@ private:
         :shared_access_lock(std::move(c4col), *database->c4db())
         ,_c4db(database->c4db())
         ,_col(c4col)
-        ,_db(database)
         {
             _sentry = [this](C4Collection* c4col) {
                 if (!_isValid()) {
@@ -268,28 +253,24 @@ private:
             return _isValid();
         }
         
-        CBLDatabase* database() const {
-            auto lock = useLocked();
-            return _db;
-        }
-        
         /** Invalidate the database pointer */
         void close() noexcept {
             LOCK_GUARD lock(getMutex());
-            _db = nullptr;
+            _isClosed = true;
         }
         
     private:
-        bool _isValid() const noexcept                  { return _db && _col->isValid(); }
+        bool _isValid() const noexcept                  { return !_isClosed && _col->isValid(); }
         
         CBLDatabase::SharedC4DatabaseAccessLock _c4db;  // For retaining the shared lock
-        CBLDatabase* _cbl_nullable              _db;
         C4Collection*                           _col;
+        bool                                    _isClosed {false};
     };
     
 #pragma mark - VARIABLES :
     
     C4CollectionAccessLock                                  _c4col;     // Shared lock with _c4db
+    CBLDatabase*                                            _db;
     
     alloc_slice                                             _name;
     Retained<CBLScope>                                      _scope;

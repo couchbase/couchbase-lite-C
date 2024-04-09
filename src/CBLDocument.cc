@@ -47,6 +47,7 @@ using namespace cbl_internal;
 CBLDocument::CBLDocument(slice docID, CBLCollection *collection, C4Document *c4doc, bool isMutable)
 :_docID(docID)
 ,_collection(collection)
+,_database(collection ? collection->database() : nullptr)
 ,_c4doc(c4doc)
 ,_mutable(isMutable)
 {
@@ -68,8 +69,7 @@ CBLDocument::~CBLDocument() {
 
 
 CBLDatabase* _cbl_nullable CBLDocument::database() const {
-    // Could throw kC4ErrorNotOpen if the collection is deleted, or database is released.
-    return _collection ? _collection->database() : nullptr;
+    return _database;
 }
 
 
@@ -113,6 +113,7 @@ bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt) {
             
             alloc_slice body;
             C4RevisionFlags revFlags;
+            
             if (!opt.deleting) {
                 body = encodeBody(collection->database(), c4db, false, revFlags);
             } else {
@@ -143,6 +144,8 @@ bool CBLDocument::save(CBLCollection* collection, const SaveOptions &opt) {
                 // Success:
                 t.commit();
                 _collection = collection;
+                _database = collection->database();
+                
                 // HACK: Replace the inner reference of the c4doc with the one from newDoc.
                 c4doc.get() = std::move(newDoc);
                 _revID = c4doc->selectedRev().revID;
@@ -234,7 +237,7 @@ bool CBLDocument::resolveConflict(Resolution resolution, const CBLDocument * _cb
         // is true, the remote revision will be kept as is and the losing branch will be pruned.
         if (resolution != Resolution::useRemote) {
             if (resolveDoc) {
-                mergeBody = resolveDoc->encodeBody(_collection->database(), c4db, true, mergeFlags);
+                mergeBody = resolveDoc->encodeBody(_database, c4db, true, mergeFlags);
             } else {
                 mergeBody = alloc_slice(size_t(0));
                 mergeFlags = kRevDeleted;
