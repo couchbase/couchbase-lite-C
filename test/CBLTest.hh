@@ -93,7 +93,7 @@ public:
     CBLCollection *defaultCollection {nullptr};
 };
 
-std::string GetTestFilePath(const std::string &filename);
+std::string GetAssetFilePath(const std::string &filename);
 
 #ifdef COUCHBASE_ENTERPRISE
 std::string GetExtensionPath();
@@ -122,6 +122,10 @@ void createDocWithPair(CBLDatabase *db, fleece::slice docID, fleece::slice prope
 void createNumberedDocsWithPrefix(CBLCollection *col, unsigned n, const std::string& idprefix, unsigned start = 1);
 
 void PurgeAllDocs(CBLCollection* collection);
+
+CBLQuery* CreateQuery(CBLDatabase* db, std::string sql);
+
+int CountResults(CBLResultSet *results);
 
 
 // RAII utility to suppress reporting C++ exceptions (or breaking at them, in the Xcode debugger.)

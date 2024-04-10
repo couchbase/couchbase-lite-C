@@ -108,7 +108,7 @@ alloc_slice CBLTest::databaseDir() {
     return sDatabaseDir;
 }
 
-slice const CBLTest::kDatabaseName = "CBLtest";
+slice const CBLTest::kDatabaseName = "CBLTest";
 
 CBLDatabaseConfiguration CBLTest::databaseConfig() {
     // One-time setup:
@@ -202,7 +202,7 @@ void CBLTest_Cpp::createDocumentInDefault(std::string docID, std::string propert
 
 #pragma mark - Test Utils C :
 
-string GetTestFilePath(const std::string &filename) {
+string GetAssetFilePath(const std::string &filename) {
     static string sTestFilesPath;
     if (sTestFilesPath.empty()) {
 #ifdef __APPLE__
@@ -284,7 +284,7 @@ unsigned ImportJSONLines(string filename, CBLDatabase* database) {
 }
 
 unsigned ImportJSONLines(string filename, CBLCollection* collection) {
-    auto path = GetTestFilePath(filename);
+    auto path = GetAssetFilePath(filename);
     CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo, "Reading %s ...  ", path.c_str());
     CBLError error {};
     unsigned numDocs = 0;
@@ -403,6 +403,21 @@ void PurgeAllDocs(CBLCollection* collection) {
     
     CBLResultSet_Release(rs);
     CBLQuery_Release(query);
+}
+
+CBLQuery* CreateQuery(CBLDatabase* db, std::string sql) {
+    int errPos;
+    CBLError error {};
+    auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(sql), &errPos, &error);
+    REQUIRE(query);
+    return query;
+}
+
+int CountResults(CBLResultSet *results) {
+    int n = 0;
+    while (CBLResultSet_Next(results))
+        ++n;
+    return n;
 }
 
 #pragma mark - Test Utils C++:

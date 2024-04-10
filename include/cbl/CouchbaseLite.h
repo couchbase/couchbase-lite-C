@@ -26,6 +26,7 @@
 #include "CBLEncryptable.h"
 #include "CBLLog.h"
 #include "CBLPlatform.h"
+#include "CBLPrediction.h"
 #include "CBLQuery.h"
 #include "CBLReplicator.h"
 #include "CBLScope.h"
