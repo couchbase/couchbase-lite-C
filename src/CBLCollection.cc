@@ -108,7 +108,7 @@ namespace cbl_internal {
 Retained<CBLListenerToken> CBLCollection::addChangeListener(CBLCollectionChangeListener listener,
                                                             void* _cbl_nullable ctx)
 {
-    auto lock =_c4col.useLocked(); // Ensure the database lifetime while creating the Listener oken
+    auto lock =_c4col.useLocked(); // Ensure the database lifetime while creating the Listener token
     auto token = addListener([&] { return new ListenerToken<CBLCollectionChangeListener>(this, listener, ctx); });
     _listeners.add((ListenerToken<CBLCollectionChangeListener>*)token.get());
     return token;
@@ -118,7 +118,7 @@ Retained<CBLListenerToken> CBLCollection::addDocumentListener(slice docID,
                                                               CBLCollectionDocumentChangeListener listener,
                                                               void* _cbl_nullable ctx)
 {
-    auto lock =_c4col.useLocked(); // // Ensure the database lifetime while creating the Listener oken
+    auto lock =_c4col.useLocked(); // // Ensure the database lifetime while creating the Listener token
     auto token = new ListenerToken<CBLCollectionDocumentChangeListener>(this, docID, listener, ctx);
     _docListeners.add(token);
     return token;

@@ -639,7 +639,6 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Pull Filters", "[Replicator]") {
     FLMutableArray_Release(docIDs);
 }
 
-
 class ReplicatorFilterTest : public ReplicatorLocalTest {
 public:
     int count = 0;

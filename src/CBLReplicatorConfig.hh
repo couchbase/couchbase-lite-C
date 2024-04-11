@@ -184,11 +184,11 @@ namespace cbl_internal
             // Throw an exception if the validation failed:
             validate();
             
-            CBLCollection* defaultCollection = nullptr;
+            Retained<CBLCollection> defaultCollection = nullptr;
             if (database) {
                 // This can technically throw if the default collection doesn't exist (We don't allow now).
                 // So call first before copying anything:
-                defaultCollection = database->getDefaultCollection(true).get();
+                defaultCollection = database->getDefaultCollection(true);
             }
             
             if (endpoint) {
@@ -229,7 +229,7 @@ namespace cbl_internal
                 collections = _effectiveCollections.data();
             } else {
                 // Create a replication collection using the default collection:
-                assert(defaultCollection != nullptr);
+                assert(defaultCollection);
                 CBLReplicationCollection col {};
                 col.collection = defaultCollection;
                 col.conflictResolver = conflictResolver;
