@@ -20,6 +20,7 @@
 #include "CBLPrivate.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -32,14 +33,19 @@ static int dbListenerCalls = 0;
 static int fooListenerCalls = 0;
 static int barListenerCalls = 0;
 static int notificationsReadyCalls = 0;
+static mutex _sListenerMutex;
 
 static void notificationsReady(void *context, CBLDatabase* db) {
+    lock_guard<mutex> lock(_sListenerMutex);
+    
     ++notificationsReadyCalls;
     auto test = (CBLTest*)context;
     CHECK(test->db == db);
 }
 
 static void dbListener(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
+    lock_guard<mutex> lock(_sListenerMutex);
+    
     ++dbListenerCalls;
     auto test = (CBLTest*)context;
     CHECK(test->db == db);
@@ -47,7 +53,9 @@ static void dbListener(void *context, const CBLDatabase *db, unsigned nDocs, FLS
     CHECK(slice(docIDs[0]) == "foo"_sl);
 }
 
-static void dbListener2(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
+static void dbListenerForBufferNotification(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
+    lock_guard<mutex> lock(_sListenerMutex);
+    
     ++dbListenerCalls;
     auto test = (CBLTest*)context;
     CHECK(test->db == db);
@@ -56,7 +64,19 @@ static void dbListener2(void *context, const CBLDatabase *db, unsigned nDocs, FL
     CHECK(docIDs[1] == "bar"_sl);
 }
 
+static void dbListenerWithDelay(void *context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs) {
+     lock_guard<mutex> lock(_sListenerMutex);
+
+     this_thread::sleep_for(1000ms);
+
+     ++dbListenerCalls;
+     auto test = (CBLTest*)context;
+     CHECK(test->db == db);
+}
+
 static void fooListener(void *context, const CBLDatabase *db, FLString docID) {
+    lock_guard<mutex> lock(_sListenerMutex);
+    
     ++fooListenerCalls;
     auto test = (CBLTest*)context;
     CHECK(test->db == db);
@@ -64,6 +84,8 @@ static void fooListener(void *context, const CBLDatabase *db, FLString docID) {
 }
 
 static void barListener(void *context, const CBLDatabase *db, FLString docID) {
+    lock_guard<mutex> lock(_sListenerMutex);
+    
     ++barListenerCalls;
     auto test = (CBLTest*)context;
     CHECK(test->db == db);
@@ -619,7 +641,7 @@ TEST_CASE_METHOD(DatabaseTest, "Scheduled database notifications") {
     // Add a listener:
     dbListenerCalls = fooListenerCalls = barListenerCalls = 0;
 
-    auto token = CBLDatabase_AddChangeListener(db, dbListener2, this);
+    auto token = CBLDatabase_AddChangeListener(db, dbListenerForBufferNotification, this);
     auto fooToken = CBLDatabase_AddDocumentChangeListener(db, "foo"_sl, fooListener, this);
     auto barToken = CBLDatabase_AddDocumentChangeListener(db, "bar"_sl, barListener, this);
 
@@ -655,6 +677,39 @@ TEST_CASE_METHOD(DatabaseTest, "Scheduled database notifications") {
     CBLListener_Remove(barToken);
 }
 
+// CBSE-16738
+TEST_CASE_METHOD(DatabaseTest, "Legacy - Database change notifications from different db threads") {
+    CBLError error {};
+    auto config = databaseConfig();
+    auto anotherDB = CBLDatabase_Open(kDatabaseName, &config, &error);
+    REQUIRE(anotherDB);
+    
+    // Add a listener:
+    dbListenerCalls = fooListenerCalls = 0;
+    auto token = CBLDatabase_AddChangeListener(db, dbListenerWithDelay, this);
+    
+    auto createDoc = [&] (CBLDatabase* database)
+    {
+        CBLError error {};
+        CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+        MutableDict props = CBLDocument_MutableProperties(doc);
+        props["greeting"] = "hello";
+        CBLDatabase_SaveDocument(database, doc, &error);
+        CBLDocument_Release(doc);
+    };
+    
+    thread t1([=]() { createDoc(db); });
+    thread t2([=]() { createDoc(anotherDB); });
+    
+    t1.join();
+    t2.join();
+    
+    CHECK(dbListenerCalls == 2);
+    CBLListener_Remove(token);
+    
+    CBLDatabase_Close(anotherDB, &error);
+    CBLDatabase_Release(anotherDB);
+}
 
 #pragma mark - BLOBS:
 
