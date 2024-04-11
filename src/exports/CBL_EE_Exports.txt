@@ -27,9 +27,8 @@ CBLEncryptable_CreateWithDict
 CBLEncryptable_Properties
 CBLEncryptable_Value
 
-FLDict_IsEncryptableValue
-FLDict_GetEncryptableValue
-FLSlot_SetEncryptableValue
+CBL_RegisterPredictiveModel
+CBL_UnregisterPredictiveModel
 
 CBL_SetExtensionPath
 CBLCollection_CreateVectorIndex
@@ -37,3 +36,7 @@ CBLVectorEncoding_CreateNone
 CBLVectorEncoding_CreateProductQuantizer
 CBLVectorEncoding_CreateScalarQuantizer
 CBLVectorEncoding_Free
+
+FLDict_IsEncryptableValue
+FLDict_GetEncryptableValue
+FLSlot_SetEncryptableValue

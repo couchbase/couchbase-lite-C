@@ -18,25 +18,1417 @@
 
 #include "CBLTest.hh"
 #include "CBLPrivate.h"
+#include "fleece/Fleece.hh"
+#include "fleece/Mutable.hh"
+#include <sstream>
+#include <vector>
 
 using namespace fleece;
 using namespace std;
 
-#ifdef COUCHBASE_ENTERPRISE
-
-class VectorSearchTest : public CBLTest { };
-
 #ifdef VECTOR_SEARCH_TEST_ENABLED
 
-TEST_CASE_METHOD(VectorSearchTest, "Vector Index Sanity Test", "[VectorSearch]") {
-    CBLVectorIndexConfiguration config = {};
-    config.expressionLanguage = kCBLN1QLLanguage;
-    config.expression = "vector"_sl;
-    config.dimensions = 300;
-    config.centroids = 8;
+#ifdef COUCHBASE_ENTERPRISE
+
+static vector<string> sVectorSearchTestLogs;
+
+class VectorSearchTest : public CBLTest {
+public:
+    constexpr static const fleece::slice kWordsDatabaseName = "words_db";
+    
+    constexpr static const fleece::slice kWordsCollectionName = "words";
+    
+    constexpr static const fleece::slice kExtWordsCollectionName = "extwords";
+    
+    constexpr static const fleece::slice kWordsIndexName = "words_index";
+    
+    constexpr static const fleece::slice kWordsPredictiveModelName = "WordEmbedding";
+    
+    constexpr static const fleece::slice kDinnerVector = "[0.03193166106939316, 0.032055653631687164, 0.07188114523887634, -0.09893740713596344, -0.07693558186292648, 0.07570040225982666, 0.42786234617233276, -0.11442682892084122, -0.7863243818283081, -0.47983086109161377, -0.10168658196926117, 0.10985997319221497, -0.15261511504650116, -0.08458329737186432, -0.16363860666751862, -0.20225222408771515, -0.2593214809894562, -0.032738097012043, -0.16649988293647766, -0.059701453894376755, 0.17472036182880402, -0.007310086861252785, -0.13918264210224152, -0.07260780036449432, -0.02461239881813526, -0.04195880889892578, -0.15714778006076813, 0.48038315773010254, 0.7536261677742004, 0.41809454560279846, -0.17144775390625, 0.18296195566654205, -0.10611499845981598, 0.11669538915157318, 0.07423929125070572, -0.3105475902557373, -0.045081984251737595, -0.18190748989582062, 0.22430984675884247, 0.05735112354159355, -0.017394868656992912, -0.148889422416687, -0.20618586242198944, -0.1446581482887268, 0.061972495168447495, 0.07787969708442688, 0.14225411415100098, 0.20560632646083832, 0.1786964386701584, -0.380594402551651, -0.18301603198051453, -0.19542981684207916, 0.3879885971546173, -0.2219538390636444, 0.11549852043390274, -0.0021717497147619724, -0.10556972026824951, 0.030264658853411674, 0.16252967715263367, 0.06010117009282112, -0.045007310807704926, 0.02435707487165928, 0.12623260915279388, -0.12688252329826355, -0.3306281864643097, 0.06452160328626633, 0.0707000121474266, -0.04959108680486679, -0.2567063570022583, -0.01878536120057106, -0.10857286304235458, -0.01754194125533104, -0.0713721290230751, 0.05946013703942299, -0.1821729987859726, -0.07293688505887985, -0.2778160572052002, 0.17880073189735413, -0.04669278487563133, 0.05351974070072174, -0.23292849957942963, 0.05746332183480263, 0.15462779998779297, -0.04772235080599785, -0.003306782804429531, 0.058290787041187286, 0.05908169597387314, 0.00504430802538991, -0.1262340396642685, 0.11612161248922348, 0.25303348898887634, 0.18580256402492523, 0.09704313427209854, -0.06087183952331543, 0.19697663187980652, -0.27528849244117737, -0.0837797075510025, -0.09988483041524887, -0.20565757155418396, 0.020984146744012833, 0.031014855951070786, 0.03521743416786194, -0.05171370506286621, 0.009112107567489147, -0.19296088814735413, -0.19363830983638763, 0.1591167151927948, -0.02629968523979187, -0.1695055067539215, -0.35807400941848755, -0.1935291737318039, -0.17090126872062683, -0.35123637318611145, -0.20035606622695923, -0.03487539291381836, 0.2650701701641083, -0.1588021069765091, 0.32268261909484863, -0.024521857500076294, -0.11985184997320175, 0.14826008677482605, 0.194917231798172, 0.07971998304128647, 0.07594677060842514, 0.007186363451182842, -0.14641280472278595, 0.053229596465826035, 0.0619836151599884, 0.003207010915502906, -0.12729716300964355, 0.13496214151382446, 0.107656329870224, -0.16516226530075073, -0.033881571143865585, -0.11175122112035751, -0.005806141998618841, -0.4765360355377197, 0.11495379358530045, 0.1472187340259552, 0.3781401813030243, 0.10045770555734634, -0.1352398842573166, -0.17544329166412354, -0.13191302120685577, -0.10440415143966675, 0.34598618745803833, 0.09728766977787018, -0.25583627820014954, 0.035236816853284836, 0.16205145418643951, -0.06128586828708649, 0.13735555112361908, 0.11582338809967041, -0.10182418674230576, 0.1370954066514969, 0.15048766136169434, 0.06671152263879776, -0.1884871870279312, -0.11004580557346344, 0.24694739282131195, -0.008159132674336433, -0.11668405681848526, -0.01214478351175785, 0.10379738360643387, -0.1626262664794922, 0.09377897530794144, 0.11594484746456146, -0.19621512293815613, 0.26271334290504456, 0.04888357222080231, -0.10103251039981842, 0.33250945806503296, 0.13565145432949066, -0.23888370394706726, -0.13335271179676056, -0.0076894499361515045, 0.18256276845932007, 0.3276212215423584, -0.06567271053791046, -0.1853761374950409, 0.08945729583501816, 0.13876311480998993, 0.09976287186145782, 0.07869105041027069, -0.1346970647573471, 0.29857659339904785, 0.1329529583454132, 0.11350086331367493, 0.09112624824047089, -0.12515446543693542, -0.07917925715446472, 0.2881546914577484, -1.4532661225530319e-05, -0.07712751626968384, 0.21063975989818573, 0.10858846455812454, -0.009552721865475178, 0.1629313975572586, -0.39703384041786194, 0.1904662847518921, 0.18924959003925323, -0.09611514210700989, 0.001136621693149209, -0.1293390840291977, -0.019481558352708817, 0.09661063551902771, -0.17659670114517212, 0.11671938002109528, 0.15038564801216125, -0.020016824826598167, -0.20642194151878357, 0.09050136059522629, -0.1768183410167694, -0.2891409397125244, 0.04596589505672455, -0.004407480824738741, 0.15323616564273834, 0.16503025591373444, 0.17370983958244324, 0.02883041836321354, 0.1463884711265564, 0.14786243438720703, -0.026439940556883812, -0.03113352134823799, 0.10978181660175323, 0.008928884752094746, 0.24813824892044067, -0.06918247044086456, 0.06958142668008804, 0.17475970089435577, 0.04911438003182411, 0.17614248394966125, 0.19236832857131958, -0.1425514668226242, -0.056531358510255814, -0.03680772706866264, -0.028677923604846, -0.11353116482496262, 0.012293893843889236, -0.05192646384239197, 0.20331953465938568, 0.09290937334299088, 0.15373043715953827, 0.21684466302394867, 0.40546831488609314, -0.23753701150417328, 0.27929359674453735, -0.07277711480855942, 0.046813879162073135, 0.06883064657449722, -0.1033223420381546, 0.15769273042678833, 0.21685580909252167, -0.00971329677850008, 0.17375953495502472, 0.027193285524845123, -0.09943609684705734, 0.05770351365208626, 0.0868956446647644, -0.02671697922050953, -0.02979189157485962, 0.024517420679330826, -0.03931192681193352, -0.35641804337501526, -0.10590721666812897, -0.2118944674730301, -0.22070199251174927, 0.0941486731171608, 0.19881175458431244, 0.1815279871225357, -0.1256905049085617, -0.0683583989739418, 0.19080783426761627, -0.009482398629188538, -0.04374842345714569, 0.08184348791837692, 0.20070189237594604, 0.039221834391355515, -0.12251003831624985, -0.04325549304485321, 0.03840530663728714, -0.19840988516807556, -0.13591833412647247, 0.03073180839419365, 0.1059495136141777, -0.10656466335058212, 0.048937033861875534, -0.1362423598766327, -0.04138947278261185, 0.10234509408473969, 0.09793911874294281, 0.1391254961490631, -0.0906999260187149, 0.146945983171463, 0.14941848814487457, 0.23930180072784424, 0.36049938201904297, 0.0239607822149992, 0.08884347230195999, 0.061145078390836716]";
+    
+    CBLDatabase *wordDB {nullptr};
+    
+    CBLDatabase *wordEmbeddingDB {nullptr};
+    
+    CBLCollection *wordsCollection {nullptr};
+    
+    CBLCollection *extwordsCollection {nullptr};
+    
+    VectorSearchTest() {
+        auto config = databaseConfig();
+        
+        CBLError error { };
+        if (!CBL_DeleteDatabase(kWordsDatabaseName, config.directory, &error) && error.code != 0) {
+            FAIL("Can't delete words database: " << error.domain << "/" << error.code);
+        }
+        
+        auto wordsDBPath = GetAssetFilePath("words_db.cblite2");
+        if (!CBL_CopyDatabase(slice(wordsDBPath), kWordsDatabaseName, &config, &error)) {
+            FAIL("Can't copy words database: " << error.domain << "/" << error.code);
+        }
+        
+        wordDB = CBLDatabase_Open(kWordsDatabaseName, &config, &error);
+        REQUIRE(wordDB);
+        
+        wordEmbeddingDB = CBLDatabase_Open(kWordsDatabaseName, &config, &error);
+        REQUIRE(wordEmbeddingDB);
+        
+        wordsCollection = CBLDatabase_Collection(wordDB, kWordsCollectionName, kFLSliceNull, &error);
+        REQUIRE(wordsCollection);
+        
+        extwordsCollection = CBLDatabase_Collection(wordDB, kExtWordsCollectionName, kFLSliceNull, &error);
+        REQUIRE(extwordsCollection);
+        
+        registerWordEmbeddingModel();
+        
+        sVectorSearchTestLogs.clear();
+        CBLLog_SetCallback([](CBLLogDomain domain, CBLLogLevel level, FLString msg) {
+            sVectorSearchTestLogs.push_back(string(msg));
+        });
+        CBLLog_SetCallbackLevel(kCBLLogInfo);
+    }
+    
+    ~VectorSearchTest() {
+        CBLCollection_Release(wordsCollection);
+        CBLCollection_Release(extwordsCollection);
+        
+        CBLError error {};
+        
+        if (wordDB){
+            if (!CBLDatabase_Close(wordDB, &error))
+                WARN("Failed to close words database: " << error.domain << "/" << error.code);
+            CBLDatabase_Release(wordDB);
+        }
+        
+        if (wordEmbeddingDB)  {
+            if (!CBLDatabase_Close(wordEmbeddingDB, &error))
+                WARN("Failed to close words database: " << error.domain << "/" << error.code);
+            CBLDatabase_Release(wordEmbeddingDB);
+        }
+        
+        unregisterWordEmbeddingModel();
+        
+        // Reset log callback:
+        CBLLog_SetCallback(nullptr);
+        CBLLog_SetCallbackLevel(kCBLLogNone);
+        sVectorSearchTestLogs.clear();
+    }
+    
+    FLMutableArray vectorForWord(FLString word, FLString collection) {
+        stringstream ss;
+        ss << "SELECT vector FROM " << slice(collection).asString() << " WHERE word = '" << slice(word).asString() << "'";
+        
+        CBLError error {};
+        auto query = CBLDatabase_CreateQuery(wordEmbeddingDB, kCBLN1QLLanguage, slice(ss.str()), nullptr, &error);
+        if (!query) {
+            FAIL("Can't create query: " << error.domain << "/" << error.code);
+        }
+        
+        auto results = CBLQuery_Execute(query, &error);
+        if (!results) {
+            FAIL("Can't execute query: " << error.domain << "/" << error.code);
+        }
+        
+        FLMutableArray vector = nullptr;
+        if (CBLResultSet_Next(results)) {
+            auto array = FLValue_AsArray(CBLResultSet_ValueAtIndex(results, 0));
+            if (array) {
+                vector = FLArray_MutableCopy(array, kFLDeepCopyImmutables);
+            }
+        }
+        
+        CBLResultSet_Release(results);
+        CBLQuery_Release(query);
+        
+        return vector;
+    }
+    
+    void registerWordEmbeddingModel() {
+        auto callback = [](void* context, FLDict input) -> FLSliceResult {
+            auto word = Dict(input)["word"].asString();
+            if (!word) { return FLSliceResult_CreateWith(nullptr, 0); }
+            
+            auto vector = ((VectorSearchTest*) context)->vectorForWord(word, kWordsCollectionName);
+            if (!vector) {
+                vector = ((VectorSearchTest*) context)->vectorForWord(word, kExtWordsCollectionName);
+            }
+            
+            if (!vector) {
+                return FLSliceResult_CreateWith(nullptr, 0);
+            }
+            
+            FLEncoder enc = FLEncoder_New();
+            FLEncoder_BeginDict(enc, 1);
+            FLEncoder_WriteKey(enc, "vector"_sl);
+            FLEncoder_WriteValue(enc, (FLValue)vector);
+            FLEncoder_EndDict(enc);
+            return FLEncoder_Finish(enc, nullptr);
+        };
+        
+        CBLPredictiveModel model = {.context = this, .prediction = callback};
+        CBL_RegisterPredictiveModel(kWordsPredictiveModelName, model);
+    }
+    
+    void unregisterWordEmbeddingModel() {
+        CBL_UnregisterPredictiveModel(kWordsPredictiveModelName);
+    }
+    
+    void createWordsIndex(const CBLVectorIndexConfiguration& config) {
+        CBLError error {};
+        CHECK(CBLCollection_CreateVectorIndex(wordsCollection, kWordsIndexName, config, &error));
+        
+        FLArray indexNames = CBLCollection_GetIndexNames(wordsCollection, &error);
+        CHECK(containsString(indexNames, slice(kWordsIndexName).asString()));
+    }
+    
+    void deleteWordsIndex() {
+        CBLError error {};
+        CHECK(CBLCollection_DeleteIndex(wordsCollection, kWordsIndexName, &error));
+    }
+    
+    void setDinnerParameter(CBLQuery* query) {
+        FLError error;
+        FLMutableArray dinner = FLMutableArray_NewFromJSON(kDinnerVector, &error);
+        REQUIRE(dinner);
+        
+        auto params = MutableDict::newDict();
+        params["vector"_sl] = MutableArray(dinner);
+        CBLQuery_SetParameters(query, params);
+    }
+    
+    string wordQueryString(optional<int> limit={}, bool queryDistance=false, string addClause="") {
+        auto indexName = slice(kWordsIndexName).asString();
+        stringstream ss;
+        ss << "SELECT meta().id, word";
+        if (queryDistance) { ss << ", VECTOR_DISTANCE(" << indexName << ") "; } else { ss << " "; }
+        ss << "FROM _default.words ";
+        ss << "WHERE vector_match(" << indexName << ", $vector";
+        if (limit) { ss << ", " << limit.value(); }
+        ss << ")";
+        if (!addClause.empty()) { ss << " " << addClause; }
+        return ss.str();
+    }
+    
+    CBLResultSet* executeWordsQuery(optional<int> limit={}, bool queryDistance=false, string addClause="") {
+        auto query = CreateQuery(wordDB, wordQueryString(limit, queryDistance, addClause));
+        setDinnerParameter(query);
+        
+        alloc_slice explanation(CBLQuery_Explain(query));
+        CHECK(vectorIndexUsedInExplain(explanation, "words_index"));
+        
+        CBLError error {};
+        auto rs = CBLQuery_Execute(query, &error);
+        CHECK(rs);
+        
+        CBLQuery_Release(query);
+        return rs;
+    }
+    
+    void resetLog() {
+        sVectorSearchTestLogs.clear();
+    }
+
+    bool isIndexTrained() {
+        for (auto& str : sVectorSearchTestLogs) {
+            if (str.find("Untrained index; queries may be slow") != std::string::npos) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    bool containsString(FLArray array, string str) {
+        auto theArray = Array(array);
+        for (Array::iterator i(theArray); i; ++i) {
+            if (i->asstring().find(str) != std::string::npos) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    bool vectorIndexUsedInExplain(alloc_slice& explain, string indexName) {
+        auto str = "SCAN kv_.words:vector:" + indexName;
+        return explain.find(slice(str)).buf != nullptr;
+    }
+    
+    void copyDocument(CBLCollection *collection, string docID, const CBLDocument* originalDoc) {
+        CBLError error {};
+        CBLDocument* doc = docID.empty() ? CBLDocument_Create() : CBLDocument_CreateWithID(slice(docID));
+        CBLDocument_SetProperties(doc, FLDict_MutableCopy(CBLDocument_Properties(originalDoc), kFLDefaultCopy));
+        REQUIRE(CBLCollection_SaveDocument(collection, doc, &error));
+        CBLDocument_Release(doc);
+    }
+    
+    unordered_map<string, string> mapWordResults(CBLResultSet *results) {
+        unordered_map<string, string> map {};
+        while (CBLResultSet_Next(results)) {
+            FLString docID = FLValue_AsString(CBLResultSet_ValueAtIndex(results, 0));
+            FLString word = FLValue_AsString(CBLResultSet_ValueAtIndex(results, 1));
+            map[slice(docID).asString()] = slice(word).asString();
+        }
+        return map;
+    }
+};
+
+/**
+ NOTE: #1 TestVectorIndexConfigurationDefaultValue and #2 TestVectorIndexConfigurationSettersAndGetters does't applicable for CBL-C as
+ CBLVectorIndexConfiguration is just a C struct and C struct doesn't have default value other than 0 or NULL.
+ */
+
+/**
+ * 3. TestDimensionsValidation
+ * Description
+ *     Test that the dimensions are validated correctly. The invalid argument exception
+ *     should be thrown when creating vector index configuration objects with invalid
+ *     dimensions.
+ * Steps
+ *     1. Create a VectorIndexConfiguration object.
+ *         - expression: "vector"
+ *         - dimensions: 2 and 2048
+ *         - centroids: 20
+ *     2. Check that the config can be created without an error thrown.
+ *     3. Use the config to create the index and check that the index
+ *       can be created successfully.
+ *     4. Change the dimensions to 1 and 2049.
+ *     5. Check that an invalid argument exception is thrown.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestDimensionsValidation", "[VectorSearch]") {
+    CBLError error {};
+    
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl };
+    config.centroids = 20;
+    
+    config.dimensions = 2;
+    CHECK(CBLCollection_CreateVectorIndex(wordsCollection, "words_index1"_sl, config, &error));
+    
+    config.dimensions = 2048;
+    CHECK(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
+    
+    config.dimensions = 1;
+    CHECK_FALSE(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
+    CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
+    
+    error = {};
+    config.dimensions = 2049;
+    CHECK_FALSE(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
+    CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
+}
+
+/**
+ * 4. TestCentroidsValidation
+ * Description
+ *     Test that the centroids value is validated correctly. The invalid argument
+ *     exception should be thrown when creating vector index configuration objects with
+ *     invalid centroids..
+ * Steps
+ *     1. Create a VectorIndexConfiguration object.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 1 and 64000
+ *     2. Check that the config can be created without an error thrown.
+ *     3. Use the config to create the index and check that the index
+ *        can be created successfully.
+ *     4. Change the centroids to 0 and 64001.
+ *     5. Check that an invalid argument exception is thrown.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestCentroidsValidation", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300 };
     
     CBLError error {};
-    CHECK(CBLCollection_CreateVectorIndex(defaultCollection, "vector_index"_sl, config, &error));
+    config.centroids = 1;
+    CHECK(CBLCollection_CreateVectorIndex(wordsCollection, "words_index1"_sl, config, &error));
+    
+    config.centroids = 6400;
+    CHECK(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
+    
+    config.centroids = 0;
+    CHECK_FALSE(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
+    CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
+    
+    error = {};
+    config.centroids = 64001;
+    CHECK_FALSE(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
+    CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
+}
+
+/**
+ * 5. TestCreateVectorIndex
+ * Description
+ *     Using the default configuration, test that the vector index can be created from
+ *     the embedded vectors in the documents. The test also verifies that the created
+ *     index can be used in the query.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 20
+ *     4. Check that the index is created without an error returned.
+ *     5. Get index names from the _default.words collection and check that the index
+ *       names contains “words_index”.
+ *     6. Create an SQL++ query:
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     7. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     8. Execute the query and check that 20 results are returned.
+ *     9. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     10. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndex", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(20);
+    CHECK(CountResults(results) == 20);
+    CHECK(isIndexTrained());
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 6. TestUpdateVectorIndex
+ * Description
+ *     Test that the vector index created from the embedded vectors will be updated
+ *     when documents are changed. The test also verifies that the created index can be
+ *     used in the query.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query:
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 350)
+ *     6. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     7. Execute the query and check that 300 results are returned.
+ *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     9. Update the documents:
+ *         - Create _default.words.word301 with the content from _default.extwords.word1
+ *         - Create _default.words.word302 with the content from _default.extwords.word2
+ *         - Update _default.words.word1 with the content from _default.extwords.word3
+ *         - Delete _default.words.word2
+ *     10. Execute the query again and check that 301 results are returned, and
+ *         - word301 and word302 are included.
+ *         - word1’s word is updated with the word from _default.extwords.word3
+ *         - word2 is not included.
+ *     11. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestUpdateVectorIndex", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(350);
+    CHECK(CountResults(results) == 300);
+    CHECK(isIndexTrained());
+    CBLResultSet_Release(results);
+    
+    // Update docs:
+    CBLError error {};
+    auto doc1 = CBLCollection_GetDocument(extwordsCollection, "word1"_sl, &error);
+    REQUIRE(doc1);
+    copyDocument(wordsCollection, "word301", doc1);
+    
+    auto doc2 = CBLCollection_GetDocument(extwordsCollection, "word2"_sl, &error);
+    REQUIRE(doc2);
+    copyDocument(wordsCollection, "word302", doc2);
+    
+    auto doc3 = CBLCollection_GetDocument(extwordsCollection, "word3"_sl, &error);
+    REQUIRE(doc3);
+    copyDocument(wordsCollection, "word1", doc3);
+    
+    REQUIRE(CBLCollection_DeleteDocumentByID(wordsCollection, "word2"_sl, &error));
+    
+    // Query:
+    results = executeWordsQuery(350);
+    
+    // Check results:
+    auto map = mapWordResults(results);
+    CHECK(map.size() == 301);
+    CHECK(map["word301"] == Dict(CBLDocument_Properties(doc1))["word"].asstring());
+    CHECK(map["word302"] == Dict(CBLDocument_Properties(doc2))["word"].asstring());
+    CHECK(map["word1"] == Dict(CBLDocument_Properties(doc3))["word"].asstring());
+    CHECK(map.count("word2") == 0);
+    
+    CBLDocument_Release(doc1);
+    CBLDocument_Release(doc2);
+    CBLDocument_Release(doc3);
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 7. TestCreateVectorIndexWithInvalidVectors
+ * Description
+ *     Using the default configuration, test that when creating the vector index with
+ *     invalid vectors, the invalid vectors will be skipped from indexing.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Update documents:
+ *         - Update _default.words word1 with "vector" = null
+ *         - Update _default.words word2 with "vector" = "string"
+ *         - Update _default.words word3 by removing the "vector" key.
+ *         - Update _default.words word4 by removing one number from the "vector" key.
+ *     4. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     5. Check that the index is created without an error returned.
+ *     6. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 350)
+ *     7. Execute the query and check that 296 results are returned, and the results
+ *        do not include document word1, word2, word3, and word4.
+ *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     9. Update an already index vector with an invalid vector.
+ *         - Update _default.words word5 with "vector" = null.
+ *     10. Execute the query and check that 295 results are returned, and the results
+ *        do not include document word5.
+ *     11. Reset the custom logger.
+ */
+
+TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithInvalidVectors", "[VectorSearch]") {
+    CBLError error {};
+    auto doc = CBLCollection_GetMutableDocument(wordsCollection, "word1"_sl, &error);
+    REQUIRE(doc);
+    auto props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetNull(props, "vector"_sl);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    doc = CBLCollection_GetMutableDocument(wordsCollection, "word2"_sl, &error);
+    REQUIRE(doc);
+    props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetString(props, "vector"_sl, "string"_sl);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    doc = CBLCollection_GetMutableDocument(wordsCollection, "word3"_sl, &error);
+    REQUIRE(doc);
+    props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_Remove(props, "vector"_sl);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    doc = CBLCollection_GetMutableDocument(wordsCollection, "word4"_sl, &error);
+    REQUIRE(doc);
+    props = CBLDocument_MutableProperties(doc);
+    auto vector = FLMutableDict_GetMutableArray(props, "vector"_sl);
+    FLMutableArray_Remove(vector, 0, 1);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+    
+    // Query:
+    auto results = executeWordsQuery(350);
+    CHECK(isIndexTrained());
+    
+    // Check results:
+    auto map = mapWordResults(results);
+    CHECK(map.size() == 296);
+    CHECK(map.count("word1") == 0);
+    CHECK(map.count("word2") == 0);
+    CHECK(map.count("word3") == 0);
+    CHECK(map.count("word4") == 0);
+    
+    CBLResultSet_Release(results);
+    
+    // Update the doc:
+    doc = CBLCollection_GetMutableDocument(wordsCollection, "word5"_sl, &error);
+    REQUIRE(doc);
+    props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetNull(props, "vector"_sl);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    // Query:
+    results = executeWordsQuery(350);
+    
+    // Check results:
+    map = mapWordResults(results);
+    CHECK(map.size() == 295);
+    CHECK(map.count("word5") == 0);
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 8. TestCreateVectorIndexUsingPredictionModel
+ * Description
+ *     Using the default configuration, test that the vector index can be created from
+ *     the vectors returned by a predictive model.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Register  "WordEmbedding" predictive model defined in section 2.
+ *     4. Create a vector index named "words_pred_index" in _default.words collection.
+ *         - expression: "prediction(WordEmbedding, {"word": word}).vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     5. Check that the index is created without an error returned.
+ *     6. Create an SQL++ query:
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_pred_index, <dinner vector>, 350)
+ *     7. Check the explain() result of the query to ensure that the "words_pred_index" is used.
+ *     8. Execute the query and check that 300 results are returned.
+ *     9. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     10. Update the vector index:
+ *         - Create _default.words.word301 with the content from _default.extwords.word1
+ *         - Create _default.words.word302 with the content from _default.extwords.word2
+ *         - Update _default.words.word1 with the content from _default.extwords.word3
+ *         - Delete _default.words.word2
+ *     11. Execute the query and check that 301 results are returned.
+ *         - word301 and word302 are included.
+ *         - word1 is updated with the word from _default.extwords.word2.
+ *         - word2 is not included.
+ *     12. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexUsingPredictionModel", "[VectorSearch]") {
+    // The test spec creates the index named "words_pred_index", but it's ok to use any index name for the test.
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "prediction(WordEmbedding,{\"word\": word}).vector"_sl, 300, 8 };
+    createWordsIndex(config); // index name is defined in kWordsIndexName.
+    
+    // Query:
+    auto results = executeWordsQuery(350);
+    CHECK(CountResults(results) == 300);
+    CHECK(isIndexTrained());
+    CBLResultSet_Release(results);
+    
+    // Update docs:
+    CBLError error {};
+    auto doc1 = CBLCollection_GetDocument(extwordsCollection, "word1"_sl, &error);
+    REQUIRE(doc1);
+    copyDocument(wordsCollection, "word301", doc1);
+    
+    auto doc2 = CBLCollection_GetDocument(extwordsCollection, "word2"_sl, &error);
+    REQUIRE(doc2);
+    copyDocument(wordsCollection, "word302", doc2);
+    
+    auto doc3 = CBLCollection_GetDocument(extwordsCollection, "word3"_sl, &error);
+    REQUIRE(doc3);
+    copyDocument(wordsCollection, "word1", doc3);
+    
+    REQUIRE(CBLCollection_DeleteDocumentByID(wordsCollection, "word2"_sl, &error));
+    
+    // Query:
+    results = executeWordsQuery(350);
+    
+    // Check results:
+    auto map = mapWordResults(results);
+    CHECK(map.size() == 301);
+    CHECK(map["word301"] == Dict(CBLDocument_Properties(doc1))["word"].asstring());
+    CHECK(map["word302"] == Dict(CBLDocument_Properties(doc2))["word"].asstring());
+    CHECK(map["word1"] == Dict(CBLDocument_Properties(doc3))["word"].asstring());
+    CHECK(map.count("word2") == 0);
+    
+    CBLDocument_Release(doc1);
+    CBLDocument_Release(doc2);
+    CBLDocument_Release(doc3);
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 9. TestCreateVectorIndexUsingPredictiveModelWithInvalidVectors
+ * Description
+ *     Using the default configuration, test that when creating the vector index using
+ *     a predictive model with invalid vectors, the invalid vectors will be skipped
+ *     from indexing.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Register  "WordEmbedding" predictive model defined in section 2.
+ *     4. Update documents.
+ *         - Update _default.words word1 with "vector" = null
+ *         - Update _default.words word2 with "vector" = "string"
+ *         - Update _default.words word3 by removing the "vector" key.
+ *         - Update _default.words word4 by removing one number from the "vector" key.
+ *     5. Create a vector index named "words_prediction_index" in _default.words collection.
+ *         - expression: "prediction(WordEmbedding, {"word": word}).embedding"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     6. Check that the index is created without an error returned.
+ *     7. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_pred_index, <dinner vector>, 350)
+ *     8. Check the explain() result of the query to ensure that the "words_predi_index" is used.
+ *     9. Execute the query and check that 296 results are returned and the results
+ *        do not include word1, word2, word3, and word4.
+ *     10. Verify that the index was trained by checking that the “Untrained index; queries may be slow” doesn’t exist in the log.
+ *     11. Update an already index vector with a non existing word in the database.
+ *         - Update _default.words.word5 with “word” = “Fried Chicken”.
+ *     12. Execute the query and check that 295 results are returned, and the results
+ *         do not include document word5.
+ *     13. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexUsingPredictionModelWithInvalidVectors", "[VectorSearch]") {
+    CBLError error {};
+    auto doc = CBLCollection_GetMutableDocument(wordsCollection, "word1"_sl, &error);
+    REQUIRE(doc);
+    auto props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetNull(props, "vector"_sl);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    doc = CBLCollection_GetMutableDocument(wordsCollection, "word2"_sl, &error);
+    REQUIRE(doc);
+    props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetString(props, "vector"_sl, "string"_sl);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    doc = CBLCollection_GetMutableDocument(wordsCollection, "word3"_sl, &error);
+    REQUIRE(doc);
+    props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_Remove(props, "vector"_sl);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    doc = CBLCollection_GetMutableDocument(wordsCollection, "word4"_sl, &error);
+    REQUIRE(doc);
+    props = CBLDocument_MutableProperties(doc);
+    auto vector = FLMutableDict_GetMutableArray(props, "vector"_sl);
+    FLMutableArray_Remove(vector, 0, 1);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    // The test spec creates the index named "words_pred_index", but it's ok to use any index name for the test.
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "prediction(WordEmbedding,{\"word\": word}).vector"_sl, 300, 4 };
+    createWordsIndex(config); // index name is defined in kWordsIndexName.
+    
+    // Query:
+    auto results = executeWordsQuery(350);
+    CHECK(isIndexTrained());
+    
+    // Check results:
+    auto map = mapWordResults(results);
+    CHECK(map.size() == 296);
+    CHECK(map.count("word1") == 0);
+    CHECK(map.count("word2") == 0);
+    CHECK(map.count("word3") == 0);
+    CHECK(map.count("word4") == 0);
+    
+    CBLResultSet_Release(results);
+    
+    // Update the doc:
+    doc = CBLCollection_GetMutableDocument(wordsCollection, "word5"_sl, &error);
+    REQUIRE(doc);
+    props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetString(props, "word"_sl, "Fried Chicken"_sl);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    // Query:
+    results = executeWordsQuery(350);
+    
+    // Check results:
+    map = mapWordResults(results);
+    CHECK(map.size() == 295);
+    CHECK(map.count("word5") == 0);
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 10. TestCreateVectorIndexWithSQ
+ * Description
+ *     Using different types of the Scalar Quantizer Encoding, test that the vector
+ *     index can be created and used.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *         - encoding: ScalarQuantizer(type: SQ4)
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     6. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     7. Execute the query and check that 20 results are returned.
+ *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     9. Delete the "words_index".
+ *     10. Reset the custom logger.
+ *     11. Repeat Step 2 – 10 by using SQ6 and SQ8 respectively.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithSQ", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    
+    SECTION("SQ4") {
+        config.encoding = CBLVectorEncoding_CreateScalarQuantizer(kCBLSQ4);
+    }
+    
+    SECTION("SQ6") {
+        config.encoding = CBLVectorEncoding_CreateScalarQuantizer(kCBLSQ6);
+    }
+    
+    SECTION("SQ8") {
+        config.encoding = CBLVectorEncoding_CreateScalarQuantizer(kCBLSQ8);
+    }
+    
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(20);
+    CHECK(CountResults(results) == 20);
+    CHECK(isIndexTrained());
+    
+    deleteWordsIndex();
+    
+    resetLog();
+    CBLVectorEncoding_Free(config.encoding);
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 11. TestCreateVectorIndexWithNoneEncoding
+ * Description
+ *     Using the None Encoding, test that the vector index can be created and used.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *         - encoding: None
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     6. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     7. Execute the query and check that 20 results are returned.
+ *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     9. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "testCreateVectorIndexWithNoneEncoding", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    config.encoding = CBLVectorEncoding_CreateNone();
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(20);
+    CHECK(CountResults(results) == 20);
+    CHECK(isIndexTrained());
+    
+    CBLVectorEncoding_Free(config.encoding);
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 12. TestCreateVectorIndexWithPQ
+ * Description
+ *     Using the PQ Encoding, test that the vector index can be created and used. The
+ *     test also tests the lower and upper bounds of the PQ’s bits.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *         - encoding : PQ(subquantizers: 5 bits: 8)
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     6. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     7. Execute the query and check that 20 results are returned.
+ *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     9. Delete the “words_index”.
+ *     10. Reset the custom logger.
+ *     11. Repeat steps 2 to 10 by changing the PQ’s bits to 4 and 12 respectively.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "testCreateVectorIndexWithPQ", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    
+    SECTION("4-bits") {
+        config.encoding = CBLVectorEncoding_CreateProductQuantizer(5, 4);
+    }
+    
+    SECTION("8-bits") {
+        config.encoding = CBLVectorEncoding_CreateProductQuantizer(5, 8);
+    }
+    
+    SECTION("12-bits") {
+        config.encoding = CBLVectorEncoding_CreateProductQuantizer(5, 12);
+    }
+    
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(20);
+    CHECK(CountResults(results) == 20);
+    
+    deleteWordsIndex();
+    
+    resetLog();
+    CBLVectorEncoding_Free(config.encoding);
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 13. TestSubquantizersValidation
+ * Description
+ *     Test that the PQ’s subquantizers value is validated with dimensions correctly.
+ *     The invalid argument exception should be thrown when the vector index is created
+ *     with invalid subquantizers which are not a divisor of the dimensions or zero.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *         - PQ(subquantizers: 2, bits: 8)
+ *     3. Check that the index is created without an error returned.
+ *     4. Delete the "words_index".
+ *     5. Repeat steps 2 to 4 by changing the subquantizers to
+ *       3, 4, 5, 6, 10, 12, 15, 20, 25, 30, 50, 60, 75, 100, 150, and 300.
+ *     6. Repeat step 2 to 4 by changing the subquantizers to 0 and 7.
+ *     7. Check that an invalid argument exception is thrown.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestSubquantizersValidation : Valid", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    
+    SECTION("Subquantizer - 2") {
+        config.encoding = CBLVectorEncoding_CreateProductQuantizer(2, 8);
+    }
+    
+    SECTION("Subquantizer - 3") {
+        config.encoding = CBLVectorEncoding_CreateProductQuantizer(3, 8);
+    }
+    
+    SECTION("Subquantizer - 150") {
+        config.encoding = CBLVectorEncoding_CreateProductQuantizer(150, 8);
+    }
+    
+    SECTION("Subquantizer - 300") {
+        config.encoding = CBLVectorEncoding_CreateProductQuantizer(300, 8);
+    }
+    
+    createWordsIndex(config);
+    
+    deleteWordsIndex();
+}
+
+TEST_CASE_METHOD(VectorSearchTest, "TestSubquantizersValidation : Invalid", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    
+    SECTION("Subquantizer - 0") {
+        config.encoding = CBLVectorEncoding_CreateProductQuantizer(0, 8);
+    }
+    
+    SECTION("Subquantizer - 7") {
+        config.encoding = CBLVectorEncoding_CreateProductQuantizer(7, 8);
+    }
+    
+    CBLError error {};
+    CHECK(!CBLCollection_CreateVectorIndex(wordsCollection, kWordsIndexName, config, &error));
+    CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
+}
+
+/**
+ * 14. TestCreateVectorIndexWithFixedTrainingSize
+ * Description
+ *     Test that the vector index can be created and trained when minTrainingSize
+ *     equals to maxTrainingSize.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *         - minTrainingSize: 100 and maxTrainingSize: 100
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     5. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     6. Execute the query and check that 20 results are returned.
+ *     7. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     8. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithFixedTrainingSize", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    config.minTrainingSize = 100;
+    config.maxTrainingSize = 100;
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(20);
+    CHECK(CountResults(results) == 20);
+    CHECK(isIndexTrained());
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 15. TestValidateMinMaxTrainingSize
+ * Description
+ *     Test that the minTrainingSize and maxTrainingSize values are validated
+ *     correctly. The invalid argument exception should be thrown when the vector index
+ *     is created with invalid minTrainingSize or maxTrainingSize.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 20
+ *         - minTrainingSize: 1 and maxTrainingSize: 100
+ *     3. Check that the index is created without an error returned.
+ *     4. Delete the "words_index"
+ *     5. Repeat Step 2 with the following cases:
+ *         - minTrainingSize = 0 and maxTrainingSize 0
+ *         - minTrainingSize = 0 and maxTrainingSize 100
+ *         - minTrainingSize = 10 and maxTrainingSize 9
+ *     6. Check that an invalid argument exception was thrown for all cases in step 4.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestValidateMinMaxTrainingSize", "[VectorSearch]") {
+    // Valid minTrainingSize / maxTrainingSize:
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 20 };
+    config.minTrainingSize = 1;
+    config.maxTrainingSize = 100;
+    CBLError error {};
+    CHECK(CBLCollection_CreateVectorIndex(wordsCollection, kWordsIndexName, config, &error));
+    
+    // Invalid minTrainingSize / maxTrainingSize:
+    config.minTrainingSize = 10;
+    config.maxTrainingSize = 9;
+    CHECK(!CBLCollection_CreateVectorIndex(wordsCollection, kWordsIndexName, config, &error));
+    CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
+}
+
+/**
+ * 16. TestQueryUntrainedVectorIndex
+ * Description
+ *     Test that the untrained vector index can be used in queries.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *         - minTrainingSize: 400
+ *         - maxTrainingSize: 500
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     6. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     7. Execute the query and check that 20 results are returned.
+ *     8. Verify that the index was not trained by checking that the “Untrained index;
+ *       queries may be slow” message exists in the log.
+ *     9. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestQueryUntrainedVectorIndex", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    config.minTrainingSize = 400;
+    config.maxTrainingSize = 500;
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(20);
+    CHECK(CountResults(results) == 20);
+    CHECK(!isIndexTrained());
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 17. TestCreateVectorIndexWithCosineDistance
+ * Description
+ *     Test that the vector index can be created and used with the cosine distance metric.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *         - metric: Cosine
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT meta().id, word,vector_distance(words_index)
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     6. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     7. Execute the query and check that 20 results are returned and the vector
+ *       distance value is in between 0 – 2.0 inclusively.
+ *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     9. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithCosineDistance", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    config.metric = kCBLDistanceMetricCosine;
+    createWordsIndex(config);
+ 
+    auto results = executeWordsQuery(20, true /* query distance */);
+    while (CBLResultSet_Next(results)) {
+        // auto distance = FLValue_AsDouble(CBLResultSet_ValueAtIndex(results, 2));
+        // CHECK(distance >= 0 && distance <= 2);
+    }
+    CHECK(isIndexTrained());
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 18. TestCreateVectorIndexWithEuclideanDistance
+ * Description
+ *     Test that the vector index can be created and used with the euclidean distance metric.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *         - metric: Euclidean
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT meta().id, word, vector_distance(words_index)
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     6. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     7. Execute the query and check that 20 results are returned and the
+ *        distance value is more than zero.
+ *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     9. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithEuclideanDistance", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    config.metric = kCBLDistanceMetricEuclidean;
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(20, true /* query distance */);
+    while (CBLResultSet_Next(results)) {
+        auto distance = FLValue_AsDouble(CBLResultSet_ValueAtIndex(results, 2));
+        CHECK(distance > 0);
+    }
+    CHECK(isIndexTrained());
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 19. TestCreateVectorIndexWithExistingName
+ * Description
+ *     Test that creating a new vector index with an existing name is fine if the index
+ *     configuration is the same or not.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 20
+ *     3. Check that the index is created without an error returned.
+ *     4. Repeat step 2 and check that the index is created without an error returned.
+ *     5. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vectors"
+ *         - dimensions: 300
+ *         - centroids: 20
+ *     6. Check that the index is created without an error returned.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithExistingName", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 20 };
+    createWordsIndex(config);
+    createWordsIndex(config);
+    
+    config.expression = "vectors"_sl;
+    config.dimensions = 300;
+    config.centroids = 20;
+    
+    createWordsIndex(config);
+}
+
+/**
+ * 20. TestDeleteVectorIndex
+ * Description
+ *     Test that creating a new vector index with an existing name is fine if the index
+ *     configuration is the same. Otherwise, an error will be returned.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vectors"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     6. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     7. Execute the query and check that 20 results are returned.
+ *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     9. Delete index named "words_index".
+ *     10. Check that getIndexes() does not contain "words_index".
+ *     11. Create the same query again and check that a CouchbaseLiteException is returned
+ *        as the index doesn’t exist.
+ *     12. Reset the custom logger.
+ */
+
+TEST_CASE_METHOD(VectorSearchTest, "TestDeleteVectorIndex", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(20);
+    CHECK(CountResults(results) == 20);
+    CHECK(isIndexTrained());
+    CBLResultSet_Release(results);
+    
+    deleteWordsIndex();
+    
+    CBLError error {};
+    auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(20)), nullptr, &error);    
+    CHECK(!query);
+    CheckError(error, kCBLErrorMissingIndex, kCBLDomain);
+}
+
+/**
+ * 21. TestVectorMatchOnNonExistingIndex
+ * Description
+ *     Test that an error will be returned when creating a vector match query that uses
+ *     a non existing index.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20)
+ *     3. Check that a CouchbaseLiteException is returned as the index doesn’t exist.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchOnNonExistingIndex", "[VectorSearch]") {
+    CBLError error {};
+    auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(20)), nullptr, &error);
+    CHECK(!query);
+    CheckError(error, kCBLErrorMissingIndex, kCBLDomain);
+}
+
+/**
+ * 22. TestVectorMatchDefaultLimit
+ * Description
+ *     Test that the number of rows returned is limited to the default value which is 3
+ *     when using the vector_match query without the limit number specified.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>)
+ *     6. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     7. Execute the query and check that 3 results are returned.
+ *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     9. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchDefaultLimit", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(); // 0 : Create VECTOR_MATCH query without specifying limit;
+    CHECK(CountResults(results) == 3);
+    CHECK(isIndexTrained());
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 23. TestVectorMatchLimitBoundary
+ * Description
+ *     Test vector_match’s limit boundary which is between 1 - 10000 inclusively. When
+ *     creating vector_match queries with an out-out-bound limit, an error should be
+ *     returned.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     3. Check that the index is created without an error returned.
+ *     4. Create an SQL++ query.
+ *         - SELECT meta().id, word
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, <limit>)
+ *         - limit: 1 and 10000
+ *     5. Check that the query can be created without an error.
+ *     6. Repeat step 4 with the limit: -1, 0, and 10001
+ *     7. Check that a CouchbaseLiteException is returned when creating the query.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+    
+    CBLQuery* query = nullptr;
+    
+    CBLError error {};
+    SECTION("Valid Limit : 1") {
+        query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(1)), nullptr, &error);
+        CHECK(query);
+    }
+    
+    SECTION("Valid Limit : 10000") {
+        query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(10000)), nullptr, &error);
+        CHECK(query);
+    }
+    
+    SECTION("Invalid Limit : -1") {
+        query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(-1)), nullptr, &error);
+        CHECK(!query);
+        CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
+    }
+    
+    SECTION("Invalid Limit : 0") {
+        query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(0)), nullptr, &error);
+        CHECK(!query);
+        CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
+    }
+    
+    SECTION("Invalid Limit : 10001") {
+        query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(10001)), nullptr, &error);
+        CHECK(!query);
+        CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
+    }
+    
+    CBLQuery_Release(query);
+}
+
+/**
+ * 24. TestVectorMatchWithAndExpression
+ * Description
+ *     Test that vector_match can be used in AND expression.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT word, catid
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 300) AND catid = 'cat1'
+ *     6. Check that the query can be created without an error.
+ *     7. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     8. Execute the query and check that the number of results returned is 50
+ *       (there are 50 words in catid=1), and the results contain only catid == 'cat1'.
+ *     9. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     10. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchWithAndExpression", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+    
+    auto results = executeWordsQuery(300, false, "AND catid = 'cat1'");
+    CHECK(CountResults(results) == 50);
+    
+    CBLResultSet_Release(results);
+}
+
+/**
+ * 25. TestVectorMatchWithMultipleAndExpression
+ * Description
+ *     Test that vector_match can be used in multiple AND expressions.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Register a custom logger to capture the INFO log.
+ *     3. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     4. Check that the index is created without an error returned.
+ *     5. Create an SQL++ query.
+ *         - SELECT word, catid
+ *           FROM _default.words
+ *           WHERE (vector_match(words_index, <dinner vector>, 300) AND word is valued) AND catid = 'cat1'
+ *     6. Check that the query can be created without an error.
+ *     7. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     8. Execute the query and check that the number of results returned is 50
+ *       (there are 50 words in catid=1), and the results contain only catid == 'cat1'.
+ *     9. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
+ *       doesn’t exist in the log.
+ *     10. Reset the custom logger.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "testVectorMatchWithMultipleAndExpression", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+    
+    string sql = "SELECT word, catid FROM _default.words WHERE (VECTOR_MATCH(words_index, $vector, 300) AND word is valued) AND catid = 'cat1'";
+    auto query = CreateQuery(wordDB, sql);
+    setDinnerParameter(query);
+    
+    alloc_slice explanation(CBLQuery_Explain(query));
+    CHECK(vectorIndexUsedInExplain(explanation, "words_index"));
+    
+    CBLError error {};
+    auto results = CBLQuery_Execute(query, &error);
+    CHECK(results);
+    CHECK(CountResults(results) == 50);
+    
+    CBLResultSet_Release(results);
+    CBLQuery_Release(query);
+}
+
+/**
+ * 26. TestInvalidVectorMatchWithOrExpression
+ * Description
+ *     Test that vector_match cannot be used with OR expression.
+ * Steps
+ *     1. Copy database words_db.
+ *     2. Create a vector index named "words_index" in _default.words collection.
+ *         - expression: "vector"
+ *         - dimensions: 300
+ *         - centroids: 8
+ *     3. Check that the index is created without an error returned.
+ *     4. Create an SQL++ query.
+ *         - SELECT word, catid
+ *           FROM _default.words
+ *           WHERE vector_match(words_index, <dinner vector>, 20) OR catid = 1
+ *     5. Check that a CouchbaseLiteException is returned when creating the query.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestInvalidVectorMatchWithOrExpression", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+    
+    CBLError error {};
+    auto sql = wordQueryString(20, false, "OR catid = 1");
+    auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(sql), nullptr, &error);
+    CHECK(!query);
+    CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
 }
 
 #endif

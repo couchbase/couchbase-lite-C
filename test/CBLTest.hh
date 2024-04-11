@@ -93,7 +93,7 @@ public:
     CBLCollection *defaultCollection {nullptr};
 };
 
-std::string GetTestFilePath(const std::string &filename);
+std::string GetAssetFilePath(const std::string &filename);
 
 #ifdef COUCHBASE_ENTERPRISE
 std::string GetExtensionPath();
@@ -123,6 +123,9 @@ void createNumberedDocsWithPrefix(CBLCollection *col, unsigned n, const std::str
 
 void PurgeAllDocs(CBLCollection* collection);
 
+CBLQuery* CreateQuery(CBLDatabase* db, std::string sql);
+
+int CountResults(CBLResultSet *results);
 
 // RAII utility to suppress reporting C++ exceptions (or breaking at them, in the Xcode debugger.)
 // Declare an instance when testing something that's expected to throw an exception internally.

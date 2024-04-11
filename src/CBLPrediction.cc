@@ -28,8 +28,7 @@ namespace cbl_internal {
     void PredictiveModel::registerModel(const slice name, const CBLPredictiveModel& model) {
         auto prediction = [](void* context, FLDict input, C4Database *db, C4Error *outError) {
             auto m = (PredictiveModel*)context;
-            FLDict output = m->_model.prediction(m->_model.context, input);
-            return C4SliceResult(m->encodeOutput(Dict(output)));
+            return m->_model.prediction(m->_model.context, input);
         };
         
         auto unregistered = [](void* context) {
@@ -54,16 +53,6 @@ namespace cbl_internal {
     void PredictiveModel::unregisterModel(slice name) {
         auto nameStr = name.asString();
         c4pred_unregisterModel(nameStr.c_str());
-    }
-
-    alloc_slice PredictiveModel::encodeOutput(Dict dict) {
-        if (!dict) {
-            return nullslice;
-        }
-        
-        Encoder enc;
-        enc.writeValue(dict);
-        return enc.finish();
     }
 }
 

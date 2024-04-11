@@ -31,13 +31,13 @@ typedef struct {
     /** Called from within a query (or document indexing) to run the prediction.
         @param context  The value of the CBLPredictiveModel's `context` field.
         @param input  The input dictionary from the query.
-        @return The output dictionary of the prediction function or NULL if there is no output.
-        @note The output dictionary will be automatically released after it's being consumed.
+        @return The output of the prediction function, encoded as a Fleece dictionary, or null if there is no output.
+        @note A null \ref FLSliceResult can be created by calling FLSliceResult_CreateWith(nullptr, 0).
         @warning This function must be "pure": given the same input parameters it must always
-                 produce the same output (otherwise indexes or queries may be messed up).
-                 It MUST NOT alter the database or any documents, nor run a query: either of
-                 those are very likely to cause a crash. */
-    FLDict _cbl_nullable (* _cbl_nonnull prediction)(void* _cbl_nullable context, FLDict input);
+                produce the same output (otherwise indexes or queries may be messed up).
+                It MUST NOT alter the database or any documents, nor run a query: either of
+                those are very likely to cause a crash. */
+    FLSliceResult (* _cbl_nonnull prediction)(void* _cbl_nullable context, FLDict input);
 
     /** Called if the model is unregistered, so it can release resources. */
     void (*_cbl_nullable unregistered)(void* context);

@@ -71,7 +71,7 @@ namespace cbl_internal {
         }
         
     private:
-        C4VectorEncoding _encoding { kC4VectorEncodingSQ };
+        C4VectorEncoding _encoding { kC4VectorEncodingPQ };
     };
 }
 
