@@ -23,6 +23,31 @@ using namespace fleece;
 using namespace cbl_internal;
 
 namespace cbl_internal {
+    template<>
+    struct ListenerToken<CBLCollectionChangeListener> : public CBLListenerToken {
+    public:
+        ListenerToken(CBLCollection *collection, CBLCollectionChangeListener callback, void *context)
+        :CBLListenerToken((const void*)callback, context)
+        ,_collection(collection)
+        ,_database(collection->database()) { }
+        
+        ~ListenerToken() { }
+        
+        CBLCollectionChangeListener _cbl_nullable callback() const {
+            return (CBLCollectionChangeListener)_callback;
+        }
+        
+        void call(const CBLCollectionChange* change) {
+            std::lock_guard<std::recursive_mutex> lock(_mutex);
+            auto cb = callback();
+            if (cb) {
+                cb(_context, change);
+            }
+        }
+    private:
+        Retained<CBLCollection> _collection;
+        Retained<CBLDatabase> _database;
+    };
 
     template<>
     struct ListenerToken<CBLCollectionDocumentChangeListener> : public CBLListenerToken {
@@ -31,6 +56,7 @@ namespace cbl_internal {
                       CBLCollectionDocumentChangeListener callback, void *context)
         :CBLListenerToken((const void*)callback, context)
         ,_collection(collection)
+        ,_database(collection->database())
         ,_docID(docID)
         {
             _c4obs = _collection->useLocked()->observeDocument(docID, [this](C4DocumentObserver*,
@@ -69,32 +95,30 @@ namespace cbl_internal {
             CBLDocumentChange change = {};
             change.collection = _collection;
             change.docID = _docID;
-
-            Retained<CBLDatabase> db;
-            try {
-                db = _collection->database();
-            } catch (...) {
-                C4Error error = C4Error::fromCurrentException();
-                CBL_Log(kCBLLogDomainDatabase, kCBLLogWarning,
-                        "Document changed notification failed: %s", error.description().c_str());
-            }
-
-            if (db) {
-                db->notify(this, change);
-            }
+            _database->notify(this, change);
         }
 
         Retained<CBLCollection> _collection;
+        Retained<CBLDatabase> _database;
         alloc_slice _docID;
         std::unique_ptr<C4DocumentObserver> _c4obs;
     };
-
 }
 
-Retained<CBLListenerToken>
-CBLCollection::addDocumentListener(slice docID, CBLCollectionDocumentChangeListener listener,
-                                   void* _cbl_nullable ctx)
+Retained<CBLListenerToken> CBLCollection::addChangeListener(CBLCollectionChangeListener listener,
+                                                            void* _cbl_nullable ctx)
 {
+    auto lock =_c4col.useLocked(); // Ensure the database lifetime while creating the Listener token
+    auto token = addListener([&] { return new ListenerToken<CBLCollectionChangeListener>(this, listener, ctx); });
+    _listeners.add((ListenerToken<CBLCollectionChangeListener>*)token.get());
+    return token;
+}
+
+Retained<CBLListenerToken> CBLCollection::addDocumentListener(slice docID, 
+                                                              CBLCollectionDocumentChangeListener listener,
+                                                              void* _cbl_nullable ctx)
+{
+    auto lock =_c4col.useLocked(); // // Ensure the database lifetime while creating the Listener token
     auto token = new ListenerToken<CBLCollectionDocumentChangeListener>(this, docID, listener, ctx);
     _docListeners.add(token);
     return token;

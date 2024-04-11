@@ -177,7 +177,7 @@ namespace cbl_internal {
             return t;
         }
 
-        void add(ListenerToken<LISTENER>* _cbl_nonnull token)                {ListenersBase::add(token);}
+        void add(ListenerToken<LISTENER>* _cbl_nonnull token)   {ListenersBase::add(token);}
         void clear()                                            {ListenersBase::clear();}
         bool empty() const                                      {return ListenersBase::empty();}
 

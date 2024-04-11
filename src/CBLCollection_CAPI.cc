@@ -113,7 +113,7 @@ uint64_t CBLCollection_Count(const CBLCollection* collection) noexcept {
     } catchAndWarn()
 }
 
-/** Private API */
+/** Private API used in tests. */
 CBLDatabase* CBLCollection_Database(const CBLCollection* collection) noexcept {
     try {
         return collection->database();
