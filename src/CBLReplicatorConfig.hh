@@ -175,22 +175,17 @@ namespace cbl_internal
         using Dict = fleece::Dict;
         using slice = fleece::slice;
         using Array = fleece::Array;
+        template <class T> using Retained = fleece::Retained<T>;
 
     public:
         ReplicatorConfiguration(const CBLReplicatorConfiguration &conf) {
             *(CBLReplicatorConfiguration*)this = conf;
-            retain(database);
+            
+            // Throw an exception if the validation failed:
+            validate();
+            
             if (endpoint)
                 endpoint = endpoint->clone();
-            
-            if (collections) {
-                // Copy collections and retain the collection object inside:
-                for (int i = 0; i < collectionCount; i++) {
-                    retain(collections[i].collection);
-                    _collections.push_back(collections[i]);
-                }
-                collections = _collections.data();
-            }
 
             authenticator = authenticator ? authenticator->clone() : nullptr;
             headers = FLDict_MutableCopy(headers, kFLDeepCopyImmutables);
@@ -214,56 +209,56 @@ namespace cbl_internal
             Dict headersDict = Dict(headers);
             fleece::Value userAgent = headersDict[kCBLReplicatorUserAgent];
             _userAgent = userAgent ? userAgent.asstring() : createUserAgentHeader();
+            
+            Retained<CBLCollection> defaultCollection = nullptr;
+            if (database) {
+                defaultCollection = database->getDefaultCollection();
+            }
+            
+            if (collections) {
+                // Copy replication collections, channels, and document ids:
+                for (int i = 0; i < collectionCount; i++) {
+                    CBLReplicationCollection col = collections[i];
+                    col.channels = FLArray_MutableCopy(col.channels, kFLDeepCopyImmutables);
+                    col.documentIDs = FLArray_MutableCopy(col.documentIDs, kFLDeepCopyImmutables);
+                    _effectiveCollections.push_back(col);
+                }
+                collections = _effectiveCollections.data();
+            } else {
+                // Create a replication collection using the default collection:
+                assert(defaultCollection);
+                
+                CBLReplicationCollection col {};
+                col.collection = defaultCollection;
+                col.conflictResolver = conflictResolver;
+                col.pushFilter = pushFilter;
+                col.pullFilter = pullFilter;
+                col.channels = FLArray_Retain(channels);        // Already copied
+                col.documentIDs = FLArray_Retain(documentIDs);  // Already copied
+                _effectiveCollections.push_back(col);
+            }
+            
+            // Retain the collections and database:
+            for (auto& col : _effectiveCollections) {
+                _retainedCollections.push_back(col.collection);
+                if (!_retainedDatabase) {
+                    _retainedDatabase = col.collection->database();
+                }
+            }
         }
 
         ~ReplicatorConfiguration() {
-            release(database);
-            
-            for (int i = 0; i < collectionCount; i++) {
-                release(_collections[i].collection);
-            }
-            
             CBLEndpoint_Free(endpoint);
             CBLAuth_Free(authenticator);
             FLDict_Release(headers);
             FLArray_Release(channels);
             FLArray_Release(documentIDs);
+            
+            for (auto& col : _effectiveCollections) {
+                FLArray_Release(col.channels);
+                FLArray_Release(col.documentIDs);
+            }
         }
-        
-
-        void validate() const {
-            const char *problem = nullptr;
-            if (!database && !collections)
-                problem = "Invalid config: Missing both database and collections";
-            else if (database && collections)
-                problem = "Invalid config: Both database and collections are set at same time";
-            else if (collections && collectionCount == 0)
-                problem = "Invalid config: collectionCount is zero";
-            else if ((documentIDs || channels || pushFilter || pullFilter) && !database)
-                problem = "Invalid config: Cannot use documentIDs, channels, pushFilter or "
-                          "pullFilter when collections is set. Set the properties in "
-                          "CBLReplicationCollection instead.";
-            else if (conflictResolver && !database)
-                problem = "Invalid config: Cannot use conflictResolver when collections is set. "
-                          "Set the property in CBLReplicationCollection instead.";
-        #ifdef COUCHBASE_ENTERPRISE
-            else if ((propertyEncryptor || propertyDecryptor ) && !database)
-                problem = "Invalid config: Cannot use propertyEncryptor or propertyDecryptor "
-                          "when collections is set. Use documentPropertyEncryptor or "
-                          "documentPropertyDecryptor instead.";
-        #endif
-            else if (!endpoint || replicatorType > kCBLReplicatorTypePull)
-                problem = "Invalid config: Missing endpoints or bad type";
-            else if (!endpoint->valid())
-                problem = "Invalid endpoint";
-            else if (proxy && (proxy->type > kCBLProxyHTTPS ||
-                                                    !proxy->hostname.buf || !proxy->port))
-                problem = "Invalid replicator proxy settings";
-
-            if (problem)
-                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "%s", problem);
-        }
-
 
         // Writes a LiteCore replicator optionsDict
         void writeOptions(Encoder &enc) const {
@@ -345,9 +340,10 @@ namespace cbl_internal
             writeOptionalKey(enc, kC4ReplicatorOptionChannels,      Array(collection.channels));
         }
 
-        slice getUserAgent() const {
-            return slice(_userAgent);
-        }
+        slice getUserAgent() const                                                  { return slice(_userAgent); }
+        
+        CBLDatabase* effectiveDatabase() const                                      { return _retainedDatabase; }
+        const std::vector<CBLReplicationCollection>& effectiveCollections() const   { return _effectiveCollections; }
 
         ReplicatorConfiguration(const ReplicatorConfiguration&) =delete;
         ReplicatorConfiguration& operator=(const ReplicatorConfiguration&) =delete;
@@ -356,14 +352,66 @@ namespace cbl_internal
         using string = std::string;
         using alloc_slice = fleece::alloc_slice;
 
-        static slice copyString(slice str, alloc_slice &allocated)
-        {
+        static slice copyString(slice str, alloc_slice &allocated) {
             allocated = alloc_slice(str);
             return allocated;
         }
+        
+        void validate() const {
+            const char *problem = nullptr;
+            if (!database && !collections)
+                problem = "Invalid config: Missing both database and collections";
+            else if (database && collections)
+                problem = "Invalid config: Both database and collections are set at same time";
+            else if (collections && collectionCount == 0)
+                problem = "Invalid config: collectionCount is zero";
+            else if ((documentIDs || channels || pushFilter || pullFilter) && !database)
+                problem = "Invalid config: Cannot use documentIDs, channels, pushFilter or "
+                          "pullFilter when collections is set. Set the properties in "
+                          "CBLReplicationCollection instead.";
+            else if (conflictResolver && !database)
+                problem = "Invalid config: Cannot use conflictResolver when collections is set. "
+                          "Set the property in CBLReplicationCollection instead.";
+        #ifdef COUCHBASE_ENTERPRISE
+            else if ((propertyEncryptor || propertyDecryptor ) && !database)
+                problem = "Invalid config: Cannot use propertyEncryptor or propertyDecryptor "
+                          "when collections is set. Use documentPropertyEncryptor or "
+                          "documentPropertyDecryptor instead.";
+        #endif
+            else if (!endpoint || replicatorType > kCBLReplicatorTypePull)
+                problem = "Invalid config: Missing endpoints or bad type";
+            else if (!endpoint->valid())
+                problem = "Invalid endpoint";
+            else if (proxy && (proxy->type > kCBLProxyHTTPS ||
+                                                    !proxy->hostname.buf || !proxy->port))
+                problem = "Invalid replicator proxy settings";
+            
+            if (collections) {
+                CBLDatabase* db = nullptr;
+                for (int i = 0; i < collectionCount; i++) {
+                    auto collection = collections[i].collection;
+                    if (!collection->isValid()) {
+                        problem = "An invalid collection was found in the configuration.";
+                        break;
+                    }
+                    
+                    if (!db) {
+                        db = collection->database();
+                    } else if (db != collection->database()) {
+                        problem = "Invalid config: collections are not from the same database instance.";
+                        break;
+                    }
+                }
+            }
+
+            if (problem)
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "%s", problem);
+        }
 
         string                                  _userAgent;
-        std::vector<CBLReplicationCollection>   _collections;
+        std::vector<CBLReplicationCollection>   _effectiveCollections;
+        std::vector<Retained<CBLCollection>>    _retainedCollections;
+        Retained<CBLDatabase>                   _retainedDatabase;
         alloc_slice                             _pinnedServerCert, _trustedRootCerts;
         CBLProxySettings                        _proxy;
         alloc_slice                             _proxyHostname, _proxyUsername, _proxyPassword;

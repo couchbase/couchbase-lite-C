@@ -605,6 +605,43 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Document Replication Listener", "[Replica
     CHECK(replicatedDocIDs.empty());
 }
 
+TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Push Filters", "[Replicator]") {
+    MutableDocument doc1("foo1");
+    doc1["greeting"] = "Howdy!";
+    db.saveDocument(doc1);
+    
+    MutableDocument doc2("foo2");
+    doc2["greeting"] = "Howdy!";
+    db.saveDocument(doc2);
+    
+    auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
+    config.replicatorType = kCBLReplicatorTypePush;
+    config.documentIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
+    expectedDocumentCount = 1;
+    replicate();
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo1"});
+    
+    FLMutableArray_Release(docIDs);
+}
+
+TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Pull Filters", "[Replicator]") {
+    MutableDocument doc1("foo1");
+    doc1["greeting"] = "Howdy!";
+    otherDB.saveDocument(doc1);
+    
+    MutableDocument doc2("foo2");
+    doc2["greeting"] = "Howdy!";
+    otherDB.saveDocument(doc2);
+    
+    auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
+    config.replicatorType = kCBLReplicatorTypePull;
+    config.documentIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
+    expectedDocumentCount = 1;
+    replicate();
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo1"});
+    
+    FLMutableArray_Release(docIDs);
+}
 
 class ReplicatorFilterTest : public ReplicatorLocalTest {
 public:

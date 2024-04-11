@@ -70,13 +70,7 @@ public:
         // One-time initialization of network transport:
         static once_flag once;
         call_once(once, std::bind(&C4RegisterBuiltInWebSocket));
-        
-        if (_conf.database) {
-            _defaultCollection = _conf.database->getInternalDefaultCollection();
-        }
 
-        _conf.validate();
-        
         // Set up the LiteCore replicator parameters:
         C4ReplicatorParameters params = { };
         
@@ -84,42 +78,15 @@ public:
         // are from the same database instance:
         auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
         
-        size_t colsCount =  _conf.collections ? _conf.collectionCount : 1;
+        auto effectiveCollections = _conf.effectiveCollections();
         
         std::vector<C4ReplicationCollection> c4ReplCols;
-        c4ReplCols.reserve(colsCount);
+        c4ReplCols.reserve(effectiveCollections.size());
         
         std::vector<alloc_slice> optionDicts;
-        optionDicts.reserve(colsCount);
+        optionDicts.reserve(effectiveCollections.size());
         
-        for (int i = 0; i < colsCount; i++) {
-            CBLReplicationCollection replCol;
-            if (_conf.database) {
-                // If using .database, a C4ReplicationCollection with the default collection
-                // and the outer conflict resolver and filters will be construct:
-                assert(colsCount == 1);
-                replCol.collection = _defaultCollection.get();
-                replCol.conflictResolver = _conf.conflictResolver;
-                replCol.pushFilter = _conf.pushFilter;
-                replCol.pullFilter = _conf.pullFilter;
-                replCol.channels = _conf.channels;
-                replCol.documentIDs = _conf.documentIDs;
-            } else {
-                replCol = _conf.collections[i];
-            }
-            
-            if (!replCol.collection->isValid()) {
-                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
-                               "An invalid collection was found in the configuration.");
-            }
-            
-            if (!_db) {
-                _db = replCol.collection->database();
-            } else if (_db != replCol.collection->database()) {
-                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
-                               "The collections are not from the same database object.");
-            }
-            
+        for (CBLReplicationCollection& replCol : effectiveCollections) {
             auto& col = c4ReplCols.emplace_back();
             
             auto spec = replCol.collection->spec();
@@ -164,7 +131,7 @@ public:
         }
         
         params.collections = c4ReplCols.data();
-        params.collectionCount = colsCount;
+        params.collectionCount = c4ReplCols.size();;
         
         params.callbackContext = this;
         params.onStatusChanged = [](C4Replicator* c4repl, C4ReplicatorStatus status, void *ctx) {
@@ -223,6 +190,7 @@ public:
         _replicatorID = alloc_slice(replID);
 
         // Create the LiteCore replicator:
+        _db = _conf.effectiveDatabase();
         _db->useLocked([&](C4Database *c4db) {
 #ifdef COUCHBASE_ENTERPRISE
             if (_conf.endpoint->otherLocalDB()) {
@@ -246,14 +214,9 @@ public:
     }
     
     CBLCollection* _cbl_nullable defaultCollection() {
-        if (_defaultCollection) {
-            return _defaultCollection;
-        }
-        
         if (auto i = _collections.find(kC4DefaultCollectionSpec); i != _collections.end()) {
             return i->second.collection;
         }
-        
         return nullptr;
     }
 
@@ -276,14 +239,12 @@ public:
                     "Couldn't start the replicator as the database is closing or closed.");
     }
 
-
     CBLReplicatorStatus status() {
         LOCK(_mutex);
         if (_useInitialStatus)
             return {}; // Allow to return initial status with zero progress.complete
         return effectiveStatus(_c4repl->getStatus());
     }
-
 
     MutableDict pendingDocumentIDs(const CBLCollection* col) const {
         checkCollectionParam(col);
@@ -300,24 +261,17 @@ public:
         return result;
     }
 
-
     bool isDocumentPending(FLString docID, const CBLCollection* col) const {
         checkCollectionParam(col);
         return _c4repl->isDocumentPending(docID, col->spec());
     }
 
-
-    Retained<CBLListenerToken> addChangeListener(CBLReplicatorChangeListener listener,
-                                                 void *context)
-    {
+    Retained<CBLListenerToken> addChangeListener(CBLReplicatorChangeListener listener, void *context) {
         LOCK(_mutex);
         return _changeListeners.add(listener, context);
     }
 
-
-    Retained<CBLListenerToken> addDocumentListener(CBLDocumentReplicationListener listener,
-                                                   void *context)
-    {
+    Retained<CBLListenerToken> addDocumentListener(CBLDocumentReplicationListener listener, void *context) {
         LOCK(_mutex);
         if (_docListeners.empty()) {
             _c4repl->setProgressLevel(kC4ReplProgressPerDocument);
@@ -343,7 +297,6 @@ private:
         }
     };
     
-
     alloc_slice encodeOptions() {
         Encoder enc;
         enc.beginDict();
@@ -352,7 +305,6 @@ private:
         return enc.finish();
     }
     
-    
     alloc_slice encodeCollectionOptions(CBLReplicationCollection& collection) {
         Encoder enc;
         enc.beginDict();
@@ -360,7 +312,6 @@ private:
         enc.endDict();
         return enc.finish();
     }
-
 
     CBLReplicatorStatus effectiveStatus(C4ReplicatorStatus c4status) {
         LOCK(_mutex);
@@ -374,14 +325,12 @@ private:
         return eff;
     }
 
-
     void bumpConflictResolverCount(int delta) {
         auto curActivity = effectiveStatus(_c4status).activity;
         _activeConflictResolvers += delta;
         if (effectiveStatus(_c4status).activity != curActivity)
             _statusChanged(_c4status);
     }
-
 
     void _statusChanged(C4ReplicatorStatus c4status) {
         LOCK(_mutex);
@@ -408,7 +357,6 @@ private:
             _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
         }
     }
-
 
     void _documentsEnded(bool pushing,
                          size_t numDocs,
@@ -459,7 +407,6 @@ private:
             _docListeners.call(this, pushing, unsigned(docs->size()), docs->data());
     }
     
-
     void _conflictResolverFinished(ConflictResolver *resolver) {
         CBLReplicatedDocument doc = resolver->result();
         _docListeners.call(this, false, 1, &doc);
@@ -468,7 +415,6 @@ private:
         LOCK(_mutex);
         bumpConflictResolverCount(-1);
     }
-
 
     bool _filter(C4CollectionSpec colSpec, slice docID, slice revID,
                  C4RevisionFlags flags, Dict body, bool pushing)
@@ -547,8 +493,7 @@ private:
 
     recursive_mutex                             _mutex;
     ReplicatorConfiguration const               _conf;
-    Retained<CBLDatabase>                       _db;
-    Retained<CBLCollection>                     _defaultCollection;
+    CBLDatabase*                                _db;                // Retained by _conf
     Retained<C4Replicator>                      _c4repl;
     alloc_slice                                 _replicatorID;
     unique_ptr<CBLReplicatorStoppable>          _stoppable;
