@@ -9,6 +9,7 @@
 #include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
 #include "Listener.hh"
+#include "ContextManager.hh"
 #include "c4Query.hh"
 #include "access_lock.hh"
 #include "fleece/Expert.hh"
@@ -17,6 +18,10 @@
 #include <optional>
 #include <unordered_map>
 
+#ifdef DEBUG
+#include <chrono>
+#include <thread>
+#endif
 
 CBL_ASSUME_NONNULL_BEGIN
 
@@ -180,14 +185,31 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         ,_query(query)
         {
-            query->_c4query.useLocked([&](C4Query *c4query) {
-                _c4obs = c4query->observe([this](C4QueryObserver*) { this->queryChanged(); });
-            });
-            
             _stoppable = std::make_unique<CBLQueryListenerStoppable>(this);
+            
+            auto ctx = ContextManager::shared().registerObject(this);
+            
+            query->_c4query.useLocked([&](C4Query *c4query) {
+                _c4obs = c4query->observe([ctx](C4QueryObserver* c4obs) {
+                #ifdef DEBUG
+                    if (sC4QueryObserverCallbackDelay > 0) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(sC4QueryObserverCallbackDelay));
+                    }
+                #endif
+                    
+                    // Get and retain object:
+                    auto obj = ContextManager::shared().getObject(ctx);
+                    
+                    // Validate and notify:
+                    auto self = dynamic_cast<ListenerToken<CBLQueryChangeListener>*>(obj.get());
+                    if (self && self->_c4obs == c4obs) {
+                        self->queryChanged();
+                    }
+                });
+            });
         }
 
-        ~ListenerToken() = default;
+        virtual ~ListenerToken() = default;
 
         void setEnabled(bool enabled);
 
@@ -198,8 +220,9 @@ namespace cbl_internal {
         void call() {
             std::lock_guard<std::recursive_mutex> lock(_mutex);
             CBLQueryChangeListener cb = callback();
-            if (cb)
+            if (cb) {
                 cb(_context, _query, this);
+            }
         }
 
         Retained<CBLResultSet> resultSet() {
@@ -208,7 +231,19 @@ namespace cbl_internal {
         
         // CBLListenerToken :
         
-        void willRemove() override                              {setEnabled(false);}
+        void willRemove() override {
+            setEnabled(false);
+            ContextManager::shared().unregisterObject(this);
+        }
+        
+        // For Testing :
+        
+        #ifdef DEBUG
+        inline static int sC4QueryObserverCallbackDelay;
+        static void setC4QueryObserverCallbackDelay(int delayMS) {
+            sC4QueryObserverCallbackDelay = delayMS;
+        }
+        #endif
 
     private:
         struct CBLQueryListenerStoppable : CBLStoppable {
@@ -225,7 +260,7 @@ namespace cbl_internal {
         void queryChanged();    // defn is in CBLDatabase.cc, to prevent circular hdr dependency
 
         Retained<CBLQuery>  _query;
-        std::unique_ptr<C4QueryObserver> _c4obs;
+        Retained<C4QueryObserver> _c4obs;
         std::unique_ptr<CBLQueryListenerStoppable> _stoppable;
         bool _isEnabled {false};
     };
