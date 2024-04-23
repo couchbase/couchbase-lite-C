@@ -134,6 +134,7 @@ set(
     src/CBLScope_CAPI.cc
     src/CBLVectorIndexConfig_CAPI.cc
     src/ConflictResolver.cc
+    src/ContextManager.cc
     src/Internal.cc
     src/Listener.cc
     ${PLATFORM_SRC}

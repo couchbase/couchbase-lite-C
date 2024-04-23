@@ -93,10 +93,10 @@
 		4083FCC02BAA235F0061509D /* CBLPrediction_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */; };
 		4083FCC22BAA38F30061509D /* CBLPrediction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCC12BAA38F30061509D /* CBLPrediction.cc */; };
 		40D1862529B6D1A50061AA85 /* Collection.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCC064BD287CBD95000C5BD7 /* Collection.hh */; };
+		40E7CA732BFE7336004BE7E1 /* ContextManager.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40E7CA632BFE7336004BE7E1 /* ContextManager.cc */; };
+		40E7CA742BFE7336004BE7E1 /* ContextManager.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40E7CA722BFE7336004BE7E1 /* ContextManager.hh */; };
 		40F902D82B9F7B12002EA0A0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */; };
 		42D1B69D2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
-		42D1B69E2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
-		42D1B69F2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 		932062DB26BC6B43006917A5 /* CBLQuery.cc in Sources */ = {isa = PBXBuildFile; fileRef = 932062DA26BC6B43006917A5 /* CBLQuery.cc */; };
 		9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */ = {isa = PBXBuildFile; fileRef = 9320630126BDB340006917A5 /* CBLPlatform.h */; };
@@ -112,8 +112,6 @@
 		93C70D3526D01B5A0093E927 /* BlobTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 93C70D3326D01B5A0093E927 /* BlobTest.cc */; };
 		93EC366226C49AF700182B02 /* CBLEncryptable_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 93EC365D26C498AB00182B02 /* CBLEncryptable_Internal.hh */; };
 		AE591AB829473A4500E4BDE8 /* CBLUserAgent.hh in Headers */ = {isa = PBXBuildFile; fileRef = AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */; };
-		AE591AB929473A4500E4BDE8 /* CBLUserAgent.hh in Headers */ = {isa = PBXBuildFile; fileRef = AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */; };
-		AE591ABA29473A4500E4BDE8 /* CBLUserAgent.hh in Headers */ = {isa = PBXBuildFile; fileRef = AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */; };
 		AED22E7D291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */; };
 		AED22E7E291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */; };
 		AED22E7F291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */; };
@@ -478,6 +476,8 @@
 		4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction_CAPI.cc; sourceTree = "<group>"; };
 		4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLPrediction_Internal.hh; sourceTree = "<group>"; };
 		4083FCC12BAA38F30061509D /* CBLPrediction.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction.cc; sourceTree = "<group>"; };
+		40E7CA632BFE7336004BE7E1 /* ContextManager.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextManager.cc; sourceTree = "<group>"; };
+		40E7CA722BFE7336004BE7E1 /* ContextManager.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ContextManager.hh; sourceTree = "<group>"; };
 		40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLUserAgent.mm; sourceTree = "<group>"; };
 		932062DA26BC6B43006917A5 /* CBLQuery.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQuery.cc; sourceTree = "<group>"; };
@@ -684,6 +684,8 @@
 				42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */,
 				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
 				27D11BED2351043B00C58A70 /* ConflictResolver.hh */,
+				40E7CA632BFE7336004BE7E1 /* ContextManager.cc */,
+				40E7CA722BFE7336004BE7E1 /* ContextManager.hh */,
 				271C2A7421CC4BD60045856E /* Internal.cc */,
 				271C2A7921CC756A0045856E /* Internal.hh */,
 				27886C8C21F64C1400069BEA /* Listener.cc */,
@@ -918,6 +920,7 @@
 				277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */,
 				FC5FBBB72821E4970066157F /* CBLDatabase_Internal.hh in Headers */,
 				FCC064202862B850000C5BD7 /* CBLScope.h in Headers */,
+				40E7CA742BFE7336004BE7E1 /* ContextManager.hh in Headers */,
 				AE591AB829473A4500E4BDE8 /* CBLUserAgent.hh in Headers */,
 				27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */,
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
@@ -942,7 +945,6 @@
 				FCB96E8429007D4F001C4DED /* CBLDefaults.h in Headers */,
 				27984E2A2249A240000FE777 /* CBLBase.h in Headers */,
 				27984E2B2249A240000FE777 /* CBLBlob.h in Headers */,
-				AE591ABA29473A4500E4BDE8 /* CBLUserAgent.hh in Headers */,
 				27984E2D2249A240000FE777 /* CBLDocument.h in Headers */,
 				40D1862529B6D1A50061AA85 /* Collection.hh in Headers */,
 				FCD988BC2821B10400512BBD /* CBLCollection.h in Headers */,
@@ -967,7 +969,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AE591AB929473A4500E4BDE8 /* CBLUserAgent.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1537,6 +1538,7 @@
 				27B61D5621D5ABA60027CCDB /* CBLQuery_CAPI.cc in Sources */,
 				277FEE7521ED3C4900B60E3C /* CBLReplicator_CAPI.cc in Sources */,
 				FCD829B32835EE39004AA814 /* CBLScope_CAPI.cc in Sources */,
+				40E7CA732BFE7336004BE7E1 /* ContextManager.cc in Sources */,
 				27D11BF02351043B00C58A70 /* ConflictResolver.cc in Sources */,
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
 				FCB96E8329007D37001C4DED /* CBLDefaults_CAPI.cc in Sources */,
@@ -1579,7 +1581,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				42D1B69F2978AD31003B9871 /* CBLUserAgent.mm in Sources */,
 				27984E212249A189000FE777 /* dylib_main.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1588,7 +1589,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				42D1B69E2978AD31003B9871 /* CBLUserAgent.mm in Sources */,
 				27B61D7F21D6B6900027CCDB /* dylib_main.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

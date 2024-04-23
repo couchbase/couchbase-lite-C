@@ -33,8 +33,11 @@ class QueryTest : public CBLTest {
 public:
     QueryTest() {
         ImportJSONLines("names_100.json", defaultCollection);
+    #ifdef DEBUG
+        CBLQuery_SetListenerCallbackDelay(0);
+    #endif
     }
-
+    
     ~QueryTest() {
         CBLResultSet_Release(results);
         CBLQuery_Release(query);
@@ -570,6 +573,50 @@ TEST_CASE_METHOD(QueryTest, "Remove Query Listener", "[Query][LiveQuery]") {
     cerr << "Sleeping to ensure async cleanup ..." << endl;
     this_thread::sleep_for(500ms);
 }
+
+
+#ifdef DEBUG
+TEST_CASE_METHOD(QueryTest, "Remove Query Listener with Delay Notification", "[Query][LiveQuery][CBL-5661]") {
+    CBLError error;
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
+                                    "SELECT name FROM _ WHERE birthday like '1959-%' ORDER BY birthday"_sl,
+                                    nullptr, &error);
+    REQUIRE(query);
+    
+    cerr << "Adding listener\n";
+    ListenerState state;
+    CBLListenerToken* listenerToken = CBLQuery_AddChangeListener(query, [](void *context, CBLQuery* query, CBLListenerToken* token) {
+        ((ListenerState*)context)->receivedCallback(context, query, token);
+    }, &state);
+
+    cerr << "Waiting for listener...\n";
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 3);
+    
+    cerr << "Set a delay in listener callback\n";
+    CBLQuery_SetListenerCallbackDelay(2000);
+    
+    cerr << "Deleting a doc...\n";
+    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
+    REQUIRE(doc);
+    CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
+    CBLDocument_Release(doc);
+    
+    cerr << "Removing the listener...\n";
+    this_thread::sleep_for(1000ms); // Max delay before refreshing result in LiteCore is 500ms
+    CBLListener_Remove(listenerToken);
+    
+    cerr << "Sleeping to ensure that the listener callback is not called..." << endl;
+    this_thread::sleep_for(3000ms); 
+    REQUIRE(state.waitForCount(1));
+    CHECK(state.resultCount() == 3);
+    
+    // Cleanup:
+    listenerToken = nullptr;
+    cerr << "Sleeping to ensure async cleanup ..." << endl;
+    this_thread::sleep_for(500ms);
+}
+#endif
 
 
 TEST_CASE_METHOD(QueryTest, "Query Listener and Changing parameters", "[Query][LiveQuery]") {
