@@ -190,6 +190,7 @@ CBL_C {
 		CBLDocument_Generation;
 		CBLError_GetCaptureBacktraces;
 		CBLError_SetCaptureBacktraces;
+		CBLQuery_SetListenerCallbackDelay;
 		CBLLog_BeginExpectingExceptions;
 		CBLLog_EndExpectingExceptions;
 		kCBLDefaultLogFileUsePlainText;
