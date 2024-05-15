@@ -71,3 +71,4 @@ elseif(UNIX)
 endif()
 
 file(COPY assets DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test)
+file(COPY extensions DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/test)

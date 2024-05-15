@@ -29,6 +29,8 @@
 
 CBL_CAPI_BEGIN
 
+// #define COUCHBASE_ENTERPRISE 1
+
 /** \defgroup errors   Errors
      @{
     Types and constants for communicating errors from API calls. */

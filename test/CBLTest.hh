@@ -82,8 +82,6 @@ public:
     
 #ifdef COUCHBASE_ENTERPRISE
     static void initVectorSearchExtension();
-    
-    bool hasVectorSearchExtension();
 #endif
     
     CBLTest();

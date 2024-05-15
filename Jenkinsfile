@@ -7,7 +7,7 @@ pipeline {
         stage("Build and Test") {
             parallel {
                 stage("Windows") {
-                   agent { label 'couchbase-lite-net-validation' }
+                   agent { label 'mobile-dotnet-windows2022-01' }
                    environment {
                        BRANCH = "${BRANCH_NAME}"
                    }
