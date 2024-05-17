@@ -63,7 +63,6 @@ public:
     VectorSearchTest() {
         auto config = databaseConfig();
         
-        CBLLog_SetConsoleLevel(kCBLLogVerbose);
         initVectorSearchExtension();
         
         CBLError error { };
@@ -121,8 +120,6 @@ public:
         CBLLog_SetCallback(nullptr);
         CBLLog_SetCallbackLevel(kCBLLogNone);
         sVectorSearchTestLogs.clear();
-        
-        CBLLog_SetConsoleLevel(kCBLLogWarning);
     }
     
     FLMutableArray vectorForWord(FLString word, FLString collection) {
