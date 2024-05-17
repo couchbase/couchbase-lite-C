@@ -44,7 +44,7 @@ try {
 
     $env:LiteCoreTestsQuiet=1
     Set-Location test\Debug
-    .\CBL_C_Tests -r list "[VectorSearch]"
+    .\CBL_C_Tests -r list
     if($LASTEXITCODE -ne 0) {
         Write-Host "C++ tests failed!" -ForegroundColor Red
         exit 1
