@@ -16,7 +16,7 @@ env:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-12
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -25,6 +25,7 @@ jobs:
 
     - name: Setup Android SDK
       run: |
+        java -version
         $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "ndk;23.1.7779620"
         $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "cmake;3.22.1"
 
@@ -33,7 +34,7 @@ jobs:
       with:
         distribution: 'adopt'
         java-version: 11
-
+        
     - name: Build
       working-directory: ${{github.workspace}}
       run: | 

@@ -51,7 +51,7 @@ pushd $SCRIPT_DIR/.. > /dev/null
 # If calling from a PR Validation :
 if [[ -n "$CHANGE_ID" ]]; then
   git submodule update --init --recursive
-  if [[ -z "$CE" ]]; then
+  if [[ "$BUILD_ENTERPRISE" == "ON" ]]; then
     pushd vendor
     if [[ $CHANGE_TARGET == "master" ]]; then
       BRANCH="main"
@@ -64,6 +64,10 @@ if [[ -n "$CHANGE_ID" ]]; then
     mv couchbase-lite-c-ee/couchbase-lite-core-EE .
     popd
   fi
+fi
+
+if [[ "$BUILD_ENTERPRISE" == "ON" ]]; then
+  ./scripts/download_vector_search_extension.sh apple
 fi
 
 mkdir -p build_coverage
@@ -119,4 +123,8 @@ fi
 echo "Done : The coverage report was generated at build_coverage/report"
 
 popd > /dev/null
+
+# Cleanup downloaded extension files
+rm -rf test/extensions/apple
+
 popd > /dev/null

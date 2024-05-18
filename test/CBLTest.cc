@@ -32,6 +32,8 @@
 
 #ifndef _MSC_VER
 #include <sys/stat.h>
+#else
+#include <Windows.h>
 #endif
 
 using namespace std;
@@ -53,21 +55,63 @@ using namespace fleece;
 
 #ifdef COUCHBASE_ENTERPRISE
 
-static string sExtensionPath;
+#if defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(_M_X64)
+
+constexpr int AVX2_POS = 1 << 5;
+constexpr int EXTENDED_FEATURE_FLAG = 0x7;
+constexpr int BASIC_INFO_FLAG = 0x0;
+
+#ifdef _MSC_VER
+
+#include <intrin.h>
+#include <Windows.h>
+
+static void cpuid(unsigned int* regs, unsigned int function) {
+    __cpuidex(reinterpret_cast<int*>(regs), static_cast<int>(function), 0);
+
+}
+#else
+
+// This header actually cannot be included on an ARM system
+// the mere act of including it is an error
+#include <cpuid.h>
+
+static void cpuid(unsigned int* regs, unsigned int function) {
+    __cpuid_count(function, 0, regs[0], regs[1], regs[2], regs[3]);
+}
+#endif
+
+#endif
+
+static bool has_avx2() {
+#if defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(_M_X64)
+    unsigned int regs[4];
+    memset(regs, 0, sizeof(int) * 4);
+    cpuid(regs, BASIC_INFO_FLAG);
+    if(regs[0] < EXTENDED_FEATURE_FLAG) {
+        return false;
+    }
+
+    cpuid(regs, EXTENDED_FEATURE_FLAG);
+    if(!(regs[1] & AVX2_POS)) {
+        return false;
+    }
+#endif
+
+    return true;
+}
 
 void CBLTest::initVectorSearchExtension() {
     std::once_flag sOnce;
     std::call_once(sOnce, [] {
+        if (!has_avx2()) {
+            WARN("The machine doesn't have AVX2; Vector Search Extension Library may not be working (SIGILL).");
+        }
         auto path = GetExtensionPath();
         if (!path.empty()) {
             CBL_SetExtensionPath(slice(path));
-            sExtensionPath = path;
         }
     });
-}
-
-bool CBLTest::hasVectorSearchExtension() {
-    return !sExtensionPath.empty();
 }
 
 #endif
@@ -97,6 +141,9 @@ alloc_slice CBLTest::databaseDir() {
     if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
         FAIL("Can't create temp directory: errno " << errno);
 #else
+    if (_mkdir("C:\\tmp") != 0 && errno != EEXIST)
+        FAIL("Can't create C:\\tmp directory: errno " << errno);
+    
     string dir = "C:\\tmp\\CBL_C_tests";
     if (_mkdir(dir.c_str()) != 0 && errno != EEXIST)
         FAIL("Can't create temp directory: errno " << errno);
@@ -126,10 +173,6 @@ CBLTest::CBLTest() {
     CHECK(FLValue_GetType(kFLUndefinedValue) == kFLUndefined);
     CHECK(FLValue_GetType((FLValue)kFLEmptyArray) == kFLArray);
     CHECK(FLValue_GetType((FLValue)kFLEmptyDict) == kFLDict);
-    
-#ifdef COUCHBASE_ENTERPRISE
-    initVectorSearchExtension();
-#endif
 
     CBLError error;
     auto config = databaseConfig();
@@ -239,18 +282,36 @@ string GetAssetFilePath(const std::string &filename) {
 #ifdef COUCHBASE_ENTERPRISE
 
 string GetExtensionPath() {
+    string dir = "";
+    
 #ifdef __APPLE__
     auto bundle = CFBundleGetBundleWithIdentifier(CFSTR("com.couchbase.CouchbaseLiteTests"));
-    if (!bundle) {
-        string dir = "test/extensions/";
-        string libPath = dir + "CouchbaseLiteVectorSearch";
-        ifstream fin(libPath);
-        if (fin.good()) {
-            return dir;
-        }
+    if (bundle) {
+#if TARGET_OS_SIMULATOR
+        dir = "test/extensions/apple/CouchbaseLiteVectorSearch.xcframework/ios-arm64/";
+#elif TARGET_OS_IPHONE
+        dir = "test/extensions/apple/CouchbaseLiteVectorSearch.xcframework/ios-arm64_x86_64-simulator/";
+#else
+        dir = "test/extensions/apple/CouchbaseLiteVectorSearch.xcframework/macos-arm64_x86_64/";
+#endif
+    } else {
+        dir = "test/extensions/apple/";
     }
+#else
+#ifdef __ANDROID__
+    dir = "test/extensions/android/arm64-v8a/";
+#else
+#ifdef WIN32
+    char fullPath[32768];
+    REQUIRE(GetFullPathName("..\\test\\extensions\\windows\\x86_64\\", 32768, fullPath, nullptr) > 0);
+    dir = string(fullPath);
+#else
+    dir = "test/extensions/linux/x86_64/";
+#endif // WIN32
+#endif // __ANDROID
 #endif // __APPLE__
-    return "";
+    
+    return dir;
 }
 
 #endif

@@ -1,1 +1,1 @@
-Download and put CouchbaseLiteVectorSearch library here.
+Run scripts/download_vector_search_extension.sh <platform: apple, linux, windows, android> to download the vector search extension library. Couchbase VPN will be required.

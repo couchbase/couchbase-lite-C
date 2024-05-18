@@ -26,9 +26,11 @@ try {
     Move-Item -Path .\couchbase-lite-c-ee\couchbase-lite-core-EE -Destination .
     Pop-Location
 
+    .\scripts\download_vector_search_extension.ps1
+
     New-Item -Type Directory -ErrorAction Ignore build
     Set-Location build
-    & 'C:\Program Files\CMake\bin\cmake.exe' -G "Visual Studio 15 2017" -A x64 -DBUILD_ENTERPRISE=ON -DCMAKE_INSTALL_PREFIX="${pwd}\out" ..
+    & 'C:\Program Files\CMake\bin\cmake.exe' -G "Visual Studio 17 2022" -A x64 -DBUILD_ENTERPRISE=ON -DCMAKE_INSTALL_PREFIX="${pwd}\out" ..
     if($LASTEXITCODE -ne 0) {
         Write-Host "Failed to run CMake!" -ForegroundColor Red
         exit 1
@@ -48,5 +50,7 @@ try {
         exit 1
     }
 } finally {
+    # Clean up downloaded extension files
+    Remove-Item -Path $PSScriptRoot\..\test\extensions\windows -Recurse -Force -ErrorAction Ignore 
     Pop-Location
 }

@@ -8,6 +8,11 @@ empty.cpp
 vendor/couchbase-lite-core-EE
 Xcode/generated_headers
 
+# Vector Search Extension libraries for tests
+test/extensions/apple
+test/extensions/linux
+test/extensions/windows
+
 # Editors
 .vscode
 *.sublime-workspace
