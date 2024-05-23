@@ -43,8 +43,13 @@ typedef struct {
     void (*_cbl_nullable unregistered)(void* context);
 } CBLPredictiveModel;
 
+/** Registers a predictive model.
+    @param name  The name.
+    @param model  The predictive model. */
 void CBL_RegisterPredictiveModel(FLString name, CBLPredictiveModel model) CBLAPI;
 
+/** Unregisters the predictive model.
+    @param name  The name of the registered predictive model. */
 void CBL_UnregisterPredictiveModel(FLString name) CBLAPI;
 
 CBL_CAPI_END
