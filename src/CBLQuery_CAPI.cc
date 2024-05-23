@@ -88,6 +88,12 @@ CBLResultSet* CBLQuery_CopyCurrentResults(const CBLQuery* query,
     return listener->resultSet().detach();
 }
 
+void CBLQuery_SetListenerCallbackDelay(int delayMS) noexcept {
+#ifdef DEBUG
+    ListenerToken<CBLQueryChangeListener>::setC4QueryObserverCallbackDelay(delayMS);
+#endif
+}
+
 bool CBLResultSet_Next(CBLResultSet* rs) noexcept {
     try {
         return rs->next();

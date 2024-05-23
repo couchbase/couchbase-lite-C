@@ -67,4 +67,10 @@ CBL_CAPI_BEGIN
     
     FLSlice CBLReplicator_UserAgent(const CBLReplicator* repl) CBLAPI;
 
+    /** Adding a delay in MS before processing the callback from C4QueryObserver. 
+        This is for testing to ensure that the callback has handle the case that the callback
+        is called after the query listener token as removed correctly without accessing
+        any invalidated objects. */
+    void CBLQuery_SetListenerCallbackDelay(int delay) CBLAPI;
+
 CBL_CAPI_END
