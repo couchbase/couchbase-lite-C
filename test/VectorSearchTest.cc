@@ -30,8 +30,14 @@ using namespace std;
 
 #ifdef COUCHBASE_ENTERPRISE
 
-#if defined(__APPLE__) || defined(__linux__) || defined(WIN32)
+#if defined(__APPLE__) || defined(__linux__)
 #define VECTOR_SEARCH_TEST_ENABLED 1
+#endif
+
+#if defined(WIN32)
+    #if defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(_M_X64)
+        #define VECTOR_SEARCH_TEST_ENABLED 1
+    #endif
 #endif
 
 #ifdef VECTOR_SEARCH_TEST_ENABLED

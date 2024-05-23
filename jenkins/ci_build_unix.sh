@@ -43,6 +43,17 @@ echo VERSION=${VERSION}
 
 ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
 
+if [[ ${EDITION} == 'enterprise'* ]]; then
+    echo "==== Download Vector Search Extension for Tests  ==="
+    pushd ${project_dir}
+    if [[ $OSTYPE == 'darwin'* ]]; then
+    ./scripts/download_vector_search_extension.sh apple
+    else
+    ./scripts/download_vector_search_extension.sh linux
+    fi
+    popd
+fi
+
 echo "====  Building macos/linux Release binary  ==="
 cd ${WORKSPACE}/build_release
 cmake -DEDITION=${EDITION} -DCMAKE_INSTALL_PREFIX=`pwd`/libcblite-$VERSION -DCMAKE_BUILD_TYPE=MinSizeRel ..

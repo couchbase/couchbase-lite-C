@@ -75,6 +75,12 @@ function Build() {
     Pop-Location
 }
 
+function DownloadVectorSearchExtension() {
+    Push-Location ${env:WORKSPACE}\couchbase-lite-c
+    & .\scripts\download_vector_search_extension.ps1
+    Pop-Location
+}
+
 function Run-UnitTest() {
     param(
         [Parameter(Mandatory=$true, Position = 0)][string]$directory
@@ -93,8 +99,14 @@ function Run-UnitTest() {
 $Build_Dir = "build_${Architecture}"
 Remove-Item -Recurse -Force -ErrorAction Ignore "${env:WORKSPACE}\${Build_Dir}\libcblite-${Version}"
 New-Item -Type Junction -Target ${env:WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE -Path ${env:WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
+
+if ("${Edition}" -eq "enterprise") {
+    DownloadVectorSearchExtension
+}
+
 Build "${env:WORKSPACE}\${Build_Dir}"
-if("${Edition}" -eq "enterprise") {
+
+if ("${Edition}" -eq "enterprise") {
     Run-UnitTest "${env:WORKSPACE}\${Build_Dir}"
 }
 
