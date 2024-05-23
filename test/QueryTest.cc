@@ -745,7 +745,7 @@ TEST_CASE_METHOD(QueryTest, "Query Listener and Coalescing notification", "[Quer
     REQUIRE(CBLCollection_DeleteDocumentByID(defaultCollection, "0000046"_sl, &error));
 
     cerr << "Sleeping to see if the notification is coalesced ...\n";
-    this_thread::sleep_for(1000ms); // Max delay before refreshing result in LiteCore is 500ms
+    this_thread::sleep_for(2000ms); // Max delay before refreshing result in LiteCore is 500ms
     REQUIRE(state.waitForCount(1));
     CHECK(state.resultCount() == 1);
     
