@@ -462,6 +462,7 @@ CBLReplicator* _cbl_nullable CBLReplicator_Create(const CBLReplicatorConfigurati
 const CBLReplicatorConfiguration* CBLReplicator_Config(CBLReplicator*) CBLAPI;
 
 /** Starts a replicator, asynchronously. Does nothing if it's already started.
+    @note Replicators cannot be started from within a database's transaction.
     @param replicator  The replicator instance.
     @param resetCheckpoint  If true, the persistent saved state ("checkpoint") for this replication
                         will be discarded, causing it to re-scan all documents. This significantly
