@@ -44,6 +44,7 @@ struct CBLEndpoint {
     const C4Address& remoteAddress() const                      {return _address;}
     virtual C4String remoteDatabaseName() const =0;
     virtual CBLEndpoint* clone() const =0;
+    virtual std::string desc() const =0;
 #ifdef COUCHBASE_ENTERPRISE
     virtual CBLDatabase* _cbl_nullable otherLocalDB() const     {return nullptr;}
 #endif
@@ -73,7 +74,7 @@ namespace cbl_internal {
         bool valid() const override                             {return _dbName != fleece::nullslice;}
         C4String remoteDatabaseName() const override            {return _dbName;}
         virtual CBLEndpoint* clone() const override             {return new CBLURLEndpoint(_url);}
-
+        virtual std::string desc() const override               {return _url.asString();}
     private:
         fleece::alloc_slice _url;
         C4String _dbName = { };
@@ -90,7 +91,7 @@ namespace cbl_internal {
         virtual C4String remoteDatabaseName() const override    {return fleece::nullslice;}
         virtual CBLDatabase* otherLocalDB() const override      {return _db;}
         virtual CBLEndpoint* clone() const override             {return new CBLLocalEndpoint(_db);}
-
+        virtual std::string desc() const override               {return _db->desc();}
     private:
         fleece::Retained<CBLDatabase> _db;
     };
