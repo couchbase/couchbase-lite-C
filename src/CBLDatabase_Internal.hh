@@ -132,6 +132,8 @@ public:
 
     uint64_t count() const                           {return _c4db->useLocked()->getDocumentCount();}
     uint64_t lastSequence() const                    {return static_cast<uint64_t>(_c4db->useLocked()->getLastSequence());}
+    
+    std::string desc() const                         {return "CBLDatabase[" + _name.asString() + "]";}
 
     
 #pragma mark - Collections:

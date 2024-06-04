@@ -36,7 +36,6 @@ CBL_ASSUME_NONNULL_BEGIN
 
 #define SyncLog(LEVEL, MSG, ...) C4LogToAt(kC4SyncLog, kC4Log ## LEVEL, MSG, ##__VA_ARGS__)
 
-
 extern "C" {
     void C4RegisterBuiltInWebSocket();
 }
@@ -60,7 +59,6 @@ static CBLReplicatorStatus external(const C4ReplicatorStatus &c4status) {
         external(c4status.error)
     };
 }
-
 
 struct CBLReplicator final : public CBLRefCounted {
 public:
@@ -186,9 +184,11 @@ public:
         // Generate replicator id for logging purpose:
         std::stringstream ss;
         ss << "CBLRepl@" << (void*)this;
-        auto replID = ss.str();
-        _replicatorID = alloc_slice(replID);
-
+        _replID = ss.str();
+        
+        // Generate description for logging purpose:
+        _desc = genDescription();
+        
         // Create the LiteCore replicator:
         _db = _conf.effectiveDatabase();
         _db->useLocked([&](C4Database *c4db) {
@@ -196,14 +196,14 @@ public:
             if (_conf.endpoint->otherLocalDB()) {
                 _c4repl = c4db->newLocalReplicator(_conf.endpoint->otherLocalDB()->useLocked().get(),
                                                    params, 
-                                                   _replicatorID);
+                                                   slice(_replID));
             } else
 #endif
             {
                 _c4repl = c4db->newReplicator(_conf.endpoint->remoteAddress(),
                                               _conf.endpoint->remoteDatabaseName(),
                                               params,
-                                              _replicatorID);
+                                              slice(_replID));
             }
         });
         
@@ -232,11 +232,12 @@ public:
         _retainSelf = this;     // keep myself from being freed until the replicator stops
         _useInitialStatus = false;
         
-        if (_db->registerStoppable(_stoppable.get()))
+        if (_db->registerStoppable(_stoppable.get())) {
+            SyncLog(Info, "%s Starting", desc().c_str());
             _c4repl->start(reset);
-        else
+        } else
             CBL_Log(kCBLLogDomainReplicator, kCBLLogWarning,
-                    "Couldn't start the replicator as the database is closing or closed.");
+                    "%s Couldn't start the replicator as the database is closing or closed.", desc().c_str());
     }
 
     CBLReplicatorStatus status() {
@@ -282,6 +283,10 @@ public:
 
     slice getUserAgent() const {
         return _conf.getUserAgent();
+    }
+    
+    std::string desc() const {
+        return _desc;
     }
 
 private:
@@ -337,7 +342,8 @@ private:
         _c4status = c4status;
         auto cblStatus = effectiveStatus(c4status);
         
-        SyncLog(Info, "CBLReplicator status: %s, progress=%llu/%llu, flag=%d, error=%d/%d (effective status=%s, completed=%.2f%%, docs=%llu)",
+        SyncLog(Info, "%s Status: %s, progress=%llu/%llu, flag=%d, error=%d/%d (effective status=%s, completed=%.2f%%, docs=%llu)",
+                desc().c_str(),
                 kC4ReplicatorActivityLevelNames[c4status.level],
                 c4status.progress.unitsCompleted, c4status.progress.unitsTotal,
                 c4status.flags, c4status.error.domain, c4status.error.code,
@@ -348,8 +354,8 @@ private:
             _changeListeners.call(this, &cblStatus);
         } else if (cblStatus.error.code) {
             char buf[256];
-            SyncLog(Warning, "No listener to receive error from CBLReplicator %p: %s",
-                    this, c4error_getDescriptionC(c4status.error, buf, sizeof(buf)));
+            SyncLog(Warning, "No listener to receive error : %s",
+                    c4error_getDescriptionC(c4status.error, buf, sizeof(buf)));
         }
 
         if (cblStatus.activity == kCBLReplicatorStopped) {
@@ -489,13 +495,29 @@ private:
                        "The collection is not included in the replicator config.");
     }
     
+    string genDescription() {
+        bool isPull = _conf.replicatorType == kCBLReplicatorTypePushAndPull || _conf.replicatorType == kCBLReplicatorTypePull;
+        bool isPush = _conf.replicatorType == kCBLReplicatorTypePushAndPull || _conf.replicatorType == kCBLReplicatorTypePush;
+        
+        std::stringstream ss;
+        ss << "CBLReplicator[" << _replID << " ("
+           << (isPull ? "<" : "")
+           << (_conf.continuous ? "*" : "o")
+           << (isPush ? ">" : "")
+           << ") "
+           << (_conf.endpoint->desc())
+           << "]";
+        return ss.str();
+    }
+    
     using ReplicationCollectionsMap = std::unordered_map<C4Database::CollectionSpec, CBLReplicationCollection>;
 
     recursive_mutex                             _mutex;
     ReplicatorConfiguration const               _conf;
     CBLDatabase*                                _db;                // Retained by _conf
     Retained<C4Replicator>                      _c4repl;
-    alloc_slice                                 _replicatorID;
+    string                                      _replID;
+    string                                      _desc;
     unique_ptr<CBLReplicatorStoppable>          _stoppable;
     ReplicationCollectionsMap                   _collections;       // For filters and conflict resolver
     bool                                        _useInitialStatus;  // For returning status before first start
@@ -504,7 +526,7 @@ private:
     int                                         _activeConflictResolvers {0};
     Listeners<CBLReplicatorChangeListener>      _changeListeners;
     Listeners<CBLDocumentReplicationListener>   _docListeners;
-    C4ReplicatorProgressLevel                   _progressLevel {kC4ReplProgressOverall};
+    C4ReplicatorProgressLevel                   _progressLevel {kC4ReplProgressOverall};;
 };
 
 CBL_ASSUME_NONNULL_END
