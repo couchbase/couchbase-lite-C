@@ -124,6 +124,8 @@ set(
     src/CBLDocument.cc
     src/CBLDocument_CAPI.cc
     src/CBLEncryptable_CAPI.cc
+    src/CBLIndex.cc
+    src/CBLIndex_CAPI.cc
     src/CBLLog.cc
     src/CBLPrediction.cc
     src/CBLPrediction_CAPI.cc

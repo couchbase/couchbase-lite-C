@@ -19,7 +19,8 @@
 #pragma once
 #include "CBLBase.h"
 #include "CBLDocument.h"
-#include "CBLQuery.h"
+#include "CBLIndexTypes.h"
+#include "CBLQueryTypes.h"
 
 CBL_CAPI_BEGIN
 
@@ -412,6 +413,17 @@ bool CBLCollection_DeleteIndex(CBLCollection *collection,
 _cbl_warn_unused
 FLMutableArray _cbl_nullable CBLCollection_GetIndexNames(CBLCollection *collection,
                                                          CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Returns an index object representing an existing index in the collection.
+    @note You are responsible for releasing the returned index object.
+    @param collection The collection.
+    @param name  The name of the index.
+    @param outError  On failure, an error is written here.
+    @return A \ref CBLIndex instance if the index exists, or NULL if the index doesn't exist or an error occurred.  */
+_cbl_warn_unused
+CBLIndex* _cbl_nullable CBLCollection_GetIndex(CBLCollection* collection,
+                                               FLString name,
+                                               CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 

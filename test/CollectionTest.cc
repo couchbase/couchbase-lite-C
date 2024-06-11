@@ -150,6 +150,10 @@ public:
         CHECK(!CBLCollection_GetIndexNames(col, &error));
         CheckNotOpenError(error);
         
+        error = {};
+        CHECK(!CBLCollection_GetIndex(col, "nonexistingindex"_sl, &error));
+        CheckNotOpenError(error);
+        
         auto listener = [](void* ctx, const CBLCollectionChange* change) { };
         auto token = CBLCollection_AddChangeListener(col, listener, nullptr);
         CBLListener_Remove(token);

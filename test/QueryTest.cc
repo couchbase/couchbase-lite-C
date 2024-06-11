@@ -341,6 +341,7 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Value Index", "[Query]") {
     FLArray indexNames = CBLCollection_GetIndexNames(defaultCollection, &error);
     CHECK(FLArray_Count(indexNames) == 2);
     CHECK(Array(indexNames).toJSONString() == R"(["index1","index2"])");
+    FLArray_Release(indexNames);
     
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
                                     "SELECT name.first FROM _ ORDER BY name.first"_sl,
@@ -365,6 +366,7 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Value Index", "[Query]") {
     indexNames = CBLCollection_GetIndexNames(defaultCollection, &error);
     CHECK(FLArray_Count(indexNames) == 0);
     CHECK(Array(indexNames).toJSONString() == R"([])");
+    FLArray_Release(indexNames);
 }
 
 
@@ -388,6 +390,7 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
     FLArray indexNames = CBLCollection_GetIndexNames(defaultCollection, &error);
     CHECK(FLArray_Count(indexNames) == 2);
     CHECK(Array(indexNames).toJSONString() == R"(["index1","index2"])");
+    FLArray_Release(indexNames);
     
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
                                     "SELECT product.name FROM _ WHERE match(index1, 'avocado')"_sl,
@@ -414,6 +417,7 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
     indexNames = CBLCollection_GetIndexNames(defaultCollection, &error);
     CHECK(FLArray_Count(indexNames) == 0);
     CHECK(Array(indexNames).toJSONString() == R"([])");
+    FLArray_Release(indexNames);
 }
 
 

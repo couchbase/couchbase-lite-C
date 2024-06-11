@@ -18,6 +18,8 @@
 
 #include "CBLCollection_Internal.hh"
 #include "Internal.hh"
+#include "CBLIndex_Internal.hh"
+#include "c4Index.hh"
 
 using namespace fleece;
 using namespace cbl_internal;
@@ -88,4 +90,9 @@ CBLCollection::addDocumentListener(slice docID, CBLCollectionDocumentChangeListe
     auto token = new ListenerToken<CBLCollectionDocumentChangeListener>(this, docID, listener, ctx);
     _docListeners.add(token);
     return token;
+}
+
+Retained<CBLIndex> CBLCollection::getIndex(slice name) {
+    auto index = _c4col.useLocked()->getIndex(name);
+    return index ? new CBLIndex(std::move(index), this) : nullptr;
 }

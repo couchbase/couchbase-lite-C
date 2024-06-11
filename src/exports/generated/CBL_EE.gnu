@@ -18,6 +18,9 @@ CBL_C {
 		CBLEncryptable_CreateWithDict;
 		CBLEncryptable_Properties;
 		CBLEncryptable_Value;
+		FLDict_IsEncryptableValue;
+		FLDict_GetEncryptableValue;
+		FLSlot_SetEncryptableValue;
 		CBL_RegisterPredictiveModel;
 		CBL_UnregisterPredictiveModel;
 		CBL_SetExtensionPath;
@@ -26,9 +29,12 @@ CBL_C {
 		CBLVectorEncoding_CreateProductQuantizer;
 		CBLVectorEncoding_CreateScalarQuantizer;
 		CBLVectorEncoding_Free;
-		FLDict_IsEncryptableValue;
-		FLDict_GetEncryptableValue;
-		FLSlot_SetEncryptableValue;
+		CBLIndex_BeginUpdate;
+		CBLIndexUpdater_Count;
+		CBLIndexUpdater_SetVector;
+		CBLIndexUpdater_SkipVector;
+		CBLIndexUpdater_Finish;
+		CBLIndexUpdater_Value;
 		CBL_Retain;
 		CBL_Release;
 		CBL_InstanceCount;
@@ -116,6 +122,7 @@ CBL_C {
 		CBLCollection_CreateValueIndex;
 		CBLCollection_CreateFullTextIndex;
 		CBLCollection_DeleteIndex;
+		CBLCollection_GetIndex;
 		CBLCollection_GetIndexNames;
 		kCBLDefaultScopeName;
 		CBLScope_Name;
@@ -170,6 +177,8 @@ CBL_C {
 		CBLResultSet_ResultArray;
 		CBLResultSet_ResultDict;
 		CBLResultSet_GetQuery;
+		CBLIndex_Collection;
+		CBLIndex_Name;
 		kCBLAuthDefaultCookieName;
 		CBLEndpoint_CreateWithURL;
 		CBLEndpoint_Free;

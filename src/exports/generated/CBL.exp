@@ -97,6 +97,7 @@ _CBLCollection_AddDocumentChangeListener
 _CBLCollection_CreateValueIndex
 _CBLCollection_CreateFullTextIndex
 _CBLCollection_DeleteIndex
+_CBLCollection_GetIndex
 _CBLCollection_GetIndexNames
 _kCBLDefaultScopeName
 _CBLScope_Name
@@ -151,6 +152,8 @@ _CBLResultSet_ValueForKey
 _CBLResultSet_ResultArray
 _CBLResultSet_ResultDict
 _CBLResultSet_GetQuery
+_CBLIndex_Collection
+_CBLIndex_Name
 _kCBLAuthDefaultCookieName
 _CBLEndpoint_CreateWithURL
 _CBLEndpoint_Free
