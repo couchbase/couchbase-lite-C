@@ -80,12 +80,12 @@ public:
     
     static CBLDatabaseConfiguration databaseConfig();
     
-#ifdef COUCHBASE_ENTERPRISE
-    static void initVectorSearchExtension();
-#endif
-    
     CBLTest();
     ~CBLTest();
+    
+    /** Calls to (re)init default test databases and collections.
+        The  databases will be closed, and if reset, the databases will be deleted. */
+    void initTestDatabases(bool reset);
     
     CBLDatabase *db {nullptr};
     CBLCollection *defaultCollection {nullptr};
@@ -95,6 +95,8 @@ std::string GetAssetFilePath(const std::string &filename);
 
 #ifdef COUCHBASE_ENTERPRISE
 std::string GetExtensionPath();
+
+void SetVectorSearchEnabled(bool enabled);
 #endif
 
 bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)> &callback);
@@ -102,6 +104,8 @@ bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)>
 unsigned ImportJSONLines(std::string filename, CBLDatabase* database);
 
 unsigned ImportJSONLines(std::string filename, CBLCollection* collection);
+
+void CheckNoError(CBLError& error);
 
 void CheckError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain = kCBLDomain);
 

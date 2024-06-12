@@ -121,6 +121,7 @@ CBLCollection_AddDocumentChangeListener
 CBLCollection_CreateValueIndex
 CBLCollection_CreateFullTextIndex
 CBLCollection_DeleteIndex
+CBLCollection_GetIndex
 CBLCollection_GetIndexNames
 
 ### SCOPE
@@ -192,6 +193,11 @@ CBLResultSet_ValueForKey
 CBLResultSet_ResultArray
 CBLResultSet_ResultDict
 CBLResultSet_GetQuery
+
+### Query Index
+
+CBLIndex_Collection
+CBLIndex_Name
 
 ### REPLICATOR
 

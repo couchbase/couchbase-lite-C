@@ -191,6 +191,7 @@ public:
         vector.clustering.type = kC4VectorClusteringFlat;
         vector.clustering.flat_centroids = config.centroids;
         vector.dimensions = config.dimensions;
+        vector.lazy = config.lazy;
         vector.metric = config.metric == kCBLDistanceMetricCosine ? kC4VectorMetricCosine : kC4VectorMetricEuclidean;
         vector.encoding = c4enc;
         vector.minTrainingSize = config.minTrainingSize;
@@ -220,6 +221,8 @@ public:
         }
         return indexes;
     }
+    
+    Retained<CBLIndex> getIndex(slice name);
     
 #pragma mark - LISTENERS
     
@@ -356,7 +359,7 @@ private:
         // Unsafe: need to call under lock:
         bool _isValid() const noexcept                  { return !_c4db->isClosedNoLock() && _col->isValid(); }
         
-        CBLDatabase::SharedC4DatabaseAccessLock _c4db;  // For retaining the shared lock
+        CBLDatabase::SharedC4DatabaseAccessLock _c4db;  // For retaining the shared c4db lock
         C4Collection*                           _col;
     };
     

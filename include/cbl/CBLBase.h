@@ -29,8 +29,6 @@
 
 CBL_CAPI_BEGIN
 
-// #define COUCHBASE_ENTERPRISE 1
-
 /** \defgroup errors   Errors
      @{
     Types and constants for communicating errors from API calls. */
@@ -218,6 +216,17 @@ typedef struct CBLQuery      CBLQuery;
 
 /** An iterator over the rows resulting from running a query. */
 typedef struct CBLResultSet  CBLResultSet;
+/** @} */
+
+/** \defgroup indexes  Indexes
+     @{ */
+/** A query index. */
+typedef struct CBLIndex      CBLIndex;
+
+#ifdef COUCHBASE_ENTERPRISE
+typedef struct CBLIndexUpdater      CBLIndexUpdater;
+#endif
+
 /** @} */
 
 /** \defgroup replication  Replication

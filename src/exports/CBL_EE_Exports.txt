@@ -4,12 +4,18 @@
 #
 # These are the additional exports for the Enterprise Edition (EE) dynamic library.
 
+### Database Encryption
+
 CBLEncryptionKey_FromPassword
 CBLEncryptionKey_FromPasswordOld
 
 CBLDatabase_ChangeEncryptionKey
 
+### Endpoint
+
 CBLEndpoint_CreateWithLocalDB
+
+### Encryptable 
 
 kCBLEncryptableType
 kCBLEncryptableValueProperty
@@ -27,8 +33,16 @@ CBLEncryptable_CreateWithDict
 CBLEncryptable_Properties
 CBLEncryptable_Value
 
+FLDict_IsEncryptableValue
+FLDict_GetEncryptableValue
+FLSlot_SetEncryptableValue
+
+### Predictive Query
+
 CBL_RegisterPredictiveModel
 CBL_UnregisterPredictiveModel
+
+### Vector Search
 
 CBL_SetExtensionPath
 CBLCollection_CreateVectorIndex
@@ -37,6 +51,12 @@ CBLVectorEncoding_CreateProductQuantizer
 CBLVectorEncoding_CreateScalarQuantizer
 CBLVectorEncoding_Free
 
-FLDict_IsEncryptableValue
-FLDict_GetEncryptableValue
-FLSlot_SetEncryptableValue
+### Lazy Index
+
+CBLIndex_BeginUpdate
+
+CBLIndexUpdater_Count
+CBLIndexUpdater_SetVector
+CBLIndexUpdater_SkipVector
+CBLIndexUpdater_Finish
+CBLIndexUpdater_Value

@@ -83,7 +83,7 @@ static void cpuid(unsigned int* regs, unsigned int function) {
 
 #endif
 
-static bool has_avx2() {
+static bool Has_Avx2() {
 #if defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(_M_X64)
     unsigned int regs[4];
     memset(regs, 0, sizeof(int) * 4);
@@ -101,17 +101,18 @@ static bool has_avx2() {
     return true;
 }
 
-void CBLTest::initVectorSearchExtension() {
-    std::once_flag sOnce;
-    std::call_once(sOnce, [] {
-        if (!has_avx2()) {
+void SetVectorSearchEnabled(bool enabled) {
+    if (enabled) {
+        if (!Has_Avx2()) {
             WARN("The machine doesn't have AVX2; Vector Search Extension Library may not be working (SIGILL).");
         }
         auto path = GetExtensionPath();
         if (!path.empty()) {
             CBL_SetExtensionPath(slice(path));
         }
-    });
+    } else {
+        CBL_SetExtensionPath(kFLSliceNull);
+    }
 }
 
 #endif
@@ -174,30 +175,55 @@ CBLTest::CBLTest() {
     CHECK(FLValue_GetType((FLValue)kFLEmptyArray) == kFLArray);
     CHECK(FLValue_GetType((FLValue)kFLEmptyDict) == kFLDict);
 
-    CBLError error;
-    auto config = databaseConfig();
-    if (!CBL_DeleteDatabase(kDatabaseName, config.directory, &error) && error.code != 0)
-        FAIL("Can't delete temp database: " << error.domain << "/" << error.code);
-    
-    db = CBLDatabase_Open(kDatabaseName, &config, &error);
-    REQUIRE(db);
-
-    defaultCollection = CBLDatabase_DefaultCollection(db, &error);
-    REQUIRE(defaultCollection);
+    initTestDatabases(true);
 }
 
 CBLTest::~CBLTest() {
-    CBLCollection_Release(defaultCollection);
+    if (defaultCollection) {
+        CBLCollection_Release(defaultCollection);
+        defaultCollection = nullptr;
+    }
+    
     if (db){
         ExpectingExceptions x; // Database might have been closed by the test:
         CBLError error;
         if (!CBLDatabase_Close(db, &error))
             WARN("Failed to close database: " << error.domain << "/" << error.code);
         CBLDatabase_Release(db);
+        db = nullptr;
     }
-    if (CBL_InstanceCount() > 0)
+    
+    if (CBL_InstanceCount() > 0) {
         CBL_DumpInstances();
+    }
     CHECK(CBL_InstanceCount() == 0);
+}
+
+void CBLTest::initTestDatabases(bool reset) {
+    CBLError error {};
+    
+    if (defaultCollection) {
+        CBLCollection_Release(defaultCollection);
+    }
+    
+    if (db) {
+        REQUIRE(CBLDatabase_Close(db, &error));
+        CheckNoError(error);
+        CBLDatabase_Release(db);
+    }
+    
+    auto config = databaseConfig();
+    if (reset) {
+        if (!CBL_DeleteDatabase(kDatabaseName, config.directory, &error) && error.code != 0) {
+            FAIL("Can't delete temp database: " << error.domain << "/" << error.code);
+        }
+    }
+    
+    db = CBLDatabase_Open(kDatabaseName, &config, &error);
+    REQUIRE(db);
+
+    defaultCollection = CBLDatabase_DefaultCollection(db, &error);
+    REQUIRE(defaultCollection);
 }
 
 #pragma mark - C++ TEST CLASS:
@@ -368,6 +394,11 @@ unsigned ImportJSONLines(string filename, CBLCollection* collection) {
     REQUIRE(CBLDatabase_EndTransaction(database, true, &error));
     
     return numDocs;
+}
+
+void CheckNoError(CBLError& error) {
+    CHECK(error.domain == 0);
+    CHECK(error.code == 0);
 }
 
 void CheckError(CBLError& error, CBLErrorCode expectedCode, CBLErrorDomain expectedDomain) {

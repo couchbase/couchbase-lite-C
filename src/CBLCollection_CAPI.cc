@@ -19,6 +19,7 @@
 #include "CBLCollection.h"
 #include "CBLCollection_Internal.hh"
 #include "CBLDatabase_Internal.hh"
+#include "CBLIndex_Internal.hh"
 
 using namespace fleece;
 
@@ -316,6 +317,12 @@ bool CBLCollection_DeleteIndex(CBLCollection *collection,
 FLMutableArray CBLCollection_GetIndexNames(CBLCollection *collection, CBLError *outError) noexcept {
     try {
         return FLMutableArray_Retain(collection->indexNames());
+    } catchAndBridge(outError)
+}
+
+CBLIndex* CBLCollection_GetIndex(CBLCollection* collection, FLString indexName, CBLError* outError) noexcept {
+    try {
+        return collection->getIndex(indexName).detach();
     } catchAndBridge(outError)
 }
 

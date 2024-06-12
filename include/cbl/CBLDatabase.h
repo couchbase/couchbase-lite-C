@@ -18,6 +18,7 @@
 
 #pragma once
 #include "CBLBase.h"
+#include "CBLIndexTypes.h"
 
 CBL_CAPI_BEGIN
 
@@ -228,7 +229,6 @@ bool CBLDatabase_PerformMaintenance(CBLDatabase* db,
 
 /** @} */
 
-
 #ifdef __APPLE__
 #pragma mark - ACCESSORS
 #endif
@@ -253,6 +253,45 @@ const CBLDatabaseConfiguration CBLDatabase_Config(const CBLDatabase*) CBLAPI;
 
 /** @} */
 
+/** \name  Query Indexes
+    @{
+    Query Index Management
+ */
+
+/** Creates a value index.
+    Indexes are persistent.
+    If an identical index with that name already exists, nothing happens (and no error is returned.)
+    If a non-identical index with that name already exists, it is deleted and re-created.
+    @warning  <b>Deprecated :</b> Use CBLCollection_CreateValueIndex on the default collection instead. */
+bool CBLDatabase_CreateValueIndex(CBLDatabase *db,
+                                  FLString name,
+                                  CBLValueIndexConfiguration config,
+                                  CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Creates a full-text index.
+    Indexes are persistent.
+    If an identical index with that name already exists, nothing happens (and no error is returned.)
+    If a non-identical index with that name already exists, it is deleted and re-created.
+    @warning  <b>Deprecated :</b> Use CBLCollection_CreateFullTextIndex on the default collection instead. */
+bool CBLDatabase_CreateFullTextIndex(CBLDatabase *db,
+                                     FLString name,
+                                     CBLFullTextIndexConfiguration config,
+                                     CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Deletes an index given its name.
+    @warning  <b>Deprecated :</b> Use CBLCollection_DeleteIndex on the default collection instead. */
+bool CBLDatabase_DeleteIndex(CBLDatabase *db,
+                             FLString name,
+                             CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Returns the names of the indexes on this database, as a Fleece array of strings.
+    @note  You are responsible for releasing the returned Fleece array.
+    @warning  <b>Deprecated :</b> Use CBLCollection_GetIndexNames on the default collection instead. */
+_cbl_warn_unused
+FLArray CBLDatabase_GetIndexNames(CBLDatabase *db) CBLAPI;
+
+
+/** @} */
 
 #ifdef __APPLE__
 #pragma mark - LISTENERS

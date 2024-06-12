@@ -22,6 +22,11 @@
 #include "CBLDatabase_Internal.hh"
 #include "CBLDocument_Internal.hh"
 #include "CBLQuery_Internal.hh"
+
+#ifdef COUCHBASE_ENTERPRISE
+#include "CBLIndex_Internal.hh"
+#endif
+
 #include "Internal.hh"
 #include "c4BlobStore.hh"
 #include "c4Document.hh"
@@ -79,6 +84,7 @@ public:
 protected:
     friend struct CBLDocument;
     friend struct CBLDatabase;
+    friend struct CBLIndexUpdater;
     friend struct CBLResultSet;
 
     // Constructor for existing blobs -- called by CBLDocument::getBlob()
@@ -271,6 +277,13 @@ inline const CBLBlob* _cbl_nullable CBLBlob::getBlob(Dict blobDict) noexcept {
     // Check if it's a blob in a query result set:
     if (auto rs = CBLResultSet::containing(blobDict); rs)
         return rs->getBlob(blobDict, *key);
+    
+#ifdef COUCHBASE_ENTERPRISE
+    // Check if it's a blob in a index updater:
+    if (auto updater = CBLIndexUpdater::containing(blobDict); updater)
+        return updater->getBlob(blobDict, *key);
+#endif
+    
     return nullptr;
 }
 

@@ -3,6 +3,18 @@
 //
 // Copyright © 2020 Couchbase. All rights reserved.
 //
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 
 #pragma once
 #include "CBLQuery.h"
@@ -113,12 +125,12 @@ private:
         _c4query.useLocked()->setParameters(encodedParameters);
     }
 
-    litecore::shared_access_lock<Retained<C4Query>> _c4query;// Thread-safe access to C4Query
-    RetainedConst<CBLDatabase>          _database;          // Owning database
-    alloc_slice                         _parameters;        // Fleece-encoded param values
-    mutable std::optional<ColumnNamesMap>    _columnNames;       // Maps colum name to index
-    mutable std::once_flag                   _onceColumnNames;   // For lazy init of _columnNames
-    Listeners<CBLQueryChangeListener>   _listeners;         // Query listeners
+    litecore::shared_access_lock<Retained<C4Query>> _c4query;           // Thread-safe access to C4Query
+    RetainedConst<CBLDatabase>                      _database;          // Owning database
+    alloc_slice                                     _parameters;        // Fleece-encoded param values
+    mutable std::optional<ColumnNamesMap>           _columnNames;       // Maps colum name to index
+    mutable std::once_flag                          _onceColumnNames;   // For lazy init of _columnNames
+    Listeners<CBLQueryChangeListener>               _listeners;         // Query listeners
 };
 
 

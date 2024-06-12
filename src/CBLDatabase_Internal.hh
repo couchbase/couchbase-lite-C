@@ -213,6 +213,8 @@ protected:
     friend struct CBLBlobWriteStream;
     friend struct CBLCollection;
     friend struct CBLDocument;
+    friend struct CBLIndexUpdater;
+    friend struct CBLIndex;
     friend struct CBLReplicator;
     friend struct CBLURLEndpointListener;
     friend struct cbl_internal::CBLLocalEndpoint;
