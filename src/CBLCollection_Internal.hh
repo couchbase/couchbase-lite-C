@@ -139,8 +139,8 @@ public:
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "expression is required.");
         }
             
-        if (config.dimensions < 2 || config.dimensions > 2048) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "dimensions must be >= 2 and <= 2048.");
+        if (config.dimensions < 2 || config.dimensions > 4096) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "dimensions must be >= 2 and <= 4096.");
         }
         
         if (config.centroids < 1 || config.centroids > 64000) {

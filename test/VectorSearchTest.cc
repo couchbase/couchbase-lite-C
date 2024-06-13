@@ -41,8 +41,8 @@ std::vector<string> VectorSearchTest::sVectorSearchTestLogs {};
  * Steps
  *     1. Create a VectorIndexConfiguration object.
  *         - expression: "vector"
- *         - dimensions: 2 and 2048
- *         - centroids: 20
+ *         - dimensions: 2 and 4096
+ *         - centroids: 8
  *     2. Check that the config can be created without an error thrown.
  *     3. Use the config to create the index and check that the index
  *       can be created successfully.
@@ -53,12 +53,12 @@ TEST_CASE_METHOD(VectorSearchTest, "TestDimensionsValidation", "[VectorSearch]")
     CBLError error {};
     
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl };
-    config.centroids = 20;
+    config.centroids = 8;
     
     config.dimensions = 2;
     CHECK(CBLCollection_CreateVectorIndex(wordsCollection, "words_index1"_sl, config, &error));
     
-    config.dimensions = 2048;
+    config.dimensions = 4096;
     CHECK(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
     
     config.dimensions = 1;
@@ -66,7 +66,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestDimensionsValidation", "[VectorSearch]")
     CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
     
     error = {};
-    config.dimensions = 2049;
+    config.dimensions = 4097;
     CHECK_FALSE(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
     CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
 }
@@ -120,7 +120,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCentroidsValidation", "[VectorSearch]") 
  *     3. Create a vector index named "words_index" in _default.words collection.
  *         - expression: "vector"
  *         - dimensions: 300
- *         - centroids: 20
+ *         - centroids: 8
  *     4. Check that the index is created without an error returned.
  *     5. Get index names from the _default.words collection and check that the index
  *       names contains “words_index”.
@@ -464,7 +464,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexUsingPredictionModelWit
     CBLDocument_Release(doc);
     
     // The test spec creates the index named "words_pred_index", but it's ok to use any index name for the test.
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "prediction(WordEmbedding,{\"word\": word}).vector"_sl, 300, 4 };
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "prediction(WordEmbedding,{\"word\": word}).vector"_sl, 300, 8 };
     createWordsIndex(config); // index name is defined in kWordsIndexName.
     
     // Query:
@@ -752,7 +752,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithFixedTrainingSize",
  *     2. Create a vector index named "words_index" in _default.words collection.
  *         - expression: "vector"
  *         - dimensions: 300
- *         - centroids: 20
+ *         - centroids: 8
  *         - minTrainingSize: 1 and maxTrainingSize: 100
  *     3. Check that the index is created without an error returned.
  *     4. Delete the "words_index"
@@ -764,7 +764,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithFixedTrainingSize",
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestValidateMinMaxTrainingSize", "[VectorSearch]") {
     // Valid minTrainingSize / maxTrainingSize:
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 20 };
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     config.minTrainingSize = 1;
     config.maxTrainingSize = 100;
     CBLError error {};
@@ -845,8 +845,9 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithCosineDistance", "[
  
     auto results = executeWordsQuery(20, true /* query distance */);
     while (CBLResultSet_Next(results)) {
-        // auto distance = FLValue_AsDouble(CBLResultSet_ValueAtIndex(results, 2));
-        // CHECK(distance >= 0 && distance <= 2);
+        auto distance = FLValue_AsDouble(CBLResultSet_ValueAtIndex(results, 2));
+        CHECK(distance >= 0.0);
+        CHECK(distance <= 2.0);
     }
     CHECK(isIndexTrained());
     
@@ -902,23 +903,23 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithEuclideanDistance",
  *     2. Create a vector index named "words_index" in _default.words collection.
  *         - expression: "vector"
  *         - dimensions: 300
- *         - centroids: 20
+ *         - centroids: 8
  *     3. Check that the index is created without an error returned.
  *     4. Repeat step 2 and check that the index is created without an error returned.
  *     5. Create a vector index named "words_index" in _default.words collection.
  *         - expression: "vectors"
  *         - dimensions: 300
- *         - centroids: 20
+ *         - centroids: 8
  *     6. Check that the index is created without an error returned.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithExistingName", "[VectorSearch]") {
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 20 };
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     createWordsIndex(config);
     createWordsIndex(config);
     
     config.expression = "vectors"_sl;
     config.dimensions = 300;
-    config.centroids = 20;
+    config.centroids = 8;
     
     createWordsIndex(config);
 }
@@ -1186,6 +1187,51 @@ TEST_CASE_METHOD(VectorSearchTest, "TestInvalidVectorMatchWithOrExpression", "[V
     auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(sql), nullptr, &error);
     CHECK(!query);
     CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
+}
+
+/**
+ * 27. TestIndexVectorInBase64
+ *
+ * Description
+ * Test that the vector in Base64 string can be indexed.
+ *
+ * Steps
+ * 1. Copy database words_db.
+ * 2. Get the vector value from _default.words.word49's vector property as an array of floats.
+ * 3. Convert the array of floats from Step 2 into binary data and then into Base64 string.
+ *     - See "Vector in Base64 for Lunch" section for the pre-calculated base64 string
+ * 4. Update _default.words.word49 with "vector" = Base64 string from Step 3.
+ * 5. Create a vector index named "words_index" in _default.words collection.
+ *     - expression: "vector"
+ *     - dimensions: 300
+ *     - centroids : 8
+ * 6. Check that the index is created without an error returned.
+ * 7. Create an SQL++ query:
+ *     - SELECT meta().id, word, vector_distance(words_index)
+ *       FROM _default.words
+ *       WHERE vector_match(words_index, < dinner vector >, 20)
+ * 8. Execute the query and check that 20 results are returned.
+ * 9. Check that the result also contains doc id = word49.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestIndexVectorInBase64", "[VectorSearch]") {
+    CBLError error {};
+    auto doc = CBLCollection_GetMutableDocument(wordsCollection, "word49"_sl, &error);
+    REQUIRE(doc);
+    auto props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetString(props, "vector"_sl, kLunchVectorBase64);
+    REQUIRE(CBLCollection_SaveDocument(wordsCollection, doc, &error));
+    CBLDocument_Release(doc);
+    
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    createWordsIndex(config);
+
+    auto results = executeWordsQuery(20);
+    auto docIDs = docIDResults(results);
+    CHECK(docIDs.size() == 20);
+    CHECK(find(docIDs.begin(), docIDs.end(), "word49") != docIDs.end());
+
+    CBLVectorEncoding_Free(config.encoding);
+    CBLResultSet_Release(results);
 }
 
 #endif
