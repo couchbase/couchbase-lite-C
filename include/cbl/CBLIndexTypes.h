@@ -106,14 +106,24 @@ typedef struct {
     /** The language used in the expressions (Required). */
     CBLQueryLanguage expressionLanguage;
     
-    /** An expression returning a vector which is an array of numbers. The expression could be specified
-        in a JSON Array or in N1QL syntax depending on the expressionLanguage. (Required) */
+    /** The expression could be specified in a JSON Array or in N1QL syntax depending on 
+        the expressionLanguage. (Required)
+     
+        For non-lazy indexes, an expression returning either a vector, which is an array of 32-bit
+        floating-point numbers, or a Base64 string representing an array of 32-bit floating-point
+        numbers in little-endian order.
+     
+        For lazy indexex, an expression returning a value for computing a vector lazily when using
+        \ref CBLIndexUpdater to add or update the vector into the index. */
     FLString expression;
     
-    /** The number of vector dimensions. (Required) */
+    /** The number of vector dimensions. (Required) 
+        @note The maximum number of vector dimensions supported is 4096. */
     unsigned dimensions;
     
-    /** The number of centroids which is the number buckets to partition the vectors in the index. (Required) */
+    /** The number of centroids which is the number buckets to partition the vectors in the index. (Required) 
+        @note The recommended number of centroids is the square root of the number of vectors to be indexed,
+              and the maximum number of centroids supported is 64,000.*/
     unsigned centroids;
     
     /** The boolean flag indicating that index is lazy or not. The default value is false.
