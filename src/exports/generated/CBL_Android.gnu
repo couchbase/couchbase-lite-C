@@ -178,6 +178,7 @@ CBL_C {
 		CBLQuery_SetListenerCallbackDelay;
 		CBLLog_BeginExpectingExceptions;
 		CBLLog_EndExpectingExceptions;
+		kCBLDefaultLogFileUsePlaintext;
 		kCBLDefaultLogFileUsePlainText;
 		kCBLDefaultLogFileMaxSize;
 		kCBLDefaultLogFileMaxRotateCount;
@@ -188,6 +189,7 @@ CBL_C {
 		kCBLDefaultReplicatorMaxAttemptsSingleShot;
 		kCBLDefaultReplicatorMaxAttemptsContinuous;
 		kCBLDefaultReplicatorMaxAttemptWaitTime;
+		kCBLDefaultReplicatorMaxAttemptsWaitTime;
 		kCBLDefaultReplicatorDisableAutoPurge;
 		kCBLDefaultReplicatorAcceptParentCookies;
 		kFLNullValue;

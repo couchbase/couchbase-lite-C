@@ -36,6 +36,8 @@ CBL_C {
 		CBLIndexUpdater_SkipVector;
 		CBLIndexUpdater_Finish;
 		CBLIndexUpdater_Value;
+		kCBLDefaultVectorIndexLazy;
+		kCBLDefaultVectorIndexDistanceMetric;
 		CBL_Retain;
 		CBL_Release;
 		CBL_InstanceCount;
@@ -213,6 +215,7 @@ CBL_C {
 		CBLQuery_SetListenerCallbackDelay;
 		CBLLog_BeginExpectingExceptions;
 		CBLLog_EndExpectingExceptions;
+		kCBLDefaultLogFileUsePlaintext;
 		kCBLDefaultLogFileUsePlainText;
 		kCBLDefaultLogFileMaxSize;
 		kCBLDefaultLogFileMaxRotateCount;
@@ -223,6 +226,7 @@ CBL_C {
 		kCBLDefaultReplicatorMaxAttemptsSingleShot;
 		kCBLDefaultReplicatorMaxAttemptsContinuous;
 		kCBLDefaultReplicatorMaxAttemptWaitTime;
+		kCBLDefaultReplicatorMaxAttemptsWaitTime;
 		kCBLDefaultReplicatorDisableAutoPurge;
 		kCBLDefaultReplicatorAcceptParentCookies;
 		kFLNullValue;
