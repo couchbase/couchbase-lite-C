@@ -18,17 +18,31 @@
 
 #include "CBLPrediction_Internal.hh"
 #include "c4PredictiveQuery.h"
+#include "fleece/Mutable.hh"
+#include "Defer.hh"
 
 #ifdef COUCHBASE_ENTERPRISE
 
 namespace cbl_internal {
     using namespace std;
     using namespace fleece;
+    using namespace litecore;
 
     void PredictiveModel::registerModel(const slice name, const CBLPredictiveModel& model) {
         auto prediction = [](void* context, FLDict input, C4Database *db, C4Error *outError) {
             auto m = (PredictiveModel*)context;
-            return m->_model.prediction(m->_model.context, input);
+            auto dict = m->_model.prediction(m->_model.context, input);
+            DEFER {
+                FLMutableDict_Release(dict);
+            };
+            
+            if (!dict) {
+                return FLSliceResult_CreateWith(nullptr, 0);
+            }
+            
+            Encoder enc;
+            enc.writeValue(Dict(dict));
+            return (FLSliceResult) enc.finish();
         };
         
         auto unregistered = [](void* context) {

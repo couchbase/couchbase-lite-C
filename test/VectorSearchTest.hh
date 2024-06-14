@@ -184,9 +184,9 @@ public:
     }
     
     void registerWordEmbeddingModel() {
-        auto callback = [](void* context, FLDict input) -> FLSliceResult {
+        auto callback = [](void* context, FLDict input) -> FLMutableDict {
             auto word = fleece::Dict(input)["word"].asString();
-            if (!word) { return FLSliceResult_CreateWith(nullptr, 0); }
+            if (!word) { return nullptr; }
             
             auto vector = ((VectorSearchTest*) context)->vectorArrayForWord(word, kWordsCollectionName);
             if (!vector) {
@@ -194,17 +194,12 @@ public:
             }
             
             if (!vector) {
-                return FLSliceResult_CreateWith(nullptr, 0);
+                return nullptr;
             }
             
-            FLEncoder enc = FLEncoder_New();
-            FLEncoder_BeginDict(enc, 1);
-            FLEncoder_WriteKey(enc, "vector"_sl);
-            FLEncoder_WriteValue(enc, (FLValue)vector);
-            FLEncoder_EndDict(enc);
-            auto result = FLEncoder_Finish(enc, nullptr);
-            FLMutableArray_Release(vector);
-            return result;
+            auto output = MutableDict(FLMutableDict_New());
+            output["vector"] = Array(vector);
+            return output;
         };
         
         CBLPredictiveModel model {};
