@@ -318,7 +318,7 @@ namespace cbl_internal
             if (maxAttemptWaitTime > 0) {
                 enc.writeUInt(maxAttemptWaitTime);
             } else {
-                enc.writeUInt(kCBLDefaultReplicatorMaxAttemptWaitTime);
+                enc.writeUInt(kCBLDefaultReplicatorMaxAttemptsWaitTime);
             }
             
             enc.writeKey(slice(kC4ReplicatorHeartbeatInterval));

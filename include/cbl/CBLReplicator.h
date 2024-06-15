@@ -343,7 +343,7 @@ typedef struct {
     unsigned maxAttempts;
     
     /** Max wait time between retry attempts in seconds.
-        The default value \ref kCBLDefaultReplicatorMaxAttemptWaitTime. */
+        The default value \ref kCBLDefaultReplicatorMaxAttemptsWaitTime. */
     unsigned maxAttemptWaitTime;
     
     //-- WebSocket:
