@@ -49,9 +49,11 @@ public:
     
 #pragma mark - Database Extension:
     
-    static void setExtensionPath(slice path) {
+    static inline constexpr slice kVectorSearchExtension = "CouchbaseLiteVectorSearch";
+    
+    static void enableVectorSearch(slice path) {
         CBLLog_Init();
-        C4Database::setExtensionPath(path);
+        C4Database::enableExtension(kVectorSearchExtension, path);
     }
     
 #endif

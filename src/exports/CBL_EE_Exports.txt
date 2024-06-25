@@ -44,7 +44,7 @@ CBL_UnregisterPredictiveModel
 
 ### Vector Search
 
-CBL_SetExtensionPath
+CBL_EnableVectorSearch
 CBLCollection_CreateVectorIndex
 CBLVectorEncoding_CreateNone
 CBLVectorEncoding_CreateProductQuantizer

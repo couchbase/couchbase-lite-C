@@ -463,8 +463,8 @@ bool CBLDatabase_SaveBlob(CBLDatabase* db, CBLBlob* blob,
 
 #ifdef COUCHBASE_ENTERPRISE
 
-void CBL_SetExtensionPath(FLString path) noexcept {
-    CBLDatabase::setExtensionPath(path);
+void CBL_EnableVectorSearch(FLString path) noexcept {
+    CBLDatabase::enableVectorSearch(path);
 }
 
 #endif

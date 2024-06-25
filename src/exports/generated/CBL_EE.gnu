@@ -23,7 +23,7 @@ CBL_C {
 		FLSlot_SetEncryptableValue;
 		CBL_RegisterPredictiveModel;
 		CBL_UnregisterPredictiveModel;
-		CBL_SetExtensionPath;
+		CBL_EnableVectorSearch;
 		CBLCollection_CreateVectorIndex;
 		CBLVectorEncoding_CreateNone;
 		CBLVectorEncoding_CreateProductQuantizer;

@@ -61,6 +61,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestDimensionsValidation", "[VectorSearch]")
     config.dimensions = 4096;
     CHECK(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
     
+    ExpectingExceptions x;
     config.dimensions = 1;
     CHECK_FALSE(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
     CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
@@ -97,6 +98,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCentroidsValidation", "[VectorSearch]") 
     
     config.centroids = 6400;
     CHECK(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
+    
+    ExpectingExceptions x;
     
     config.centroids = 0;
     CHECK_FALSE(CBLCollection_CreateVectorIndex(wordsCollection, "words_index2"_sl, config, &error));
@@ -699,6 +702,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestSubquantizersValidation : Invalid", "[Ve
         config.encoding = CBLVectorEncoding_CreateProductQuantizer(7, 8);
     }
     
+    ExpectingExceptions x;
     CBLError error {};
     CHECK(!CBLCollection_CreateVectorIndex(wordsCollection, kWordsIndexName, config, &error));
     CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
@@ -773,6 +777,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestValidateMinMaxTrainingSize", "[VectorSea
     // Invalid minTrainingSize / maxTrainingSize:
     config.minTrainingSize = 10;
     config.maxTrainingSize = 9;
+    
+    ExpectingExceptions x;
     CHECK(!CBLCollection_CreateVectorIndex(wordsCollection, kWordsIndexName, config, &error));
     CheckError(error, kCBLErrorInvalidParameter, kCBLDomain);
 }
@@ -963,6 +969,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestDeleteVectorIndex", "[VectorSearch]") {
     
     deleteWordsIndex();
     
+    ExpectingExceptions x;
     CBLError error {};
     auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(20)), nullptr, &error);    
     CHECK(!query);
@@ -983,6 +990,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestDeleteVectorIndex", "[VectorSearch]") {
  *     3. Check that a CouchbaseLiteException is returned as the index doesn’t exist.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchOnNonExistingIndex", "[VectorSearch]") {
+    ExpectingExceptions x;
     CBLError error {};
     auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(20)), nullptr, &error);
     CHECK(!query);
@@ -1051,6 +1059,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearc
     
     CBLQuery* query = nullptr;
     
+    ExpectingExceptions x;
     CBLError error {};
     SECTION("Valid Limit : 1") {
         query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(1)), nullptr, &error);
@@ -1182,6 +1191,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestInvalidVectorMatchWithOrExpression", "[V
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     createWordsIndex(config);
     
+    ExpectingExceptions x;
     CBLError error {};
     auto sql = wordQueryString(20, false, "OR catid = 1");
     auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(sql), nullptr, &error);
