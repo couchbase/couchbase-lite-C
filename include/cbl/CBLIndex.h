@@ -49,7 +49,7 @@ CBL_CAPI_BEGIN
  
      * (Enterprise Edition Only) Vector indexes allows efficient search of ML vectors by using
        the `VECTOR_MATCH()` function in a query. The `CouchbaseLiteVectorSearch`
-       extension library is **required** to use the functionality. Use \ref CBL_SetExtensionPath
+       extension library is **required** to use the functionality. Use \ref CBL_EnableVectorSearch
        function to set the directoary path containing the extension library. */
 
 /** \name  CBLIndex

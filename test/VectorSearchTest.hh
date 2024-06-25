@@ -69,7 +69,8 @@ public:
     
     VectorSearchTest() {
         // Eanble vector search and reinit test databases:
-        SetVectorSearchEnabled(true);
+        EnableVectorSearch();
+        
         initTestDatabases(false);
         
         auto config = databaseConfig();
@@ -129,9 +130,6 @@ public:
         CBLLog_SetCallback(nullptr);
         CBLLog_SetCallbackLevel(kCBLLogNone);
         sVectorSearchTestLogs.clear();
-        
-        // Disable vector search:
-        SetVectorSearchEnabled(false);
     }
     
     FLMutableArray vectorArrayForWord(FLString word, FLString collection) {

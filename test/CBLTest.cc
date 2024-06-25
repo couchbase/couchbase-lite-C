@@ -55,63 +55,10 @@ using namespace fleece;
 
 #ifdef COUCHBASE_ENTERPRISE
 
-#if defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(_M_X64)
-
-constexpr int AVX2_POS = 1 << 5;
-constexpr int EXTENDED_FEATURE_FLAG = 0x7;
-constexpr int BASIC_INFO_FLAG = 0x0;
-
-#ifdef _MSC_VER
-
-#include <intrin.h>
-#include <Windows.h>
-
-static void cpuid(unsigned int* regs, unsigned int function) {
-    __cpuidex(reinterpret_cast<int*>(regs), static_cast<int>(function), 0);
-
-}
-#else
-
-// This header actually cannot be included on an ARM system
-// the mere act of including it is an error
-#include <cpuid.h>
-
-static void cpuid(unsigned int* regs, unsigned int function) {
-    __cpuid_count(function, 0, regs[0], regs[1], regs[2], regs[3]);
-}
-#endif
-
-#endif
-
-static bool Has_Avx2() {
-#if defined(__x86_64__) || defined(__x86_64) || defined(__amd64__) || defined(_M_X64)
-    unsigned int regs[4];
-    memset(regs, 0, sizeof(int) * 4);
-    cpuid(regs, BASIC_INFO_FLAG);
-    if(regs[0] < EXTENDED_FEATURE_FLAG) {
-        return false;
-    }
-
-    cpuid(regs, EXTENDED_FEATURE_FLAG);
-    if(!(regs[1] & AVX2_POS)) {
-        return false;
-    }
-#endif
-
-    return true;
-}
-
-void SetVectorSearchEnabled(bool enabled) {
-    if (enabled) {
-        if (!Has_Avx2()) {
-            WARN("The machine doesn't have AVX2; Vector Search Extension Library may not be working (SIGILL).");
-        }
-        auto path = GetExtensionPath();
-        if (!path.empty()) {
-            CBL_SetExtensionPath(slice(path));
-        }
-    } else {
-        CBL_SetExtensionPath(kFLSliceNull);
+void EnableVectorSearch() {
+    auto path = GetExtensionPath();
+    if (!path.empty()) {
+        CBL_EnableVectorSearch(slice(path));
     }
 }
 

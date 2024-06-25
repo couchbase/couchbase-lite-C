@@ -94,9 +94,11 @@ public:
 std::string GetAssetFilePath(const std::string &filename);
 
 #ifdef COUCHBASE_ENTERPRISE
+
 std::string GetExtensionPath();
 
-void SetVectorSearchEnabled(bool enabled);
+void EnableVectorSearch();
+
 #endif
 
 bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)> &callback);

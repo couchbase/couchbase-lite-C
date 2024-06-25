@@ -37,10 +37,12 @@ CBL_CAPI_BEGIN
     @{ */
 
 /** ENTERPRISE EDITION ONLY
- 
-    Registers a directory path to load extension libraries from, such as Vector Search.
-    Must be called before opening a database that will use an extension. */
-void CBL_SetExtensionPath(FLString path) CBLAPI;
+  
+    Enables Vector Search extension by specifying the extension path to search for the Vector Search extension library.
+    This function must be called before opening a database that intends to use the vector search extension.
+    @param path The file system path of the directory that contains the Vector Search extension library.
+    @note Must be called before opening a database that intends to use the vector search extension. */
+void CBL_EnableVectorSearch(FLString path) CBLAPI;
 
 /** @} */
 
