@@ -47,6 +47,9 @@ _CBLIndexUpdater_Finish
 _CBLIndexUpdater_Value
 _kCBLDefaultVectorIndexLazy
 _kCBLDefaultVectorIndexDistanceMetric
+_kCBLDefaultVectorIndexMinTrainingSize
+_kCBLDefaultVectorIndexMaxTrainingSize
+_kCBLDefaultVectorIndexNumProbes
 _CBL_Retain
 _CBL_Release
 _CBL_InstanceCount

@@ -108,6 +108,15 @@ CBL_PUBLIC extern const bool kCBLDefaultVectorIndexLazy;
 /** [kCBLDistanceMetricEuclidean] By default, vectors are compared using Euclidean metrics */
 CBL_PUBLIC extern const CBLDistanceMetric kCBLDefaultVectorIndexDistanceMetric;
 
+/** [0] By default, the value will be determined based on the number of centroids, encoding types, and the encoding parameters. */
+CBL_PUBLIC extern const unsigned kCBLDefaultVectorIndexMinTrainingSize;
+
+/** [0] By default, the value will be determined based on the number of centroids, encoding types, and the encoding parameters */
+CBL_PUBLIC extern const unsigned kCBLDefaultVectorIndexMaxTrainingSize;
+
+/** [0] By default, the value will be determined based on the number of centroids. */
+CBL_PUBLIC extern const unsigned kCBLDefaultVectorIndexNumProbes;
+
 /** @} */
 
 #endif

@@ -147,21 +147,7 @@ public:
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "centroids must be >= 1 and <= 64000.");
         }
         
-        // Use default minTrainingSize if minTrainingSize is not specified:
-        if (config.minTrainingSize == 0) {
-            config.minTrainingSize = 25 * config.centroids;
-        }
-        
-        // Use default maxTrainingSize if maxTrainingSize is not specified:
-        if (config.maxTrainingSize == 0) {
-            config.maxTrainingSize = 250 * config.centroids;
-        }
-        
-        if (config.minTrainingSize < 1) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "minTrainingSize must be > 1.");
-        } else if (config.maxTrainingSize < 1) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "maxTrainingSize must be > 1.");
-        } else if (config.minTrainingSize > config.maxTrainingSize) {
+        if (config.minTrainingSize > 0 && config.maxTrainingSize > 0 && config.minTrainingSize > config.maxTrainingSize) {
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "minTrainingSize must be <= maxTrainingSize.");
         }
         
@@ -196,7 +182,7 @@ public:
         vector.encoding = c4enc;
         vector.minTrainingSize = config.minTrainingSize;
         vector.maxTrainingSize = config.maxTrainingSize;
-        vector.numProbes = 0;
+        vector.numProbes = config.numProbes;
         
         C4IndexOptions options {};
         options.vector = vector;

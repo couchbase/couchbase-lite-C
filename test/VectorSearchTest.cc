@@ -1244,6 +1244,48 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexVectorInBase64", "[VectorSearch]") 
     CBLResultSet_Release(results);
 }
 
+/**
+ * 28. TestNumProbes
+ *
+ * Description
+ * Test that the numProces specified is effective.
+ *
+ * Steps
+ * 1. Copy database words_db.
+ * 2. Create a vector index named "words_index" in _default.words collection.
+ *     - expression: "vector"
+ *     - dimensions: 300
+ *     - centroids : 8
+ *     - numProbes: 5
+ * 3. Check that the index is created without an error returned.
+ * 4. Create an SQL++ query:
+ *     - SELECT meta().id, word
+ *       FROM _default.words
+ *       WHERE vector_match(words_index, < dinner vector >, 300)
+ * 5. Execute the query and record the number of results returned.
+ * 6. Repeat step 2 - 6 but change the numProbes to 1.
+ * 7. Verify the number of results returned in Step 5 is larger than Step 6.
+ */
+TEST_CASE_METHOD(VectorSearchTest, "TestNumProbes", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    
+    config.numProbes = 5;
+    createWordsIndex(config);
+    auto results = executeWordsQuery(300);
+    auto numResultsFor5Probes = CountResults(results);
+    CHECK(numResultsFor5Probes > 0);
+    CBLResultSet_Release(results);
+    
+    config.numProbes = 1;
+    createWordsIndex(config);
+    results = executeWordsQuery(300);
+    auto numResultsFor1Probes = CountResults(results);
+    CHECK(numResultsFor1Probes > 0);
+    CBLResultSet_Release(results);
+    
+    CHECK(numResultsFor5Probes > numResultsFor1Probes);
+}
+
 #endif
 
 #endif
