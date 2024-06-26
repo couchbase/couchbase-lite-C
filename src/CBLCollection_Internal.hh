@@ -177,7 +177,7 @@ public:
         vector.clustering.type = kC4VectorClusteringFlat;
         vector.clustering.flat_centroids = config.centroids;
         vector.dimensions = config.dimensions;
-        vector.lazy = config.lazy;
+        vector.lazy = config.isLazy;
         vector.metric = config.metric == kCBLDistanceMetricCosine ? kC4VectorMetricCosine : kC4VectorMetricEuclidean;
         vector.encoding = c4enc;
         vector.minTrainingSize = config.minTrainingSize;
@@ -208,7 +208,7 @@ public:
         return indexes;
     }
     
-    Retained<CBLIndex> getIndex(slice name);
+    Retained<CBLQueryIndex> getIndex(slice name);
     
 #pragma mark - LISTENERS
     

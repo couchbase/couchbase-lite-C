@@ -1,5 +1,5 @@
 //
-// CBLIndex.cc
+// CBLQueryIndex.cc
 //
 // Copyright © 2024 Couchbase. All rights reserved.
 //
@@ -16,31 +16,31 @@
 // limitations under the License.
 //
 
-#include "CBLIndex_Internal.hh"
+#include "CBLQueryIndex_Internal.hh"
 #include "CBLBlob_Internal.hh"
 #include "CBLCollection_Internal.hh"
 #include "c4Index.hh"
 
 using namespace fleece;
 
-#pragma mark - CBLIndex:
+#pragma mark - CBLQueryIndex:
 
-CBLIndex::CBLIndex(Retained<C4Index>&& index, CBLCollection* collection)
+CBLQueryIndex::CBLQueryIndex(Retained<C4Index>&& index, CBLCollection* collection)
 :_collection(collection)
 ,_c4Index(std::move(index), _collection->database()->c4db().get())
 { }
 
-CBLCollection* CBLIndex::collection() const {
+CBLCollection* CBLQueryIndex::collection() const {
     return _collection;
 }
 
-slice CBLIndex::name() const {
+slice CBLQueryIndex::name() const {
     return _c4Index.useLocked()->getName();
 }
 
 #ifdef COUCHBASE_ENTERPRISE
 
-Retained<CBLIndexUpdater> CBLIndex::beginUpdate(size_t limit) {
+Retained<CBLIndexUpdater> CBLQueryIndex::beginUpdate(size_t limit) {
     auto updater = _c4Index.useLocked()->beginUpdate(limit);
     if (!updater) {
         return nullptr;
@@ -52,7 +52,7 @@ Retained<CBLIndexUpdater> CBLIndex::beginUpdate(size_t limit) {
 
 static const char* kCBLIndexUpdaterName = "CBLIndexUpdater";
 
-CBLIndexUpdater::CBLIndexUpdater(Retained<C4IndexUpdater>&& indexUpdater, CBLIndex* index)
+CBLIndexUpdater::CBLIndexUpdater(Retained<C4IndexUpdater>&& indexUpdater, CBLQueryIndex* index)
 :_c4IndexUpdater(indexUpdater)
 ,_c4IndexUpdaterWithLock(std::move(indexUpdater), index->collection()->database()->c4db().get())
 ,_index(index)

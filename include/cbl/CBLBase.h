@@ -221,7 +221,7 @@ typedef struct CBLResultSet  CBLResultSet;
 /** \defgroup indexes  Indexes
      @{ */
 /** A query index. */
-typedef struct CBLIndex      CBLIndex;
+typedef struct CBLQueryIndex      CBLQueryIndex;
 
 #ifdef COUCHBASE_ENTERPRISE
 typedef struct CBLIndexUpdater      CBLIndexUpdater;

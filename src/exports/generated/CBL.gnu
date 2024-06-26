@@ -142,8 +142,8 @@ CBL_C {
 		CBLResultSet_ResultArray;
 		CBLResultSet_ResultDict;
 		CBLResultSet_GetQuery;
-		CBLIndex_Collection;
-		CBLIndex_Name;
+		CBLQueryIndex_Collection;
+		CBLQueryIndex_Name;
 		kCBLAuthDefaultCookieName;
 		CBLEndpoint_CreateWithURL;
 		CBLEndpoint_Free;

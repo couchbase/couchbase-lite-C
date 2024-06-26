@@ -39,7 +39,7 @@ _CBLVectorEncoding_CreateNone
 _CBLVectorEncoding_CreateProductQuantizer
 _CBLVectorEncoding_CreateScalarQuantizer
 _CBLVectorEncoding_Free
-_CBLIndex_BeginUpdate
+_CBLQueryIndex_BeginUpdate
 _CBLIndexUpdater_Count
 _CBLIndexUpdater_SetVector
 _CBLIndexUpdater_SkipVector
@@ -192,8 +192,8 @@ _CBLResultSet_ValueForKey
 _CBLResultSet_ResultArray
 _CBLResultSet_ResultDict
 _CBLResultSet_GetQuery
-_CBLIndex_Collection
-_CBLIndex_Name
+_CBLQueryIndex_Collection
+_CBLQueryIndex_Name
 _kCBLAuthDefaultCookieName
 _CBLEndpoint_CreateWithURL
 _CBLEndpoint_Free

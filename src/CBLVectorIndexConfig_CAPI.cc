@@ -17,7 +17,7 @@
 //
 
 
-#include "CBLIndexTypes.h"
+#include "CBLQueryIndexTypes.h"
 #include "CBLVectorIndexConfig.hh"
 #include "Internal.hh"
 

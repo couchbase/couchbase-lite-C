@@ -223,13 +223,13 @@ public:
         createVectorIndex(wordsCollection, kWordsIndexName, config);
     }
     
-    CBLIndex* getWordsIndex() {
+    CBLQueryIndex* getWordsIndex() {
         CBLError error {};
         auto index = CBLCollection_GetIndex(wordsCollection, kWordsIndexName, &error);
         CheckNoError(error);
         CHECK(index);
-        CHECK(CBLIndex_Name(index) == kWordsIndexName);
-        CHECK(CBLIndex_Collection(index) == wordsCollection);
+        CHECK(CBLQueryIndex_Name(index) == kWordsIndexName);
+        CHECK(CBLQueryIndex_Collection(index) == wordsCollection);
         return index;
     }
     

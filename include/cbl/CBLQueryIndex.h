@@ -1,5 +1,5 @@
 //
-//  CBLIndex.h
+//  CBLQueryIndex.h
 //
 // Copyright (c) 2024 Couchbase, Inc All rights reserved.
 //
@@ -52,15 +52,15 @@ CBL_CAPI_BEGIN
        extension library is **required** to use the functionality. Use \ref CBL_EnableVectorSearch
        function to set the directoary path containing the extension library. */
 
-/** \name  CBLIndex
+/** \name  CBLQueryIndex
     @{
-    CBLIndex represents an existing index in a collection.
+    CBLQueryIndex represents an existing index in a collection.
  
-    Available in the enterprise edition, the \ref CBLIndex can be used to obtain
+    Available in the enterprise edition, the \ref CBLQueryIndex can be used to obtain
     a \ref CBLIndexUpdater object for updating the vector index in lazy mode.
     To use the \ref CBLIndexUpdater object to update the vector index, follow these steps:
  
-    1. Call CBLIndex_BeginUpdate with the max number of vectors to be updated.
+    1. Call CBLQueryIndex_BeginUpdate with the max number of vectors to be updated.
       The function will return a \ref CBLIndexUpdater object or NULL if the index is up-to-date.
     2. Call `CBLIndexUpdater_Value` for each of the `count` items to get the Fleece value, and :
       2.1 Compute a vector from this value
@@ -70,17 +70,17 @@ CBL_CAPI_BEGIN
     4. Call `CBLIndexUpdater_Release` to release the updater object.
     5. Repeat the Step 1 until the index is up-to-date. */
 
-CBL_REFCOUNTED(CBLIndex*, Index);
+CBL_REFCOUNTED(CBLQueryIndex*, QueryIndex);
 
 /** Returns the index's name.
     @param index  The index.
     @return The name of the index. */
-FLString CBLIndex_Name(const CBLIndex* index) CBLAPI;
+FLString CBLQueryIndex_Name(const CBLQueryIndex* index) CBLAPI;
 
 /** Returns the collection that the index belongs to.
     @param index  The index.
     @return A \ref CBLCollection instance that the index belongs to. */
-CBLCollection* CBLIndex_Collection(const CBLIndex* index) CBLAPI;
+CBLCollection* CBLQueryIndex_Collection(const CBLQueryIndex* index) CBLAPI;
 
 #ifdef COUCHBASE_ENTERPRISE
 
@@ -97,7 +97,7 @@ CBL_REFCOUNTED(CBLIndexUpdater*, IndexUpdater);
     @param outError  On failure, an error is written here.
     @return A \ref CBLIndexUpdater object for setting the computed vectors to update the index, or NULL if an error occurred. */
 _cbl_warn_unused
-CBLIndexUpdater* _cbl_nullable CBLIndex_BeginUpdate(CBLIndex* index,
+CBLIndexUpdater* _cbl_nullable CBLQueryIndex_BeginUpdate(CBLQueryIndex* index,
                                                     size_t limit,
                                                     CBLError* _cbl_nullable outError) CBLAPI;
 
@@ -147,7 +147,7 @@ bool CBLIndexUpdater_SetVector(CBLIndexUpdater* updater,
 /** ENTERPRISE EDITION ONLY
  
     Skip setting the vector for the value corresponding to the index.
-    The vector will be required to compute and set again when the `CBLIndex_BeginUpdate` is later called.
+    The vector will be required to compute and set again when the `CBLQueryIndex_BeginUpdate` is later called.
     @param updater  The index updater.
     @param index The zero-based index.
     @param outError  On failure, an error is written here.

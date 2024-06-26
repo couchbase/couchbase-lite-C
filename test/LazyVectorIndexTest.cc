@@ -49,8 +49,8 @@
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestIsLazyAccessor", "[VectorSearch][LazyVectorIndex]") {
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
-    config.lazy = true;
-    CHECK(config.lazy);
+    config.isLazy = true;
+    CHECK(config.isLazy);
 }
 
 /**
@@ -100,9 +100,9 @@ TEST_CASE_METHOD(VectorSearchTest, "TestGetExistingNonVectorIndex", "[VectorSear
     
     auto index = CBLCollection_GetIndex(defaultCollection, "value_index"_sl, &error);
     CHECK(index);
-    CHECK(CBLIndex_Name(index) == "value_index"_sl);
-    CHECK(CBLIndex_Collection(index) == defaultCollection);
-    CBLIndex_Release(index);
+    CHECK(CBLQueryIndex_Name(index) == "value_index"_sl);
+    CHECK(CBLQueryIndex_Collection(index) == defaultCollection);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -131,7 +131,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestGetExistingVectorIndex", "[VectorSearch]
     // getWordsIndex() already checks index's name and collection
     auto index = getWordsIndex();
     CHECK(index);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -224,7 +224,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdateDeletedDocs", "
     // Update Index:
     auto index = getWordsIndex();
     
-    auto updater = CBLIndex_BeginUpdate(index, 1, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 1, &error);
     CHECK(updater);
     CHECK(CBLIndexUpdater_Count(updater) == 1);
     
@@ -238,7 +238,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdateDeletedDocs", "
     updateWordsIndexWithUpdater(updater);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
     
     // Query:
     auto results = executeWordsQuery(300);
@@ -302,7 +302,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdatePurgedDocs", "[
     // Update Index:
     auto index = getWordsIndex();
     
-    auto updater = CBLIndex_BeginUpdate(index, 1, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 1, &error);
     CHECK(updater);
     CHECK(CBLIndexUpdater_Count(updater) == 1);
     
@@ -316,7 +316,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdatePurgedDocs", "[
     updateWordsIndexWithUpdater(updater);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
     
     // Query:
     auto results = executeWordsQuery(300);
@@ -369,11 +369,11 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterBeginUpdateOnNonVectorIndex"
     CHECK(index);
     
     ExpectingExceptions x {};
-    auto updater = CBLIndex_BeginUpdate(index, 10, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 10, &error);
     CHECK(!updater);
     CheckError(error, kCBLErrorUnsupported);
     
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -402,11 +402,11 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterBeginUpdateOnNonLazyVectorIn
     auto index = getWordsIndex();
     
     ExpectingExceptions x {};
-    auto updater = CBLIndex_BeginUpdate(index, 10, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 10, &error);
     CHECK(!updater);
     CheckError(error, kCBLErrorUnsupported);
     
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -436,11 +436,11 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterBeginUpdateWithZeroLimit", "
     auto index = getWordsIndex();
     
     ExpectingExceptions x {};
-    auto updater = CBLIndex_BeginUpdate(index, 0, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 0, &error);
     CHECK(!updater);
     CheckError(error, kCBLErrorInvalidParameter);
     
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -469,13 +469,13 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterBeginUpdateOnLazyVectorIndex
     auto index = getWordsIndex();
     
     ExpectingExceptions x {};
-    auto updater = CBLIndex_BeginUpdate(index, 10, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 10, &error);
     CHECK(updater);
     CheckNoError(error);
     CHECK(CBLIndexUpdater_Count(updater) == 10);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -648,7 +648,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterGettingValues", "[VectorSear
     CHECK(index);
     CheckNoError(error);
     
-    auto updater = CBLIndex_BeginUpdate(index, 9, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 9, &error);
     CHECK(updater);
     CheckNoError(error);
     CHECK(CBLIndexUpdater_Count(updater) == 9);
@@ -700,7 +700,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterGettingValues", "[VectorSear
     CHECK(FLValue_GetType(val8) == kFLNull);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -741,14 +741,14 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetFloatArrayVectors", "[Vec
     // Update Index:
     auto index = getWordsIndex();
     
-    auto updater = CBLIndex_BeginUpdate(index, 10, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 10, &error);
     CHECK(updater);
     
     vector<string> updatedWords {};
     updateWordsIndexWithUpdater(updater, true, &updatedWords);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
     
     // Query:
     auto results = executeWordsQuery(300);
@@ -792,7 +792,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetInvalidVectorDimensions",
     
     auto index = getWordsIndex();
     
-    auto updater = CBLIndex_BeginUpdate(index, 1, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 1, &error);
     CHECK(updater);
     
     float vector[1] = {1.0};
@@ -800,7 +800,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetInvalidVectorDimensions",
     CheckError(error, kCBLErrorInvalidParameter);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -851,7 +851,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSkipVectors", "[.CBL-5842]")
     // Update Index:
     auto index = getWordsIndex();
     
-    auto updater = CBLIndex_BeginUpdate(index, 10, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 10, &error);
     CHECK(updater);
     
     vector<string> updatedWords {};
@@ -874,7 +874,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSkipVectors", "[.CBL-5842]")
     CBLResultSet_Release(results);
     
     // Update index for the skipped words:
-    updater = CBLIndex_BeginUpdate(index, 5, &error);
+    updater = CBLQueryIndex_BeginUpdate(index, 5, &error);
     CHECK(updater);
     
     updatedWords.clear();
@@ -885,7 +885,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSkipVectors", "[.CBL-5842]")
     CHECK(updatedWords == skippedWords);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -923,7 +923,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterFinishWithIncompletedUpdate"
     // Update Index:
     auto index = getWordsIndex();
     
-    auto updater = CBLIndex_BeginUpdate(index, 2, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 2, &error);
     CHECK(updater);
     
     auto value = CBLIndexUpdater_Value(updater, 0);
@@ -940,7 +940,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterFinishWithIncompletedUpdate"
     CheckError(error, kCBLErrorUnsupported);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -976,7 +976,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterCaughtUp", "[VectorSearch][L
     auto index = getWordsIndex();
     
     for (int i = 0; i < 3; i++) {
-        auto updater = CBLIndex_BeginUpdate(index, 100, &error);
+        auto updater = CBLQueryIndex_BeginUpdate(index, 100, &error);
         CHECK(updater);
         
         vector<string> updatedWords {};
@@ -985,11 +985,11 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterCaughtUp", "[VectorSearch][L
         CBLIndexUpdater_Release(updater);
     }
     
-    auto updater = CBLIndex_BeginUpdate(index, 100, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 100, &error);
     CHECK(!updater);
     CheckNoError(error);
     
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -1029,14 +1029,14 @@ TEST_CASE_METHOD(VectorSearchTest, "TestNonFinishedIndexUpdaterNotUpdateIndex", 
     // Update Index:
     auto index = getWordsIndex();
     
-    auto updater = CBLIndex_BeginUpdate(index, 10, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 10, &error);
     CHECK(updater);
     
     vector<string> updatedWords {};
     updateWordsIndexWithUpdater(updater, false, &updatedWords);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
     
     // Query:
     auto results = executeWordsQuery(300);
@@ -1090,7 +1090,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterIndexOutOfBounds", "[VectorS
     CHECK(index);
     CheckNoError(error);
     
-    auto updater = CBLIndex_BeginUpdate(index, 10, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 10, &error);
     CHECK(updater);
     CheckNoError(error);
     CHECK(CBLIndexUpdater_Count(updater) == 1);
@@ -1120,7 +1120,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterIndexOutOfBounds", "[VectorS
     }
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 /**
@@ -1154,7 +1154,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterCallFinishTwice", "[.CBL-584
     // Update Index:
     auto index = getWordsIndex();
     
-    auto updater = CBLIndex_BeginUpdate(index, 1, &error);
+    auto updater = CBLQueryIndex_BeginUpdate(index, 1, &error);
     CHECK(updater);
     
     // This will call finish:
@@ -1165,7 +1165,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterCallFinishTwice", "[.CBL-584
     CheckError(error, kCBLErrorUnsupported);
     
     CBLIndexUpdater_Release(updater);
-    CBLIndex_Release(index);
+    CBLQueryIndex_Release(index);
 }
 
 #endif

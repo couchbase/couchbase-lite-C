@@ -1,5 +1,5 @@
 //
-//  CBLIndexTypes.h
+//  CBLQueryIndexTypes.h
 //
 // Copyright (c) 2024 Couchbase, Inc All rights reserved.
 //
@@ -135,8 +135,8 @@ typedef struct {
         a value used for computing the vector.
      
         To update the lazy index, use a CBLIndexUpdater object, which can be obtained
-        from a CBLIndex object. To get a CBLIndex object, call CBLCollection_GetIndex. */
-    bool lazy;
+        from a CBLQueryIndex object. To get a CBLQueryIndex object, call CBLCollection_GetIndex. */
+    bool isLazy;
     
     /** Vector encoding type. The default value is 8-bits Scalar Quantizer. */
     CBLVectorEncoding* encoding;

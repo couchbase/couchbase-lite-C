@@ -96,11 +96,11 @@
 		40E7CA732BFE7336004BE7E1 /* ContextManager.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40E7CA632BFE7336004BE7E1 /* ContextManager.cc */; };
 		40E7CA742BFE7336004BE7E1 /* ContextManager.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40E7CA722BFE7336004BE7E1 /* ContextManager.hh */; };
 		40F902D82B9F7B12002EA0A0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */; };
-		40FE2DD12C082465005E99E9 /* CBLIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = 40FE2DC22C08245E005E99E9 /* CBLIndex.h */; };
-		40FE2DD22C082466005E99E9 /* CBLIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = 40FE2DC22C08245E005E99E9 /* CBLIndex.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		40FE2DD62C092578005E99E9 /* CBLIndex_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40FE2DD52C092578005E99E9 /* CBLIndex_CAPI.cc */; };
-		40FE2DD92C0926FF005E99E9 /* CBLIndex.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40FE2DD72C0926FF005E99E9 /* CBLIndex.cc */; };
-		40FE2DDA2C0926FF005E99E9 /* CBLIndex_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40FE2DD82C0926FF005E99E9 /* CBLIndex_Internal.hh */; };
+		40FE2DD12C082465005E99E9 /* CBLQueryIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = 40FE2DC22C08245E005E99E9 /* CBLQueryIndex.h */; };
+		40FE2DD22C082466005E99E9 /* CBLQueryIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = 40FE2DC22C08245E005E99E9 /* CBLQueryIndex.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		40FE2DD62C092578005E99E9 /* CBLQueryIndex_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40FE2DD52C092578005E99E9 /* CBLQueryIndex_CAPI.cc */; };
+		40FE2DD92C0926FF005E99E9 /* CBLQueryIndex.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40FE2DD72C0926FF005E99E9 /* CBLQueryIndex.cc */; };
+		40FE2DDA2C0926FF005E99E9 /* CBLQueryIndex_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40FE2DD82C0926FF005E99E9 /* CBLQueryIndex_Internal.hh */; };
 		40FE2E0E2C12AEF6005E99E9 /* LazyVectorIndexTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40FE2DFE2C12AEEB005E99E9 /* LazyVectorIndexTest.cc */; };
 		42D1B69D2978AD31003B9871 /* CBLUserAgent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */; };
 		6938073022DE96C200727053 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
@@ -477,7 +477,7 @@
 		406E46D22BACAEFF0088198C /* VectorSearchTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VectorSearchTest.cc; sourceTree = "<group>"; };
 		406E46E72BAD3BB30088198C /* cmake */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cmake; sourceTree = "<group>"; };
 		406F8D6F2C17E191000223FC /* CBLQueryTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLQueryTypes.h; sourceTree = "<group>"; };
-		406F8D802C17E3B4000223FC /* CBLIndexTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLIndexTypes.h; sourceTree = "<group>"; };
+		406F8D802C17E3B4000223FC /* CBLQueryIndexTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLQueryIndexTypes.h; sourceTree = "<group>"; };
 		406F8D852C180611000223FC /* cmake */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cmake; sourceTree = "<group>"; };
 		4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLVectorIndexConfig.hh; sourceTree = "<group>"; };
 		4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLVectorIndexConfig_CAPI.cc; sourceTree = "<group>"; };
@@ -488,10 +488,10 @@
 		40E7CA632BFE7336004BE7E1 /* ContextManager.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextManager.cc; sourceTree = "<group>"; };
 		40E7CA722BFE7336004BE7E1 /* ContextManager.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ContextManager.hh; sourceTree = "<group>"; };
 		40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		40FE2DC22C08245E005E99E9 /* CBLIndex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLIndex.h; sourceTree = "<group>"; };
-		40FE2DD52C092578005E99E9 /* CBLIndex_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLIndex_CAPI.cc; sourceTree = "<group>"; };
-		40FE2DD72C0926FF005E99E9 /* CBLIndex.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLIndex.cc; sourceTree = "<group>"; };
-		40FE2DD82C0926FF005E99E9 /* CBLIndex_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLIndex_Internal.hh; sourceTree = "<group>"; };
+		40FE2DC22C08245E005E99E9 /* CBLQueryIndex.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLQueryIndex.h; sourceTree = "<group>"; };
+		40FE2DD52C092578005E99E9 /* CBLQueryIndex_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQueryIndex_CAPI.cc; sourceTree = "<group>"; };
+		40FE2DD72C0926FF005E99E9 /* CBLQueryIndex.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLQueryIndex.cc; sourceTree = "<group>"; };
+		40FE2DD82C0926FF005E99E9 /* CBLQueryIndex_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLQueryIndex_Internal.hh; sourceTree = "<group>"; };
 		40FE2DFE2C12AEEB005E99E9 /* LazyVectorIndexTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LazyVectorIndexTest.cc; sourceTree = "<group>"; };
 		40FE2E0F2C12AF52005E99E9 /* VectorSearchTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VectorSearchTest.hh; sourceTree = "<group>"; };
 		42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CBLUserAgent.mm; sourceTree = "<group>"; };
@@ -664,9 +664,9 @@
 				9320630126BDB340006917A5 /* CBLPlatform.h */,
 				4083FCB62BA3F6930061509D /* CBLPrediction.h */,
 				271C2A3021CAC98F0045856E /* CBLQuery.h */,
+				40FE2DC22C08245E005E99E9 /* CBLQueryIndex.h */,
+				406F8D802C17E3B4000223FC /* CBLQueryIndexTypes.h */,
 				406F8D6F2C17E191000223FC /* CBLQueryTypes.h */,
-				40FE2DC22C08245E005E99E9 /* CBLIndex.h */,
-				406F8D802C17E3B4000223FC /* CBLIndexTypes.h */,
 				271C2A2C21CAC98F0045856E /* CBLReplicator.h */,
 				FCD829B12835ECE0004AA814 /* CBLScope.h */,
 				271C2A7021CAD6440045856E /* CBL_Compat.h */,
@@ -694,8 +694,8 @@
 				4083FCC12BAA38F30061509D /* CBLPrediction.cc */,
 				932062DA26BC6B43006917A5 /* CBLQuery.cc */,
 				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
-				40FE2DD72C0926FF005E99E9 /* CBLIndex.cc */,
-				40FE2DD82C0926FF005E99E9 /* CBLIndex_Internal.hh */,
+				40FE2DD72C0926FF005E99E9 /* CBLQueryIndex.cc */,
+				40FE2DD82C0926FF005E99E9 /* CBLQueryIndex_Internal.hh */,
 				4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				FCC063C828588DA6000C5BD7 /* CBLScope.cc */,
@@ -768,7 +768,7 @@
 				FCB96E8229007D37001C4DED /* CBLDefaults_CAPI.cc */,
 				276634182605338300B9BD36 /* CBLDocument_CAPI.cc */,
 				93C70CE226C5B4BC0093E927 /* CBLEncryptable_CAPI.cc */,
-				40FE2DD52C092578005E99E9 /* CBLIndex_CAPI.cc */,
+				40FE2DD52C092578005E99E9 /* CBLQueryIndex_CAPI.cc */,
 				9320631126BDB5CA006917A5 /* CBLPlatform_CAPI+Android.cc */,
 				4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */,
 				27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */,
@@ -934,8 +934,8 @@
 				9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */,
 				4083FCB02BA3B8C50061509D /* CBLVectorIndexConfig.hh in Headers */,
 				27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */,
-				40FE2DD12C082465005E99E9 /* CBLIndex.h in Headers */,
-				40FE2DDA2C0926FF005E99E9 /* CBLIndex_Internal.hh in Headers */,
+				40FE2DD12C082465005E99E9 /* CBLQueryIndex.h in Headers */,
+				40FE2DDA2C0926FF005E99E9 /* CBLQueryIndex_Internal.hh in Headers */,
 				27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */,
 				FC5FBBA62821B3450066157F /* CBLCollection_Internal.hh in Headers */,
 				93C70CE026C4D3F80093E927 /* CBLEncryptable.h in Headers */,
@@ -980,7 +980,7 @@
 				27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */,
 				9320631026BDB409006917A5 /* CBLPlatform.h in Headers */,
 				27984E322249A247000FE777 /* Base.hh in Headers */,
-				40FE2DD22C082466005E99E9 /* CBLIndex.h in Headers */,
+				40FE2DD22C082466005E99E9 /* CBLQueryIndex.h in Headers */,
 				93C70CE126C4D3F90093E927 /* CBLEncryptable.h in Headers */,
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
 				27984E342249A247000FE777 /* Database.hh in Headers */,
@@ -1553,7 +1553,7 @@
 				93C70CE326C5B4BC0093E927 /* CBLEncryptable_CAPI.cc in Sources */,
 				42D1B69D2978AD31003B9871 /* CBLUserAgent.mm in Sources */,
 				277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */,
-				40FE2DD92C0926FF005E99E9 /* CBLIndex.cc in Sources */,
+				40FE2DD92C0926FF005E99E9 /* CBLQueryIndex.cc in Sources */,
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
 				27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */,
@@ -1571,7 +1571,7 @@
 				27886C8E21F64C1400069BEA /* Listener.cc in Sources */,
 				FCB96E8329007D37001C4DED /* CBLDefaults_CAPI.cc in Sources */,
 				4083FCC22BAA38F30061509D /* CBLPrediction.cc in Sources */,
-				40FE2DD62C092578005E99E9 /* CBLIndex_CAPI.cc in Sources */,
+				40FE2DD62C092578005E99E9 /* CBLQueryIndex_CAPI.cc in Sources */,
 				271C2A7621CC4BD60045856E /* Internal.cc in Sources */,
 				FCC063C928588DA6000C5BD7 /* CBLScope.cc in Sources */,
 				FC5FBBA52821B3450066157F /* CBLCollection.cc in Sources */,

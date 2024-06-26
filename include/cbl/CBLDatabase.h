@@ -18,7 +18,7 @@
 
 #pragma once
 #include "CBLBase.h"
-#include "CBLIndexTypes.h"
+#include "CBLQueryIndexTypes.h"
 
 CBL_CAPI_BEGIN
 
