@@ -31,6 +31,7 @@
  * - Test 6 (TestGetIndexOnClosedDatabase) is done in "Close Database then Use Collection".
  * - Test 7 (testInvalidCollection) is done in "Delete Collection then Use Collection".
  * - Test 16 (TestIndexUpdaterArrayIterator) Not applicable for C (Not Implement Iterator in C, not the main purpose of the updater and hard to use)
+ * - Test 25 (TestIndexUpdaterCallFinishTwice) Merged with Test 27.
  */
 
 /**
@@ -1124,28 +1125,33 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterIndexOutOfBounds", "[VectorS
 }
 
 /**
- * 26. TestIndexUpdaterCallFinishTwice
+ * 27. TestIndexUpdaterUseAfterFinished
  *
  * Description
- * Test that when calling IndexUpdater's finish() after it was finished,
- * a CuchbaseLiteException is thrown.
+ * Test that using the index updater after calling finish() behaves as expected.
+ *     - Getting count property returns zero.
+ *     - Getting value returns null.
+ *     - Calling setVector() will be no-ops (success as no exception thrown)
+ *     - Calling skiVector() will be no-ops (success as no exception thrown)
+ * Note: Test 26 and 27 can be merged into a single test as desire.
  *
  * Steps
  * 1. Copy database words_db.
  * 2. Create a vector index named "words_index" in the _default.words collection.
- *     - expression: "word"
- *     - dimensions: 300
- *     - centroids : 8
- *     - isLazy : true
+ *       - expression: "word"
+ *       - dimensions: 300
+ *       - centroids : 8
+ *       - isLazy : true
  * 3. Call beginUpdate() with limit 1 to get an IndexUpdater object.
- *     - Get the word string from the IndexUpdater.
- *     - Query the vector by word from the _default.words collection.
- *     - Convert the vector result which is an array object to a platform's float array.
- *     - Call setVector() with the platform's float array at the index..
- * 8. Call finish() and check that the finish() is successfully called.
- * 9. Call finish() again and check that a CouchbaseLiteException with the code Unsupported is thrown.
+ *       - Get the word string from the IndexUpdater.
+ *       - Query the vector by word from the _default.words collection.
+ *       - Convert the vector result which is an array object to a platform's float array.
+ *       - Call setVector() with the platform's float array at the index.
+ *       
+ * 4. Call finish() and check that the finish() is successfully called.
+ * 5. Call finish() again and check that a CouchbaseLiteException with the code NotOpen is thrown.
  */
-TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterCallFinishTwice", "[.CBL-5843]") {
+TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterUseAfterFinished", "[VectorSearch][LazyVectorIndex]") {
     CBLError error {};
     
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "word"_sl, 300, 8, true };
@@ -1160,9 +1166,23 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterCallFinishTwice", "[.CBL-584
     // This will call finish:
     updateWordsIndexWithUpdater(updater);
     
+    CHECK(CBLIndexUpdater_Count(updater) == 0);
+    
+    CHECK(CBLIndexUpdater_Value(updater, 0) == nullptr);
+    
+    // No-Ops
+    float vector[] = { 1.0, 2.0, 3.0 };
+    CHECK(CBLIndexUpdater_SetVector(updater, 0, vector, 3, &error));
+    CheckNoError(error);
+    
+    // No-Ops
+    CHECK(CBLIndexUpdater_SkipVector(updater, 0, &error));
+    CheckNoError(error);
+    
     // Call finish again:
+    ExpectingExceptions x;
     CHECK(!CBLIndexUpdater_Finish(updater, &error));
-    CheckError(error, kCBLErrorUnsupported);
+    CheckError(error, kCBLErrorNotOpen);
     
     CBLIndexUpdater_Release(updater);
     CBLQueryIndex_Release(index);
