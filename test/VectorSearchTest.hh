@@ -296,10 +296,9 @@ public:
         ss << "SELECT meta().id, word";
         if (queryDistance) { ss << ", VECTOR_DISTANCE(" << indexName << ") "; } else { ss << " "; }
         ss << "FROM _default.words ";
-        ss << "WHERE vector_match(" << indexName << ", $vector";
-        if (limit) { ss << ", " << limit.value(); }
-        ss << ")";
+        ss << "WHERE vector_match(" << indexName << ", $vector)";
         if (!addClause.empty()) { ss << " " << addClause; }
+        if (limit) { ss << " LIMIT " << limit.value(); }
         return ss.str();
     }
     
@@ -342,7 +341,7 @@ public:
     }
     
     bool vectorIndexUsedInExplain(alloc_slice& explain, string indexName) {
-        auto str = "SCAN kv_.words:vector:" + indexName;
+        auto str = "kv_.words:vector:" + indexName;
         return explain.find(slice(str)).buf != nullptr;
     }
     
