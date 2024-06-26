@@ -209,7 +209,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexNotAutoUpdatedChangedDocs
  * 6. Create an SQL++ query:
  *    - SELECT word
  *      FROM _default.words
- *      WHERE vector_match(words_index, < dinner vector >, 300)
+ *      WHERE vector_match(words_index, < dinner vector >) LIMIT 300
  * 7. Execute the query and check that 1 results are returned.
  * 8. Check that the word gotten from the query result is the same as the word in Step 5.
  * 9. Delete _default.words.word1 doc.
@@ -287,7 +287,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdateDeletedDocs", "
  * 7. Create an SQL++ query:
  *    - SELECT word
  *      FROM _default.words
- *      WHERE vector_match(words_index, < dinner vector >, 300)
+ *      WHERE vector_match(words_index, < dinner vector >) LIMIT 300
  * 8. Execute the query and check that 1 results are returned.
  * 9. Check that the word gotten from the query result is the same as the word in Step 5.
  * 10. Purge _default.words.word1 doc.
@@ -728,7 +728,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterGettingValues", "[VectorSear
  * 7. Execute a vector search query.
  *     - SELECT word
  *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >, 300)
+ *       WHERE vector_match(words_index, < dinner vector >) LIMIT 300
  * 8. Check that there are 10 words returned.
  * 9. Check that the word is in the word set from the step 5.
  */
@@ -781,7 +781,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetFloatArrayVectors", "[Vec
  * 7. Execute a vector search query.
  *     - SELECT word
  *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >, 300)
+ *       WHERE vector_match(words_index, < dinner vector >) LIMIT 300
  * 8. Check that there are 0 words returned.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetInvalidVectorDimensions", "[.CBL-5814]") {
@@ -834,7 +834,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetInvalidVectorDimensions",
  * 7. Execute a vector search query.
  *     - SELECT word
  *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >, 300)
+ *       WHERE vector_match(words_index, < dinner vector >) LIMIT 300
  * 8. Check that there are 5 words returned.
  * 9. Check that the word is in the indexed word set from the step 5.
  * 10. Call beginUpdate() with limit 5 to get an IndexUpdater object.
@@ -1017,7 +1017,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterCaughtUp", "[VectorSearch][L
  * 7. Execute a vector search query.
  *     - SELECT word
  *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >, 300)
+ *       WHERE vector_match(words_index, < dinner vector >) LIMIT 300
  * 8. Check that there are 0 words returned.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestNonFinishedIndexUpdaterNotUpdateIndex", "[VectorSearch][LazyVectorIndex]") {
