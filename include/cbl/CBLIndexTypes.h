@@ -144,21 +144,30 @@ typedef struct {
     /** Distance Metric type. The default value is euclidean distance. */
     CBLDistanceMetric metric;
     
-    /** The minium number of vectors for training the index, an initial process for preparing an index based on
-        the characteristics of the vectors to be indexed. Prior training, the full table scan will be peformed
-        when the vector_match() function is used in the query.
+    /** The minimum number of vectors for training the index. 
+        The default value is zero, meaning that minTrainingSize will be determined based on
+        the number of centroids, encoding types, and the encoding parameters.
         
-        The default value is 25 times number of centroids.The number must be more than zero and not
-        greater than maxTrainingSize.
+        @note The index is trained during its creation if sufficient data is available.
+              If not, training will occur when the vector_match() query is executed,
+              provided there is enough data at that time. Consequently, if training is
+              triggered during a query, the query may take longer to return results.
      
-        An invalid argument error will be thrown when creating the index if an invalid value is used. */
+              If a query is executed against the index before it is trained, a full
+              scan of the vectors will be performed. If there are insufficient vectors
+              in the database for training, a warning message will be logged,
+              indicating the required number of vectors. */
     unsigned minTrainingSize;
     
-    /** The max number of vectors used when trainning the index. The default
-        value is 256 times number of centroids. The number must be more than zero
-        and not less than minTrainingSize. An invalid argument will be thrown
-        when creating the index if an invalid value is used. */
+    /** The maximum number of vectors used for training the index.
+        The default value is zero, meaning that the maxTrainingSize will be determined based on
+        the number of centroids, encoding types, and encoding parameters. */
     unsigned maxTrainingSize;
+    
+    /** The number of centroids that will be scanned during a query.
+        The default value is zero, meaning that the numProbes will be determined based on
+        the number of centroids. */
+    unsigned numProbes;
 } CBLVectorIndexConfiguration;
 
 #endif

@@ -38,6 +38,9 @@ CBL_C {
 		CBLIndexUpdater_Value;
 		kCBLDefaultVectorIndexLazy;
 		kCBLDefaultVectorIndexDistanceMetric;
+		kCBLDefaultVectorIndexMinTrainingSize;
+		kCBLDefaultVectorIndexMaxTrainingSize;
+		kCBLDefaultVectorIndexNumProbes;
 		CBL_Retain;
 		CBL_Release;
 		CBL_InstanceCount;

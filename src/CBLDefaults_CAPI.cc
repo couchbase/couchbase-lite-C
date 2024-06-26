@@ -53,5 +53,8 @@ CBL_PUBLIC const bool kCBLDefaultReplicatorAcceptParentCookies = false;
 
 CBL_PUBLIC const bool kCBLDefaultVectorIndexLazy = false;
 CBL_PUBLIC const CBLDistanceMetric kCBLDefaultVectorIndexDistanceMetric = kCBLDistanceMetricEuclidean;
+CBL_PUBLIC const unsigned kCBLDefaultVectorIndexMinTrainingSize = 0;
+CBL_PUBLIC const unsigned kCBLDefaultVectorIndexMaxTrainingSize = 0;
+CBL_PUBLIC const unsigned kCBLDefaultVectorIndexNumProbes = 0;
 
 #endif
