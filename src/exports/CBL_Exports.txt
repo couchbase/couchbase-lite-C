@@ -196,8 +196,8 @@ CBLResultSet_GetQuery
 
 ### Query Index
 
-CBLIndex_Collection
-CBLIndex_Name
+CBLQueryIndex_Collection
+CBLQueryIndex_Name
 
 ### REPLICATOR
 

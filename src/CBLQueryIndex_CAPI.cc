@@ -1,5 +1,5 @@
 //
-// CBLIndex_CAPI.cc
+// CBLQueryIndex_CAPI.cc
 //
 // Copyright © 2024 Couchbase. All rights reserved.
 //
@@ -16,16 +16,16 @@
 // limitations under the License.
 //
 
-#include "CBLIndex.h"
-#include "CBLIndex_Internal.hh"
+#include "CBLQueryIndex.h"
+#include "CBLQueryIndex_Internal.hh"
 
-FLString CBLIndex_Name(const CBLIndex* index) noexcept {
+FLString CBLQueryIndex_Name(const CBLQueryIndex* index) noexcept {
     try {
         return index->name();
     } catchAndWarn()
 }
 
-CBLCollection* CBLIndex_Collection(const CBLIndex* index) noexcept {
+CBLCollection* CBLQueryIndex_Collection(const CBLQueryIndex* index) noexcept {
     try {
         return index->collection();
     } catchAndWarn()
@@ -33,7 +33,7 @@ CBLCollection* CBLIndex_Collection(const CBLIndex* index) noexcept {
 
 #ifdef COUCHBASE_ENTERPRISE
 
-CBLIndexUpdater* _cbl_nullable CBLIndex_BeginUpdate(CBLIndex* index, size_t limit,
+CBLIndexUpdater* _cbl_nullable CBLQueryIndex_BeginUpdate(CBLQueryIndex* index, size_t limit,
                                                     CBLError* _cbl_nullable outError) noexcept
 {
     try {

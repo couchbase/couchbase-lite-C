@@ -216,7 +216,7 @@ protected:
     friend struct CBLCollection;
     friend struct CBLDocument;
     friend struct CBLIndexUpdater;
-    friend struct CBLIndex;
+    friend struct CBLQueryIndex;
     friend struct CBLReplicator;
     friend struct CBLURLEndpointListener;
     friend struct cbl_internal::CBLLocalEndpoint;

@@ -1,5 +1,5 @@
 //
-// CBLIndex_Internal.hh
+// CBLQueryIndex_Internal.hh
 //
 // Copyright © 2024 Couchbase. All rights reserved.
 //
@@ -24,9 +24,9 @@
 
 CBL_ASSUME_NONNULL_BEGIN
 
-struct CBLIndex final : public CBLRefCounted {
+struct CBLQueryIndex final : public CBLRefCounted {
 public:
-    CBLIndex(Retained<C4Index>&& index, CBLCollection* collection);
+    CBLQueryIndex(Retained<C4Index>&& index, CBLCollection* collection);
     
     CBLCollection* collection() const;
     
@@ -45,7 +45,7 @@ private:
 
 struct CBLIndexUpdater final : public CBLRefCounted {
 public:
-    CBLIndexUpdater(Retained<C4IndexUpdater>&& indexUpdater, CBLIndex* index);
+    CBLIndexUpdater(Retained<C4IndexUpdater>&& indexUpdater, CBLQueryIndex* index);
     
     ~CBLIndexUpdater();
     
@@ -71,7 +71,7 @@ private:
     mutable std::mutex                                      _mutex;
     Retained<C4IndexUpdater>                                _c4IndexUpdater;
     litecore::shared_access_lock<Retained<C4IndexUpdater>>  _c4IndexUpdaterWithLock;
-    Retained<CBLIndex>                                      _index;
+    Retained<CBLQueryIndex>                                 _index;
     
     Doc                                                     _fleeceDoc;    // Fleece Doc that owns the values
     std::unordered_map<FLDict, Retained<CBLBlob>>           _blobs;        // Cached CBLBLobs, keyed by FLDict

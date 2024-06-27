@@ -19,7 +19,7 @@
 #include "CBLCollection.h"
 #include "CBLCollection_Internal.hh"
 #include "CBLDatabase_Internal.hh"
-#include "CBLIndex_Internal.hh"
+#include "CBLQueryIndex_Internal.hh"
 
 using namespace fleece;
 
@@ -320,7 +320,7 @@ FLMutableArray CBLCollection_GetIndexNames(CBLCollection *collection, CBLError *
     } catchAndBridge(outError)
 }
 
-CBLIndex* CBLCollection_GetIndex(CBLCollection* collection, FLString indexName, CBLError* outError) noexcept {
+CBLQueryIndex* CBLCollection_GetIndex(CBLCollection* collection, FLString indexName, CBLError* outError) noexcept {
     try {
         return collection->getIndex(indexName).detach();
     } catchAndBridge(outError)

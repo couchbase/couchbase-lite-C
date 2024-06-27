@@ -53,7 +53,7 @@ CBLVectorEncoding_Free
 
 ### Lazy Index
 
-CBLIndex_BeginUpdate
+CBLQueryIndex_BeginUpdate
 
 CBLIndexUpdater_Count
 CBLIndexUpdater_SetVector

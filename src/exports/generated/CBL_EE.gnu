@@ -29,7 +29,7 @@ CBL_C {
 		CBLVectorEncoding_CreateProductQuantizer;
 		CBLVectorEncoding_CreateScalarQuantizer;
 		CBLVectorEncoding_Free;
-		CBLIndex_BeginUpdate;
+		CBLQueryIndex_BeginUpdate;
 		CBLIndexUpdater_Count;
 		CBLIndexUpdater_SetVector;
 		CBLIndexUpdater_SkipVector;
@@ -182,8 +182,8 @@ CBL_C {
 		CBLResultSet_ResultArray;
 		CBLResultSet_ResultDict;
 		CBLResultSet_GetQuery;
-		CBLIndex_Collection;
-		CBLIndex_Name;
+		CBLQueryIndex_Collection;
+		CBLQueryIndex_Name;
 		kCBLAuthDefaultCookieName;
 		CBLEndpoint_CreateWithURL;
 		CBLEndpoint_Free;

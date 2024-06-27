@@ -24,7 +24,7 @@
 #include "CBLQuery_Internal.hh"
 
 #ifdef COUCHBASE_ENTERPRISE
-#include "CBLIndex_Internal.hh"
+#include "CBLQueryIndex_Internal.hh"
 #endif
 
 #include "Internal.hh"

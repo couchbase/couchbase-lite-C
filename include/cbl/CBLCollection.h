@@ -19,7 +19,7 @@
 #pragma once
 #include "CBLBase.h"
 #include "CBLDocument.h"
-#include "CBLIndexTypes.h"
+#include "CBLQueryIndexTypes.h"
 #include "CBLQueryTypes.h"
 
 CBL_CAPI_BEGIN
@@ -419,11 +419,11 @@ FLMutableArray _cbl_nullable CBLCollection_GetIndexNames(CBLCollection *collecti
     @param collection The collection.
     @param name  The name of the index.
     @param outError  On failure, an error is written here.
-    @return A \ref CBLIndex instance if the index exists, or NULL if the index doesn't exist or an error occurred.  */
+    @return A \ref CBLQueryIndex instance if the index exists, or NULL if the index doesn't exist or an error occurred.  */
 _cbl_warn_unused
-CBLIndex* _cbl_nullable CBLCollection_GetIndex(CBLCollection* collection,
-                                               FLString name,
-                                               CBLError* _cbl_nullable outError) CBLAPI;
+CBLQueryIndex* _cbl_nullable CBLCollection_GetIndex(CBLCollection* collection,
+                                                    FLString name,
+                                                    CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 

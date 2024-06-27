@@ -24,7 +24,7 @@
 #pragma once
 #include "CBL_Compat.h"
 #include "CBLReplicator.h"
-#include "CBLIndexTypes.h"
+#include "CBLQueryIndexTypes.h"
 
 CBL_CAPI_BEGIN
 
