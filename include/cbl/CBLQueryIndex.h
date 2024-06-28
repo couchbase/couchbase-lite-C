@@ -95,7 +95,8 @@ CBL_REFCOUNTED(CBLIndexUpdater*, IndexUpdater);
     @param index  The index.
     @param limit The maximum number of vectors to be computed.
     @param outError  On failure, an error is written here.
-    @return A \ref CBLIndexUpdater object for setting the computed vectors to update the index, or NULL if an error occurred. */
+    @return A \ref CBLIndexUpdater object for setting the computed vectors to update the index, 
+            or NULL if the index is up-to-date or an error occurred. */
 _cbl_warn_unused
 CBLIndexUpdater* _cbl_nullable CBLQueryIndex_BeginUpdate(CBLQueryIndex* index,
                                                     size_t limit,

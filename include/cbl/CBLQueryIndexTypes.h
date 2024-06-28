@@ -68,10 +68,10 @@ typedef struct {
 
 #ifdef COUCHBASE_ENTERPRISE
 
-/** An opaque object representing vector encoding config to use in CBLVectorIndexConfiguration. */
+/** An opaque object representing vector encoding type to use in CBLVectorIndexConfiguration. */
 typedef struct CBLVectorEncoding CBLVectorEncoding;
 
-/** Creates a no-encoding config to use in CBLVectorIndexConfiguration; 4 bytes per dimension, no data loss.  */
+/** Creates a no-encoding type to use in CBLVectorIndexConfiguration; 4 bytes per dimension, no data loss.  */
 _cbl_warn_unused
 CBLVectorEncoding* CBLVectorEncoding_CreateNone(void) CBLAPI;
 
@@ -82,11 +82,11 @@ typedef CBL_ENUM(uint32_t, CBLScalarQuantizerType) {
     kCBLSQ8                                 ///< 8 bits per dimension
 };
 
-/** Creates a Scalar Quantizer encoding config to use in CBLVectorIndexConfiguration. */
+/** Creates a Scalar Quantizer type to use in CBLVectorIndexConfiguration. */
 _cbl_warn_unused
 CBLVectorEncoding* CBLVectorEncoding_CreateScalarQuantizer(CBLScalarQuantizerType type) CBLAPI;
 
-/** Creates a Product Quantizer encoding config to use in CBLVectorIndexConfiguration. */
+/** Creates a Product Quantizer type to use in CBLVectorIndexConfiguration. */
 _cbl_warn_unused
 CBLVectorEncoding* CBLVectorEncoding_CreateProductQuantizer(unsigned subquantizers, unsigned bits) CBLAPI;
 

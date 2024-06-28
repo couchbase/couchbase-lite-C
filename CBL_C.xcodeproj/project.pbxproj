@@ -83,6 +83,8 @@
 		27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */; };
 		27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		400AB0512C2E669F00DB6223 /* VectorSearchTest_Cpp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400AB0412C2E669500DB6223 /* VectorSearchTest_Cpp.cpp */; };
+		400AB0532C2E66B500DB6223 /* QueryIndex.hh in Headers */ = {isa = PBXBuildFile; fileRef = 400AB0522C2E66B500DB6223 /* QueryIndex.hh */; };
 		4022546E29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		4022546F29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		4022547029355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
@@ -92,6 +94,8 @@
 		4083FCBC2BA8DE200061509D /* CBLPrediction_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */; };
 		4083FCC02BAA235F0061509D /* CBLPrediction_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */; };
 		4083FCC22BAA38F30061509D /* CBLPrediction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCC12BAA38F30061509D /* CBLPrediction.cc */; };
+		40ACB2392C2F98B200CBE8F2 /* Prediction.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */; };
+		40ACB23A2C2F98B600CBE8F2 /* VectorIndex.hh in Headers */ = {isa = PBXBuildFile; fileRef = 400AB0542C2E7AC300DB6223 /* VectorIndex.hh */; };
 		40D1862529B6D1A50061AA85 /* Collection.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCC064BD287CBD95000C5BD7 /* Collection.hh */; };
 		40E7CA732BFE7336004BE7E1 /* ContextManager.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40E7CA632BFE7336004BE7E1 /* ContextManager.cc */; };
 		40E7CA742BFE7336004BE7E1 /* ContextManager.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40E7CA722BFE7336004BE7E1 /* ContextManager.hh */; };
@@ -473,6 +477,9 @@
 		27DBCF41246B81EE002FD7A7 /* LibC++Debug.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "LibC++Debug.cc"; sourceTree = "<group>"; };
 		27DBD096246C99AF002FD7A7 /* mergeIntoStaticLib.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = mergeIntoStaticLib.sh; sourceTree = "<group>"; };
 		27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLDatabase+Apple.mm"; sourceTree = "<group>"; };
+		400AB0412C2E669500DB6223 /* VectorSearchTest_Cpp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VectorSearchTest_Cpp.cpp; sourceTree = "<group>"; };
+		400AB0522C2E66B500DB6223 /* QueryIndex.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = QueryIndex.hh; sourceTree = "<group>"; };
+		400AB0542C2E7AC300DB6223 /* VectorIndex.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = VectorIndex.hh; sourceTree = "<group>"; };
 		4022546D29355576000FBAC8 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		406E46D22BACAEFF0088198C /* VectorSearchTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VectorSearchTest.cc; sourceTree = "<group>"; };
 		406E46E72BAD3BB30088198C /* cmake */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cmake; sourceTree = "<group>"; };
@@ -485,6 +492,7 @@
 		4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction_CAPI.cc; sourceTree = "<group>"; };
 		4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLPrediction_Internal.hh; sourceTree = "<group>"; };
 		4083FCC12BAA38F30061509D /* CBLPrediction.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction.cc; sourceTree = "<group>"; };
+		40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Prediction.hh; sourceTree = "<group>"; };
 		40E7CA632BFE7336004BE7E1 /* ContextManager.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextManager.cc; sourceTree = "<group>"; };
 		40E7CA722BFE7336004BE7E1 /* ContextManager.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ContextManager.hh; sourceTree = "<group>"; };
 		40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -788,8 +796,11 @@
 				FCC064BD287CBD95000C5BD7 /* Collection.hh */,
 				27B61DD821DEEC540027CCDB /* Database.hh */,
 				277FEE4E21DEF54D00B60E3C /* Document.hh */,
+				40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */,
 				277FEE4F21E6AB1100B60E3C /* Query.hh */,
+				400AB0522C2E66B500DB6223 /* QueryIndex.hh */,
 				27C9B5F121F7D74A0040BC45 /* Replicator.hh */,
+				400AB0542C2E7AC300DB6223 /* VectorIndex.hh */,
 			);
 			path = "cbl++";
 			sourceTree = "<group>";
@@ -825,6 +836,7 @@
 				93C70D1626CB334D0093E927 /* ReplicatorPropEncTest.cc */,
 				40FE2E0F2C12AF52005E99E9 /* VectorSearchTest.hh */,
 				406E46D22BACAEFF0088198C /* VectorSearchTest.cc */,
+				400AB0412C2E669500DB6223 /* VectorSearchTest_Cpp.cpp */,
 				40FE2DFE2C12AEEB005E99E9 /* LazyVectorIndexTest.cc */,
 				27D30F9123A2D30500392107 /* PerfTest.cc */,
 				275B3597234C158400FE9CF0 /* CouchbaseLiteTests.mm */,
@@ -971,6 +983,7 @@
 				FCB96E8429007D4F001C4DED /* CBLDefaults.h in Headers */,
 				27984E2A2249A240000FE777 /* CBLBase.h in Headers */,
 				27984E2B2249A240000FE777 /* CBLBlob.h in Headers */,
+				40ACB2392C2F98B200CBE8F2 /* Prediction.hh in Headers */,
 				27984E2D2249A240000FE777 /* CBLDocument.h in Headers */,
 				40D1862529B6D1A50061AA85 /* Collection.hh in Headers */,
 				FCD988BC2821B10400512BBD /* CBLCollection.h in Headers */,
@@ -982,7 +995,9 @@
 				27984E322249A247000FE777 /* Base.hh in Headers */,
 				40FE2DD22C082466005E99E9 /* CBLQueryIndex.h in Headers */,
 				93C70CE126C4D3F90093E927 /* CBLEncryptable.h in Headers */,
+				40ACB23A2C2F98B600CBE8F2 /* VectorIndex.hh in Headers */,
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
+				400AB0532C2E66B500DB6223 /* QueryIndex.hh in Headers */,
 				27984E342249A247000FE777 /* Database.hh in Headers */,
 				FCC064212862B851000C5BD7 /* CBLScope.h in Headers */,
 				27984E352249A247000FE777 /* Document.hh in Headers */,
@@ -1644,6 +1659,7 @@
 				AED22E7D291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */,
 				275B359E234D064600FE9CF0 /* QueryTest.cc in Sources */,
 				277CC99522BC23DE00B245CB /* ReplicatorTest.cc in Sources */,
+				400AB0512C2E669F00DB6223 /* VectorSearchTest_Cpp.cpp in Sources */,
 				2736A634242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,
 				FC09078A28A5F40200201B07 /* CollectionTest_Cpp.cc in Sources */,
 				27D30F9F23A2D30500392107 /* PerfTest.cc in Sources */,

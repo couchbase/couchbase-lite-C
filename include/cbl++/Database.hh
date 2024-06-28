@@ -45,6 +45,23 @@ namespace cbl {
     using ConflictHandler = std::function<bool(MutableDocument documentBeingSaved,
                                                Document conflictingDocument)>;
 
+    
+#ifdef COUCHBASE_ENTERPRISE
+    /** ENTERPRISE EDITION ONLY
+     
+        Couchbase Lite  Extension. */
+    class Extension {
+    public:
+        /** Enables Vector Search extension by specifying the extension path to search for the Vector Search extension library.
+            This function must be called before opening a database that intends to use the vector search extension.
+            @param path The file system path of the directory that contains the Vector Search extension library.
+            @note Must be called before opening a database that intends to use the vector search extension. */
+        static void enableVectorSearch(slice path) {
+            CBL_EnableVectorSearch(path);
+        }
+    };
+#endif
+
     /** Couchbase Lite Database. */
     class Database : private RefCounted {
     public:
@@ -570,7 +587,6 @@ namespace cbl {
 
         CBLDatabase* _cbl_nullable _db = nullptr;
     };
-
 }
 
 CBL_ASSUME_NONNULL_END

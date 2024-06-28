@@ -195,8 +195,11 @@ public:
                 return nullptr;
             }
             
+            auto array = MutableArray(vector);
+            FLArray_Release(vector);
+            
             auto output = MutableDict(FLMutableDict_New());
-            output["vector"] = Array(vector);
+            output["vector"] = array;
             return output;
         };
         
