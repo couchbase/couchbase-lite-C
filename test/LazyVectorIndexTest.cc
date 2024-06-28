@@ -1098,26 +1098,14 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterIndexOutOfBounds", "[VectorS
     
     array<int, 2> indices { -1, 1 };
     for (auto i : indices) {
-        {
-            // This is in line with FLArray, returns null when index is out-of-bound.
-            ExpectingExceptions x {};
-            auto value = CBLIndexUpdater_Value(updater, i);
-            CHECK(!value);
-        }
+        // Note: These two functions cannot be tested as they will abort when index is out-of-bound.
+        // CBLIndexUpdater_Value(updater, i)
+        // CBLIndexUpdater_SkipVector(updater, i)
         
-        {
-            ExpectingExceptions x {};
-            float vector[] = { 1.0, 2.0, 3.0 };
-            CHECK(!CBLIndexUpdater_SetVector(updater, i, vector, 3, &error));
-            CheckError(error, kCBLErrorInvalidParameter);
-        }
-        
-        {
-            error = {};
-            ExpectingExceptions x {};
-            CHECK(!CBLIndexUpdater_SkipVector(updater, i, &error));
-            CheckError(error, kCBLErrorInvalidParameter);
-        }
+        ExpectingExceptions x;
+        float vector[] = { 1.0, 2.0, 3.0 };
+        CHECK(!CBLIndexUpdater_SetVector(updater, i, vector, 3, &error));
+        CheckError(error, kCBLErrorInvalidParameter);
     }
     
     CBLIndexUpdater_Release(updater);
@@ -1152,6 +1140,10 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterIndexOutOfBounds", "[VectorS
  * 5. Call finish() again and check that a CouchbaseLiteException with the code NotOpen is thrown.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterUseAfterFinished", "[VectorSearch][LazyVectorIndex]") {
+    // These 3 functions will abort after the updater is finished.
+    // CBLIndexUpdater_Count(updater, i)
+    // CBLIndexUpdater_Value(updater, i)
+    // CBLIndexUpdater_SkipVector(updater, i)
     CBLError error {};
     
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "word"_sl, 300, 8, true };
@@ -1165,19 +1157,6 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterUseAfterFinished", "[VectorS
     
     // This will call finish:
     updateWordsIndexWithUpdater(updater);
-    
-    CHECK(CBLIndexUpdater_Count(updater) == 0);
-    
-    CHECK(CBLIndexUpdater_Value(updater, 0) == nullptr);
-    
-    // No-Ops
-    float vector[] = { 1.0, 2.0, 3.0 };
-    CHECK(CBLIndexUpdater_SetVector(updater, 0, vector, 3, &error));
-    CheckNoError(error);
-    
-    // No-Ops
-    CHECK(CBLIndexUpdater_SkipVector(updater, 0, &error));
-    CheckNoError(error);
     
     // Call finish again:
     ExpectingExceptions x;

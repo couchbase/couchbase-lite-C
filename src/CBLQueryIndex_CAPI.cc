@@ -45,13 +45,13 @@ CBLIndexUpdater* _cbl_nullable CBLQueryIndex_BeginUpdate(CBLQueryIndex* index, s
 size_t CBLIndexUpdater_Count(const CBLIndexUpdater* updater) noexcept {
     try {
         return updater->count();
-    } catchAndWarn()
+    } catchAndAbort()
 }
 
-FLValue _cbl_nullable CBLIndexUpdater_Value(CBLIndexUpdater* updater, size_t index) noexcept {
+FLValue CBLIndexUpdater_Value(CBLIndexUpdater* updater, size_t index) noexcept {
     try {
         return updater->value(index);
-    } catchAndWarn()
+    } catchAndAbort()
 }
 
 bool CBLIndexUpdater_SetVector(CBLIndexUpdater* updater, size_t index, const float vector[_cbl_nullable],
@@ -63,11 +63,10 @@ bool CBLIndexUpdater_SetVector(CBLIndexUpdater* updater, size_t index, const flo
     } catchAndBridge(outError)
 }
 
-bool CBLIndexUpdater_SkipVector(CBLIndexUpdater* updater, size_t index, CBLError* _cbl_nullable outError) noexcept {
+void CBLIndexUpdater_SkipVector(CBLIndexUpdater* updater, size_t index) noexcept {
     try {
         updater->skipVector(index);
-        return true;
-    } catchAndBridge(outError)
+    } catchAndAbort()
 }
 
 bool CBLIndexUpdater_Finish(CBLIndexUpdater* updater, CBLError* _cbl_nullable outError) noexcept {

@@ -124,8 +124,7 @@ size_t CBLIndexUpdater_Count(const CBLIndexUpdater* updater) CBLAPI;
     @param updater  The index updater.
     @param index  The zero-based index.
     @return A Fleece value of the index's evaluated expression at the given index. */
-FLValue _cbl_nullable CBLIndexUpdater_Value(CBLIndexUpdater* updater,
-                                            size_t index) CBLAPI;
+FLValue CBLIndexUpdater_Value(CBLIndexUpdater* updater, size_t index) CBLAPI;
 
 /** ENTERPRISE EDITION ONLY
  
@@ -149,16 +148,15 @@ bool CBLIndexUpdater_SetVector(CBLIndexUpdater* updater,
     Skip setting the vector for the value corresponding to the index.
     The vector will be required to compute and set again when the `CBLQueryIndex_BeginUpdate` is later called.
     @param updater  The index updater.
-    @param index The zero-based index.
-    @param outError  On failure, an error is written here.
-    @return True if success, or False if an error occurred. */
-bool CBLIndexUpdater_SkipVector(CBLIndexUpdater* updater, size_t index, CBLError* _cbl_nullable outError) CBLAPI;
+    @param index The zero-based index. */
+void CBLIndexUpdater_SkipVector(CBLIndexUpdater* updater, size_t index) CBLAPI;
 
 /** ENTERPRISE EDITION ONLY
  
     Updates the index with the computed vectors and removes any index rows for which null vector was given.
     If there are any indexes that do not have their vector value set or are skipped, a error will be returned.
     @note Before calling `CBLIndexUpdater_Finish`, the set vectors are kept in the memory.
+    @warning The index updater cannot be used after calling `CBLIndexUpdater_Finish`.
     @param updater  The index updater.
     @param outError  On failure, an error is written here.
     @return True if success, or False if an error occurred. */

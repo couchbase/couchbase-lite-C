@@ -107,6 +107,9 @@ using namespace cbl_internal;
 #define catchAndWarn() \
     catchAndBridge(nullptr)
 
+#define catchAndAbort() \
+    catch (...) { cbl_internal::BridgeException(__FUNCTION__, nullptr); std::terminate(); }
+
 
 #define LOCK(MUTEX)     std::lock_guard<decltype(MUTEX)> _lock(MUTEX)
 

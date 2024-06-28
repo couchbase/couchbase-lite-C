@@ -18,6 +18,7 @@
 
 #pragma once
 #include "access_lock.hh"
+#include "CBLDatabase_Internal.hh"
 #include "Internal.hh"
 #include <mutex>
 #include <unordered_map>
@@ -45,7 +46,7 @@ private:
 
 struct CBLIndexUpdater final : public CBLRefCounted {
 public:
-    CBLIndexUpdater(Retained<C4IndexUpdater>&& indexUpdater, CBLQueryIndex* index);
+    CBLIndexUpdater(Retained<C4IndexUpdater>&& indexUpdater, CBLDatabase* db);
     
     ~CBLIndexUpdater();
     
@@ -68,10 +69,13 @@ protected:
     CBLBlob* getBlob(Dict blobDict, const C4BlobKey&);
    
 private:
+    
+    inline void checkFinishedUnLock() const;
+    
     mutable std::mutex                                      _mutex;
+    
     Retained<C4IndexUpdater>                                _c4IndexUpdater;
-    litecore::shared_access_lock<Retained<C4IndexUpdater>>  _c4IndexUpdaterWithLock;
-    Retained<CBLQueryIndex>                                 _index;
+    Retained<CBLDatabase>                                   _db;
     
     Doc                                                     _fleeceDoc;    // Fleece Doc that owns the values
     std::unordered_map<FLDict, Retained<CBLBlob>>           _blobs;        // Cached CBLBLobs, keyed by FLDict

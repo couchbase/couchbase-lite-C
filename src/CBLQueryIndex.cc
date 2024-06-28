@@ -45,17 +45,16 @@ Retained<CBLIndexUpdater> CBLQueryIndex::beginUpdate(size_t limit) {
     if (!updater) {
         return nullptr;
     }
-    return new CBLIndexUpdater(std::move(updater), this);
+    return new CBLIndexUpdater(std::move(updater), this->collection()->database());
 }
 
 #pragma mark - CBLIndexUpdater:
 
 static const char* kCBLIndexUpdaterName = "CBLIndexUpdater";
 
-CBLIndexUpdater::CBLIndexUpdater(Retained<C4IndexUpdater>&& indexUpdater, CBLQueryIndex* index)
+CBLIndexUpdater::CBLIndexUpdater(Retained<C4IndexUpdater>&& indexUpdater, CBLDatabase* db)
 :_c4IndexUpdater(indexUpdater)
-,_c4IndexUpdaterWithLock(std::move(indexUpdater), index->collection()->database()->c4db().get())
-,_index(index)
+,_db(db)
 {  }
 
 CBLIndexUpdater::~CBLIndexUpdater() {
@@ -66,11 +65,18 @@ CBLIndexUpdater::~CBLIndexUpdater() {
 
 size_t CBLIndexUpdater::count() const {
     LOCK(_mutex);
+    
+    checkFinishedUnLock();
+    
     return _c4IndexUpdater->count();
 }
 
-FLValue _cbl_nullable CBLIndexUpdater::value(size_t index) {
+FLValue CBLIndexUpdater::value(size_t index) {
     LOCK(_mutex);
+    
+    checkFinishedUnLock();
+    precondition(index < _c4IndexUpdater->count());
+    
     auto val = _c4IndexUpdater->valueAt(index);
     
     // Associate myself with the `Doc` backing the Fleece
@@ -86,17 +92,36 @@ FLValue _cbl_nullable CBLIndexUpdater::value(size_t index) {
 
 void CBLIndexUpdater::setVector(size_t index, const float* _cbl_nullable vector, size_t dimension) {
     LOCK(_mutex);
+    
+    checkFinishedUnLock();
+    precondition(index < _c4IndexUpdater->count());
+    
     _c4IndexUpdater->setVectorAt(index, vector, dimension);
 }
 
 void CBLIndexUpdater::skipVector(size_t index) {
     LOCK(_mutex);
+    
+    checkFinishedUnLock();
+    precondition(index < _c4IndexUpdater->count());
+    
     _c4IndexUpdater->skipVectorAt(index);
 }
 
 void CBLIndexUpdater::finish() {
     LOCK(_mutex);
-    _c4IndexUpdaterWithLock.useLocked()->finish(); // Ignore return value
+    
+    checkFinishedUnLock();
+    
+    auto lock = _db->c4db()->useLocked();
+    _c4IndexUpdater->finish(); // Ignore return value
+    _c4IndexUpdater = nullptr;
+}
+
+inline void CBLIndexUpdater::checkFinishedUnLock() const {
+    if (!_c4IndexUpdater) {
+        C4Error::raise(LiteCoreDomain, kC4ErrorNotOpen, "The index updater has already finished.");
+    }
 }
 
 Retained<CBLIndexUpdater> CBLIndexUpdater::containing(Value v) {
@@ -111,8 +136,7 @@ CBLBlob* CBLIndexUpdater::getBlob(Dict blobDict, const C4BlobKey &key) {
     LOCK(_mutex);
     auto i = _blobs.find(blobDict);
     if (i == _blobs.end()) {
-        auto db = const_cast<CBLDatabase*>(_index->collection()->database());
-        i = _blobs.emplace(blobDict, new CBLBlob(db, blobDict, key)).first;
+        i = _blobs.emplace(blobDict, new CBLBlob(_db.get(), blobDict, key)).first;
     }
     return i->second;
 }
