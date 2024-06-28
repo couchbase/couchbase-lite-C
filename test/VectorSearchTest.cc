@@ -1154,20 +1154,10 @@ TEST_CASE_METHOD(VectorSearchTest, "testVectorMatchWithMultipleAndExpression", "
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     createWordsIndex(config);
     
-    string sql = "SELECT word, catid FROM _default.words WHERE (VECTOR_MATCH(words_index, $vector, 300) AND word is valued) AND catid = 'cat1'";
-    auto query = CreateQuery(wordDB, sql);
-    setDinnerParameter(query);
-    
-    alloc_slice explanation(CBLQuery_Explain(query));
-    CHECK(vectorIndexUsedInExplain(explanation, "words_index"));
-    
-    CBLError error {};
-    auto results = CBLQuery_Execute(query, &error);
-    CHECK(results);
+    auto results = executeWordsQuery(300, false, "AND word is valued AND catid = 'cat1'");
     CHECK(CountResults(results) == 50);
     
     CBLResultSet_Release(results);
-    CBLQuery_Release(query);
 }
 
 /**

@@ -265,8 +265,7 @@ public:
                     outUpdatedWords->push_back(slice(word).asString());
                 }
             } else {
-                CHECK(CBLIndexUpdater_SkipVector(updater, i, &error));
-                CheckNoError(error);
+                CBLIndexUpdater_SkipVector(updater, i);
                 
                 if (outSkippedWords) {
                     outSkippedWords->push_back(slice(word).asString());
