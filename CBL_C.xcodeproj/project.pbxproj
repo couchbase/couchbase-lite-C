@@ -88,6 +88,10 @@
 		4022546E29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		4022546F29355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
 		4022547029355577000FBAC8 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 4022546D29355576000FBAC8 /* assets */; };
+		405D4F7D2C34713400221516 /* CBLQueryIndexTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 406F8D802C17E3B4000223FC /* CBLQueryIndexTypes.h */; };
+		405D4F8C2C34713500221516 /* CBLQueryIndexTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 406F8D802C17E3B4000223FC /* CBLQueryIndexTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		405D4F8D2C34714E00221516 /* CBLQueryTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 406F8D6F2C17E191000223FC /* CBLQueryTypes.h */; };
+		405D4F8E2C34714F00221516 /* CBLQueryTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 406F8D6F2C17E191000223FC /* CBLQueryTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		406E46E42BACC4BF0088198C /* VectorSearchTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 406E46D22BACAEFF0088198C /* VectorSearchTest.cc */; };
 		4083FCAF2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */; };
 		4083FCB02BA3B8C50061509D /* CBLVectorIndexConfig.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */; };
@@ -948,6 +952,7 @@
 				27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */,
 				40FE2DD12C082465005E99E9 /* CBLQueryIndex.h in Headers */,
 				40FE2DDA2C0926FF005E99E9 /* CBLQueryIndex_Internal.hh in Headers */,
+				405D4F7D2C34713400221516 /* CBLQueryIndexTypes.h in Headers */,
 				27D11BEF2351043B00C58A70 /* ConflictResolver.hh in Headers */,
 				FC5FBBA62821B3450066157F /* CBLCollection_Internal.hh in Headers */,
 				93C70CE026C4D3F80093E927 /* CBLEncryptable.h in Headers */,
@@ -957,6 +962,7 @@
 				FCD8299D2835AC3F004AA814 /* CBLScope_Internal.hh in Headers */,
 				277B77D3245B44BE00B222D3 /* CBLLog.h in Headers */,
 				FC5FBBB72821E4970066157F /* CBLDatabase_Internal.hh in Headers */,
+				405D4F8D2C34714E00221516 /* CBLQueryTypes.h in Headers */,
 				FCC064202862B850000C5BD7 /* CBLScope.h in Headers */,
 				40E7CA742BFE7336004BE7E1 /* ContextManager.hh in Headers */,
 				AE591AB829473A4500E4BDE8 /* CBLUserAgent.hh in Headers */,
@@ -981,6 +987,7 @@
 				27984E292249A240000FE777 /* CouchbaseLite.h in Headers */,
 				27984E302249A240000FE777 /* CBL_Compat.h in Headers */,
 				FCB96E8429007D4F001C4DED /* CBLDefaults.h in Headers */,
+				405D4F8C2C34713500221516 /* CBLQueryIndexTypes.h in Headers */,
 				27984E2A2249A240000FE777 /* CBLBase.h in Headers */,
 				27984E2B2249A240000FE777 /* CBLBlob.h in Headers */,
 				40ACB2392C2F98B200CBE8F2 /* Prediction.hh in Headers */,
@@ -1002,6 +1009,7 @@
 				FCC064212862B851000C5BD7 /* CBLScope.h in Headers */,
 				27984E352249A247000FE777 /* Document.hh in Headers */,
 				27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */,
+				405D4F8E2C34714F00221516 /* CBLQueryTypes.h in Headers */,
 				27984E362249A247000FE777 /* Query.hh in Headers */,
 				27984E372249A247000FE777 /* Replicator.hh in Headers */,
 			);
