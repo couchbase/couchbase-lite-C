@@ -129,6 +129,8 @@
 		AED22E7D291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */; };
 		AED22E7E291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */; };
 		AED22E7F291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */; };
+		EA34BC4C2C369895000CEA70 /* CBLPrediction.h in Headers */ = {isa = PBXBuildFile; fileRef = 4083FCB62BA3F6930061509D /* CBLPrediction.h */; };
+		EA34BC5A2C3698B8000CEA70 /* CBLPrediction.h in Headers */ = {isa = PBXBuildFile; fileRef = 4083FCB62BA3F6930061509D /* CBLPrediction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FC09077C28A5F3EF00201B07 /* CollectionTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC09077B28A5F3EF00201B07 /* CollectionTest_Cpp.cc */; };
 		FC09078A28A5F40200201B07 /* CollectionTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC09077B28A5F3EF00201B07 /* CollectionTest_Cpp.cc */; };
 		FC0907E728AD763600201B07 /* DocumentTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = FC0907E628AD763600201B07 /* DocumentTest_Cpp.cc */; };
@@ -946,6 +948,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA34BC4C2C369895000CEA70 /* CBLPrediction.h in Headers */,
 				277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */,
 				9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */,
 				4083FCB02BA3B8C50061509D /* CBLVectorIndexConfig.hh in Headers */,
@@ -1001,6 +1004,7 @@
 				9320631026BDB409006917A5 /* CBLPlatform.h in Headers */,
 				27984E322249A247000FE777 /* Base.hh in Headers */,
 				40FE2DD22C082466005E99E9 /* CBLQueryIndex.h in Headers */,
+				EA34BC5A2C3698B8000CEA70 /* CBLPrediction.h in Headers */,
 				93C70CE126C4D3F90093E927 /* CBLEncryptable.h in Headers */,
 				40ACB23A2C2F98B600CBE8F2 /* VectorIndex.hh in Headers */,
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
