@@ -176,7 +176,7 @@ namespace cbl {
         
         /** Returns the names of all existing scopes in the database.
             The scope exists when there is at least one collection created under the scope.
-            The default scope is exceptional in that it will always exists even there are no collections under it.
+            @note The default scope will always exist, containing at least the default collection.
             @return The names of all existing scopes in the database, or throws if an error occurred. */
         fleece::MutableArray getScopeNames() const {
             CBLError error {};
@@ -218,6 +218,7 @@ namespace cbl {
         inline Collection createCollection(slice collectionName, slice scopeName =kCBLDefaultScopeName);
         
         /** Delete an existing collection.
+            @note The default collection cannot be deleted.
             @param collectionName  The name of the collection.
             @param scopeName  The name of the scope. */
         inline void deleteCollection(slice collectionName, slice scopeName =kCBLDefaultScopeName) {
@@ -225,10 +226,7 @@ namespace cbl {
             check(CBLDatabase_DeleteCollection(ref(), collectionName, scopeName, &error), error);
         }
         
-        /** Returns the default collection.
-            @note The default collection may not exist if it was deleted.
-                  Also, the default collection cannot be recreated after being deleted.
-            @return A \ref Collection instance, or NULL if the default collection doesn't exist, or throws if an error occurred. */
+        /** Returns the default collection. */
         inline Collection getDefaultCollection() const;
         
         // Documents:
