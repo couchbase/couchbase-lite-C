@@ -39,6 +39,14 @@ CBL_CAPI_BEGIN
     This starts at zero and increments every time a document is saved or deleted. */
     uint64_t CBLCollection_LastSequence(const CBLCollection*) CBLAPI;
 
+#ifdef COUCHBASE_ENTERPRISE
+/** Returns true if the index is a vector index and the index is trained.
+    If the index doesn't exist nor the vector index, an error will be returend. */
+    bool CBLCollection_IsIndexTrained(const CBLCollection* collection,
+                                      FLString name,
+                                      CBLError* _cbl_nullable outError) CBLAPI;
+#endif
+
 /** Deletes a document from the database, given only its ID.
     @note  If no document with that ID exists, this function will return false but the error
             code will be zero.

@@ -36,6 +36,7 @@ CBL_C {
 		CBLIndexUpdater_SkipVector;
 		CBLIndexUpdater_Finish;
 		CBLIndexUpdater_Value;
+		CBLCollection_IsIndexTrained;
 		kCBLDefaultVectorIndexLazy;
 		kCBLDefaultVectorIndexDistanceMetric;
 		kCBLDefaultVectorIndexMinTrainingSize;

@@ -208,6 +208,10 @@ public:
                                         (C4QueryLanguage)config.expressionLanguage,
                                         kC4VectorIndex, &options);
     }
+    
+    bool isIndexTrained(slice name) const {
+        return _c4col.useLocked()->isIndexTrained(name);
+    }
 
 #endif
     

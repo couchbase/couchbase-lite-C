@@ -45,6 +45,7 @@ _CBLIndexUpdater_SetVector
 _CBLIndexUpdater_SkipVector
 _CBLIndexUpdater_Finish
 _CBLIndexUpdater_Value
+_CBLCollection_IsIndexTrained
 _kCBLDefaultVectorIndexLazy
 _kCBLDefaultVectorIndexDistanceMetric
 _kCBLDefaultVectorIndexMinTrainingSize

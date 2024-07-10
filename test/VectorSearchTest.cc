@@ -20,8 +20,6 @@
 
 #ifdef COUCHBASE_ENTERPRISE
 
-std::vector<string> VectorSearchTest::sVectorSearchTestLogs {};
-
 #ifdef VECTOR_SEARCH_TEST_ENABLED
 
 /**
@@ -559,7 +557,6 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithSQ", "[VectorSearch
     
     deleteWordsIndex();
     
-    resetLog();
     CBLVectorEncoding_Free(config.encoding);
     CBLResultSet_Release(results);
 }
@@ -650,7 +647,6 @@ TEST_CASE_METHOD(VectorSearchTest, "testCreateVectorIndexWithPQ", "[VectorSearch
     
     deleteWordsIndex();
     
-    resetLog();
     CBLVectorEncoding_Free(config.encoding);
     CBLResultSet_Release(results);
 }

@@ -302,6 +302,16 @@ bool CBLCollection_CreateVectorIndex(CBLCollection *collection,
     } catchAndBridge(outError)
 }
 
+/** Private API for testing purpose */
+bool CBLCollection_IsIndexTrained(const CBLCollection* collection,
+                                  FLString name,
+                                  CBLError* outError) noexcept
+{
+    try {
+        return collection->isIndexTrained(name);
+    } catchAndBridge(outError)
+}
+
 #endif
 
 bool CBLCollection_DeleteIndex(CBLCollection *collection,

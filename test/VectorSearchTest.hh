@@ -65,8 +65,6 @@ public:
     
     CBLCollection *extwordsCollection {nullptr};
     
-    static vector<string> sVectorSearchTestLogs;
-    
     VectorSearchTest() {
         // Eanble vector search and reinit test databases:
         EnableVectorSearch();
@@ -98,12 +96,6 @@ public:
         REQUIRE(extwordsCollection);
         
         registerWordEmbeddingModel();
-        
-        sVectorSearchTestLogs.clear();
-        CBLLog_SetCallback([](CBLLogDomain domain, CBLLogLevel level, FLString msg) {
-            sVectorSearchTestLogs.push_back(string(msg));
-        });
-        CBLLog_SetCallbackLevel(kCBLLogInfo);
     }
     
     ~VectorSearchTest() {
@@ -125,11 +117,6 @@ public:
         }
         
         unregisterWordEmbeddingModel();
-        
-        // Reset log callback:
-        CBLLog_SetCallback(nullptr);
-        CBLLog_SetCallbackLevel(kCBLLogNone);
-        sVectorSearchTestLogs.clear();
     }
     
     FLMutableArray vectorArrayForWord(FLString word, FLString collection) {
@@ -323,18 +310,12 @@ public:
         CBLQuery_Release(query);
         return rs;
     }
-    
-    void resetLog() {
-        sVectorSearchTestLogs.clear();
-    }
 
     bool isIndexTrained() {
-        for (auto& str : sVectorSearchTestLogs) {
-            if (str.find("Untrained index; queries may be slow") != string::npos) {
-                return false;
-            }
-        }
-        return true;
+        CBLError error {};
+        auto result = CBLCollection_IsIndexTrained(wordsCollection, kWordsIndexName, &error);
+        CheckNoError(error);
+        return result;
     }
     
     bool containsString(FLArray array, string str) {
