@@ -25,6 +25,8 @@
 /**
  Test Spec :
  https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0001-Vector-Search.md
+
+ Version : 2.0.9
  
  NOTE: #1 TestVectorIndexConfigurationDefaultValue and #2 TestVectorIndexConfigurationSettersAndGetters does't applicable for CBL-C as
  CBLVectorIndexConfiguration is just a C struct and C struct doesn't have default value other than 0 or NULL.

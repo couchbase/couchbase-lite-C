@@ -26,7 +26,9 @@
  * Test Spec :
  * https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0002-Lazy-Vector-Index.md
  *
- * Note: 
+ * Version : 2.0.1
+ *
+ * Note:
  * - Test 1 (TestIsLazyDefaultValue) Not applicable for C
  * - Test 6 (TestGetIndexOnClosedDatabase) is done in "Close Database then Use Collection".
  * - Test 7 (testInvalidCollection) is done in "Delete Collection then Use Collection".
