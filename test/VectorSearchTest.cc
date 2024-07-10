@@ -130,7 +130,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCentroidsValidation", "[VectorSearch]") 
  *     6. Create an SQL++ query:
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 20
  *     7. Check the explain() result of the query to ensure that the "words_index" is used.
  *     8. Execute the query and check that 20 results are returned.
  *     9. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
@@ -164,7 +165,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndex", "[VectorSearch]") {
  *     5. Create an SQL++ query:
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 350
+ *           WHERE vector_match(words_index, <dinner vector>)
+ *           LIMIT 350
  *     6. Check the explain() result of the query to ensure that the "words_index" is used.
  *     7. Execute the query and check that 300 results are returned.
  *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
@@ -244,7 +246,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestUpdateVectorIndex", "[VectorSearch]") {
  *     6. Create an SQL++ query.
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 350
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 350
  *     7. Execute the query and check that 296 results are returned, and the results
  *        do not include document word1, word2, word3, and word4.
  *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
@@ -255,7 +258,6 @@ TEST_CASE_METHOD(VectorSearchTest, "TestUpdateVectorIndex", "[VectorSearch]") {
  *        do not include document word5.
  *     11. Reset the custom logger.
  */
-
 TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithInvalidVectors", "[VectorSearch]") {
     CBLError error {};
     auto doc = CBLCollection_GetMutableDocument(wordsCollection, "word1"_sl, &error);
@@ -340,7 +342,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithInvalidVectors", "[
  *     6. Create an SQL++ query:
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_pred_index, <dinner vector>) LIMIT 350
+ *           ORDER BY APPROX_VECTOR_DISTANCE(prediction(WordEmbedding, {'word': word}).vector, $dinerVector)
+ *           LIMIT 350
  *     7. Check the explain() result of the query to ensure that the "words_pred_index" is used.
  *     8. Execute the query and check that 300 results are returned.
  *     9. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
@@ -358,11 +361,12 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithInvalidVectors", "[
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexUsingPredictionModel", "[VectorSearch]") {
     // The test spec creates the index named "words_pred_index", but it's ok to use any index name for the test.
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "prediction(WordEmbedding,{\"word\": word}).vector"_sl, 300, 8 };
+    auto expr = "prediction(WordEmbedding,{\"word\": word}).vector"_sl;
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, expr, 300, 8 };
     createWordsIndex(config); // index name is defined in kWordsIndexName.
     
     // Query:
-    auto results = executeWordsQuery(350);
+    auto results = executeWordsQuery(350, expr.asString());
     CHECK(CountResults(results) == 300);
     CHECK(isIndexTrained());
     CBLResultSet_Release(results);
@@ -384,7 +388,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexUsingPredictionModel", 
     REQUIRE(CBLCollection_DeleteDocumentByID(wordsCollection, "word2"_sl, &error));
     
     // Query:
-    results = executeWordsQuery(350);
+    results = executeWordsQuery(350, expr.asString());
     
     // Check results:
     auto map = mapWordResults(results);
@@ -424,7 +428,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexUsingPredictionModel", 
  *     7. Create an SQL++ query.
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_pred_index, <dinner vector>) LIMIT 350
+ *           ORDER BY APPROX_VECTOR_DISTANCE(prediction(WordEmbedding, {'word': word}).vector, $dinerVector)
+ *           LIMIT 350
  *     8. Check the explain() result of the query to ensure that the "words_predi_index" is used.
  *     9. Execute the query and check that 296 results are returned and the results
  *        do not include word1, word2, word3, and word4.
@@ -467,11 +472,12 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexUsingPredictionModelWit
     CBLDocument_Release(doc);
     
     // The test spec creates the index named "words_pred_index", but it's ok to use any index name for the test.
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "prediction(WordEmbedding,{\"word\": word}).vector"_sl, 300, 8 };
+    auto expr = "prediction(WordEmbedding,{\"word\": word}).vector"_sl;
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, expr, 300, 8 };
     createWordsIndex(config); // index name is defined in kWordsIndexName.
     
     // Query:
-    auto results = executeWordsQuery(350);
+    auto results = executeWordsQuery(350, expr.asString());
     CHECK(isIndexTrained());
     
     // Check results:
@@ -493,7 +499,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexUsingPredictionModelWit
     CBLDocument_Release(doc);
     
     // Query:
-    results = executeWordsQuery(350);
+    results = executeWordsQuery(350, expr.asString());
     
     // Check results:
     map = mapWordResults(results);
@@ -520,7 +526,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexUsingPredictionModelWit
  *     5. Create an SQL++ query
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 20
  *     6. Check the explain() result of the query to ensure that the "words_index" is used.
  *     7. Execute the query and check that 20 results are returned.
  *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
@@ -573,7 +580,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithSQ", "[VectorSearch
  *     5. Create an SQL++ query.
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 20
  *     6. Check the explain() result of the query to ensure that the "words_index" is used.
  *     7. Execute the query and check that 20 results are returned.
  *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
@@ -610,7 +618,8 @@ TEST_CASE_METHOD(VectorSearchTest, "testCreateVectorIndexWithNoneEncoding", "[Ve
  *     5. Create an SQL++ query.
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 20
  *     6. Check the explain() result of the query to ensure that the "words_index" is used.
  *     7. Execute the query and check that 20 results are returned.
  *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
@@ -630,10 +639,9 @@ TEST_CASE_METHOD(VectorSearchTest, "testCreateVectorIndexWithPQ", "[VectorSearch
         config.encoding = CBLVectorEncoding_CreateProductQuantizer(5, 8);
     }
     
-    /* FAILED
     SECTION("12-bits") {
         config.encoding = CBLVectorEncoding_CreateProductQuantizer(5, 12);
-    } */
+    }
      
     createWordsIndex(config);
     
@@ -725,7 +733,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestSubquantizersValidation : Invalid", "[Ve
  *     5. Create an SQL++ query.
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 20
  *     5. Check the explain() result of the query to ensure that the "words_index" is used.
  *     6. Execute the query and check that 20 results are returned.
  *     7. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
@@ -800,7 +809,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestValidateMinMaxTrainingSize", "[VectorSea
  *     5. Create an SQL++ query.
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 20
  *     6. Check the explain() result of the query to ensure that the "words_index" is used.
  *     7. Execute the query and check that 20 results are returned.
  *     8. Verify that the index was not trained by checking that the “Untrained index;
@@ -821,82 +831,43 @@ TEST_CASE_METHOD(VectorSearchTest, "TestQueryUntrainedVectorIndex", "[VectorSear
 }
 
 /**
- * 17. TestCreateVectorIndexWithCosineDistance
+ * 17. TestCreateVectorIndexWithDistanceMetric
  * Description
- *     Test that the vector index can be created and used with the cosine distance metric.
+ *     Test that the vector index can be created with all supported distance metrics.
  * Steps
  *     1. Copy database words_db.
- *     2. Register a custom logger to capture the INFO log.
- *     3. Create a vector index named "words_index" in _default.words collection.
- *         - expression: "vector"
- *         - dimensions: 300
- *         - centroids: 8
- *         - metric: Cosine
- *     4. Check that the index is created without an error returned.
- *     5. Create an SQL++ query.
- *         - SELECT meta().id, word,vector_distance(words_index)
- *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
- *     6. Check the explain() result of the query to ensure that the "words_index" is used.
- *     7. Execute the query and check that 20 results are returned and the vector
- *       distance value is in between 0 – 2.0 inclusively.
- *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
- *       doesn’t exist in the log.
- *     9. Reset the custom logger.
+ *     2. For each distance metric types : euclideanSquared, euclidean, cosine, and dot,
+ *       create a vector index named "words_index" in _default.words collection:
+ *        - expression: "vector"
+ *        - dimensions: 300
+ *        - centroids : 8
+ *        - metric: <distance-metric>
+ *     3. Check that the index is created without an error returned.
+ *     4. Create an SQL++ query with the correspoding SQL++ metric name string:
+ *       "EUCLIDEAN_SQUARED", "EUCLIDEAN", "COSINE", and "DOT"
+ *        - SELECT meta().id, word
+ *          FROM _default.words
+ *          ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector, "<metric-name>")
+ *          LIMIT 20
+ *     5. Check the explain() result of the query to ensure that the "words_index" is used.
+ *     6. Verify that the index was trained.
+ *     7. Execute the query and check that 20 results are returned.
  */
-TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithCosineDistance", "[VectorSearch]") {
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
-    config.metric = kCBLDistanceMetricCosine;
-    createWordsIndex(config);
- 
-    auto results = executeWordsQuery(20, true /* query distance */);
-    while (CBLResultSet_Next(results)) {
-        auto distance = FLValue_AsDouble(CBLResultSet_ValueAtIndex(results, 2));
-        CHECK(distance >= 0.0);
-        CHECK(distance <= 2.0);
+TEST_CASE_METHOD(VectorSearchTest, "TestVectorIndexDistanceMetric", "[VectorSearch]") {
+    CBLDistanceMetric metrics[] = { kCBLDistanceMetricEuclideanSquared,
+                                    kCBLDistanceMetricEuclidean,
+                                    kCBLDistanceMetricCosine,
+                                    kCBLDistanceMetricDot };
+    string metricNames[] = { "EUCLIDEAN_SQUARED", "EUCLIDEAN", "COSINE", "DOT" };
+    
+    for (int i = 0; i < sizeof(metrics)/sizeof(metrics[0]); i++) {
+        CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+        config.metric = metrics[i];
+        createWordsIndex(config);
+        auto results = executeWordsQuery(20, "vector", metricNames[i], "");
+        CHECK(CountResults(results) == 20);
+        CBLResultSet_Release(results);
     }
-    CHECK(isIndexTrained());
-    
-    CBLResultSet_Release(results);
-}
-
-/**
- * 18. TestCreateVectorIndexWithEuclideanDistance
- * Description
- *     Test that the vector index can be created and used with the euclidean distance metric.
- * Steps
- *     1. Copy database words_db.
- *     2. Register a custom logger to capture the INFO log.
- *     3. Create a vector index named "words_index" in _default.words collection.
- *         - expression: "vector"
- *         - dimensions: 300
- *         - centroids: 8
- *         - metric: Euclidean
- *     4. Check that the index is created without an error returned.
- *     5. Create an SQL++ query.
- *         - SELECT meta().id, word, vector_distance(words_index)
- *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
- *     6. Check the explain() result of the query to ensure that the "words_index" is used.
- *     7. Execute the query and check that 20 results are returned and the
- *        distance value is more than zero.
- *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
- *       doesn’t exist in the log.
- *     9. Reset the custom logger.
- */
-TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithEuclideanDistance", "[VectorSearch]") {
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
-    config.metric = kCBLDistanceMetricEuclidean;
-    createWordsIndex(config);
-    
-    auto results = executeWordsQuery(20, true /* query distance */);
-    while (CBLResultSet_Next(results)) {
-        auto distance = FLValue_AsDouble(CBLResultSet_ValueAtIndex(results, 2));
-        CHECK(distance > 0);
-    }
-    CHECK(isIndexTrained());
-    
-    CBLResultSet_Release(results);
 }
 
 /**
@@ -946,7 +917,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithExistingName", "[Ve
  *     5. Create an SQL++ query.
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 20
  *     6. Check the explain() result of the query to ensure that the "words_index" is used.
  *     7. Execute the query and check that 20 results are returned.
  *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
@@ -957,7 +929,6 @@ TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithExistingName", "[Ve
  *        as the index doesn’t exist.
  *     12. Reset the custom logger.
  */
-
 TEST_CASE_METHOD(VectorSearchTest, "TestDeleteVectorIndex", "[VectorSearch]") {
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     createWordsIndex(config);
@@ -970,10 +941,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestDeleteVectorIndex", "[VectorSearch]") {
     deleteWordsIndex();
     
     ExpectingExceptions x;
-    CBLError error {};
-    auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(20)), nullptr, &error);    
-    CHECK(!query);
-    CheckError(error, kCBLErrorMissingIndex, kCBLDomain);
+    results = executeWordsQuery(20, "vector", "", "", kCBLErrorMissingIndex);
+    CHECK(!results);
 }
 
 /**
@@ -986,7 +955,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestDeleteVectorIndex", "[VectorSearch]") {
  *     2. Create an SQL++ query.
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT 20
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 20
  *     3. Check that a CouchbaseLiteException is returned as the index doesn’t exist.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchOnNonExistingIndex", "[VectorSearch]") {
@@ -995,40 +965,6 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchOnNonExistingIndex", "[Vector
     auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(20)), nullptr, &error);
     CHECK(!query);
     CheckError(error, kCBLErrorMissingIndex, kCBLDomain);
-}
-
-/**
- * 22. TestVectorMatchDefaultLimit
- * Description
- *     Test that the number of rows returned is limited to the default value which is 3
- *     when using the vector_match query without the limit number specified.
- * Steps
- *     1. Copy database words_db.
- *     2. Register a custom logger to capture the INFO log.
- *     3. Create a vector index named "words_index" in _default.words collection.
- *         - expression: "vector"
- *         - dimensions: 300
- *         - centroids: 8
- *     4. Check that the index is created without an error returned.
- *     5. Create an SQL++ query.
- *         - SELECT meta().id, word
- *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>)
- *     6. Check the explain() result of the query to ensure that the "words_index" is used.
- *     7. Execute the query and check that 3 results are returned.
- *     8. Verify that the index was trained by checking that the “Untrained index; queries may be slow”
- *       doesn’t exist in the log.
- *     9. Reset the custom logger.
- */
-TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchDefaultLimit", "[VectorSearch]") {
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
-    createWordsIndex(config);
-    
-    auto results = executeWordsQuery(); // 0 : Create VECTOR_MATCH query without specifying limit;
-    CHECK(CountResults(results) == 3);
-    CHECK(isIndexTrained());
-    
-    CBLResultSet_Release(results);
 }
 
 /**
@@ -1047,8 +983,9 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchDefaultLimit", "[VectorSearch
  *     4. Create an SQL++ query.
  *         - SELECT meta().id, word
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) LIMIT <limit>
- *         - limit: 1 and 10000
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT <limit>
+ *         - limit : 1 and 10000
  *     5. Check that the query can be created without an error.
  *     6. Repeat step 4 with the limit: -1, 0, and 10001
  *     7. Check that a CouchbaseLiteException is returned when creating the query.
@@ -1093,9 +1030,9 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearc
 }
 
 /**
- * 24. TestVectorMatchWithAndExpression
+ * 24. TestHybridVectorSearch
  * Description
- *     Test that vector_match can be used in AND expression.
+ *     Test a simple hybrid search with WHERE clause.
  * Steps
  *     1. Copy database words_db.
  *     2. Register a custom logger to capture the INFO log.
@@ -1107,7 +1044,9 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearc
  *     5. Create an SQL++ query.
  *         - SELECT word, catid
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) AND catid = 'cat1' LIMIT 300
+ *           WHERE catid = "cat1"
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 300
  *     6. Check that the query can be created without an error.
  *     7. Check the explain() result of the query to ensure that the "words_index" is used.
  *     8. Execute the query and check that the number of results returned is 50
@@ -1116,20 +1055,20 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearc
  *       doesn’t exist in the log.
  *     10. Reset the custom logger.
  */
-TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchWithAndExpression", "[VectorSearch]") {
+TEST_CASE_METHOD(VectorSearchTest, "TestHybridVectorSearch", "[VectorSearch]") {
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     createWordsIndex(config);
     
-    auto results = executeWordsQuery(300, false, "AND catid = 'cat1'");
+    auto results = executeWordsQuery(300, "vector", "", "catid = 'cat1'");
     CHECK(CountResults(results) == 50);
     
     CBLResultSet_Release(results);
 }
 
 /**
- * 25. TestVectorMatchWithMultipleAndExpression
+ * 25. TestHybridVectorSearchWithAND
  * Description
- *     Test that vector_match can be used in multiple AND expressions.
+ *     Test hybrid search with multiple AND
  * Steps
  *     1. Copy database words_db.
  *     2. Register a custom logger to capture the INFO log.
@@ -1141,7 +1080,9 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchWithAndExpression", "[VectorS
  *     5. Create an SQL++ query.
  *         - SELECT word, catid
  *           FROM _default.words
- *           WHERE (vector_match(words_index, <dinner vector>) AND word is valued) AND catid = 'cat1' LIMIT 300
+ *           WHERE catid = "cat1" AND word is valued
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 300
  *     6. Check that the query can be created without an error.
  *     7. Check the explain() result of the query to ensure that the "words_index" is used.
  *     8. Execute the query and check that the number of results returned is 50
@@ -1150,20 +1091,20 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchWithAndExpression", "[VectorS
  *       doesn’t exist in the log.
  *     10. Reset the custom logger.
  */
-TEST_CASE_METHOD(VectorSearchTest, "testVectorMatchWithMultipleAndExpression", "[VectorSearch]") {
+TEST_CASE_METHOD(VectorSearchTest, "TestHybridVectorSearchWithAND", "[VectorSearch]") {
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     createWordsIndex(config);
     
-    auto results = executeWordsQuery(300, false, "AND word is valued AND catid = 'cat1'");
+    auto results = executeWordsQuery(300, "vector", "", "word is valued AND catid = 'cat1'");
     CHECK(CountResults(results) == 50);
     
     CBLResultSet_Release(results);
 }
 
 /**
- * 26. TestInvalidVectorMatchWithOrExpression
+ * 26. TestInvalidHybridVectorSearchWithOR
  * Description
- *     Test that vector_match cannot be used with OR expression.
+ *     Test that APPROX_VECTOR_DISTANCE cannot be used with OR expression.
  * Steps
  *     1. Copy database words_db.
  *     2. Create a vector index named "words_index" in _default.words collection.
@@ -1174,17 +1115,19 @@ TEST_CASE_METHOD(VectorSearchTest, "testVectorMatchWithMultipleAndExpression", "
  *     4. Create an SQL++ query.
  *         - SELECT word, catid
  *           FROM _default.words
- *           WHERE vector_match(words_index, <dinner vector>) OR catid = 1 LIMIT 20
+ *           WHERE APPROX_VECTOR_DISTANCE(vector, $dinerVector) < 10 OR catid = 'cat1'
+ *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *           LIMIT 20
  *     5. Check that a CouchbaseLiteException is returned when creating the query.
  */
-TEST_CASE_METHOD(VectorSearchTest, "TestInvalidVectorMatchWithOrExpression", "[VectorSearch]") {
+TEST_CASE_METHOD(VectorSearchTest, "TestInvalidHybridVectorSearchWithOR", "[VectorSearch]") {
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     createWordsIndex(config);
     
     ExpectingExceptions x;
     CBLError error {};
-    auto sql = wordQueryString(20, false, "OR catid = 1");
-    auto query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(sql), nullptr, &error);
+    auto sql = wordQueryString(20, "vector", "", "APPROX_VECTOR_DISTANCE(vector, $vector) < 10 OR catid = 'cat1'");
+    auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(sql), nullptr, &error);
     CHECK(!query);
     CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
 }
@@ -1207,9 +1150,10 @@ TEST_CASE_METHOD(VectorSearchTest, "TestInvalidVectorMatchWithOrExpression", "[V
  *     - centroids : 8
  * 6. Check that the index is created without an error returned.
  * 7. Create an SQL++ query:
- *     - SELECT meta().id, word, vector_distance(words_index)
+ *     - SELECT meta().id, word
  *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >) LIMIT 20
+ *       ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *       LIMIT 20
  * 8. Execute the query and check that 20 results are returned.
  * 9. Check that the result also contains doc id = word49.
  */
@@ -1251,7 +1195,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexVectorInBase64", "[VectorSearch]") 
  * 4. Create an SQL++ query:
  *     - SELECT meta().id, word
  *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >, 300)
+ *       ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
+ *       LIMIT 300
  * 5. Execute the query and record the number of results returned.
  * 6. Repeat step 2 - 6 but change the numProbes to 1.
  * 7. Verify the number of results returned in Step 5 is larger than Step 6.
@@ -1274,6 +1219,36 @@ TEST_CASE_METHOD(VectorSearchTest, "TestNumProbes", "[VectorSearch]") {
     CBLResultSet_Release(results);
     
     CHECK(numResultsFor5Probes > numResultsFor1Probes);
+}
+
+TEST_CASE_METHOD(VectorSearchTest, "TestVectorSearchWithWhereClause", "[VectorSearch]") {
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
+    config.metric = kCBLDistanceMetricCosine;
+    createWordsIndex(config);
+    
+    ExpectingExceptions x;
+    CBLError error {};
+    auto sql = "SELECT meta().id, word, APPROX_VECTOR_DISTANCE(vector, $vector) FROM words WHERE APPROX_VECTOR_DISTANCE(vector, $vector) < 0.5 LIMIT 100";
+    auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(sql), nullptr, &error);
+    CHECK(query);
+    setDinnerParameter(query);
+    
+    alloc_slice exp = CBLQuery_Explain(query);
+    
+    auto ex = exp.asString();
+    
+    
+    auto rs = CBLQuery_Execute(query, &error);
+    CHECK(rs);
+    CheckNoError(error);
+    CBLQuery_Release(query);
+    
+    vector<double> distances {};
+    while (CBLResultSet_Next(rs)) {
+        double distance = FLValue_AsDouble(CBLResultSet_ValueAtIndex(rs, 2));
+        distances.push_back(distance);
+    }
+    CBLResultSet_Release(rs);
 }
 
 #endif

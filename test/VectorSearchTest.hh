@@ -292,29 +292,34 @@ public:
         CBLQuery_SetParameters(query, params);
     }
     
-    string wordQueryString(optional<int> limit={}, bool queryDistance=false, string addClause="") {
-        auto indexName = slice(kWordsIndexName).asString();
+    string wordQueryString(int limit, string expr="vector", string metric="", string where="") {
         stringstream ss;
-        ss << "SELECT meta().id, word";
-        if (queryDistance) { ss << ", VECTOR_DISTANCE(" << indexName << ") "; } else { ss << " "; }
+        ss << "SELECT meta().id, word ";
         ss << "FROM _default.words ";
-        ss << "WHERE vector_match(" << indexName << ", $vector)";
-        if (!addClause.empty()) { ss << " " << addClause; }
-        if (limit) { ss << " LIMIT " << limit.value(); }
+        if (!where.empty()) { ss << "WHERE " << where << " "; };
+        ss << "ORDER BY APPROX_VECTOR_DISTANCE(" << expr << ", $vector";
+        if (!metric.empty()) { ss << ", \"" << metric << "\""; }
+        ss << ") ";
+        ss << "LIMIT " << limit;
         return ss.str();
     }
     
-    CBLResultSet* executeWordsQuery(optional<int> limit={}, bool queryDistance=false, string addClause="") {
-        auto query = CreateQuery(wordDB, wordQueryString(limit, queryDistance, addClause));
+    CBLResultSet* executeWordsQuery(int limit, string expr="vector", string metric="", string where="", int expectedQueryError=0) {
+        CBLError error {};
+        auto sql = wordQueryString(limit, expr, metric, where);
+        CBLQuery* query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(sql), nullptr, &error);
+        if (expectedQueryError > 0) {
+            CHECK(!query);
+            CheckError(error, (CBLErrorCode) expectedQueryError);
+            return nullptr;
+        }
+        
+        REQUIRE(query);
         setDinnerParameter(query);
         
-        alloc_slice explanation(CBLQuery_Explain(query));
-        CHECK(vectorIndexUsedInExplain(explanation, "words_index"));
-        
-        CBLError error {};
         auto rs = CBLQuery_Execute(query, &error);
         CHECK(rs);
-        
+        CheckNoError(error);
         CBLQuery_Release(query);
         return rs;
     }

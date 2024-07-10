@@ -71,7 +71,8 @@ typedef struct {
 /** An opaque object representing vector encoding type to use in CBLVectorIndexConfiguration. */
 typedef struct CBLVectorEncoding CBLVectorEncoding;
 
-/** Creates a no-encoding type to use in CBLVectorIndexConfiguration; 4 bytes per dimension, no data loss.  */
+/** Creates a no-encoding type to use in CBLVectorIndexConfiguration; 4 bytes per dimension, no data loss.  
+    @return A None encoding object. */
 _cbl_warn_unused
 CBLVectorEncoding* CBLVectorEncoding_CreateNone(void) CBLAPI;
 
@@ -82,11 +83,16 @@ typedef CBL_ENUM(uint32_t, CBLScalarQuantizerType) {
     kCBLSQ8                                 ///< 8 bits per dimension
 };
 
-/** Creates a Scalar Quantizer type to use in CBLVectorIndexConfiguration. */
+/** Creates a Scalar Quantizer encoding to use in CBLVectorIndexConfiguration.
+    @param type Scalar Quantizer Type.
+    @return A Scalar Quantizer encoding object. */
 _cbl_warn_unused
 CBLVectorEncoding* CBLVectorEncoding_CreateScalarQuantizer(CBLScalarQuantizerType type) CBLAPI;
 
-/** Creates a Product Quantizer type to use in CBLVectorIndexConfiguration. */
+/** Creates a Product Quantizer encoding to use in CBLVectorIndexConfiguration.
+    @param subquantizers Number of subquantizers. Must be > 1 and a factor of vector dimensions.
+    @param bits Number of bits. Must be >= 4 and <= 12. 
+    @return A Product Quantizer encoding object. */
 _cbl_warn_unused
 CBLVectorEncoding* CBLVectorEncoding_CreateProductQuantizer(unsigned subquantizers, unsigned bits) CBLAPI;
 
@@ -95,8 +101,10 @@ void CBLVectorEncoding_Free(CBLVectorEncoding* _cbl_nullable) CBLAPI;
 
 /** Distance metric to use in CBLVectorIndexConfiguration. */
 typedef CBL_ENUM(uint32_t, CBLDistanceMetric) {
-    kCBLDistanceMetricEuclidean = 0,        ///< Euclidean distance
-    kCBLDistanceMetricCosine,               ///< Cosine distance (1.0 - Cosine Similarity)
+    kCBLDistanceMetricEuclideanSquared = 0,         ///< Squared Euclidean distance (AKA Squared L2)
+    kCBLDistanceMetricEuclidean,                    ///< Euclidean distance (AKA L2)
+    kCBLDistanceMetricCosine,                       ///< Cosine distance (1.0 - Cosine Similarity)
+    kCBLDistanceMetricDot                           ///< Dot-product distance (Negative of dot-product)
 };
 
 /** ENTERPRISE EDITION ONLY
