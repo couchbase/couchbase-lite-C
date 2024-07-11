@@ -178,24 +178,7 @@ public:
         vector.clustering.flat_centroids = config.centroids;
         vector.dimensions = config.dimensions;
         vector.lazy = config.isLazy;
-        
-        switch (config.metric) {
-            case kCBLDistanceMetricEuclideanSquared:
-                vector.metric = kC4VectorMetricEuclidean2;
-                break;
-            case kCBLDistanceMetricEuclidean:
-                vector.metric = kC4VectorMetricEuclidean1;
-                break;
-            case kCBLDistanceMetricCosine:
-                vector.metric = kC4VectorMetricCosine;
-                break;
-            case kCBLDistanceMetricDot:
-                vector.metric = kC4VectorMetricDot;
-                break;
-            default:
-                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Invalid Distance Metric");
-        }
-        
+        vector.metric = (C4VectorMetricType) config.metric;
         vector.encoding = c4enc;
         vector.minTrainingSize = config.minTrainingSize;
         vector.maxTrainingSize = config.maxTrainingSize;

@@ -78,9 +78,9 @@ CBLVectorEncoding* CBLVectorEncoding_CreateNone(void) CBLAPI;
 
 /** Scalar Quantizer encoding type */
 typedef CBL_ENUM(uint32_t, CBLScalarQuantizerType) {
-    kCBLSQ4 = 0,                            ///< 4 bits per dimension
-    kCBLSQ6,                                ///< 6 bits per dimension
-    kCBLSQ8                                 ///< 8 bits per dimension
+    kCBLSQ4 = 4,                            ///< 4 bits per dimension
+    kCBLSQ6 = 6,                            ///< 6 bits per dimension
+    kCBLSQ8 = 8                             ///< 8 bits per dimension
 };
 
 /** Creates a Scalar Quantizer encoding to use in CBLVectorIndexConfiguration.
@@ -101,9 +101,9 @@ void CBLVectorEncoding_Free(CBLVectorEncoding* _cbl_nullable) CBLAPI;
 
 /** Distance metric to use in CBLVectorIndexConfiguration. */
 typedef CBL_ENUM(uint32_t, CBLDistanceMetric) {
-    kCBLDistanceMetricEuclideanSquared = 0,         ///< Squared Euclidean distance (AKA Squared L2)
-    kCBLDistanceMetricEuclidean,                    ///< Euclidean distance (AKA L2)
+    kCBLDistanceMetricEuclideanSquared = 1,         ///< Squared Euclidean distance (AKA Squared L2)
     kCBLDistanceMetricCosine,                       ///< Cosine distance (1.0 - Cosine Similarity)
+    kCBLDistanceMetricEuclidean,                    ///< Euclidean distance (AKA L2)
     kCBLDistanceMetricDot                           ///< Dot-product distance (Negative of dot-product)
 };
 
