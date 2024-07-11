@@ -34,17 +34,23 @@ namespace cbl {
         Vector Encoding  Type*/
     class VectorEncoding {
     public:
-        /** Creates a no-encoding type to use in VectorIndexConfiguration; 4 bytes per dimension, no data loss.  */
+        /** Creates a no-encoding type to use in VectorIndexConfiguration; 4 bytes per dimension, no data loss.
+            @return A None encoding object. */
         static VectorEncoding none() {
             return VectorEncoding(CBLVectorEncoding_CreateNone());
         }
         
-        /** Creates a Scalar Quantizer encoding type to use in VectorIndexConfiguration. */
+        /** Creates a Scalar Quantizer encoding type to use in VectorIndexConfiguration. 
+            @param type Scalar Quantizer Type.
+            @return A Scalar Quantizer encoding object. */
         static VectorEncoding scalarQuantizer(CBLScalarQuantizerType type) {
             return VectorEncoding(CBLVectorEncoding_CreateScalarQuantizer(type));
         }
         
-        /** Creates a Product Quantizer encoding type to use in VectorIndexConfiguration. */
+        /** Creates a Product Quantizer encoding type to use in VectorIndexConfiguration.
+            @param subquantizers Number of subquantizers. Must be > 1 and a factor of vector dimensions.
+            @param bits Number of bits. Must be >= 4 and <= 12.
+            @return A Product Quantizer encoding object. */
         static VectorEncoding productQuantizer(unsigned int subquantizers, unsigned int bits) {
             return VectorEncoding(CBLVectorEncoding_CreateProductQuantizer(subquantizers, bits));
         }
@@ -123,7 +129,7 @@ namespace cbl {
         VectorEncoding encoding = VectorEncoding::scalarQuantizer(kCBLSQ8);
         
         /** Distance Metric type. The default value is euclidean distance.  */
-        CBLDistanceMetric metric = kCBLDistanceMetricEuclidean;
+        CBLDistanceMetric metric = kCBLDistanceMetricEuclideanSquared;
         
         /** The minimum number of vectors for training the index.
             The default value is zero, meaning that minTrainingSize will be determined based on

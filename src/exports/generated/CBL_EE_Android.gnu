@@ -36,6 +36,7 @@ CBL_C {
 		CBLIndexUpdater_SkipVector;
 		CBLIndexUpdater_Finish;
 		CBLIndexUpdater_Value;
+		CBLCollection_IsIndexTrained;
 		kCBLDefaultVectorIndexLazy;
 		kCBLDefaultVectorIndexDistanceMetric;
 		kCBLDefaultVectorIndexMinTrainingSize;
@@ -206,7 +207,6 @@ CBL_C {
 		CBLReplicator_AddDocumentReplicationListener;
 		CBLReplicator_UserAgent;
 		CBLDefaultConflictResolver;
-		CBLCollection_Database;
 		CBLCollection_DeleteDocumentByID;
 		CBLCollection_LastSequence;
 		CBLDatabase_DeleteDocumentByID;

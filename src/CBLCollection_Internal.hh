@@ -178,7 +178,7 @@ public:
         vector.clustering.flat_centroids = config.centroids;
         vector.dimensions = config.dimensions;
         vector.lazy = config.isLazy;
-        vector.metric = config.metric == kCBLDistanceMetricCosine ? kC4VectorMetricCosine : kC4VectorMetricEuclidean;
+        vector.metric = (C4VectorMetricType) config.metric;
         vector.encoding = c4enc;
         vector.minTrainingSize = config.minTrainingSize;
         vector.maxTrainingSize = config.maxTrainingSize;
@@ -190,6 +190,10 @@ public:
         _c4col.useLocked()->createIndex(name, config.expression,
                                         (C4QueryLanguage)config.expressionLanguage,
                                         kC4VectorIndex, &options);
+    }
+    
+    bool isIndexTrained(slice name) const {
+        return _c4col.useLocked()->isIndexTrained(name);
     }
 
 #endif

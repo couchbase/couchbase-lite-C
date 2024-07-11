@@ -41,14 +41,8 @@ namespace cbl_internal {
     };
 
     struct CBLVectorEncodingSQ : public CBLVectorEncoding {
-        CBLVectorEncodingSQ(CBLScalarQuantizerType type)
-        :_type(type) {
-            switch (type) {
-                case kCBLSQ4: _encoding.bits = 4; break;
-                case kCBLSQ6: _encoding.bits = 6; break;
-                case kCBLSQ8: _encoding.bits = 8; break;
-                default: C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Invalid Scalar Quantizer Type");
-            }
+        CBLVectorEncodingSQ(CBLScalarQuantizerType type) {
+            _encoding.bits = type;
         }
         
         virtual const C4VectorEncoding& c4encoding() const override {
@@ -57,7 +51,6 @@ namespace cbl_internal {
         
     private:
         C4VectorEncoding _encoding { kC4VectorEncodingSQ };
-        CBLScalarQuantizerType _type;
     };
 
     struct CBLVectorEncodingPQ : public CBLVectorEncoding {

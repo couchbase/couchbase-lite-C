@@ -65,8 +65,6 @@ public:
     
     CBLCollection *extwordsCollection {nullptr};
     
-    static vector<string> sVectorSearchTestLogs;
-    
     VectorSearchTest() {
         // Eanble vector search and reinit test databases:
         EnableVectorSearch();
@@ -98,12 +96,6 @@ public:
         REQUIRE(extwordsCollection);
         
         registerWordEmbeddingModel();
-        
-        sVectorSearchTestLogs.clear();
-        CBLLog_SetCallback([](CBLLogDomain domain, CBLLogLevel level, FLString msg) {
-            sVectorSearchTestLogs.push_back(string(msg));
-        });
-        CBLLog_SetCallbackLevel(kCBLLogInfo);
     }
     
     ~VectorSearchTest() {
@@ -125,11 +117,6 @@ public:
         }
         
         unregisterWordEmbeddingModel();
-        
-        // Reset log callback:
-        CBLLog_SetCallback(nullptr);
-        CBLLog_SetCallbackLevel(kCBLLogNone);
-        sVectorSearchTestLogs.clear();
     }
     
     FLMutableArray vectorArrayForWord(FLString word, FLString collection) {
@@ -292,44 +279,43 @@ public:
         CBLQuery_SetParameters(query, params);
     }
     
-    string wordQueryString(optional<int> limit={}, bool queryDistance=false, string addClause="") {
-        auto indexName = slice(kWordsIndexName).asString();
+    string wordQueryString(int limit, string expr="vector", string metric="", string where="") {
         stringstream ss;
-        ss << "SELECT meta().id, word";
-        if (queryDistance) { ss << ", VECTOR_DISTANCE(" << indexName << ") "; } else { ss << " "; }
+        ss << "SELECT meta().id, word ";
         ss << "FROM _default.words ";
-        ss << "WHERE vector_match(" << indexName << ", $vector)";
-        if (!addClause.empty()) { ss << " " << addClause; }
-        if (limit) { ss << " LIMIT " << limit.value(); }
+        if (!where.empty()) { ss << "WHERE " << where << " "; };
+        ss << "ORDER BY APPROX_VECTOR_DISTANCE(" << expr << ", $vector";
+        if (!metric.empty()) { ss << ", \"" << metric << "\""; }
+        ss << ") ";
+        ss << "LIMIT " << limit;
         return ss.str();
     }
     
-    CBLResultSet* executeWordsQuery(optional<int> limit={}, bool queryDistance=false, string addClause="") {
-        auto query = CreateQuery(wordDB, wordQueryString(limit, queryDistance, addClause));
+    CBLResultSet* executeWordsQuery(int limit, string expr="vector", string metric="", string where="", int expectedQueryError=0) {
+        CBLError error {};
+        auto sql = wordQueryString(limit, expr, metric, where);
+        CBLQuery* query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(sql), nullptr, &error);
+        if (expectedQueryError > 0) {
+            CHECK(!query);
+            CheckError(error, (CBLErrorCode) expectedQueryError);
+            return nullptr;
+        }
+        
+        REQUIRE(query);
         setDinnerParameter(query);
         
-        alloc_slice explanation(CBLQuery_Explain(query));
-        CHECK(vectorIndexUsedInExplain(explanation, "words_index"));
-        
-        CBLError error {};
         auto rs = CBLQuery_Execute(query, &error);
         CHECK(rs);
-        
+        CheckNoError(error);
         CBLQuery_Release(query);
         return rs;
     }
-    
-    void resetLog() {
-        sVectorSearchTestLogs.clear();
-    }
 
     bool isIndexTrained() {
-        for (auto& str : sVectorSearchTestLogs) {
-            if (str.find("Untrained index; queries may be slow") != string::npos) {
-                return false;
-            }
-        }
-        return true;
+        CBLError error {};
+        auto result = CBLCollection_IsIndexTrained(wordsCollection, kWordsIndexName, &error);
+        CheckNoError(error);
+        return result;
     }
     
     bool containsString(FLArray array, string str) {

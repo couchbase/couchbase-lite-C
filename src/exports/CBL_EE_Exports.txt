@@ -60,3 +60,7 @@ CBLIndexUpdater_SetVector
 CBLIndexUpdater_SkipVector
 CBLIndexUpdater_Finish
 CBLIndexUpdater_Value
+
+### PRIVATE
+
+CBLCollection_IsIndexTrained

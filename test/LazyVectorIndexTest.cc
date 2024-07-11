@@ -26,7 +26,9 @@
  * Test Spec :
  * https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0002-Lazy-Vector-Index.md
  *
- * Note: 
+ * Version : 2.0.1
+ *
+ * Note:
  * - Test 1 (TestIsLazyDefaultValue) Not applicable for C
  * - Test 6 (TestGetIndexOnClosedDatabase) is done in "Close Database then Use Collection".
  * - Test 7 (testInvalidCollection) is done in "Delete Collection then Use Collection".
@@ -152,7 +154,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestGetExistingVectorIndex", "[VectorSearch]
  * 3. Create an SQL++ query:
  *     - SELECT word
  *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >)
+ *       ORDER BY APPROX_VECTOR_DISTANCE(word, $dinnerVector)
+ *       LIMIT 10
  * 4. Execute the query and check that 0 results are returned.
  * 5. Update the documents:
  *     - Create _default.words.word301 with the content from _default.extwords.word1
@@ -162,10 +165,10 @@ TEST_CASE_METHOD(VectorSearchTest, "TestGetExistingVectorIndex", "[VectorSearch]
 TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexNotAutoUpdatedChangedDocs", "[VectorSearch][LazyVectorIndex]") {
     CBLError error {};
     
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8, true };
+    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "word"_sl, 300, 8, true };
     createWordsIndex(config);
     
-    auto results = executeWordsQuery();
+    auto results = executeWordsQuery(3, "word");
     CHECK(CountResults(results) == 0);
     CBLResultSet_Release(results);
     
@@ -177,7 +180,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexNotAutoUpdatedChangedDocs
     REQUIRE(doc2);
     copyDocument(wordsCollection, "word1", doc2);
     
-    results = executeWordsQuery();
+    results = executeWordsQuery(3, "word");
     CHECK(CountResults(results) == 0);
     CBLResultSet_Release(results);
     
@@ -210,7 +213,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexNotAutoUpdatedChangedDocs
  * 6. Create an SQL++ query:
  *    - SELECT word
  *      FROM _default.words
- *      WHERE vector_match(words_index, < dinner vector >) LIMIT 300
+ *      ORDER BY APPROX_VECTOR_DISTANCE(word, $dinnerVector)
+ *      LIMIT 300
  * 7. Execute the query and check that 1 results are returned.
  * 8. Check that the word gotten from the query result is the same as the word in Step 5.
  * 9. Delete _default.words.word1 doc.
@@ -242,7 +246,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdateDeletedDocs", "
     CBLQueryIndex_Release(index);
     
     // Query:
-    auto results = executeWordsQuery(300);
+    auto results = executeWordsQuery(300, "word");
     
     // Check results:
     auto map = mapWordResults(results);
@@ -256,7 +260,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdateDeletedDocs", "
     
     // Query Again:
     CBLResultSet_Release(results);
-    results = executeWordsQuery(300);
+    results = executeWordsQuery(300, "word");
     
     // Check results:
     CHECK(CountResults(results) == 0);
@@ -288,7 +292,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdateDeletedDocs", "
  * 7. Create an SQL++ query:
  *    - SELECT word
  *      FROM _default.words
- *      WHERE vector_match(words_index, < dinner vector >) LIMIT 300
+ *      ORDER BY APPROX_VECTOR_DISTANCE(word, $dinnerVector)
+ *      LIMIT 300
  * 8. Execute the query and check that 1 results are returned.
  * 9. Check that the word gotten from the query result is the same as the word in Step 5.
  * 10. Purge _default.words.word1 doc.
@@ -320,7 +325,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdatePurgedDocs", "[
     CBLQueryIndex_Release(index);
     
     // Query:
-    auto results = executeWordsQuery(300);
+    auto results = executeWordsQuery(300, "word");
     
     // Check results:
     auto map = mapWordResults(results);
@@ -334,7 +339,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestLazyVectorIndexAutoUpdatePurgedDocs", "[
     
     // Query Again:
     CBLResultSet_Release(results);
-    results = executeWordsQuery(300);
+    results = executeWordsQuery(300, "word");
     
     // Check results:
     CHECK(CountResults(results) == 0);
@@ -727,9 +732,10 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterGettingValues", "[VectorSear
  *     - Call setVector() with the platform's float array at the index.
  * 6. With the IndexUpdater object, call finish()
  * 7. Execute a vector search query.
- *     - SELECT word
- *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >) LIMIT 300
+ *     -  SELECT word
+ *        FROM _default.words
+ *        ORDER BY APPROX_VECTOR_DISTANCE(word, $dinnerVector)
+ *        LIMIT 300
  * 8. Check that there are 10 words returned.
  * 9. Check that the word is in the word set from the step 5.
  */
@@ -752,7 +758,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetFloatArrayVectors", "[Vec
     CBLQueryIndex_Release(index);
     
     // Query:
-    auto results = executeWordsQuery(300);
+    auto results = executeWordsQuery(300, "word");
     auto words = wordResults(results);
     CHECK(words.size() == 10);
     for (auto& word : updatedWords) {
@@ -778,14 +784,9 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetFloatArrayVectors", "[Vec
  * 3. Get a QueryIndex object from the words with the name as "words_index".
  * 4. Call beginUpdate() with limit 1 to get an IndexUpdater object.
  * 5. With the IndexUpdater object, call setVector() with a float array as [1.0]
- * 6. With the IndexUpdater object, call finish().
- * 7. Execute a vector search query.
- *     - SELECT word
- *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >) LIMIT 300
- * 8. Check that there are 0 words returned.
+ * 6. Check that the setVector throws CouchbaseLiteException with the InvalidParameter error.
  */
-TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetInvalidVectorDimensions", "[.CBL-5814]") {
+TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetInvalidVectorDimensions", "[VectorSearch][LazyVectorIndex]") {
     CBLError error {};
     
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "word"_sl, 300, 8, true };
@@ -795,10 +796,13 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetInvalidVectorDimensions",
     
     auto updater = CBLQueryIndex_BeginUpdate(index, 1, &error);
     CHECK(updater);
-    
-    float vector[1] = {1.0};
-    CHECK(CBLIndexUpdater_SetVector(updater, 0, vector, 1, &error));
-    CheckError(error, kCBLErrorInvalidParameter);
+
+    {
+        ExpectingExceptions x;
+        float vector[1] = {1.0};
+        CHECK(!CBLIndexUpdater_SetVector(updater, 0, vector, 1, &error));
+        CheckError(error, kCBLErrorInvalidParameter);
+    }
     
     CBLIndexUpdater_Release(updater);
     CBLQueryIndex_Release(index);
@@ -822,28 +826,27 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSetInvalidVectorDimensions",
  * 5. With the IndexUpdater object, for each index from 0 - 9.
  *     - Get the word string from the IndexUpdater.
  *     - If index % 2 == 0,
- *         - Store the word string in a skipped word set for verifying the
- *           skipped words later.
+ *         - Store the word string in a skipped word set for verifying the skipped words later.
  *         - Call skipVector at the index.
  *     - If index % 2 != 0,
- *         - Store the word string in a indexed word set for verifying the
- *           vector search result.
  *         - Query the vector by word from the _default.words collection.
  *         - Convert the vector result which is an array object to a platform's float array.
  *         - Call setVector() with the platform's float array at the index.
  * 6. With the IndexUpdater object, call finish()
- * 7. Execute a vector search query.
- *     - SELECT word
- *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >) LIMIT 300
- * 8. Check that there are 5 words returned.
- * 9. Check that the word is in the indexed word set from the step 5.
- * 10. Call beginUpdate() with limit 5 to get an IndexUpdater object.
- * 11. With the IndexUpdater object, for each index from 0 - 4.
+ * 7. Call beginUpdate with limit 10 to get an IndexUpdater object.
+ * 8. With the IndexUpdater object, for each index
  *     - Get the word string from the dictionary for the key named "word".
- *     - Check that the word is in the skipped word set from the step 5.
+ *     - Check if the word is in the skipped word set from the Step 5. If the word
+ *        is in the skipped word set, remove the word from the skipped word set.
+ *     - Query the vector by word from the _default.words collection.
+ *         - Convert the vector result which is an array object to a platform's float array.
+ *         - Call setVector() with the platform's float array at the index
+ * 9. With the IndexUpdater object, call finish()
+ * 10. Repeat Step 7, until the returned IndexUpdater is null or the skipped word set
+ *      has zero words in it.
+ * 11. Verify that the skipped word set has zero words in it.
  */
-TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSkipVectors", "[.CBL-5842]") {
+TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSkipVectors", "[VectorSearch][LazyVectorIndex]") {
     CBLError error {};
     
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "word"_sl, 300, 8, true };
@@ -866,7 +869,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSkipVectors", "[.CBL-5842]")
     CBLIndexUpdater_Release(updater);
     
     // Query:
-    auto results = executeWordsQuery(300);
+    auto results = executeWordsQuery(300, "word");
     auto words = wordResults(results);
     CHECK(words.size() == 5);
     for (auto& word : updatedWords) {
@@ -875,7 +878,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterSkipVectors", "[.CBL-5842]")
     CBLResultSet_Release(results);
     
     // Update index for the skipped words:
-    updater = CBLQueryIndex_BeginUpdate(index, 5, &error);
+    updater = CBLQueryIndex_BeginUpdate(index, 10, &error);
     CHECK(updater);
     
     updatedWords.clear();
@@ -1018,7 +1021,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestIndexUpdaterCaughtUp", "[VectorSearch][L
  * 7. Execute a vector search query.
  *     - SELECT word
  *       FROM _default.words
- *       WHERE vector_match(words_index, < dinner vector >) LIMIT 300
+ *       ORDER BY APPROX_VECTOR_DISTANCE(word, $dinnerVector)
+ *       LIMIT 300
  * 8. Check that there are 0 words returned.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestNonFinishedIndexUpdaterNotUpdateIndex", "[VectorSearch][LazyVectorIndex]") {
@@ -1040,7 +1044,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestNonFinishedIndexUpdaterNotUpdateIndex", 
     CBLQueryIndex_Release(index);
     
     // Query:
-    auto results = executeWordsQuery(300);
+    auto results = executeWordsQuery(300, "word");
     CHECK(CountResults(results) == 0);
     CBLResultSet_Release(results);
 }

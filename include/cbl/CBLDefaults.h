@@ -105,7 +105,7 @@ CBL_PUBLIC extern const bool kCBLDefaultReplicatorAcceptParentCookies;
 /** [false] Vectors are not lazily indexed, by default */
 CBL_PUBLIC extern const bool kCBLDefaultVectorIndexLazy;
 
-/** [kCBLDistanceMetricEuclidean] By default, vectors are compared using Euclidean metrics */
+/** [kCBLDistanceMetricEuclideanSquared] By default, vectors are compared using Squared Euclidean metric. */
 CBL_PUBLIC extern const CBLDistanceMetric kCBLDefaultVectorIndexDistanceMetric;
 
 /** [0] By default, the value will be determined based on the number of centroids, encoding types, and the encoding parameters. */

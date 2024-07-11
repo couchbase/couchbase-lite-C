@@ -229,7 +229,6 @@ CBLDefaultConflictResolver
 
 ### PRIVATE
 
-CBLCollection_Database
 CBLCollection_DeleteDocumentByID
 CBLCollection_LastSequence
 
