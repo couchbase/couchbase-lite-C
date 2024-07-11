@@ -28,9 +28,6 @@ CBL_CAPI_BEGIN
     void CBLLog_BeginExpectingExceptions() CBLAPI;
     void CBLLog_EndExpectingExceptions() CBLAPI;
 
-/** Returns the collection's database, */
-    CBLDatabase* CBLCollection_Database(const CBLCollection*) CBLAPI;
-
 /** Returns the last sequence number assigned in the database (default collection).
     This starts at zero and increments every time a document is saved or deleted. */
     uint64_t CBLDatabase_LastSequence(const CBLDatabase*) CBLAPI;

@@ -166,7 +166,6 @@ CBL_C {
 		CBLReplicator_AddDocumentReplicationListener;
 		CBLReplicator_UserAgent;
 		CBLDefaultConflictResolver;
-		CBLCollection_Database;
 		CBLCollection_DeleteDocumentByID;
 		CBLCollection_LastSequence;
 		CBLDatabase_DeleteDocumentByID;
