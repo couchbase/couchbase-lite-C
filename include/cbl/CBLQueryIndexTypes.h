@@ -155,16 +155,16 @@ typedef struct {
     /** The minimum number of vectors for training the index. 
         The default value is zero, meaning that minTrainingSize will be determined based on
         the number of centroids, encoding types, and the encoding parameters.
-        
-        @note The index is trained during its creation if sufficient data is available.
-              If not, training will occur when the vector_match() query is executed,
-              provided there is enough data at that time. Consequently, if training is
-              triggered during a query, the query may take longer to return results.
      
-              If a query is executed against the index before it is trained, a full
-              scan of the vectors will be performed. If there are insufficient vectors
-              in the database for training, a warning message will be logged,
-              indicating the required number of vectors. */
+        @note The training will occur at or before the APPROX_VECTOR_DISANCE query is
+        executed, provided there is enough data at that time, and consequently, if
+        training is triggered during a query, the query may take longer to return
+        results.
+     
+        @note If a query is executed against the index before it is trained, a full
+        scan of the vectors will be performed. If there are insufficient vectors
+        in the database for training, a warning message will be logged,
+        indicating the required number of vectors. */
     unsigned minTrainingSize;
     
     /** The maximum number of vectors used for training the index.

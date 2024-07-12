@@ -23,6 +23,7 @@
 CBL_CAPI_BEGIN
 
 /** \defgroup index  Index
+    @{
  Indexes are used to speed up queries by allowing fast -- O(log n) -- lookup of documents
  that have specific values or ranges of values. The values may be properties, or expressions
  based on properties.
@@ -50,26 +51,14 @@ CBL_CAPI_BEGIN
      * (Enterprise Edition Only) Vector indexes allows efficient search of ML vectors by using
        the `VECTOR_MATCH()` function in a query. The `CouchbaseLiteVectorSearch`
        extension library is **required** to use the functionality. Use \ref CBL_EnableVectorSearch
-       function to set the directoary path containing the extension library. */
+       function to set the directoary path containing the extension library.  */
 
 /** \name  CBLQueryIndex
     @{
     CBLQueryIndex represents an existing index in a collection.
  
     Available in the enterprise edition, the \ref CBLQueryIndex can be used to obtain
-    a \ref CBLIndexUpdater object for updating the vector index in lazy mode.
-    To use the \ref CBLIndexUpdater object to update the vector index, follow these steps:
- 
-    1. Call CBLQueryIndex_BeginUpdate with the max number of vectors to be updated.
-      The function will return a \ref CBLIndexUpdater object or NULL if the index is up-to-date.
-    2. Call `CBLIndexUpdater_Value` for each of the `count` items to get the Fleece value, and :
-      2.1 Compute a vector from this value
-      2.2 Call `CBLIndexUpdater_SetVector` with the resulting vector, or with NULL if none. Or
-      2.3 Call `CBLIndexUpdater_SkipVector` if the vector cannot be computed at this time.
-    3. Call `finish` to apply the updates to the index.
-    4. Call `CBLIndexUpdater_Release` to release the updater object.
-    5. Repeat the Step 1 until the index is up-to-date. */
-
+    a \ref CBLIndexUpdater object for updating the vector index in lazy mode. */
 CBL_REFCOUNTED(CBLQueryIndex*, QueryIndex);
 
 /** Returns the index's name.
