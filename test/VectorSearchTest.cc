@@ -26,7 +26,7 @@
  Test Spec :
  https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0001-Vector-Search.md
 
- Version : 2.0.9
+ Version : 2.1.0
  
  NOTE: #1 TestVectorIndexConfigurationDefaultValue and #2 TestVectorIndexConfigurationSettersAndGetters does't applicable for CBL-C as
  CBLVectorIndexConfiguration is just a C struct and C struct doesn't have default value other than 0 or NULL.
@@ -740,15 +740,16 @@ TEST_CASE_METHOD(VectorSearchTest, "TestSubquantizersValidation : Invalid", "[Ve
  *     8. Reset the custom logger.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithFixedTrainingSize", "[VectorSearch]") {
+    CBLLog_SetConsoleLevel(kCBLLogVerbose);
+    
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     config.minTrainingSize = 100;
     config.maxTrainingSize = 100;
     createWordsIndex(config);
-    
+
     auto results = executeWordsQuery(20);
     CHECK(CountResults(results) == 20);
     CHECK(isIndexTrained());
-    
     CBLResultSet_Release(results);
 }
 
@@ -1113,7 +1114,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestHybridVectorSearchWithAND", "[VectorSear
  *     4. Create an SQL++ query.
  *         - SELECT word, catid
  *           FROM _default.words
- *           WHERE APPROX_VECTOR_DISTANCE(vector, $dinerVector) < 10 OR catid = 'cat1'
+ *           WHERE APPROX_VECTOR_DISTANCE(vector, $dinerVector) < 0.5 OR catid = 'cat1'
  *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
  *           LIMIT 20
  *     5. Check that a CouchbaseLiteException is returned when creating the query.
@@ -1124,7 +1125,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestInvalidHybridVectorSearchWithOR", "[Vect
     
     ExpectingExceptions x;
     CBLError error {};
-    auto sql = wordQueryString(20, "vector", "", "APPROX_VECTOR_DISTANCE(vector, $vector) < 10 OR catid = 'cat1'");
+    auto sql = wordQueryString(20, "vector", "", "APPROX_VECTOR_DISTANCE(vector, $vector) < 0.5 OR catid = 'cat1'");
     auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(sql), nullptr, &error);
     CHECK(!query);
     CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
