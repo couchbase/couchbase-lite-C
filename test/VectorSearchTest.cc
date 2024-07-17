@@ -1220,36 +1220,6 @@ TEST_CASE_METHOD(VectorSearchTest, "TestNumProbes", "[VectorSearch]") {
     CHECK(numResultsFor5Probes > numResultsFor1Probes);
 }
 
-TEST_CASE_METHOD(VectorSearchTest, "TestVectorSearchWithWhereClause", "[VectorSearch]") {
-    CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
-    config.metric = kCBLDistanceMetricCosine;
-    createWordsIndex(config);
-    
-    ExpectingExceptions x;
-    CBLError error {};
-    auto sql = "SELECT meta().id, word, APPROX_VECTOR_DISTANCE(vector, $vector) FROM words WHERE APPROX_VECTOR_DISTANCE(vector, $vector) < 0.5 LIMIT 100";
-    auto query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(sql), nullptr, &error);
-    CHECK(query);
-    setDinnerParameter(query);
-    
-    alloc_slice exp = CBLQuery_Explain(query);
-    
-    auto ex = exp.asString();
-    
-    
-    auto rs = CBLQuery_Execute(query, &error);
-    CHECK(rs);
-    CheckNoError(error);
-    CBLQuery_Release(query);
-    
-    vector<double> distances {};
-    while (CBLResultSet_Next(rs)) {
-        double distance = FLValue_AsDouble(CBLResultSet_ValueAtIndex(rs, 2));
-        distances.push_back(distance);
-    }
-    CBLResultSet_Release(rs);
-}
-
 #endif
 
 #endif

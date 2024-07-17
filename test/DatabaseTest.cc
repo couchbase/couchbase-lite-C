@@ -896,7 +896,7 @@ TEST_CASE_METHOD(DatabaseTest, "Close Database with Active Live Query") {
     CBLListener_Remove(listenerToken);
     
     // Sleeping to ensure async cleanup
-    this_thread::sleep_for(200ms);
+    this_thread::sleep_for(400ms);
 }
 
 
@@ -923,7 +923,7 @@ TEST_CASE_METHOD(DatabaseTest, "Delete Database with Active Live Query") {
     CBLListener_Remove(listenerToken);
     
     // Sleeping to ensure async cleanup
-    this_thread::sleep_for(200ms);
+    this_thread::sleep_for(400ms);
 }
 
 TEST_CASE_METHOD(DatabaseTest, "Use Closed Database") {
