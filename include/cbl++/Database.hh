@@ -57,7 +57,8 @@ namespace cbl {
             @param path The file system path of the directory that contains the Vector Search extension library.
             @note Must be called before opening a database that intends to use the vector search extension. */
         static void enableVectorSearch(slice path) {
-            CBL_EnableVectorSearch(path);
+            CBLError error {};
+            RefCounted::check(CBL_EnableVectorSearch(path, &error), error);
         }
     };
 #endif

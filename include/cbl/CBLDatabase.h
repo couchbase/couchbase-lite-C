@@ -41,8 +41,10 @@ CBL_CAPI_BEGIN
     Enables Vector Search extension by specifying the extension path to search for the Vector Search extension library.
     This function must be called before opening a database that intends to use the vector search extension.
     @param path The file system path of the directory that contains the Vector Search extension library.
+    @param outError  On return, will be set to the error that occurred.
+    @return  True on success, false if there was an error.
     @note Must be called before opening a database that intends to use the vector search extension. */
-void CBL_EnableVectorSearch(FLString path) CBLAPI;
+bool CBL_EnableVectorSearch(FLString path, CBLError* _cbl_nullable outError) CBLAPI;
 
 /** @} */
 
