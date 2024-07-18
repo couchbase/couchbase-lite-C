@@ -73,8 +73,8 @@ CBL_PUBLIC extern const FLString kCBLDefaultCollectionName;
 
 /** Returns the names of all existing scopes in the database.
     The scope exists when there is at least one collection created under the scope.
-    The default scope is exceptional in that it will always exists even there are no collections under it.
-    @note  You are responsible for releasing the returned array.
+    @note The default scope will always exist, containing at least the default collection.
+    @note You are responsible for releasing the returned array.
     @param db  The database.
     @param outError  On failure, the error will be written here.
     @return  The names of all existing scopes in the database, or NULL if an error occurred. */
@@ -93,8 +93,8 @@ FLMutableArray _cbl_nullable CBLDatabase_CollectionNames(const CBLDatabase* db,
 
 /** Returns an existing scope with the given name.
     The scope exists when there is at least one collection created under the scope.
-    The default scope is exception in that it will always exists even there are no collections under it.
-    @note  You are responsible for releasing the returned scope.
+    @note The default scope will always exist, containing at least the default collection.
+    @note You are responsible for releasing the returned scope.
     @param db  The database.
     @param scopeName  The name of the scope.
     @param outError  On failure, the error will be written here.
@@ -146,7 +146,6 @@ bool CBLDatabase_DeleteCollection(CBLDatabase* db,
                                   CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the default scope.
-    @note  The default scope always exist even there are no collections under it.
     @note  You are responsible for releasing the returned scope.
     @param db  The database.
     @param outError  On failure, the error will be written here.
