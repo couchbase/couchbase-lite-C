@@ -58,7 +58,8 @@ using namespace fleece;
 void EnableVectorSearch() {
     auto path = GetExtensionPath();
     if (!path.empty()) {
-        CBL_EnableVectorSearch(slice(path));
+        CBLError error{};
+        REQUIRE(CBL_EnableVectorSearch(slice(path), &error));
     }
 }
 

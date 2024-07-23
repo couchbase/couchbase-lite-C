@@ -101,7 +101,7 @@ TEST_CASE_METHOD(VectorSearchTest_Cpp, "Sanity - Create Vector Index Using Predi
     
     _wordsColl.createVectorIndex(kWordsIndexName, config);
     
-    auto results = executeWordsQuery(20);
+    auto results = executeWordsQuery(20, "prediction(WordEmbeddingCpp,{\"word\": word}).vector");
     CHECK(CountResults(results) == 20);
     CBLResultSet_Release(results);
 }
@@ -113,7 +113,7 @@ TEST_CASE_METHOD(VectorSearchTest_Cpp, "Lazy Vector Index Sanity C++", "[VectorS
     
     _wordsColl.createVectorIndex(kWordsIndexName, config);
     
-    auto results = executeWordsQuery(20);
+    auto results = executeWordsQuery(20, "word");
     CHECK(CountResults(results) == 0);
     CBLResultSet_Release(results);
     
@@ -138,7 +138,7 @@ TEST_CASE_METHOD(VectorSearchTest_Cpp, "Lazy Vector Index Sanity C++", "[VectorS
     }
     
     CHECK(count == 300);
-    results = executeWordsQuery(300);
+    results = executeWordsQuery(300, "word");
     CHECK(CountResults(results) == 300);
     CBLResultSet_Release(results);
 }

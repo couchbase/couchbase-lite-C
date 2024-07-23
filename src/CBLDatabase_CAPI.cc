@@ -463,8 +463,11 @@ bool CBLDatabase_SaveBlob(CBLDatabase* db, CBLBlob* blob,
 
 #ifdef COUCHBASE_ENTERPRISE
 
-void CBL_EnableVectorSearch(FLString path) noexcept {
-    CBLDatabase::enableVectorSearch(path);
+bool CBL_EnableVectorSearch(FLString path, CBLError* _cbl_nullable outError) noexcept {
+    try {
+        CBLDatabase::enableVectorSearch(path);
+        return true;
+    } catchAndBridge(outError)
 }
 
 #endif
