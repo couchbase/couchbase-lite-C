@@ -209,7 +209,7 @@ typedef struct CBLDocument   CBLDocument;
 typedef struct CBLBlob      CBLBlob;
 /** @} */
 
-/** \defgroup queries  Queries
+/** \defgroup query  Query
      @{ */
 /** A compiled database query. */
 typedef struct CBLQuery      CBLQuery;
@@ -218,7 +218,7 @@ typedef struct CBLQuery      CBLQuery;
 typedef struct CBLResultSet  CBLResultSet;
 /** @} */
 
-/** \defgroup indexes  Indexes
+/** \defgroup index  Index
      @{ */
 /** A query index. */
 typedef struct CBLQueryIndex      CBLQueryIndex;
@@ -226,7 +226,6 @@ typedef struct CBLQueryIndex      CBLQueryIndex;
 #ifdef COUCHBASE_ENTERPRISE
 typedef struct CBLIndexUpdater      CBLIndexUpdater;
 #endif
-
 /** @} */
 
 /** \defgroup replication  Replication

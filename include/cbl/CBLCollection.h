@@ -147,7 +147,6 @@ bool CBLDatabase_DeleteCollection(CBLDatabase* db,
                                   CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Returns the default scope.
-    @note  The default scope always exist even there are no collections under it.
     @note  You are responsible for releasing the returned scope.
     @param db  The database.
     @param outError  On failure, the error will be written here.
