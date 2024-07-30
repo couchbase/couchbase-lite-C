@@ -58,6 +58,16 @@ typedef struct {
 #ifdef COUCHBASE_ENTERPRISE
     CBLEncryptionKey encryptionKey;     ///< The database's encryption key (if any)
 #endif
+    /** As Couchbase Lite normally configures its databases, There is a very
+        small (though non-zero) chance that a power failure at just the wrong
+        time could cause the most recently committed transaction's changes to
+        be lost. This would cause the database to appear as it did immediately
+        before that transaction.
+     
+        Setting this mode true ensures that an operating system crash or
+        power failure will not cause the loss of any data.  FULL synchronous
+        is very safe but it is also dramatically slower. */
+    bool fullSync;
 } CBLDatabaseConfiguration;
 
 /** Returns the default database configuration. */
