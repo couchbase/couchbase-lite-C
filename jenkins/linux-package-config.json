@@ -15,11 +15,11 @@
       "target_debs": [ "debian10", "debian11", "debian12", "ubuntu20.04", "ubuntu22.04" ]
     },
     "armhf": {
-        "build_os": "raspbian9",
+        "build_os": "raspios10-armhf", 
         "strip_prefix": "arm-linux-gnueabihf-",
         "toolchain": "Toolchain-pi",
         "target_osname": "linux-armhf",
-        "target_debs": [ "debian9", "debian10", "debian11", "debian12", "ubuntu20.04", "ubuntu22.04" ]
+        "target_debs": [ "debian10", "debian11", "debian12", "ubuntu20.04", "ubuntu22.04" ]
     }
   },
   "package_distro_config": {
