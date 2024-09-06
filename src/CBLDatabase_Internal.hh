@@ -125,11 +125,13 @@ public:
     
     CBLDatabaseConfiguration config() const noexcept {
         auto &c4config = _c4db->useLocked()->getConfiguration();
+        CBLDatabaseConfiguration config {};
+        config.directory = c4config.parentDirectory;
 #ifdef COUCHBASE_ENTERPRISE
-        return {c4config.parentDirectory, asCBLKey(c4config.encryptionKey)};
-#else
-        return {c4config.parentDirectory};
+        config.encryptionKey = asCBLKey(c4config.encryptionKey);
 #endif
+        config.fullSync = (c4config.flags & kC4DB_DiskSyncFull) == kC4DB_DiskSyncFull;
+        return config;
     }
 
     uint64_t count() const                           {return _c4db->useLocked()->getDocumentCount();}
@@ -321,6 +323,9 @@ private:
         C4DatabaseConfig2 c4Config = {};
         c4Config.parentDirectory = effectiveDir(config->directory);
         c4Config.flags = kC4DB_Create;
+        if (config->fullSync) {
+            c4Config.flags |= kC4DB_DiskSyncFull;
+        }
 #ifdef COUCHBASE_ENTERPRISE
         c4Config.encryptionKey = asC4Key(&config->encryptionKey);
 #endif

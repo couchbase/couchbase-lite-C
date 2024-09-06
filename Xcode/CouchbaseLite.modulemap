@@ -11,7 +11,11 @@ framework module CouchbaseLite {
     header "CBLEncryptable.h"
     header "CBLLog.h"
     header "CBLPlatform.h"
+    header "CBLPrediction.h"
     header "CBLQuery.h"
+    header "CBLQueryIndex.h"
+    header "CBLQueryIndexTypes.h"
+    header "CBLQueryTypes.h"
     header "CBLReplicator.h"
     header "CBLScope.h"
     

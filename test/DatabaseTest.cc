@@ -336,6 +336,79 @@ TEST_CASE_METHOD(DatabaseTest, "Database Encryption") {
 
 #endif
 
+#pragma mark - Full Sync:
+
+/** Test Spec for Database Full Sync Option
+    https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0003-SQLite-Options.md
+    v. 2.0.0 */
+
+/**
+ 1. TestSQLiteFullSyncConfig
+
+ Description
+
+ Test that the FullSync default is as expected and that it's setter and getter work.
+
+ Steps
+
+ 1. Create a DatabaseConfiguration object.
+ 2. Get and check the value of the FullSync property: it should be false.
+ 3. Set the FullSync property true
+ 4. Get the config FullSync property and verify that it is true
+ 5. Set the FullSync property false
+ 6. Get the config FullSync property and verify that it is false */
+TEST_CASE_METHOD(DatabaseTest, "TestSQLiteFullSyncConfig") {
+    auto config = CBLDatabaseConfiguration_Default();
+    CHECK(!config.fullSync);
+    
+    config.fullSync = true;
+    CHECK(config.fullSync);
+    
+    config.fullSync = false;
+    CHECK(!config.fullSync);
+}
+
+/**
+ 2. TestDBWithFullSync
+
+ Description
+
+ Test that a Database respects the FullSync property
+
+ Steps
+
+ 1. Create a DatabaseConfiguration object and set Full Sync false
+ 2. Create a database with the config
+ 3. Get the configuration object from the Database and verify that FullSync is false
+ 4. Use c4db_config2 (perhaps necessary only for this test) to confirm that its config does not contain the kC4DB_DiskSyncFull flag
+ 5. Set the config's FullSync property true
+ 6. Create a database with the config
+ 7. Get the configuration object from the Database and verify that FullSync is true
+ 8. Use c4db_config2 to confirm that its config contains the kC4DB_DiskSyncFull flag
+ */
+TEST_CASE_METHOD(DatabaseTest, "TestDBWithFullSync") {
+    auto config = databaseConfig();
+    
+    auto dbname = "fullsyncdb"_sl;
+    CBL_DeleteDatabase(dbname, config.directory, nullptr);
+    CHECK(!CBL_DatabaseExists(dbname, config.directory));
+    
+    CBLError error{};
+    config.fullSync = false;
+    CBLDatabase* db = CBLDatabase_Open(dbname, &config, &error);
+    REQUIRE(db);
+    CHECK(!CBLDatabase_Config(db).fullSync);
+    CHECK(CBLDatabase_Close(db, &error));
+    CBLDatabase_Release(db);
+    
+    config.fullSync = true;
+    db = CBLDatabase_Open(dbname, &config, &error);
+    REQUIRE(db);
+    CHECK(CBLDatabase_Config(db).fullSync);
+    CHECK(CBLDatabase_Close(db, &error));
+    CBLDatabase_Release(db);
+}
+
 #pragma mark - Save Document:
 
 TEST_CASE_METHOD(DatabaseTest, "Save Document into Different DB Instance") {
