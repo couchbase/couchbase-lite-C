@@ -132,6 +132,14 @@ public:
                                         kC4FullTextIndex, &options);
     }
     
+    void createArrayIndex(slice name, CBLArrayIndexConfiguration config) {
+        C4IndexOptions options = {};
+        // TODO Set options for array path when LiteCore API is ready
+        _c4col.useLocked()->createIndex(name, config.expressions,
+                                        (C4QueryLanguage)config.expressionLanguage,
+                                        kC4ArrayIndex, &options);
+    }
+    
 #ifdef COUCHBASE_ENTERPRISE
     
     void createVectorIndex(slice name, CBLVectorIndexConfiguration config) {
