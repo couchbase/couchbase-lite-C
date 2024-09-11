@@ -289,6 +289,17 @@ bool CBLCollection_CreateFullTextIndex(CBLCollection *collection,
     } catchAndBridge(outError)
 }
 
+bool CBLCollection_CreateArrayIndex(CBLCollection *collection,
+                                    FLString name,
+                                    CBLArrayIndexConfiguration config,
+                                    CBLError *outError) noexcept
+{
+    try {
+        collection->createArrayIndex(name, config);
+        return true;
+    } catchAndBridge(outError)
+}
+
 #ifdef COUCHBASE_ENTERPRISE
 
 bool CBLCollection_CreateVectorIndex(CBLCollection *collection,
