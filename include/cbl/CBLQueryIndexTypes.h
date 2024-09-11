@@ -66,6 +66,25 @@ typedef struct {
     FLString language;
 } CBLFullTextIndexConfiguration;
 
+/** Array Index Configuration for indexing property values within arrays
+    in documents, intended for use with the UNNEST query. */
+typedef struct {
+    /** The language used in the expressions (Required). */
+    CBLQueryLanguage expressionLanguage;
+    
+    /** Path to the array, which can be nested to be indexed (Required).
+        Use "[]" to represent a property that is an array of each nested array level.
+        For a single array or the last level array, the "[]" is optional. For instance,
+        use "contacts[].phones" to specify an array of phones within each contact. */
+    FLString path;
+    
+    /** Optional expressions representing the values within the array to be
+        indexed. The expressions could be specified in a JSON Array or in N1QL syntax
+        using comma delimiter. If the array specified by the path contains scalar values,
+        the expressions should be left unset or set to null. */
+    FLString expressions;
+} CBLArrayIndexConfiguration;
+
 #ifdef COUCHBASE_ENTERPRISE
 
 /** An opaque object representing vector encoding type to use in CBLVectorIndexConfiguration. */
