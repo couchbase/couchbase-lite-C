@@ -538,7 +538,7 @@ TEST_CASE_METHOD(DatabaseTest, "Maintenance : Reindex") {
     CBLError error;
     CBLValueIndexConfiguration config = {};
     config.expressionLanguage = kCBLJSONLanguage;
-    config.expressions = R"(["foo"])"_sl;
+    config.expressions = R"([".foo"])"_sl;
     CHECK(CBLCollection_CreateValueIndex(defaultCollection, "foo"_sl, config, &error));
     
     createDocWithPair(db, "doc1", "foo", "bar1");

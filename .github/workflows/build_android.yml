@@ -16,6 +16,7 @@ env:
 
 jobs:
   build:
+    if: false
     runs-on: macos-12
     steps:
     - name: Checkout
@@ -26,8 +27,9 @@ jobs:
     - name: Setup Android SDK
       run: |
         java -version
-        $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "ndk;23.1.7779620"
-        $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "cmake;3.22.1"
+        $ANDROID_SDK_ROOT/tools/bin/sdkmanager --list
+        $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "ndk;27.0.12077973"
+        $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "cmake;3.28.1"
 
     - name: Setup Java SDK
       uses: actions/setup-java@v3

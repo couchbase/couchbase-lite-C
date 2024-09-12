@@ -25,6 +25,7 @@
 #include "cbl/CBLLog.h"
 #include "cbl/CBLScope.h"
 #include "fleece/Mutable.hh"
+#include <exception>
 #include <functional>
 #include <mutex>
 #include <string>
