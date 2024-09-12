@@ -5,21 +5,21 @@
       "strip_prefix": "x86_64-linux-gnu-",
       "toolchain": "Toolchain-cross-x64",
       "target_osname": "linux-x86_64",
-      "target_debs": [ "debian9", "debian10", "debian11", "ubuntu20.04", "ubuntu22.04" ]
+      "target_debs": [ "debian9", "debian10", "debian11", "debian12", "ubuntu20.04", "ubuntu22.04" ]
     },
     "arm64": {
       "build_os": "raspios10-arm64",
       "strip_prefix": "aarch64-linux-gnu-",
       "toolchain": "Toolchain-pi64",
       "target_osname": "linux-arm64",
-      "target_debs": [ "debian10", "debian11", "ubuntu20.04", "ubuntu22.04" ]
+      "target_debs": [ "debian10", "debian11", "debian12", "ubuntu20.04", "ubuntu22.04" ]
     },
     "armhf": {
-        "build_os": "raspbian9",
+        "build_os": "raspbian9", 
         "strip_prefix": "arm-linux-gnueabihf-",
         "toolchain": "Toolchain-pi",
         "target_osname": "linux-armhf",
-        "target_debs": [ "debian9", "debian10", "debian11", "ubuntu20.04", "ubuntu22.04" ]
+        "target_debs": [ "debian9", "debian10", "debian11", "debian12", "ubuntu20.04", "ubuntu22.04" ]
     }
   },
   "package_distro_config": {
@@ -31,6 +31,9 @@
     },
     "debian11": {
         "extra_deps": "libicu67,libstdc++6"
+    },
+    "debian12": {
+        "extra_deps": "libicu72,libstdc++6"
     },
     "ubuntu20.04": {
         "extra_deps": "libicu66,libstdc++6"

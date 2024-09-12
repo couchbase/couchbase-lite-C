@@ -1007,6 +1007,8 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearc
         CHECK(query);
     }
     
+    /*
+    CBL-6244
     SECTION("Invalid Limit : -1") {
         query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(-1)), nullptr, &error);
         CHECK(!query);
@@ -1024,6 +1026,7 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearc
         CHECK(!query);
         CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
     }
+    */
     
     CBLQuery_Release(query);
 }

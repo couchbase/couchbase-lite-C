@@ -30,7 +30,7 @@ try {
 
     New-Item -Type Directory -ErrorAction Ignore build
     Set-Location build
-    & 'C:\Program Files\CMake\bin\cmake.exe' -G "Visual Studio 17 2022" -A x64 -DBUILD_ENTERPRISE=ON -DCMAKE_INSTALL_PREFIX="${pwd}\out" ..
+    & 'C:\Program Files\CMake\bin\cmake.exe' -A x64 -DBUILD_ENTERPRISE=ON -DCMAKE_INSTALL_PREFIX="${pwd}\out" ..
     if($LASTEXITCODE -ne 0) {
         Write-Host "Failed to run CMake!" -ForegroundColor Red
         exit 1

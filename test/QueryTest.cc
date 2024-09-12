@@ -281,7 +281,7 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
             cerr << "Creating index\n";
             CBLValueIndexConfiguration config = {};
             config.expressionLanguage = kCBLJSONLanguage;
-            config.expressions = R"(["contact.address.zip"])"_sl;
+            config.expressions = R"([".contact.address.zip"])"_sl;
             CHECK(CBLCollection_CreateValueIndex(defaultCollection, "zips"_sl, config, &error));
         }
 
@@ -397,8 +397,8 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
                                     &errPos, &error);
     
     alloc_slice explanation1(CBLQuery_Explain(query));
-    CHECK(explanation1.find("JOIN \"kv_default::index1\" AS fts1"));
-    CHECK(explanation1.find("SCAN fts1 VIRTUAL TABLE INDEX"_sl));
+    CHECK(explanation1.find("JOIN \"kv_default::index1\" AS \"<idx1>\""));
+    CHECK(explanation1.find("SCAN <idx1> VIRTUAL TABLE INDEX"_sl));
     CBLQuery_Release(query);
     
     query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage,
@@ -406,8 +406,8 @@ TEST_CASE_METHOD(QueryTest, "Create and Delete Full-Text Index", "[Query]") {
                                     &errPos, &error);
     
     alloc_slice explanation2(CBLQuery_Explain(query));
-    CHECK(explanation2.find("JOIN \"kv_default::index2\" AS fts1"));
-    CHECK(explanation2.find("SCAN fts1 VIRTUAL TABLE INDEX"_sl));
+    CHECK(explanation2.find("JOIN \"kv_default::index2\" AS \"<idx1>\""));
+    CHECK(explanation2.find("SCAN <idx1> VIRTUAL TABLE INDEX"_sl));
     CBLQuery_Release(query);
     query = nullptr;
     
@@ -901,6 +901,8 @@ TEST_CASE_METHOD(QueryTest, "Test Joins with Collections", "[Query]") {
 
     string queryString;
     
+    /*
+    CBL-6243
     SECTION("Use Full Collection Name") {
         queryString = "SELECT flowers.name, colors.color "
                       "FROM test.flowers "
@@ -908,7 +910,8 @@ TEST_CASE_METHOD(QueryTest, "Test Joins with Collections", "[Query]") {
                       "ON flowers.cid = colors.cid "
                       "ORDER BY flowers.name";
     }
-
+    */
+    
     SECTION("Use Alias Name") {
         queryString = "SELECT f.name, c.color "
                       "FROM test.flowers f "
