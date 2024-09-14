@@ -322,7 +322,7 @@ private:
         }
         C4DatabaseConfig2 c4Config = {};
         c4Config.parentDirectory = effectiveDir(config->directory);
-        c4Config.flags = kC4DB_Create;
+        c4Config.flags = kC4DB_Create | kC4DB_VersionVectors;
         if (config->fullSync) {
             c4Config.flags |= kC4DB_DiskSyncFull;
         }

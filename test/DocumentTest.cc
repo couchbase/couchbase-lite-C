@@ -338,13 +338,15 @@ TEST_CASE_METHOD(DocumentTest, "Save Empty Document", "[Document]") {
     REQUIRE(CBLCollection_SaveDocument(col, doc, &error));
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
+    auto revID = alloc_slice(CBLDocument_RevisionID(doc));
+    CHECK(!revID.empty());
     CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);
 
     doc = CBLCollection_GetMutableDocument(col, "foo"_sl, &error);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
-    CHECK(CBLDocument_RevisionID(doc) == "1-581ad726ee407c8376fc94aad966051d013893c4"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
+    CHECK(CBLDocument_RevisionID(doc) == revID);
     CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{}"_sl);
     CBLDocument_Release(doc);
 }
@@ -361,6 +363,8 @@ TEST_CASE_METHOD(DocumentTest, "Save Document With Properties", "[Document]") {
     REQUIRE(CBLCollection_SaveDocument(col, doc, &error));
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
+    auto revID = alloc_slice(CBLDocument_RevisionID(doc));
+    CHECK(!revID.empty());
     CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CBLDocument_Release(doc);
@@ -368,6 +372,7 @@ TEST_CASE_METHOD(DocumentTest, "Save Document With Properties", "[Document]") {
     doc = CBLCollection_GetMutableDocument(col, "foo"_sl, &error);
     CHECK(CBLDocument_ID(doc) == "foo"_sl);
     CHECK(CBLDocument_Sequence(doc) == 1);
+    CHECK(CBLDocument_RevisionID(doc) == revID);
     CHECK(alloc_slice(CBLDocument_CreateJSON(doc)) == "{\"greeting\":\"Howdy!\"}"_sl);
     CHECK(Dict(CBLDocument_Properties(doc)).toJSONString() == "{\"greeting\":\"Howdy!\"}");
     CBLDocument_Release(doc);
@@ -688,6 +693,77 @@ TEST_CASE_METHOD(DocumentTest, "Save Document into Different Collection", "[Docu
     CHECK(!CBLCollection_SaveDocument(otherCol, doc, &error));
     CHECK(error.domain == kCBLDomain);
     CHECK(error.code == kCBLErrorInvalidParameter);
+    CBLDocument_Release(doc);
+}
+
+#pragma mark - Timestamp
+
+/*
+ https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0005-Version-Vector.md
+
+ 1. TestDocumentTimestamp
+
+ Description
+ Test that the document's timestamp returns value as expected.
+
+ Steps
+ 1. Create a new document with id = "doc1"
+ 2. Get document's timestamp and check that the timestamp is 0.
+ 3. Save the document into the default collection.
+ 4. Get document's timestamp and check that the timestamp is more than 0.
+ 5. Get the document id = "doc1" from the database.
+ 6. Get document's timestamp and check that the timestamp is the same as the timestamp from step 4.
+*/
+TEST_CASE_METHOD(DocumentTest, "Timestamp", "[Document]") {
+    CBLDocument* doc = CBLDocument_CreateWithID("doc1"_sl);
+    REQUIRE(doc);
+    CHECK(CBLDocument_Timestamp(doc) == 0);
+    
+    CBLError error;
+    REQUIRE(CBLCollection_SaveDocument(col, doc, &error));
+    auto timestamp = CBLDocument_Timestamp(doc);
+    CHECK(timestamp > 0);
+    CBLDocument_Release(doc);
+    
+    doc = CBLCollection_GetMutableDocument(col, "doc1"_sl, &error);
+    CHECK(CBLDocument_Timestamp(doc) == timestamp);
+    CBLDocument_Release(doc);
+}
+
+#pragma mark - Revision History
+
+/*
+ https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0005-Version-Vector.md
+ 2. TestDocumentRevisionHistory
+
+ Description
+ Test that the document's timestamp returns value as expected.
+
+ Steps
+ 1. Create a new document with id = "doc1"
+ 2. Get document's _revisionIDs and check that the value returned is an empty array.
+ 3. Save the document into the default collection.
+ 4. Get document's _revisionIDs and check that the value returned is an array containing a 
+    single revision id which is the revision id of the documnt.
+ 5. Get the document id = "doc1" from the database.
+ 6. Get document's _revisionIDs and check that the value returned is an array containing a 
+    single revision id which is the revision id of the documnt.
+ */
+TEST_CASE_METHOD(DocumentTest, "Revision History", "[Document]") {
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+    
+    alloc_slice revHistory = CBLDocument_GetRevisionHistory(doc);
+    CHECK(revHistory == nullslice);
+    
+    CBLError error;
+    REQUIRE(CBLCollection_SaveDocument(col, doc, &error));
+    revHistory = CBLDocument_GetRevisionHistory(doc);
+    CHECK(revHistory != nullslice);
+    CBLDocument_Release(doc);
+    
+    doc = CBLCollection_GetMutableDocument(col, "foo"_sl, &error);
+    revHistory = CBLDocument_GetRevisionHistory(doc);
+    CHECK(revHistory != nullslice);
     CBLDocument_Release(doc);
 }
 

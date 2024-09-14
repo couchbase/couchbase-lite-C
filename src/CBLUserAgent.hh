@@ -21,8 +21,6 @@
 #include "CBL_Edition.h"
 #include <sstream>
 
-using string = std::string;
-
 #ifdef _MSC_VER
 #define NOMINMAX
 #include <windows.h>
@@ -37,7 +35,7 @@ extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetVersion(
 #if __APPLE__
 #include <sys/utsname.h>
 #if TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
-static string getDeviceModel(const char* fallback) {
+static std::string getDeviceModel(const char* fallback) {
     utsname uts;
     if(uname(&uts) != 0) {
         return fallback;
@@ -46,7 +44,7 @@ static string getDeviceModel(const char* fallback) {
 }
 
 #endif
-string getAppleVersion();
+std::string getAppleVersion();
 #endif
 
 #if defined(__linux__) && !defined(__ANDROID__)
@@ -56,7 +54,7 @@ string getAppleVersion();
 #include <fstream>
 #include <sys/utsname.h>
 
-static std::optional<string> tryKey(const char* filename, string&& key) {
+static std::optional<std::string> tryKey(const char* filename, std::string&& key) {
     static const std::regex r("(.*)=(.*)");
     std::ifstream fin(filename);
     if(!fin) {
@@ -64,7 +62,7 @@ static std::optional<string> tryKey(const char* filename, string&& key) {
     }
 
     fin.exceptions(std::ios_base::badbit);
-    string line;
+    std::string line;
     std::smatch match;
     while(std::getline(fin, line)) {
         if(std::regex_match(line, match, r)) {
@@ -77,7 +75,7 @@ static std::optional<string> tryKey(const char* filename, string&& key) {
     return {};
 }
 
-static string getDistroInfo() {
+static std::string getDistroInfo() {
     // os-release is apparently the standard these days
     if(auto os = tryKey("/etc/os-release", "PRETTY_NAME")) {
         return *os;
@@ -102,7 +100,7 @@ static string getDistroInfo() {
         return "Unknown Linux";
     }
 
-    return string(uts.sysname) + ' ' + uts.release;
+    return std::string(uts.sysname) + ' ' + uts.release;
 }
 #endif
 
@@ -110,15 +108,14 @@ static string getDistroInfo() {
 #include <sys/system_properties.h>
 #endif
 
-using stringstream = std::stringstream;
 using alloc_slice = fleece::alloc_slice;
 
 // TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
 // OUTPUT   - CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
 
-static string createUserAgentHeader(){
-        stringstream header;
-        string os;
+static std::string createUserAgentHeader(){
+        std::stringstream header;
+        std::string os;
         alloc_slice coreVersion = c4_getVersion();
         alloc_slice coreBuild = c4_getBuildInfo();
 #if defined (__APPLE__) && defined (__MACH__)
@@ -139,7 +136,7 @@ static string createUserAgentHeader(){
         RTL_OSVERSIONINFOW version{};
         version.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
         auto result = RtlGetVersion(&version);
-        stringstream osStream;
+        std::stringstream osStream;
         if (result < 0) {
             os = "Microsoft Windows (Version Fetch Failed)";
         } else {

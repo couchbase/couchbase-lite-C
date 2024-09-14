@@ -33,18 +33,12 @@ static const CBLDocument* defaultConflictResolver(void *context,
                                                   const CBLDocument *localDoc,
                                                   const CBLDocument *remoteDoc)
 {
-    const CBLDocument* resolved;
     if (remoteDoc == nullptr || localDoc == nullptr)
-        resolved = nullptr;
-    else if (remoteDoc->generation() > localDoc->generation())
-        resolved = remoteDoc;
-    else if (localDoc->generation() > remoteDoc->generation())
-        resolved = localDoc;
-    else if (FLSlice_Compare(localDoc->revisionID(), remoteDoc->revisionID()) > 0)
-        resolved = localDoc;
+        return nullptr;
+    else if (localDoc->timestamp() > remoteDoc->timestamp())
+        return localDoc;
     else
-        resolved = remoteDoc;
-    return resolved;
+        return remoteDoc;
 }
 
 CBL_PUBLIC const CBLConflictResolver CBLDefaultConflictResolver = &defaultConflictResolver;
