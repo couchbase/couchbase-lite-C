@@ -138,6 +138,7 @@ CBL_C {
 		CBLScope_CollectionNames;
 		CBLDocument_ID;
 		CBLDocument_RevisionID;
+		CBLDocument_Timestamp;
 		CBLDocument_Sequence;
 		CBLDocument_Collection;
 		CBLDocument_Create;
@@ -212,7 +213,7 @@ CBL_C {
 		CBLDatabase_DeleteDocumentByID;
 		CBLDatabase_LastSequence;
 		CBLDocument_CanonicalRevisionID;
-		CBLDocument_Generation;
+		CBLDocument_GetRevisionHistory;
 		CBLError_GetCaptureBacktraces;
 		CBLError_SetCaptureBacktraces;
 		CBLQuery_SetListenerCallbackDelay;

@@ -161,7 +161,25 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Pending Documents", "[Replicator]") {
     CHECK(error.code == 0);
 }
 
+/*
+ https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0005-Version-Vector.md
+ 4. DefaultConflictResolverDeleteWins
 
+ Description
+ Test that the default conflict resolver that the delete always wins works as expected. 
+ There could be already a default conflict resolver test that can be modified to test this test case.
+
+ Steps
+ 1. Create two databases the names such as "db1" and "db2".
+ 2. Create a document on each database as :
+    - Document id "doc1" on "db1" with content as {"key": "value1"}
+    - Document id "doc1" on "db2" with content as {"key": "value2"}
+ 3. Update the document on each database as the following order:
+    - Delete document id "doc1" on "db1"
+    - Update document id "doc1" on "db2" as as {"key": "value3"}
+4. Start a single shot pull replicator to pull documents from "db2" to "db1".
+5. Get the document "doc1" from "db1" and check that the returned document is null.
+*/
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Replicator][Conflict]") {
     SECTION("No conflict resolved specified") {
         config.conflictResolver = nullptr;
@@ -173,21 +191,19 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
     
     config.replicatorType = kCBLReplicatorTypePull;
     
-    // Delete Doc:
-    MutableDocument doc("foo");
-    doc["greeting"] = "Howdy!";
-    defaultCollection.saveDocument(doc);
-    defaultCollection.deleteDocument(doc);
+    MutableDocument doc1("doc1");
+    doc1["key"] = "value1";
+    defaultCollection.saveDocument(doc1);
 
-    // Update multiple times:
-    MutableDocument doc2("foo");
-    doc2["greeting"] = "Salaam Alaykum";
-    otherDBDefaultCol.saveDocument(doc2);
-
-    doc2["greeting"] = "Hello";
+    MutableDocument doc2("doc1");
+    doc2["key"] = "value2";
     otherDBDefaultCol.saveDocument(doc2);
     
-    doc2["greeting"] = "Konichiwa";
+    // Delete doc:
+    defaultCollection.deleteDocument(doc1);
+    
+    // Update doc:
+    doc2["key"] = "value3";
     otherDBDefaultCol.saveDocument(doc2);
     
     // Pull:
@@ -195,9 +211,11 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
     replicate();
 
     // Deleted doc should win:
-    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
-    Document localDoc = defaultCollection.getDocument("foo");
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"doc1"});
+    Document localDoc = defaultCollection.getDocument("doc1");
     REQUIRE(!localDoc);
+    
+    // Additional Check:
     
     // Push
     config.replicatorType = kCBLReplicatorTypePush;
@@ -206,13 +224,34 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
     replicate();
     
     // Resolved doc should be pushed:
-    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
-    Document remoteDoc = otherDBDefaultCol.getDocument("foo");
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"doc1"});
+    Document remoteDoc = otherDBDefaultCol.getDocument("doc1");
     REQUIRE(!remoteDoc);
 }
 
+/*
+ https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0005-Version-Vector.md
+ 3. DefaultConflictResolverLastWriteWins
 
-TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Replicator][Conflict]") {
+ Description
+ Test that the default conflict resolver that the last write wins works as expected.
+ There could be already a default conflict resolver test that can be modified to test this test case.
+
+ Steps
+ 1. Create two databases the names such as "db1" and "db2".
+ 2. Create a document on each database in the exact order as :
+    - Document id "doc1" on "db2" with content as {"key": "value2"}
+    - Document id "doc1" on "db1" with content as {"key": "value1"}
+ 3. Start a single shot pull replicator to pull documents from "db2" to "db1".
+ 4. Get the document "doc1" from "db1" and check that the content is {"key": "value1"}.
+ 5. Create a document on each database in the exact order as :
+    - Document id "doc2" on "db1" with content as {"key": "value1"}
+    - Document id "doc2" on "db2" with content as {"key": "value2"}
+ 6. Start a single shot pull replicator to pull documents from "db2" to "db1".
+ 7. Get the document "doc2" from "db1" and check that the content is {"key": "value2"}.
+*/
+TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Last Write Wins - Client", "[Replicator][Conflict]") {
+    // Test Step 1 - 4
     SECTION("No conflict resolved specified") {
         config.conflictResolver = nullptr;
     }
@@ -222,32 +261,28 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
     }
     
     config.replicatorType = kCBLReplicatorTypePull;
-
+    
     // Create:
-    MutableDocument doc("foo");
-    doc["greeting"] = "Howdy!";
-    defaultCollection.saveDocument(doc);
-    
-    // Create and Update:
-    MutableDocument doc2("foo");
-    doc2["greeting"] = "Salaam Alaykum";
+    MutableDocument doc2("doc1");
+    doc2["key"] = "value2";
     otherDBDefaultCol.saveDocument(doc2);
     
-    doc2["greeting"] = "Konichiwa";
-    otherDBDefaultCol.saveDocument(doc2);
+    // Create:
+    MutableDocument doc1("doc1");
+    doc1["key"] = "value1";
+    defaultCollection.saveDocument(doc1);
     
-    REQUIRE(CBLDocument_Generation(doc2.ref()) > CBLDocument_Generation(doc.ref()));
-
     // Pull
     resetReplicator();
     replicate();
 
-    // Higher generation should win:
-    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
-    Document localDoc = defaultCollection.getDocument("foo");
+    // Last Write:
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"doc1"});
+    Document localDoc = defaultCollection.getDocument("doc1");
     REQUIRE(localDoc);
-    CHECK(localDoc["greeting"].asString() == "Konichiwa"_sl);
-    CHECK(localDoc.revisionID() == doc2.revisionID());
+    CHECK(localDoc["key"].asString() == "value1"_sl);
+    
+    // Additional Check:
     
     // Push
     config.replicatorType = kCBLReplicatorTypePush;
@@ -255,16 +290,36 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher Gen Wins", "[Re
     resetReplicator();
     replicate();
     
-    // Resolved doc, same as remote doc, should not be pushed.
-    CHECK(asVector(replicatedDocIDs) == vector<string>{});
-    Document remoteDoc = defaultCollection.getDocument("foo");
+    // Resolved doc
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"doc1"});
+    Document remoteDoc = otherDBDefaultCol.getDocument("doc1");
     REQUIRE(remoteDoc);
-    CHECK(remoteDoc["greeting"].asString() == "Konichiwa"_sl);
-    CHECK(remoteDoc.revisionID() == doc2.revisionID());
+    CHECK(remoteDoc["key"].asString() == "value1"_sl);
 }
 
+/*
+ https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0005-Version-Vector.md
+ 3. DefaultConflictResolverLastWriteWins
 
-TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[Replicator][Conflict]") {
+ Description
+ Test that the default conflict resolver that the last write wins works as expected.
+ There could be already a default conflict resolver test that can be modified to test this test case.
+
+ Steps
+ 1. Create two databases the names such as "db1" and "db2".
+ 2. Create a document on each database in the exact order as :
+    - Document id "doc1" on "db2" with content as {"key": "value2"}
+    - Document id "doc1" on "db1" with content as {"key": "value1"}
+ 3. Start a single shot pull replicator to pull documents from "db2" to "db1".
+ 4. Get the document "doc1" from "db1" and check that the content is {"key": "value1"}.
+ 5. Create a document on each database in the exact order as :
+    - Document id "doc2" on "db1" with content as {"key": "value1"}
+    - Document id "doc2" on "db2" with content as {"key": "value2"}
+ 6. Start a single shot pull replicator to pull documents from "db2" to "db1".
+ 7. Get the document "doc2" from "db1" and check that the content is {"key": "value2"}.
+*/
+TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Last Write Wins - Server", "[Replicator][Conflict]") {
+    // Test Step 5 - 7
     SECTION("No conflict resolved specified") {
         config.conflictResolver = nullptr;
     }
@@ -274,29 +329,27 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
     }
     
     config.replicatorType = kCBLReplicatorTypePull;
-
+    
     // Create:
-    MutableDocument doc("foo");
-    doc["greeting"] = "Howdy!";
-    defaultCollection.saveDocument(doc);
-
-    // Create:
-    MutableDocument doc2("foo");
-    doc2["greeting"] = "Salaam Alaykum";
+    MutableDocument doc1("doc2");
+    doc1["key"] = "value1";
+    defaultCollection.saveDocument(doc1);
+    
+    MutableDocument doc2("doc2");
+    doc2["key"] = "value2";
     otherDBDefaultCol.saveDocument(doc2);
-    
-    REQUIRE(doc2.revisionID().compare(doc.revisionID()) > 0);
-    
+
     // Pull
     resetReplicator();
     replicate();
 
-    // Higher revOD should win:
-    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
-    Document localDoc = defaultCollection.getDocument("foo");
+    // Last Write:
+    CHECK(asVector(replicatedDocIDs) == vector<string>{"doc2"});
+    Document localDoc = defaultCollection.getDocument("doc2");
     REQUIRE(localDoc);
-    CHECK(localDoc["greeting"].asString() == "Salaam Alaykum"_sl);
-    CHECK(localDoc.revisionID() == doc2.revisionID());
+    CHECK(localDoc["key"].asString() == "value2"_sl);
+    
+    // Additional Check:
     
     // Push
     config.replicatorType = kCBLReplicatorTypePush;
@@ -304,13 +357,11 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Higher RevID Wins", "[
     resetReplicator();
     replicate();
     
-    // Resolved doc should be the same:
-    // Resolved doc, same as remote doc, should not be pushed.
+    // Resolved doc
     CHECK(asVector(replicatedDocIDs) == vector<string>{});
-    Document remoteDoc = defaultCollection.getDocument("foo");
+    Document remoteDoc = otherDBDefaultCol.getDocument("doc2");
     REQUIRE(remoteDoc);
-    CHECK(remoteDoc["greeting"].asString() == "Salaam Alaykum"_sl);
-    CHECK(remoteDoc.revisionID() == doc2.revisionID());
+    CHECK(remoteDoc["key"].asString() == "value2"_sl);
 }
 
 class ReplicatorConflictTest : public ReplicatorLocalTest {

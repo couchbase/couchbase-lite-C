@@ -24,6 +24,8 @@
 #include "fleece/Expert.hh"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <climits>
+#include <sstream>
 #include <unordered_map>
 
 CBL_ASSUME_NONNULL_BEGIN
@@ -87,13 +89,12 @@ public:
     bool isMutable() const                      {return _mutable;}
     slice docID() const                         {return _docID;}
     slice revisionID() const                    {return _revID;}
-    unsigned generation() const                 {return C4Document::getRevIDGeneration(_revID);}
-
+    uint64_t timestamp() const                  {return C4Document::getRevIDTimestamp(_revID);}
+    
     uint64_t sequence() const {
         auto c4doc = _c4doc.useLocked();
         return c4doc ? static_cast<uint64_t>(c4doc->selectedRev().sequence) : 0;
     }
-
 
     alloc_slice canonicalRevisionID() const {
         auto c4doc = _c4doc.useLocked();
@@ -103,12 +104,18 @@ public:
         return c4doc->getSelectedRevIDGlobalForm();
     }
 
-
     C4RevisionFlags revisionFlags() const {
         auto c4doc = _c4doc.useLocked();
         return c4doc ? c4doc->selectedRev().flags : (kRevNew | kRevLeaf);
     }
-
+    
+    alloc_slice getRevisionHistory() const {
+        auto history = fleece::MutableArray::newArray();
+        auto c4doc = _c4doc.useLocked();
+        if (!c4doc)
+            return fleece::nullslice;
+        return c4doc->getRevisionHistory(UINT_MAX, nullptr, 0);
+    }
 
 #pragma mark - Properties:
 
