@@ -196,14 +196,10 @@ if __name__ == '__main__':
 
     os.environ['ROOTFS'] = str(sysroot_path)
     cmake_args=['cmake', '..', f'-DEDITION={args.edition}', f'-DCMAKE_INSTALL_PREFIX={os.getcwd()}/libcblite-{args.version}',
-        '-DCMAKE_BUILD_TYPE=MinSizeRel', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}']
-    if args.build_os == "raspbian9" or args.build_os == "debian9-x86_64":
-        cmake_args.append('-DCBL_STATIC_CXX=ON')
-    elif args.build_os == "raspios10-arm64":
-        cmake_args.append('-D64_BIT=ON')
+        '-DCMAKE_BUILD_TYPE=MinSizeRel', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}', '-DCBL_STATIC_CXX=ON']
 
     subprocess.run(cmake_args, check=True)
-    subprocess.run(['make', '-j8'], check=True)
+    subprocess.run(['make', '-j8', 'cblite'], check=True)
 
     print(f"==== Stripping binary using {args.strip_prefix}strip")
     subprocess.run([str(workspace_path / 'couchbase-lite-c' / 'jenkins' / 'strip.sh'), project_dir,
