@@ -102,7 +102,6 @@ def check_toolchain(name: str):
             files_to_move = outer_dir.glob("**/*")
             for file in files_to_move:
                 relative = file.relative_to(outer_dir)
-                print(relative)
                 os.makedirs(tmppath / relative.parent, 0o755, True)
                 shutil.move(str(file), tmppath / relative.parent)
 
