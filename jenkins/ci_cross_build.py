@@ -94,14 +94,20 @@ def check_toolchain(name: str):
         with tarfile.open('toolchain.tar.gz', 'r:gz') as tar:
             safe_extract(tar, tmpdir, members=tar_extract_callback(tar))
 
-        outer_dir = tmppath / os.listdir(tmpdir)[0]
-        files_to_move = outer_dir.glob("**/*")
-        for file in files_to_move:
-            relative = file.relative_to(outer_dir)
-            os.makedirs(tmppath / relative.parent, 0o755, True)
-            shutil.move(str(file), tmppath / relative.parent)
+        if len(os.listdir(tmpdir)) == 1:
+            # The toolchain was packaged with a top level directory
+            # (i.e. usually with the same name as the tar.gz so foo.tar.gz -> foo/everything)
+            # but I don't want that, so remove it so that all the folders are in root
+            outer_dir = tmppath / os.listdir(tmpdir)[0]
+            files_to_move = outer_dir.glob("**/*")
+            for file in files_to_move:
+                relative = file.relative_to(outer_dir)
+                print(relative)
+                os.makedirs(tmppath / relative.parent, 0o755, True)
+                shutil.move(str(file), tmppath / relative.parent)
 
-        os.rmdir(outer_dir)
+            os.rmdir(outer_dir)
+
         os.remove("toolchain.tar.gz")
         if not toolchain_path.exists():
             shutil.move(tmpdir, toolchain_path)
