@@ -201,7 +201,7 @@ if __name__ == '__main__':
 
     os.environ['ROOTFS'] = str(sysroot_path)
     cmake_args=['cmake', '..', f'-DEDITION={args.edition}', f'-DCMAKE_INSTALL_PREFIX={os.getcwd()}/libcblite-{args.version}',
-        '-DCMAKE_BUILD_TYPE=MinSizeRel', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}', '-DCBL_STATIC_CXX=ON']
+        '-DCMAKE_BUILD_TYPE=MinSizeRel', f'-DCMAKE_TOOLCHAIN_FILE={args.toolchain}', '-DCBL_STATIC_CXX=ON', '-DCBL_C_BUILD_TESTS=OFF']
 
     subprocess.run(cmake_args, check=True)
     subprocess.run(['make', '-j8', 'cblite'], check=True)

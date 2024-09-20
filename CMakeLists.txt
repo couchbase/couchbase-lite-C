@@ -36,6 +36,7 @@ set(CMAKE_C_STANDARD 11)
 option(BUILD_ENTERPRISE "Set whether or not to build enterprise edition" OFF)
 option(CODE_COVERAGE_ENABLED "Set whether or not code coverage report should be generated" OFF)
 option(STRIP_SYMBOLS "Set whether or not the private symbols will be stripped" OFF)
+option(CBL_C_BUILD_TESTS "If enabled, build the test suite as well" ON)
 
 if(CODE_COVERAGE_ENABLED)
    message("Code coverage enabled, forcing sanitizers off")
