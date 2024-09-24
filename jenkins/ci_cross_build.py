@@ -164,7 +164,6 @@ if __name__ == '__main__':
     parser.add_argument('edition', type=str, choices=['enterprise', 'community'], help='The edition of the product to build')
     parser.add_argument('build_os', type=str, help="The OS to compile for")
     parser.add_argument('target_osname', type=str, help="OS name to use in deliverable .tar.gz files")
-    parser.add_argument('strip_prefix', type=str, help='The prefix to use on the binary for stripping the final product')
     parser.add_argument('toolchain', type=str, help='The CMake toolchain file to use for building')
     args = parser.parse_args()
 
