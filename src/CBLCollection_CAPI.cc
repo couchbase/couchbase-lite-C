@@ -347,6 +347,14 @@ CBLQueryIndex* CBLCollection_GetIndex(CBLCollection* collection, FLString indexN
     } catchAndBridge(outError)
 }
 
+/** Private API for testing purpose */
+FLMutableArray CBLCollection_GetIndexesInfo(const CBLCollection* collection,
+                                            CBLError* _cbl_nullable outError) noexcept {
+    try {
+        return FLMutableArray_Retain(collection->indexesInfo());
+    } catchAndBridge(outError)
+}
+
 #pragma mark - LISTENERS:
 
 CBLListenerToken* CBLCollection_AddChangeListener(const CBLCollection* collection,

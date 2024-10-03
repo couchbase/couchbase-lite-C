@@ -44,6 +44,9 @@ CBL_CAPI_BEGIN
                                       CBLError* _cbl_nullable outError) CBLAPI;
 #endif
 
+FLMutableArray CBLCollection_GetIndexesInfo(const CBLCollection* collection,
+                                            CBLError* _cbl_nullable outError) CBLAPI;
+
 /** Deletes a document from the database, given only its ID.
     @note  If no document with that ID exists, this function will return false but the error
             code will be zero.
