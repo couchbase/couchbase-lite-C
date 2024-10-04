@@ -20,6 +20,7 @@
 #include "cbl/CouchbaseLite.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include "CBLPrivate.h"
 #include <iostream>
 #include <mutex>
 #include <thread>
@@ -33,6 +34,7 @@ class QueryTest : public CBLTest {
 public:
     QueryTest() {
         ImportJSONLines("names_100.json", defaultCollection);
+        
     #ifdef DEBUG
         CBLQuery_SetListenerCallbackDelay(0);
     #endif
@@ -281,7 +283,7 @@ TEST_CASE_METHOD(QueryTest, "Query Parameters", "[Query]") {
             cerr << "Creating index\n";
             CBLValueIndexConfiguration config = {};
             config.expressionLanguage = kCBLJSONLanguage;
-            config.expressions = R"(["contact.address.zip"])"_sl;
+            config.expressions = R"([".contact.address.zip"])"_sl;
             CHECK(CBLCollection_CreateValueIndex(defaultCollection, "zips"_sl, config, &error));
         }
 
@@ -942,6 +944,7 @@ TEST_CASE_METHOD(QueryTest, "Test Joins with Collections", "[Query]") {
     }
     CHECK(n == 2);
 }
+
 TEST_CASE_METHOD(QueryTest, "FTS with FTS Index in Default Collection", "[Query]"){
     CBLError error;
     int errPos;
@@ -1158,6 +1161,130 @@ TEST_CASE_METHOD(QueryTest, "Test Select All Result Key", "[Query]") {
         CBLResultSet_Release(results);
         CBLQuery_Release(query);
     }
+}
+
+#pragma mark - ArrayIndex / Unnest
+
+// Spec: https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0004-Unnest-Array-Index.md
+// Version: 1.0.1
+//
+// Notes:
+// * 1. TestArrayIndexConfigInvalidExpressions is not applicable for CBL-C as
+//      ArrayIndexConfigurationConfiguration is just a pure struct (no validation logic)
+//
+
+/**
+ 2. TestCreateArrayIndexWithPath
+
+ Description
+ Test that creating an array index with only path works as expected.
+
+ Steps
+ 1. Load profiles.json into the collection named "_default.profiles".
+ 2. Create a ArrayIndexConfiguration object.
+     - path: "contacts"
+     - expressions:  null
+ 3. Create an array index named "contacts" in the profiles collection.
+ 4. Get index names from the profiles collection and check that the index named "contacts" exists.
+ 5. Get info of the index named "contacts" using an internal API and check that the index has
+     path and expressions as configured.
+ */
+TEST_CASE_METHOD(QueryTest, "TestCreateArrayIndexWithPath", "[Query]") {
+    auto collection = CreateCollection(db, "profiles");
+    ImportJSONLines("profiles_100.json", collection);
+    
+    CBLArrayIndexConfiguration config {};
+    config.path = "contacts"_sl;
+    
+    SECTION("SQL++") {
+        config.expressionLanguage = kCBLN1QLLanguage;
+    }
+    
+    SECTION("JSON") {
+        config.expressionLanguage = kCBLJSONLanguage;
+    }
+    
+    CBLError error {};
+    CHECK(CBLCollection_CreateArrayIndex(collection, "contacts"_sl, config, &error));
+    CheckNoError(error);
+    
+    auto indexNames = CBLCollection_GetIndexNames(collection, &error);
+    CHECK(FLArray_Count(indexNames) == 1);
+    CHECK(Array(indexNames).toJSONString() == R"(["contacts"])");
+    FLArray_Release(indexNames);
+    
+    auto indexesInfo = CBLCollection_GetIndexesInfo(collection, &error);
+    CheckNoError(error);
+    CHECK(FLArray_Count(indexesInfo) == 1);
+    auto info = FLValue_AsDict(FLArray_Get(indexesInfo, 0));
+    CHECK(info);
+    auto expr = FLValue_AsString(FLDict_Get(info, "expr"_sl));
+    if (config.expressionLanguage == kCBLN1QLLanguage) {
+        CHECK(expr == kFLSliceNull);
+    } else {
+        CHECK(expr == "[]"_sl);
+    }
+    FLArray_Release(indexesInfo);
+    
+    CBLCollection_Release(collection);
+}
+
+/**
+ 3. TestCreateArrayIndexWithPathAndExpressions
+
+ Description
+ Test that creating an array index with path and expressions works as expected.
+
+ Steps
+ 1. Load profiles.json into the collection named "_default.profiles".
+ 2. Create a ArrayIndexConfiguration object.
+     - path: "contacts"
+     - expressions:  ["address.city", "address.state"]
+ 3. Create an array index named "contacts" in the profiles collection.
+ 4. Get index names from the profiles collection and check that the index named "contacts" exists.
+ 5. Get info of the index named "contacts" using an internal API and check that the index has
+     path and expressions as configured.
+ */
+TEST_CASE_METHOD(QueryTest, "TestCreateArrayIndexWithPathAndExpressions", "[Query]") {
+    auto collection = CreateCollection(db, "profiles");
+    ImportJSONLines("profiles_100.json", collection);
+    
+    CBLArrayIndexConfiguration config {};
+    config.path = "contacts"_sl;
+    
+    SECTION("SQL++") {
+        config.expressionLanguage = kCBLN1QLLanguage;
+        config.expressions = "address.city, address.state"_sl;
+    }
+    
+    SECTION("JSON") {
+        config.expressionLanguage = kCBLJSONLanguage;
+        config.expressions = R"([[".address.city"], [".address.state"]])"_sl;
+    }
+    
+    CBLError error {};
+    CHECK(CBLCollection_CreateArrayIndex(collection, "contacts"_sl, config, &error));
+    CheckNoError(error);
+    
+    auto indexNames = CBLCollection_GetIndexNames(collection, &error);
+    CHECK(FLArray_Count(indexNames) == 1);
+    CHECK(Array(indexNames).toJSONString() == R"(["contacts"])");
+    FLArray_Release(indexNames);
+    
+    auto indexesInfo = CBLCollection_GetIndexesInfo(collection, &error);
+    CheckNoError(error);
+    CHECK(FLArray_Count(indexesInfo) == 1);
+    auto info = FLValue_AsDict(FLArray_Get(indexesInfo, 0));
+    CHECK(info);
+    auto expr = FLValue_AsString(FLDict_Get(info, "expr"_sl));
+    if (config.expressionLanguage == kCBLN1QLLanguage) {
+        CHECK(expr == "address.city, address.state"_sl);
+    } else {
+        CHECK(expr == R"([[".address.city"], [".address.state"]])"_sl);
+    }
+    FLArray_Release(indexesInfo);
+    
+    CBLCollection_Release(collection);
 }
 
 #ifdef COUCHBASE_ENTERPRISE
