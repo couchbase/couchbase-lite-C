@@ -126,11 +126,13 @@ CBL_C {
 		CBLCollection_GetMutableDocument;
 		CBLCollection_AddChangeListener;
 		CBLCollection_AddDocumentChangeListener;
+		CBLCollection_CreateArrayIndex;
 		CBLCollection_CreateValueIndex;
 		CBLCollection_CreateFullTextIndex;
 		CBLCollection_DeleteIndex;
 		CBLCollection_GetIndex;
 		CBLCollection_GetIndexNames;
+		CBLCollection_GetIndexesInfo;
 		kCBLDefaultScopeName;
 		CBLScope_Name;
 		CBLScope_Database;
