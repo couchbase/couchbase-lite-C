@@ -134,8 +134,15 @@ public:
     
     void createArrayIndex(slice name, CBLArrayIndexConfiguration config) {
         C4IndexOptions options = {};
-        // TODO Set options for array path when LiteCore API is ready
-        _c4col.useLocked()->createIndex(name, config.expressions,
+        options.unnestPath = (char*)config.path.buf;
+        
+        auto exprs = config.expressions;
+        if (!exprs.buf && config.expressionLanguage == kCBLJSONLanguage) {
+            exprs = FLStr("[]");
+        }
+        
+        config.expressions = exprs;
+        _c4col.useLocked()->createIndex(name, exprs,
                                         (C4QueryLanguage)config.expressionLanguage,
                                         kC4ArrayIndex, &options);
     }
@@ -221,6 +228,11 @@ public:
     }
     
     Retained<CBLQueryIndex> getIndex(slice name);
+    
+    fleece::MutableArray indexesInfo() const {
+        Doc doc(_c4col.useLocked()->getIndexesInfo());
+        return doc.root().asArray().mutableCopy();
+    }
     
 #pragma mark - LISTENERS
     
