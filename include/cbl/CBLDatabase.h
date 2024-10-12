@@ -92,6 +92,17 @@ typedef struct {
         power failure will not cause the loss of any data.  FULL synchronous
         is very safe but it is also dramatically slower. */
     bool fullSync;
+    
+#if !defined(TARGET_OS_OSX) || (TARGET_OS_OSX == 0)
+    /**
+     Disable memory-mapped I/O. By default, memory-mapped
+     I/O is enabled. Disabling it may affect database performance.
+     Typically, there is no need to modify this setting.
+        
+     @note Memory-mapped I/O is always disabled on macOS to prevent database corruption,
+           so this configuration is not supported on the macOS platform. */
+    bool mmapDisabled;
+#endif
 } CBLDatabaseConfiguration;
 
 /** Returns the default database configuration. */

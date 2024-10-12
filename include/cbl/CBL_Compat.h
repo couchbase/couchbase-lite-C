@@ -55,6 +55,7 @@
 #endif
 
 #if __APPLE__
+    #include <TargetConditionals.h>
     #include <CoreFoundation/CFBase.h>      /* for CF_ENUM and CF_OPTIONS macros */
     #define CBL_ENUM CF_ENUM
     #define CBL_OPTIONS CF_OPTIONS
