@@ -131,9 +131,7 @@ public:
         config.encryptionKey = asCBLKey(c4config.encryptionKey);
 #endif
         config.fullSync = (c4config.flags & kC4DB_DiskSyncFull) == kC4DB_DiskSyncFull;
-#if !defined(TARGET_OS_OSX) || (TARGET_OS_OSX == 0)
         config.mmapDisabled = (c4config.flags & kC4DB_MmapDisabled) == kC4DB_MmapDisabled;
-#endif
         return config;
     }
 
@@ -329,11 +327,9 @@ private:
         if (config->fullSync) {
             c4Config.flags |= kC4DB_DiskSyncFull;
         }
-#if !defined(TARGET_OS_OSX) || (TARGET_OS_OSX == 0)
         if (config->mmapDisabled) {
             c4Config.flags |= kC4DB_MmapDisabled;
         }
-#endif
         
 #ifdef COUCHBASE_ENTERPRISE
         c4Config.encryptionKey = asC4Key(&config->encryptionKey);

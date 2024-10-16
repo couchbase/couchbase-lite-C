@@ -417,8 +417,6 @@ TEST_CASE_METHOD(DatabaseTest, "TestDBWithFullSync") {
 
 #pragma mark - MMap:
 
-#if !defined(TARGET_OS_OSX) || (TARGET_OS_OSX == 0)
-
 /** Test Spec for Database MMap Configuration
     https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0006-MMap-Config.md
     v. 1.0.0 */
@@ -428,10 +426,7 @@ TEST_CASE_METHOD(DatabaseTest, "TestDBWithFullSync") {
 
  #### Description
  Test that the mmapEnabled default value is as expected and that it's setter and getter work.
-
- For macOS, an unsupported arugment or equivalent exception should be thrown
- when accessing the mmapEnabled property.
-
+ 
  #### Steps
  1. Create a DatabaseConfiguration object.
  2. Get and check that the value of the mmapEnabled property is true.
@@ -453,7 +448,7 @@ TEST_CASE_METHOD(DatabaseTest, "TestDefaultMMapConfig") {
  ### 2. TestDatabaseWithConfiguredMMap
 
  #### Description
- Test that a Database respects the mmapEnabled property. This test is not applicable for macOS.
+ Test that a Database respects the mmapEnabled property.
 
  #### Steps
  1. Create a DatabaseConfiguration object and set mmapEnabled to false.
@@ -493,8 +488,6 @@ TEST_CASE_METHOD(DatabaseTest, "TestDatabaseWithConfiguredMMap") {
     CHECK(CBLDatabase_Close(mmapDB, &error));
     CBLDatabase_Release(mmapDB);
 }
-
-#endif
 
 #pragma mark - Save Document:
 
