@@ -178,6 +178,8 @@ CBL_C {
 		CBLQuery_SetListenerCallbackDelay;
 		CBLLog_BeginExpectingExceptions;
 		CBLLog_EndExpectingExceptions;
+		kCBLDefaultDatabaseFullSync;
+		kCBLDefaultDatabaseMmapDisabled;
 		kCBLDefaultLogFileUsePlaintext;
 		kCBLDefaultLogFileUsePlainText;
 		kCBLDefaultLogFileMaxSize;

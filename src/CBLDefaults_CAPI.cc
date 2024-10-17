@@ -24,6 +24,11 @@
 #include "CBLDefaults.h"
 #include <climits>
 
+#pragma mark - CBLDatabaseConfiguration
+
+CBL_PUBLIC const bool kCBLDefaultDatabaseFullSync = false;
+CBL_PUBLIC const bool kCBLDefaultDatabaseMmapDisabled = false;
+
 #pragma mark - CBLLogFileConfiguration
 
 CBL_PUBLIC const bool kCBLDefaultLogFileUsePlaintext = false;
