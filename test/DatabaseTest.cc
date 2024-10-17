@@ -394,19 +394,99 @@ TEST_CASE_METHOD(DatabaseTest, "TestDBWithFullSync") {
     CHECK(!CBL_DatabaseExists(dbname, config.directory));
     
     CBLError error{};
-    config.fullSync = false;
-    CBLDatabase* db = CBLDatabase_Open(dbname, &config, &error);
-    REQUIRE(db);
-    CHECK(!CBLDatabase_Config(db).fullSync);
-    CHECK(CBLDatabase_Close(db, &error));
-    CBLDatabase_Release(db);
+    CBLDatabase* fullSyncDB = CBLDatabase_Open(dbname, &config, &error);
+    REQUIRE(fullSyncDB);
+    CHECK(!CBLDatabase_Config(fullSyncDB).fullSync);
+    CHECK(CBLDatabase_Close(fullSyncDB, &error));
+    CBLDatabase_Release(fullSyncDB);
     
     config.fullSync = true;
-    db = CBLDatabase_Open(dbname, &config, &error);
+    fullSyncDB = CBLDatabase_Open(dbname, &config, &error);
+    REQUIRE(fullSyncDB);
+    CHECK(CBLDatabase_Config(fullSyncDB).fullSync);
+    CHECK(CBLDatabase_Close(fullSyncDB, &error));
+    CBLDatabase_Release(fullSyncDB);
+    
+    config.fullSync = false;
+    fullSyncDB = CBLDatabase_Open(dbname, &config, &error);
     REQUIRE(db);
-    CHECK(CBLDatabase_Config(db).fullSync);
-    CHECK(CBLDatabase_Close(db, &error));
-    CBLDatabase_Release(db);
+    CHECK(!CBLDatabase_Config(fullSyncDB).fullSync);
+    CHECK(CBLDatabase_Close(fullSyncDB, &error));
+    CBLDatabase_Release(fullSyncDB);
+}
+
+#pragma mark - MMap:
+
+/** Test Spec for Database MMap Configuration
+    https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0006-MMap-Config.md
+    v. 1.0.0 */
+
+/**
+ ### 1. TestDefaultMMapConfig
+
+ #### Description
+ Test that the mmapEnabled default value is as expected and that it's setter and getter work.
+ 
+ #### Steps
+ 1. Create a DatabaseConfiguration object.
+ 2. Get and check that the value of the mmapEnabled property is true.
+ 3. Set the mmapEnabled property to false and verify that the value is false.
+ 4. Set the mmapEnabled property to true, and verify that the mmap value is true.
+ */
+TEST_CASE_METHOD(DatabaseTest, "TestDefaultMMapConfig") {
+    auto config = CBLDatabaseConfiguration_Default();
+    CHECK(!config.mmapDisabled);
+    
+    config.mmapDisabled = true;
+    CHECK(config.mmapDisabled);
+    
+    config.mmapDisabled = false;
+    CHECK(!config.mmapDisabled);
+}
+
+/**
+ ### 2. TestDatabaseWithConfiguredMMap
+
+ #### Description
+ Test that a Database respects the mmapEnabled property.
+
+ #### Steps
+ 1. Create a DatabaseConfiguration object and set mmapEnabled to false.
+ 2. Create a database with the config.
+ 3. Get the configuration object from the database and check that the mmapEnabled is false.
+ 4. Use c4db_config2 to confirm that its config contains the kC4DB_MmapDisabled flag
+ 5. Set the config's mmapEnabled property true
+ 6. Create a database with the config.
+ 7. Get the configuration object from the database and verify that mmapEnabled is true
+ 8. Use c4db_config2 to confirm that its config doesn't contains the kC4DB_MmapDisabled flag
+ */
+TEST_CASE_METHOD(DatabaseTest, "TestDatabaseWithConfiguredMMap") {
+    auto config = databaseConfig();
+    
+    auto dbname = "mmapdb"_sl;
+    CBL_DeleteDatabase(dbname, config.directory, nullptr);
+    CHECK(!CBL_DatabaseExists(dbname, config.directory));
+    
+    CBLError error{};
+    CBLDatabase* mmapDB = CBLDatabase_Open(dbname, &config, &error);
+    REQUIRE(mmapDB);
+    CHECK(!CBLDatabase_Config(mmapDB).mmapDisabled);
+    CHECK(CBLDatabase_Close(mmapDB, &error));
+    CBLDatabase_Release(mmapDB);
+    
+    config.mmapDisabled = true;
+    mmapDB = CBLDatabase_Open(dbname, &config, &error);
+    REQUIRE(mmapDB);
+    CHECK(CBLDatabase_Config(mmapDB).mmapDisabled);
+    CHECK(CBLDatabase_Close(mmapDB, &error));
+    CBLDatabase_Release(mmapDB);
+    
+    config.mmapDisabled = false;
+    mmapDB = CBLDatabase_Open(dbname, &config, &error);
+    REQUIRE(mmapDB);
+    CHECK(!CBLDatabase_Config(mmapDB).mmapDisabled);
+    CHECK(CBLDatabase_Close(mmapDB, &error));
+    CBLDatabase_Release(mmapDB);
 }
 
 #pragma mark - Save Document:
