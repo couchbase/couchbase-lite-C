@@ -108,6 +108,9 @@ public:
         auto c4doc = _c4doc.useLocked();
         return c4doc ? c4doc->selectedRev().flags : (kRevNew | kRevLeaf);
     }
+    
+    
+    alloc_slice getRevisionHistory() const;
 
 
 #pragma mark - Properties:

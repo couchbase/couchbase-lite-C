@@ -51,6 +51,11 @@ unsigned CBLDocument_Generation(const CBLDocument* doc) noexcept {
     return doc->generation();
 }
 
+/** Private API */
+FLSliceResult CBLDocument_GetRevisionHistory(const CBLDocument* doc) noexcept {
+    return FLSliceResult(doc->getRevisionHistory());
+}
+
 FLMutableDict CBLDocument_MutableProperties(CBLDocument* doc) noexcept {
     return doc->mutableProperties();
 }
