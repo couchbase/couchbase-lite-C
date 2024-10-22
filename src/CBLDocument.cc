@@ -24,6 +24,7 @@
 #include "c4BlobStore.hh"
 #include "c4Private.h"
 #include "betterassert.hh"
+#include <climits>
 #include <mutex>
 
 #ifdef COUCHBASE_ENTERPRISE
@@ -69,6 +70,25 @@ CBLDocument::~CBLDocument() {
 
 CBLDatabase* _cbl_nullable CBLDocument::database() const {
     return _collection ? _collection->database() : nullptr;
+}
+
+
+#pragma mark - REVISION HISTORY:
+
+
+alloc_slice CBLDocument::getRevisionHistory() const {
+    if (!_collection) {
+        return fleece::nullslice;
+    }
+    
+    auto doc = _collection->getDocument(_docID, false, true);
+    if (!doc) {
+        return fleece::nullslice;
+    }
+    
+    auto c4doc = doc->_c4doc.useLocked();
+    assert(c4doc);
+    return c4doc->getRevisionHistory(UINT_MAX, nullptr, 0);
 }
 
 

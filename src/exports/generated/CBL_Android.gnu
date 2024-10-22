@@ -174,6 +174,7 @@ CBL_C {
 		CBLDatabase_LastSequence;
 		CBLDocument_CanonicalRevisionID;
 		CBLDocument_Generation;
+		CBLDocument_GetRevisionHistory;
 		CBLError_GetCaptureBacktraces;
 		CBLError_SetCaptureBacktraces;
 		CBLQuery_SetListenerCallbackDelay;

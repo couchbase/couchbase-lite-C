@@ -691,6 +691,43 @@ TEST_CASE_METHOD(DocumentTest, "Save Document into Different Collection", "[Docu
     CBLDocument_Release(doc);
 }
 
+#pragma mark - Revision History
+
+/*
+ https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0005-Version-Vector.md
+ 2. TestDocumentRevisionHistory
+
+ Description
+ Test that the document's timestamp returns value as expected.
+
+ Steps
+ 1. Create a new document with id = "doc1"
+ 2. Get document's _revisionIDs and check that the value returned is an empty array.
+ 3. Save the document into the default collection.
+ 4. Get document's _revisionIDs and check that the value returned is an array containing a
+    single revision id which is the revision id of the documnt.
+ 5. Get the document id = "doc1" from the database.
+ 6. Get document's _revisionIDs and check that the value returned is an array containing a
+    single revision id which is the revision id of the documnt.
+ */
+TEST_CASE_METHOD(DocumentTest, "Revision History", "[Document]") {
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+    
+    alloc_slice revHistory = CBLDocument_GetRevisionHistory(doc);
+    CHECK(revHistory == nullslice);
+    
+    CBLError error;
+    REQUIRE(CBLCollection_SaveDocument(col, doc, &error));
+    revHistory = CBLDocument_GetRevisionHistory(doc);
+    CHECK(revHistory != nullslice);
+    CBLDocument_Release(doc);
+    
+    doc = CBLCollection_GetMutableDocument(col, "foo"_sl, &error);
+    revHistory = CBLDocument_GetRevisionHistory(doc);
+    CHECK(revHistory != nullslice);
+    CBLDocument_Release(doc);
+}
+
 #pragma mark - Delete Document:
 
 TEST_CASE_METHOD(DocumentTest, "Delete Non Existing Document", "[Document]") {
