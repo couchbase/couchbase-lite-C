@@ -901,8 +901,6 @@ TEST_CASE_METHOD(QueryTest, "Test Joins with Collections", "[Query]") {
 
     string queryString;
     
-    /*
-    CBL-6243
     SECTION("Use Full Collection Name") {
         queryString = "SELECT flowers.name, colors.color "
                       "FROM test.flowers "
@@ -910,7 +908,6 @@ TEST_CASE_METHOD(QueryTest, "Test Joins with Collections", "[Query]") {
                       "ON flowers.cid = colors.cid "
                       "ORDER BY flowers.name";
     }
-    */
     
     SECTION("Use Alias Name") {
         queryString = "SELECT f.name, c.color "
