@@ -20,7 +20,8 @@ HEADER_SEARCH_PATHS     = include Xcode/generated_headers/public/cbl $(FLEECE)/A
 PRODUCT_NAME            = cbl_tests
 CODE_SIGN_IDENTITY      = Apple Development
 DEVELOPMENT_TEAM        = N2Q372V7W2
-LLVM_LTO                = NO    // LTO makes tests very slow to link and confuses Instruments
+LLVM_LTO                = NO        // LTO makes tests very slow to link and confuses Instruments
+OTHER_LDFLAGS           = -all_load // Prevents dead-stripping of reporters from libCatch2.a
 
 CLANG_WARN__EXIT_TIME_DESTRUCTORS           = NO
 GCC_WARN_UNKNOWN_PRAGMAS                    = NO

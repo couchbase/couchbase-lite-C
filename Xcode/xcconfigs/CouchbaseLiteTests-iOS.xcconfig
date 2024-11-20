@@ -17,3 +17,6 @@
 //
 
 HEADER_SEARCH_PATHS       = $(SRCROOT)/include $(SRCROOT)/Xcode/generated_headers/public/cbl $(FLEECE)/API $(FLEECE)/Fleece/Support $(FLEECE)/vendor/catch $(inherited) $(SRCROOT)/vendor/couchbase-lite-core/C/include
+
+OTHER_LDFLAGS             = -all_load // Prevents dead-stripping of reporters from libCatch2.a
+

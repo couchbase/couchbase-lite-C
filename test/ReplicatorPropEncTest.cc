@@ -238,6 +238,8 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Create Encryptable", "[Encry
         expJson = "{\"@type\":\"encryptable\",\"value\":{\"greeting\":\"hello\"}}";
     }
     
+    REQUIRE(encryptable);
+    
     auto dict = FLMutableDict_New();
     FLSlot_SetEncryptableValue(FLMutableDict_Set(dict, "encryptable"_sl), encryptable);
     FLValue value = FLDict_Get(dict, "encryptable"_sl);

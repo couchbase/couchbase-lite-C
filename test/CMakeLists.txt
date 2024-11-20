@@ -29,7 +29,11 @@ include_directories(
 include("cmake/test_source_files.cmake")
 set_test_source_files(DIR ${PROJECT_SOURCE_DIR} RESULT TEST_SRC)
 
-add_executable(CBL_C_Tests ${TEST_SRC})
+add_executable(CBL_C_Tests
+    ${TEST_SRC}
+    ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/catch/catch_amalgamated.cpp
+    ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/catch/CaseListReporter.cc
+)
 
 target_link_libraries(CBL_C_Tests PRIVATE  cblite)
 

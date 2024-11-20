@@ -43,6 +43,8 @@ set_test_source_files(DIR ${TEST_DIR} RESULT TEST_SRC)
 set(LIB_SRC
     ${TEST_SRC}
     src/main/cpp/native-lib.cpp
+    ${CBL_DIR}/vendor/couchbase-lite-core/vendor/fleece/vendor/catch/catch_amalgamated.cpp
+    ${CBL_DIR}/vendor/couchbase-lite-core/vendor/fleece/vendor/catch/CaseListReporter.cc
 )
 
 add_library(

@@ -6,7 +6,6 @@
 #define CATCH_CONFIG_NOSTDOUT
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
-#include "CaseListReporter.hh"
 
 #include "CBLTest.hh"
 
@@ -114,7 +113,6 @@ Java_com_couchbase_tests_CouchbaseLiteTest_runTests(
 
     // Start Catch test session:
     Catch::Session session;
-    session.configData().reporterName = "list";
     session.applyCommandLine(args.size(), args.data());
     return session.run();
 }
