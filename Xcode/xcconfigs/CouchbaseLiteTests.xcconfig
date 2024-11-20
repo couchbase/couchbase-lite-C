@@ -24,4 +24,5 @@ INFOPLIST_FILE          = Xcode/Tests-Info.plist
 PRODUCT_BUNDLE_IDENTIFIER = com.couchbase.CouchbaseLiteTests
 PRODUCT_NAME            = $(TARGET_NAME)
 
-LLVM_LTO                = NO    // LTO makes tests very slow to link and confuses Instruments
+LLVM_LTO                = NO        // LTO makes tests very slow to link and confuses Instruments
+OTHER_LDFLAGS           = -all_load // Prevents dead-stripping of reporters from libCatch2.a

@@ -100,6 +100,9 @@
 		4083FCC22BAA38F30061509D /* CBLPrediction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCC12BAA38F30061509D /* CBLPrediction.cc */; };
 		40ACB2392C2F98B200CBE8F2 /* Prediction.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */; };
 		40ACB23A2C2F98B600CBE8F2 /* VectorIndex.hh in Headers */ = {isa = PBXBuildFile; fileRef = 400AB0542C2E7AC300DB6223 /* VectorIndex.hh */; };
+		40BC19422CED34F400143002 /* libCatch2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 40BC193D2CED34EA00143002 /* libCatch2.a */; };
+		40BC19452CED435600143002 /* libCatch2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 40BC193D2CED34EA00143002 /* libCatch2.a */; };
+		40BC19462CED478B00143002 /* libCatch2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 40BC193D2CED34EA00143002 /* libCatch2.a */; };
 		40D1862529B6D1A50061AA85 /* Collection.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCC064BD287CBD95000C5BD7 /* Collection.hh */; };
 		40E7CA732BFE7336004BE7E1 /* ContextManager.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40E7CA632BFE7336004BE7E1 /* ContextManager.cc */; };
 		40E7CA742BFE7336004BE7E1 /* ContextManager.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40E7CA722BFE7336004BE7E1 /* ContextManager.hh */; };
@@ -355,6 +358,76 @@
 			remoteGlobalIDString = 27EF80F91917EEC600A327B9;
 			remoteInfo = "LiteCore static";
 		};
+		40BC192B2CED34EA00143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 2718B3322CAF102D006C09CB;
+			remoteInfo = Catch2;
+		};
+		40BC19342CED34EA00143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 270FA25C1BF53CAD005DCB13;
+			remoteInfo = Fleece;
+		};
+		40BC19362CED34EA00143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 27DE2EDF2125FA1700123597;
+			remoteInfo = FleeceBase;
+		};
+		40BC19382CED34EA00143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 27C4CE9C2127719D00470DE9;
+			remoteInfo = fleeceDylib;
+		};
+		40BC193A2CED34EA00143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 27D721901F8E8EEA00AA4458;
+			remoteInfo = FleeceMutableObjC;
+		};
+		40BC193C2CED34EA00143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2718B37F2CAF102D006C09CB;
+			remoteInfo = Catch2;
+		};
+		40BC193E2CED34EA00143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 272E5A4B1BF7FE5600848580;
+			remoteInfo = Test;
+		};
+		40BC19402CED34EA00143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 279AC5311C096872002C80DB;
+			remoteInfo = Tool;
+		};
+		40BC19432CED434F00143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 2718B3322CAF102D006C09CB;
+			remoteInfo = Catch2;
+		};
+		40BC19472CED47B500143002 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 2718B3322CAF102D006C09CB;
+			remoteInfo = Catch2;
+		};
 		FC645E2629087419007D5536 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 271C2A1B21CAC8920045856E /* Project object */;
@@ -499,6 +572,9 @@
 		4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLPrediction_Internal.hh; sourceTree = "<group>"; };
 		4083FCC12BAA38F30061509D /* CBLPrediction.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction.cc; sourceTree = "<group>"; };
 		40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Prediction.hh; sourceTree = "<group>"; };
+		40BC19242CED333D00143002 /* libCatch2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libCatch2.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		40BC19262CED34AD00143002 /* libCatch2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libCatch2.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		40BC19282CED34EA00143002 /* Fleece.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Fleece.xcodeproj; path = "/Users/pasin.suriyentrakorn/Github/cbl/c/master/couchbase-lite-c/vendor/couchbase-lite-core/vendor/fleece/Fleece.xcodeproj"; sourceTree = "<absolute>"; };
 		40E7CA632BFE7336004BE7E1 /* ContextManager.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextManager.cc; sourceTree = "<group>"; };
 		40E7CA722BFE7336004BE7E1 /* ContextManager.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ContextManager.hh; sourceTree = "<group>"; };
 		40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -566,6 +642,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40BC19452CED435600143002 /* libCatch2.a in Frameworks */,
 				275B3591234BCF7500FE9CF0 /* libcblite.dylib in Frameworks */,
 				273CE7E22452123400D01CA2 /* libfleeceBase.a in Frameworks */,
 			);
@@ -601,6 +678,7 @@
 			files = (
 				27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */,
 				27B61DB521D6EBDD0027CCDB /* libcblite.dylib in Frameworks */,
+				40BC19422CED34F400143002 /* libCatch2.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -616,6 +694,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40BC19462CED478B00143002 /* libCatch2.a in Frameworks */,
 				FC645E2029086153007D5536 /* CouchbaseLite.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -637,6 +716,7 @@
 				271C2A3721CAC9B50045856E /* vendor */,
 				271C2A2421CAC8920045856E /* Products */,
 				271C2A7C21CC86EB0045856E /* Frameworks */,
+				40BC19282CED34EA00143002 /* Fleece.xcodeproj */,
 			);
 			sourceTree = "<group>";
 		};
@@ -763,6 +843,8 @@
 		271C2A7C21CC86EB0045856E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				40BC19262CED34AD00143002 /* libCatch2.a */,
+				40BC19242CED333D00143002 /* libCatch2.a */,
 				271A98AF243FDF55008C032D /* SystemConfiguration.framework */,
 				275B3567234810C400FE9CF0 /* Foundation.framework */,
 				277CC9B122BC4E2E00B245CB /* Security.framework */,
@@ -895,6 +977,20 @@
 				FCE497162907917300EF2354 /* iOS */,
 			);
 			path = platforms;
+			sourceTree = "<group>";
+		};
+		40BC19292CED34EA00143002 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				40BC19352CED34EA00143002 /* libfleeceStatic.a */,
+				40BC19372CED34EA00143002 /* libfleeceBase.a */,
+				40BC19392CED34EA00143002 /* libfleece.dylib */,
+				40BC193B2CED34EA00143002 /* libFleeceMutableObjC.a */,
+				40BC193D2CED34EA00143002 /* libCatch2.a */,
+				40BC193F2CED34EA00143002 /* Test */,
+				40BC19412CED34EA00143002 /* fleece */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		FC645DFD290852D5007D5536 /* App */ = {
@@ -1079,6 +1175,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				40BC19442CED434F00143002 /* PBXTargetDependency */,
 				275B3590234BCF6900FE9CF0 /* PBXTargetDependency */,
 			);
 			name = CouchbaseLiteTests;
@@ -1143,6 +1240,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				40BC192C2CED34EA00143002 /* PBXTargetDependency */,
 				27B61DB721D6EBE00027CCDB /* PBXTargetDependency */,
 			);
 			name = CBL_Tests;
@@ -1180,6 +1278,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				40BC19482CED47B500143002 /* PBXTargetDependency */,
 				FCE497312907917400EF2354 /* PBXTargetDependency */,
 			);
 			name = "CouchbaseLiteTests-iOS";
@@ -1235,6 +1334,10 @@
 			productRefGroup = 271C2A2421CAC8920045856E /* Products */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = 40BC19292CED34EA00143002 /* Products */;
+					ProjectRef = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
+				},
 				{
 					ProductGroup = 271C2A3921CAD5950045856E /* Products */;
 					ProjectRef = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
@@ -1344,6 +1447,55 @@
 			fileType = wrapper.application;
 			path = "iOS Perf Test.app";
 			remoteRef = 279157C624E1CAC8008B56FE /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		40BC19352CED34EA00143002 /* libfleeceStatic.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libfleeceStatic.a;
+			remoteRef = 40BC19342CED34EA00143002 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		40BC19372CED34EA00143002 /* libfleeceBase.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libfleeceBase.a;
+			remoteRef = 40BC19362CED34EA00143002 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		40BC19392CED34EA00143002 /* libfleece.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libfleece.dylib;
+			remoteRef = 40BC19382CED34EA00143002 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		40BC193B2CED34EA00143002 /* libFleeceMutableObjC.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFleeceMutableObjC.a;
+			remoteRef = 40BC193A2CED34EA00143002 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		40BC193D2CED34EA00143002 /* libCatch2.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCatch2.a;
+			remoteRef = 40BC193C2CED34EA00143002 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		40BC193F2CED34EA00143002 /* Test */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = Test;
+			remoteRef = 40BC193E2CED34EA00143002 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		40BC19412CED34EA00143002 /* fleece */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = fleece;
+			remoteRef = 40BC19402CED34EA00143002 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1771,6 +1923,21 @@
 			isa = PBXTargetDependency;
 			name = "LiteCore static";
 			targetProxy = 27B61DBD21D707910027CCDB /* PBXContainerItemProxy */;
+		};
+		40BC192C2CED34EA00143002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Catch2;
+			targetProxy = 40BC192B2CED34EA00143002 /* PBXContainerItemProxy */;
+		};
+		40BC19442CED434F00143002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Catch2;
+			targetProxy = 40BC19432CED434F00143002 /* PBXContainerItemProxy */;
+		};
+		40BC19482CED47B500143002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Catch2;
+			targetProxy = 40BC19472CED47B500143002 /* PBXContainerItemProxy */;
 		};
 		FC645E2729087419007D5536 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

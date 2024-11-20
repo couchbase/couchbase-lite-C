@@ -1189,7 +1189,7 @@ TEST_CASE_METHOD(QueryTest, "Test Select All Result Key", "[Query]") {
  5. Get info of the index named "contacts" using an internal API and check that the index has
      path and expressions as configured.
  */
-TEST_CASE_METHOD(QueryTest, "TestCreateArrayIndexWithPath", "[Query]") {
+TEST_CASE_METHOD(QueryTest, "TestCreateArrayIndexWithPath", "[.Query]") {
     auto collection = CreateCollection(db, "profiles");
     ImportJSONLines("profiles_100.json", collection);
     
@@ -1245,7 +1245,7 @@ TEST_CASE_METHOD(QueryTest, "TestCreateArrayIndexWithPath", "[Query]") {
  5. Get info of the index named "contacts" using an internal API and check that the index has
      path and expressions as configured.
  */
-TEST_CASE_METHOD(QueryTest, "TestCreateArrayIndexWithPathAndExpressions", "[Query]") {
+TEST_CASE_METHOD(QueryTest, "TestCreateArrayIndexWithPathAndExpressions", "[.Query]") {
     auto collection = CreateCollection(db, "profiles");
     ImportJSONLines("profiles_100.json", collection);
     

@@ -50,19 +50,21 @@ public:
     CBLCollection* col = nullptr;
     
     DocumentTest() {
-        CBLError error = {};
+        CBLError error {};
         
         col = CBLDatabase_CreateCollection(db, kCollectionName, kCBLDefaultScopeName, &error);
-        if (!col) {
+        if (col) {
+            CHECK(CBLCollection_Count(col) == 0);
+        } else {
             FAIL("Can't create test collection: " << error.domain << "/" << error.code);
         }
-        CHECK(CBLCollection_Count(col) == 0);
         
         otherCol = CBLDatabase_CreateCollection(db, kOtherCollectionName, kCBLDefaultScopeName, &error);
-        if (!otherCol) {
+        if (otherCol) {
+            CHECK(CBLCollection_Count(otherCol) == 0);
+        } else {
             FAIL("Can't create test other collection: " << error.domain << "/" << error.code);
         }
-        CHECK(CBLCollection_Count(otherCol) == 0);
     }
     
     void createDocument(CBLCollection* collection, slice docID, slice property, slice value) {
@@ -205,6 +207,8 @@ TEST_CASE_METHOD(DocumentTest, "Access nested collections from mutable props", "
         mDoc = CBLDocument_MutableCopy(mDoc1);
         CBLDocument_Release(mDoc1);
     }
+    
+    REQUIRE(mDoc);
     
     mProps = CBLDocument_MutableProperties(mDoc);
     
@@ -822,7 +826,7 @@ TEST_CASE_METHOD(DocumentTest, "Delete Already Deleted Document") {
     CHECK(CBLCollection_DeleteDocumentByID(col, "doc1"_sl, &error));
 }
 
-TEST_CASE_METHOD(DocumentTest, "Delete Then Update Document", "[Document]") {
+TEST_CASE_METHOD(DocumentTest, "Delete Then Update Document", "[.CBL-6483]") {
     createDocument(col, "doc1", "foo", "bar");
     
     CBLError error;

@@ -311,8 +311,8 @@ CBLBlob* CBLDocument::getBlob(FLDict dict, const C4BlobKey &key) {
         return nullptr;
 
     // Create a new CBLBlob and remember it:
-    auto blob = retained(new CBLBlob(db, dict, key));
-    _blobs.insert({dict, blob});
+    auto blob = new CBLBlob(db, dict, key);
+    _blobs.insert({dict, retained(blob)});
     return blob;
 }
 
@@ -330,8 +330,8 @@ CBLEncryptable* CBLDocument::getEncryptableValue(FLDict dict) {
         return i->second;
     
     // Create a new CBLEncryptable and remember it:
-    auto prop = retained(new CBLEncryptable(dict));
-    _encryptables.insert({dict, prop});
+    auto prop = new CBLEncryptable(dict);
+    _encryptables.insert({dict, retained(prop)});
     return prop;
 }
 

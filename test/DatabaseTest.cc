@@ -102,16 +102,18 @@ public:
 
         CBLError error;
         auto config = databaseConfig();
-        if (!CBL_DeleteDatabase(kOtherDBName, config.directory, &error) && error.code != 0)
+        if (!CBL_DeleteDatabase(kOtherDBName, config.directory, &error) && error.code != 0) {
             FAIL("Can't delete otherDB database: " << error.domain << "/" << error.code);
+        }
 
         otherDB = CBLDatabase_Open(kOtherDBName, &config, &error);
 
         otherDBDefaultCol = CBLDatabase_DefaultCollection(otherDB, &error);
-        if (!otherDBDefaultCol) {
+        if (otherDBDefaultCol) {
+            CHECK(CBLCollection_Count(otherDBDefaultCol) == 0);
+        } else {
             FAIL("_default collection not found for otherDB: " << error.domain << "/" << error.code);
         }
-        CHECK(CBLCollection_Count(otherDBDefaultCol) == 0);
     }
 
     ~DatabaseTest() {
@@ -271,8 +273,8 @@ TEST_CASE_METHOD(DatabaseTest, "Database Encryption") {
     CHECK(!CBL_DatabaseExists("encdb"_sl, nullslice));
     
     // Correct key:
-    CBLError error;
-    CBLEncryptionKey key;
+    CBLError error{};
+    CBLEncryptionKey key{};
     
     bool useSHA256Key = true;
     SECTION("SHA-265 Key")
