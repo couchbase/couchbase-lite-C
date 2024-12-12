@@ -125,6 +125,8 @@ set(
     src/CBLDocument_CAPI.cc
     src/CBLEncryptable_CAPI.cc
     src/CBLLog.cc
+    src/CBLLogSinks.cc
+    src/CBLLogSinks_CAPI.cc
     src/CBLPrediction.cc
     src/CBLPrediction_CAPI.cc
     src/CBLQuery.cc

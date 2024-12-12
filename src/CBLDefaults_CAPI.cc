@@ -36,6 +36,12 @@ CBL_PUBLIC const bool kCBLDefaultLogFileUsePlainText = false;
 CBL_PUBLIC const size_t kCBLDefaultLogFileMaxSize = 524288;
 CBL_PUBLIC const uint32_t kCBLDefaultLogFileMaxRotateCount = 1;
 
+#pragma mark - CBLFileLogSink
+
+CBL_PUBLIC const bool kCBLDefaultFileLogSinkUsePlaintext = false;
+CBL_PUBLIC const size_t kCBLDefaultFileLogSinkMaxSize = 524288;
+CBL_PUBLIC const uint32_t kCBLDefaultFileLogSinkMaxKeptFiles = 2;
+
 #pragma mark - CBLFullTextIndexConfiguration
 
 CBL_PUBLIC const bool kCBLDefaultFullTextIndexIgnoreAccents = false;
