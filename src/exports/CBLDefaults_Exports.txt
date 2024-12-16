@@ -32,6 +32,12 @@ kCBLDefaultLogFileUsePlainText
 kCBLDefaultLogFileMaxSize
 kCBLDefaultLogFileMaxRotateCount
 
+### CBLFileLogSink
+
+kCBLDefaultFileLogSinkUsePlaintext
+kCBLDefaultFileLogSinkMaxSize
+kCBLDefaultFileLogSinkMaxKeptFiles
+
 ### CBLFullTextIndexConfiguration
 
 kCBLDefaultFullTextIndexIgnoreAccents

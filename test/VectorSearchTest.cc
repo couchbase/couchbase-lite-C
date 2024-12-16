@@ -740,8 +740,6 @@ TEST_CASE_METHOD(VectorSearchTest, "TestSubquantizersValidation : Invalid", "[Ve
  *     8. Reset the custom logger.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestCreateVectorIndexWithFixedTrainingSize", "[VectorSearch]") {
-    CBLLog_SetConsoleLevel(kCBLLogVerbose);
-    
     CBLVectorIndexConfiguration config { kCBLN1QLLanguage, "vector"_sl, 300, 8 };
     config.minTrainingSize = 100;
     config.maxTrainingSize = 100;

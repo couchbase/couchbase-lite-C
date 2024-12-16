@@ -81,4 +81,10 @@ FLMutableArray CBLCollection_GetIndexesInfo(const CBLCollection* collection,
         any invalidated objects. */
     void CBLQuery_SetListenerCallbackDelay(int delay) CBLAPI;
 
+    /** Reset log and log sink to the default state. This is for log API testing purpose.  */
+    void CBLLog_Reset(void) CBLAPI;
+
+    /** Use c4log to log the message so that the message will be sent to LiteCore's callback and file logging */
+    void CBLLog_LogWithC4Log(CBLLogDomain domain, CBLLogLevel level, const char *message) CBLAPI;
+
 CBL_CAPI_END
