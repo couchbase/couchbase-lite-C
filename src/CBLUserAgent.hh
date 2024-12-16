@@ -116,7 +116,7 @@ using alloc_slice = fleece::alloc_slice;
 // TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
 // OUTPUT   - CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
 
-static string createUserAgentHeader(){
+static string userAgentHeader(){
         stringstream header;
         string os;
         alloc_slice coreVersion = c4_getVersion();
