@@ -106,6 +106,10 @@
 		40ACB2392C2F98B200CBE8F2 /* Prediction.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */; };
 		40ACB23A2C2F98B600CBE8F2 /* VectorIndex.hh in Headers */ = {isa = PBXBuildFile; fileRef = 400AB0542C2E7AC300DB6223 /* VectorIndex.hh */; };
 		40D1862529B6D1A50061AA85 /* Collection.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCC064BD287CBD95000C5BD7 /* Collection.hh */; };
+		40E32F402D2F3ED4000CED57 /* LogSinks.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40E32F3F2D2F3ED4000CED57 /* LogSinks.hh */; };
+		40E32F422D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40E32F412D2F45A3000CED57 /* LogTest_Cpp.cc */; };
+		40E32F432D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40E32F412D2F45A3000CED57 /* LogTest_Cpp.cc */; };
+		40E32F442D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40E32F412D2F45A3000CED57 /* LogTest_Cpp.cc */; };
 		40E7CA732BFE7336004BE7E1 /* ContextManager.cc in Sources */ = {isa = PBXBuildFile; fileRef = 40E7CA632BFE7336004BE7E1 /* ContextManager.cc */; };
 		40E7CA742BFE7336004BE7E1 /* ContextManager.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40E7CA722BFE7336004BE7E1 /* ContextManager.hh */; };
 		40F902D82B9F7B12002EA0A0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */; };
@@ -508,6 +512,8 @@
 		4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLPrediction_Internal.hh; sourceTree = "<group>"; };
 		4083FCC12BAA38F30061509D /* CBLPrediction.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction.cc; sourceTree = "<group>"; };
 		40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Prediction.hh; sourceTree = "<group>"; };
+		40E32F3F2D2F3ED4000CED57 /* LogSinks.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LogSinks.hh; sourceTree = "<group>"; };
+		40E32F412D2F45A3000CED57 /* LogTest_Cpp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogTest_Cpp.cc; sourceTree = "<group>"; };
 		40E7CA632BFE7336004BE7E1 /* ContextManager.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContextManager.cc; sourceTree = "<group>"; };
 		40E7CA722BFE7336004BE7E1 /* ContextManager.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ContextManager.hh; sourceTree = "<group>"; };
 		40F902C82B9F7AF6002EA0A0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -815,6 +821,7 @@
 				FCC064BD287CBD95000C5BD7 /* Collection.hh */,
 				27B61DD821DEEC540027CCDB /* Database.hh */,
 				277FEE4E21DEF54D00B60E3C /* Document.hh */,
+				40E32F3F2D2F3ED4000CED57 /* LogSinks.hh */,
 				40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */,
 				277FEE4F21E6AB1100B60E3C /* Query.hh */,
 				400AB0522C2E66B500DB6223 /* QueryIndex.hh */,
@@ -845,6 +852,7 @@
 				FCC063F2285BA641000C5BD7 /* DocumentTest.cc */,
 				FC0907E628AD763600201B07 /* DocumentTest_Cpp.cc */,
 				93965A6226A7CD50008728EE /* LogTest.cc */,
+				40E32F412D2F45A3000CED57 /* LogTest_Cpp.cc */,
 				275B359D234D064600FE9CF0 /* QueryTest.cc */,
 				AED22E6F291BE1AF005F065D /* QueryTest_Cpp.cc */,
 				2736A625242E5A07002B9D65 /* ReplicatorTest.hh */,
@@ -1021,6 +1029,7 @@
 				27984E322249A247000FE777 /* Base.hh in Headers */,
 				40FE2DD22C082466005E99E9 /* CBLQueryIndex.h in Headers */,
 				EA34BC5A2C3698B8000CEA70 /* CBLPrediction.h in Headers */,
+				40E32F402D2F3ED4000CED57 /* LogSinks.hh in Headers */,
 				93C70CE126C4D3F90093E927 /* CBLEncryptable.h in Headers */,
 				40ACB23A2C2F98B600CBE8F2 /* VectorIndex.hh in Headers */,
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
@@ -1627,6 +1636,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40E32F432D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */,
 				93965A6426A7CD50008728EE /* LogTest.cc in Sources */,
 				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
 				275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */,
@@ -1675,6 +1685,7 @@
 				27C9B5F321F7EE670040BC45 /* CBLTest.c in Sources */,
 				FCC06403285BCAC9000C5BD7 /* DocumentTest.cc in Sources */,
 				40FE2E0E2C12AEF6005E99E9 /* LazyVectorIndexTest.cc in Sources */,
+				40E32F422D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */,
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
 				FCD8298C283591D4004AA814 /* CollectionTest.cc in Sources */,
 				FC645E2D29088211007D5536 /* Platform_Apple.mm in Sources */,
@@ -1731,6 +1742,7 @@
 				FC645E1029085C26007D5536 /* BlobTest.cc in Sources */,
 				FC645E1129085C2A007D5536 /* BlobTest_Cpp.cc in Sources */,
 				FC645E1429085C5D007D5536 /* DatabaseTest_Cpp.cc in Sources */,
+				40E32F442D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */,
 				FC645E1629085C6B007D5536 /* DocumentTest_Cpp.cc in Sources */,
 				FC645E1829085C71007D5536 /* QueryTest.cc in Sources */,
 				FC645E0F29085C0A007D5536 /* CBLTest.cc in Sources */,
