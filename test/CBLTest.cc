@@ -290,6 +290,16 @@ string GetExtensionPath() {
 
 #endif
 
+void CreateDir(const string &dir) {
+#ifdef WIN32
+    if (_mkdir(dir.c_str()) != 0 && errno != EEXIST)
+        FAIL("Can't create temp directory: errno " << errno);
+#else
+    if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
+        FAIL("Can't create temp directory: errno " << errno);
+#endif
+}
+
 bool ReadFileByLines(const string &path, const function<bool(FLSlice)> &callback) {
     INFO("Reading lines from " << path);
     fstream fd(path.c_str(), ios_base::in);

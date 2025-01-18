@@ -33,16 +33,6 @@
 using namespace std;
 using namespace fleece;
 
-#ifdef _MSC_VER
-    static const char  kSeparatorChar = '\\';
-    static const char  kBackupSeparatorChar = '/';
-    static const char* kCurrentDir = ".\\";
-#else
-    static const char  kSeparatorChar = '/';
-    static const char  kBackupSeparatorChar = '\\';
-    static const char* kCurrentDir = "./";
-#endif
-
 static const array<CBLLogLevel, 6> kLogLevels = {{
     kCBLLogDebug, kCBLLogVerbose, kCBLLogInfo, kCBLLogWarning, kCBLLogError, kCBLLogNone
 }};
@@ -103,11 +93,11 @@ public:
         while ((entry = readdir(dir)) != NULL) {
             string filename = string(entry->d_name);
 #ifndef WIN32
-            string path = logDir() + kSeparatorChar + filename;
+            string path = logDir() + kPathSeparator + filename;
             struct stat statEntry;
             stat(path.c_str(), &statEntry);
 #else
-            string path = logDir() + kSeparatorChar + filename;
+            string path = logDir() + kPathSeparator + filename;
             struct _stat statEntry;
             _stat(path.c_str(), &statEntry);
 #endif
@@ -189,12 +179,12 @@ private:
     
     void prepareLogDir() {
         // Base:
-        string dir = string(CBLTest::databaseDir()) + kSeparatorChar + "CBLLogTest";
-        createDir(dir);
+        string dir = string(CBLTest::databaseDir()) + kPathSeparator + "CBLLogTest";
+        CreateDir(dir);
         
         // Log dir:
-        dir += kSeparatorChar + to_string(++sLogDirCount);
-        createDir(dir);
+        dir += kPathSeparator + to_string(++sLogDirCount);
+        CreateDir(dir);
         
         _logDir = dir;
     }
@@ -214,19 +204,9 @@ private:
     
     // File Utils:
     
-    void createDir(string dir) {
-    #ifndef WIN32
-        if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
-            FAIL("Can't create temp directory: errno " << errno);
-    #else
-        if (_mkdir(dir.c_str()) != 0 && errno != EEXIST)
-            FAIL("Can't create temp directory: errno " << errno);
-    #endif
-    }
-    
     pair<string,string> splitExtension(const string &file) {
         auto dot = file.rfind('.');
-        auto lastSlash = file.rfind(kSeparatorChar);
+        auto lastSlash = file.rfind(kPathSeparator);
         if (dot == string::npos || (lastSlash != string::npos && dot < lastSlash))
             return {file, ""};
         else
@@ -235,10 +215,10 @@ private:
     
     pair<string,string> splitPath(const string &path) {
         string dirname, basename;
-        auto slash = path.rfind(kSeparatorChar);
-        auto backupSlash = path.rfind(kBackupSeparatorChar);
+        auto slash = path.rfind(kPathSeparator);
+        auto backupSlash = path.rfind(kBackupPathSeparator);
         if (slash == string::npos && backupSlash == string::npos) {
-            return{ kCurrentDir, string(path) };
+            return{ kCurrentDirectory, string(path) };
         }
         
         if (slash == string::npos) {
