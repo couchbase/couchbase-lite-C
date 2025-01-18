@@ -291,11 +291,11 @@ string GetExtensionPath() {
 #endif
 
 void CreateDir(const string &dir) {
-#ifndef WIN32
-    if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
+#ifdef WIN32
+    if (_mkdir(dir.c_str()) != 0 && errno != EEXIST)
         FAIL("Can't create temp directory: errno " << errno);
 #else
-    if (_mkdir(dir.c_str()) != 0 && errno != EEXIST)
+    if (mkdir(dir.c_str(), 0744) != 0 && errno != EEXIST)
         FAIL("Can't create temp directory: errno " << errno);
 #endif
 }
