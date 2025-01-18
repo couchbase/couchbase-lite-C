@@ -24,10 +24,14 @@
 #include <iostream>
 #include <string>
 
-#ifdef WIN32
-constexpr char kPathSeparator[] = "\\";
+#ifdef _MSC_VER
+    static const char  kPathSeparator = '\\';
+    static const char  kBackupPathSeparator = '/';
+    static const char* kCurrentDirectory = ".\\";
 #else
-constexpr char kPathSeparator[] = "/";
+    static const char  kPathSeparator = '/';
+    static const char  kBackupPathSeparator = '\\';
+    static const char* kCurrentDirectory = "./";
 #endif
 
 #ifdef __APPLE__
@@ -100,6 +104,8 @@ std::string GetExtensionPath();
 void EnableVectorSearch();
 
 #endif
+
+void CreateDir(const std::string &dir);
 
 bool ReadFileByLines(const std::string &path, const std::function<bool(FLSlice)> &callback);
 
