@@ -5,6 +5,7 @@ plugins {
 android {
     namespace 'com.couchbase.tests'
     compileSdk 32
+    ndkVersion '27.2.12479018'
 
     ext {
         PROJECT_DIR = "${projectDir}"
@@ -60,7 +61,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('CMakeLists.txt')
-            version '3.18.1'
+            version '3.31.0'
         }
     }
 

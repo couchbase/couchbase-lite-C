@@ -16,8 +16,7 @@ env:
 
 jobs:
   build:
-    if: false
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -27,19 +26,15 @@ jobs:
     - name: Setup Android SDK
       run: |
         java -version
-        $ANDROID_SDK_ROOT/tools/bin/sdkmanager --list
-        $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "ndk;27.0.12077973"
-        $ANDROID_SDK_ROOT/tools/bin/sdkmanager --install "cmake;3.28.1"
-
-    - name: Setup Java SDK
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'adopt'
-        java-version: 11
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --list
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.2.12479018"
+        $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install "cmake;3.31.0"
         
     - name: Build
       working-directory: ${{github.workspace}}
       run: | 
+        export ANDROID_NDK_VERSION=27.2.12479018
+        export ANDROID_CMAKE_VERSION=3.31.0
         scripts/build_android.sh -a x86_64
 
     - name: Prepare for Tests
