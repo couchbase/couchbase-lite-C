@@ -56,18 +56,12 @@ public:
     }
 };
 
-namespace Catch {
-    ostream& cout() {
-        static ostream ret(new AndroidLogStream());
-        return ret;
-    }
-    ostream& clog() {
-        static ostream ret(new AndroidLogStream());
-        return ret;
-    }
-    ostream& cerr() {
-        return clog();
-    }
+// Initialize the custom stream buffer
+static AndroidLogStream androidLogStream;
+void redirectCatchToLogcat() {
+    std::cout.rdbuf(&androidLogStream);
+    std::clog.rdbuf(&androidLogStream);
+    std::cerr.rdbuf(&androidLogStream);
 }
 
 extern "C" JNIEXPORT int JNICALL
@@ -94,6 +88,8 @@ Java_com_couchbase_tests_CouchbaseLiteTest_runTests(
         AndroidLog::log(level, m);
     });
     CBLLog_SetCallbackLevel(kCBLLogInfo);
+
+    redirectCatchToLogcat();
 
     // Preparing Catch test arguments:
     vector<string> tmpArgs;

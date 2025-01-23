@@ -6,7 +6,6 @@
 cmake_minimum_required(VERSION 3.18.1)
 
 # Declares and names the project.
-
 project("cbl_tests")
 
 set(CBL_DIR ${PROJECT_SOURCE_DIR}/../../../..)
@@ -19,6 +18,13 @@ list(APPEND CMAKE_PREFIX_PATH ${LIB_CBLITE_DIR})
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE NEVER)
 find_package(CouchbaseLite REQUIRED)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+# BUILD SETTINGS:
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_STANDARD 11)
 
 add_definitions(
     -DCBL_TESTS
