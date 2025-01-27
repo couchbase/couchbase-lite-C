@@ -30,12 +30,18 @@ CBL_CAPI_BEGIN
 
 /** Value Index Configuration. */
 typedef struct {
-    /** The language used in the expressions. */
+    /** The language used in the expressions (Required). */
     CBLQueryLanguage expressionLanguage;
     
-    /** The expressions describing each coloumn of the index. The expressions could be specified
-        in a JSON Array or in N1QL syntax using comma delimiter. */
+    /** The expressions describing each coloumn of the index (Required).
+        The expressions could be specified in a JSON Array or in N1QL syntax
+        using comma delimiter, depending on expressionLanguage. */
     FLString expressions;
+    
+    /** A predicate expression defining conditions for indexing documents.
+        Only documents satisfying the predicate are included, enabling partial indexes.
+        The expression can be JSON or N1QL/SQL++ syntax, depending on expressionLanguage. */
+    FLString where;
 } CBLValueIndexConfiguration;
 
 /** Full-Text Index Configuration. */
@@ -43,8 +49,9 @@ typedef struct {
     /** The language used in the expressions (Required). */
     CBLQueryLanguage expressionLanguage;
     
-    /** The expressions describing each coloumn of the index. The expressions could be specified
-        in a JSON Array or in N1QL syntax using comma delimiter. (Required) */
+    /** The expressions describing each coloumn of the index (Required).
+        The expressions could be specified in a JSON Array or in N1QL syntax
+        using comma delimiter, depending on expressionLanguage. */
     FLString expressions;
     
     /** Should diacritical marks (accents) be ignored?
@@ -64,6 +71,11 @@ typedef struct {
         If left null,  or set to an unrecognized language, no language-specific behaviors
         such as stemming and stop-word removal occur. */
     FLString language;
+    
+    /** A predicate expression defining conditions for indexing documents.
+        Only documents satisfying the predicate are included, enabling partial indexes.
+        The expression can be JSON or N1QL/SQL++ syntax, depending on expressionLanguage. */
+    FLString where;
 } CBLFullTextIndexConfiguration;
 
 /** Array Index Configuration for indexing property values within arrays
@@ -80,8 +92,9 @@ typedef struct {
     
     /** Optional expressions representing the values within the array to be
         indexed. The expressions could be specified in a JSON Array or in N1QL syntax
-        using comma delimiter. If the array specified by the path contains scalar values,
-        the expressions should be left unset or set to null. */
+        using comma delimiter, depending on expressionLanguage.
+        If the array specified by the path contains scalar values, the expressions
+        should be left unset or set to null. */
     FLString expressions;
 } CBLArrayIndexConfiguration;
 
