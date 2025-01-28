@@ -1287,6 +1287,88 @@ TEST_CASE_METHOD(QueryTest, "TestCreateArrayIndexWithPathAndExpressions", "[Quer
     CBLCollection_Release(collection);
 }
 
+#pragma mark - Partial Index
+
+// Spec: https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0007-Partial-Index.md
+// Version: 1.0.2
+
+TEST_CASE_METHOD(QueryTest, "TestCreatePartialValueIndex", "[Query]") {
+    CBLValueIndexConfiguration config {};
+    
+    SECTION("SQL++") {
+        config.expressionLanguage = kCBLN1QLLanguage;
+        config.expressions = "num"_sl;
+        config.where = "type = 'number'"_sl;
+    }
+    
+    SECTION("JSON") {
+        config.expressionLanguage = kCBLJSONLanguage;
+        config.expressions = R"([[".num"]])"_sl;
+        config.where = R"(["=",[".type"],"number"])"_sl;
+    }
+    
+    CBLError error {};
+    CHECK(CBLCollection_CreateValueIndex(defaultCollection, "num-index"_sl, config, &error));
+    CheckNoError(error);
+    
+    string queryString = "SELECT * FROM _ WHERE type = 'number' AND number > 1000";
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), nullptr, &error);
+    REQUIRE(query);
+    
+    alloc_slice exp = CBLQuery_Explain(query);
+    CHECK(exp.find("USING INDEX num-index"_sl));
+    
+    CBLQuery_Release(query);
+    
+    queryString = "SELECT * FROM _ WHERE type = 'foo' AND number > 1000";
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), nullptr, &error);
+    REQUIRE(query);
+    
+    exp = CBLQuery_Explain(query);
+    CHECK(!exp.find("USING INDEX num-index"_sl));
+}
+
+TEST_CASE_METHOD(QueryTest, "TestCreatePartialFullTextIndex", "[Query]") {
+    createDocWithJSON(defaultCollection, "doc1", "{\"content\": \"Couchbase Lite is a database.\"}");
+    createDocWithJSON(defaultCollection, "doc2", "{\"content\": \"Couchbase Lite is a NoSQL syncable database.\"}");
+
+    CBLFullTextIndexConfiguration config {};
+    
+    SECTION("SQL++") {
+        config.expressionLanguage = kCBLN1QLLanguage;
+        config.expressions = "content"_sl;
+        config.where = "length(content) > 30"_sl;
+    }
+    
+    SECTION("JSON") {
+        config.expressionLanguage = kCBLJSONLanguage;
+        config.expressions = R"([[".content"]])"_sl;
+        config.where = R"-([">", ["length()", [".content"]], 30])-"_sl;
+    }
+
+    CBLError error {};
+    CHECK(CBLCollection_CreateFullTextIndex(defaultCollection, "contentIndex"_sl, config, &error));
+    CheckNoError(error);
+    
+    string queryString = "SELECT content FROM _ WHERE match(contentIndex, 'database')";
+    query = CBLDatabase_CreateQuery(db, kCBLN1QLLanguage, slice(queryString), nullptr, &error);
+    REQUIRE(query);
+    CheckNoError(error);
+    
+    results = CBLQuery_Execute(query, &error);
+    REQUIRE(results);
+
+    int n = 0;
+    while (CBLResultSet_Next(results))
+    {
+        FLDict result = CBLResultSet_ResultDict(results);
+        slice content = FLValue_AsString(FLDict_Get(result, "content"_sl));
+        CHECK(content == "Couchbase Lite is a NoSQL syncable database.");
+        ++n;
+    }
+    CHECK(n == 1);
+}
+
 #ifdef COUCHBASE_ENTERPRISE
 
 TEST_CASE_METHOD(QueryTest, "Query Encryptable", "[Query]") {
