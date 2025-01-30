@@ -19,6 +19,7 @@
 #include "CBLLogSinks_Internal.hh"
 #include "CBLPrivate.h"
 #include "CBLUserAgent.hh"
+#include "FilePath.hh"
 #include "LogDecoder.hh"
 #include "ParseDate.hh"
 
@@ -140,6 +141,17 @@ void CBLLogSinks::_setCustomLogSink(const CBLCustomLogSink& customSink) {
 
 void CBLLogSinks::_setFileLogSink(const CBLFileLogSink& fileSink) {
     std::unique_lock<std::shared_mutex> lock(_sMutex);
+    
+    if (fileSink.level != kCBLLogNone) {
+        auto directory = slice(fileSink.directory);
+        if (!directory.empty()) {
+            FilePath path(directory, "");
+            if (!path.exists() && !path.mkdir()) {
+                C4Error::raise(LiteCoreDomain, kC4ErrorIOError,
+                               "Failed to create log directory at path: %s", path.path().c_str());
+            }
+        }
+    }
     
     C4LogFileOptions c4opt {};
     c4opt.log_level         = C4LogLevel(fileSink.level);
