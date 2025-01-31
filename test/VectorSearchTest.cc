@@ -982,9 +982,9 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchOnNonExistingIndex", "[Vector
  *           FROM _default.words
  *           ORDER BY APPROX_VECTOR_DISTANCE(vector, $dinerVector)
  *           LIMIT <limit>
- *         - limit : 1 and 10000
+ *         - limit : -1, 0, 1, 10000
  *     5. Check that the query can be created without an error.
- *     6. Repeat step 4 with the limit: -1, 0, and 10001
+ *     6. Repeat step 4 with the limit = 10001
  *     7. Check that a CouchbaseLiteException is returned when creating the query.
  */
 TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearch]") {
@@ -995,6 +995,17 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearc
     
     ExpectingExceptions x;
     CBLError error {};
+    
+    SECTION("Valid Limit : -1") {
+        query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(-1)), nullptr, &error);
+        CHECK(query);
+    }
+    
+    SECTION("Valid Limit : 0") {
+        query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(0)), nullptr, &error);
+        CHECK(query);
+    }
+    
     SECTION("Valid Limit : 1") {
         query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(1)), nullptr, &error);
         CHECK(query);
@@ -1003,18 +1014,6 @@ TEST_CASE_METHOD(VectorSearchTest, "TestVectorMatchLimitBoundary", "[VectorSearc
     SECTION("Valid Limit : 10000") {
         query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(10000)), nullptr, &error);
         CHECK(query);
-    }
-    
-    SECTION("Invalid Limit : -1") {
-        query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(-1)), nullptr, &error);
-        CHECK(!query);
-        CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
-    }
-    
-    SECTION("Invalid Limit : 0") {
-        query = CBLDatabase_CreateQuery(wordDB, kCBLN1QLLanguage, slice(wordQueryString(0)), nullptr, &error);
-        CHECK(!query);
-        CheckError(error, kCBLErrorInvalidQuery, kCBLDomain);
     }
     
     SECTION("Invalid Limit : 10001") {
