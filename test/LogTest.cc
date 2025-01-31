@@ -82,12 +82,35 @@ public:
         deleteAllLogFiles();
     }
     
+    void deleteLogDir() {
+        CBLError error {};
+        CBL_DeleteDirectoryRecursive(slice(_logDir), &error);
+        CheckNoError(error);
+    }
+    
+    void deleteAllLogFiles() {
+        auto paths = getAllLogFilePaths();
+        for (string path : paths) {
+        #ifndef WIN32
+            int result = unlink(path.c_str());
+        #else
+            int result = _unlink(path.c_str());
+        #endif
+            if (result != 0)
+                FAIL("Can't delete file at " << path <<": errno " << errno);
+        }
+    }
+    
     vector<string> getAllLogFilePaths() {
         vector<string> logFiles;
         
         auto dir = opendir(logDir().c_str());
-        if (!dir)
-            FAIL("Can't open log directory at "<< logDir() << ": errno " << errno);
+        if (!dir) {
+            if (errno != ENOENT) {
+                FAIL("Can't open log directory at "<< logDir() << ": errno " << errno);
+            }
+            return logFiles;
+        }
         
         struct dirent *entry;
         while ((entry = readdir(dir)) != NULL) {
@@ -139,13 +162,14 @@ public:
                 filePath = path;
             }
         }
-        REQUIRE(!filePath.empty());
         
         vector<string> lines;
-        ReadFileByLines(filePath, [&](FLSlice line) {
-            lines.push_back(string(line));
-            return true;
-        });
+        if (!filePath.empty()) {
+            ReadFileByLines(filePath, [&](FLSlice line) {
+                lines.push_back(string(line));
+                return true;
+            });
+        }
         return lines;
     }
     
@@ -187,19 +211,6 @@ private:
         CreateDir(dir);
         
         _logDir = dir;
-    }
-    
-    void deleteAllLogFiles() {
-        auto paths = getAllLogFilePaths();
-        for (string path : paths) {
-        #ifndef WIN32
-            int result = unlink(path.c_str());
-        #else
-            int result = _unlink(path.c_str());
-        #endif
-            if (result != 0)
-                FAIL("Can't delete file at " << path <<": " << result);
-        }
     }
     
     // File Utils:
@@ -679,4 +690,69 @@ TEST_CASE_METHOD(LogTest, "File Log Sink : Binary Format", "[Log]") {
     file.read(reinterpret_cast<char*>(bytes.data()), targetBytes.size());
     file.close();
     CHECK(bytes == targetBytes);
+}
+
+TEST_CASE_METHOD(LogTest, "File Log Sink : Create Directory", "[Log]") {
+    deleteLogDir();
+    
+    CBLFileLogSink logSink {};
+    logSink.level = kCBLLogInfo;
+    logSink.directory = slice(logDir());
+    logSink.usePlaintext = true;
+    CBLLogSinks_SetFile(logSink);
+    
+    writeLog(kCBLLogDomainDatabase, kCBLLogInfo, "message");
+    vector<string> lines = readLogFile(kCBLLogInfo);
+    REQUIRE(lines.size() == 3);
+}
+
+TEST_CASE_METHOD(LogTest, "File Log Sink : Disable", "[Log]") {
+    CBLFileLogSink logSink {};
+    logSink.level = kCBLLogInfo;
+    logSink.directory = slice(logDir());
+    logSink.usePlaintext = true;
+    CBLLogSinks_SetFile(logSink);
+    
+    writeLog(kCBLLogDomainDatabase, kCBLLogInfo, "message");
+    vector<string> lines = readLogFile(kCBLLogInfo);
+    REQUIRE(lines.size() == 3);
+    
+    SECTION("With directory") {
+        logSink.level = kCBLLogNone;
+        logSink.directory = slice(logDir());
+        logSink.usePlaintext = true;
+        CBLLogSinks_SetFile(logSink);
+    }
+    
+    SECTION("With null directory") {
+        logSink.level = kCBLLogNone;
+        logSink.directory = kFLSliceNull;
+        logSink.usePlaintext = true;
+        CBLLogSinks_SetFile(logSink);
+    }
+    
+    SECTION("With empty directory") {
+        logSink.level = kCBLLogNone;
+        logSink.directory = slice("");
+        logSink.usePlaintext = true;
+        CBLLogSinks_SetFile(logSink);
+    }
+    
+    SECTION("With log level and null directory") {
+        logSink.level = kCBLLogInfo;
+        logSink.directory = kFLSliceNull;
+        logSink.usePlaintext = true;
+        CBLLogSinks_SetFile(logSink);
+    }
+    
+    SECTION("With log level and empty directory") {
+        logSink.level = kCBLLogInfo;
+        logSink.directory = slice("");
+        logSink.usePlaintext = true;
+        CBLLogSinks_SetFile(logSink);
+    }
+    
+    writeLog(kCBLLogDomainDatabase, kCBLLogInfo, "message");
+    lines = readLogFile(kCBLLogInfo);
+    REQUIRE(lines.size() == 3); // No changes
 }

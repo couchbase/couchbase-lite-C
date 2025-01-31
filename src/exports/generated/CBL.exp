@@ -197,6 +197,7 @@ _CBLLog_BeginExpectingExceptions
 _CBLLog_EndExpectingExceptions
 _CBLLog_Reset
 _CBLLog_LogWithC4Log
+_CBL_DeleteDirectoryRecursive
 _kCBLDefaultDatabaseFullSync
 _kCBLDefaultDatabaseMmapDisabled
 _kCBLDefaultLogFileUsePlaintext
