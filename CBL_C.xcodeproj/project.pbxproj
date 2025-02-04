@@ -83,7 +83,7 @@
 		27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 27DBD097246C9DE7002FD7A7 /* CBLDatabase+Apple.mm */; };
 		27DBD09C246CA60E002FD7A7 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 277B77C6245B44BE00B222D3 /* CBLLog.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		400983512D0769630029F26E /* CBLLogSinks.h in Headers */ = {isa = PBXBuildFile; fileRef = 400983502D0769630029F26E /* CBLLogSinks.h */; };
+		400983512D0769630029F26E /* CBLLogSinks.h in Headers */ = {isa = PBXBuildFile; fileRef = 400983502D0769630029F26E /* CBLLogSinks.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		400983522D0769630029F26E /* CBLLogSinks.h in Headers */ = {isa = PBXBuildFile; fileRef = 400983502D0769630029F26E /* CBLLogSinks.h */; };
 		400983552D07B8500029F26E /* CBLLogSinks.cc in Sources */ = {isa = PBXBuildFile; fileRef = 400983542D07B8500029F26E /* CBLLogSinks.cc */; };
 		400983562D07B8500029F26E /* CBLLogSinks_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 400983532D07B8500029F26E /* CBLLogSinks_Internal.hh */; };
