@@ -10,6 +10,8 @@ else
     BUILD_ENTERPRISE="OFF"
 fi
 
+PATH=$PATH:/opt/homebrew/bin
+
 # Run cmake to generate CBL_Edition.h:
 GEN_OUTPUT_DIR="${SRCROOT}/Xcode"
 cmake -DVERSION="${CBL_VERSION_STRING}" -DOUTPUT_DIR="${GEN_OUTPUT_DIR}" -DBLD_NUM="${CBL_BUILD_NUMBER}" -DBUILD_ENTERPRISE="${BUILD_ENTERPRISE}" -P "${SRCROOT}/cmake/generate_edition.cmake"
