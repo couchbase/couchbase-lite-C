@@ -197,6 +197,62 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1B32E8B92D5E6B7E00267AEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 2718B3322CAF102D006C09CB;
+			remoteInfo = Catch2;
+		};
+		1B32E8C22D5E6B7F00267AEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 270FA25C1BF53CAD005DCB13;
+			remoteInfo = Fleece;
+		};
+		1B32E8C42D5E6B7F00267AEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 27DE2EDF2125FA1700123597;
+			remoteInfo = FleeceBase;
+		};
+		1B32E8C62D5E6B7F00267AEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 27C4CE9C2127719D00470DE9;
+			remoteInfo = fleeceDylib;
+		};
+		1B32E8C82D5E6B7F00267AEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 27D721901F8E8EEA00AA4458;
+			remoteInfo = FleeceMutableObjC;
+		};
+		1B32E8CA2D5E6B7F00267AEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 2718B37F2CAF102D006C09CB;
+			remoteInfo = Catch2;
+		};
+		1B32E8CC2D5E6B7F00267AEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 272E5A4B1BF7FE5600848580;
+			remoteInfo = Test;
+		};
+		1B32E8CE2D5E6B7F00267AEB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 279AC5311C096872002C80DB;
+			remoteInfo = Tool;
+		};
 		271A989F243C0852008C032D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
@@ -358,13 +414,6 @@
 			remoteGlobalIDString = 27EF80F91917EEC600A327B9;
 			remoteInfo = "LiteCore static";
 		};
-		40BC192B2CED34EA00143002 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 2718B3322CAF102D006C09CB;
-			remoteInfo = Catch2;
-		};
 		40BC19342CED34EA00143002 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
@@ -468,6 +517,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Fleece.xcodeproj; path = "/Users/jianmin.zhao/work/Git/couchbase-lite-C/vendor/couchbase-lite-core/vendor/fleece/Fleece.xcodeproj"; sourceTree = "<absolute>"; };
 		2716F8F5247D9D6700BE21D9 /* exports */ = {isa = PBXFileReference; lastKnownFileType = folder; path = exports; sourceTree = "<group>"; };
 		271A98AF243FDF55008C032D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		271C2A2321CAC8920045856E /* libcblite-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libcblite-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -702,6 +752,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1B32E8B72D5E6B7E00267AEB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1B32E8C32D5E6B7F00267AEB /* libfleeceStatic.a */,
+				1B32E8C52D5E6B7F00267AEB /* libfleeceBase.a */,
+				1B32E8C72D5E6B7F00267AEB /* libfleece.dylib */,
+				1B32E8C92D5E6B7F00267AEB /* libFleeceMutableObjC.a */,
+				1B32E8CB2D5E6B7F00267AEB /* libCatch2.a */,
+				1B32E8CD2D5E6B7F00267AEB /* Test */,
+				1B32E8CF2D5E6B7F00267AEB /* fleece */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		271C2A1A21CAC8920045856E = {
 			isa = PBXGroup;
 			children = (
@@ -717,6 +781,7 @@
 				271C2A2421CAC8920045856E /* Products */,
 				271C2A7C21CC86EB0045856E /* Frameworks */,
 				40BC19282CED34EA00143002 /* Fleece.xcodeproj */,
+				1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1240,7 +1305,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				40BC192C2CED34EA00143002 /* PBXTargetDependency */,
+				1B32E8BA2D5E6B7E00267AEB /* PBXTargetDependency */,
 				27B61DB721D6EBE00027CCDB /* PBXTargetDependency */,
 			);
 			name = CBL_Tests;
@@ -1339,6 +1404,10 @@
 					ProjectRef = 40BC19282CED34EA00143002 /* Fleece.xcodeproj */;
 				},
 				{
+					ProductGroup = 1B32E8B72D5E6B7E00267AEB /* Products */;
+					ProjectRef = 1B32E8B62D5E6B7E00267AEB /* Fleece.xcodeproj */;
+				},
+				{
 					ProductGroup = 271C2A3921CAD5950045856E /* Products */;
 					ProjectRef = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
 				},
@@ -1358,6 +1427,55 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		1B32E8C32D5E6B7F00267AEB /* libfleeceStatic.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libfleeceStatic.a;
+			remoteRef = 1B32E8C22D5E6B7F00267AEB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1B32E8C52D5E6B7F00267AEB /* libfleeceBase.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libfleeceBase.a;
+			remoteRef = 1B32E8C42D5E6B7F00267AEB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1B32E8C72D5E6B7F00267AEB /* libfleece.dylib */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.dylib";
+			path = libfleece.dylib;
+			remoteRef = 1B32E8C62D5E6B7F00267AEB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1B32E8C92D5E6B7F00267AEB /* libFleeceMutableObjC.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libFleeceMutableObjC.a;
+			remoteRef = 1B32E8C82D5E6B7F00267AEB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1B32E8CB2D5E6B7F00267AEB /* libCatch2.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCatch2.a;
+			remoteRef = 1B32E8CA2D5E6B7F00267AEB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1B32E8CD2D5E6B7F00267AEB /* Test */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = Test;
+			remoteRef = 1B32E8CC2D5E6B7F00267AEB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		1B32E8CF2D5E6B7F00267AEB /* fleece */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = fleece;
+			remoteRef = 1B32E8CE2D5E6B7F00267AEB /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		271C2A4F21CAD5950045856E /* libLiteCore-static.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1874,6 +1992,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1B32E8BA2D5E6B7E00267AEB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Catch2;
+			targetProxy = 1B32E8B92D5E6B7E00267AEB /* PBXContainerItemProxy */;
+		};
 		271A98A0243C0852008C032D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = LiteCoreWebSocket;
@@ -1923,11 +2046,6 @@
 			isa = PBXTargetDependency;
 			name = "LiteCore static";
 			targetProxy = 27B61DBD21D707910027CCDB /* PBXContainerItemProxy */;
-		};
-		40BC192C2CED34EA00143002 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Catch2;
-			targetProxy = 40BC192B2CED34EA00143002 /* PBXContainerItemProxy */;
 		};
 		40BC19442CED434F00143002 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
