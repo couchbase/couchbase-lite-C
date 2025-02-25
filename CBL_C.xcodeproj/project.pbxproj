@@ -93,6 +93,7 @@
 		405D4F8D2C34714E00221516 /* CBLQueryTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 406F8D6F2C17E191000223FC /* CBLQueryTypes.h */; };
 		405D4F8E2C34714F00221516 /* CBLQueryTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 406F8D6F2C17E191000223FC /* CBLQueryTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		406E46E42BACC4BF0088198C /* VectorSearchTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 406E46D22BACAEFF0088198C /* VectorSearchTest.cc */; };
+		4073CF102D6D5D6500339E59 /* libCatch2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4073CF0F2D6D5D6500339E59 /* libCatch2.a */; };
 		4083FCAF2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */; };
 		4083FCB02BA3B8C50061509D /* CBLVectorIndexConfig.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */; };
 		4083FCBC2BA8DE200061509D /* CBLPrediction_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */; };
@@ -492,6 +493,7 @@
 		406F8D6F2C17E191000223FC /* CBLQueryTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLQueryTypes.h; sourceTree = "<group>"; };
 		406F8D802C17E3B4000223FC /* CBLQueryIndexTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLQueryIndexTypes.h; sourceTree = "<group>"; };
 		406F8D852C180611000223FC /* cmake */ = {isa = PBXFileReference; lastKnownFileType = folder; path = cmake; sourceTree = "<group>"; };
+		4073CF0F2D6D5D6500339E59 /* libCatch2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libCatch2.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLVectorIndexConfig.hh; sourceTree = "<group>"; };
 		4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLVectorIndexConfig_CAPI.cc; sourceTree = "<group>"; };
 		4083FCB62BA3F6930061509D /* CBLPrediction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLPrediction.h; sourceTree = "<group>"; };
@@ -602,6 +604,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */,
+				4073CF102D6D5D6500339E59 /* libCatch2.a in Frameworks */,
 				27B61DB521D6EBDD0027CCDB /* libcblite.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -765,6 +768,7 @@
 		271C2A7C21CC86EB0045856E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4073CF0F2D6D5D6500339E59 /* libCatch2.a */,
 				40BC19262CED34AD00143002 /* libCatch2.a */,
 				40BC19242CED333D00143002 /* libCatch2.a */,
 				271A98AF243FDF55008C032D /* SystemConfiguration.framework */,
