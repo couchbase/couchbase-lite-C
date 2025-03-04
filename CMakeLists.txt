@@ -136,6 +136,7 @@ set(
     src/CBLReplicator_CAPI.cc
     src/CBLScope.cc
     src/CBLScope_CAPI.cc
+    src/CBLURLEndpointListener_CAPI.cc
     src/CBLVectorIndexConfig_CAPI.cc
     src/ConflictResolver.cc
     src/ContextManager.cc
