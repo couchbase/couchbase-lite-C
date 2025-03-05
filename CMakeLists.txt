@@ -191,8 +191,9 @@ set(CBL_LIBRARIES_PRIVATE
     ${WHOLE_LIBRARY_FLAG}
     cblite-static
     ${NO_WHOLE_LIBRARY_FLAG}
-    LiteCoreWebSocket
     LiteCoreObjects
+    LiteCoreREST_Objects
+    LiteCoreWebSocket
     FleeceObjects
     BLIPObjects
 )
