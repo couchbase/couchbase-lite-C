@@ -17,7 +17,6 @@
 //
 
 #include "ReplicatorTest.hh"
-#include "CBLURLEndpointListener.h"
 #include "CBLPrivate.h"
 #include "fleece/Fleece.hh"
 #include <string>

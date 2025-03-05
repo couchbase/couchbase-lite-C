@@ -15,9 +15,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#ifdef COUCHBASE_ENTERPRISE
 
 #include "CBLURLEndpointListener_Internal.hh"
+
+#ifdef COUCHBASE_ENTERPRISE
 
 CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth) noexcept {
     return nullptr;

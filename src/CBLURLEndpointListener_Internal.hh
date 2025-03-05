@@ -17,12 +17,12 @@
 //
 
 #pragma once
-
 #include "Internal.hh"
-#include "CBLURLEndpointListener.h"
 #include "CBLCollection_Internal.hh"
 #include "CBLDatabase_Internal.hh"
 #include "c4.h"
+
+#ifdef COUCHBASE_ENTERPRISE
 
 CBL_ASSUME_NONNULL_BEGIN
 
@@ -141,3 +141,5 @@ private:
 };
 
 CBL_ASSUME_NONNULL_END
+
+#endif
