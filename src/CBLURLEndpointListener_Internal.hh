@@ -68,14 +68,14 @@ public:
 
         Assert(_conf.collectionCount > 0);
 
-        C4ListenerConfig c4config = {
-            .port = _conf.port,
-            .networkInterface = _conf.networkInterface,
-            .apis = kC4SyncAPI,
-            .allowPush = true,
-            .allowPull = !_conf.readOnly,
-            .enableDeltaSync = _conf.enableDeltaSync,
+        C4ListenerConfig c4config {
+            _conf.port,
+            _conf.networkInterface,
+            kC4SyncAPI
         };
+        c4config.allowPush = true;
+        c4config.allowPull = !_conf.readOnly;
+        c4config.enableDeltaSync = _conf.enableDeltaSync;
 
         _c4listener = c4listener_start(&c4config, internal(outError));
         if (!_c4listener)

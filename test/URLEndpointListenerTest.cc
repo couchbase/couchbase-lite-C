@@ -90,11 +90,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Basics", "[URLListener]") {
     createNumberedDocsWithPrefix(cy[1], 20, "doc2");
 
     CBLURLEndpointListenerConfiguration listenerConfig {
-        .collections = cy.data(),
-        .collectionCount = 2,
-        .port = 0,
-        .disableTLS = true
+        nullptr, // context
+        cy.data(),
+        2,
+        0
     };
+    listenerConfig.disableTLS = true;
 
     CBLURLEndpointListener* listener = nullptr;
     SECTION("0 Collections") {
@@ -154,11 +155,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with OneShot Replication", "
     CBLError error {};
 
     CBLURLEndpointListenerConfiguration listenerConfig {
-        .collections = cy.data(),
-        .collectionCount = 2,
-        .port = 0,
-        .disableTLS = true
+        nullptr, // context
+        cy.data(),
+        2,
+        0
     };
+    listenerConfig.disableTLS = true;
 
     createNumberedDocsWithPrefix(cx[0], 10, "doc");
     createNumberedDocsWithPrefix(cx[1], 10, "doc");
