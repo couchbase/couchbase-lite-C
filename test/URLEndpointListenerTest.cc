@@ -20,6 +20,7 @@
 #include "CBLPrivate.h"
 #include "fleece/Fleece.hh"
 #include <string>
+#include <sstream>
 
 #ifdef COUCHBASE_ENTERPRISE
 
