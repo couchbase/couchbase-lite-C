@@ -36,6 +36,17 @@ CBL_C {
 		CBLIndexUpdater_Finish;
 		CBLIndexUpdater_Value;
 		CBLCollection_IsIndexTrained;
+		CBLListenerAuth_CreatePassword;
+		CBLListenerAuth_CreateCertificate;
+		CBLListenerAuth_Free;
+		CBLURLEndpointListener_Create;
+		CBLURLEndpointListener_Free;
+		CBLURLEndpointListener_Config;
+		CBLURLEndpointListener_Port;
+		CBLURLEndpointListener_Urls;
+		CBLURLEndpointListener_Status;
+		CBLURLEndpointListener_Start;
+		CBLURLEndpointListener_Stop;
 		kCBLDefaultVectorIndexLazy;
 		kCBLDefaultVectorIndexDistanceMetric;
 		kCBLDefaultVectorIndexMinTrainingSize;
