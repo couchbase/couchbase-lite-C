@@ -33,13 +33,6 @@ void CBLListenerAuth_Free(CBLListenerAuthenticator* _cbl_nullable auth) noexcept
 }
 
 CBLURLEndpointListener* CBLURLEndpointListener_Create(const CBLURLEndpointListenerConfiguration* conf, CBLError* outError) noexcept {
-    if (conf->collectionCount == 0) {
-        if (outError) {
-            outError->domain = kCBLDomain;
-            outError->code = kCBLErrorInvalidParameter;
-        }
-        return nullptr;
-    }
     try {
         return retain(new CBLURLEndpointListener(*conf));
     } catchAndBridge(outError);
@@ -72,7 +65,7 @@ CBLConnectionStatus CBLURLEndpointListener_Status(const CBLURLEndpointListener* 
 
 bool CBLURLEndpointListener_Start(CBLURLEndpointListener* listener, CBLError* outError) noexcept {
     try {
-        return listener->start(outError);
+        return listener->start();
     } catchAndBridge(outError)
 }
 

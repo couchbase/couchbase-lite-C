@@ -21,7 +21,8 @@
 #include "Internal.hh"
 #include "CBLCollection_Internal.hh"
 #include "CBLDatabase_Internal.hh"
-#include "c4.h"
+#include "Defer.hh"
+#include "c4Listener.hh"
 
 #ifdef COUCHBASE_ENTERPRISE
 
@@ -35,36 +36,60 @@ struct CBLURLEndpointListener final : public CBLRefCounted {
 public:
     CBLURLEndpointListener(const CBLURLEndpointListenerConfiguration &conf)
     : _conf(conf)
-    { }
+    {
+        if (conf.collectionCount == 0) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "No collections in CBLURLEndpointListenerConfiguration");
+        }
+    }
 
     const CBLURLEndpointListenerConfiguration* configuration() const { return &_conf; }
 
     uint16_t port() const {
         if (_port == 0 && _c4listener) {
-            _port = c4listener_getPort(_c4listener);
+            _port = _c4listener->port();
         }
         return _port;
     }
 
     FLMutableArray _cbl_nullable getUrls() const {
-        FLMutableArray ret = (FLMutableArray) nullptr;
-        if (_c4listener) {
-            CBLDatabase* cblDb = CBLCollection_Database(_conf.collections[0]);
-            cblDb->c4db()->useLocked([&](C4Database* db) {
-                ret = c4listener_getURLs(_c4listener, db, kC4SyncAPI, nullptr);
-            });
-        }
-        return ret;
+        if (!_c4listener) return (FLMutableArray) nullptr;
+
+        CBLDatabase* cblDb = CBLCollection_Database(_conf.collections[0]);
+        auto urls = fleece::MutableArray::newArray();
+        cblDb->c4db()->useLocked([&](C4Database* db) {
+            for ( const std::string& url : _c4listener->URLs(db, kC4SyncAPI) )
+                urls.append(url);
+        });
+        return (FLMutableArray)FLValue_Retain(urls);
     }
 
     CBLConnectionStatus getConnectionStatus() const {
-        unsigned int total = 0, active = 0;
-        if (_c4listener) c4listener_getConnectionStatus(_c4listener, &total, &active);
-        return {total, active};
+        if (_c4listener) {
+            auto [total, active] = _c4listener->connectionStatus();
+            return {total, active};
+        } else {
+            return {0, 0};
+        }
     }
 
-    bool start(CBLError* _cbl_nullable outError) {
+    bool start() {
         if (_c4listener) return true;
+
+        bool succ = true;
+        slice dbname;
+        DEFER {
+            if (!succ) {
+                for (C4Collection* coll: _collections) {
+                    // These collections have been successfully shared.
+                    (void)_c4listener->unshareCollection(dbname, coll);
+                }
+                (void)_c4listener->unshareDB(_db);
+                delete _c4listener;
+                _c4listener = nullptr;
+                _collections.clear();
+                _db = nullptr;
+            }
+        };
 
         Assert(_conf.collectionCount > 0);
 
@@ -77,47 +102,26 @@ public:
         c4config.allowPull = !_conf.readOnly;
         c4config.enableDeltaSync = _conf.enableDeltaSync;
 
-        _c4listener = c4listener_start(&c4config, internal(outError));
-        if (!_c4listener)
-            return false;
+        _c4listener = new C4Listener(c4config);
 
-        slice dbname;
         CBLDatabase* cblDb = CBLCollection_Database(_conf.collections[0]);
         cblDb->c4db()->useLocked([&](C4Database* db) {
             dbname = db->getName();
-            if (c4listener_shareDB(_c4listener, dbname, db, internal(outError))) {
+            if (_c4listener->shareDB(dbname, db)) {
                 _db = db;
             }
             if (_db) {
                 for (unsigned i = 0; i < _conf.collectionCount; ++i) {
-                    C4Collection* coll = db->getCollection(_conf.collections[i]->spec());
-                    if (!coll) {
-                        if (outError) {
-                            outError->domain = kCBLDomain;
-                            outError->code = kCBLErrorInvalidParameter;
+                    _conf.collections[i]->useLocked([&](C4Collection* coll) {
+                        if (_c4listener->shareCollection(dbname, coll)) {
+                            _collections.push_back(coll);
                         }
-                        break;
-                    }
-                    if (c4listener_shareCollection(_c4listener, dbname, coll, internal(outError))) {
-                        _collections.push_back(coll);
-                    }
+                    });
+                    if (_collections.size() < i + 1) break;
                 }
             }
         });
-        if (_collections.size() == _conf.collectionCount) {
-            return true;
-        }
-
-        // Otherwise unwind
-        for (C4Collection* coll: _collections) {
-            // These collections have been successfully shared.
-            (void)c4listener_unshareCollection(_c4listener, dbname, coll, nullptr);
-        }
-        (void)c4listener_unshareDB(_c4listener, _db, nullptr);
-
-        c4listener_free(_c4listener);
-        _c4listener = nullptr;
-        return false;
+        return (succ = _collections.size() == _conf.collectionCount);
     }
 
     void stop() {
@@ -125,9 +129,9 @@ public:
 
         auto dbname = _db->getName();
         for (C4Collection* coll: _collections) {
-            (void)c4listener_unshareCollection(_c4listener, dbname, coll, nullptr);
+            (void)_c4listener->unshareCollection(dbname, coll);
         }
-        (void)c4listener_unshareDB(_c4listener, _db, nullptr);
+        (void)_c4listener->unshareDB(_db);
 
         c4listener_free(_c4listener);
         _c4listener = nullptr;
@@ -137,7 +141,7 @@ private:
     const CBLURLEndpointListenerConfiguration _conf;
     mutable uint16_t                          _port{0};
     C4Listener* _cbl_nullable                 _c4listener{nullptr};
-    C4Database*                               _db;
+    C4Database* _cbl_nullable                 _db;
     std::vector<C4Collection*>                _collections;
 };
 

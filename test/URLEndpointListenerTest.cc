@@ -99,6 +99,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Basics", "[URLListener]") {
 
     CBLURLEndpointListener* listener = nullptr;
     SECTION("0 Collections") {
+        ExpectingExceptions x;
         listenerConfig.collectionCount = 0;
         // Cannot create listener with 0 collections.
         listener = CBLURLEndpointListener_Create(&listenerConfig, &error);
