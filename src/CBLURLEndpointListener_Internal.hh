@@ -51,16 +51,16 @@ public:
         return _port;
     }
 
-    FLMutableArray _cbl_nullable getUrls() const {
-        if (!_c4listener) return (FLMutableArray) nullptr;
+    fleece::MutableArray getUrls() const {
+        if (!_c4listener) return {};
 
-        CBLDatabase* cblDb = CBLCollection_Database(_conf.collections[0]);
-        auto urls = fleece::MutableArray::newArray();
+        CBLDatabase* cblDb = _conf.collections[0]->database();
+        fleece::MutableArray urls = fleece::MutableArray::newArray();
         cblDb->c4db()->useLocked([&](C4Database* db) {
             for ( const std::string& url : _c4listener->URLs(db, kC4SyncAPI) )
                 urls.append(url);
         });
-        return (FLMutableArray)FLValue_Retain(urls);
+        return urls;
     }
 
     CBLConnectionStatus getConnectionStatus() const {

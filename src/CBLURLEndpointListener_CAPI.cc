@@ -55,7 +55,7 @@ uint16_t CBLURLEndpointListener_Port(const CBLURLEndpointListener* listener) noe
 
 FLMutableArray CBLURLEndpointListener_Urls(const CBLURLEndpointListener* listener) noexcept {
     try {
-        return listener->getUrls();
+        return (FLMutableArray)FLValue_Retain(listener->getUrls());
     } catchAndBridge(nullptr)
 }
 
