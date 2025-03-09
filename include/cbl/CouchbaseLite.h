@@ -34,3 +34,4 @@
 #include "CBLQueryTypes.h"
 #include "CBLReplicator.h"
 #include "CBLScope.h"
+#include "CBLURLEndpointListener.h"
