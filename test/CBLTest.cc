@@ -22,8 +22,10 @@
 #include "CBLTest_Cpp.hh"
 #include "CBLPrivate.h"
 #include "fleece/slice.hh"
+#include <chrono>
 #include <sstream>
 #include <fstream>
+#include <thread>
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -192,7 +194,14 @@ CBLTest_Cpp::~CBLTest_Cpp() {
         db = nullptr;
     }
 
-    if (CBL_InstanceCount() > 0) {
+    bool hasLeak = CBL_InstanceCount() > 0;
+    constexpr auto pollPeriod = 50ms;
+    for (auto now = chrono::steady_clock::now(), end = now + 10s;
+         hasLeak && now < end;
+         now = chrono::steady_clock::now(), hasLeak = CBL_InstanceCount() > 0) {
+        this_thread::sleep_for(pollPeriod);
+    }
+    if (hasLeak) {
         WARN("*** LEAKED OBJECTS: ***");
         CBL_DumpInstances();
     }
