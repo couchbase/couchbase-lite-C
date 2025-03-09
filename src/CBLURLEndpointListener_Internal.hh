@@ -21,7 +21,6 @@
 #include "Internal.hh"
 #include "CBLCollection_Internal.hh"
 #include "CBLDatabase_Internal.hh"
-#include "Defer.hh"
 #include "c4Listener.hh"
 
 #ifdef COUCHBASE_ENTERPRISE
@@ -75,14 +74,6 @@ public:
     bool start() {
         if (_c4listener) return true;
 
-        bool succ = true;
-        DEFER {
-            if (!succ && _c4listener) {
-                delete _c4listener;
-                _c4listener = nullptr;
-            }
-        };
-
         Assert(_conf.collectionCount > 0);
 
         C4ListenerConfig c4config {
@@ -94,22 +85,29 @@ public:
         c4config.allowPull = !_conf.readOnly;
         c4config.enableDeltaSync = _conf.enableDeltaSync;
 
-        _c4listener = new C4Listener(c4config);
+        std::unique_ptr<C4Listener> c4listener{new C4Listener(c4config)};
+        auto ret = [&](bool succ) -> bool {
+            if (succ) {
+                _c4listener = c4listener.release();
+            }
+            return succ;
+        };
 
         CBLDatabase* cblDb = _conf.collections[0]->database();
+        bool succ = true;
         cblDb->c4db()->useLocked([&](C4Database* db) {
             slice dbname = db->getName();
-            if ( (succ = _c4listener->shareDB(dbname, db)) ) {
+            if ( (succ = c4listener->shareDB(dbname, db)) ) {
                 for (unsigned i = 0; i < _conf.collectionCount; ++i) {
                     _conf.collections[i]->useLocked([&](C4Collection* coll) {
-                        succ = _c4listener->shareCollection(dbname, coll);
+                        succ = c4listener->shareCollection(dbname, coll);
                     });
                     if (!succ) break;
                 }
             }
         });
 
-        return succ;
+        return ret(succ);
     }
 
     void stop() {
