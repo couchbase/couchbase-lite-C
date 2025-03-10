@@ -21,11 +21,17 @@
 #ifdef COUCHBASE_ENTERPRISE
 
 CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth) noexcept {
-    return nullptr;
+    CBLListenerAuthenticator* ret = new CBLListenerAuthenticator;
+    ret->pswCallback = auth;
+    ret->withCert = false;
+    return ret;
 }
 
 CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth) noexcept {
-    return nullptr;
+    CBLListenerAuthenticator* ret = new CBLListenerAuthenticator;
+    ret->certCallback = auth;
+    ret->withCert = true;
+    return ret;
 }
 
 void CBLListenerAuth_Free(CBLListenerAuthenticator* _cbl_nullable auth) noexcept {
