@@ -290,6 +290,7 @@ protected:
     friend struct CBLDatabase;
     friend struct CBLDocument;
     friend struct cbl_internal::ListenerToken<CBLCollectionDocumentChangeListener>;
+    friend struct CBLURLEndpointListener;
     
     // Called by the database to take an ownership.
     // Release the database to avoid the circular reference

@@ -16,7 +16,6 @@ add_definitions(
 
 include_directories(
     ${TOP}test/
-    ${TOP}include/
     ${TOP}/src/        # Just for CBLPrivate.h
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/API/
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/catch/
