@@ -229,6 +229,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
             return usr == kUser && psw == kPassword;
         });
         listenerConfig.authenticator = auth;
+        auth = nullptr; // ownership passed to listenerConfig
         expectedDocumentCount = 20;
     }
 
@@ -239,6 +240,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
             return usr == "InvalidUser"_sl && psw == kPassword;
         });
         listenerConfig.authenticator = auth;
+        auth = nullptr; // ownership passed to listenerConfig
         expectedError.code = 401;
     }
 
@@ -249,10 +251,11 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
             return usr == kUser && psw == "InvalidPassword"_sl;
         });
         listenerConfig.authenticator = auth;
+        auth = nullptr; // ownership passed to listenerConfig
         expectedError.code = 401;
     }
 
-    REQUIRE(auth);
+    REQUIRE(listenerConfig.authenticator);
 
     createNumberedDocsWithPrefix(cx[0], 10, "doc");
     createNumberedDocsWithPrefix(cx[1], 10, "doc");
