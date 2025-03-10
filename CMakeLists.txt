@@ -136,6 +136,7 @@ set(
     src/CBLReplicator_CAPI.cc
     src/CBLScope.cc
     src/CBLScope_CAPI.cc
+    src/CBLURLEndpointListener_CAPI.cc
     src/CBLVectorIndexConfig_CAPI.cc
     src/ConflictResolver.cc
     src/ContextManager.cc
@@ -191,8 +192,9 @@ set(CBL_LIBRARIES_PRIVATE
     ${WHOLE_LIBRARY_FLAG}
     cblite-static
     ${NO_WHOLE_LIBRARY_FLAG}
-    LiteCoreWebSocket
     LiteCoreObjects
+    LiteCoreREST_Objects
+    LiteCoreWebSocket
     FleeceObjects
     BLIPObjects
 )
