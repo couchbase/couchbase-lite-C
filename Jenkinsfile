@@ -20,10 +20,11 @@ pipeline {
                     environment {
                         BRANCH = "${BRANCH_NAME}"
                         GH_PAT = credentials("cbl-bot-github-pat")
+                        KEYCHAIN_PWD = credentials("mobile-mac-mini-keychain")
                     }
                     steps {
                         sh 'jenkins/jenkins_ios.sh'
-                        sh 'scripts/coverage_macos.sh --push'
+                        sh 'couchbase-lite-c/scripts/coverage_macos.sh --push'
                     }
                 }
                 stage("Linux") {

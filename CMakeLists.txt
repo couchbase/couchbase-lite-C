@@ -1,5 +1,5 @@
-cmake_minimum_required (VERSION 3.1)
-cmake_policy(VERSION 3.1)
+cmake_minimum_required (VERSION 3.5)
+cmake_policy(VERSION 3.5)
 
 if(NOT DEFINED CMAKE_OSX_SYSROOT)
     # Tells Mac builds to use the current SDK's headers & libs, not what's in the OS.
@@ -52,6 +52,9 @@ endif()
 if(BUILD_ENTERPRISE)
     message("Building Enterprise Edition")
     set(COUCHBASE_ENTERPRISE 1)                     # For generating CBL_Edition.h
+    add_definitions(
+        -DCOUCHBASE_ENTERPRISE                       # For building source files that don't include CBL_Edition.h
+    )
 else()
     message("Building Community Edition")
 endif()
@@ -95,21 +98,6 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
 
 add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
 
-### SOURCE FILES:
-
-include_directories(
-    "vendor/couchbase-lite-core/C/include"
-    "vendor/couchbase-lite-core/C/Cpp_include"
-    "vendor/couchbase-lite-core/LiteCore/Logging"
-    "vendor/couchbase-lite-core/LiteCore/Support"
-    "vendor/couchbase-lite-core/vendor/fleece/API"
-    "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support"
-)
-
-if(!MSVC)
-    set_source_files_properties(${C_SRC} PROPERTIES COMPILE_FLAGS -Wno-return-type-c-linkage)
-endif()
-
 ### BUILDING THE LIBRARY:
 
 set_platform_source_files(RESULT PLATFORM_SRC)
@@ -137,6 +125,9 @@ set(
     src/CBLReplicator_CAPI.cc
     src/CBLScope.cc
     src/CBLScope_CAPI.cc
+    src/CBLTLSIdentity_CAPI.cc
+    src/CBLURLEndpointListener_stub.cc
+    src/CBLURLEndpointListener_CAPI.cc
     src/CBLVectorIndexConfig_CAPI.cc
     src/ConflictResolver.cc
     src/ContextManager.cc
@@ -157,16 +148,27 @@ set_platform_include_directories(RESULT PLATFORM_INCLUDE)
 target_include_directories(
     cblite-static
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/cbl
+    # Project includes
+    include/cbl
     src
-    vendor/couchbase-lite-core/C
-    ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
-    ${PLATFORM_INCLUDE}
-)
 
-target_link_libraries(
-    cblite-static INTERFACE
-    LiteCoreStatic
+    # Generated headers
+    ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
+
+    # Platform-specific includes
+    ${PLATFORM_INCLUDE}
+
+    # Enterprise-only includes
+    $<$<BOOL:${BUILD_ENTERPRISE}>:${CMAKE_CURRENT_SOURCE_DIR}/../couchbase-lite-c-ee/src>
+
+    # LiteCore and Fleece
+    vendor/couchbase-lite-core/C
+    vendor/couchbase-lite-core/C/include
+    vendor/couchbase-lite-core/C/Cpp_include
+    vendor/couchbase-lite-core/LiteCore/Logging
+    vendor/couchbase-lite-core/LiteCore/Support
+    vendor/couchbase-lite-core/vendor/fleece/API
+    vendor/couchbase-lite-core/vendor/fleece/Fleece/Support
 )
 
 file(WRITE empty.cpp)
@@ -179,21 +181,13 @@ target_include_directories(
     $<INSTALL_INTERFACE:include/>
 )
 
-target_include_directories(
-    cblite
-    PRIVATE
-    src
-    vendor/couchbase-lite-core/C
-    ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
-    ${PLATFORM_INCLUDE}
-)
-
 set(CBL_LIBRARIES_PRIVATE
     ${WHOLE_LIBRARY_FLAG}
     cblite-static
     ${NO_WHOLE_LIBRARY_FLAG}
-    LiteCoreWebSocket
     LiteCoreObjects
+    LiteCoreREST_Objects
+    LiteCoreWebSocket
     FleeceObjects
     BLIPObjects
 )

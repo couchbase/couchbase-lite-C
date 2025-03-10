@@ -19,6 +19,7 @@
 #include "CBLPrivate.h"
 #include "CBLReplicator.h"
 #include "CBLReplicator_Internal.hh"
+#include "CBLTLSIdentity.h"
 
 
 const FLString kCBLAuthDefaultCookieName = FLSTR("SyncGatewaySession");
@@ -53,6 +54,14 @@ CBLAuthenticator* CBLAuth_CreateSession(FLString sessionID, FLString cookieName)
         return new SessionAuthenticator(sessionID, cookieName);
     } catchAndWarn()
 }
+
+#ifdef COUCHBASE_ENTERPRISE
+CBLAuthenticator* CBLAuth_CreateCertificate(CBLTLSIdentity* identity) noexcept {
+    try {
+        return new CertAuthenticator(identity);
+    } catchAndWarn();
+}
+#endif
 
 void CBLAuth_Free(CBLAuthenticator *auth) noexcept {
     delete auth;

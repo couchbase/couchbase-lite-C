@@ -188,6 +188,7 @@ _CBLCollection_GetIndexesInfo
 _CBLCollection_LastSequence
 _CBLDatabase_DeleteDocumentByID
 _CBLDatabase_LastSequence
+_CBLDatabase_PublicUUID
 _CBLDocument_CanonicalRevisionID
 _CBLDocument_GetRevisionHistory
 _CBLError_GetCaptureBacktraces
