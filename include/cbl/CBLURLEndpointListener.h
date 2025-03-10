@@ -1,0 +1,110 @@
+//
+//  CBLURLEndpointListener.h
+//  CBL_C
+//
+//  Created by Pasin Suriyentrakorn on 2/19/25.
+//  Copyright © 2025 Couchbase. All rights reserved.
+//
+
+#pragma once
+#include "CBLBase.h"
+
+#ifdef COUCHBASE_ENTERPRISE
+
+CBL_CAPI_BEGIN
+
+/** An opaque object representing the listener authenticator. */
+typedef struct CBLListenerAuthenticator CBLListenerAuthenticator;
+
+/** Password authenticator callback for verifying client credentials when the HTTP Basic Authentication is used. */
+typedef bool (*CBLListenerPasswordAuthCallback) (
+    void* context,              ///< URLEndpointListener’s context
+    FLString username,          ///< Username
+    FLString password           ///< Password
+);
+
+/** Creates a password authenticatorfor verifying client credentials when the HTTP Basic Authentication is used. */
+_cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth) CBLAPI;
+
+/** Certificate authenticator callback for verifying client certificate when the TLS client certificate authentication is used. */
+typedef bool (*CBLListenerCertAuthCallback) (
+    void* context,              ///< URLEndpointListener’s context
+    FLSlice cert                ///< Certificate data
+);
+
+/** Creates a certificate authenticator for verifying client certificate when the TLS client certificate authentication is used. */
+_cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth) CBLAPI;
+
+/** Frees a CBLListenerAuthenticator object. */
+void CBLListenerAuth_Free(CBLListenerAuthenticator* _cbl_nullable) CBLAPI;
+
+/** The configuration for the URLEndpointListener. */
+typedef struct {
+    /** Arbitrary value that will be passed to the authenticator callback. */
+    void* _cbl_nullable context;
+    
+    /** (Required) The collections available for replication . */
+    CBLCollection* _cbl_nonnull * _cbl_nullable collections;
+
+    /** (Required) The number of collections  (Required). */
+    size_t collectionCount;
+
+    /** The port that the listener will listen to. Default value is zero which means that the listener will automatically
+        select an available port to listen to when the listener is started. */
+    uint16_t port;
+
+    /** The network interface in the form of the IP Address or network interface name such as en0 that the listener will
+        listen to. The default value is null slice which means that the listener will listen to all network interfaces. */
+    FLString networkInterface;
+
+    /** Disable TLS communication. The default value is false which means that TLS will be enabled by default.  */
+    bool disableTLS;
+
+    /** The authenticator used by the listener to authenticate clients. */
+    CBLListenerAuthenticator* authenticator;
+
+    /** Allow delta sync when replicating with the listener. The default value is false. */
+    bool enableDeltaSync;
+
+    /** Allow only pull replication to pull changes from the listener. The default value is false. */
+    bool readOnly;
+} CBLURLEndpointListenerConfiguration;
+
+/** An opaque object representing the listener. */
+typedef struct CBLURLEndpointListener CBLURLEndpointListener;
+
+CBL_REFCOUNTED(CBLURLEndpointListener*, URLEndpointListener);
+
+/** Creates a URL endpoint listener with the given configuration. */
+_cbl_warn_unused CBLURLEndpointListener* _cbl_nullable CBLURLEndpointListener_Create(const CBLURLEndpointListenerConfiguration*, CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Frees a CBLURLEndpointListener object. */
+void CBLURLEndpointListener_Free(CBLURLEndpointListener* _cbl_nullable) CBLAPI;
+
+/** Gets the listener's configuration. */
+const CBLURLEndpointListenerConfiguration* CBLURLEndpointListener_Config(const CBLURLEndpointListener*) CBLAPI;
+
+/** The listening port of the listener. If the listener is not started, the port will be zero. */
+uint16_t CBLURLEndpointListener_Port(const CBLURLEndpointListener*) CBLAPI;
+
+/** The possible URLs of the listener. If the listener is not started, NULL will be returned.  */
+FLMutableArray CBLURLEndpointListener_Urls(const CBLURLEndpointListener*) CBLAPI;
+
+/** The connection status of the listener */
+typedef struct {
+    uint64_t connectionCount;       ///< The total number of connections.
+    uint64_t activeConnectionCount; ///< The number of the connections that are in active or busy state.
+} CBLConnectionStatus;
+
+/** Gets the current connection status of the listener. */
+CBLConnectionStatus CBLURLEndpointListener_Status(const CBLURLEndpointListener*) CBLAPI;
+
+/** Starts the listener. */
+bool CBLURLEndpointListener_Start(CBLURLEndpointListener*, CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Stops the listener. */
+void CBLURLEndpointListener_Stop(CBLURLEndpointListener*) CBLAPI;
+
+CBL_CAPI_END
+
+#endif

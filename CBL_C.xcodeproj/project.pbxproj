@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B21A7D92D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */; };
+		1B21A7DA2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */; };
+		1B21A7DB2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */; };
+		1BC5D9602D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */; };
+		1BC5D9612D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */; };
+		1BC5D9662D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */; };
+		1BC5D9682D6E50960080153E /* CBLURLEndpointListener_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 1BC5D9672D6E50960080153E /* CBLURLEndpointListener_Internal.hh */; };
 		271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2C21CAC98F0045856E /* CBLReplicator.h */; };
 		271C2A3221CAC98F0045856E /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; };
@@ -203,6 +210,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1B21A7D42D70E760000CA0D5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 27FC81E71EAAB0D90028E38E;
+			remoteInfo = "LiteCoreREST static";
+		};
 		271A989F243C0852008C032D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
@@ -404,6 +418,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = URLEndpointListenerTest.cc; sourceTree = "<group>"; };
+		1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLURLEndpointListener.h; sourceTree = "<group>"; };
+		1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLURLEndpointListener_CAPI.cc; sourceTree = "<group>"; };
+		1BC5D9672D6E50960080153E /* CBLURLEndpointListener_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLURLEndpointListener_Internal.hh; sourceTree = "<group>"; };
 		2716F8F5247D9D6700BE21D9 /* exports */ = {isa = PBXFileReference; lastKnownFileType = folder; path = exports; sourceTree = "<group>"; };
 		271A98AF243FDF55008C032D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		271C2A2321CAC8920045856E /* libcblite-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libcblite-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -699,6 +717,7 @@
 				406F8D6F2C17E191000223FC /* CBLQueryTypes.h */,
 				271C2A2C21CAC98F0045856E /* CBLReplicator.h */,
 				FCD829B12835ECE0004AA814 /* CBLScope.h */,
+				1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */,
 				271C2A7021CAD6440045856E /* CBL_Compat.h */,
 			);
 			path = cbl;
@@ -732,6 +751,7 @@
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				FCC063C828588DA6000C5BD7 /* CBLScope.cc */,
 				FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */,
+				1BC5D9672D6E50960080153E /* CBLURLEndpointListener_Internal.hh */,
 				AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */,
 				42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */,
 				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
@@ -807,6 +827,7 @@
 				27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */,
 				277FEE7421ED3C4900B60E3C /* CBLReplicator_CAPI.cc */,
 				FCD829B22835EE39004AA814 /* CBLScope_CAPI.cc */,
+				1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */,
 				4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */,
 			);
 			name = "C Glue";
@@ -861,6 +882,7 @@
 				FC82CE0428C6E2BD001FA083 /* ReplicatorCollectionTest_Cpp.cc */,
 				2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */,
 				93C70D1626CB334D0093E927 /* ReplicatorPropEncTest.cc */,
+				1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */,
 				40FE2E0F2C12AF52005E99E9 /* VectorSearchTest.hh */,
 				406E46D22BACAEFF0088198C /* VectorSearchTest.cc */,
 				400AB0412C2E669500DB6223 /* VectorSearchTest_Cpp.cc */,
@@ -971,6 +993,7 @@
 			files = (
 				EA34BC4C2C369895000CEA70 /* CBLPrediction.h in Headers */,
 				277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */,
+				1BC5D9602D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */,
 				9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */,
 				4083FCB02BA3B8C50061509D /* CBLVectorIndexConfig.hh in Headers */,
 				27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */,
@@ -999,6 +1022,7 @@
 				271C2A3421CAC98F0045856E /* CBLDatabase.h in Headers */,
 				FCC064122862B848000C5BD7 /* CBLBlob.h in Headers */,
 				271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */,
+				1BC5D9682D6E50960080153E /* CBLURLEndpointListener_Internal.hh in Headers */,
 				271C2A3221CAC98F0045856E /* CBLBase.h in Headers */,
 				FCB96E8529007D50001C4DED /* CBLDefaults.h in Headers */,
 				27886C8D21F64C1400069BEA /* Listener.hh in Headers */,
@@ -1035,6 +1059,7 @@
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
 				400AB0532C2E66B500DB6223 /* QueryIndex.hh in Headers */,
 				27984E342249A247000FE777 /* Database.hh in Headers */,
+				1BC5D9612D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */,
 				FCC064212862B851000C5BD7 /* CBLScope.h in Headers */,
 				27984E352249A247000FE777 /* Document.hh in Headers */,
 				27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */,
@@ -1084,6 +1109,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1B21A7D52D70E760000CA0D5 /* PBXTargetDependency */,
 				271A98A0243C0852008C032D /* PBXTargetDependency */,
 				271C2A7B21CC86E10045856E /* PBXTargetDependency */,
 			);
@@ -1485,6 +1511,7 @@
 				"$(BUILT_PRODUCTS_DIR)/libmbedcrypto.a",
 				"$(BUILT_PRODUCTS_DIR)/libmbedtls.a",
 				"$(BUILT_PRODUCTS_DIR)/libmbedx509.a",
+				"$(BUILT_PRODUCTS_DIR)/libLiteCoreREST-static.a",
 			);
 			name = "Merge static libs";
 			outputFileListPaths = (
@@ -1611,6 +1638,7 @@
 				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
 				27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */,
 				FC5FBBB52821CC2E0066157F /* CBLCollection_CAPI.cc in Sources */,
+				1BC5D9662D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob_CAPI.cc in Sources */,
 				4083FCAF2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
@@ -1638,6 +1666,7 @@
 			files = (
 				40E32F432D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */,
 				93965A6426A7CD50008728EE /* LogTest.cc in Sources */,
+				1B21A7DB2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */,
 				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
 				275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */,
 				FC645E2E29088211007D5536 /* Platform_Apple.mm in Sources */,
@@ -1689,6 +1718,7 @@
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
 				FCD8298C283591D4004AA814 /* CollectionTest.cc in Sources */,
 				FC645E2D29088211007D5536 /* Platform_Apple.mm in Sources */,
+				1B21A7DA2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */,
 				93C70D3426D01B5A0093E927 /* BlobTest.cc in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
@@ -1731,6 +1761,7 @@
 				FC645E1D29085CBF007D5536 /* CBLTest.c in Sources */,
 				FCE497C02907959400EF2354 /* LibC++Debug.cc in Sources */,
 				FC645E1229085C2E007D5536 /* CollectionTest_Cpp.cc in Sources */,
+				1B21A7D92D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */,
 				FC645E2C29087777007D5536 /* Platform_Apple.mm in Sources */,
 				FC645E0E29085C05007D5536 /* CollectionTest.cc in Sources */,
 				FC645E1B29085C87007D5536 /* ReplicatorEETest.cc in Sources */,
@@ -1752,6 +1783,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1B21A7D52D70E760000CA0D5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "LiteCoreREST static";
+			targetProxy = 1B21A7D42D70E760000CA0D5 /* PBXContainerItemProxy */;
+		};
 		271A98A0243C0852008C032D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = LiteCoreWebSocket;

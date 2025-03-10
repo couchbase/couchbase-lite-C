@@ -22,8 +22,11 @@
 #include "CBLTest_Cpp.hh"
 #include "CBLPrivate.h"
 #include "fleece/slice.hh"
+#include <chrono>
 #include <sstream>
+#include <functional>
 #include <fstream>
+#include <thread>
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -116,6 +119,16 @@ CBLDatabaseConfiguration CBLTest::databaseConfig() {
 static constexpr size_t kDocIDBufferSize = 20;
 static constexpr size_t kDocContentBufferSize = 100;
 
+static bool WaitUntil(chrono::milliseconds timeout, std::function<bool()> predicate) {
+    auto deadline = chrono::steady_clock::now() + timeout;
+    do {
+        if ( predicate() ) return true;
+        this_thread::sleep_for(50ms);
+    } while ( chrono::steady_clock::now() < deadline );
+
+    return false;
+}
+
 CBLTest::CBLTest() {
     // Check that these have been correctly exported
     CHECK(FLValue_GetType(kFLNullValue) == kFLNull);
@@ -140,11 +153,12 @@ CBLTest::~CBLTest() {
         CBLDatabase_Release(db);
         db = nullptr;
     }
-    
-    if (CBL_InstanceCount() > 0) {
+
+    if ( !WaitUntil(10s, [&] { return CBL_InstanceCount() == 0; }) ) {
         CBL_DumpInstances();
+        WARN("*** LEAKED OBJECTS: ***");
+        CHECK(CBL_InstanceCount() == 0);
     }
-    CHECK(CBL_InstanceCount() == 0);
 }
 
 void CBLTest::initTestDatabases(bool reset) {
@@ -192,11 +206,11 @@ CBLTest_Cpp::~CBLTest_Cpp() {
         db = nullptr;
     }
 
-    if (CBL_InstanceCount() > 0) {
-        WARN("*** LEAKED OBJECTS: ***");
+    if ( !WaitUntil(10s, [&] { return CBL_InstanceCount() == 0; }) ) {
         CBL_DumpInstances();
+        WARN("*** LEAKED OBJECTS: ***");
+        CHECK(CBL_InstanceCount() == 0);
     }
-    CHECK(CBL_InstanceCount() == 0);
 }
 
 cbl::Database CBLTest_Cpp::openDatabaseNamed(slice name, bool createEmpty){
