@@ -32,6 +32,7 @@ struct CBLListenerAuthenticator {
     union {
         CBLListenerPasswordAuthCallback pswCallback;
         CBLListenerCertAuthCallback     certCallback;
+        void*                           callback;
     };
     bool withCert{false};
 
@@ -44,6 +45,11 @@ struct CBLListenerAuthenticator {
     : certCallback(auth)
     , withCert(true)
     {}
+
+    CBLListenerAuthenticator(const CBLListenerAuthenticator& src)
+    : callback(src.callback)
+    , withCert(src.withCert)
+    {}
 };
 
 struct CBLURLEndpointListener final : public CBLRefCounted {
@@ -54,6 +60,7 @@ public:
         if (conf.collectionCount == 0) {
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "No collections in CBLURLEndpointListenerConfiguration");
         }
+        if (_conf.authenticator) _conf.authenticator = new CBLListenerAuthenticator(*_conf.authenticator);
     }
 
     ~CBLURLEndpointListener() {
@@ -166,9 +173,9 @@ public:
     }
 
 private:
-    const CBLURLEndpointListenerConfiguration _conf;
-    mutable uint16_t                          _port{0};
-    C4Listener* _cbl_nullable                 _c4listener{nullptr};
+    CBLURLEndpointListenerConfiguration _conf;
+    mutable uint16_t                    _port{0};
+    C4Listener* _cbl_nullable           _c4listener{nullptr};
 };
 
 CBL_ASSUME_NONNULL_END

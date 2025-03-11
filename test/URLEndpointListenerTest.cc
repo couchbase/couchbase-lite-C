@@ -221,37 +221,30 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
     };
     listenerConfig.disableTLS = true;
 
-    CBLListenerAuthenticator* auth = nullptr;
     SECTION("Successful Login") {
-        auth = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
+        listenerConfig.authenticator = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
             auto context = reinterpret_cast<Context*>(ctx);
             CHECK(context-> rand  == 6801);
             return usr == kUser && psw == kPassword;
         });
-        listenerConfig.authenticator = auth;
-        auth = nullptr; // ownership passed to listenerConfig
         expectedDocumentCount = 20;
     }
 
     SECTION("Wrong User") {
-        auth = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
+        listenerConfig.authenticator = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
             auto context = reinterpret_cast<Context*>(ctx);
             CHECK(context-> rand  == 6801);
             return usr == "InvalidUser"_sl && psw == kPassword;
         });
-        listenerConfig.authenticator = auth;
-        auth = nullptr; // ownership passed to listenerConfig
         expectedError.code = 401;
     }
 
     SECTION("Wrong Password") {
-        auth = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
+        listenerConfig.authenticator = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
             auto context = reinterpret_cast<Context*>(ctx);
             CHECK(context-> rand  == 6801);
             return usr == kUser && psw == "InvalidPassword"_sl;
         });
-        listenerConfig.authenticator = auth;
-        auth = nullptr; // ownership passed to listenerConfig
         expectedError.code = 401;
     }
 
@@ -287,7 +280,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
 
     CBLURLEndpointListener_Stop(listener);
     CBLURLEndpointListener_Free(listener);
-    CBLListenerAuth_Free(auth);
+    if (listenerConfig.authenticator) CBLListenerAuth_Free(listenerConfig.authenticator);
 }
 
 #endif //#ifdef COUCHBASE_ENTERPRISE
