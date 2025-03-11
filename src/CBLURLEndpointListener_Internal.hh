@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Internal.hh"
+#include "Base64.hh"
 #include "CBLCollection_Internal.hh"
 #include "CBLDatabase_Internal.hh"
 #include "c4Listener.hh"
@@ -28,7 +29,27 @@
 CBL_ASSUME_NONNULL_BEGIN
 
 struct CBLListenerAuthenticator {
-    
+    union {
+        CBLListenerPasswordAuthCallback pswCallback;
+        CBLListenerCertAuthCallback     certCallback;
+        void*                           callback;
+    };
+    bool withCert{false};
+
+    CBLListenerAuthenticator(CBLListenerPasswordAuthCallback auth)
+    : pswCallback(auth)
+    , withCert(false)
+    {}
+
+    CBLListenerAuthenticator(CBLListenerCertAuthCallback auth)
+    : certCallback(auth)
+    , withCert(true)
+    {}
+
+    CBLListenerAuthenticator(const CBLListenerAuthenticator& src)
+    : callback(src.callback)
+    , withCert(src.withCert)
+    {}
 };
 
 struct CBLURLEndpointListener final : public CBLRefCounted {
@@ -38,6 +59,13 @@ public:
     {
         if (conf.collectionCount == 0) {
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "No collections in CBLURLEndpointListenerConfiguration");
+        }
+        if (_conf.authenticator) _conf.authenticator = new CBLListenerAuthenticator(*_conf.authenticator);
+    }
+
+    ~CBLURLEndpointListener() {
+        if (_conf.authenticator) {
+            delete _conf.authenticator;
         }
     }
 
@@ -84,6 +112,33 @@ public:
         c4config.allowPush = true;
         c4config.allowPull = !_conf.readOnly;
         c4config.enableDeltaSync = _conf.enableDeltaSync;
+        if (_conf.authenticator) {
+            if (!_conf.authenticator->withCert) {
+                // user/password
+                c4config.httpAuthCallback = [](C4Listener* listener, C4Slice authHeader, void* context) {
+                    slice header{authHeader};
+                    auto space = header.findByte(' ');
+                    if (!space) return false;
+
+                    else header = header.from(space + 1);
+                    while ( !header.empty() && header[0] == ' ' )
+                        header = header.from(1);
+                    alloc_slice decoded = fleece::base64::decode(header);
+                    auto colon = decoded.findByte(':');
+                    if (!colon) return false;
+
+                    slice usr = decoded.upTo(colon);
+                    slice pwd = decoded.from(colon + 1);
+
+                    auto me = reinterpret_cast<CBLURLEndpointListener*>(context);
+                    Assert(me->_c4listener == listener);
+                    return me->_conf.authenticator->pswCallback(me->_conf.context, usr, pwd);
+                };
+                c4config.callbackContext = this;
+            } else {
+                // certificate
+            }
+        }
 
         std::unique_ptr<C4Listener> c4listener{new C4Listener(c4config)};
         auto ret = [&](bool succ) -> bool {
@@ -118,9 +173,9 @@ public:
     }
 
 private:
-    const CBLURLEndpointListenerConfiguration _conf;
-    mutable uint16_t                          _port{0};
-    C4Listener* _cbl_nullable                 _c4listener{nullptr};
+    CBLURLEndpointListenerConfiguration _conf;
+    mutable uint16_t                    _port{0};
+    C4Listener* _cbl_nullable           _c4listener{nullptr};
 };
 
 CBL_ASSUME_NONNULL_END

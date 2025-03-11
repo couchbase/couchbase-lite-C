@@ -21,15 +21,19 @@
 #ifdef COUCHBASE_ENTERPRISE
 
 CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth) noexcept {
-    return nullptr;
+    try {
+        return new CBLListenerAuthenticator(auth);
+    } catchAndBridge(nullptr);
 }
 
 CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth) noexcept {
-    return nullptr;
+    try {
+        return new CBLListenerAuthenticator(auth);
+    } catchAndBridge(nullptr);
 }
 
 void CBLListenerAuth_Free(CBLListenerAuthenticator* _cbl_nullable auth) noexcept {
-    delete auth;
+    if (auth) delete auth;
 }
 
 CBLURLEndpointListener* CBLURLEndpointListener_Create(const CBLURLEndpointListenerConfiguration* conf, CBLError* outError) noexcept {

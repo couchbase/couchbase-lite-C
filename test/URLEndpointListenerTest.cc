@@ -205,4 +205,82 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with OneShot Replication", "
     CBLURLEndpointListener_Free(listener);
 }
 
+TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", "[URLListener]") {
+    struct Context {
+        int rand = 6801;
+    } context;
+
+    static constexpr slice kUser{"pupshaw"};
+    static constexpr slice kPassword{"frank"};
+
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        &context, // context
+        cy.data(),
+        2,
+        0
+    };
+    listenerConfig.disableTLS = true;
+
+    SECTION("Successful Login") {
+        listenerConfig.authenticator = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
+            auto context = reinterpret_cast<Context*>(ctx);
+            CHECK(context-> rand  == 6801);
+            return usr == kUser && psw == kPassword;
+        });
+        expectedDocumentCount = 20;
+    }
+
+    SECTION("Wrong User") {
+        listenerConfig.authenticator = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
+            auto context = reinterpret_cast<Context*>(ctx);
+            CHECK(context-> rand  == 6801);
+            return usr == "InvalidUser"_sl && psw == kPassword;
+        });
+        expectedError.code = 401;
+    }
+
+    SECTION("Wrong Password") {
+        listenerConfig.authenticator = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
+            auto context = reinterpret_cast<Context*>(ctx);
+            CHECK(context-> rand  == 6801);
+            return usr == kUser && psw == "InvalidPassword"_sl;
+        });
+        expectedError.code = 401;
+    }
+
+    REQUIRE(listenerConfig.authenticator);
+
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    auto cols = collectionConfigs({cx[0], cx[1]});
+    config.collections = cols.data();
+    config.collectionCount = cols.size();
+
+    CBLError error {};
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, &error);
+    REQUIRE(listener);
+
+    CHECK(CBLURLEndpointListener_Start(listener, &error));
+
+    CBLEndpoint* replEndpoint = clientEndpoint(listener, &error);
+    REQUIRE(replEndpoint);
+
+    config.endpoint = replEndpoint;
+    // the lifetime of replEndpoint is passed to config.
+    replEndpoint = nullptr;
+    CBLAuthenticator* clientAuth = CBLAuth_CreatePassword(kUser, kPassword);
+    REQUIRE(clientAuth);
+    config.authenticator = clientAuth;
+    clientAuth = nullptr;
+
+    config.replicatorType = kCBLReplicatorTypePush;
+    replicate();
+
+    CBLURLEndpointListener_Stop(listener);
+    CBLURLEndpointListener_Free(listener);
+    if (listenerConfig.authenticator) CBLListenerAuth_Free(listenerConfig.authenticator);
+}
+
 #endif //#ifdef COUCHBASE_ENTERPRISE
