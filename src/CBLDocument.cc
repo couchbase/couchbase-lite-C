@@ -92,6 +92,16 @@ alloc_slice CBLDocument::getRevisionHistory() const {
 }
 
 
+#pragma mark - Utils:
+
+
+void CBLDocument::checkCollectionMatches(CBLCollection* _cbl_nullable myCol, CBLCollection *colParam) {
+    if (myCol && *myCol != *colParam) {
+        C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Use document on a wrong collection");
+    }
+}
+
+
 #pragma mark - SAVING:
 
 

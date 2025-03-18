@@ -66,6 +66,17 @@ public:
     uint64_t lastSequence() const               {return static_cast<uint64_t>(_c4col.useLocked()->getLastSequence());}
     CBLDatabase* database() const               {return _database; }
     
+#pragma mark - OPERATORS:
+    
+    bool operator== (const CBLCollection &coll) const {
+        // Same scope and collection name && same database reference:
+        return _fullName == coll._fullName && _database == coll._database;
+    }
+    
+    bool operator!= (const CBLCollection &coll) const {
+        return !(*this == coll);
+    }
+    
 #pragma mark - DOCUMENTS:
     
     RetainedConst<CBLDocument> getDocument(slice docID, bool allRevisions =false) const {
