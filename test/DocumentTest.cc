@@ -700,6 +700,67 @@ TEST_CASE_METHOD(DocumentTest, "Save Document into Different Collection", "[Docu
     CBLDocument_Release(doc);
 }
 
+TEST_CASE_METHOD(DocumentTest, "Save Document into Same Collection Different Instance", "[Document]") {
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+    FLMutableDict props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
+    
+    CBLError error;
+    CHECK(CBLCollection_SaveDocument(col, doc, &error));
+    
+    CBLScope* scope = CBLCollection_Scope(col);
+    CBLCollection* col2 = CBLDatabase_Collection(db, CBLCollection_Name(col), CBLScope_Name(scope), &error);
+    CHECK(col != col2);
+    CHECK(CBLCollection_SaveDocument(col2, doc, &error));
+    
+    CBLDocument_Release(doc);
+    CBLScope_Release(scope);
+    CBLCollection_Release(col2);
+}
+
+TEST_CASE_METHOD(DocumentTest, "Save Document into Same Collection Different DB Instance", "[Document]") {
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+    FLMutableDict props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
+    
+    CBLError error;
+    CHECK(CBLCollection_SaveDocument(col, doc, &error));
+    
+    auto config = databaseConfig();
+    auto anotherDB = CBLDatabase_Open(kDatabaseName, &config, &error);
+    REQUIRE(anotherDB);
+    
+    CBLScope* scope = CBLCollection_Scope(col);
+    CBLCollection* col2 = CBLDatabase_Collection(anotherDB, CBLCollection_Name(col), CBLScope_Name(scope), &error);
+    CHECK(col != col2);
+    
+    ExpectingExceptions x;
+    CHECK(!CBLCollection_SaveDocument(col2, doc, &error));
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
+    
+    CBLDocument_Release(doc);
+    CBLScope_Release(scope);
+    CBLCollection_Release(col2);
+    CBLDatabase_Release(anotherDB);
+}
+
+TEST_CASE_METHOD(DocumentTest, "Save Document into Different Default Collection Instance", "[Document]") {
+    CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+    FLMutableDict props = CBLDocument_MutableProperties(doc);
+    FLMutableDict_SetString(props, "greeting"_sl, "Howdy!"_sl);
+    
+    CBLError error;
+    CHECK(CBLCollection_SaveDocument(defaultCollection, doc, &error));
+    
+    CBLCollection* defaultCollection2 = CBLDatabase_DefaultCollection(db, &error);
+    CHECK(defaultCollection != defaultCollection2);
+    CHECK(CBLCollection_SaveDocument(defaultCollection2, doc, &error));
+    
+    CBLDocument_Release(doc);
+    CBLCollection_Release(defaultCollection2);
+}
+
 #pragma mark - Timestamp
 
 /*
@@ -916,6 +977,66 @@ TEST_CASE_METHOD(DocumentTest, "Delete Document from Different Collection", "[Do
     CHECK(!CBLCollection_DeleteDocument(otherCol, doc, &error));
     CHECK(error.domain == kCBLDomain);
     CHECK(error.code == kCBLErrorInvalidParameter);
+    CBLDocument_Release(doc);
+}
+
+TEST_CASE_METHOD(DocumentTest, "Delete Document from Same Collection Different Instance", "[Document]") {
+    createDocument(col, "doc1", "foo", "bar");
+    
+    CBLError error;
+    const CBLDocument* doc = CBLCollection_GetDocument(col, "doc1"_sl, &error);
+    REQUIRE(doc);
+    
+    CBLScope* scope = CBLCollection_Scope(col);
+    CBLCollection* col2 = CBLDatabase_Collection(db, CBLCollection_Name(col), CBLScope_Name(scope), &error);
+    CHECK(col != col2);
+    
+    CHECK(CBLCollection_DeleteDocument(col2, doc, &error));
+    
+    CBLScope_Release(scope);
+    CBLCollection_Release(col2);
+    CBLDocument_Release(doc);
+}
+
+TEST_CASE_METHOD(DocumentTest, "Delete Document from Same Collection Different DB Instance", "[Document]") {
+    createDocument(col, "doc1", "foo", "bar");
+    
+    CBLError error;
+    const CBLDocument* doc = CBLCollection_GetDocument(col, "doc1"_sl, &error);
+    REQUIRE(doc);
+
+    auto config = databaseConfig();
+    auto anotherDB = CBLDatabase_Open(kDatabaseName, &config, &error);
+    REQUIRE(anotherDB);
+    
+    CBLScope* scope = CBLCollection_Scope(col);
+    CBLCollection* col2 = CBLDatabase_Collection(anotherDB, CBLCollection_Name(col), CBLScope_Name(scope), &error);
+    CHECK(col != col2);
+    
+    ExpectingExceptions x;
+    CHECK(!CBLCollection_DeleteDocument(col2, doc, &error));
+    CHECK(error.domain == kCBLDomain);
+    CHECK(error.code == kCBLErrorInvalidParameter);
+    
+    CBLDocument_Release(doc);
+    CBLScope_Release(scope);
+    CBLCollection_Release(col2);
+    CBLDatabase_Release(anotherDB);
+}
+
+TEST_CASE_METHOD(DocumentTest, "Delete Document from Different Default Collection Instance", "[Document]") {
+    createDocument(defaultCollection, "doc1", "foo", "bar");
+    
+    CBLError error;
+    const CBLDocument* doc = CBLCollection_GetDocument(defaultCollection, "doc1"_sl, &error);
+    REQUIRE(doc);
+    
+    CBLCollection* defaultCollection2 = CBLDatabase_DefaultCollection(db, &error);
+    CHECK(defaultCollection != defaultCollection2);
+    
+    CHECK(CBLCollection_DeleteDocument(defaultCollection2, doc, &error));
+    
+    CBLCollection_Release(defaultCollection2);
     CBLDocument_Release(doc);
 }
 

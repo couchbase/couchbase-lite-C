@@ -72,6 +72,36 @@ CBLDatabase* _cbl_nullable CBLDocument::database() const {
 }
 
 
+#pragma mark - REVISION HISTORY:
+
+
+alloc_slice CBLDocument::getRevisionHistory() const {
+    if (!_collection) {
+        return fleece::nullslice;
+    }
+    
+    auto doc = _collection->getDocument(_docID, false, true);
+    if (!doc) {
+        return fleece::nullslice;
+    }
+    
+    auto c4doc = doc->_c4doc.useLocked();
+    assert(c4doc);
+    return c4doc->getRevisionHistory(UINT_MAX, nullptr, 0);
+}
+
+
+#pragma mark - Utils:
+
+
+void CBLDocument::checkCollectionMatches(CBLCollection* _cbl_nullable myCol, CBLCollection *colParam) {
+    if (myCol && (*myCol != *colParam)) {
+        C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+            "The collection for save or delete does not match the document’s collection or belongs to a different database instance.");
+    }
+}
+
+
 #pragma mark - SAVING:
 
 
