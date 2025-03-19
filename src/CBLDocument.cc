@@ -92,6 +92,17 @@ alloc_slice CBLDocument::getRevisionHistory() const {
 }
 
 
+#pragma mark - Utils:
+
+
+void CBLDocument::checkCollectionMatches(CBLCollection* _cbl_nullable myCol, CBLCollection *colParam) {
+    if (myCol && (*myCol != *colParam)) {
+        C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+            "The collection for save or delete does not match the document’s collection or belongs to a different database instance.");
+    }
+}
+
+
 #pragma mark - SAVING:
 
 
