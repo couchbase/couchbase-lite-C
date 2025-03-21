@@ -22,6 +22,7 @@
 #include "CBLPrivate.h"
 
 #include "Internal.hh"
+#include "c4Certificate.h"
 #include "c4Certificate.hh"
 #include <chrono>
 #include <sstream>
@@ -36,7 +37,7 @@ public:
     CBLKeyPair(C4KeyPair* key)
     : _c4KeyPair(key)
     {}
-    
+
     static CBLKeyPair* RSAKeyPairWithPrivateKeyData(slice privateKeyData, slice passwordOrNull) {
         return new CBLKeyPair{C4KeyPair::fromPrivateKeyData(privateKeyData, passwordOrNull).detach()};
     }
@@ -100,9 +101,10 @@ public:
         return _c4Cert->getSubjectNameComponent(attributeKey);
     }
 
-    void getValidTimespan(CBLTimestamp* outCreated,
-                          CBLTimestamp* outExpires) const {
-        auto [created, expires] = _c4Cert->getValidTimespan();
+    void getValidTimespan(CBLTimestamp* _cbl_nullable outCreated,
+                          CBLTimestamp* _cbl_nullable outExpires) const {
+        CBLTimestamp created, expires;
+        c4cert_getValidTimespan(c4Cert(), &created, &expires);
         if (outCreated) *outCreated = created;
         if (outExpires) *outExpires = expires;
     }
@@ -183,9 +185,7 @@ public:
 
     CBLTimestamp expiration() const {
         CBLTimestamp expires = 0;
-        if (_cblCert && _cblCert->c4Cert()) {
-            std::tie(std::ignore, expires) = _cblCert->c4Cert()->getValidTimespan();
-        }
+        _cblCert->getValidTimespan(nullptr, &expires);
         return expires;
     }
 
