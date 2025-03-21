@@ -42,13 +42,6 @@ CBLURLEndpointListener* CBLURLEndpointListener_Create(const CBLURLEndpointListen
     } catchAndBridge(outError);
 }
 
-void CBLURLEndpointListener_Free(CBLURLEndpointListener* listener) noexcept {
-    if (!listener) return;
-    try {
-        release(listener);
-    } catchAndWarnNoReturn()
-}
-
 const CBLURLEndpointListenerConfiguration* CBLURLEndpointListener_Config(const CBLURLEndpointListener* listener) noexcept {
     return listener->configuration();
 }

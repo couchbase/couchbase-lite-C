@@ -18,10 +18,13 @@
 
 #pragma once
 
+#include "CBLURLEndpointListener.h"
+
 #include "Internal.hh"
 #include "Base64.hh"
 #include "CBLCollection_Internal.hh"
 #include "CBLDatabase_Internal.hh"
+#include "CBLTLSIdentity_Internal.hh"
 #include "c4Listener.hh"
 
 #ifdef COUCHBASE_ENTERPRISE
@@ -60,13 +63,17 @@ public:
         if (conf.collectionCount == 0) {
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "No collections in CBLURLEndpointListenerConfiguration");
         }
+        if (_conf.authenticator && _conf.authenticator->withCert) {
+            if (_conf.disableTLS)
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "TLS must be enabled to use the cert authenticator");
+        }
         if (_conf.authenticator) _conf.authenticator = new CBLListenerAuthenticator(*_conf.authenticator);
+        if (_conf.tlsIdentity) CBLTLSIdentity_Retain(_conf.tlsIdentity);
     }
 
     ~CBLURLEndpointListener() {
-        if (_conf.authenticator) {
-            delete _conf.authenticator;
-        }
+        if (_conf.authenticator) delete _conf.authenticator;
+        if (_conf.tlsIdentity)   CBLTLSIdentity_Release(_conf.tlsIdentity);
     }
 
     const CBLURLEndpointListenerConfiguration* configuration() const { return &_conf; }
@@ -112,10 +119,29 @@ public:
         c4config.allowPush = true;
         c4config.allowPull = !_conf.readOnly;
         c4config.enableDeltaSync = _conf.enableDeltaSync;
+
+        C4TLSConfig tls = {};
+        if ( !_conf.disableTLS && _conf.tlsIdentity ) {
+            tls.privateKeyRepresentation = kC4PrivateKeyFromKey;
+            tls.certificate = _conf.tlsIdentity->certificates()->c4Cert();
+            tls.key = _conf.tlsIdentity->key()->c4KeyPair();
+            tls.requireClientCerts = false;
+            c4config.tlsConfig = &tls;
+        }
+
         if (_conf.authenticator) {
-            if (!_conf.authenticator->withCert) {
+            if (_conf.authenticator->withCert) {
+                // certificate
+                // Pre-condition: !_conf.disableTLS
+                tls.requireClientCerts = true;
+                tls.tlsCallbackContext = this;
+                tls.certAuthCallback = [](C4Listener *listener, C4Slice clientCertData, void *context) -> bool {
+                    auto me = reinterpret_cast<CBLURLEndpointListener*>(context);
+                    return me->_conf.authenticator->certCallback(me->_conf.context, clientCertData);
+                };
+            } else {
                 // user/password
-                c4config.httpAuthCallback = [](C4Listener* listener, C4Slice authHeader, void* context) {
+                c4config.httpAuthCallback = [](C4Listener* listener, C4Slice authHeader, void* context) -> bool {
                     slice header{authHeader};
                     auto space = header.findByte(' ');
                     if (!space) return false;
@@ -135,8 +161,6 @@ public:
                     return me->_conf.authenticator->pswCallback(me->_conf.context, usr, pwd);
                 };
                 c4config.callbackContext = this;
-            } else {
-                // certificate
             }
         }
 

@@ -42,6 +42,8 @@ CBL_CAPI_BEGIN
     bool CBLCollection_IsIndexTrained(const CBLCollection* collection,
                                       FLString name,
                                       CBLError* _cbl_nullable outError) CBLAPI;
+    CBLKeyPair* CBLKeyPair_GenerateRSAKeyPair(FLSlice passwordOrNull,
+                                              CBLError* _cbl_nullable outError) CBLAPI;
 #endif
 
 FLMutableArray CBLCollection_GetIndexesInfo(const CBLCollection* collection,

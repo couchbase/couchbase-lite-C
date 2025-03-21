@@ -14,6 +14,13 @@
 		1BC5D9612D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */; };
 		1BC5D9662D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */; };
 		1BC5D9682D6E50960080153E /* CBLURLEndpointListener_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 1BC5D9672D6E50960080153E /* CBLURLEndpointListener_Internal.hh */; };
+		1BF219BA2D7F87E2009534EC /* CBLTLSIdentity.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BF219B92D7F87E2009534EC /* CBLTLSIdentity.h */; };
+		1BF219BB2D7F87E2009534EC /* CBLTLSIdentity.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BF219B92D7F87E2009534EC /* CBLTLSIdentity.h */; };
+		1BF219BD2D7F8C01009534EC /* CBLTLSIdentity_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 1BF219BC2D7F8C01009534EC /* CBLTLSIdentity_Internal.hh */; };
+		1BF219C02D7F930F009534EC /* CBLTLSIdentity_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF219BF2D7F930F009534EC /* CBLTLSIdentity_CAPI.cc */; };
+		1BF21A3D2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
+		1BF21A3E2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
+		1BF21A3F2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
 		271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2C21CAC98F0045856E /* CBLReplicator.h */; };
 		271C2A3221CAC98F0045856E /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; };
@@ -422,6 +429,10 @@
 		1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLURLEndpointListener.h; sourceTree = "<group>"; };
 		1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLURLEndpointListener_CAPI.cc; sourceTree = "<group>"; };
 		1BC5D9672D6E50960080153E /* CBLURLEndpointListener_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLURLEndpointListener_Internal.hh; sourceTree = "<group>"; };
+		1BF219B92D7F87E2009534EC /* CBLTLSIdentity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLTLSIdentity.h; sourceTree = "<group>"; };
+		1BF219BC2D7F8C01009534EC /* CBLTLSIdentity_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTLSIdentity_Internal.hh; sourceTree = "<group>"; };
+		1BF219BF2D7F930F009534EC /* CBLTLSIdentity_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTLSIdentity_CAPI.cc; sourceTree = "<group>"; };
+		1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TLSIdentityTest.cc; sourceTree = "<group>"; };
 		2716F8F5247D9D6700BE21D9 /* exports */ = {isa = PBXFileReference; lastKnownFileType = folder; path = exports; sourceTree = "<group>"; };
 		271A98AF243FDF55008C032D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		271C2A2321CAC8920045856E /* libcblite-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libcblite-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -717,6 +728,7 @@
 				406F8D6F2C17E191000223FC /* CBLQueryTypes.h */,
 				271C2A2C21CAC98F0045856E /* CBLReplicator.h */,
 				FCD829B12835ECE0004AA814 /* CBLScope.h */,
+				1BF219B92D7F87E2009534EC /* CBLTLSIdentity.h */,
 				1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */,
 				271C2A7021CAD6440045856E /* CBL_Compat.h */,
 			);
@@ -747,6 +759,7 @@
 				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
 				40FE2DD72C0926FF005E99E9 /* CBLQueryIndex.cc */,
 				40FE2DD82C0926FF005E99E9 /* CBLQueryIndex_Internal.hh */,
+				1BF219BC2D7F8C01009534EC /* CBLTLSIdentity_Internal.hh */,
 				4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				FCC063C828588DA6000C5BD7 /* CBLScope.cc */,
@@ -827,6 +840,7 @@
 				27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */,
 				277FEE7421ED3C4900B60E3C /* CBLReplicator_CAPI.cc */,
 				FCD829B22835EE39004AA814 /* CBLScope_CAPI.cc */,
+				1BF219BF2D7F930F009534EC /* CBLTLSIdentity_CAPI.cc */,
 				1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */,
 				4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */,
 			);
@@ -882,6 +896,7 @@
 				FC82CE0428C6E2BD001FA083 /* ReplicatorCollectionTest_Cpp.cc */,
 				2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */,
 				93C70D1626CB334D0093E927 /* ReplicatorPropEncTest.cc */,
+				1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */,
 				1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */,
 				40FE2E0F2C12AF52005E99E9 /* VectorSearchTest.hh */,
 				406E46D22BACAEFF0088198C /* VectorSearchTest.cc */,
@@ -995,6 +1010,7 @@
 				277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */,
 				1BC5D9602D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */,
 				9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */,
+				1BF219BA2D7F87E2009534EC /* CBLTLSIdentity.h in Headers */,
 				4083FCB02BA3B8C50061509D /* CBLVectorIndexConfig.hh in Headers */,
 				27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */,
 				400983522D0769630029F26E /* CBLLogSinks.h in Headers */,
@@ -1024,6 +1040,7 @@
 				271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */,
 				1BC5D9682D6E50960080153E /* CBLURLEndpointListener_Internal.hh in Headers */,
 				271C2A3221CAC98F0045856E /* CBLBase.h in Headers */,
+				1BF219BD2D7F8C01009534EC /* CBLTLSIdentity_Internal.hh in Headers */,
 				FCB96E8529007D50001C4DED /* CBLDefaults.h in Headers */,
 				27886C8D21F64C1400069BEA /* Listener.hh in Headers */,
 				93EC366226C49AF700182B02 /* CBLEncryptable_Internal.hh in Headers */,
@@ -1055,6 +1072,7 @@
 				EA34BC5A2C3698B8000CEA70 /* CBLPrediction.h in Headers */,
 				40E32F402D2F3ED4000CED57 /* LogSinks.hh in Headers */,
 				93C70CE126C4D3F90093E927 /* CBLEncryptable.h in Headers */,
+				1BF219BB2D7F87E2009534EC /* CBLTLSIdentity.h in Headers */,
 				40ACB23A2C2F98B600CBE8F2 /* VectorIndex.hh in Headers */,
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
 				400AB0532C2E66B500DB6223 /* QueryIndex.hh in Headers */,
@@ -1637,6 +1655,7 @@
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
 				27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */,
+				1BF219C02D7F930F009534EC /* CBLTLSIdentity_CAPI.cc in Sources */,
 				FC5FBBB52821CC2E0066157F /* CBLCollection_CAPI.cc in Sources */,
 				1BC5D9662D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob_CAPI.cc in Sources */,
@@ -1667,6 +1686,7 @@
 				40E32F432D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */,
 				93965A6426A7CD50008728EE /* LogTest.cc in Sources */,
 				1B21A7DB2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */,
+				1BF21A3D2D84E419009534EC /* TLSIdentityTest.cc in Sources */,
 				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
 				275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */,
 				FC645E2E29088211007D5536 /* Platform_Apple.mm in Sources */,
@@ -1721,6 +1741,7 @@
 				1B21A7DA2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */,
 				93C70D3426D01B5A0093E927 /* BlobTest.cc in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
+				1BF21A3F2D84E419009534EC /* TLSIdentityTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				FC8678F2289C69690023F34F /* ReplicatorCollectionTest.cc in Sources */,
 				93C70D1826CB535D0093E927 /* ReplicatorPropEncTest.cc in Sources */,
@@ -1769,6 +1790,7 @@
 				FC645E1529085C63007D5536 /* DocumentTest.cc in Sources */,
 				FCE497D32907963900EF2354 /* CBLCatchTests.mm in Sources */,
 				AED22E7F291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */,
+				1BF21A3E2D84E419009534EC /* TLSIdentityTest.cc in Sources */,
 				FC645E1A29085C84007D5536 /* ReplicatorCollectionTest_Cpp.cc in Sources */,
 				FC645E1029085C26007D5536 /* BlobTest.cc in Sources */,
 				FC645E1129085C2A007D5536 /* BlobTest_Cpp.cc in Sources */,
