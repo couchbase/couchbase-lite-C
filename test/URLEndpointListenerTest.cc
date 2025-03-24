@@ -16,11 +16,14 @@
 // limitations under the License.
 //
 
+#include "CBLTest.hh"
 #include "ReplicatorTest.hh"
 #include "CBLPrivate.h"
 #include "fleece/Fleece.hh"
+#include <chrono>
 #include <string>
 #include <sstream>
+using namespace std::chrono;
 
 #ifdef COUCHBASE_ENTERPRISE
 
@@ -76,6 +79,24 @@ public:
             configs[i].collection = collections[i];
         }
         return configs;
+    }
+
+    CBLTLSIdentity* createTLSIdentity(bool isServer) {
+        std::unique_ptr<CBLKeyPair, void(*)(CBLKeyPair*)> keypair{
+            CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr),
+            [](CBLKeyPair* k) {
+                CBLKeyPair_Release(k);
+            }
+        };
+        if (!keypair) return nullptr;
+
+        fleece::MutableDict mdict = fleece::MutableDict::newDict();
+        mdict[kCBLCertAttrKeyCommonName] = isServer ? "URLEndpointListener" : "URLEndpointListener_Client";
+
+        static constexpr auto validity = seconds(31536000); // one year
+
+        return  CBLTLSIdentity_SelfSignedCertIdentity
+            (isServer, keypair.get(), mdict, duration_cast<milliseconds>(validity).count(), nullptr);
     }
 
     Database db2;
@@ -148,7 +169,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Basics", "[URLListener]") {
 
     if (listener) {
         CBLURLEndpointListener_Stop(listener);
-        CBLURLEndpointListener_Free(listener);
+        CBLURLEndpointListener_Release(listener);
     }
 }
 
@@ -202,7 +223,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with OneShot Replication", "
     }
 
     CBLURLEndpointListener_Stop(listener);
-    CBLURLEndpointListener_Free(listener);
+    CBLURLEndpointListener_Release(listener);
 }
 
 TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", "[URLListener]") {
@@ -217,7 +238,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
         &context, // context
         cy.data(),
         2,
-        0
+        0         // port
     };
     listenerConfig.disableTLS = true;
 
@@ -264,23 +285,82 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
 
     CHECK(CBLURLEndpointListener_Start(listener, &error));
 
-    CBLEndpoint* replEndpoint = clientEndpoint(listener, &error);
-    REQUIRE(replEndpoint);
-
-    config.endpoint = replEndpoint;
-    // the lifetime of replEndpoint is passed to config.
-    replEndpoint = nullptr;
-    CBLAuthenticator* clientAuth = CBLAuth_CreatePassword(kUser, kPassword);
-    REQUIRE(clientAuth);
-    config.authenticator = clientAuth;
-    clientAuth = nullptr;
-
+    config.endpoint = clientEndpoint(listener, &error);
+    REQUIRE(config.endpoint);
+    config.authenticator = CBLAuth_CreatePassword(kUser, kPassword);
+    REQUIRE(config.authenticator);
     config.replicatorType = kCBLReplicatorTypePush;
     replicate();
 
     CBLURLEndpointListener_Stop(listener);
-    CBLURLEndpointListener_Free(listener);
+    CBLURLEndpointListener_Release(listener);
     if (listenerConfig.authenticator) CBLListenerAuth_Free(listenerConfig.authenticator);
+}
+
+TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "[URLListener]") {
+    struct Context {
+        int rand = 6801;
+    } context;
+    
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        &context, // context
+        cy.data(),
+        2,
+        0         // port
+    };
+    listenerConfig.disableTLS = false;
+    listenerConfig.tlsIdentity = createTLSIdentity(true);
+    
+    SECTION("Self-signed Cert") {
+        listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, FLSlice certData) {
+            auto context = reinterpret_cast<Context*>(ctx);
+            CHECK(context->rand  == 6801);
+            CBLError error;
+            CBLCert* cert = CBLCert_CertFromData(certData, &error);
+            if (!cert) {
+                CBL_Log(kCBLLogDomainReplicator, kCBLLogError,
+                        "CBLCert_CertFromData failed with code %d", error.code);
+                return false;
+            }
+            alloc_slice sname = CBLCert_SubjectName(cert);
+            CBLCert_Release(cert);
+            return sname == slice("CN=URLEndpointListener_Client");
+        });
+        config.acceptOnlySelfSignedServerCertificate = true;
+        expectedDocumentCount = 20;
+    }
+
+    REQUIRE(listenerConfig.authenticator);
+    
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    auto cols = collectionConfigs({cx[0], cx[1]});
+    config.collections = cols.data();
+    config.collectionCount = cols.size();
+    CBLError error {};
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, &error);
+    REQUIRE(listener);
+    
+    CHECK(CBLURLEndpointListener_Start(listener, &error));
+
+    config.endpoint = clientEndpoint(listener, &error);
+    REQUIRE(config.endpoint);
+    
+    CBLTLSIdentity* clientIdentity = createTLSIdentity(false);
+    REQUIRE(clientIdentity);
+    config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
+    REQUIRE(config.authenticator);
+    config.replicatorType = kCBLReplicatorTypePush;
+    replicate();
+    
+    CBLURLEndpointListener_Stop(listener);
+    CBLURLEndpointListener_Release(listener);
+    CBLTLSIdentity_Release(clientIdentity);
+    if (listenerConfig.authenticator) CBLListenerAuth_Free(listenerConfig.authenticator);
+    if (listenerConfig.tlsIdentity)
+        CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
 }
 
 #endif //#ifdef COUCHBASE_ENTERPRISE

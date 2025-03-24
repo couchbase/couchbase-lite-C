@@ -8,6 +8,7 @@
 
 #pragma once
 #include "CBLBase.h"
+#include "CBLTLSIdentity.h"
 
 #ifdef COUCHBASE_ENTERPRISE
 
@@ -44,7 +45,7 @@ typedef struct {
     void* _cbl_nullable context;
     
     /** (Required) The collections available for replication . */
-    CBLCollection* _cbl_nonnull * _cbl_nullable collections;
+    CBLCollection* _cbl_nonnull * _cbl_nonnull collections;
 
     /** (Required) The number of collections  (Required). */
     size_t collectionCount;
@@ -60,8 +61,11 @@ typedef struct {
     /** Disable TLS communication. The default value is false which means that TLS will be enabled by default.  */
     bool disableTLS;
 
+    /** TLSIdentity required for TLS communication. */
+    CBLTLSIdentity* _cbl_nullable tlsIdentity;
+
     /** The authenticator used by the listener to authenticate clients. */
-    CBLListenerAuthenticator* authenticator;
+    CBLListenerAuthenticator* _cbl_nullable authenticator;
 
     /** Allow delta sync when replicating with the listener. The default value is false. */
     bool enableDeltaSync;
@@ -75,11 +79,9 @@ typedef struct CBLURLEndpointListener CBLURLEndpointListener;
 
 CBL_REFCOUNTED(CBLURLEndpointListener*, URLEndpointListener);
 
-/** Creates a URL endpoint listener with the given configuration. */
+/** Creates a URL endpoint listener with the given configuration.
+ @note You are responsible for releasing the returned reference. */
 _cbl_warn_unused CBLURLEndpointListener* _cbl_nullable CBLURLEndpointListener_Create(const CBLURLEndpointListenerConfiguration*, CBLError* _cbl_nullable outError) CBLAPI;
-
-/** Frees a CBLURLEndpointListener object. */
-void CBLURLEndpointListener_Free(CBLURLEndpointListener* _cbl_nullable) CBLAPI;
 
 /** Gets the listener's configuration. */
 const CBLURLEndpointListenerConfiguration* CBLURLEndpointListener_Config(const CBLURLEndpointListener*) CBLAPI;
@@ -87,7 +89,8 @@ const CBLURLEndpointListenerConfiguration* CBLURLEndpointListener_Config(const C
 /** The listening port of the listener. If the listener is not started, the port will be zero. */
 uint16_t CBLURLEndpointListener_Port(const CBLURLEndpointListener*) CBLAPI;
 
-/** The possible URLs of the listener. If the listener is not started, NULL will be returned.  */
+/** The possible URLs of the listener. If the listener is not started, NULL will be returned.
+ @note You are responsible for releasing the returned reference. */
 FLMutableArray CBLURLEndpointListener_Urls(const CBLURLEndpointListener*) CBLAPI;
 
 /** The connection status of the listener */
