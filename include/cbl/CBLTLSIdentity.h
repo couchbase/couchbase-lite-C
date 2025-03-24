@@ -207,7 +207,7 @@ CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_SelfSignedCertIdentityWithLabel(boo
                                                                     CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Deletes the identity from the platform's keystore (Keychain for Apple or x509 Key/Certificate Stores for Windows) witih the given persistent label. */
-bool CBLTLSIdentity_deleteIdentityWithLabel(FLString persistentLabel,
+bool CBLTLSIdentity_DeleteIdentityWithLabel(FLString persistentLabel,
                                             CBLError* _cbl_nullable outError) CBLAPI;
 
 _cbl_warn_unused
@@ -227,7 +227,7 @@ CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyP
 
 #ifdef __OBJC__
 
-/** Create a TLS identity with the given SecIdentity object.
+/** Creates a TLS identity with the given SecIdentity object.
  @note You are responsible for releasing the returned reference. */
 CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithSecIdentity(SecIdentityRef secIdentity,
                                                                      NSArray* _cbl_nullable certs,

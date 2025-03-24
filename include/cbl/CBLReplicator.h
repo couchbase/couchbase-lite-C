@@ -74,7 +74,7 @@ CBLAuthenticator* CBLAuth_CreateSession(FLString sessionID, FLString cookieName)
 
 #ifdef COUCHBASE_ENTERPRISE
 
-/** Create an authenticator that presents a client certificate to the server during the initial SSL/TLS
+/** Creates an authenticator that presents a client certificate to the server during the initial SSL/TLS
     handshake. This is currently used for authenticating with CBLURLEndpointListener only.*/
 _cbl_warn_unused
 CBLAuthenticator* CBLAuth_CreateCertificate(CBLTLSIdentity* identity) CBLAPI;
