@@ -124,7 +124,7 @@ public:
         if ( !_conf.disableTLS && _conf.tlsIdentity ) {
             tls.privateKeyRepresentation = kC4PrivateKeyFromKey;
             tls.certificate = _conf.tlsIdentity->certificates()->c4Cert();
-            tls.key = _conf.tlsIdentity->key()->c4KeyPair();
+            tls.key = _conf.tlsIdentity->privateKey()->c4KeyPair();
             tls.requireClientCerts = false;
             c4config.tlsConfig = &tls;
         }

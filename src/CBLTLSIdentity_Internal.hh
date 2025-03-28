@@ -25,6 +25,8 @@
 #include "c4Certificate.h"
 #include "c4Certificate.hh"
 #include <chrono>
+#include <inttypes.h>
+#include <mutex>
 #include <sstream>
 using namespace std::chrono;
 
@@ -121,22 +123,26 @@ private:
 
 struct CBLTLSIdentity final : public CBLRefCounted {
 public:
-    static constexpr unsigned kCBLNotBeforeCertClockDriftOffsetInSeconds = 60;
+    static constexpr unsigned    kCBLNotBeforeCertClockDriftOffsetInSeconds = 60;
+    static constexpr const char* kCBLErrorMessageDuplicateCertificate = "Certificate already exists with the label";
+    static constexpr const char* kCBLErrorMessageMissingCommonName    = "The Common Name attribute is required";
 
-    CBLTLSIdentity(CBLKeyPair* keyPair, CBLCert* cert)
+    CBLTLSIdentity(CBLKeyPair* _cbl_nullable keyPair, CBLCert* cert)
     : _cblKeyPair(keyPair)
     , _cblCert(cert)
     {}
 
     CBLTLSIdentity() {}
-    
-    static CBLTLSIdentity* SelfSignedCertIdentity(bool server,
-                                                  CBLKeyPair* keypair,
-                                                  Dict attributes,
-                                                  CBLTimestamp expiration) {
-        if (!attributes.get(kCBLCertAttrKeyCommonName))
-            C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "Missing Common Name when creating SelfSigedCertIdentity.");
 
+#ifdef TARGET_OS_IPHONE
+    // Definition is in CBLTLSIdentity+Apple.mm
+    static bool StripPublicKey(C4Cert* c4cert, CBLError* _cbl_nullable error);
+#endif
+
+    static Retained<C4Cert> SelfSignedCert_internal(bool server,
+                                                    C4KeyPair* keypair,
+                                                    Dict attributes,
+                                                    CBLTimestamp expiration) {
         // copy attributes to a vector.
         std::vector<C4CertNameComponent> names;
         for (Dict::iterator iter(attributes); iter; ++iter) {
@@ -147,7 +153,7 @@ public:
 
         // Create CSR:
         C4CertUsage usage = server ? kC4CertUsage_TLSServer : kC4CertUsage_TLSClient;
-        Retained<C4Cert> csr = C4Cert::createRequest(names, usage, keypair->c4KeyPair());
+        Retained<C4Cert> csr = C4Cert::createRequest(names, usage, keypair);
         if (!csr) {
             C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "Fails to create a signing request.");
         }
@@ -171,15 +177,136 @@ public:
             issuerParams.validityInSeconds = expirationInSeconds;
         }
 
-        // Sign:
-        CBLCert* cert = new CBLCert{csr->signRequest(issuerParams, keypair->c4KeyPair(), nullptr).get()};
-        return new CBLTLSIdentity{keypair, cert};
+        // Self sign:
+        return csr->signRequest(issuerParams, keypair, nullptr);
     }
 
-    static CBLTLSIdentity* IdentityWithKeyPairAndCerts(CBLKeyPair* keypair,
+    static CBLTLSIdentity* SelfSignedCertIdentity(bool server,
+                                                  CBLKeyPair* keypair,
+                                                  Dict attributes,
+                                                  CBLTimestamp expiration) {
+        if (!attributes.get(kCBLCertAttrKeyCommonName))
+            C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, kCBLErrorMessageMissingCommonName);
+
+        Retained<C4Cert> cert = SelfSignedCert_internal(server,
+                                                        keypair->c4KeyPair(),
+                                                        attributes,
+                                                        expiration);
+        return new CBLTLSIdentity{keypair, new CBLCert(cert.get())};
+    }
+
+    static CBLTLSIdentity* IdentityWithKeyPairAndCerts(CBLKeyPair* _cbl_nullable keypair,
                                                        CBLCert* cert) {
         return new CBLTLSIdentity{keypair, cert};
     }
+
+#if !defined(__linux__) && !defined(__ANDROID__)
+    static const int             kErrSecDuplicateItem; // Definition is in CBLTLSIdentity+Apple.mm
+
+    static bool checkCertExistAtLabel(slice label, CBLError* _cbl_nullable error) {
+        // FIXME: https://issues.couchbase.com/browse/CBL-932
+        C4Cert* cert = c4cert_load(label, cbl_internal::internal(error));
+        bool exists = cert != nullptr;
+        c4cert_release(cert);
+        return exists;
+    }
+
+    static CBLTLSIdentity* _cbl_nullable SelfSignedCertIdentityWithLabel(bool server,
+                                                                         slice persistentLabel,
+                                                                         Dict attributes,
+                                                                         CBLTimestamp expiration) {
+        assert(persistentLabel);
+        std::scoped_lock<std::mutex> lock(_mutex);
+
+        if (checkCertExistAtLabel(persistentLabel, nullptr)) {
+            std::stringstream ss;
+            ss << kCBLErrorMessageDuplicateCertificate << " " << persistentLabel.asString()
+                << "; OSStatus = " << kErrSecDuplicateItem;
+            std::string errmsg = ss.str();
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-security"
+            C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, errmsg.c_str());
+#pragma clang diagnostic pop
+        }
+
+        if (!attributes.get(kCBLCertAttrKeyCommonName)) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, kCBLErrorMessageMissingCommonName);
+        }
+
+        Retained<C4KeyPair> keyPair = C4KeyPair::generate(kC4RSA, 2048, true);
+        Retained<C4Cert> c4cert = SelfSignedCert_internal(server,
+                                                          keyPair.get(),
+                                                          attributes,
+                                                          expiration);
+        assert(c4cert);
+
+#ifdef TARGET_OS_IPHONE
+        CBLError cblError;
+        if (!StripPublicKey(c4cert, &cblError)) {
+            C4Error::raise((C4ErrorDomain)cblError.domain, cblError.code, "Couldn't remove a public key");
+        }
+#endif
+        // Save the cert:
+        // Assertion: c4cert != nullptr
+        c4cert->save(false, persistentLabel);
+
+        CBL_Log(kCBLLogDomainListener, kCBLLogVerbose, "Created self signed cert(%.*s) isServer=%d expiry=%" PRId64 " attr=%s",
+                (int)persistentLabel.size, (char*)persistentLabel.buf, server, expiration, attributes.toJSONString().c_str());
+
+        return new CBLTLSIdentity(nullptr, new CBLCert(c4cert.get()));
+    }
+
+    static bool DeleteIdentityWithLabel(slice persistentLabel) {
+        std::scoped_lock<std::mutex> lock(_mutex);
+
+        // Load cert for getting the public key:
+        Retained<C4Cert> c4cert;
+        try {
+            c4cert = C4Cert::load(persistentLabel);
+        } catch (C4Error& err) {
+            //        if (!c4cert) {
+            if (err.code != 0 && err.code != kC4ErrorNotFound)
+                throw(err);
+            // Otherwise, no cert to delete.
+            return true;
+        }
+        if (!c4cert) return true;
+
+        // Get public key from the cert:
+        Retained<C4KeyPair> publicKey = c4cert->getPublicKey();
+        // No longer need c4cert
+
+        // Get private key from the public key:
+        Retained<C4KeyPair> persistentKey;
+        try {
+            persistentKey = C4KeyPair::persistentWithPublicKey(publicKey);
+        } catch (C4Error &err) {
+            if (err.domain != LiteCoreDomain || err.code !=  kC4ErrorNotFound) {
+                throw(err);
+            }
+            // Question: why ignore other errors?
+        }
+
+        // Remove the cert:
+        C4Cert::deleteNamed(persistentLabel);
+
+        // Remove the keypair:
+        if (persistentKey) persistentKey->removePersistent();
+
+        CBL_Log(kCBLLogDomainReplicator, kCBLLogVerbose, "Deleted Identity %.*s", (int)persistentLabel.size, (char*)persistentLabel.buf);
+        return true;
+    }
+
+    static CBLTLSIdentity* IdentityWithLabel(slice persistentLabel) {
+        std::scoped_lock<std::mutex> lock(_mutex);
+
+        Retained<C4Cert> cert = C4Cert::load(persistentLabel);
+        if (!cert) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "Fails to create the cert from the lable");
+        }
+        return new CBLTLSIdentity(nullptr, new CBLCert(cert.get()));
+    }
+#endif // #if !defined(__linux__) && !defined(__ANDROID__)
 
     CBLCert* certificates() const { return _cblCert; }
 
@@ -189,11 +316,14 @@ public:
         return expires;
     }
 
-    CBLKeyPair* key() const { return _cblKeyPair; }
+    CBLKeyPair* privateKey() const { return _cblKeyPair; }
 
 private:
-    Retained<CBLKeyPair> _cblKeyPair;
+    Retained<CBLKeyPair> _cblKeyPair; // may be null
     Retained<CBLCert>    _cblCert;
+#if !defined(__linux__) && !defined(__ANDROID__)
+    static inline std::mutex _mutex;
+#endif
 };
 
 CBL_ASSUME_NONNULL_END

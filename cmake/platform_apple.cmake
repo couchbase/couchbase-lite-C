@@ -9,6 +9,7 @@ function(set_platform_source_files)
         ${PLATFORM_RESULT}
         src/CBLDatabase+Apple.mm
         src/CBLUserAgent.mm
+        src/CBLTLSIdentity+Apple.mm
         PARENT_SCOPE
     )
 endfunction()

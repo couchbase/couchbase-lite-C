@@ -85,4 +85,42 @@ TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity") {
     CBLKeyPair_Release(pkOfCert);
 }
 
+#if !defined(__linux__) && !defined(__ANDROID__)
+TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity With Label") {
+    CBLError outError{};
+
+    slice label{"CBL_Labal"};
+
+    fleece::MutableDict mdict = fleece::MutableDict::newDict();
+    mdict[kCBLCertAttrKeyCommonName] = "CBLAnonymousCertificate";
+    static constexpr auto validity = seconds(3141592);
+
+    // CBLTLSIdentity_SelfSignedCertIdentityWithLabel
+
+    CBLTLSIdentity* tlsID = CBLTLSIdentity_SelfSignedCertIdentityWithLabel
+        (true, label, mdict, duration_cast<milliseconds>(validity).count(), &outError);
+
+    if (outError.code) {
+        alloc_slice msg = CBLError_Message(&outError);
+        WARN("Error Code=" << outError.code << ", msge=" << msg.asString());
+    } else {
+        CHECK(tlsID);
+    }
+
+    // CBLTLSIdentity_IdentityWithLabel
+
+    outError.code = 0;
+    CBLTLSIdentity* tlsID2 = CBLTLSIdentity_IdentityWithLabel(label, &outError);
+    CHECK(tlsID2);
+    CHECK(outError.code == 0);
+
+    // CBLTLSIdentity_DeleteIdentityWithLabel
+
+    CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(label, &outError));
+
+    CBLTLSIdentity_Release(tlsID);
+    CBLTLSIdentity_Release(tlsID2);
+}
+#endif // #if !defined(__linux__) && !defined(__ANDROID__)
+
 #endif // #ifdef COUCHBASE_ENTERPRISE
