@@ -88,7 +88,7 @@ TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity") {
 #if !defined(__linux__) && !defined(__ANDROID__)
 TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity With Label") {
     CBLError outError{};
-
+    printf("[DBG] - Self-Signed Cert Identity With Label\n");
     slice label{"CBL_Labal"};
 
     fleece::MutableDict mdict = fleece::MutableDict::newDict();
@@ -96,10 +96,10 @@ TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity With Label") {
     static constexpr auto validity = seconds(3141592);
 
     // CBLTLSIdentity_SelfSignedCertIdentityWithLabel
-
+    printf("[DBG] - before CBLTLSIdentity_IdentityWithLabel\n");
     CBLTLSIdentity* tlsID = CBLTLSIdentity_SelfSignedCertIdentityWithLabel
         (true, label, mdict, duration_cast<milliseconds>(validity).count(), &outError);
-
+    printf("[DBG] - after CBLTLSIdentity_IdentityWithLabel\n");
     if (outError.code) {
         alloc_slice msg = CBLError_Message(&outError);
         WARN("Error Code=" << outError.code << ", msge=" << msg.asString());
