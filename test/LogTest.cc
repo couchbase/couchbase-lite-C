@@ -45,18 +45,20 @@ static const array<string, 5> kLogFileNamePrefixes = {{
     "cbl_debug_", "cbl_verbose_", "cbl_info_", "cbl_warning_", "cbl_error_"
 }};
 
-static const array<CBLLogDomainMask, 4> kLogDomainMasks = {{
+static const array<CBLLogDomainMask, 5> kLogDomainMasks = {{
     kCBLLogDomainMaskDatabase,
     kCBLLogDomainMaskQuery,
     kCBLLogDomainMaskReplicator,
-    kCBLLogDomainMaskNetwork
+    kCBLLogDomainMaskNetwork,
+    kCBLLogDomainMaskListener
 }};
 
-static const array<CBLLogDomain, 4> kLogDomains = {{
+static const array<CBLLogDomain, 5> kLogDomains = {{
     kCBLLogDomainDatabase,
     kCBLLogDomainQuery,
     kCBLLogDomainReplicator,
-    kCBLLogDomainNetwork
+    kCBLLogDomainNetwork,
+    kCBLLogDomainListener
 }};
 
 // For rotating test log directory:

@@ -44,12 +44,18 @@ CBLFileLogSink CBLLogSinks::_sFileSink { kCBLLogNone, kFLSliceNull };
 
 std::shared_mutex CBLLogSinks::_sMutex;
 
-static const C4LogDomain kC4Domains[] = { kC4DatabaseLog, kC4QueryLog, kC4SyncLog, kC4WebSocketLog };
+// Listener domain is not published explicitly with C4. It has
+// to be initialized in CBLogSinks::init().
+C4LogDomain C4LogDomainListener;
+
+static const C4LogDomain kC4Domains[] = { kC4DatabaseLog, kC4QueryLog, kC4SyncLog, kC4WebSocketLog, C4LogDomainListener };
 static const char* kC4ExtraDomains[] = { "SyncBusy", "Changes", "BLIPMessages", "TLS", "Zip" };
 
 static once_flag initFlag;
 void CBLLogSinks::init() {
     call_once(initFlag, [](){
+        C4LogDomain* domains = (C4LogDomain*)kC4Domains;
+        domains[kCBLLogDomainListener] = C4LogDomainListener = c4log_getDomain("Listener", true);
         updateLogLevels();
     });
 }
@@ -272,7 +278,8 @@ CBLLogDomain CBLLogSinks::toCBLLogDomain(C4LogDomain c4Domain) {
         {"BLIPMessages", kCBLLogDomainNetwork},
         {"WS", kCBLLogDomainNetwork},
         {"Zip", kCBLLogDomainNetwork},
-        {"TLS", kCBLLogDomainNetwork}
+        {"TLS", kCBLLogDomainNetwork},
+        {"Listener", kCBLLogDomainListener}
     };
     
     auto domainName = c4log_getDomainName(c4Domain);

@@ -21,6 +21,7 @@
 		1BF21A3D2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
 		1BF21A3E2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
 		1BF21A3F2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
+		1BF21B212D8E3ED0009534EC /* CBLTLSIdentity+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21B202D8E3ED0009534EC /* CBLTLSIdentity+Apple.mm */; };
 		271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2C21CAC98F0045856E /* CBLReplicator.h */; };
 		271C2A3221CAC98F0045856E /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; };
@@ -433,6 +434,7 @@
 		1BF219BC2D7F8C01009534EC /* CBLTLSIdentity_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTLSIdentity_Internal.hh; sourceTree = "<group>"; };
 		1BF219BF2D7F930F009534EC /* CBLTLSIdentity_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTLSIdentity_CAPI.cc; sourceTree = "<group>"; };
 		1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TLSIdentityTest.cc; sourceTree = "<group>"; };
+		1BF21B202D8E3ED0009534EC /* CBLTLSIdentity+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLTLSIdentity+Apple.mm"; sourceTree = "<group>"; };
 		2716F8F5247D9D6700BE21D9 /* exports */ = {isa = PBXFileReference; lastKnownFileType = folder; path = exports; sourceTree = "<group>"; };
 		271A98AF243FDF55008C032D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		271C2A2321CAC8920045856E /* libcblite-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libcblite-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -759,6 +761,7 @@
 				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
 				40FE2DD72C0926FF005E99E9 /* CBLQueryIndex.cc */,
 				40FE2DD82C0926FF005E99E9 /* CBLQueryIndex_Internal.hh */,
+				1BF21B202D8E3ED0009534EC /* CBLTLSIdentity+Apple.mm */,
 				1BF219BC2D7F8C01009534EC /* CBLTLSIdentity_Internal.hh */,
 				4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
@@ -1655,6 +1658,7 @@
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
 				27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */,
+				1BF21B212D8E3ED0009534EC /* CBLTLSIdentity+Apple.mm in Sources */,
 				1BF219C02D7F930F009534EC /* CBLTLSIdentity_CAPI.cc in Sources */,
 				FC5FBBB52821CC2E0066157F /* CBLCollection_CAPI.cc in Sources */,
 				1BC5D9662D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc in Sources */,
