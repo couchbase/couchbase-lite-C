@@ -83,7 +83,6 @@ CBL_C {
 		CBLTLSIdentity_SelfSignedCertIdentityWithLabel;
 		CBLTLSIdentity_DeleteIdentityWithLabel;
 		CBLTLSIdentity_IdentityWithLabel;
-		CBLTLSIdentity_IdentityWithSecIdentity;
 		kCBLDefaultVectorIndexLazy;
 		kCBLDefaultVectorIndexDistanceMetric;
 		kCBLDefaultVectorIndexMinTrainingSize;
