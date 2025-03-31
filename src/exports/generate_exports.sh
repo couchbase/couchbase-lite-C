@@ -11,8 +11,8 @@ cd "$SCRIPT_DIR/generated"
 cat ../CBL_Exports.txt ../CBLDefaults_Exports.txt ../Fleece_Exports.txt >exports.txt
 cat ../CBL_EE_Exports.txt ../CBLDefaults_EE_Exports.txt exports.txt     >exports_ee.txt
 
-cat ../Fleece_Apple_Exports.txt exports.txt     >apple_exports.txt
-cat ../Fleece_Apple_Exports.txt exports_ee.txt  >apple_exports_ee.txt
+cat ../Fleece_Apple_Exports.txt exports.txt                                 >apple_exports.txt
+cat ../Fleece_Apple_Exports.txt ../CBL_EE_Apple_Exports.txt exports_ee.txt  >apple_exports_ee.txt
 
 cat ../CBL_Android_Exports.txt exports.txt      >android_exports.txt
 cat ../CBL_Android_Exports.txt exports_ee.txt   >android_exports_ee.txt

@@ -157,7 +157,9 @@ namespace cbl_internal {
                 certData = _identity->certificates()->c4Cert()->getData(false);
             enc.writeData(certData);
             alloc_slice privateKeyData;
-            if (_identity->key()) privateKeyData = _identity->key()->c4KeyPair()->getPrivateKeyData();
+            // TODO/FIXME: what if the identity does not include the key? Or, if the KeyPair is
+            // constructued by external keys and callback, key-data won't be available.
+            if (_identity->privateKey()) privateKeyData = _identity->privateKey()->c4KeyPair()->getPrivateKeyData();
             if ( privateKeyData ) {
                 enc.writeKey(C4STR(kC4ReplicatorAuthClientCertKey));
                 enc.writeData(privateKeyData);

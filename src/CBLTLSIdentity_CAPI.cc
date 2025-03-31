@@ -158,44 +158,32 @@ CBLTimestamp CBLTLSIdentity_Expiration(CBLTLSIdentity* tlsID) noexcept {
 }
 
 #if !defined(__linux__) && !defined(__ANDROID__)
-
 CBLTLSIdentity* CBLTLSIdentity_SelfSignedCertIdentityWithLabel(bool server,
-                                                                FLString persistentLabel,
-                                                                FLDict attributes,
-                                                                CBLTimestamp expiration,
-                                                                CBLError* outError) noexcept {
+                                                               FLString persistentLabel,
+                                                               FLDict attributes,
+                                                               CBLTimestamp expiration,
+                                                               CBLError* outError) noexcept {
     try {
-        // TBD
-        return new CBLTLSIdentity;
+        return retain(CBLTLSIdentity::SelfSignedCertIdentityWithLabel(server,
+                                                                      persistentLabel,
+                                                                      attributes,
+                                                                      expiration));
     } catchAndBridge(outError);
 }
 
-bool CBLTLSIdentity_deleteIdentityWithLabel(FLString persistentLabel,
+bool CBLTLSIdentity_DeleteIdentityWithLabel(FLString persistentLabel,
                                             CBLError* _cbl_nullable outError) noexcept {
-    // TBD
-    return true;
+    try {
+        return CBLTLSIdentity::DeleteIdentityWithLabel(persistentLabel);
+    } catchAndBridge(outError);
 }
 
 CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithLabel(FLString persistentLabel,
-                                                               CBLError* _cbl_nullable outError) noexcept {
-    // TBD
-    return new CBLTLSIdentity;
-}
-
-#endif // #if !defined(__linux__) && !defined(__ANDROID__)
-
-#ifdef __OBJC__
-
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithSecIdentity(SecIdentityRef secIdentity,
-                                                                     NSArray* _cbl_nullable certs,
-                                                                     CBLError* _cbl_nullable outError) noexcept {
+                                                               CBLError* outError) noexcept {
     try {
-        // TBD
-        return new CBLTLSIdentity;
+        return retain(CBLTLSIdentity::IdentityWithLabel(persistentLabel));
     } catchAndBridge(outError);
 }
-
-#endif // #ifdef __OBJC__
-
+#endif // #if !defined(__linux__) && !defined(__ANDROID__)
 
 #endif // #ifdef COUCHBASE_ENTERPRISE
