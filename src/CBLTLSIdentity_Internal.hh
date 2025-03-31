@@ -268,7 +268,6 @@ public:
         try {
             c4cert = C4Cert::load(persistentLabel);
         } catch (C4Error& err) {
-            //        if (!c4cert) {
             if (err.code != 0 && err.code != kC4ErrorNotFound)
                 throw(err);
             // Otherwise, no cert to delete.
@@ -288,7 +287,8 @@ public:
             if (err.domain != LiteCoreDomain || err.code !=  kC4ErrorNotFound) {
                 throw(err);
             }
-            // Question: why ignore other errors?
+            // Otherwise, this is an error of NotFound. It's okay and we just don't
+            // need to remove it.
         }
 
         // Remove the cert:
