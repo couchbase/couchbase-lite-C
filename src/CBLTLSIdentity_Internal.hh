@@ -201,7 +201,9 @@ public:
     }
 
 #if !defined(__linux__) && !defined(__ANDROID__)
+#ifdef __OBJC__
     static const int             kErrSecDuplicateItem; // Definition is in CBLTLSIdentity+Apple.mm
+#endif
 
     static bool checkCertExistAtLabel(slice label, CBLError* _cbl_nullable error) {
         // FIXME: https://issues.couchbase.com/browse/CBL-932
@@ -220,8 +222,10 @@ public:
 
         if (checkCertExistAtLabel(persistentLabel, nullptr)) {
             std::stringstream ss;
-            ss << kCBLErrorMessageDuplicateCertificate << " " << persistentLabel.asString()
-                << "; OSStatus = " << kErrSecDuplicateItem;
+            ss << kCBLErrorMessageDuplicateCertificate << " " << persistentLabel.asString();
+#ifdef __OBJC__
+            ss << "; OSStatus = " << kErrSecDuplicateItem;
+#endif
             std::string errmsg = ss.str();
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wformat-security"
