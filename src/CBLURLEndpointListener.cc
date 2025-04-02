@@ -143,7 +143,7 @@ CBLTLSIdentity* CBLURLEndpointListener::effectiveTLSIdentity(bool persistent) {
         return nullptr;
 
     if (!_effectiveTLSIdentity)
-        _effectiveTLSIdentity = _conf.tlsIdentity ? _conf.tlsIdentity : anonymousTLSIdentity(persistent);
+        _effectiveTLSIdentity = _conf.tlsIdentity ? _conf.tlsIdentity : anonymousTLSIdentity(persistent).get();
 
     return _effectiveTLSIdentity;
 }

@@ -378,6 +378,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
         CBLTLSIdentity* id = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
         CHECK(id);
         CBLTLSIdentity_Release(id);
+        CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(persistentLabel, nullptr));
     }
 #endif
 
