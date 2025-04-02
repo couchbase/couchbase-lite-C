@@ -32,6 +32,9 @@ CBL_CAPI_BEGIN
     This starts at zero and increments every time a document is saved or deleted. */
     uint64_t CBLDatabase_LastSequence(const CBLDatabase*) CBLAPI;
 
+/** Returns the public UUID of the database.*/
+    FLSliceResult CBLDatabase_PublicUUID(const CBLDatabase*) CBLAPI;
+
 /** Returns the last sequence number assigned in the collection.
     This starts at zero and increments every time a document is saved or deleted. */
     uint64_t CBLCollection_LastSequence(const CBLCollection*) CBLAPI;

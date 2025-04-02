@@ -301,14 +301,12 @@ public:
         return true;
     }
 
-    static CBLTLSIdentity* IdentityWithLabel(slice persistentLabel) {
+    static CBLTLSIdentity* _cbl_nullable IdentityWithLabel(slice persistentLabel) {
         std::scoped_lock<std::mutex> lock(_mutex);
 
         Retained<C4Cert> cert = C4Cert::load(persistentLabel);
-        if (!cert) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "Fails to create the cert from the lable");
-        }
-        return new CBLTLSIdentity(nullptr, new CBLCert(cert.get()));
+        if (!cert) return nullptr;
+        else       return new CBLTLSIdentity(nullptr, new CBLCert(cert.get()));
     }
 #endif // #if !defined(__linux__) && !defined(__ANDROID__)
 
@@ -320,7 +318,7 @@ public:
         return expires;
     }
 
-    CBLKeyPair* privateKey() const { return _cblKeyPair; }
+    CBLKeyPair* _cbl_nullable privateKey() const { return _cblKeyPair; }
 
 private:
     Retained<CBLKeyPair> _cblKeyPair; // may be null

@@ -26,6 +26,7 @@
 #include "CBLDatabase_Internal.hh"
 #include "CBLTLSIdentity_Internal.hh"
 #include "c4Listener.hh"
+#include <mutex>
 
 #ifdef COUCHBASE_ENTERPRISE
 
@@ -106,100 +107,21 @@ public:
         }
     }
 
-    bool start() {
-        if (_c4listener) return true;
+    bool start();
+    void stop();
 
-        Assert(_conf.collectionCount > 0);
-
-        C4ListenerConfig c4config {
-            _conf.port,
-            _conf.networkInterface,
-            kC4SyncAPI
-        };
-        c4config.allowPush = true;
-        c4config.allowPull = !_conf.readOnly;
-        c4config.enableDeltaSync = _conf.enableDeltaSync;
-
-        C4TLSConfig tls = {};
-        if ( !_conf.disableTLS && _conf.tlsIdentity ) {
-            tls.privateKeyRepresentation = kC4PrivateKeyFromKey;
-            tls.certificate = _conf.tlsIdentity->certificates()->c4Cert();
-            tls.key = _conf.tlsIdentity->privateKey()->c4KeyPair();
-            tls.requireClientCerts = false;
-            c4config.tlsConfig = &tls;
-        }
-
-        if (_conf.authenticator) {
-            if (_conf.authenticator->withCert) {
-                // certificate
-                // Pre-condition: !_conf.disableTLS
-                tls.requireClientCerts = true;
-                tls.tlsCallbackContext = this;
-                tls.certAuthCallback = [](C4Listener *listener, C4Slice clientCertData, void *context) -> bool {
-                    auto me = reinterpret_cast<CBLURLEndpointListener*>(context);
-                    return me->_conf.authenticator->certCallback(me->_conf.context, clientCertData);
-                };
-            } else {
-                // user/password
-                c4config.httpAuthCallback = [](C4Listener* listener, C4Slice authHeader, void* context) -> bool {
-                    slice header{authHeader};
-                    auto space = header.findByte(' ');
-                    if (!space) return false;
-
-                    else header = header.from(space + 1);
-                    while ( !header.empty() && header[0] == ' ' )
-                        header = header.from(1);
-                    alloc_slice decoded = fleece::base64::decode(header);
-                    auto colon = decoded.findByte(':');
-                    if (!colon) return false;
-
-                    slice usr = decoded.upTo(colon);
-                    slice pwd = decoded.from(colon + 1);
-
-                    auto me = reinterpret_cast<CBLURLEndpointListener*>(context);
-                    Assert(me->_c4listener == listener);
-                    return me->_conf.authenticator->pswCallback(me->_conf.context, usr, pwd);
-                };
-                c4config.callbackContext = this;
-            }
-        }
-
-        std::unique_ptr<C4Listener> c4listener{new C4Listener(c4config)};
-        auto ret = [&](bool succ) -> bool {
-            if (succ) {
-                _c4listener = c4listener.release();
-            }
-            return succ;
-        };
-
-        CBLDatabase* cblDb = _conf.collections[0]->database();
-        bool succ = true;
-        cblDb->c4db()->useLocked([&](C4Database* db) {
-            slice dbname = db->getName();
-            if ( (succ = c4listener->shareDB(dbname, db)) ) {
-                for (unsigned i = 0; i < _conf.collectionCount; ++i) {
-                    _conf.collections[i]->useLocked([&](C4Collection* coll) {
-                        succ = c4listener->shareCollection(dbname, coll);
-                    });
-                    if (!succ) break;
-                }
-            }
-        });
-
-        return ret(succ);
-    }
-
-    void stop() {
-        if (_c4listener) {
-            delete _c4listener;
-            _c4listener = nullptr;
-        }
-    }
+protected:
+    std::string dumpConfig();
+    CBLTLSIdentity* _cbl_nullable effectiveTLSIdentity(bool persistent);
+    Retained<CBLTLSIdentity>      anonymousTLSIdentity(bool persistent);
+    alloc_slice                   labelForAnonymousTLSIdentity();
 
 private:
+    static std::mutex                   _mutex;
     CBLURLEndpointListenerConfiguration _conf;
     mutable uint16_t                    _port{0};
     C4Listener* _cbl_nullable           _c4listener{nullptr};
+    Retained<CBLTLSIdentity>            _effectiveTLSIdentity;
 };
 
 CBL_ASSUME_NONNULL_END

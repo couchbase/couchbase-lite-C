@@ -309,26 +309,43 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
         0         // port
     };
     listenerConfig.disableTLS = false;
-    listenerConfig.tlsIdentity = createTLSIdentity(true);
-    
+#if !defined(__linux__) && !defined(__ANDROID__)
+    bool anonymous = false;
+    alloc_slice persistentLabel;
+#endif
+
     SECTION("Self-signed Cert") {
-        listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, FLSlice certData) {
-            auto context = reinterpret_cast<Context*>(ctx);
-            CHECK(context->rand  == 6801);
-            CBLError error;
-            CBLCert* cert = CBLCert_CertFromData(certData, &error);
-            if (!cert) {
-                CBL_Log(kCBLLogDomainReplicator, kCBLLogError,
-                        "CBLCert_CertFromData failed with code %d", error.code);
-                return false;
-            }
-            alloc_slice sname = CBLCert_SubjectName(cert);
-            CBLCert_Release(cert);
-            return sname == slice("CN=URLEndpointListener_Client");
-        });
-        config.acceptOnlySelfSignedServerCertificate = true;
-        expectedDocumentCount = 20;
+        listenerConfig.tlsIdentity = createTLSIdentity(true);
     }
+
+    SECTION("Self-signed Anonymous Cert") {
+#if !defined(__linux__) && !defined(__ANDROID__)
+        anonymous = true;
+        // cy is the collection used in the Listener.
+        // Its UUID is used as the label for persistent TLSIdentity
+        alloc_slice uuid = CBLDatabase_PublicUUID(CBLCollection_Database(cy[0]));
+        persistentLabel = alloc_slice{uuid.hexString()};
+        CBLTLSIdentity* id = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
+        REQUIRE(id == nullptr);
+#endif
+    }
+
+    listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, FLSlice certData) {
+        auto context = reinterpret_cast<Context*>(ctx);
+        CHECK(context->rand  == 6801);
+        CBLError error;
+        CBLCert* cert = CBLCert_CertFromData(certData, &error);
+        if (!cert) {
+            CBL_Log(kCBLLogDomainReplicator, kCBLLogError,
+                    "CBLCert_CertFromData failed with code %d", error.code);
+            return false;
+        }
+        alloc_slice sname = CBLCert_SubjectName(cert);
+        CBLCert_Release(cert);
+        return sname == slice("CN=URLEndpointListener_Client");
+    });
+    config.acceptOnlySelfSignedServerCertificate = true;
+    expectedDocumentCount = 20;
 
     REQUIRE(listenerConfig.authenticator);
     
@@ -355,6 +372,15 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
     config.replicatorType = kCBLReplicatorTypePush;
     replicate();
     
+#if !defined(__linux__) && !defined(__ANDROID__)
+    if (anonymous) {
+        REQUIRE(!!persistentLabel);
+        CBLTLSIdentity* id = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
+        CHECK(id);
+        CBLTLSIdentity_Release(id);
+    }
+#endif
+
     CBLURLEndpointListener_Stop(listener);
     CBLURLEndpointListener_Release(listener);
     CBLTLSIdentity_Release(clientIdentity);
