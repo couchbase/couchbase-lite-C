@@ -137,7 +137,9 @@ public:
 
     uint64_t count() const                           {return _c4db->useLocked()->getDocumentCount();}
     uint64_t lastSequence() const                    {return static_cast<uint64_t>(_c4db->useLocked()->getLastSequence());}
-    
+    alloc_slice publicUUID() const                   {C4UUID uuid = _c4db->useLocked()->getPublicUUID();
+                                                      return {uuid.bytes, 16}; }
+
     std::string desc() const                         {return "CBLDatabase[" + _name.asString() + "]";}
 
     

@@ -62,7 +62,8 @@ CBLConnectionStatus CBLURLEndpointListener_Status(const CBLURLEndpointListener* 
 
 bool CBLURLEndpointListener_Start(CBLURLEndpointListener* listener, CBLError* outError) noexcept {
     try {
-        return listener->start();
+        listener->start();
+        return true;
     } catchAndBridge(outError)
 }
 

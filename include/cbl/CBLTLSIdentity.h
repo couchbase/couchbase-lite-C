@@ -221,7 +221,7 @@ CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithLabel(FLString persiste
 
 /** Create a TLS identity with the given RSA keypair and certificates. */
 _cbl_warn_unused
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyPair* _cbl_nullable keypair,
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyPair* keypair,
                                                                          CBLCert* cert,
                                                                          CBLError* _cbl_nullable outError) CBLAPI;
 

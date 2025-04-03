@@ -1,5 +1,5 @@
-cmake_minimum_required (VERSION 3.1)
-cmake_policy(VERSION 3.1)
+cmake_minimum_required (VERSION 3.5)
+cmake_policy(VERSION 3.5)
 
 if(NOT DEFINED CMAKE_OSX_SYSROOT)
     # Tells Mac builds to use the current SDK's headers & libs, not what's in the OS.
@@ -137,6 +137,7 @@ set(
     src/CBLScope.cc
     src/CBLScope_CAPI.cc
     src/CBLTLSIdentity_CAPI.cc
+    src/CBLURLEndpointListener.cc
     src/CBLURLEndpointListener_CAPI.cc
     src/CBLVectorIndexConfig_CAPI.cc
     src/ConflictResolver.cc
