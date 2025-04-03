@@ -39,6 +39,15 @@ CBL_PUBLIC extern const FLString kCBLCertAttrKeyURL;               // "uniformRe
 CBL_PUBLIC extern const FLString kCBLCertAttrKeyIPAddress;         // "iPAddress",       e.g. An IP Address in binary format e.g. "\x0A\x00\x01\x01"
 CBL_PUBLIC extern const FLString kCBLCertAttrKeyRegisteredID;      // "registeredID",    e.g. A domain specific identifier.
 
+
+/** Defines key usage options for creating TLS identities.
+    This enumeration specifies whether a key can be used for client or server authentication.
+    The values can be combined using bitwise OR (`|`) to allow multiple usages. */
+typedef CBL_OPTIONS(uint16_t, CBLKeyUsages) {
+    kCBLKeyUsagesClientAuth = 0x80, ///< For client authentication.
+    kCBLKeyUsagesServerAuth = 0x40  ///< For server authentication.
+};
+
 /** Digest algorithms to be used when generating signatures. */
 typedef CBL_ENUM(int, CBLSignatureDigestAlgorithm) {
     kCBLSignatureDigestNone = 0,   ///< No digest, just direct signature of input data.
@@ -54,7 +63,7 @@ typedef CBL_ENUM(int, CBLSignatureDigestAlgorithm) {
     In general, these crypto operations are performed inside a secure keystore available on the platform. */
 typedef struct CBLKeyPairCallbacks {
     /** Provides the public key's raw data, as an ASN.1 DER sequence of [modulus, exponent].
-        @param context  The context given to CBLKeyPair_RSAKeyPairWithCallbacks.
+        @param context  The context given to CBLKeyPair_CreateWithCallbacks.
         @param output  Where to copy the key data.
         @param outputMaxLen  Maximum length of output that can be written.
         @param outputLen  Store the length of the output here before returning.
@@ -62,7 +71,7 @@ typedef struct CBLKeyPairCallbacks {
     bool (*publicKeyData)(void* context, void* output, size_t outputMaxLen, size_t* outputLen);
     
     /** Decrypts data using the private key.
-        @param context  The context given to CBLKeyPair_RSAKeyPairWithCallbacks.
+        @param context  The context given to CBLKeyPair_CreateWithCallbacks.
         @param input  The encrypted data (size is always equal to the key size.)
         @param output  Where to write the decrypted data.
         @param outputMaxLen  Maximum length of output that can be written.
@@ -71,7 +80,7 @@ typedef struct CBLKeyPairCallbacks {
     bool (*decrypt)(void* context, FLSlice input, void* output, size_t outputMaxLen, size_t* outputLen);
     
     /** Uses the private key to generate a signature of input data.
-        @param context  The context given to CBLKeyPair_RSAKeyPairWithCallbacks.
+        @param context  The context given to CBLKeyPair_CreateWithCallbacks.
         @param digestAlgorithm  Indicates what type of digest to create the signature from.
         @param inputData  The data to be signed.
         @param outSignature  Write the signature here; length must be equal to the key size.
@@ -82,7 +91,7 @@ typedef struct CBLKeyPairCallbacks {
     
     /** Called when the CBLKeyPair is released and the callback is no longer needed, so that
         your code can free any associated resources. (This callback is optionaly and may be NULL.)
-        @param context The context given to CBLKeyPair_RSAKeyPairWithCallbacks. */
+        @param context The context given to CBLKeyPair_CreateWithCallbacks. */
     void (*_cbl_nullable free)(void* context);
 } CBLKeyPairCallbacks;
 
@@ -98,20 +107,20 @@ CBL_REFCOUNTED(CBLCert*, Cert);
 typedef struct CBLTLSIdentity CBLTLSIdentity;
 CBL_REFCOUNTED(CBLTLSIdentity*, TLSIdentity);
 
-/** Returns a KeyPair from external key provided as the context
- @note You are responsible for releasing the returned KeyPair */
+/** Returns an RSA KeyPair from external key provided as the keypair callbacks.
+    @note You are responsible for releasing the returned KeyPair */
 _cbl_warn_unused
-CBLKeyPair* _cbl_nullable CBLKeyPair_RSAKeyPairWithCallbacks(void* context,
-                                                             size_t keySizeInBits,
-                                                             CBLKeyPairCallbacks callbacks,
-                                                             CBLError* _cbl_nullable outError) CBLAPI;
+CBLKeyPair* _cbl_nullable CBLKeyPair_CreateWithCallbacks(void* context,
+                                                         size_t keySizeInBits,
+                                                         CBLKeyPairCallbacks callbacks,
+                                                         CBLError* _cbl_nullable outError) CBLAPI;
 
-/** Returns a KeyPair from private key data.
- @note You are responsible for releasig the returned KeyPair. */
+/** Returns an RSA KeyPair from private key data in PEM or DER format.
+    @note You are responsible for releasig the returned KeyPair. */
 _cbl_warn_unused
-CBLKeyPair* _cbl_nullable CBLKeyPair_RSAKeyPairWithPrivateKeyData(FLSlice privateKeyData,
-                                                                  FLSlice passwordOrNull,
-                                                                  CBLError* _cbl_nullable outError) CBLAPI;
+CBLKeyPair* _cbl_nullable CBLKeyPair_CreateWithPrivateKeyData(FLSlice privateKeyData,
+                                                              FLSlice passwordOrNull,
+                                                              CBLError* _cbl_nullable outError) CBLAPI;
 
 
 /** Returns a hex digest of the public key.
@@ -130,13 +139,15 @@ FLSliceResult CBLKeyPair_PublicKeyData(CBLKeyPair*) CBLAPI;
 _cbl_warn_unused
 FLSliceResult CBLKeyPair_PrivateKeyData(CBLKeyPair*) CBLAPI;
 
-/** Instantiates a CBLCert from X.509 certificate data in DER or PEM form.
+/** Creates a CBLCert from X.509 certificate data in DER or PEM form.
     @note PEM data might consist of a series of certificates. If so, the returned CBLCert
           will represent only the first, and you can iterate over the next by calling \ref CBLCert_NextInChain.
     @note You are responsible for releasing the returned reference. */
 _cbl_warn_unused
-CBLCert* _cbl_nullable CBLCert_CertFromData(FLSlice certData, CBLError* _cbl_nullable outError) CBLAPI;
+CBLCert* _cbl_nullable CBLCert_CreateWithData(FLSlice certData, CBLError* _cbl_nullable outError) CBLAPI;
 
+/** Gets the next certificate in the chain if presents.
+    @note You are responsible for releasing the returned reference. */
 _cbl_warn_unused
 CBLCert* _cbl_nullable CBLCert_CertNextInChain(CBLCert* cert) CBLAPI;
 
@@ -182,56 +193,58 @@ CBLTimestamp CBLTLSIdentity_Expiration(CBLTLSIdentity*) CBLAPI;
 
 /**
  Creates a self-signed TLS identity with the given RSA keypair and certificate attributes.
+ 
+ If the persietent label is not NULL (`kFLSliceNull`), The identity will be persisted in the platform's keystore
+ (e.g. Keychain for Apple or x509 Key/Certificate Stores for Windows).
+ 
+ @Note The Linux and Android platforms do not support persisting the identity with a label.
+ @Note The Common Name (kCBLCertAttrKeyCommonName) attribute is required.
+ @Note You are responsible for releasing the returned reference. */
+_cbl_warn_unused
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_CreateIdentity(CBLKeyUsages keyUsages,
+                                                            FLDict attributes,
+                                                            CBLTimestamp expiration,
+                                                            FLString label,
+                                                            CBLError* _cbl_nullable outError) CBLAPI;
+
+/**
+ Creates a self-signed TLS identity with the given RSA keypair and certificate attributes.
  @Note The Common Name (kCBLCertAttrKeyCommonName) attribute is required.
  @Note You are responsible for releasig the returned reference. */
 _cbl_warn_unused
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_SelfSignedCertIdentity(bool server,
-                                                                    CBLKeyPair* keypair,
-                                                                    FLDict attributes,
-                                                                    CBLTimestamp expiration,
-                                                                    CBLError* _cbl_nullable outError) CBLAPI;
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_CreateIdentityWithKeyPair(CBLKeyUsages keyUsages,
+                                                                       CBLKeyPair* keypair,
+                                                                       FLDict attributes,
+                                                                       CBLTimestamp expiration,
+                                                                       CBLError* _cbl_nullable outError) CBLAPI;
 
 #if !defined(__linux__) && !defined(__ANDROID__)
 
-/**
- Creates a self-signed TLS identity with the given RSA keypair and certificate attributes. If the persietent label is specified,
- The identity will be persisted in the platform's keystore (Keychain for Apple or x509 Key/Certificate Stores for Windows)
- @Note The Common Name (kCBLCertAttrKeyCommonName) attribute is required.
- @Note You are responsible for releasing the returned reference.
- */
-_cbl_warn_unused
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_SelfSignedCertIdentityWithLabel(bool server,
-                                                                    FLString persistentLabel,
-                                                                    FLDict attributes,
-                                                                    CBLTimestamp expiration,
-                                                                    CBLError* _cbl_nullable outError) CBLAPI;
-
 /** Deletes the identity from the platform's keystore (Keychain for Apple or x509 Key/Certificate Stores for Windows) witih the given persistent label. */
-bool CBLTLSIdentity_DeleteIdentityWithLabel(FLString persistentLabel,
+bool CBLTLSIdentity_DeleteIdentityWithLabel(FLString label,
                                             CBLError* _cbl_nullable outError) CBLAPI;
 
 _cbl_warn_unused
-/** Creates a TLS identity from the identity in the platfrom's keystore (Keychain for Apple or x509 Key/Certificate Stores for Windows)
-    with the given persistent label.
- @note You are responsible for releasing the returned reference. */
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithLabel(FLString persistentLabel,
+/** Gets a TLS identity with the given label from the platfrom's keystore (Keychain for Apple or x509 Key/Certificate Stores for Windows).
+    @note You are responsible for releasing the returned reference. */
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithLabel(FLString label,
                                                                CBLError* _cbl_nullable outError) CBLAPI;
 
 #endif //#if !defined(__linux__) && !defined(__ANDROID__)
 
 /** Create a TLS identity with the given RSA keypair and certificates. */
 _cbl_warn_unused
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyPair* keypair,
-                                                                         CBLCert* cert,
-                                                                         CBLError* _cbl_nullable outError) CBLAPI;
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_CreateWithKeyPairAndCerts(CBLKeyPair* keypair,
+                                                                       CBLCert* cert,
+                                                                       CBLError* _cbl_nullable outError) CBLAPI;
 
 #ifdef __OBJC__
 
 /** Creates a TLS identity with the given SecIdentity object.
  @note You are responsible for releasing the returned reference. */
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithSecIdentity(SecIdentityRef secIdentity,
-                                                                     NSArray* _cbl_nullable certs,
-                                                                     CBLError* _cbl_nullable outError) CBLAPI;
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_CreateWithSecIdentity(SecIdentityRef secIdentity,
+                                                                   NSArray* _cbl_nullable certs,
+                                                                   CBLError* _cbl_nullable outError) CBLAPI;
 
 #endif //#ifdef __OBJC__
 

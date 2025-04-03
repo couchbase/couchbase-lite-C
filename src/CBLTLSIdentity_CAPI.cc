@@ -43,24 +43,25 @@ const FLString kCBLCertAttrKeyRegisteredID = FLSTR("registeredID");
 
 // KeyPair
 
-CBLKeyPair* CBLKeyPair_RSAKeyPairWithCallbacks(void* context,
-                                               size_t keySizeInBits,
-                                               CBLKeyPairCallbacks callbacks,
-                                               CBLError* outError) noexcept {
+CBLKeyPair* CBLKeyPair_CreateWithCallbacks(void* context,
+                                           size_t keySizeInBits,
+                                           CBLKeyPairCallbacks callbacks,
+                                           CBLError* outError) noexcept {
     try {
-        return retain(CBLKeyPair::RSAKeyPairWithCallbacks(context, keySizeInBits, callbacks));
+        return retain(CBLKeyPair::CreateKeyPairWithCallbacks(context, keySizeInBits, callbacks));
     } catchAndBridge(outError);
 }
 
-CBLKeyPair* CBLKeyPair_RSAKeyPairWithPrivateKeyData(FLSlice privateKeyData,
-                                                    FLSlice passwordOrNull,
-                                                    CBLError* _cbl_nullable outError) noexcept {
+CBLKeyPair* CBLKeyPair_CreateWithPrivateKeyData(FLSlice privateKeyData,
+                                                FLSlice passwordOrNull,
+                                                CBLError* _cbl_nullable outError) noexcept {
     try {
-        return retain(CBLKeyPair::RSAKeyPairWithPrivateKeyData(privateKeyData, passwordOrNull));
+        return retain(CBLKeyPair::CreateKeyPairWithPrivateKeyData(privateKeyData, passwordOrNull));
     } catchAndBridge(outError);
 }
 
 // CBLPrivate.h
+
 CBLKeyPair* CBLKeyPair_GenerateRSAKeyPair(FLSlice passwordOrNull, CBLError* outError) noexcept {
     try {
         return retain(CBLKeyPair::GenerateRSAKeyPair(passwordOrNull));
@@ -81,9 +82,9 @@ FLSliceResult CBLKeyPair_PrivateKeyData(CBLKeyPair* keyPair) noexcept {
 
 // CBLCert:
 
-CBLCert* CBLCert_CertFromData(FLSlice certData, CBLError* outError) noexcept {
+CBLCert* CBLCert_CreateWithData(FLSlice certData, CBLError* outError) noexcept {
     try {
-        return retain(CBLCert::CertFromData(certData));
+        return retain(CBLCert::CreateWithData(certData));
     } catchAndBridge(outError);
 }
 
@@ -127,24 +128,24 @@ CBLKeyPair* CBLCert_PublicKey(CBLCert* cert) noexcept {
 
 // CBLTLSIdentity
 
-CBLTLSIdentity* CBLTLSIdentity_SelfSignedCertIdentity(bool server,
-                                                      CBLKeyPair* keypair,
-                                                      FLDict attributes,
-                                                      CBLTimestamp expiration,
-                                                      CBLError* outError) noexcept {
+CBLTLSIdentity* CBLTLSIdentity_CreateIdentityWithKeyPair(CBLKeyUsages usages,
+                                                         CBLKeyPair* keypair,
+                                                         FLDict attributes,
+                                                         CBLTimestamp expiration,
+                                                         CBLError* outError) noexcept {
     try {
-        return retain(CBLTLSIdentity::SelfSignedCertIdentity(server,
-                                                             keypair,
-                                                             attributes,
-                                                             expiration));
+        return retain(CBLTLSIdentity::CreateIdentityWithKeyPair(usages,
+                                                                keypair,
+                                                                attributes,
+                                                                expiration));
     } catchAndBridge(outError);
 }
 
-CBLTLSIdentity* CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyPair* keypair,
+CBLTLSIdentity* CBLTLSIdentity_CreateWithKeyPairAndCerts(CBLKeyPair* keypair,
                                                            CBLCert* cert,
                                                            CBLError*  outError) noexcept {
     try {
-        return retain(CBLTLSIdentity::IdentityWithKeyPairAndCerts(keypair, cert));
+        return retain(CBLTLSIdentity::CreateWithKeyPairAndCerts(keypair, cert));
     } catchAndBridge(outError);
 }
 
@@ -156,31 +157,29 @@ CBLTimestamp CBLTLSIdentity_Expiration(CBLTLSIdentity* tlsID) noexcept {
     return tlsID->expiration();
 }
 
-#if !defined(__linux__) && !defined(__ANDROID__)
-CBLTLSIdentity* CBLTLSIdentity_SelfSignedCertIdentityWithLabel(bool server,
-                                                               FLString persistentLabel,
-                                                               FLDict attributes,
-                                                               CBLTimestamp expiration,
-                                                               CBLError* outError) noexcept {
+CBLTLSIdentity* CBLTLSIdentity_CreateIdentity(CBLKeyUsages usages,
+                                              FLDict attrs,
+                                              CBLTimestamp exp,
+                                              FLString label,
+                                              CBLError* outError) noexcept {
     try {
-        return retain(CBLTLSIdentity::SelfSignedCertIdentityWithLabel(server,
-                                                                      persistentLabel,
-                                                                      attributes,
-                                                                      expiration));
+        return retain(CBLTLSIdentity::CreateIdentity(usages, attrs, exp, label));
     } catchAndBridge(outError);
 }
 
-bool CBLTLSIdentity_DeleteIdentityWithLabel(FLString persistentLabel,
+#if !defined(__linux__) && !defined(__ANDROID__)
+
+bool CBLTLSIdentity_DeleteIdentityWithLabel(FLString label,
                                             CBLError* _cbl_nullable outError) noexcept {
     try {
-        return CBLTLSIdentity::DeleteIdentityWithLabel(persistentLabel);
+        return CBLTLSIdentity::DeleteIdentityWithLabel(label);
     } catchAndBridge(outError);
 }
 
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithLabel(FLString persistentLabel,
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithLabel(FLString label,
                                                                CBLError* outError) noexcept {
     try {
-        return retain(CBLTLSIdentity::IdentityWithLabel(persistentLabel));
+        return retain(CBLTLSIdentity::IdentityWithLabel(label));
     } catchAndBridge(outError);
 }
 #endif // #if !defined(__linux__) && !defined(__ANDROID__)

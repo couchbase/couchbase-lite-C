@@ -40,27 +40,30 @@ public:
     }
 };
 
-TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity") {
+TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity", "[TSLIdentity]") {
     CBLError outError;
 
     CBLKeyPair* keypair = CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, &outError);
-    fleece::MutableDict mdict = fleece::MutableDict::newDict();
-    mdict[kCBLCertAttrKeyCommonName] = "CBLAnonymousCertificate";
+    fleece::MutableDict attributes = fleece::MutableDict::newDict();
+    attributes[kCBLCertAttrKeyCommonName] = "CBLAnonymousCertificate";
 
     static constexpr auto validity = seconds(3141592);
     auto                    expire = system_clock::now() + validity;
 
     // Server ID
-    CBLTLSIdentity* tlsID = CBLTLSIdentity_SelfSignedCertIdentity
-        (true, keypair, mdict, duration_cast<milliseconds>(validity).count(), &outError);
-    CHECK(tlsID);
+    CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentityWithKeyPair(kCBLKeyUsagesServerAuth,
+                                                                        keypair,
+                                                                        attributes,
+                                                                        duration_cast<milliseconds>(validity).count(),
+                                                                        &outError);
+    CHECK(identity);
 
-    CBLCert* certOfIdentity = CBLTLSIdentity_Certificates(tlsID);
+    CBLCert* certOfIdentity = CBLTLSIdentity_Certificates(identity);
     CHECK(certOfIdentity);
     CHECK( !CBLCert_CertNextInChain(certOfIdentity) );
 
     // CBLTimestamp is in milliseconds
-    CBLTimestamp certExpire  = CBLTLSIdentity_Expiration(tlsID);
+    CBLTimestamp certExpire  = CBLTLSIdentity_Expiration(identity);
     CBLTimestamp paramExpire = duration_cast<milliseconds>(expire.time_since_epoch()).count();
 
     // Can differ by 60 seconds
@@ -80,47 +83,51 @@ TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity") {
     alloc_slice pubDigest2 = CBLKeyPair_PublicKeyDigest(pkOfCert);
     CHECK( (pubDigest1 && pubDigest1 == pubDigest2) );
 
-    CBLTLSIdentity_Release(tlsID);
+    CBLTLSIdentity_Release(identity);
     CBLKeyPair_Release(keypair);
     CBLKeyPair_Release(pkOfCert);
 }
 
 #if !defined(__linux__) && !defined(__ANDROID__)
-TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity With Label") {
+
+TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity With Label", "[TSLIdentity]") {
     CBLError outError{};
 
     slice label{"CBL_Labal"};
 
-    fleece::MutableDict mdict = fleece::MutableDict::newDict();
-    mdict[kCBLCertAttrKeyCommonName] = "CBLAnonymousCertificate";
+    fleece::MutableDict attributes = fleece::MutableDict::newDict();
+    attributes[kCBLCertAttrKeyCommonName] = "CBLAnonymousCertificate";
+    
     static constexpr auto validity = seconds(3141592);
 
-    // CBLTLSIdentity_SelfSignedCertIdentityWithLabel
-
-    CBLTLSIdentity* tlsID = CBLTLSIdentity_SelfSignedCertIdentityWithLabel
-        (true, label, mdict, duration_cast<milliseconds>(validity).count(), &outError);
+    CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentity(kCBLKeyUsagesServerAuth,
+                                                             attributes,
+                                                             duration_cast<milliseconds>(validity).count(),
+                                                             label,
+                                                             &outError);
 
     if (outError.code) {
         alloc_slice msg = CBLError_Message(&outError);
         WARN("Error Code=" << outError.code << ", msge=" << msg.asString());
     } else {
-        CHECK(tlsID);
+        CHECK(identity);
     }
 
     // CBLTLSIdentity_IdentityWithLabel
 
     outError.code = 0;
-    CBLTLSIdentity* tlsID2 = CBLTLSIdentity_IdentityWithLabel(label, &outError);
-    CHECK(tlsID2);
+    CBLTLSIdentity* identity2 = CBLTLSIdentity_IdentityWithLabel(label, &outError);
+    CHECK(identity2);
     CHECK(outError.code == 0);
 
     // CBLTLSIdentity_DeleteIdentityWithLabel
 
     CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(label, &outError));
 
-    CBLTLSIdentity_Release(tlsID);
-    CBLTLSIdentity_Release(tlsID2);
+    CBLTLSIdentity_Release(identity);
+    CBLTLSIdentity_Release(identity2);
 }
+
 #endif // #if !defined(__linux__) && !defined(__ANDROID__)
 
 #endif // #ifdef COUCHBASE_ENTERPRISE

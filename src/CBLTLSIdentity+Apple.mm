@@ -85,9 +85,9 @@ static NSData* __nullable toPEM(NSArray* secCerts) /* may throw */ {
     return data;
 }
 
-CBLTLSIdentity* CBLTLSIdentity_IdentityWithSecIdentity(SecIdentityRef identity,
-                                                       NSArray* certs,
-                                                       CBLError* outError) noexcept {
+CBLTLSIdentity* CBLTLSIdentity_CreateWithSecIdentity(SecIdentityRef identity,
+                                                     NSArray* certs,
+                                                     CBLError* outError) noexcept {
     try {
         if ( !identityExists(identity) ) {
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "The identity is not present in the KeyChain");
@@ -109,13 +109,13 @@ CBLTLSIdentity* CBLTLSIdentity_IdentityWithSecIdentity(SecIdentityRef identity,
         if (!certData)
             return nullptr;
 
-        fleece::Retained<CBLCert> cblCert = CBLCert::CertFromData(data2slice(certData));
+        fleece::Retained<CBLCert> cblCert = CBLCert::CreateWithData(data2slice(certData));
         if (!cblCert) {
             CBL_Log(kCBLLogDomainListener, kCBLLogWarning, "Couldn't convert certs to C4Cert");
             return nullptr;
         }
 
-        return retain(CBLTLSIdentity::IdentityWithKeyPairAndCerts(nullptr, cblCert.get()));
+        return retain(CBLTLSIdentity::CreateWithKeyPairAndCerts(nullptr, cblCert.get()));
     } catchAndBridge(outError);
 }
 

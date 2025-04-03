@@ -64,12 +64,12 @@ CBL_C {
 		kCBLCertAttrKeyURL;
 		kCBLCertAttrKeyIPAddress;
 		kCBLCertAttrKeyRegisteredID;
-		CBLKeyPair_RSAKeyPairWithCallbacks;
-		CBLKeyPair_RSAKeyPairWithPrivateKeyData;
+		CBLKeyPair_CreateWithCallbacks;
+		CBLKeyPair_CreateWithPrivateKeyData;
 		CBLKeyPair_PublicKeyDigest;
 		CBLKeyPair_PublicKeyData;
 		CBLKeyPair_PrivateKeyData;
-		CBLCert_CertFromData;
+		CBLCert_CreateWithData;
 		CBLCert_CertNextInChain;
 		CBLCert_Data;
 		CBLCert_SubjectName;
@@ -78,9 +78,9 @@ CBL_C {
 		CBLCert_PublicKey;
 		CBLTLSIdentity_Certificates;
 		CBLTLSIdentity_Expiration;
-		CBLTLSIdentity_SelfSignedCertIdentity;
-		CBLTLSIdentity_IdentityWithKeyPairAndCerts;
-		CBLTLSIdentity_SelfSignedCertIdentityWithLabel;
+		CBLTLSIdentity_CreateIdentity;
+		CBLTLSIdentity_CreateIdentityWithKeyPair;
+		CBLTLSIdentity_CreateWithKeyPairAndCerts;
 		CBLTLSIdentity_DeleteIdentityWithLabel;
 		CBLTLSIdentity_IdentityWithLabel;
 		kCBLDefaultVectorIndexLazy;
