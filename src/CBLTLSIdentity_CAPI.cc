@@ -62,10 +62,9 @@ CBLKeyPair* CBLKeyPair_RSAKeyPairWithPrivateKeyData(FLSlice privateKeyData,
 
 // CBLPrivate.h
 CBLKeyPair* CBLKeyPair_GenerateRSAKeyPair(FLSlice passwordOrNull, CBLError* outError) noexcept {
-    C4KeyPair* c4Key = C4KeyPair::generate(kC4RSA, 2048, false).detach();
-    if ( !c4Key ) C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "fails to generate a KeyPair.");
-
-    return retain(new CBLKeyPair{c4Key});
+    try {
+        return retain(CBLKeyPair::GenerateRSAKeyPair(passwordOrNull));
+    } catchAndBridge(outError);
 }
 
 FLSliceResult CBLKeyPair_PublicKeyDigest(CBLKeyPair* keyPair) noexcept {

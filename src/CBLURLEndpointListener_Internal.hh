@@ -27,6 +27,7 @@
 #include "CBLTLSIdentity_Internal.hh"
 #include "c4Listener.hh"
 #include <mutex>
+using namespace fleece;
 
 #ifdef COUCHBASE_ENTERPRISE
 
@@ -107,7 +108,7 @@ public:
         }
     }
 
-    bool start();
+    void start();
     void stop();
 
 protected:

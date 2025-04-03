@@ -70,7 +70,14 @@ public:
     }
     
     C4KeyPair* c4KeyPair() const { return _c4KeyPair; }
-    
+
+    // Private:
+    static CBLKeyPair* GenerateRSAKeyPair(slice passwordOrNull) {
+        C4KeyPair* c4Key = C4KeyPair::generate(kC4RSA, 2048, false).detach();
+        if ( !c4Key ) C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "fails to generate a KeyPair.");
+        return new CBLKeyPair{c4Key};
+    }
+
 private:
     Retained<C4KeyPair> _c4KeyPair;
 };

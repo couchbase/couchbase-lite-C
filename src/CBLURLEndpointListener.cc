@@ -20,15 +20,13 @@
 
 #ifdef COUCHBASE_ENTERPRISE
 
-using namespace fleece;
-
 std::mutex CBLURLEndpointListener::_mutex;
 constexpr CBLTimestamp kCBLAnonymousIdentityMinValidTimeAllowed = 86400; /* 24 Hours */
 
-bool CBLURLEndpointListener::start() {
+void CBLURLEndpointListener::start() {
     std::scoped_lock lock(_mutex);
 
-    if (_c4listener) return true;
+    if (_c4listener) return;
 
     Assert(_conf.collectionCount > 0);
 
@@ -53,7 +51,7 @@ bool CBLURLEndpointListener::start() {
         CBLTLSIdentity* identity = effectiveTLSIdentity(persistent);
         if (!identity) {
             CBL_Log(kCBLLogDomainListener, kCBLLogWarning, "Cannot determine TLSIdentity when TLS is enabled. %s", dumpConfig().c_str());
-            return false;
+            C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "Cannot determine TLSIdentity when TLS is enabled");
         }
         tls.certificate = identity->certificates()->c4Cert();
         if (identity->privateKey()) {
@@ -102,11 +100,10 @@ bool CBLURLEndpointListener::start() {
     }
 
     std::unique_ptr<C4Listener> c4listener{new C4Listener(c4config)};
-    auto ret = [&](bool succ) -> bool {
+    auto ret = [&](bool succ) {
         if (succ) {
             _c4listener = c4listener.release();
         }
-        return succ;
     };
 
     CBLDatabase* cblDb = _conf.collections[0]->database();
@@ -123,7 +120,7 @@ bool CBLURLEndpointListener::start() {
         }
     });
 
-    return ret(succ);
+    ret(succ);
 }
 
 void CBLURLEndpointListener::stop() {
@@ -150,13 +147,9 @@ CBLTLSIdentity* CBLURLEndpointListener::effectiveTLSIdentity(bool persistent) {
 
 Retained<CBLTLSIdentity> CBLURLEndpointListener::anonymousTLSIdentity(bool persistent) {
     Retained<CBLTLSIdentity> identity;
-    alloc_slice label;
-    std::unique_ptr<CBLKeyPair, void(*)(CBLKeyPair*)> keypair{
-        nullptr,
-        [](CBLKeyPair* k) {
-            CBLKeyPair_Release(k);
-        }
-    };
+    alloc_slice              label;
+    Retained<CBLKeyPair>     keypair;
+
     if (persistent) {
 #if !defined(__linux__) && !defined(__ANDROID__)
         label = labelForAnonymousTLSIdentity();
@@ -174,10 +167,7 @@ Retained<CBLTLSIdentity> CBLURLEndpointListener::anonymousTLSIdentity(bool persi
 
             CBL_Log(kCBLLogDomainListener, kCBLLogVerbose, "Delete anonymous identity of label = '%.*s' (expiration = %ld)", (int)label.size, (char*)label.buf, (long)(expire/1000));
 
-            CBLTLSIdentity_DeleteIdentityWithLabel(label, cbl_internal::external(&error));
-            if (error.code) {
-                CBL_Log(kCBLLogDomainListener, kCBLLogWarning, "Error when delete anonymous identity of label = '%.*s', error = %d/%d", (int)label.size, (char*)label.buf, error.domain, error.code);
-            }
+            CBLTLSIdentity::DeleteIdentityWithLabel(label);
         }
 
         if (error.code && error.code != kC4ErrorNotFound) {
@@ -187,7 +177,7 @@ Retained<CBLTLSIdentity> CBLURLEndpointListener::anonymousTLSIdentity(bool persi
         C4Error::raise(LiteCoreDomain, kC4ErrorUnimplemented, "No persistent key support");
 #endif
     } else {
-        keypair.reset(CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr));
+        keypair = CBLKeyPair::GenerateRSAKeyPair(fleece::nullslice);
         if (!keypair) {
             CBL_Log(kCBLLogDomainListener, kCBLLogWarning, "Failed to create an anonymous self-signed key-pair");
             return nullptr;
