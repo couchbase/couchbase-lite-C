@@ -88,15 +88,22 @@ public:
                 CBLKeyPair_Release(k);
             }
         };
+        
         if (!keypair) return nullptr;
 
-        fleece::MutableDict mdict = fleece::MutableDict::newDict();
-        mdict[kCBLCertAttrKeyCommonName] = isServer ? "URLEndpointListener" : "URLEndpointListener_Client";
+        fleece::MutableDict attributes = fleece::MutableDict::newDict();
+        
+        attributes[kCBLCertAttrKeyCommonName] = isServer ? "URLEndpointListener" : "URLEndpointListener_Client";
 
         static constexpr auto validity = seconds(31536000); // one year
-
-        return  CBLTLSIdentity_SelfSignedCertIdentity
-            (isServer, keypair.get(), mdict, duration_cast<milliseconds>(validity).count(), nullptr);
+        
+        CBLKeyUsages usages = isServer ? kCBLKeyUsagesServerAuth : kCBLKeyUsagesClientAuth;
+        
+        return  CBLTLSIdentity_CreateIdentityWithKeyPair(usages,
+                                                         keypair.get(),
+                                                         attributes,
+                                                         duration_cast<milliseconds>(validity).count(),
+                                                         nullptr);
     }
 
     Database db2;
@@ -334,7 +341,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
         auto context = reinterpret_cast<Context*>(ctx);
         CHECK(context->rand  == 6801);
         CBLError error;
-        CBLCert* cert = CBLCert_CertFromData(certData, &error);
+        CBLCert* cert = CBLCert_CreateWithData(certData, &error);
         if (!cert) {
             CBL_Log(kCBLLogDomainReplicator, kCBLLogError,
                     "CBLCert_CertFromData failed with code %d", error.code);

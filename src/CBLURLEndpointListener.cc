@@ -156,7 +156,6 @@ Retained<CBLTLSIdentity> CBLURLEndpointListener::anonymousTLSIdentity(bool persi
         if (!label) return nullptr;
 
         identity = CBLTLSIdentity::IdentityWithLabel(label);
-        C4Error error{};
         if (identity) {
             CBL_Log(kCBLLogDomainListener, kCBLLogVerbose, "Found anonymous identity by label = '%.*s'", (int)label.size, (char*)label.buf);
 
@@ -169,33 +168,15 @@ Retained<CBLTLSIdentity> CBLURLEndpointListener::anonymousTLSIdentity(bool persi
 
             CBLTLSIdentity::DeleteIdentityWithLabel(label);
         }
-
-        if (error.code && error.code != kC4ErrorNotFound) {
-            C4Error::raise(error);
-        }
-#else //#if !defined(__linux__) && !defined(__ANDROID__)
+        
+#else // #if defined(__linux__) || defined(__ANDROID__)
         C4Error::raise(LiteCoreDomain, kC4ErrorUnimplemented, "No persistent key support");
 #endif
-    } else {
-        keypair = CBLKeyPair::GenerateRSAKeyPair(fleece::nullslice);
-        if (!keypair) {
-            CBL_Log(kCBLLogDomainListener, kCBLLogWarning, "Failed to create an anonymous self-signed key-pair");
-            return nullptr;
-        }
     }
 
-    fleece::MutableDict mdict = fleece::MutableDict::newDict();
-    mdict[kCBLCertAttrKeyCommonName] = "CBLAnonymousCertificate";
-
-    if (persistent) {
-#if !defined(__linux__) && !defined(__ANDROID__)
-        identity = CBLTLSIdentity::SelfSignedCertIdentityWithLabel(true, label, mdict, 0);
-#endif
-    } else {
-        identity = CBLTLSIdentity::SelfSignedCertIdentity(true, keypair.get(), mdict, 0);
-    }
-
-    return identity;
+    fleece::MutableDict attrs = fleece::MutableDict::newDict();
+    attrs[kCBLCertAttrKeyCommonName] = "CBLAnonymousCertificate";
+    return CBLTLSIdentity::CreateIdentity(kCBLKeyUsagesServerAuth, attrs, 0, label);
 }
 
 alloc_slice CBLURLEndpointListener::labelForAnonymousTLSIdentity() {
