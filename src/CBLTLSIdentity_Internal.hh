@@ -54,7 +54,7 @@ public:
         c4Callbacks.decrypt       = callbacks.decrypt;
         c4Callbacks.sign          = (SignFuncPtr)callbacks.sign;
         c4Callbacks.free          = callbacks.free;
-        return new CBLKeyPair{C4KeyPair::fromExternal(kC4RSA, keySizeInBits, externalKey, c4Callbacks).detach()};
+        return new CBLKeyPair{C4KeyPair::fromExternal(kC4RSA, keySizeInBits, externalKey, c4Callbacks).get()};
     }
     
     alloc_slice publicKeyDigest() const {
@@ -75,6 +75,12 @@ public:
     static CBLKeyPair* GenerateRSAKeyPair(slice passwordOrNull) {
         C4KeyPair* c4Key = C4KeyPair::generate(kC4RSA, 2048, false).detach();
         if ( !c4Key ) C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "fails to generate a KeyPair.");
+        return new CBLKeyPair{c4Key};
+    }
+
+    static CBLKeyPair* PublicKeyFromData(slice data) {
+        C4KeyPair* c4Key = C4KeyPair::fromPublicKeyData(data).detach();
+        if (!c4Key) C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "fails to get PublicKey from data.");
         return new CBLKeyPair{c4Key};
     }
 

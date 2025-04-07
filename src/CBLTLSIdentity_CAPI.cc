@@ -61,10 +61,17 @@ CBLKeyPair* CBLKeyPair_CreateWithPrivateKeyData(FLSlice privateKeyData,
 }
 
 // CBLPrivate.h
-
 CBLKeyPair* CBLKeyPair_GenerateRSAKeyPair(FLSlice passwordOrNull, CBLError* outError) noexcept {
     try {
         return retain(CBLKeyPair::GenerateRSAKeyPair(passwordOrNull));
+    } catchAndBridge(outError);
+}
+
+// CBLPrivate.h
+CBLKeyPair* CBLKeyPair_PublicKeyFromData(FLSlice data,
+                                         CBLError* _cbl_nullable outError) noexcept {
+    try {
+        return retain(CBLKeyPair::PublicKeyFromData(data));
     } catchAndBridge(outError);
 }
 

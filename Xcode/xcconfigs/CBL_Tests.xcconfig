@@ -25,3 +25,5 @@ LLVM_LTO                = NO    // LTO makes tests very slow to link and confuse
 CLANG_WARN__EXIT_TIME_DESTRUCTORS           = NO
 GCC_WARN_UNKNOWN_PRAGMAS                    = NO
 CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND    = NO
+
+OTHER_LDFLAGS = $(inherited) -framework Security

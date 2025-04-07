@@ -39,6 +39,7 @@ CBL_C {
 		CBLIndexUpdater_Value;
 		CBLCollection_IsIndexTrained;
 		CBLKeyPair_GenerateRSAKeyPair;
+		CBLKeyPair_PublicKeyFromData;
 		CBLListenerAuth_CreatePassword;
 		CBLListenerAuth_CreateCertificate;
 		CBLListenerAuth_Free;

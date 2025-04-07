@@ -19,6 +19,7 @@
 #include "CBLTest.hh"
 #include "ReplicatorTest.hh"
 #include "CBLPrivate.h"
+#include "TLSIdentityTest.hh"
 #include "fleece/Fleece.hh"
 #include <chrono>
 #include <string>
@@ -28,6 +29,30 @@ using namespace std::chrono;
 #ifdef COUCHBASE_ENTERPRISE
 
 static const string kDefaultDocContent = "{\"greeting\":\"hello\"}";
+
+namespace {
+#ifdef __APPLE__
+TLSIdentityTest::ExternalKey* externalKey(void* context) {
+    return (TLSIdentityTest::ExternalKey*)context;
+}
+
+bool kc_publicKeyData(void* context, void* output, size_t outputMaxLen, size_t* outputLen) {
+    return externalKey(context)->publicKeyData(output, outputMaxLen, outputLen);
+}
+
+bool kc_decrypt(void* context, FLSlice input, void* output, size_t outputMaxLen, size_t* outputLen) {
+    return externalKey(context)->decrypt(input, output, outputMaxLen, outputLen);
+}
+
+bool kc_sign(void* context, CBLSignatureDigestAlgorithm digestAlgorithm, FLSlice inputData, void* outSignature) {
+    return externalKey(context)->sign(digestAlgorithm, inputData, outSignature);
+}
+
+void kc_free(void* context) {
+    delete externalKey(context);
+}
+#endif
+}; // anonymous namespace
 
 class URLEndpointListenerTest : public ReplicatorTest {
 public:
@@ -81,14 +106,30 @@ public:
         return configs;
     }
 
-    CBLTLSIdentity* createTLSIdentity(bool isServer) {
+    CBLTLSIdentity* createTLSIdentity(bool isServer, bool withExternalKey) {
         std::unique_ptr<CBLKeyPair, void(*)(CBLKeyPair*)> keypair{
-            CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr),
+            nullptr,
             [](CBLKeyPair* k) {
                 CBLKeyPair_Release(k);
             }
         };
-        
+        if (!withExternalKey) {
+            keypair.reset(CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr));
+        } else {
+#ifdef __APPLE__
+            if (isServer)
+                keypair.reset(CBLKeyPair_CreateWithCallbacks(TLSIdentityTest::ExternalKey::generateRSA(2048),
+                                                             2048,
+                                                             CBLKeyPairCallbacks{
+                    kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
+                                                             nullptr));
+            else
+                // TBD, pending CBL-6903
+                keypair.reset(CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr));
+#else
+            return nullptr;
+#endif
+        }
         if (!keypair) return nullptr;
 
         fleece::MutableDict attributes = fleece::MutableDict::newDict();
@@ -305,10 +346,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
 }
 
 TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "[URLListener]") {
+    constexpr bool withExternalKey = false;
+
     struct Context {
         int rand = 6801;
     } context;
-    
+
     CBLURLEndpointListenerConfiguration listenerConfig {
         &context, // context
         cy.data(),
@@ -322,7 +365,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
 #endif
 
     SECTION("Self-signed Cert") {
-        listenerConfig.tlsIdentity = createTLSIdentity(true);
+        listenerConfig.tlsIdentity = createTLSIdentity(true, withExternalKey);
     }
 
     SECTION("Self-signed Anonymous Cert") {
@@ -372,7 +415,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
     config.endpoint = clientEndpoint(listener, &error);
     REQUIRE(config.endpoint);
     
-    CBLTLSIdentity* clientIdentity = createTLSIdentity(false);
+    CBLTLSIdentity* clientIdentity = createTLSIdentity(false, withExternalKey);
     REQUIRE(clientIdentity);
     config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
     REQUIRE(config.authenticator);
@@ -396,5 +439,87 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
     if (listenerConfig.tlsIdentity)
         CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
 }
+
+#ifdef __APPLE__
+TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication with External KeyPair", "[URLListener]") {
+    constexpr bool withExternalKey = true;
+
+    struct Context {
+        int rand = 6801;
+    } context;
+    
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        &context, // context
+        cy.data(),
+        2,
+        0         // port
+    };
+    listenerConfig.disableTLS = false;
+
+    bool anonymous = false;
+    alloc_slice persistentLabel;
+
+    SECTION("Self-signed Cert") {
+        listenerConfig.tlsIdentity = createTLSIdentity(true, withExternalKey);
+    }
+
+    listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, FLSlice certData) {
+        auto context = reinterpret_cast<Context*>(ctx);
+        CHECK(context->rand  == 6801);
+        CBLError error;
+        CBLCert* cert = CBLCert_CreateWithData(certData, &error);
+        if (!cert) {
+            CBL_Log(kCBLLogDomainReplicator, kCBLLogError,
+                    "CBLCert_CertFromData failed with code %d", error.code);
+            return false;
+        }
+        alloc_slice sname = CBLCert_SubjectName(cert);
+        CBLCert_Release(cert);
+        return sname == slice("CN=URLEndpointListener_Client");
+    });
+    config.acceptOnlySelfSignedServerCertificate = true;
+    expectedDocumentCount = 20;
+
+    REQUIRE(listenerConfig.authenticator);
+    
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    auto cols = collectionConfigs({cx[0], cx[1]});
+    config.collections = cols.data();
+    config.collectionCount = cols.size();
+    CBLError error {};
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, &error);
+    REQUIRE(listener);
+    
+    CHECK(CBLURLEndpointListener_Start(listener, &error));
+
+    config.endpoint = clientEndpoint(listener, &error);
+    REQUIRE(config.endpoint);
+
+    CBLTLSIdentity* clientIdentity = createTLSIdentity(false, withExternalKey);
+    REQUIRE(clientIdentity);
+    config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
+    REQUIRE(config.authenticator);
+    config.replicatorType = kCBLReplicatorTypePush;
+    replicate();
+
+    if (anonymous) {
+        REQUIRE(!!persistentLabel);
+        CBLTLSIdentity* id = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
+        CHECK(id);
+        CBLTLSIdentity_Release(id);
+        CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(persistentLabel, nullptr));
+    }
+
+    CBLURLEndpointListener_Stop(listener);
+    CBLURLEndpointListener_Release(listener);
+    CBLTLSIdentity_Release(clientIdentity);
+    if (listenerConfig.authenticator) CBLListenerAuth_Free(listenerConfig.authenticator);
+    if (listenerConfig.tlsIdentity)
+        CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
+}
+#endif // #ifdef __APPLE__
 
 #endif //#ifdef COUCHBASE_ENTERPRISE
