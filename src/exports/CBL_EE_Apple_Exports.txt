@@ -4,4 +4,4 @@
 #
 # This is the list of symbols that CBL-C for Apple Platform exports.
 
-CBLTLSIdentity_CreateWithSecIdentity
+CBLTLSIdentity_IdentityWithSecIdentity

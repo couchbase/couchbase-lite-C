@@ -1,5 +1,5 @@
 //
-// CBLDatabase+Apple.mm
+// CBLTLSIdentity+Apple.mm
 //
 // Copyright © 2025 Couchbase. All rights reserved.
 //
@@ -85,9 +85,9 @@ static NSData* __nullable toPEM(NSArray* secCerts) /* may throw */ {
     return data;
 }
 
-CBLTLSIdentity* CBLTLSIdentity_CreateWithSecIdentity(SecIdentityRef identity,
-                                                     NSArray* certs,
-                                                     CBLError* outError) noexcept {
+CBLTLSIdentity* CBLTLSIdentity_IdentityWithSecIdentity(SecIdentityRef identity,
+                                                       NSArray* certs,
+                                                       CBLError* outError) noexcept {
     try {
         if ( !identityExists(identity) ) {
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "The identity is not present in the KeyChain");
@@ -115,7 +115,7 @@ CBLTLSIdentity* CBLTLSIdentity_CreateWithSecIdentity(SecIdentityRef identity,
             return nullptr;
         }
 
-        return retain(CBLTLSIdentity::CreateWithKeyPairAndCerts(nullptr, cblCert.get()));
+        return retain(CBLTLSIdentity::IdentityWithKeyPairAndCerts(nullptr, cblCert.get()));
     } catchAndBridge(outError);
 }
 
@@ -127,15 +127,14 @@ static NSData* _getPublicKeyHash(SecKeyRef keyRef) {
     return publicKeyHash;
 }
 
-static SecKeyRef __nullable _getPublicKey(SecCertificateRef certRef, CBLError* _Nullable error) {
+static SecKeyRef __nullable _getPublicKey(SecCertificateRef certRef) {
     SecTrustRef trustRef;
     SecPolicyRef policyRef = SecPolicyCreateBasicX509();
     CFAutorelease(policyRef);
 
     OSStatus status = SecTrustCreateWithCertificates(certRef, policyRef, &trustRef);
     if (status != errSecSuccess) {
-        if (error) *error = cbl_internal::external(createSecError(status, "Couldn't create trust from certificate"));
-        return nil;
+        C4Error::raise(createSecError(status, "Couldn't create trust from certificate"));
     }
 
     SecKeyRef publicKeyRef = NULL;
@@ -150,31 +149,30 @@ static SecKeyRef __nullable _getPublicKey(SecCertificateRef certRef, CBLError* _
 
     CFRelease(trustRef);
     if (!publicKeyRef) {
-        if (error) *error = cbl_internal::external(createSecError(errSecUnsupportedFormat, "Couldn't extract public key from trust"));
-        return nil;
+        CBL_Log(kCBLLogDomainListener, kCBLLogWarning, "Couldn't extract public key from trust");
     }
     return publicKeyRef;
 }
 
-static NSData* __nullable _getPublicKeyHash(SecCertificateRef certRef, CBLError* _Nullable error) {
-    SecKeyRef publicKeyRef = _getPublicKey(certRef, error);
-    if (!publicKeyRef)
+static NSData* __nullable _getPublicKeyHash(SecCertificateRef certRef) {
+    SecKeyRef publicKeyRef = _getPublicKey(certRef);
+    if (!publicKeyRef) {
         return nil;
+    }
     return _getPublicKeyHash(publicKeyRef);
 }
 
-static SecCertificateRef __nullable toSecCert(C4Cert* c4cert, CBLError* _Nullable error) {
+static SecCertificateRef toSecCert(C4Cert* c4cert) {
     fleece::alloc_slice certData(c4cert_copyData(c4cert, false));
     NSData* data = slice2data(certData);
     SecCertificateRef certRef = SecCertificateCreateWithData(NULL, (__bridge CFDataRef)data);
     if (certRef == NULL) {
-        if (error) *error = cbl_internal::external(createSecError(errSecUnknownFormat, "Couldn't create certificate from data"));
-        return nil;
+        C4Error::raise(createSecError(errSecUnknownFormat, "Couldn't get certificate from the identity"));
     }
     return certRef;
 }
 
-static bool _deleteKey(NSData* publicKeyHash, bool isPrivateKey, CBLError* _Nullable error) {
+static void _deleteKey(NSData* publicKeyHash, bool isPrivateKey) {
     id keyClass = isPrivateKey ? (id)kSecAttrKeyClassPrivate : (id)kSecAttrKeyClassPublic;
     NSDictionary* params = @{
         (id)kSecClass:                  (id)kSecClassKey,
@@ -183,27 +181,29 @@ static bool _deleteKey(NSData* publicKeyHash, bool isPrivateKey, CBLError* _Null
     };
     OSStatus status = SecItemDelete((CFDictionaryRef)params);
     if (status != errSecSuccess && status != errSecInvalidItemRef && status != errSecItemNotFound) {
-        if (error) *error = cbl_internal::external(createSecError(status, "Couldn't delete the public key from the KeyChain"));
-        return false;
+        C4Error::raise(createSecError(status, "Couldn't delete the public key from the KeyChain"));
     }
-    return true;
 }
 
-static bool deletePublicKey(SecCertificateRef certRef, CBLError* _Nullable error) {
-    NSData* publicKeyHash = _getPublicKeyHash(certRef, error);
-    if (!publicKeyHash)
-        return false;
-    return _deleteKey(publicKeyHash, false, error);
+static void deletePublicKey(SecCertificateRef certRef) {
+    NSData* publicKeyHash = _getPublicKeyHash(certRef);
+    if (!publicKeyHash) {
+        return;
+    }
+    _deleteKey(publicKeyHash, false);
 }
 
 const int CBLTLSIdentity::kErrSecDuplicateItem = errSecDuplicateItem;
 
-bool CBLTLSIdentity::StripPublicKey(C4Cert* c4cert, CBLError* error) {
+void CBLTLSIdentity::StripPublicKey(C4Cert* c4cert) {
     // KeyChain API could pick up public key instead of private key when getting a SecIdentity.
     // A work around is to remove the public key from the KeyChain. This is found when testing
     // client cert auth on iOS. See: https://forums.developer.apple.com/thread/69642.
-    SecCertificateRef certRef = toSecCert(c4cert, error);
-    return !!certRef && deletePublicKey(certRef, error);
+    SecCertificateRef certRef = toSecCert(c4cert);
+    CFAutorelease(certRef);
+    
+    deletePublicKey(certRef);
+    CFRelease(certRef);
 }
 
 #endif // #ifdef TARGET_OS_IPHONE
