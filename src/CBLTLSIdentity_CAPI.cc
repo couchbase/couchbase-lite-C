@@ -141,18 +141,18 @@ CBLTLSIdentity* CBLTLSIdentity_CreateIdentityWithKeyPair(CBLKeyUsages usages,
                                                          CBLTimestamp expiration,
                                                          CBLError* outError) noexcept {
     try {
-        return retain(CBLTLSIdentity::CreateIdentityWithKeyPair(usages,
-                                                                keypair,
-                                                                attributes,
-                                                                expiration));
+        return retain(CBLTLSIdentity::CreateIdentity(usages,
+                                                     keypair,
+                                                     attributes,
+                                                     expiration));
     } catchAndBridge(outError);
 }
 
-CBLTLSIdentity* CBLTLSIdentity_CreateWithKeyPairAndCerts(CBLKeyPair* keypair,
+CBLTLSIdentity* CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyPair* keypair,
                                                            CBLCert* cert,
                                                            CBLError*  outError) noexcept {
     try {
-        return retain(CBLTLSIdentity::CreateWithKeyPairAndCerts(keypair, cert));
+        return retain(CBLTLSIdentity::IdentityWithKeyPairAndCerts(keypair, cert));
     } catchAndBridge(outError);
 }
 
@@ -189,6 +189,14 @@ CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithLabel(FLString label,
         return retain(CBLTLSIdentity::IdentityWithLabel(label));
     } catchAndBridge(outError);
 }
+
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithCerts(CBLCert* cert,
+                                                               CBLError* _cbl_nullable outError) noexcept {
+    try {
+        return retain(CBLTLSIdentity::IdentityWithCerts(cert));
+    } catchAndBridge(outError);
+}
+
 #endif // #if !defined(__linux__) && !defined(__ANDROID__)
 
 #endif // #ifdef COUCHBASE_ENTERPRISE

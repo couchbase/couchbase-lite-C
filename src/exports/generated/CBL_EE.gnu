@@ -81,8 +81,9 @@ CBL_C {
 		CBLTLSIdentity_Expiration;
 		CBLTLSIdentity_CreateIdentity;
 		CBLTLSIdentity_CreateIdentityWithKeyPair;
-		CBLTLSIdentity_CreateWithKeyPairAndCerts;
 		CBLTLSIdentity_DeleteIdentityWithLabel;
+		CBLTLSIdentity_IdentityWithCerts;
+		CBLTLSIdentity_IdentityWithKeyPairAndCerts;
 		CBLTLSIdentity_IdentityWithLabel;
 		kCBLDefaultVectorIndexLazy;
 		kCBLDefaultVectorIndexDistanceMetric;

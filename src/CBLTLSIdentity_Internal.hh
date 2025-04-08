@@ -149,7 +149,7 @@ public:
 
 #ifdef TARGET_OS_IPHONE
     // Definition is in CBLTLSIdentity+Apple.mm
-    static bool StripPublicKey(C4Cert* c4cert, CBLError* _cbl_nullable error);
+    static void StripPublicKey(C4Cert* c4cert);
 #endif
 
     static Retained<C4Cert> CreateSelfSignedCert(CBLKeyUsages usages,
@@ -193,10 +193,10 @@ public:
         return csr->signRequest(issuerParams, keypair, nullptr);
     }
 
-    static CBLTLSIdentity* CreateIdentityWithKeyPair(CBLKeyUsages usages,
-                                                     CBLKeyPair* keypair,
-                                                     Dict attrs,
-                                                     CBLTimestamp exp) {
+    static CBLTLSIdentity* CreateIdentity(CBLKeyUsages usages,
+                                          CBLKeyPair* keypair,
+                                          Dict attrs,
+                                          CBLTimestamp exp) {
         if (!attrs.get(kCBLCertAttrKeyCommonName)) {
             C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, kCBLErrorMessageMissingCommonName);
         }
@@ -205,7 +205,7 @@ public:
         return new CBLTLSIdentity{keypair, new CBLCert(cert.get())};
     }
 
-    static CBLTLSIdentity* CreateWithKeyPairAndCerts(CBLKeyPair* _cbl_nullable keypair,
+    static CBLTLSIdentity* IdentityWithKeyPairAndCerts(CBLKeyPair* _cbl_nullable keypair,
                                                        CBLCert* cert) {
         return new CBLTLSIdentity{keypair, cert};
     }
@@ -265,10 +265,7 @@ public:
 #ifdef TARGET_OS_IPHONE
             // Workaround: Strip public key from the cert to avoid the keychain api
             // to get confused when finding the private key from the cert.
-            CBLError cblError {};
-            if (!StripPublicKey(c4cert, &cblError)) {
-                C4Error::raise((C4ErrorDomain)cblError.domain, cblError.code, "Couldn't remove a public key");
-            }
+            StripPublicKey(c4cert);
 #endif
             c4cert->save(false, label);
             CBL_Log(kCBLLogDomainListener, kCBLLogVerbose, "Created a self-signed identity with label=%.*s, usages=%d, expiry=%" PRId64 ", attr=%s",
@@ -332,6 +329,16 @@ public:
         Retained<C4Cert> cert = C4Cert::load(persistentLabel);
         if (!cert) return nullptr;
         else       return new CBLTLSIdentity(nullptr, new CBLCert(cert.get()));
+    }
+    
+    static CBLTLSIdentity* _cbl_nullable IdentityWithCerts(CBLCert* cert) {
+        std::scoped_lock<std::mutex> lock(_mutex);
+        
+        if (!cert->c4Cert()->loadPersistentPrivateKey()) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "No matching private key in keystore");
+        }
+        
+        return new CBLTLSIdentity(nullptr, cert);
     }
     
 #endif // #if !defined(__linux__) && !defined(__ANDROID__)
