@@ -327,6 +327,11 @@ public:
     
     static CBLTLSIdentity* _cbl_nullable IdentityWithCerts(CBLCert* cert) {
         std::scoped_lock<std::mutex> lock(_mutex);
+        
+        if (!cert->c4Cert()->loadPersistentPrivateKey()) {
+            C4Error::raise(LiteCoreDomain, kC4ErrorCrypto, "No matching private key in keystore");
+        }
+        
         return new CBLTLSIdentity(nullptr, cert);
     }
     
