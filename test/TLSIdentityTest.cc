@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "CBLTest.hh"
+#include "TLSIdentityTest.hh"
 #include "CBLPrivate.h"
 #include "fleece/Mutable.hh"
 
@@ -27,18 +27,6 @@ using namespace std::chrono;
 using namespace fleece;
 
 #ifdef COUCHBASE_ENTERPRISE
-
-class TLSIdentityTest : public CBLTest {
-public:
-
-    TLSIdentityTest() {
-        
-    }
-
-    ~TLSIdentityTest() {
-      
-    }
-};
 
 TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity", "[TSLIdentity]") {
     CBLError outError;

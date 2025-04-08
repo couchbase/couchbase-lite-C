@@ -49,6 +49,7 @@ _CBLIndexUpdater_Finish
 _CBLIndexUpdater_Value
 _CBLCollection_IsIndexTrained
 _CBLKeyPair_GenerateRSAKeyPair
+_CBLKeyPair_PublicKeyFromData
 _CBLListenerAuth_CreatePassword
 _CBLListenerAuth_CreateCertificate
 _CBLListenerAuth_Free

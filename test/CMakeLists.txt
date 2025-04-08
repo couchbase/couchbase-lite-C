@@ -59,11 +59,13 @@ elseif(APPLE)
     target_sources(
         CBL_C_Tests PRIVATE
         Platform_Apple.mm
+        TLSIdentityTest+Apple.mm
     )
     if(BUILD_ENTERPRISE)
         target_link_libraries(CBL_C_Tests PUBLIC  "-framework CoreFoundation"
                                                   "-framework CoreML"
-                                                  "-framework Vision")
+                                                  "-framework Vision"
+                                                  "-framework Security")
     endif()
 elseif(UNIX)
     target_link_libraries(CBL_C_Tests PUBLIC dl)
