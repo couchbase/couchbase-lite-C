@@ -456,7 +456,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication wit
     };
     listenerConfig.disableTLS = false;
 
-    bool anonymous = false;
     alloc_slice persistentLabel;
 
     SECTION("Self-signed Cert") {
@@ -504,14 +503,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication wit
     REQUIRE(config.authenticator);
     config.replicatorType = kCBLReplicatorTypePush;
     replicate();
-
-    if (anonymous) {
-        REQUIRE(!!persistentLabel);
-        CBLTLSIdentity* id = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
-        CHECK(id);
-        CBLTLSIdentity_Release(id);
-        CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(persistentLabel, nullptr));
-    }
 
     CBLURLEndpointListener_Stop(listener);
     CBLURLEndpointListener_Release(listener);

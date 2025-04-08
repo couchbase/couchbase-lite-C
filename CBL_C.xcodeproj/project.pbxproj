@@ -13,6 +13,7 @@
 		1B7694AC2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1B7694AB2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm */; };
 		1B7694AD2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1B7694AB2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm */; };
 		1B7694AE2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1B7694AB2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm */; };
+		1B7694B12DA49EB9006EEEAB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
 		1BC5D9602D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */; };
 		1BC5D9612D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */; };
 		1BC5D9662D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */; };
@@ -652,6 +653,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1B7694B12DA49EB9006EEEAB /* Security.framework in Frameworks */,
 				27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */,
 				27B61DB521D6EBDD0027CCDB /* libcblite.dylib in Frameworks */,
 			);
