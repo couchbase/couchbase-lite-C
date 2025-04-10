@@ -157,13 +157,27 @@ namespace cbl_internal {
                 certData = _identity->certificates()->c4Cert()->getData(false);
             enc.writeData(certData);
             alloc_slice privateKeyData;
-            // TODO/FIXME: what if the identity does not include the key? Or, if the KeyPair is
-            // constructued by external keys and callback, key-data won't be available.
-            if (_identity->privateKey()) privateKeyData = _identity->privateKey()->c4KeyPair()->getPrivateKeyData();
+            bool privateKeyIsExternal = false;
+            if ( _identity->privateKey() ) {
+                // The life of c4key is tied to _identity
+                C4KeyPair* c4Key = _identity->privateKey()->c4KeyPair();
+                privateKeyData = c4Key->getPrivateKeyData();
+                if (!privateKeyData) {
+                    privateKeyIsExternal = true;
+                    std::vector<uint8_t> data(sizeof(void*));
+                    memcpy(&data[0], &c4Key, data.size());
+                    privateKeyData = slice(&data[0], data.size());
+                }
+            }
             if ( privateKeyData ) {
                 enc.writeKey(C4STR(kC4ReplicatorAuthClientCertKey));
                 enc.writeData(privateKeyData);
+                if (privateKeyIsExternal) {
+                    enc.writeKey(C4STR(kC4ReplicatorAuthClientCertKeyIsExternal));
+                    enc.writeBool(true);
+                }
             }
+
             enc.endDict();
         }
 
