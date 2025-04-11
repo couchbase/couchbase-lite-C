@@ -23,13 +23,19 @@
 CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth) noexcept {
     try {
         return new CBLListenerAuthenticator(auth);
-    } catchAndBridge(nullptr);
+    } catchAndWarn();
 }
 
 CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth) noexcept {
     try {
         return new CBLListenerAuthenticator(auth);
-    } catchAndBridge(nullptr);
+    } catchAndWarn();
+}
+
+CBLListenerAuthenticator* CBLListenerAuth_CreateCertificateWithRootCerts(CBLCert* rootCerts) noexcept {
+    try {
+        return new CBLListenerAuthenticator(rootCerts);
+    } catchAndWarn();
 }
 
 void CBLListenerAuth_Free(CBLListenerAuthenticator* _cbl_nullable auth) noexcept {
@@ -53,7 +59,7 @@ uint16_t CBLURLEndpointListener_Port(const CBLURLEndpointListener* listener) noe
 FLMutableArray CBLURLEndpointListener_Urls(const CBLURLEndpointListener* listener) noexcept {
     try {
         return (FLMutableArray)FLValue_Retain(listener->getUrls());
-    } catchAndBridge(nullptr)
+    } catchAndWarn()
 }
 
 CBLConnectionStatus CBLURLEndpointListener_Status(const CBLURLEndpointListener* listener) noexcept {

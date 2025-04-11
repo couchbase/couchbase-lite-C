@@ -39,21 +39,29 @@ struct CBLListenerAuthenticator {
         CBLListenerCertAuthCallback     certCallback;
         void*                           callback;
     };
-    bool withCert{false};
+    
+    bool isCert{false};             // Whether the authenticator is a CertAuth
+    Retained<CBLCert> rootCerts;    // For CertAuth created with root certs
 
-    CBLListenerAuthenticator(CBLListenerPasswordAuthCallback auth)
-    : pswCallback(auth)
-    , withCert(false)
+    CBLListenerAuthenticator(CBLListenerPasswordAuthCallback callback)
+    : pswCallback(callback)
+    , isCert(false)
     {}
 
-    CBLListenerAuthenticator(CBLListenerCertAuthCallback auth)
-    : certCallback(auth)
-    , withCert(true)
+    CBLListenerAuthenticator(CBLListenerCertAuthCallback callback)
+    : certCallback(callback)
+    , isCert(true)
+    {}
+    
+    CBLListenerAuthenticator(CBLCert* cert)
+    : rootCerts(cert)
+    , isCert(true)
     {}
 
     CBLListenerAuthenticator(const CBLListenerAuthenticator& src)
     : callback(src.callback)
-    , withCert(src.withCert)
+    , rootCerts(src.rootCerts)
+    , isCert(src.isCert)
     {}
 };
 
@@ -65,7 +73,7 @@ public:
         if (conf.collectionCount == 0) {
             C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "No collections in CBLURLEndpointListenerConfiguration");
         }
-        if (_conf.authenticator && _conf.authenticator->withCert) {
+        if (_conf.authenticator && _conf.authenticator->isCert) {
             if (_conf.disableTLS)
                 C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "TLS must be enabled to use the cert authenticator");
         }

@@ -43,8 +43,13 @@ typedef bool (*CBLListenerCertAuthCallback) (
     FLSlice cert                ///< Certificate data
 );
 
-/** Creates a certificate authenticator for verifying client certificate when the TLS client certificate authentication is used. */
+/** Creates a certificate authenticator for verifying client certificate with the specified authentication callback
+    when the TLS client certificate authentication is used. */
 _cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth) CBLAPI;
+
+/** Creates a certificate authenticator for verifying client certificate with the specified root certificates to trust
+    when the TLS client certificate authentication is used. */
+_cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreateCertificateWithRootCerts(CBLCert* rootCerts) CBLAPI;
 
 /** Frees a CBLListenerAuthenticator object. */
 void CBLListenerAuth_Free(CBLListenerAuthenticator* _cbl_nullable) CBLAPI;

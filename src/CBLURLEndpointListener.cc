@@ -65,15 +65,20 @@ void CBLURLEndpointListener::start() {
     }
 
     if (_conf.authenticator) {
-        if (_conf.authenticator->withCert) {
+        if (_conf.authenticator->isCert) {
             // certificate
             // Pre-condition: !_conf.disableTLS
             tls.requireClientCerts = true;
-            tls.tlsCallbackContext = this;
-            tls.certAuthCallback = [](C4Listener *listener, C4Slice clientCertData, void *context) -> bool {
-                auto me = reinterpret_cast<CBLURLEndpointListener*>(context);
-                return me->_conf.authenticator->certCallback(me->_conf.context, clientCertData);
-            };
+            if (_conf.authenticator->certCallback) {
+                tls.tlsCallbackContext = this;
+                tls.certAuthCallback = [](C4Listener *listener, C4Slice clientCertData, void *context) -> bool {
+                    auto me = reinterpret_cast<CBLURLEndpointListener*>(context);
+                    return me->_conf.authenticator->certCallback(me->_conf.context, clientCertData);
+                };
+            } else {
+                assert(_conf.authenticator->rootCerts);
+                tls.rootClientCerts = _conf.authenticator->rootCerts->c4Cert();
+            }
         } else {
             // user/password
             c4config.httpAuthCallback = [](C4Listener* listener, C4Slice authHeader, void* context) -> bool {
