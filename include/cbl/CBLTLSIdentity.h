@@ -164,7 +164,7 @@ typedef CBL_ENUM(int, CBLSignatureDigestAlgorithm) {
     kCBLSignatureDigestRIPEMD160,  ///< RIPEMD-160 message digest.
 };
 
-/** Callbacks used to create a key pair for performing cryptographic operations required by TLS.
+/** Callbacks for a key pair to perform cryptographic operations for certificate signing and TLS handshake process.
     The core idea is that all operations involving the private key are executed within secure key storage,
     ensuring the private key is never exposed outside the storage. */
 typedef struct CBLKeyPairCallbacks {
@@ -177,26 +177,29 @@ typedef struct CBLKeyPairCallbacks {
     bool (*publicKeyData)(void* context, void* output, size_t outputMaxLen, size_t* outputLen);
     
     /** Decrypts the input data using the private key, applying the RSA algorithm with PKCS#1 v1.5 padding.
-        In many cryptographic libraries, this is referred to as “RSA/ECB/PKCS1Padding.
+        In some cryptographic libraries, this is referred to as “RSA/ECB/PKCS1Padding.
         @param context  The context given to CBLKeyPair_CreateWithCallbacks.
         @param input  The encrypted data (size is always equal to the key size.)
         @param output  Where to write the decrypted data.
         @param outputMaxLen  Maximum length of output that can be written.
         @param outputLen  Store the length of the output here before returning.
-        @return True on success, false on failure. */
+        @return True on success, false on failure.
+        @note Depending on the selected key exchange method, the decrypt() function may not be invoked
+              during the TLS handshake.
+     */
     bool (*decrypt)(void* context, FLSlice input, void* output, size_t outputMaxLen, size_t* outputLen);
     
     /** Generates a signature for the input data using the private key and the PKCS#1 v1.5 padding algorithm.
-        Ensure that the input data is hashed using the specified digestAlgorithm and encoded as an ASN.1
-        DigestInfo structure in DER format before performing the signature operation.
-        @Note Some cryptographic libraries may handle the hashing and formatting internally.
+        Ensure that the input data, which is already hashed based on the specified digest algorithm, is encoded as
+        an ASN.1 DigestInfo structure in DER format before performing the signing operation. Some cryptographic
+        libraries may handle the DigestInfo formatting internally.
         @param context  The context given to CBLKeyPair_CreateWithCallbacks.
         @param digestAlgorithm  Indicates what type of digest to create the signature from.
-        @param inputData  The data to be signed.
+        @param inputData The data to be signed.
         @param outSignature  Write the signature here; length must be equal to the key size.
         @return True on success, false on failure.
-        @note The data in inputData is already hashed and DOES NOT need to be hashed by the caller.  The
-              algorithm is provided as a reference for what was used to perform the hashing. */
+        @note The data in inputData is already hashed and DOES NOT need to be hashed by the caller.
+              The algorithm is provided as a reference for what was used to perform the hashing. */
     bool (*sign)(void* context, CBLSignatureDigestAlgorithm digestAlgorithm, FLSlice inputData, void* outSignature);
     
     /** Called when the CBLKeyPair is released and the callback is no longer needed, so that
@@ -205,7 +208,7 @@ typedef struct CBLKeyPairCallbacks {
     void (*_cbl_nullable free)(void* context);
 } CBLKeyPairCallbacks;
 
-/** Returns an RSA Key pair using the provide keypair callbacks.
+/** Returns an RSA Key pair using the provided callbacks.
     @param context A user-defined context pointer that will be passed to each callback.
     @param keySizeInBits The size of the RSA key in bits (e.g., 2048 or 4096).
     @param callbacks A set of callback functions used to perform cryptographic operations with the key pair.
