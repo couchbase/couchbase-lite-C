@@ -178,8 +178,10 @@ public:
 #endif
 
         // Encode replicator options dict:
-        alloc_slice options = encodeOptions();
+        C4KeyPair* externalKey = nullptr;
+        alloc_slice options = encodeOptions(&externalKey);
         params.optionsDictFleece = options;
+        params.externalKey = externalKey;
         
         // Generate replicator id for logging purpose:
         std::stringstream ss;
@@ -302,10 +304,13 @@ private:
         }
     };
     
-    alloc_slice encodeOptions() {
+    alloc_slice encodeOptions(C4KeyPair* _cbl_nonnull * _cbl_nonnull outExternalKey) {
         Encoder enc;
         enc.beginDict();
         _conf.writeOptions(enc);
+        if (_conf.authenticator) {
+            _conf.authenticator->writeOptions(enc, outExternalKey);
+        }
         enc.endDict();
         return enc.finish();
     }
