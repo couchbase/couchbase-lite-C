@@ -41,6 +41,7 @@ CBL_C {
 		CBLKeyPair_PublicKeyFromData;
 		CBLListenerAuth_CreatePassword;
 		CBLListenerAuth_CreateCertificate;
+		CBLListenerAuth_CreateCertificateWithRootCerts;
 		CBLListenerAuth_Free;
 		CBLURLEndpointListener_Create;
 		CBLURLEndpointListener_Config;
