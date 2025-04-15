@@ -138,9 +138,9 @@ FLSliceResult CBLCert_SubjectNameComponent(CBLCert* cert, FLString attributeKey)
     @param cert  The certificate.
     @param outCreated  On return, the date/time the cert became valid (was signed).
     @param outExpires  On return, the date/time at which the certificate expires. */
-void CBLCert_getValidTimespan(CBLCert* cert,
-                             CBLTimestamp* _cbl_nullable outCreated,
-                             CBLTimestamp* _cbl_nullable outExpires) CBLAPI;
+void CBLCert_ValidTimespan(CBLCert* cert,
+                           CBLTimestamp* _cbl_nullable outCreated,
+                           CBLTimestamp* _cbl_nullable outExpires) CBLAPI;
 
 /** Returns a certificate's public key.
     @note You are responsible for releasing the returned key reference. */

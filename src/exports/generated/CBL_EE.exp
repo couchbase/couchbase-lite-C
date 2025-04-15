@@ -87,7 +87,7 @@ _CBLCert_CertNextInChain
 _CBLCert_Data
 _CBLCert_SubjectName
 _CBLCert_SubjectNameComponent
-_CBLCert_getValidTimespan
+_CBLCert_ValidTimespan
 _CBLCert_PublicKey
 _CBLTLSIdentity_Certificates
 _CBLTLSIdentity_Expiration
