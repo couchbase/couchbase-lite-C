@@ -76,7 +76,7 @@ CBL_C {
 		CBLCert_Data;
 		CBLCert_SubjectName;
 		CBLCert_SubjectNameComponent;
-		CBLCert_getValidTimespan;
+		CBLCert_ValidTimespan;
 		CBLCert_PublicKey;
 		CBLTLSIdentity_Certificates;
 		CBLTLSIdentity_Expiration;

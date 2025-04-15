@@ -119,9 +119,9 @@ FLSliceResult CBLCert_SubjectNameComponent(CBLCert* cert, FLString attributeKey)
     } catchAndBridge(nullptr);
 }
 
-void CBLCert_getValidTimespan(CBLCert* cert,
-                              CBLTimestamp* outCreated,
-                              CBLTimestamp* outExpires) noexcept {
+void CBLCert_ValidTimespan(CBLCert* cert,
+                           CBLTimestamp* outCreated,
+                           CBLTimestamp* outExpires) noexcept {
     try {
         cert->getValidTimespan(outCreated, outExpires);
     } catchAndWarnNoReturn();
