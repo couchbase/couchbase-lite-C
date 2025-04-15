@@ -104,16 +104,18 @@ void CBLURLEndpointListener::start() {
         }
     }
 
+    CBLDatabase* db = _conf.collections[0]->database();
+    bool succ = true;
+    
     std::unique_ptr<C4Listener> c4listener{new C4Listener(c4config)};
     auto ret = [&](bool succ) {
         if (succ) {
+            db->registerService(this, [this] { stop(); });
             _c4listener = c4listener.release();
         }
     };
-
-    CBLDatabase* cblDb = _conf.collections[0]->database();
-    bool succ = true;
-    cblDb->c4db()->useLocked([&](C4Database* db) {
+    
+    db->c4db()->useLocked([&](C4Database* db) {
         slice dbname = db->getName();
         if ( (succ = c4listener->shareDB(dbname, db)) ) {
             for (unsigned i = 0; i < _conf.collectionCount; ++i) {
@@ -131,6 +133,9 @@ void CBLURLEndpointListener::start() {
 void CBLURLEndpointListener::stop() {
     std::scoped_lock lock(_mutex);
     if (_c4listener) {
+        CBLDatabase* db = _conf.collections[0]->database();
+        db->unregisterService(this);
+        
         delete _c4listener;
         _c4listener = nullptr;
     }

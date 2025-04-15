@@ -215,8 +215,6 @@ public:
         
         _c4status = _c4repl->getStatus();
         _useInitialStatus = true;
-        
-        _stoppable = make_unique<CBLReplicatorStoppable>(this);
     }
     
     CBLCollection* _cbl_nullable defaultCollection() {
@@ -235,10 +233,9 @@ public:
 
     void start(bool reset) {
         LOCK(_mutex);
-        _retainSelf = this;     // keep myself from being freed until the replicator stops
         _useInitialStatus = false;
         
-        if (_db->registerStoppable(_stoppable.get())) {
+        if (_db->registerService(this, [this] { stop(); })) {
             SyncLog(Info, "%s Starting", desc().c_str());
             _c4repl->start(reset);
         } else
@@ -296,17 +293,6 @@ public:
     }
 
 private:
-    
-    struct CBLReplicatorStoppable : CBLStoppable {
-    public:
-        CBLReplicatorStoppable(CBLReplicator* r)
-        :CBLStoppable(r)
-        {}
-        
-        void stop() const override {
-            ((CBLReplicator*)_ref)->stop();
-        }
-    };
     
     alloc_slice encodeOptions(C4KeyPair* _cbl_nullable * _cbl_nullable outExternalKey) {
         Encoder enc;
@@ -368,8 +354,7 @@ private:
         }
 
         if (cblStatus.activity == kCBLReplicatorStopped) {
-            _db->unregisterStoppable(_stoppable.get());
-            _retainSelf = nullptr;  // Undoes the retain in `start`; now I can be freed
+            _db->unregisterService(this);
         }
     }
 
@@ -527,11 +512,9 @@ private:
     Retained<C4Replicator>                      _c4repl;
     string                                      _replID;
     string                                      _desc;
-    unique_ptr<CBLReplicatorStoppable>          _stoppable;
     ReplicationCollectionsMap                   _collections;       // For filters and conflict resolver
     bool                                        _useInitialStatus;  // For returning status before first start
     C4ReplicatorStatus                          _c4status {kC4Stopped};
-    Retained<CBLReplicator>                     _retainSelf;
     int                                         _activeConflictResolvers {0};
     Listeners<CBLReplicatorChangeListener>      _changeListeners;
     Listeners<CBLDocumentReplicationListener>   _docListeners;

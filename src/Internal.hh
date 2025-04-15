@@ -25,6 +25,7 @@
 #include "fleece/Fleece.hh"
 #include "fleece/RefCounted.hh"
 #include "fleece/InstanceCounted.hh"
+#include <functional>
 
 CBL_ASSUME_NONNULL_BEGIN
 
@@ -44,26 +45,33 @@ protected:
 };
 
 
-/** CBLStoppable objects can be registered / unregisted to / from the database. The registered object will be called
+/** CBLActiveService objects can be registered / unregisted to / from the database. The registered object will be called
     to stop() when the database is closed. The object will be unregistered either after the object is called to stop() or
     when there is an API call to unregister the object. The database will also retain the object when the object is registered,
     and will release the object when the object is unregistered to ensure that the object is alive until the object is unregistered. */
-struct CBLStoppable {
-public:
-    CBLStoppable(CBLRefCounted* ref)
-    :_ref(ref)
-    {}
+struct CBLActiveService {
+    CBLActiveService(CBLRefCounted* ref, std::function<void()> stopFn)
+    : _ref(ref), _stopFn(std::move(stopFn)) {}
+
+    void stop() const                                       { if (_stopFn) _stopFn(); }
     
-    virtual ~CBLStoppable()                             =default;
-    virtual void stop() const                           =0;
-    
-    void retain()                                       {fleece::retain(_ref);}
-    void release()                                      {fleece::release(_ref);}
+    bool operator==(const CBLActiveService& other) const    { return _ref.get() == other._ref.get(); }
     
 protected:
-    CBLRefCounted* _ref;
+    friend struct std::hash<CBLActiveService>;
+    
+    fleece::Retained<CBLRefCounted> _ref;                   // Retain the underlining service
+    std::function<void()> _stopFn;
 };
 
+namespace std {
+    template<>
+    struct hash<CBLActiveService> {
+        size_t operator()(const CBLActiveService& s) const {
+            return std::hash<const void*>()(s._ref.get());  // Hash with the pointer address
+        }
+    };
+}
 
 namespace cbl_internal {
     // Converting C4Error <--> CBLError

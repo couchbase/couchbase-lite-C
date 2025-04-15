@@ -102,7 +102,7 @@ CBLDatabase::~CBLDatabase() {
 
 
 void CBLDatabase::close() {
-    stopActiveStoppables();
+    stopActiveService();
     
     try {
         auto db = _c4db->useLocked();
@@ -118,7 +118,7 @@ void CBLDatabase::close() {
 
 
 void CBLDatabase::closeAndDelete() {
-    stopActiveStoppables();
+    stopActiveService();
     
     auto db = _c4db->useLocked();
     db->closeAndDeleteFile();
