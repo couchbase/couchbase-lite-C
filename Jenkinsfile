@@ -24,7 +24,7 @@ pipeline {
                     }
                     steps {
                         sh 'jenkins/jenkins_ios.sh'
-                        sh 'scripts/coverage_macos.sh --push'
+                        sh 'couchbase-lite-c/scripts/coverage_macos.sh --push'
                     }
                 }
                 stage("Linux") {

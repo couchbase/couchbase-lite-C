@@ -16,9 +16,9 @@
 // limitations under the License.
 //
 
-#include "CBLURLEndpointListener_Internal.hh"
-
 #ifdef COUCHBASE_ENTERPRISE
+
+#include "CBLURLEndpointListener_Internal.hh"
 
 CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth) noexcept {
     try {

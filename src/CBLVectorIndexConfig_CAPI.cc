@@ -16,12 +16,11 @@
 // limitations under the License.
 //
 
+#ifdef COUCHBASE_ENTERPRISE
 
 #include "CBLQueryIndexTypes.h"
 #include "CBLVectorIndexConfig.hh"
 #include "Internal.hh"
-
-#ifdef COUCHBASE_ENTERPRISE
 
 CBLVectorEncoding* CBLVectorEncoding_CreateNone() noexcept {
     try {
