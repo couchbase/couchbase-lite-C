@@ -17,12 +17,29 @@ else
     BRANCH=$CHANGE_TARGET
 fi
 
+echo "BRANCH: ${BRANCH}"
+echo "BRANCH_NAME: ${BRANCH_NAME}"
+
+# Update couchbase-lite-c submodule
 git submodule update --init --recursive
-pushd vendor
-rm -rf couchbase-lite-c-ee couchbase-lite-core-EE
+
+# Move everyting into couchbase-lite-c directory
+shopt -s extglob dotglob 
+mkdir couchbase-lite-c
+mv !(couchbase-lite-c) couchbase-lite-c
+
+# Get couchbase-lite-c-ee
 git clone ssh://git@github.com/couchbase/couchbase-lite-c-ee --branch $BRANCH_NAME --recursive --depth 1 couchbase-lite-c-ee || \
     git clone ssh://git@github.com/couchbase/couchbase-lite-c-ee --branch $BRANCH --recursive --depth 1 couchbase-lite-c-ee
-mv couchbase-lite-c-ee/couchbase-lite-core-EE .
-popd
 
+# Update couchbase-lite-c submodule
+pushd couchbase-lite-c  > /dev/null
+git submodule update --init --recursive
+
+# Link LiteCore EE
+pushd vendor  > /dev/null
+ln -s ../../couchbase-lite-c-ee/couchbase-lite-core-EE couchbase-lite-core-EE
+popd   > /dev/null
+
+# Build Framework
 xcodebuild -project CBL_C.xcodeproj -configuration Debug-EE -derivedDataPath ios -scheme "CBL_C Framework" -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO

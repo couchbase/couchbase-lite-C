@@ -16,10 +16,11 @@
 // limitations under the License.
 //
 
+#include "CBL_Edition.h"
+#ifdef COUCHBASE_ENTERPRISE
+
 #include "CBLTLSIdentity_Internal.hh"
 #include "CBLPrivate.h"
-
-#ifdef COUCHBASE_ENTERPRISE
 
 #pragma mark - CONSTANTS
 

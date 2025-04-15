@@ -21,7 +21,11 @@
 #include "CBLReplicator.h"
 #include "CBLDatabase_Internal.hh"
 #include "CBLCollection_Internal.hh"
+
+#ifdef COUCHBASE_ENTERPRISE
 #include "CBLTLSIdentity_Internal.hh"
+#endif
+
 #include "CBLUserAgent.hh"
 #include "Internal.hh"
 #include "c4ReplicatorTypes.h"

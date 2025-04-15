@@ -95,20 +95,6 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
 
 add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
 
-### SOURCE FILES:
-
-include_directories(
-    "vendor/couchbase-lite-core/C/include"
-    "vendor/couchbase-lite-core/C/Cpp_include"
-    "vendor/couchbase-lite-core/LiteCore/Support"
-    "vendor/couchbase-lite-core/vendor/fleece/API"
-    "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support"
-)
-
-if(!MSVC)
-    set_source_files_properties(${C_SRC} PROPERTIES COMPILE_FLAGS -Wno-return-type-c-linkage)
-endif()
-
 ### BUILDING THE LIBRARY:
 
 set_platform_source_files(RESULT PLATFORM_SRC)
@@ -137,7 +123,7 @@ set(
     src/CBLScope.cc
     src/CBLScope_CAPI.cc
     src/CBLTLSIdentity_CAPI.cc
-    src/CBLURLEndpointListener.cc
+    src/CBLURLEndpointListener_stub.cc
     src/CBLURLEndpointListener_CAPI.cc
     src/CBLVectorIndexConfig_CAPI.cc
     src/ConflictResolver.cc
@@ -161,14 +147,15 @@ target_include_directories(
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/cbl
     src
-    vendor/couchbase-lite-core/C
-    ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
+    $<$<BOOL:${BUILD_ENTERPRISE}>:${CMAKE_CURRENT_SOURCE_DIR}/../couchbase-lite-c-ee/src>
     ${PLATFORM_INCLUDE}
-)
-
-target_link_libraries(
-    cblite-static INTERFACE
-    LiteCoreStatic
+    ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
+    vendor/couchbase-lite-core/C
+    vendor/couchbase-lite-core/C/include
+    vendor/couchbase-lite-core/C/Cpp_include
+    vendor/couchbase-lite-core/LiteCore/Support
+    vendor/couchbase-lite-core/vendor/fleece/API
+    vendor/couchbase-lite-core/vendor/fleece/Fleece/Support
 )
 
 file(WRITE empty.cpp)
@@ -179,15 +166,6 @@ target_include_directories(
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated_headers/public/cbl/>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/couchbase-lite-core/vendor/fleece/API/>
     $<INSTALL_INTERFACE:include/>
-)
-
-target_include_directories(
-    cblite
-    PRIVATE
-    src
-    vendor/couchbase-lite-core/C
-    ${PROJECT_BINARY_DIR}/generated_headers/private/cbl
-    ${PLATFORM_INCLUDE}
 )
 
 set(CBL_LIBRARIES_PRIVATE
