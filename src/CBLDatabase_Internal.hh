@@ -30,6 +30,7 @@
 #include "access_lock.hh"
 #include "fleece/function_ref.hh"
 #include "fleece/Mutable.hh"
+#include "fleece/RefCounted.hh"
 #include <condition_variable>
 #include <string>
 #include <utility>
@@ -351,48 +352,40 @@ private:
 
     void callDocListeners();
     
-    void stopActiveStoppables() {
-        std::unordered_set<CBLStoppable*> stoppables;
+    void stopActiveService() {
+        std::unordered_set<CBLActiveService> services;
         {
             std::lock_guard<std::mutex> lock(_stopMutex);
             if (_stopping)
                 return;
             _stopping = true;
-            stoppables = _stoppables;
+            services = _services;
         }
-        
+
         // Call stop outside lock to prevent deadlock:
-        for (auto s : stoppables) {
-            s->stop();
+        for (const auto& s : services) {
+            s.stop();
         }
         
         std::unique_lock<std::mutex> lock(_stopMutex);
-        if (!_stoppables.empty()) {
+        if (!_services.empty()) {
             CBL_Log(kCBLLogDomainDatabase, kCBLLogInfo,
                     "Waiting for %zu active replicators and live queries to stop ...",
-                    _stoppables.size());
-            _stopCond.wait(lock, [this] {return _stoppables.empty();});
+                    _services.size());
+            _stopCond.wait(lock, [this] { return _services.empty(); });
         }
     }
     
-    bool registerStoppable(CBLStoppable* stoppable) {
+    bool registerService(CBLRefCounted* ref, std::function<void()> stopFn) {
         LOCK(_stopMutex);
-        if (_stopping)
-            return false;
-        
-        if (_stoppables.find(stoppable) == _stoppables.end()) {
-            _stoppables.insert(stoppable);
-            stoppable->retain();
-        }
-        
+        if (_stopping) { return false; }
+        _services.emplace(ref, std::move(stopFn));
         return true;
     }
     
-    void unregisterStoppable(CBLStoppable* stoppable) {
+    void unregisterService(CBLRefCounted* ref) {
         LOCK(_stopMutex);
-        if (_stoppables.erase(stoppable) > 0) {
-            stoppable->release();
-        }
+        _services.erase(CBLActiveService{ref, nullptr});
         _stopCond.notify_one();
     }
 
@@ -414,11 +407,11 @@ private:
     // For sending notifications:
     NotificationQueue                           _notificationQueue;
     
-    // For Active Stoppables:
+    // For Active Services:
     bool                                        _stopping {false};
     mutable std::mutex                          _stopMutex;
     std::condition_variable                     _stopCond;
-    std::unordered_set<CBLStoppable*>           _stoppables;
+    std::unordered_set<CBLActiveService>        _services;
 };
 
 CBL_ASSUME_NONNULL_END
