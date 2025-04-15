@@ -178,10 +178,14 @@ public:
 #endif
 
         // Encode replicator options dict:
+#ifdef COUCHBASE_ENTERPRISE
         C4KeyPair* externalKey = nullptr;
         alloc_slice options = encodeOptions(&externalKey);
-        params.optionsDictFleece = options;
         params.externalKey = externalKey;
+#else
+        alloc_slice options = encodeOptions(nullptr);
+#endif
+        params.optionsDictFleece = options;
         
         // Generate replicator id for logging purpose:
         std::stringstream ss;
@@ -304,7 +308,7 @@ private:
         }
     };
     
-    alloc_slice encodeOptions(C4KeyPair* _cbl_nonnull * _cbl_nonnull outExternalKey) {
+    alloc_slice encodeOptions(C4KeyPair* _cbl_nullable * _cbl_nullable outExternalKey) {
         Encoder enc;
         enc.beginDict();
         _conf.writeOptions(enc);

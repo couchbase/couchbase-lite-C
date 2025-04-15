@@ -147,7 +147,7 @@ namespace cbl_internal {
         : _identity(identity)
         { }
 
-        virtual void writeOptions(Encoder &enc, C4KeyPair* _cbl_nonnull * _cbl_nullable outExternalKey) override {
+        virtual void writeOptions(Encoder &enc, C4KeyPair* _cbl_nullable * _cbl_nullable outExternalKey) override {
             enc.writeKey(slice(kC4ReplicatorOptionAuthentication));
             enc.beginDict();
             enc[slice(kC4ReplicatorAuthType)] = kC4AuthTypeClientCert;
@@ -158,6 +158,7 @@ namespace cbl_internal {
             enc.writeData(certData);
             alloc_slice privateKeyData;
             C4KeyPair* privateKey = _identity->privateKey()->c4KeyPair();
+            if (outExternalKey) *outExternalKey = nullptr;
             if ( privateKey ) {
                 // The life of privateKey is tied to _identity
                 privateKeyData = privateKey->getPrivateKeyData();
@@ -165,8 +166,6 @@ namespace cbl_internal {
                     enc.writeKey(C4STR(kC4ReplicatorAuthClientCertKey));
                     enc.writeData(privateKeyData);
                 } else {
-                    enc.writeKey(C4STR(kC4ReplicatorAuthClientCertKeyIsExternal));
-                    enc.writeBool(true);
                     if (outExternalKey) *outExternalKey = privateKey;
                 }
             }
