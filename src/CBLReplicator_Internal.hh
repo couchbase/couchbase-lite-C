@@ -178,7 +178,13 @@ public:
 #endif
 
         // Encode replicator options dict:
-        alloc_slice options = encodeOptions();
+#ifdef COUCHBASE_ENTERPRISE
+        C4KeyPair* externalKey = nullptr;
+        alloc_slice options = encodeOptions(&externalKey);
+        params.externalKey = externalKey;
+#else
+        alloc_slice options = encodeOptions(nullptr);
+#endif
         params.optionsDictFleece = options;
         
         // Generate replicator id for logging purpose:
@@ -302,10 +308,13 @@ private:
         }
     };
     
-    alloc_slice encodeOptions() {
+    alloc_slice encodeOptions(C4KeyPair* _cbl_nullable * _cbl_nullable outExternalKey) {
         Encoder enc;
         enc.beginDict();
         _conf.writeOptions(enc);
+        if (_conf.authenticator) {
+            _conf.authenticator->writeOptions(enc, outExternalKey);
+        }
         enc.endDict();
         return enc.finish();
     }

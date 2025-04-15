@@ -117,15 +117,11 @@ public:
             keypair.reset(CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr));
         } else {
 #ifdef __APPLE__
-            if (isServer)
-                keypair.reset(CBLKeyPair_CreateWithCallbacks(TLSIdentityTest::ExternalKey::generateRSA(2048),
-                                                             2048,
-                                                             CBLKeyPairCallbacks{
-                    kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
-                                                             nullptr));
-            else
-                // TBD, pending CBL-6903
-                keypair.reset(CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr));
+            keypair.reset(CBLKeyPair_CreateWithCallbacks(TLSIdentityTest::ExternalKey::generateRSA(2048),
+                                                         2048,
+                                                         CBLKeyPairCallbacks{
+                kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
+                                                         nullptr));
 #else
             return nullptr;
 #endif
@@ -442,7 +438,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
 
 #ifdef __APPLE__
 TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication with External KeyPair", "[URLListener]") {
-    constexpr bool withExternalKey = true;
 
     struct Context {
         int rand = 6801;
@@ -456,11 +451,25 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication wit
     };
     listenerConfig.disableTLS = false;
 
-    alloc_slice persistentLabel;
+    CBLTLSIdentity* clientIdentity = nullptr;
 
-    SECTION("Self-signed Cert") {
-        listenerConfig.tlsIdentity = createTLSIdentity(true, withExternalKey);
+    SECTION("Server External KeyPair") {
+        listenerConfig.tlsIdentity = createTLSIdentity(true, true);
+        clientIdentity = createTLSIdentity(false, false);
     }
+
+    SECTION("Client External KeyPair") {
+        listenerConfig.tlsIdentity = createTLSIdentity(true, false);
+        clientIdentity = createTLSIdentity(false, true);
+    }
+
+    SECTION("Server & Client External KeyPairs") {
+        listenerConfig.tlsIdentity = createTLSIdentity(true, true);
+        clientIdentity = createTLSIdentity(false, true);
+    }
+
+    REQUIRE(listenerConfig.tlsIdentity);
+    REQUIRE(clientIdentity);
 
     listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, FLSlice certData) {
         auto context = reinterpret_cast<Context*>(ctx);
@@ -491,14 +500,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication wit
     CBLError error {};
     CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, &error);
     REQUIRE(listener);
-    
+
     CHECK(CBLURLEndpointListener_Start(listener, &error));
 
     config.endpoint = clientEndpoint(listener, &error);
     REQUIRE(config.endpoint);
 
-    CBLTLSIdentity* clientIdentity = createTLSIdentity(false, withExternalKey);
-    REQUIRE(clientIdentity);
     config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
     REQUIRE(config.authenticator);
     config.replicatorType = kCBLReplicatorTypePush;
@@ -507,9 +514,8 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication wit
     CBLURLEndpointListener_Stop(listener);
     CBLURLEndpointListener_Release(listener);
     CBLTLSIdentity_Release(clientIdentity);
-    if (listenerConfig.authenticator) CBLListenerAuth_Free(listenerConfig.authenticator);
-    if (listenerConfig.tlsIdentity)
-        CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
+    CBLListenerAuth_Free(listenerConfig.authenticator);
+    CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
 }
 #endif // #ifdef __APPLE__
 
