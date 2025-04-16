@@ -55,7 +55,7 @@ const std::vector<C4LogDomain>& CBLLogSinks::c4LogDomains() {
             kC4SyncLog,
             kC4WebSocketLog
         };
-        static C4LogDomain listenerDomain = c4log_getDomain("Listener", true);
+        C4LogDomain listenerDomain = c4log_getDomain("Listener", true);
         vec.push_back(listenerDomain);
         return vec;
     }();
@@ -206,7 +206,8 @@ void CBLLogSinks::updateLogLevels() {
     C4LogLevel c4LogLevel = C4LogLevel(domainsLogLevel);
     
     if (_sDomainsLogLevel.load() != domainsLogLevel) {
-        for (C4LogDomain domain : c4LogDomains()) {
+        auto domains = c4LogDomains();
+        for (C4LogDomain domain : domains) {
             c4log_setLevel(domain, c4LogLevel);
         }
 
