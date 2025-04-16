@@ -18,9 +18,10 @@
 
 #pragma once
 #include "CBLBase.h"
-#include "CBLTLSIdentity.h"
 
 #ifdef COUCHBASE_ENTERPRISE
+
+#include "CBLTLSIdentity.h"
 
 CBL_CAPI_BEGIN
 

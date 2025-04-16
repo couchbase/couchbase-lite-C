@@ -17,7 +17,6 @@
 //
 
 #pragma once
-
 #include "CBLBase.h"
 
 #ifdef COUCHBASE_ENTERPRISE
