@@ -24,6 +24,7 @@
 #include <atomic>
 #include <shared_mutex>
 #include <unordered_map>
+#include <vector>
 
 class CBLLogSinks {
 public:
@@ -66,6 +67,9 @@ private:
     static CBLFileLogSink _sFileSink;
     
     static std::shared_mutex _sMutex;
+    
+    static const std::vector<C4LogDomain>& c4LogDomains();
+    static C4LogDomain toC4LogDomain(CBLLogDomain);
     
     static void _setConsoleLogSink(const CBLConsoleLogSink&);
     static void _setCustomLogSink(const CBLCustomLogSink&);
