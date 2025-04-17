@@ -155,7 +155,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Basics", "[URLListener]") {
     createNumberedDocsWithPrefix(cy[1], 20, "doc2");
 
     CBLURLEndpointListenerConfiguration listenerConfig {
-        nullptr, // context
         cy.data(),
         2,
         0
@@ -221,7 +220,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with OneShot Replication", "
     CBLError error {};
 
     CBLURLEndpointListenerConfiguration listenerConfig {
-        nullptr, // context
         cy.data(),
         2,
         0
@@ -279,7 +277,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
     static constexpr slice kPassword{"frank"};
 
     CBLURLEndpointListenerConfiguration listenerConfig {
-        &context, // context
         cy.data(),
         2,
         0         // port
@@ -291,7 +288,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
             auto context = reinterpret_cast<Context*>(ctx);
             CHECK(context-> rand  == 6801);
             return usr == kUser && psw == kPassword;
-        });
+        }, &context);
         expectedDocumentCount = 20;
     }
 
@@ -300,7 +297,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
             auto context = reinterpret_cast<Context*>(ctx);
             CHECK(context-> rand  == 6801);
             return usr == "InvalidUser"_sl && psw == kPassword;
-        });
+        }, &context);
         expectedError.code = 401;
     }
 
@@ -309,7 +306,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Basic Authentication", 
             auto context = reinterpret_cast<Context*>(ctx);
             CHECK(context-> rand  == 6801);
             return usr == kUser && psw == "InvalidPassword"_sl;
-        });
+        }, &context);
         expectedError.code = 401;
     }
 
@@ -349,7 +346,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
     } context;
 
     CBLURLEndpointListenerConfiguration listenerConfig {
-        &context, // context
         cy.data(),
         2,
         0         // port
@@ -376,20 +372,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
 #endif
     }
 
-    listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, FLSlice certData) {
+    listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, CBLCert* cert) {
         auto context = reinterpret_cast<Context*>(ctx);
         CHECK(context->rand  == 6801);
-        CBLError error;
-        CBLCert* cert = CBLCert_CreateWithData(certData, &error);
-        if (!cert) {
-            CBL_Log(kCBLLogDomainReplicator, kCBLLogError,
-                    "CBLCert_CertFromData failed with code %d", error.code);
-            return false;
-        }
         alloc_slice sname = CBLCert_SubjectName(cert);
-        CBLCert_Release(cert);
         return sname == slice("CN=URLEndpointListener_Client");
-    });
+    }, &context);
     config.acceptOnlySelfSignedServerCertificate = true;
     expectedDocumentCount = 20;
 
@@ -438,13 +426,11 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
 
 #ifdef __APPLE__
 TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication with External KeyPair", "[URLListener]") {
-
     struct Context {
         int rand = 6801;
     } context;
     
     CBLURLEndpointListenerConfiguration listenerConfig {
-        &context, // context
         cy.data(),
         2,
         0         // port
@@ -471,20 +457,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication wit
     REQUIRE(listenerConfig.tlsIdentity);
     REQUIRE(clientIdentity);
 
-    listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, FLSlice certData) {
+    listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, CBLCert* cert) {
         auto context = reinterpret_cast<Context*>(ctx);
         CHECK(context->rand  == 6801);
-        CBLError error;
-        CBLCert* cert = CBLCert_CreateWithData(certData, &error);
-        if (!cert) {
-            CBL_Log(kCBLLogDomainReplicator, kCBLLogError,
-                    "CBLCert_CertFromData failed with code %d", error.code);
-            return false;
-        }
         alloc_slice sname = CBLCert_SubjectName(cert);
-        CBLCert_Release(cert);
         return sname == slice("CN=URLEndpointListener_Client");
-    });
+    }, &context);
     config.acceptOnlySelfSignedServerCertificate = true;
     expectedDocumentCount = 20;
 
