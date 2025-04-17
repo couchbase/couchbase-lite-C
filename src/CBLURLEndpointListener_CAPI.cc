@@ -20,15 +20,15 @@
 
 #include "CBLURLEndpointListener_Internal.hh"
 
-CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth) noexcept {
+CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth, void* context) noexcept {
     try {
-        return new CBLListenerAuthenticator(auth);
+        return new CBLListenerAuthenticator(auth, context);
     } catchAndWarn();
 }
 
-CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth) noexcept {
+CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth, void* context) noexcept {
     try {
-        return new CBLListenerAuthenticator(auth);
+        return new CBLListenerAuthenticator(auth, context);
     } catchAndWarn();
 }
 

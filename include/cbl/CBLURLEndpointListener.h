@@ -30,23 +30,25 @@ typedef struct CBLListenerAuthenticator CBLListenerAuthenticator;
 
 /** Password authenticator callback for verifying client credentials when the HTTP Basic Authentication is used. */
 typedef bool (*CBLListenerPasswordAuthCallback) (
-    void* context,              ///< URLEndpointListener’s context
+    void* context,              ///< Context
     FLString username,          ///< Username
     FLString password           ///< Password
 );
 
 /** Creates a password authenticatorfor verifying client credentials when the HTTP Basic Authentication is used. */
-_cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth) CBLAPI;
+_cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth,
+                                                                          void* _cbl_nullable context) CBLAPI;
 
 /** Certificate authenticator callback for verifying client certificate when the TLS client certificate authentication is used. */
 typedef bool (*CBLListenerCertAuthCallback) (
-    void* context,              ///< URLEndpointListener’s context
-    FLSlice cert                ///< Certificate data
+    void* context,              ///< Context
+    CBLCert* cert               ///< Certificate
 );
 
 /** Creates a certificate authenticator for verifying client certificate with the specified authentication callback
     when the TLS client certificate authentication is used. */
-_cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth) CBLAPI;
+_cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth,
+                                                                             void* _cbl_nullable context) CBLAPI;
 
 /** Creates a certificate authenticator for verifying client certificate with the specified root certificates to trust
     when the TLS client certificate authentication is used. */
@@ -57,9 +59,6 @@ void CBLListenerAuth_Free(CBLListenerAuthenticator* _cbl_nullable) CBLAPI;
 
 /** The configuration for the URLEndpointListener. */
 typedef struct {
-    /** Arbitrary value that will be passed to the authenticator callback. */
-    void* _cbl_nullable context;
-    
     /** (Required) The collections available for replication . */
     CBLCollection* _cbl_nonnull * _cbl_nonnull collections;
 
