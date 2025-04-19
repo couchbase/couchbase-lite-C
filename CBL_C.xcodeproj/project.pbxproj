@@ -23,6 +23,8 @@
 		1BF21A3D2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
 		1BF21A3E2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
 		1BF21A3F2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
+		1BF3E3152DB07E5900B11DD4 /* URLEndpointListenerTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 1B49DBCF2DAF106F000F382E /* URLEndpointListenerTest.hh */; };
+		1BF3E3162DB07E5900B11DD4 /* URLEndpointListenerTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 1B49DBCF2DAF106F000F382E /* URLEndpointListenerTest.hh */; };
 		271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2C21CAC98F0045856E /* CBLReplicator.h */; };
 		271C2A3221CAC98F0045856E /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; };
@@ -432,6 +434,7 @@
 
 /* Begin PBXFileReference section */
 		1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = URLEndpointListenerTest.cc; sourceTree = "<group>"; };
+		1B49DBCF2DAF106F000F382E /* URLEndpointListenerTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = URLEndpointListenerTest.hh; sourceTree = "<group>"; };
 		1B7694AA2DA07261006EEEAB /* TLSIdentityTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TLSIdentityTest.hh; sourceTree = "<group>"; };
 		1B7694AB2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "TLSIdentityTest+Apple.mm"; sourceTree = "<group>"; };
 		1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLURLEndpointListener.h; sourceTree = "<group>"; };
@@ -914,6 +917,7 @@
 				1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */,
 				1B7694AA2DA07261006EEEAB /* TLSIdentityTest.hh */,
 				1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */,
+				1B49DBCF2DAF106F000F382E /* URLEndpointListenerTest.hh */,
 				40FE2E0F2C12AF52005E99E9 /* VectorSearchTest.hh */,
 				406E46D22BACAEFF0088198C /* VectorSearchTest.cc */,
 				400AB0412C2E669500DB6223 /* VectorSearchTest_Cpp.cc */,
@@ -1072,6 +1076,7 @@
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
 				FCC064232862B869000C5BD7 /* CouchbaseLite.h in Headers */,
 				FCC064222862B859000C5BD7 /* CBL_Compat.h in Headers */,
+				1BF3E3152DB07E5900B11DD4 /* URLEndpointListenerTest.hh in Headers */,
 				271C2A3421CAC98F0045856E /* CBLDatabase.h in Headers */,
 				FCC064122862B848000C5BD7 /* CBLBlob.h in Headers */,
 				271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */,
@@ -1099,6 +1104,7 @@
 				40D1862529B6D1A50061AA85 /* Collection.hh in Headers */,
 				FCD988BC2821B10400512BBD /* CBLCollection.h in Headers */,
 				27984E2C2249A240000FE777 /* CBLDatabase.h in Headers */,
+				1BF3E3162DB07E5900B11DD4 /* URLEndpointListenerTest.hh in Headers */,
 				27984E2E2249A240000FE777 /* CBLQuery.h in Headers */,
 				27984E2F2249A240000FE777 /* CBLReplicator.h in Headers */,
 				27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */,

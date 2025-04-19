@@ -354,7 +354,7 @@ CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithLabel(FLString label,
  *  @return A CBLTLSIdentity instance on success, or `NULL` if an error occurs.
     @note You are responsible for releasing the returned reference. */
 _cbl_warn_unused
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyPair* keypair,
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyPair* _cbl_nullable keypair,
                                                                          CBLCert* cert,
                                                                          CBLError* _cbl_nullable outError) CBLAPI;
 

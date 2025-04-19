@@ -161,7 +161,7 @@ namespace cbl_internal {
                 certData = _identity->certificates()->c4Cert()->getData(false);
             enc.writeData(certData);
             alloc_slice privateKeyData;
-            C4KeyPair* privateKey = _identity->privateKey()->c4KeyPair();
+            C4KeyPair* privateKey = _identity->privateKey() ? _identity->privateKey()->c4KeyPair() : nullptr;
             if (outExternalKey) *outExternalKey = nullptr;
             if ( privateKey ) {
                 // The life of privateKey is tied to _identity
