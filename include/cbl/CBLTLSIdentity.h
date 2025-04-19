@@ -225,6 +225,7 @@ CBLKeyPair* _cbl_nullable CBLKeyPair_CreateWithCallbacks(void* context,
     @param passwordOrNull The password used to decrypt the key, or NULL if the key is not encrypted.
     @param outError On failure, the error will be written here.
     @return A CBLKeyPair instance on success, or NULL on failure.
+    @note Only PKCS#1 format for private keys is supported.
     @note You are responsible for releasig the returned KeyPair. */
 _cbl_warn_unused
 CBLKeyPair* _cbl_nullable CBLKeyPair_CreateWithPrivateKeyData(FLSlice privateKeyData,
