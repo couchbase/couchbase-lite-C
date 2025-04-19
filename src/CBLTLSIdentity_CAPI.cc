@@ -43,12 +43,12 @@ const FLString kCBLCertAttrKeyRegisteredID = FLSTR("registeredID");
 
 // KeyPair
 
-CBLKeyPair* CBLKeyPair_CreateWithCallbacks(void* context,
-                                           size_t keySizeInBits,
-                                           CBLKeyPairCallbacks callbacks,
-                                           CBLError* outError) noexcept {
+CBLKeyPair* CBLKeyPair_CreateWithExternalKey(size_t keySizeInBits,
+                                             void* externalKey,
+                                             CBLExternalKeyCallbacks callbacks,
+                                             CBLError* outError) noexcept {
     try {
-        return retain(CBLKeyPair::CreateKeyPairWithCallbacks(context, keySizeInBits, callbacks));
+        return retain(CBLKeyPair::CreateKeyPairWithExternalKey(keySizeInBits, externalKey, callbacks));
     } catchAndBridge(outError);
 }
 

@@ -77,7 +77,7 @@ _kCBLCertAttrKeyHostname
 _kCBLCertAttrKeyURL
 _kCBLCertAttrKeyIPAddress
 _kCBLCertAttrKeyRegisteredID
-_CBLKeyPair_CreateWithCallbacks
+_CBLKeyPair_CreateWithExternalKey
 _CBLKeyPair_CreateWithPrivateKeyData
 _CBLKeyPair_PublicKeyDigest
 _CBLKeyPair_PublicKeyData
