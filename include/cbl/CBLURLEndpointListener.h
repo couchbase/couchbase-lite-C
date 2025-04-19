@@ -50,7 +50,7 @@ typedef bool (*CBLListenerCertAuthCallback) (
 _cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreateCertificate(CBLListenerCertAuthCallback auth,
                                                                              void* _cbl_nullable context) CBLAPI;
 
-/** Creates a certificate authenticator for verifying client certificate with the specified root certificates to trust
+/** Creates a certificate authenticator for verifying client certificate with the specified root certificate chain to trust
     when the TLS client certificate authentication is used. */
 _cbl_warn_unused CBLListenerAuthenticator* CBLListenerAuth_CreateCertificateWithRootCerts(CBLCert* rootCerts) CBLAPI;
 
