@@ -27,8 +27,8 @@ public:
     TLSIdentityTest() {}
     ~TLSIdentityTest() {}
 
-    static constexpr fleece::slice Label{"CBL-Server-Cert"};
-    static constexpr fleece::slice CN{"CBL-Server"};
+    static constexpr fleece::slice Label{"CBLTest-Server-Cert"};
+    static constexpr fleece::slice CN{"CBLTest-Server"};
     static constexpr auto OneYear = std::chrono::seconds(3141592);
     static constexpr fleece::slice kUser{"pupshaw"};
     static constexpr fleece::slice kPassword{"frank"};

@@ -37,7 +37,7 @@ TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity", "[TSLIdentity]") 
 
     CBLKeyPair* keypair = CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, &outError);
     fleece::MutableDict attributes = fleece::MutableDict::newDict();
-    attributes[kCBLCertAttrKeyCommonName] = "CBLAnonymousCertificate";
+    attributes[kCBLCertAttrKeyCommonName] = CN;
 
     auto                    expire = system_clock::now() + OneYear;
 
@@ -62,10 +62,10 @@ TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity", "[TSLIdentity]") 
 
     // checking cert of TLSIdentity
     alloc_slice subjectName = CBLCert_SubjectNameComponent(certOfIdentity, kCBLCertAttrKeyCommonName);
-    CHECK(subjectName == "CBLAnonymousCertificate");
+    CHECK(subjectName == CN);
 
     subjectName = CBLCert_SubjectName(certOfIdentity);
-    CHECK(subjectName == "CN=CBLAnonymousCertificate");
+    CHECK(subjectName == "CN="s + CN.asString());
 
     // Check the digest of public keys of the input KeyPair and that inside the Cert.
     alloc_slice pubDigest1 = CBLKeyPair_PublicKeyDigest(keypair);
@@ -80,48 +80,6 @@ TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity", "[TSLIdentity]") 
 }
 
 #if !defined(__linux__) && !defined(__ANDROID__)
-
-TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity With Label", "[TSLIdentity]") {
-    CBLError outError{};
-
-    slice label{"CBL_Labal"};
-    
-    // Clean the identity from the system.
-    CBLTLSIdentity_DeleteIdentityWithLabel(label, nullptr);
-
-    fleece::MutableDict attributes = fleece::MutableDict::newDict();
-    attributes[kCBLCertAttrKeyCommonName] = "CBLAnonymousCertificate";
-    
-    static constexpr auto validity = seconds(3141592);
-
-    CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentity(kCBLKeyUsagesServerAuth,
-                                                             attributes,
-                                                             duration_cast<milliseconds>(validity).count(),
-                                                             label,
-                                                             &outError);
-
-    if (outError.code) {
-        alloc_slice msg = CBLError_Message(&outError);
-        WARN("Error Code=" << outError.code << ", msge=" << msg.asString());
-    } else {
-        CHECK(identity);
-    }
-
-    // CBLTLSIdentity_IdentityWithLabel
-
-    outError.code = 0;
-    CBLTLSIdentity* identity2 = CBLTLSIdentity_IdentityWithLabel(label, &outError);
-    CHECK(identity2);
-    CHECK(outError.code == 0);
-
-    // CBLTLSIdentity_DeleteIdentityWithLabel
-
-    CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(label, &outError));
-
-    CBLTLSIdentity_Release(identity);
-    CBLTLSIdentity_Release(identity2);
-}
-
 
 // T0011-1 TestCreateGetDeleteIdentityWithLabel
 TEST_CASE_METHOD(TLSIdentityTest, "Identity With Label", "[TSLIdentity]") {
@@ -143,7 +101,7 @@ TEST_CASE_METHOD(TLSIdentityTest, "Identity With Label", "[TSLIdentity]") {
     // Checks that the identity was created successfully.
     if (outError.code) {
         alloc_slice msg = CBLError_Message(&outError);
-        WARN("Error Code=" << outError.code << ", msge=" << msg.asString());
+        WARN("Error Code=" << outError.code << ", msg=" << msg.asString());
     }
     CHECK(identity);
 
@@ -153,7 +111,7 @@ TEST_CASE_METHOD(TLSIdentityTest, "Identity With Label", "[TSLIdentity]") {
     CBLTLSIdentity* identity2 = CBLTLSIdentity_IdentityWithLabel(Label, &outError);
     if (outError.code) {
         alloc_slice msg = CBLError_Message(&outError);
-        WARN("Error Code=" << outError.code << ", msge=" << msg.asString());
+        WARN("Error Code=" << outError.code << ", msg=" << msg.asString());
     }
     CHECK(identity2);
     CHECK(outError.code == 0);
