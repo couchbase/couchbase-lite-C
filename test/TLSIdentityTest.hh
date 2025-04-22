@@ -18,6 +18,7 @@
 #pragma once
 
 #include "CBLTest.hh"
+#include <chrono>
 
 #ifdef COUCHBASE_ENTERPRISE
 
@@ -25,6 +26,12 @@ class TLSIdentityTest : public CBLTest {
 public:
     TLSIdentityTest() {}
     ~TLSIdentityTest() {}
+
+    static constexpr fleece::slice Label{"CBLTest-Server-Cert"};
+    static constexpr fleece::slice CN{"CBLTest-Server"};
+    static constexpr auto OneYear = std::chrono::seconds(3141592);
+    static constexpr fleece::slice kUser{"pupshaw"};
+    static constexpr fleece::slice kPassword{"frank"};
 
 #ifdef __APPLE__
     class ExternalKey {

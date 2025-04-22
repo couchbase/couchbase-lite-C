@@ -1,7 +1,7 @@
 //
 // URLEndpointListenerTest.cc
 //
-// Copyright © 2022 Couchbase. All rights reserved.
+// Copyright © 2025 Couchbase. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 // limitations under the License.
 //
 
-#include "CBLTest.hh"
-#include "ReplicatorTest.hh"
+#include "URLEndpointListenerTest.hh"
 #include "CBLPrivate.h"
 #include "TLSIdentityTest.hh"
 #include "fleece/Fleece.hh"
 #include <chrono>
+#include <fstream>
 #include <string>
 #include <sstream>
 using namespace std::chrono;
@@ -32,121 +32,108 @@ static const string kDefaultDocContent = "{\"greeting\":\"hello\"}";
 
 namespace {
 #ifdef __APPLE__
-TLSIdentityTest::ExternalKey* externalKey(void* context) {
-    return (TLSIdentityTest::ExternalKey*)context;
-}
+    TLSIdentityTest::ExternalKey* externalKey(void* context) {
+        return (TLSIdentityTest::ExternalKey*)context;
+    }
 
-bool kc_publicKeyData(void* context, void* output, size_t outputMaxLen, size_t* outputLen) {
-    return externalKey(context)->publicKeyData(output, outputMaxLen, outputLen);
-}
+    bool kc_publicKeyData(void* context, void* output, size_t outputMaxLen, size_t* outputLen) {
+        return externalKey(context)->publicKeyData(output, outputMaxLen, outputLen);
+    }
 
-bool kc_decrypt(void* context, FLSlice input, void* output, size_t outputMaxLen, size_t* outputLen) {
-    return externalKey(context)->decrypt(input, output, outputMaxLen, outputLen);
-}
+    bool kc_decrypt(void* context, FLSlice input, void* output, size_t outputMaxLen, size_t* outputLen) {
+        return externalKey(context)->decrypt(input, output, outputMaxLen, outputLen);
+    }
 
-bool kc_sign(void* context, CBLSignatureDigestAlgorithm digestAlgorithm, FLSlice inputData, void* outSignature) {
-    return externalKey(context)->sign(digestAlgorithm, inputData, outSignature);
-}
+    bool kc_sign(void* context, CBLSignatureDigestAlgorithm digestAlgorithm, FLSlice inputData, void* outSignature) {
+        return externalKey(context)->sign(digestAlgorithm, inputData, outSignature);
+    }
 
-void kc_free(void* context) {
-    delete externalKey(context);
-}
+    void kc_free(void* context) {
+        delete externalKey(context);
+    }
 #endif
 }; // anonymous namespace
 
-class URLEndpointListenerTest : public ReplicatorTest {
-public:
-    URLEndpointListenerTest()
-    :db2(openDatabaseNamed("otherdb", true)) // empty
-    {
-        config.database = nullptr;
+CBLEndpoint* URLEndpointListenerTest::clientEndpoint(CBLURLEndpointListener* listener, CBLError* outError) {
+    uint16_t port = CBLURLEndpointListener_Port(listener);
+    const CBLURLEndpointListenerConfiguration* config = CBLURLEndpointListener_Config(listener);
+    std::stringstream ss;
+    ss << (config->disableTLS ? "ws" : "wss");
+    ss << "://localhost:" << port << "/";
+    auto listenerConfig = CBLURLEndpointListener_Config(listener);
+    REQUIRE(listenerConfig->collectionCount > 0);
+    auto db = CBLCollection_Database(listenerConfig->collections[0]);
+    REQUIRE(db);
+    auto dbname = CBLDatabase_Name(db);
+    ss << string(dbname);
+    return CBLEndpoint_CreateWithURL(slice(ss.str().c_str()), outError);
+}
 
-        cx.push_back(CreateCollection(db.ref(), "colA", "scopeA"));
-        cx.push_back(CreateCollection(db.ref(), "colB", "scopeA"));
-        cx.push_back(CreateCollection(db.ref(), "colC", "scopeA"));
-
-        cy.push_back(CreateCollection(db2.ref(), "colA", "scopeA"));
-        cy.push_back(CreateCollection(db2.ref(), "colB", "scopeA"));
-        cy.push_back(CreateCollection(db2.ref(), "colC", "scopeA"));
+vector<CBLReplicationCollection> URLEndpointListenerTest::collectionConfigs(vector<CBLCollection*>collections) {
+    vector<CBLReplicationCollection> configs(collections.size());
+    for (int i = 0; i < collections.size(); i++) {
+        configs[i].collection = collections[i];
     }
+    return configs;
+}
 
-    ~URLEndpointListenerTest() {
-        for (auto col : cx) {
-            CBLCollection_Release(col);
+CBLTLSIdentity* URLEndpointListenerTest::createTLSIdentity(bool isServer, bool withExternalKey) {
+    std::unique_ptr<CBLKeyPair, void(*)(CBLKeyPair*)> keypair{
+        nullptr,
+        [](CBLKeyPair* k) {
+            CBLKeyPair_Release(k);
         }
-        
-        for (auto col : cy) {
-            CBLCollection_Release(col);
-        }
-        
-        db2.close();
-        db2 = nullptr;
-    }
-
-    CBLEndpoint* clientEndpoint(CBLURLEndpointListener* listener, CBLError* outError) {
-        uint16_t port = CBLURLEndpointListener_Port(listener);
-        const CBLURLEndpointListenerConfiguration* config = CBLURLEndpointListener_Config(listener);
-        std::stringstream ss;
-        ss << (config->disableTLS ? "ws" : "wss");
-        ss << "://localhost:" << port << "/";
-        auto listenerConfig = CBLURLEndpointListener_Config(listener);
-        REQUIRE(listenerConfig->collectionCount > 0);
-        auto db = CBLCollection_Database(listenerConfig->collections[0]);
-        REQUIRE(db);
-        auto dbname = CBLDatabase_Name(db);
-        ss << string(dbname);
-        return CBLEndpoint_CreateWithURL(slice(ss.str().c_str()), outError);
-    }
-
-    vector<CBLReplicationCollection> collectionConfigs(vector<CBLCollection*>collections) {
-        vector<CBLReplicationCollection> configs(collections.size());
-        for (int i = 0; i < collections.size(); i++) {
-            configs[i].collection = collections[i];
-        }
-        return configs;
-    }
-
-    CBLTLSIdentity* createTLSIdentity(bool isServer, bool withExternalKey) {
-        std::unique_ptr<CBLKeyPair, void(*)(CBLKeyPair*)> keypair{
-            nullptr,
-            [](CBLKeyPair* k) {
-                CBLKeyPair_Release(k);
-            }
-        };
-        if (!withExternalKey) {
-            keypair.reset(CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr));
-        } else {
+    };
+    if (!withExternalKey) {
+        keypair.reset(CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr));
+    } else {
 #ifdef __APPLE__
-            keypair.reset(CBLKeyPair_CreateWithCallbacks(TLSIdentityTest::ExternalKey::generateRSA(2048),
-                                                         2048,
-                                                         CBLKeyPairCallbacks{
-                kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
-                                                         nullptr));
+        keypair.reset(CBLKeyPair_CreateWithCallbacks(TLSIdentityTest::ExternalKey::generateRSA(2048),
+                                                     2048,
+                                                     CBLKeyPairCallbacks{
+            kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
+                                                     nullptr));
 #else
-            return nullptr;
+        return nullptr;
 #endif
-        }
-        if (!keypair) return nullptr;
-
-        fleece::MutableDict attributes = fleece::MutableDict::newDict();
-        
-        attributes[kCBLCertAttrKeyCommonName] = isServer ? "URLEndpointListener" : "URLEndpointListener_Client";
-
-        static constexpr auto validity = seconds(31536000); // one year
-        
-        CBLKeyUsages usages = isServer ? kCBLKeyUsagesServerAuth : kCBLKeyUsagesClientAuth;
-        
-        return  CBLTLSIdentity_CreateIdentityWithKeyPair(usages,
-                                                         keypair.get(),
-                                                         attributes,
-                                                         duration_cast<milliseconds>(validity).count(),
-                                                         nullptr);
     }
+    if (!keypair) return nullptr;
 
-    Database db2;
-    vector<CBLCollection*> cx;
-    vector<CBLCollection*> cy;
-};
+    fleece::MutableDict attributes = fleece::MutableDict::newDict();
+
+    attributes[kCBLCertAttrKeyCommonName] = isServer ? "URLEndpointListener" : "URLEndpointListener_Client";
+
+    static constexpr auto validity = seconds(31536000); // one year
+
+    CBLKeyUsages usages = isServer ? kCBLKeyUsagesServerAuth : kCBLKeyUsagesClientAuth;
+
+    return  CBLTLSIdentity_CreateIdentityWithKeyPair(usages,
+                                                     keypair.get(),
+                                                     attributes,
+                                                     duration_cast<milliseconds>(validity).count(),
+                                                     nullptr);
+}
+
+void URLEndpointListenerTest::configOneShotReplicator(CBLURLEndpointListener* listener, std::vector<CBLReplicationCollection>& colls) {
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    expectedDocumentCount = 20;
+    colls = collectionConfigs({cx[0], cx[1]});
+    config.acceptOnlySelfSignedServerCertificate = true;
+    config.collections = colls.data();
+    config.collectionCount = colls.size();
+    config.replicatorType = kCBLReplicatorTypePush;
+    CBLError outError{};
+    config.endpoint = clientEndpoint(listener, &outError);
+    REQUIRE(outError.code == 0);
+    REQUIRE(config.endpoint);
+}
+
+string URLEndpointListenerTest::readFile(const char* filename) {
+    string path = GetAssetFilePath(filename);
+    std::ifstream file(path, std::ios::binary);  // Use binary to preserve newlines
+    return string{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+}
 
 TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Basics", "[URLListener]") {
     CBLError error {};
@@ -417,6 +404,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
 #endif
 
     CBLURLEndpointListener_Stop(listener);
+
     CBLURLEndpointListener_Release(listener);
     CBLTLSIdentity_Release(clientIdentity);
     if (listenerConfig.authenticator) CBLListenerAuth_Free(listenerConfig.authenticator);
@@ -496,5 +484,777 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication wit
     CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
 }
 #endif // #ifdef __APPLE__
+
+// T0010-1 TestPort
+TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Port", "[URLListener]") {
+    // Initializes a listener with a config that specifies a port.
+    
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        12345   // port
+    };
+    listenerConfig.disableTLS = false;
+    
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    // Starts the listener.
+    REQUIRE(CBLURLEndpointListener_Start(listener, nullptr));
+
+    //Checks that the listener’s port is the same as the port specified in the config.
+    
+    auto port = CBLURLEndpointListener_Port(listener);
+    CHECK(port == 12345);
+
+    //Stops the listener.
+    CBLURLEndpointListener_Stop(listener);
+    
+    //Checks that the listener’s port is zero.
+    CHECK(CBLURLEndpointListener_Port(listener) == 0);
+    
+    CBLURLEndpointListener_Release(listener);
+}
+
+// T0010-2 TestEmptyPort
+TEST_CASE_METHOD(URLEndpointListenerTest, "Empty Port", "[URLListener]") {
+    // Initializes a listener with a config that specifies zero port.
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0   // port
+    };
+    listenerConfig.disableTLS = false;
+
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    // Starts the listener.
+    REQUIRE(CBLURLEndpointListener_Start(listener, nullptr));
+
+    //Checks that the listener’s port is more than zero.
+    CHECK(CBLURLEndpointListener_Port(listener) > 0);
+
+    // Stops the listener.
+    CBLURLEndpointListener_Stop(listener);
+    
+    // Checks that the listener’s port is zero.
+    CHECK(CBLURLEndpointListener_Port(listener) == 0);
+
+    CBLURLEndpointListener_Release(listener);
+}
+
+// T0010-3 TestBusyPort
+TEST_CASE_METHOD(URLEndpointListenerTest, "Busy Port", "[URLListener]") {
+    // Initializes a listener with a config that specifies zero port.
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0   // port
+    };
+    listenerConfig.disableTLS = false;
+
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    // Starts the listener.
+    REQUIRE(CBLURLEndpointListener_Start(listener, nullptr));
+
+    auto port = CBLURLEndpointListener_Port(listener);
+    REQUIRE(port > 0);
+
+    // Initializes a second Listener with a config that uses the same port.
+    CBLURLEndpointListenerConfiguration listener2Config {
+        cy.data(),
+        2,
+        port   // port
+    };
+    listener2Config.disableTLS = false;
+
+    CBLURLEndpointListener* listener2 = CBLURLEndpointListener_Create(&listener2Config, nullptr);
+
+    // Starts the second listener.
+    CBLError outError{};
+    bool succ = CBLURLEndpointListener_Start(listener2, &outError);
+    CHECK(!succ);
+
+    // Checks that an error is returned as POSIX/EADDRINUSE or equivalent when starting the second listener.
+
+    CHECK(outError.code); // EADDRINUSE
+    // Error messages may differ by platforms.
+    // alloc_slice errmsg = CBLError_Message(&outError);
+    // CHECK(errmsg == "Address already in use");
+
+    // Stops both listeners.
+    CBLURLEndpointListener_Stop(listener);
+    CBLURLEndpointListener_Stop(listener2);
+
+    CBLURLEndpointListener_Release(listener);
+    CBLURLEndpointListener_Release(listener2);
+}
+
+// T0010-4 TestURLs
+TEST_CASE_METHOD(URLEndpointListenerTest, "Listener URLs", "[URLListener]") {
+    // Initializes a listener with a config that specifies zero port.
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0   // port
+    };
+    listenerConfig.disableTLS = false;
+    
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+    
+    // Starts the listener.
+    REQUIRE(CBLURLEndpointListener_Start(listener, nullptr));
+    
+    auto port = CBLURLEndpointListener_Port(listener);
+    REQUIRE(port > 0);
+    
+    // Checks that the listener’s urls are not empty.
+    FLMutableArray urls = CBLURLEndpointListener_Urls(listener);
+    auto count = FLArray_Count(urls);
+    CHECK(count > 0);
+
+    Array urlArray(urls);
+    std::stringstream ss;
+    ss << ":" << port << "/";
+    string portSuffix = ss.str();
+    for (Array::iterator iter(urlArray); iter; ++iter) {
+        auto url = iter.value().asString().asString();
+        // Checks that the listener’s urls contains the specified port. This step may be skipped on the platform that is difficult to check.
+        CHECK(url.find(portSuffix) != string::npos);
+    }
+
+    // Stops both listeners.
+    CBLURLEndpointListener_Stop(listener);
+
+    // Checks that the listener’s urls are now empty.
+    FLMutableArray urls2 = CBLURLEndpointListener_Urls(listener);
+    count = FLArray_Count(urls2);
+    CHECK(count == 0);
+
+    CBLURLEndpointListener_Release(listener);
+    FLMutableArray_Release(urls);
+    FLMutableArray_Release(urls2);
+}
+
+// T0010-5 TestConnectionStatus
+TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Connection Status", "[URLListener]") {
+    // Initializes a listener with a config that specifies zero port and the default collection.
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        1,  // one collection
+        0   // port
+    };
+    listenerConfig.disableTLS = true;
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    // Starts the listener.
+    REQUIRE(CBLURLEndpointListener_Start(listener, nullptr));
+
+    // Checks that the active connection count and connection count are zero.
+    CBLConnectionStatus status = CBLURLEndpointListener_Status(listener);
+    CHECK(status.connectionCount == 0);
+    CHECK(status.activeConnectionCount == 0);
+
+    // Creates a new document in the listener’s default collection.
+    createNumberedDocsWithPrefix(cy[0], 1, "doc2");
+
+    // Setups a single shot pull replicator with a pull filter connecting the listener.
+    auto cols = collectionConfigs({cx[0]});
+    config.collections = cols.data();
+    config.collectionCount = cols.size();
+    config.replicatorType = kCBLReplicatorTypePull;
+    config.endpoint = clientEndpoint(listener, nullptr);
+    REQUIRE(config.endpoint);
+    struct Context {
+        CBLURLEndpointListener* listener;
+        CBLConnectionStatus status;
+    } context;
+    context.listener = listener;
+    config.context = &context;
+
+    // In the pull filter, get the active connection count and connection count.
+
+    cols[0].pullFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
+        Context* ctx = reinterpret_cast<Context*>(context);
+        ctx->status = CBLURLEndpointListener_Status(ctx->listener);
+        return true;
+    };
+
+    // Starts the replicator and waits until the replicator is stopped.
+
+    replicate();
+    
+    // Checks that the active connection count and connection count are one.
+
+    CHECK(context.status.connectionCount == 1);
+    CHECK(context.status.activeConnectionCount == 1);
+
+    //    Stop sthe listener.
+    CBLURLEndpointListener_Stop(listener);
+
+    CBLURLEndpointListener_Release(listener);
+}
+
+// T0010-6 TestListenerWithDefaultAnonymousIdentity
+TEST_CASE_METHOD(URLEndpointListenerTest, "Anonymous Identity", "[URLListener]") {
+    // Initializes a listener with a config with TLS enabled without TLS identity.
+
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0         // port
+    };
+    listenerConfig.disableTLS = false;
+    alloc_slice persistentLabel;
+
+#if !defined(__linux__) && !defined(__ANDROID__)
+    // cy is the collection used in the Listener.
+    // Its UUID is used as the label for persistent TLSIdentity
+    alloc_slice uuid = CBLDatabase_PublicUUID(CBLCollection_Database(cy[0]));
+    persistentLabel = alloc_slice{uuid.hexString()};
+    CBLTLSIdentity* id = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
+    REQUIRE(id == nullptr);
+#endif
+    config.acceptOnlySelfSignedServerCertificate = true;
+    
+    // Anonymous Identity means following two conditions:
+    REQUIRE(listenerConfig.tlsIdentity == nullptr);
+    REQUIRE( !listenerConfig.disableTLS );
+
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    //Starts the listener.
+    CHECK(CBLURLEndpointListener_Start(listener, nullptr));
+    
+    // Checks that the listener’s TLS identity is not null.
+    // Q: how to check it
+    
+    // Checks that the listener’s TLS identity contains a self-signed certificate. This step may be skipped on the platform that is difficult to check.
+
+    // Starts a continuous replicator to the listener using wss URL and with accept only self-sign cert enabled. This step is valid to use a single shot replicator as well.
+    
+    std::vector<CBLReplicationCollection> colls;
+    configOneShotReplicator(listener, colls);
+    replicate();
+
+    //Checks that the replicator becomes IDLE without an error.
+    //Stops the replicator and wait until the replicator is stoped.
+    //Stops the listener.
+    
+    CBLURLEndpointListener_Stop(listener);
+
+    // Release
+    CBLURLEndpointListener_Release(listener);
+#if !defined(__linux__) && !defined(__ANDROID__)
+    // Anonymous identity is either saved by UUID of the database, or released by the listener.
+    if (persistentLabel) {
+        CBLTLSIdentity* id2 = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
+        CHECK(id2);
+        CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(persistentLabel, nullptr));
+        CBLTLSIdentity_Release(id2);
+    }
+#endif
+}
+
+// T0010-7 TestListenerWithSpecifiedIdentity
+// This has been tested multiple times
+
+// T0010-8 TestPasswordAuthenticator
+TEST_CASE_METHOD(URLEndpointListenerTest, "Password Authenticator", "[URLListener]") {
+    // Initializes a listener with a config that specifies a password authenticator.
+    
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0,         // port
+        {},        // networkInterface
+        true      // disableTLS
+    };
+
+    // Starts the listener.
+
+    listenerConfig.authenticator = CBLListenerAuth_CreatePassword([](void* ctx, FLString usr, FLString psw) {
+        return usr == TLSIdentityTest::kUser && psw == TLSIdentityTest::kPassword;
+    }, nullptr);
+    REQUIRE(listenerConfig.authenticator);
+
+    CBLError outError{};
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, &outError);
+    CHECK(outError.code == 0);
+    CHECK(listener);
+    CHECK(CBLURLEndpointListener_Start(listener, nullptr));
+
+    // Start Replicator
+    std::vector<CBLReplicationCollection> colls;
+    configOneShotReplicator(listener, colls);
+    
+    SECTION("Without Client Auth") {
+        // Starts a single shot replicator to the listener without a password authenticator.
+        // Checks that the replicator stoped with a HTTP AUTH error.
+        expectedError.code = 401;
+        expectedDocumentCount = -1;
+    }
+
+    SECTION("Incorrect Password") {
+        // Starts a single shot replicator to the listener with an incorrect password authenticator.
+        config.authenticator = CBLAuth_CreatePassword(TLSIdentityTest::kUser, slice("wrong-password"));
+        REQUIRE(config.authenticator);
+        // Checks that the replicator stoped with a HTTP AUTH error.
+        expectedError.code = 401;
+        expectedDocumentCount = -1;
+    }
+
+    SECTION("Good Password") {
+        // Starts a single shot replicator to the listener with a correct password authenticator.
+        config.authenticator = CBLAuth_CreatePassword(TLSIdentityTest::kUser, TLSIdentityTest::kPassword);
+        REQUIRE(config.authenticator);
+        // Checks that the replicator stoped without an error.
+    }
+
+    replicate();
+
+    //Stops the listener.
+    CBLURLEndpointListener_Stop(listener);
+    
+    // Cleanup
+    CBLURLEndpointListener_Release(listener);
+    CBLListenerAuth_Free(listenerConfig.authenticator);
+}
+
+// T0010-9 TestClientCertCallbackAuthenticator
+TEST_CASE_METHOD(URLEndpointListenerTest, "Client Cert Callback Authenticator", "[URLListener]") {
+    // Initializes a listener with a config that enables TLS and specifies a certificate authenticator with a callback.
+
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0,         // port
+        {},        // networkInterface
+        false      // disableTLS
+    };
+    // Self-signed certificate with KeyPair
+    listenerConfig.tlsIdentity = createTLSIdentity(true, false);
+    
+    struct Context {
+        int section;
+    } context;
+    
+    listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, CBLCert* cert) {
+        Context* context = reinterpret_cast<Context*>(ctx);
+        if (context->section == 2) return false;
+        else                       return true;
+    }, &context);
+
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    // Starts the listener.
+    CHECK(CBLURLEndpointListener_Start(listener, nullptr));
+
+    // Start Replicator
+    std::vector<CBLReplicationCollection> colls;
+    configOneShotReplicator(listener, colls);
+    config.acceptOnlySelfSignedServerCertificate = true;
+    
+    CBLTLSIdentity* clientIdentity = nullptr;
+
+    SECTION("Without Client Cert Authenticator") {
+        // Starts a single shot replicator to the listener without a client cert authenticator.
+        // Checks that the replicator stoped with a HTTP AUTH error.
+        context.section = 1;
+        expectedError.code = kCBLNetErrTLSHandshakeFailed;
+        expectedDocumentCount = -1;
+    }
+
+    SECTION("Listener Auth Callback Returns false") {
+        // Starts a single shot replicator to the listener with a client cert authenticator.
+        // The listener’s client cert auth callback returns false.
+        context.section = 2;
+        // Checks that the replicator stoped with a HTTP AUTH error.
+        expectedError.code = kCBLNetErrTLSClientCertRejected;
+        expectedDocumentCount = -1;
+    }
+
+    SECTION("Listener Auth Callback Returns true") {
+        // Starts a single shot replicator to the listener with a client cert authenticator.
+        // The listener’s client cert auth callback returns true.
+        context.section = 3;
+        // Checks that the replicator stoped without an error.
+    }
+
+    if (context.section != 1) {
+        clientIdentity = createTLSIdentity(false, false);
+        REQUIRE(clientIdentity);
+        config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
+        REQUIRE(config.authenticator);
+    }
+    
+    // Starts a single shot replicator to the listener with a client cert authenticator.
+    replicate();
+    
+    // Stops the listener.
+    CBLURLEndpointListener_Stop(listener);
+
+    // Cleanup
+    CBLURLEndpointListener_Release(listener);
+    if (clientIdentity) CBLTLSIdentity_Release(clientIdentity);
+    CBLListenerAuth_Free(listenerConfig.authenticator);
+    CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
+}
+
+// T0010-10 TestClientCertAuthenticatorWithRootCert
+TEST_CASE_METHOD(URLEndpointListenerTest, "Client Cert Authenticator with RootCert", "[URLListener]") {
+    // Initializes a listener with a config that enables TLS and specifies a certificate authenticator with a parent of root cert of the client cert.
+
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0,         // port
+        {},        // networkInterface
+        false      // disableTLS
+    };
+    // Self-signed certificate with KeyPair
+    listenerConfig.tlsIdentity = createTLSIdentity(true, false);
+
+    string pemRootChain = readFile("inter1_root.pem");
+    CBLCert* rootCerts = CBLCert_CreateWithData(slice{pemRootChain}, nullptr);
+    REQUIRE(rootCerts);
+
+    listenerConfig.authenticator = CBLListenerAuth_CreateCertificateWithRootCerts(rootCerts);
+    REQUIRE(listenerConfig.authenticator);
+
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    // Starts the listener.
+    CHECK(CBLURLEndpointListener_Start(listener, nullptr));
+
+    // Replicator setting up
+
+    CBLTLSIdentity* clientIdentity = nullptr;
+    CBLCert*            clientCert = nullptr;
+    CBLKeyPair*   clientPrivateKey = nullptr;
+    
+    std::vector<CBLReplicationCollection> colls;
+    configOneShotReplicator(listener, colls);
+
+    SECTION("Not Signed By the rootCerts") {
+        // Starts a single shot replicator to the listener with a client cert authenticator that uses a cert that is not signed by the parent cert specified in the step one. Using a self-signed certificate is fine as well.
+
+        string pemCert = readFile("self_signed_cert.pem");
+        clientCert = CBLCert_CreateWithData(slice{pemCert}, nullptr);
+        REQUIRE(clientCert);
+        
+        string pemKey = readFile("private_key_of_self_signed_cert.pem");
+        clientPrivateKey = CBLKeyPair_CreateWithPrivateKeyData(slice(pemKey),
+                                                               nullslice,
+                                                               nullptr);
+        REQUIRE(clientPrivateKey);
+
+        clientIdentity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(clientPrivateKey, clientCert, nullptr);
+        REQUIRE(clientIdentity);
+
+        config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
+        REQUIRE(config.authenticator);
+
+        // Checks that the replicator stoped with a HTTP AUTH error.
+        expectedError.code = kCBLNetErrTLSClientCertRejected;
+        expectedDocumentCount = -1;
+    }
+
+    SECTION("Signed Leaf Cert") {
+        // Starts a single shot replicator to the listener with a client cert authenticator that uses a cert that is signed by the parent cert specified in the step one.
+        
+        string pemCert = readFile("leaf.pem");
+        clientCert = CBLCert_CreateWithData(slice{pemCert}, nullptr);
+        REQUIRE(clientCert);
+        
+        string pemKey = readFile("leaf.key");
+        clientPrivateKey = CBLKeyPair_CreateWithPrivateKeyData(slice(pemKey),
+                                                               nullslice,
+                                                               nullptr);
+
+        clientIdentity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(clientPrivateKey, clientCert, nullptr);
+        REQUIRE(clientIdentity);
+
+        config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
+        REQUIRE(config.authenticator);
+
+        
+        // Checks that the replicator stoped without an error.
+    }
+
+    replicate();
+
+    // Stops the listener.
+    CBLURLEndpointListener_Stop(listener);
+
+    // Cleanup:
+    CBLURLEndpointListener_Release(listener);
+    CBLCert_Release(rootCerts);
+    CBLCert_Release(clientCert);
+    CBLKeyPair_Release(clientPrivateKey);
+    CBLTLSIdentity_Release(clientIdentity);
+    CBLListenerAuth_Free(listenerConfig.authenticator);
+    CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
+    
+}
+
+// T0010-11 TestClientCertAuthenticatorWithDisabledTLS
+TEST_CASE_METHOD(URLEndpointListenerTest, "Client Cert Auth with Disabled TLS", "[URLListener]") {
+    // Initializes a listener with a config that disabled TLS and specifies a certificate authenticator with a callback.
+
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0,         // port
+        {},        // networkInterface
+        true       // disableTLS
+    };
+    listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, CBLCert* cert) {
+        return true;
+    }, nullptr);
+
+    // Starts the listener.
+
+    CBLError outError{};
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, &outError);
+    CHECK(outError.code == 9);
+    CHECK(!listener);
+    
+    // Cleanups
+    CBLListenerAuth_Free(listenerConfig.authenticator);
+}
+
+// T0010-12 TestInvalidNetworkInterface
+TEST_CASE_METHOD(URLEndpointListenerTest, "Invalid Network Interface", "[URLListener]") {
+
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    CBLURLEndpointListener* listener = nullptr;
+
+    SECTION("Incorrect Interface 1") {
+        // Initializes a listener with a config that specifies a network interface as “1.1.1.256”.
+
+        CBLURLEndpointListenerConfiguration listenerConfig {
+            cy.data(),
+            2,
+            0,         // port
+            {"1.1.1.256"}, // networkInterface
+            true      // disableTLS
+        };
+        listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    }
+    
+    SECTION("Incorrect Interface 2") {
+        // Initializes a listener with a config that specifies a network interface as “foo”.
+
+        CBLURLEndpointListenerConfiguration listenerConfig {
+            cy.data(),
+            2,
+            0,         // port
+            {"foo"},  // networkInterface
+            true      // disableTLS
+        };
+        listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    }
+
+    // Starts the listener.
+    // Checks that an unknown host or equivalent error is returned.
+
+    REQUIRE(listener);
+    CBLError outError{};
+    CHECK(!CBLURLEndpointListener_Start(listener, &outError));
+    CHECK(outError.code == 2);
+
+    // Cleanups:
+    CBLURLEndpointListener_Release(listener);
+}
+
+// T0010-13 TestReplicatorServerCertificate
+TEST_CASE_METHOD(URLEndpointListenerTest, "Replicator Server Certificate", "[URLListener]") {
+    // Initializes a listener with a config with TLS enabled with a TLS identity which could be a self-signed certificate.
+
+    
+    // Starts the listener.
+    // Starts a single shot replicator to the listener.
+    // Checks that the replicator stops with a certificate error. This is correct.
+    // Check that the replicator.serverCerticate is not null.
+    // Check that the replicator.serverCerticate is the same certificate specified in the step 1.
+    // Stops the listener.
+}
+
+// T0010-14 TestAcceptOnlySelfSignedCertificate
+TEST_CASE_METHOD(URLEndpointListenerTest, "Accept Only Self-Signed Certificate", "[URLListener]") {
+    // Initializes a listener with a config with TLS enabled with a TLS identity that has a cert chain.
+
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0,         // port
+        {},        // networkInterface
+        false      // disableTLS
+    };
+    {
+        string pem = readFile("leaf_inter1_root.pem");
+        CBLCert* cert = CBLCert_CreateWithData(slice{pem}, nullptr);
+        REQUIRE(cert);
+        pem = readFile("leaf.key");
+        CBLKeyPair* privateKey = CBLKeyPair_CreateWithPrivateKeyData(slice(pem),
+                                                                     nullslice,
+                                                                     nullptr);
+        REQUIRE(privateKey);
+        listenerConfig.tlsIdentity = CBLTLSIdentity_IdentityWithKeyPairAndCerts(privateKey, cert, nullptr);
+
+        CBLCert_Release(cert);
+        CBLKeyPair_Release(privateKey);
+
+        REQUIRE(listenerConfig.tlsIdentity);
+    }
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    //Starts the listener.
+    CHECK(CBLURLEndpointListener_Start(listener, nullptr));
+
+    // Replicator setup
+
+    std::vector<CBLReplicationCollection> colls;
+    configOneShotReplicator(listener, colls);
+
+    SECTION("Self-Signed Only") {
+        // Starts a single shot replicator to the listener with accept only self-signed cert mode enabled.
+        // Checks that the replicator is stopped with a certificate error.
+        config.acceptOnlySelfSignedServerCertificate = true;
+        expectedDocumentCount = -1;
+        expectedError.code = kCBLNetErrTLSCertNameMismatch;
+    }
+    
+    SECTION("Not Self-Signed Only") {
+        // Starts a single shot replicator to the listener with accept only self-signed cert mode enabled.
+        // Checks that the replicator is stopped without an error.
+        config.acceptOnlySelfSignedServerCertificate = false;
+        expectedError.code = kCBLNetErrTLSCertUnknownRoot;
+        expectedDocumentCount = -1;
+    }
+
+    replicate();
+
+    // Stops the listener.
+    CBLURLEndpointListener_Stop(listener);
+    
+    // Cleanups:
+    CBLURLEndpointListener_Release(listener);
+    CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
+    
+//    Initializes a listener with a config with TLS enabled with a self-signed certificate.
+//    Starts a single shot replicator to the listener with accept only self-signed cert mode enabled.
+//    Starts the listener.
+}
+
+// T0010-15 TestReadOnly
+TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Read Only", "[URLListener]") {
+    // Initializes a listener with a config that enables the readonly mode.
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0,         // port
+        {},        // networkInterface
+        true       // disableTLS
+    };
+    listenerConfig.readOnly = true;
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    // Starts the listener.
+    CHECK(CBLURLEndpointListener_Start(listener, nullptr));
+
+    // Replicator
+    std::vector<CBLReplicationCollection> colls;
+    configOneShotReplicator(listener, colls);
+    
+    SECTION("Push Replicator") {
+        // Starts a single shot push replicator to the listener.
+        config.replicatorType = kCBLReplicatorTypePush;
+        // Checks that the replicator stops with the forbidden error.
+        expectedError.code = 403; // webSocketDomain
+        expectedDocumentCount = -1;
+    }
+
+    SECTION("Push-and-Pull Replicator") {
+        // Starts a single shot push-and-pull replicator to the listener.
+        config.replicatorType = kCBLReplicatorTypePushAndPull;
+        // Checks that the replicator stops with the forbidden error.
+        expectedError.code = 403; // webSocketDomain
+        expectedDocumentCount = -1;
+    }
+
+    replicate();
+
+    // Stops the listener.
+    CBLURLEndpointListener_Stop(listener);
+
+    // Cleanup
+    CBLURLEndpointListener_Release(listener);
+}
+
+// T0010-16 TestListenerWithMultipleCollections
+// We've used multi-collections as default set-uup
+
+// T0010-17 TestCloseDatabaseStopsListener
+TEST_CASE_METHOD(URLEndpointListenerTest, "Close Database Stops Listener", "[URLListener]") {
+    // Initializes and starts the listener on a non zero port.
+
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        54321,      // port
+        {},        // networkInterface
+        true       // disableTLS
+    };
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+
+    // Starts the listener.
+    CHECK(CBLURLEndpointListener_Start(listener, nullptr));
+
+    auto port = CBLURLEndpointListener_Port(listener);
+    CHECK(port == 54321);
+
+    // Closes its associated database.
+    
+    db2.close();
+    db2 = nullptr;
+
+    // Checks that listener’s port is zero and urls is empty.
+    
+    port = CBLURLEndpointListener_Port(listener);
+    CHECK(port == 0);
+    
+    CBLURLEndpointListener_Release(listener);
+}
+
 
 #endif //#ifdef COUCHBASE_ENTERPRISE
