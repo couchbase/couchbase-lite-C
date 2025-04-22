@@ -88,11 +88,10 @@ CBLTLSIdentity* URLEndpointListenerTest::createTLSIdentity(bool isServer, bool w
         keypair.reset(CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, nullptr));
     } else {
 #ifdef __APPLE__
-        keypair.reset(CBLKeyPair_CreateWithCallbacks(TLSIdentityTest::ExternalKey::generateRSA(2048),
-                                                     2048,
-                                                     CBLKeyPairCallbacks{
-            kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
-                                                     nullptr));
+        keypair.reset(CBLKeyPair_CreateWithExternalKey(2048,
+                                                       TLSIdentityTest::ExternalKey::generateRSA(2048),
+                                                       CBLExternalKeyCallbacks{kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
+                                                       nullptr));
 #else
         return nullptr;
 #endif
@@ -579,11 +578,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Busy Port", "[URLListener]") {
     CHECK(!succ);
 
     // Checks that an error is returned as POSIX/EADDRINUSE or equivalent when starting the second listener.
-
-    CHECK(outError.code); // EADDRINUSE
-    // Error messages may differ by platforms.
-    // alloc_slice errmsg = CBLError_Message(&outError);
-    // CHECK(errmsg == "Address already in use");
+    CHECK(outError.code); // EADDRINUSE (Error messages may differ by platforms)
 
     // Stops both listeners.
     CBLURLEndpointListener_Stop(listener);

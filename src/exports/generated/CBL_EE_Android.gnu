@@ -67,7 +67,7 @@ CBL_C {
 		kCBLCertAttrKeyURL;
 		kCBLCertAttrKeyIPAddress;
 		kCBLCertAttrKeyRegisteredID;
-		CBLKeyPair_CreateWithCallbacks;
+		CBLKeyPair_CreateWithExternalKey;
 		CBLKeyPair_CreateWithPrivateKeyData;
 		CBLKeyPair_PublicKeyDigest;
 		CBLKeyPair_PublicKeyData;

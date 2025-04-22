@@ -163,62 +163,63 @@ typedef CBL_ENUM(int, CBLSignatureDigestAlgorithm) {
     kCBLSignatureDigestRIPEMD160,  ///< RIPEMD-160 message digest.
 };
 
-/** Callbacks for a key pair to perform cryptographic operations for certificate signing and TLS handshake process.
-    The core idea is that all operations involving the private key are executed within secure key storage,
-    ensuring the private key is never exposed outside the storage. */
-typedef struct CBLKeyPairCallbacks {
+/** Callbacks for performing cryptographic operations with an externally managed key pair.
+    These callbacks are used during certificate signing and the TLS handshake process.
+    The core idea is that all private key operations are delegated to the application's secure key storage,
+    ensuring that the private key is never exposed outside the key storage. */
+typedef struct CBLExternalKeyCallbacks {
     /** Provides the public key's raw data, as an ASN.1 DER sequence of [modulus, exponent].
-        @param context  The context given to CBLKeyPair_CreateWithCallbacks.
+        @param externalKey  The external key pointer given to CBLKeyPair_CreateWithExternalKey.
         @param output  Where to copy the key data.
         @param outputMaxLen  Maximum length of output that can be written.
         @param outputLen  Store the length of the output here before returning.
         @return True on success, false on failure. */
-    bool (*publicKeyData)(void* context, void* output, size_t outputMaxLen, size_t* outputLen);
+    bool (*publicKeyData)(void* externalKey, void* output, size_t outputMaxLen, size_t* outputLen);
     
     /** Decrypts the input data using the private key, applying the RSA algorithm with PKCS#1 v1.5 padding.
         In some cryptographic libraries, this is referred to as “RSA/ECB/PKCS1Padding.
-        @param context  The context given to CBLKeyPair_CreateWithCallbacks.
+        @param externalKey  The external key pointer given to CBLKeyPair_CreateWithExternalKey.
         @param input  The encrypted data (size is always equal to the key size.)
         @param output  Where to write the decrypted data.
         @param outputMaxLen  Maximum length of output that can be written.
         @param outputLen  Store the length of the output here before returning.
         @return True on success, false on failure.
         @note Depending on the selected key exchange method, the decrypt() function may not be invoked
-              during the TLS handshake.
-     */
-    bool (*decrypt)(void* context, FLSlice input, void* output, size_t outputMaxLen, size_t* outputLen);
+              during the TLS handshake. */
+    bool (*decrypt)(void* externalKey, FLSlice input, void* output, size_t outputMaxLen, size_t* outputLen);
     
     /** Generates a signature for the input data using the private key and the PKCS#1 v1.5 padding algorithm.
         Ensure that the input data, which is already hashed based on the specified digest algorithm, is encoded as
         an ASN.1 DigestInfo structure in DER format before performing the signing operation. Some cryptographic
         libraries may handle the DigestInfo formatting internally.
-        @param context  The context given to CBLKeyPair_CreateWithCallbacks.
+        @param externalKey  The external key pointer given to CBLKeyPair_CreateWithExternalKey.
         @param digestAlgorithm  Indicates what type of digest to create the signature from.
         @param inputData The data to be signed.
         @param outSignature  Write the signature here; length must be equal to the key size.
         @return True on success, false on failure.
-        @note The data in inputData is already hashed and DOES NOT need to be hashed by the caller.
+        @note The inputData has already been hashed; the implementation MUST NOT hash it again.
               The algorithm is provided as a reference for what was used to perform the hashing. */
-    bool (*sign)(void* context, CBLSignatureDigestAlgorithm digestAlgorithm, FLSlice inputData, void* outSignature);
+    bool (*sign)(void* externalKey, CBLSignatureDigestAlgorithm digestAlgorithm, FLSlice inputData, void* outSignature);
     
     /** Called when the CBLKeyPair is released and the callback is no longer needed, so that
         your code can free any associated resources. (This callback is optionaly and may be NULL.)
-        @param context The context given to CBLKeyPair_CreateWithCallbacks. */
-    void (*_cbl_nullable free)(void* context);
-} CBLKeyPairCallbacks;
+        @param externalKey  The external key pointer given to CBLKeyPair_CreateWithExternalKey. */
+    void (*_cbl_nullable free)(void* externalKey);
+} CBLExternalKeyCallbacks;
 
-/** Returns an RSA Key pair using the provided callbacks.
-    @param context A user-defined context pointer that will be passed to each callback.
+/** Returns an RSA key pair object that wraps an external key pair managed by application code.
+    All private key operations (signing and decryption) are delegated to the specified callbacks.
     @param keySizeInBits The size of the RSA key in bits (e.g., 2048 or 4096).
-    @param callbacks A set of callback functions used to perform cryptographic operations with the key pair.
+    @param externalKey An opaque pointer that will be passed to the callbacks. Typically a pointer to your own external key object.
+    @param callbacks A set of callback functions used to perform cryptographic operations using the external key.
     @param outError On failure, the error will be written here.
     @return A CBLKeyPair instance on success, or NULL on failure.
     @note You are responsible for releasing the returned KeyPair */
 _cbl_warn_unused
-CBLKeyPair* _cbl_nullable CBLKeyPair_CreateWithCallbacks(void* context,
-                                                         size_t keySizeInBits,
-                                                         CBLKeyPairCallbacks callbacks,
-                                                         CBLError* _cbl_nullable outError) CBLAPI;
+CBLKeyPair* _cbl_nullable CBLKeyPair_CreateWithExternalKey(size_t keySizeInBits,
+                                                           void* externalKey,
+                                                           CBLExternalKeyCallbacks callbacks,
+                                                           CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Creates an RSA KeyPair from private key data in PEM or DER format.
     @param privateKeyData The private key data in either PEM or DER format.
@@ -355,7 +356,7 @@ CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithLabel(FLString label,
  *  @return A CBLTLSIdentity instance on success, or `NULL` if an error occurs.
     @note You are responsible for releasing the returned reference. */
 _cbl_warn_unused
-CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyPair* _cbl_nullable keypair,
+CBLTLSIdentity* _cbl_nullable CBLTLSIdentity_IdentityWithKeyPairAndCerts(CBLKeyPair* keypair,
                                                                          CBLCert* cert,
                                                                          CBLError* _cbl_nullable outError) CBLAPI;
 

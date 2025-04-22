@@ -369,12 +369,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Self-Signed Identity with PrivateKey 
     ExternalKeyContext ekContext{externalKey};
 
     // Creates a RSA KeyPair from the KeyPair callback.
-
-    CBLKeyPair* cblKeyPair = CBLKeyPair_CreateWithCallbacks(&ekContext, 2048,
-                                                            CBLKeyPairCallbacks{
-            // These callbacks are defined in TLSIdentityTest+Apple.mm
-            kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
-                                                            &outError);
+    // These callbacks are defined in TLSIdentityTest+Apple.mm
+    CBLKeyPair* cblKeyPair = CBLKeyPair_CreateWithExternalKey(2048,
+                                                              &ekContext,
+                                                              CBLExternalKeyCallbacks{kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
+                                                              &outError);
+    
     CHECK(outError.code == 0);
     CHECK(cblKeyPair);
 
