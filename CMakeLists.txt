@@ -76,11 +76,11 @@ configure_file(
 )
 
 if(MSVC)
-    include("cmake/platform_win.cmake")
-
     # CBL-6932 : Workaround to avoid crash when locking mutex on VC++ Runtime version < 14.4.
     # Add this before adding any subdirectories so that the added definition is propagated.
     add_compile_definitions(_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
+    
+    include("cmake/platform_win.cmake")
 elseif(ANDROID)
     include("cmake/platform_android.cmake")
 elseif(APPLE)
