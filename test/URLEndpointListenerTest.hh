@@ -50,6 +50,15 @@ public:
             db2.close();
             db2 = nullptr;
         }
+
+        std::set<alloc_slice> labelSet;
+        for (const auto& label : identityLabelsToDelete) {
+            auto res = labelSet.insert(label);
+            // Make sure that a test does not generate identical labels.
+            printf("Deleteing %s\n", label.asString().c_str());
+            REQUIRE(res.second);
+            CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(label, nullptr));
+        }
     }
     
     CBLEndpoint* clientEndpoint(CBLURLEndpointListener* listener, CBLError* outError);
@@ -64,5 +73,6 @@ public:
     Database db2;
     vector<CBLCollection*> cx;
     vector<CBLCollection*> cy;
+    vector<alloc_slice> identityLabelsToDelete;
 };
 #endif //#ifdef COUCHBASE_ENTERPRISE

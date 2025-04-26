@@ -19,6 +19,7 @@
 #ifdef COUCHBASE_ENTERPRISE
 
 #include "CBLURLEndpointListener_Internal.hh"
+#include "CBLPrivate.h"
 
 CBLListenerAuthenticator* CBLListenerAuth_CreatePassword(CBLListenerPasswordAuthCallback auth, void* context) noexcept {
     try {
@@ -79,4 +80,12 @@ void CBLURLEndpointListener_Stop(CBLURLEndpointListener* listener) noexcept {
     } catchAndWarnNoReturn()
 }
 
+// CBLPrivate.h
+FLSliceResult CBLURLEndpointListener_AnonymousLabel(const CBLURLEndpointListener* listener) noexcept {
+    return (FLSliceResult)listener->anonymousLabel();
+}
+
+CBLTLSIdentity* CBLURLEndpointListener_TLSIdentity(const CBLURLEndpointListener* listener) noexcept {
+    return listener->TLSIdentity();
+}
 #endif
