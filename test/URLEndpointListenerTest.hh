@@ -57,10 +57,14 @@ public:
             // Make sure that a test does not generate identical labels.
             printf("Deleteing %s\n", label.asString().c_str());
             REQUIRE(res.second);
+#if !defined(__linux__) && !defined(__ANDROID__)
             CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(label, nullptr));
+#else // #if !defined(__linux__) && !defined(__ANDROID__)
+            assert(false);
+#endif
         }
     }
-    
+
     CBLEndpoint* clientEndpoint(CBLURLEndpointListener* listener, CBLError* outError);
     vector<CBLReplicationCollection> collectionConfigs(vector<CBLCollection*>collections);
     CBLTLSIdentity* createTLSIdentity(bool isServer, bool withExternalKey);
