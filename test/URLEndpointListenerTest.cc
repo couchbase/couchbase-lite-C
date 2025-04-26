@@ -388,8 +388,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
     if (listenerConfig.tlsIdentity) {
         CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
     } else {
+#if !defined(__linux__) && !defined(__ANDROID__)
         CHECK(anonymousLabel);
         identityLabelsToDelete.emplace_back(anonymousLabel);
+#else
+        CHECK(!anonymousLabel);
+#endif
     }
 }
 
