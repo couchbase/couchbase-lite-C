@@ -65,11 +65,17 @@ namespace cbl_internal {
         CBLURLEndpoint(fleece::slice url)
         :_url(url)
         {
-            if (!C4Address::fromURL(_url, &_address, (fleece::slice*)&_dbName)) {
+            if (!C4Address::fromURL(_url, &_address, nullptr)) {
                 C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
                                "Invalid URLEndpoint url '%.*s'", FMTSLICE(_url));
-            } else if (_address.scheme != kC4Replicator2Scheme &&
-                       _address.scheme != kC4Replicator2TLSScheme) {
+            }
+            
+            if (!extractRemoteDatabaseName(&_address, &_dbName)) {
+                C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
+                               "Invalid Database Name in URLEndpoint url '%.*s'", FMTSLICE(_url));
+            }
+            
+            if (_address.scheme != kC4Replicator2Scheme && _address.scheme != kC4Replicator2TLSScheme) {
                 C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter,
                                "Invalid scheme for URLEndpoint url '%.*s'. It must be either 'ws:' or 'wss:'.",
                                FMTSLICE(_url));
@@ -83,6 +89,23 @@ namespace cbl_internal {
     private:
         fleece::alloc_slice _url;
         C4String _dbName = { };
+        
+        bool extractRemoteDatabaseName(C4Address* address, C4String* outDbName) {
+            auto str = fleece::slice(address->path);
+            
+            if ( str.hasSuffix(fleece::slice("/")) ) str.setSize(str.size - 1);
+            const uint8_t* slash;
+            while ( (slash = str.findByte('/')) != nullptr ) str.setStart(slash + 1);
+            
+            address->path = fleece::slice(address->path.buf, str.buf);
+            outDbName->buf = str.buf;
+            outDbName->size = str.size;
+            return validateDatabaseName(str);
+        }
+        
+        bool validateDatabaseName(fleece::slice dbName) {
+            return (dbName.size > 0);
+        }
     };
 
 #ifdef COUCHBASE_ENTERPRISE
