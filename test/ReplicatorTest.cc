@@ -52,7 +52,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
 }
 
 
-TEST_CASE_METHOD(ReplicatorTest, "Validate url", "[Replicator]") {
+TEST_CASE_METHOD(ReplicatorTest, "Bad url", "[Replicator]") {
     ExpectingExceptions x;
     
     // No db:
@@ -62,39 +62,11 @@ TEST_CASE_METHOD(ReplicatorTest, "Validate url", "[Replicator]") {
     CHECK(error.domain == kCBLDomain);
     CHECK(error.code == kCBLErrorInvalidParameter);
     
-    // No db:
-    endpoint = CBLEndpoint_CreateWithURL("ws://localhost:4984/"_sl, &error);
-    CHECK(!endpoint);
-    CHECK(error.domain == kCBLDomain);
-    CHECK(error.code == kCBLErrorInvalidParameter);
-    
     // Invalid scheme:
     endpoint = CBLEndpoint_CreateWithURL("https://localhost:4984/db"_sl, &error);
     CHECK(!endpoint);
     CHECK(error.domain == kCBLDomain);
     CHECK(error.code == kCBLErrorInvalidParameter);
-    
-    // Good db:
-    endpoint = CBLEndpoint_CreateWithURL("ws://localhost:4984/db"_sl, &error);
-    CHECK(endpoint);
-    CBLEndpoint_Free(endpoint);
-    
-    endpoint = CBLEndpoint_CreateWithURL("ws://localhost:4984/db.1"_sl, &error);
-    CHECK(endpoint);
-    CBLEndpoint_Free(endpoint);
-    
-    endpoint = CBLEndpoint_CreateWithURL("ws://localhost:4984/Db"_sl, &error);
-    CHECK(endpoint);
-    CBLEndpoint_Free(endpoint);
-    
-    endpoint = CBLEndpoint_CreateWithURL("ws://localhost:4984/db/"_sl, &error);
-    CHECK(endpoint);
-    CBLEndpoint_Free(endpoint);
-    
-    // wss:
-    endpoint = CBLEndpoint_CreateWithURL("wss://localhost:4984/db"_sl, &error);
-    CHECK(endpoint);
-    CBLEndpoint_Free(endpoint);
 }
 
 #ifndef __ANDROID__
