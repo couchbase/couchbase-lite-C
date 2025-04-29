@@ -23,20 +23,22 @@ function(init_vars)
     init_vars_linux()
 endfunction()
 
-function(set_android_exported_symbols_file)
+function(set_android_exported_symbols_file_and_linker_flags)
     if(BUILD_ENTERPRISE)
-        set_target_properties(
-            cblite PROPERTIES LINK_FLAGS
-            "-Wl,--version-script=${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_EE_Android.gnu")
+        set(EXPORT_LINK_FLAGS "-Wl,--version-script=${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_EE_Android.gnu")
     else()
-                set_target_properties(
-            cblite PROPERTIES LINK_FLAGS
-            "-Wl,--version-script=${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_Android.gnu")
+        set(EXPORT_LINK_FLAGS "-Wl,--version-script=${PROJECT_SOURCE_DIR}/src/exports/generated/CBL_Android.gnu")
     endif()
+    
+    # Set the final link flags
+    set(ANDROID_LINK_FLAGS "${EXPORT_LINK_FLAGS} -Wl,-z,max-page-size=16384")
+    
+    # Set the target properties with the combined link flags
+    set_target_properties(cblite PROPERTIES LINK_FLAGS "${ANDROID_LINK_FLAGS}")
 endfunction()
 
 function(set_dylib_properties)
-    set_android_exported_symbols_file()
+    set_android_exported_symbols_file_and_linker_flags()
     
     target_compile_definitions(cblite-static PRIVATE -D_CRYPTO_MBEDTLS)
     target_link_libraries(cblite PRIVATE atomic log zlibstatic)
