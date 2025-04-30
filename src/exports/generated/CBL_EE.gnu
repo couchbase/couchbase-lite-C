@@ -131,7 +131,6 @@ CBL_C {
 		CBLCollection_DeleteIndex;
 		CBLCollection_GetIndex;
 		CBLCollection_GetIndexNames;
-		CBLCollection_GetIndexesInfo;
 		kCBLDefaultScopeName;
 		CBLScope_Name;
 		CBLScope_Database;
@@ -171,6 +170,12 @@ CBL_C {
 		CBLLog_SetConsoleLevel;
 		CBLLog_FileConfig;
 		CBLLog_SetFileConfig;
+		CBLLogSinks_SetConsole;
+		CBLLogSinks_Console;
+		CBLLogSinks_SetCustom;
+		CBLLogSinks_CustomSink;
+		CBLLogSinks_SetFile;
+		CBLLogSinks_File;
 		CBLDatabase_CreateQuery;
 		CBLQuery_Parameters;
 		CBLQuery_SetParameters;
@@ -210,6 +215,7 @@ CBL_C {
 		CBLReplicator_UserAgent;
 		CBLDefaultConflictResolver;
 		CBLCollection_DeleteDocumentByID;
+		CBLCollection_GetIndexesInfo;
 		CBLCollection_LastSequence;
 		CBLDatabase_DeleteDocumentByID;
 		CBLDatabase_LastSequence;
@@ -220,12 +226,18 @@ CBL_C {
 		CBLQuery_SetListenerCallbackDelay;
 		CBLLog_BeginExpectingExceptions;
 		CBLLog_EndExpectingExceptions;
+		CBLLog_Reset;
+		CBLLog_LogWithC4Log;
+		CBL_DeleteDirectoryRecursive;
 		kCBLDefaultDatabaseFullSync;
 		kCBLDefaultDatabaseMmapDisabled;
 		kCBLDefaultLogFileUsePlaintext;
 		kCBLDefaultLogFileUsePlainText;
 		kCBLDefaultLogFileMaxSize;
 		kCBLDefaultLogFileMaxRotateCount;
+		kCBLDefaultFileLogSinkUsePlaintext;
+		kCBLDefaultFileLogSinkMaxSize;
+		kCBLDefaultFileLogSinkMaxKeptFiles;
 		kCBLDefaultFullTextIndexIgnoreAccents;
 		kCBLDefaultReplicatorType;
 		kCBLDefaultReplicatorContinuous;

@@ -81,7 +81,7 @@ public:
 
     static void deleteDatabase(slice name, slice inDirectory) {
         CBLLog_Init();
-        C4Database::deleteNamed(name, effectiveDir(inDirectory));
+        (void) C4Database::deleteNamed(name, effectiveDir(inDirectory));
     }
 
     static Retained<CBLDatabase> open(slice name,
@@ -134,9 +134,6 @@ public:
         config.mmapDisabled = (c4config.flags & kC4DB_MmapDisabled) == kC4DB_MmapDisabled;
         return config;
     }
-
-    uint64_t count() const                           {return _c4db->useLocked()->getDocumentCount();}
-    uint64_t lastSequence() const                    {return static_cast<uint64_t>(_c4db->useLocked()->getLastSequence());}
     
     std::string desc() const                         {return "CBLDatabase[" + _name.asString() + "]";}
 

@@ -20,6 +20,7 @@
 #include "CBLBlob_Internal.hh"
 #include "CBLQuery_Internal.hh"
 #include "CBLEncryptable_Internal.hh"
+#include "c4Log.h"
 
 
 using namespace std;

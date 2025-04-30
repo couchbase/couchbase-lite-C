@@ -20,6 +20,7 @@
 #include "CBLBlob_Internal.hh"
 #include "CBLCollection_Internal.hh"
 #include "c4Index.hh"
+#include "c4Log.h"
 
 using namespace fleece;
 

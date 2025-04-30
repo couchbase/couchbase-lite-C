@@ -18,6 +18,7 @@
 
 #include "CBLBase.h"
 #include "CBLPrivate.h"
+#include "FilePath.hh"
 #include "Internal.hh"
 #include "Listener.hh"
 #include <iostream>
@@ -68,4 +69,12 @@ void CBLListener_Remove(CBLListenerToken *token) noexcept {
         token->remove();
         release(token);
     }
+}
+
+/** Private API */
+bool CBL_DeleteDirectoryRecursive(FLString dir, CBLError* _cbl_nullable outError) noexcept {
+    try {
+        auto path = litecore::FilePath(fleece::slice(dir), "");
+        return path.delRecursive();
+    } catchAndBridge(outError)
 }

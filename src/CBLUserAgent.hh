@@ -113,11 +113,11 @@ using alloc_slice = fleece::alloc_slice;
 // TEMPLATE - “CouchbaseLite”/<version> “-” <build #> ” (Java; ” <Android API> “;” <device id> “) ” <build type> “, Commit/” (“unofficial@” <hostname> | <git commit>) ” Core/” <core version>
 // OUTPUT   - CouchbaseLite/3.1.0-SNAPSHOT (Java; Android 11; Pixel 4a) EE/debug, Commit/unofficial@HQ-Rename0337 Core/3.1.0
 
-static std::string createUserAgentHeader(){
-        std::stringstream header;
-        std::string os;
-        alloc_slice coreVersion = c4_getVersion();
-        alloc_slice coreBuild = c4_getBuildInfo();
+static std::string userAgentHeader(){
+    std::stringstream header;
+    std::string os;
+    alloc_slice coreVersion = c4_getVersion();
+    alloc_slice coreBuild = c4_getBuildInfo();
 #if defined (__APPLE__) && defined (__MACH__)
 #if TARGET_IPHONE_SIMULATOR
     os = "iOS Simulator " + getAppleVersion();
@@ -127,38 +127,38 @@ static std::string createUserAgentHeader(){
     os = "macOS " + getAppleVersion();
 #endif
 #elif __ANDROID__
-        char rel_ver_str[PROP_VALUE_MAX];
-        char sdk_ver_str[PROP_VALUE_MAX];
-        __system_property_get("ro.build.version.sdk", sdk_ver_str);
-        __system_property_get("ro.build.version.release", rel_ver_str);
-        os = "Android " + std::string(rel_ver_str) + " - API " + std::string(sdk_ver_str);
+    char rel_ver_str[PROP_VALUE_MAX];
+    char sdk_ver_str[PROP_VALUE_MAX];
+    __system_property_get("ro.build.version.sdk", sdk_ver_str);
+    __system_property_get("ro.build.version.release", rel_ver_str);
+    os = "Android " + std::string(rel_ver_str) + " - API " + std::string(sdk_ver_str);
 #elif _MSC_VER
-        RTL_OSVERSIONINFOW version{};
-        version.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
-        auto result = RtlGetVersion(&version);
-        std::stringstream osStream;
-        if (result < 0) {
-            os = "Microsoft Windows (Version Fetch Failed)";
-        } else {
-            osStream << "Microsoft Windows " << version.dwMajorVersion << "." << version.dwMinorVersion << "." << version.dwBuildNumber;
-            os = osStream.str();
-        }
+    RTL_OSVERSIONINFOW version{};
+    version.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
+    auto result = RtlGetVersion(&version);
+    std::stringstream osStream;
+    if (result < 0) {
+        os = "Microsoft Windows (Version Fetch Failed)";
+    } else {
+        osStream << "Microsoft Windows " << version.dwMajorVersion << "." << version.dwMinorVersion << "." << version.dwBuildNumber;
+        os = osStream.str();
+    }
 #elif __linux__
-        os = getDistroInfo();
+    os = getDistroInfo();
 #else
-        os = "Unknown OS";
+    os = "Unknown OS";
 #endif
-        header << "CouchbaseLite/"
-                << CBLITE_VERSION
-                << "-"
-                << CBLITE_BUILD_NUMBER
-                << " ("
-                << os
-                << ") "
-                << "Commit/"
-                << CBLITE_SOURCE_ID
-                << " Core/"
-                << coreVersion.asString();
-
-        return header.str();
+    header << "CouchbaseLite/"
+    << CBLITE_VERSION
+    << "-"
+    << CBLITE_BUILD_NUMBER
+    << " ("
+    << os
+    << ") "
+    << "Commit/"
+    << CBLITE_SOURCE_ID
+    << " Core/"
+    << coreVersion.asString();
+    
+    return header.str();
 }

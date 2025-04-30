@@ -65,6 +65,21 @@ CBL_PUBLIC extern const uint32_t kCBLDefaultLogFileMaxRotateCount;
 
 /** @} */
 
+/** \name CBLFileLogSink
+    @{
+*/
+
+/** [false] Plaintext is not used, and instead binary encoding is used in log files */
+CBL_PUBLIC extern const bool kCBLDefaultFileLogSinkUsePlaintext;
+
+/** [524288] 512 KiB for the size of a log file */
+CBL_PUBLIC extern const size_t kCBLDefaultFileLogSinkMaxSize;
+
+/** [2] 2 files preserved during each log rotation */
+CBL_PUBLIC extern const uint32_t kCBLDefaultFileLogSinkMaxKeptFiles;
+
+/** @} */
+
 /** \name CBLFullTextIndexConfiguration
     @{
 */

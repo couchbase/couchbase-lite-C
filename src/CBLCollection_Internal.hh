@@ -111,20 +111,34 @@ public:
 #pragma mark - INDEXES:
     
     void createValueIndex(slice name, CBLValueIndexConfiguration config) {
-        C4IndexOptions options = {};
+        C4IndexOptions options {};
+        
+        alloc_slice whereAlloc;
+        if (config.where.buf) {
+            whereAlloc = alloc_slice::nullPaddedString(slice(config.where));
+            options.where = (const char*)whereAlloc.buf;
+        }
+        
         _c4col.useLocked()->createIndex(name, config.expressions,
                                         (C4QueryLanguage)config.expressionLanguage,
                                         kC4ValueIndex, &options);
     }
     
     void createFullTextIndex(slice name, CBLFullTextIndexConfiguration config) {
-        C4IndexOptions options = {};
+        C4IndexOptions options {};
+        
         options.ignoreDiacritics = config.ignoreAccents;
         
-        std::string languageStr;
+        alloc_slice langAlloc;
         if (config.language.buf) {
-            languageStr = std::string(config.language);
-            options.language = languageStr.c_str();
+            langAlloc = alloc_slice::nullPaddedString(slice(config.language));
+            options.language = (const char*)langAlloc.buf;
+        }
+        
+        alloc_slice whereAlloc;
+        if (config.where.buf) {
+            whereAlloc = alloc_slice::nullPaddedString(slice(config.where));
+            options.where = (const char*)whereAlloc.buf;
         }
         
         _c4col.useLocked()->createIndex(name, config.expressions,
@@ -133,8 +147,10 @@ public:
     }
     
     void createArrayIndex(slice name, CBLArrayIndexConfiguration config) {
-        C4IndexOptions options = {};
-        options.unnestPath = (char*)config.path.buf;
+        C4IndexOptions options {};
+        
+        alloc_slice pathAlloc = alloc_slice::nullPaddedString(slice(config.path));
+        options.unnestPath = (const char*)pathAlloc.buf;
         
         auto exprs = config.expressions;
         if (!exprs.buf && config.expressionLanguage == kCBLJSONLanguage) {
