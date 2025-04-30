@@ -287,7 +287,7 @@ TEST_CASE_METHOD(LogTest, "File Logging : Set Log Level", "[Log]") {
     }
     
     // Verify:
-    int lineCount = 2; // 2 header lines :
+    int lineCount = 2 + 1; // 2 header lines + 1 ending line :
     for (CBLLogLevel level : kLogLevels) {
         if (level == kCBLLogNone)
             continue;
@@ -642,7 +642,7 @@ TEST_CASE_METHOD(LogTest, "File Log Sink : Log Level", "[Log]") {
     }
     
     // Verify:
-    int lineCount = 2; // 2 header lines :
+    int lineCount = 2 + 1; // 2 header lines + 1 ending line:
     for (CBLLogLevel level : kLogLevels) {
         if (level == kCBLLogNone)
             continue;
@@ -754,5 +754,6 @@ TEST_CASE_METHOD(LogTest, "File Log Sink : Disable", "[Log]") {
     
     writeLog(kCBLLogDomainDatabase, kCBLLogInfo, "message");
     lines = readLogFile(kCBLLogInfo);
-    REQUIRE(lines.size() == 3); // No changes
+    REQUIRE(lines.size() == 4); // No changes + 1 for ending line.
+    CHECK(lines[3].find("---- END ----"));
 }

@@ -19,6 +19,7 @@
 #pragma once
 #include "CBLLogSinks.h"
 #include "Internal.hh"
+#include "c4Log.h"
 
 #include <algorithm>
 #include <atomic>

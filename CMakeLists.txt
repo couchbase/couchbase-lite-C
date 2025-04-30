@@ -100,6 +100,7 @@ add_subdirectory(vendor/couchbase-lite-core EXCLUDE_FROM_ALL)
 include_directories(
     "vendor/couchbase-lite-core/C/include"
     "vendor/couchbase-lite-core/C/Cpp_include"
+    "vendor/couchbase-lite-core/LiteCore/Logging"
     "vendor/couchbase-lite-core/LiteCore/Support"
     "vendor/couchbase-lite-core/vendor/fleece/API"
     "vendor/couchbase-lite-core/vendor/fleece/Fleece/Support"

@@ -19,6 +19,7 @@
 #include "Internal.hh"
 #include "CBLLog_Internal.hh"
 #include "c4Base.hh"
+#include "c4Log.h"
 #include "fleece/Fleece.h"
 #include "fleece/FLExpert.h"
 #include "betterassert.hh"

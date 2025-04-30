@@ -21,6 +21,6 @@
 PRODUCT_NAME                = cblite-static
 
 DSTROOT                     = /tmp/couchbase_lite_C.dst
-HEADER_SEARCH_PATHS         = $(LITECORE)/C/include $(LITECORE)/C/Cpp_include $(LITECORE)/C  $(LITECORE)/LiteCore/Support  $(FLEECE)/API  $(FLEECE)/Fleece/Support $(SRCROOT)/include
+HEADER_SEARCH_PATHS         = $(LITECORE)/C/include $(LITECORE)/C/Cpp_include $(LITECORE)/C  $(LITECORE)/LiteCore/Support  $(LITECORE)/LiteCore/Logging  $(FLEECE)/API  $(FLEECE)/Fleece/Support $(SRCROOT)/include
 SKIP_INSTALL                = YES
 STRIP_INSTALLED_PRODUCT     = NO
