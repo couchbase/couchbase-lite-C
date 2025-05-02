@@ -20,6 +20,7 @@
 #include "CBLPrivate.h"
 #include "TLSIdentityTest.hh"
 #include "fleece/Fleece.hh"
+#include <cstddef>
 #include <chrono>
 #include <fstream>
 #include <string>
@@ -164,7 +165,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Basics", "[URLListener]") {
         REQUIRE(configFromListener);
         // Listener keeps the config by a copy.
         CHECK(&listenerConfig != configFromListener);
-        CHECK(0 == memcmp(configFromListener, &listenerConfig, sizeof(CBLURLEndpointListenerConfiguration)));
+        size_t offset = offsetof(CBLURLEndpointListenerConfiguration, collectionCount);
+        CHECK(0 == memcmp((char*)configFromListener + offset,
+                          (char*)&listenerConfig + offset,
+                          sizeof(CBLURLEndpointListenerConfiguration) - offset));
+        CHECK(0 == memcmp(configFromListener->collections, listenerConfig.collections,
+                          listenerConfig.collectionCount * sizeof(CBLCollection*)));
     }
 
     SECTION("Port from the Listener") {
@@ -558,14 +564,14 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Busy Port", "[URLListener]") {
 
     CBLURLEndpointListener* listener2 = CBLURLEndpointListener_Create(&listener2Config, nullptr);
 
-    // Starts the second listener.
     CBLError outError{};
-    bool succ = true;
+    
+    // Starts the second listener.
     {
         ExpectingExceptions x;
-        succ = CBLURLEndpointListener_Start(listener2, &outError);
+        bool succ = CBLURLEndpointListener_Start(listener2, &outError);
+        CHECK(!succ);
     }
-    CHECK(!succ);
 
     // Checks that an error is returned as POSIX/EADDRINUSE or equivalent when starting the second listener.
     CHECK(outError.code); // EADDRINUSE (Error messages may differ by platforms)
@@ -1006,13 +1012,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Client Cert Auth with Disabled TLS", 
     // Starts the listener.
 
     CBLError outError{};
-    CBLURLEndpointListener* listener = nullptr;
     {
         ExpectingExceptions x;
-        listener = CBLURLEndpointListener_Create(&listenerConfig, &outError);
+        CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, &outError);
+        CHECK(outError.code == 9);
+        CHECK(!listener);
     }
-    CHECK(outError.code == 9);
-    CHECK(!listener);
     
     // Cleanups
     CBLListenerAuth_Free(listenerConfig.authenticator);
@@ -1232,6 +1237,32 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Close Database Stops Listener", "[URL
     CHECK(port == 0);
     
     CBLURLEndpointListener_Release(listener);
+}
+
+TEST_CASE_METHOD(URLEndpointListenerTest, "Start and Stop Listener", "[URLListener]") {
+    CBLURLEndpointListener* listener;
+    {
+        CBLError error{};
+        CBLURLEndpointListenerConfiguration config{};
+
+        vector<CBLCollection*> vec;
+        CBLCollection* collection = CBLDatabase_DefaultCollection(db.ref(), &error);
+        vec.push_back(collection);
+
+        config.collections = vec.data();
+        config.collectionCount = vec.size();
+        config.port = 0;
+        config.disableTLS = true;
+        listener = CBLURLEndpointListener_Create(&config, &error);
+        CBLURLEndpointListener_Start(listener, &error);
+
+        CBLCollection_Release(collection);
+    }
+
+    {
+        CBLURLEndpointListener_Stop(listener);
+        CBLURLEndpointListener_Release(listener);
+    }
 }
 
 
