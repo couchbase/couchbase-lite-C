@@ -70,6 +70,8 @@ CBLIndexUpdater_Value
 CBLCollection_IsIndexTrained
 CBLKeyPair_GenerateRSAKeyPair
 CBLKeyPair_PublicKeyFromData
+CBLURLEndpointListener_AnonymousLabel
+CBLURLEndpointListener_TLSIdentity
 
 ### URLEndpointListener
 

@@ -178,6 +178,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Use Identity Created with Label", "[T
             WARN("Error Code=" << outError.code << ", msge=" << msg.asString());
         }
         CHECK(outError.code == 0);
+        identityLabelsToDelete.emplace_back(TLSIdentityTest::Label);
     }
 
     CHECK(identity);
@@ -239,10 +240,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Self-Signed Identity with Private Key
     CBLError outError{};
 
     // Gets a pre-created RSA private key data in PEM format with a password from file.
-    constexpr const char* pem = "private_key_pass.pem";
-    string path = GetAssetFilePath(pem);
-    std::ifstream file(path, std::ios::binary);  // Use binary to preserve newlines
-    string pemString{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+    string pemString = URLEndpointListenerTest::readFile("private_key_pass.pem");
 
     // Creates a RSA KeyPair from the data.
     outError.code = 0;
@@ -454,13 +452,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Identity from KeyPair and Certs", "[T
 
     // Create a KeyPair object from a private key loaded from a PEM file.
 
-    auto readPEM = [](const char* fname) -> string {
-        string path = GetAssetFilePath(fname);
-        std::ifstream file(path, std::ios::binary);  // Use binary to preserve newlines
-        return string{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
-    };
-
-    string pem = readPEM("private_key_of_self_signed_cert.pem");
+    string pem = readFile("private_key_of_self_signed_cert.pem");
     outError.code = 0;
     CBLKeyPair* privateKey = CBLKeyPair_CreateWithPrivateKeyData(slice{pem.c_str(), pem.size() + 1},
                                                                  nullslice, // password
@@ -470,7 +462,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Identity from KeyPair and Certs", "[T
 
     // Creates a Cert object from a PEM file.
 
-    pem = readPEM("self_signed_cert.pem");
+    pem = readFile("self_signed_cert.pem");
     outError.code = 0;
     CBLCert* cert = CBLCert_CreateWithData(slice{pem.c_str(), pem.size() + 1}, &outError);
     CHECK(outError.code == 0);
@@ -553,12 +545,9 @@ TEST_CASE_METHOD(TLSIdentityTest, "Get CertChain", "[TSLIdentity]") {
     CBLError outError{};
 
     // Create a Cert object with the PEM file containing a cert chain.
-    
-    string pemChain = [](const char* fname) -> string {
-        string path = GetAssetFilePath(fname);
-        std::ifstream file(path, std::ios::binary);  // Use binary to preserve newlines
-        return string{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
-    }("cert_chain.pem");
+
+    string pemChain = URLEndpointListenerTest::readFile("cert_chain.pem");
+
     outError.code = 0;
     CBLCert* cert = CBLCert_CreateWithData(slice{pemChain}, &outError);
     CHECK(outError.code == 0);
