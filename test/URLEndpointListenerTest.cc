@@ -343,25 +343,12 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
         0         // port
     };
     listenerConfig.disableTLS = false;
-#if !defined(__linux__) && !defined(__ANDROID__)
-    bool anonymous = false;
-    alloc_slice persistentLabel;
-#endif
 
     SECTION("Self-signed Cert") {
         listenerConfig.tlsIdentity = createTLSIdentity(true, withExternalKey);
     }
 
     SECTION("Self-signed Anonymous Cert") {
-#if !defined(__linux__) && !defined(__ANDROID__)
-        anonymous = true;
-        // cy is the collection used in the Listener.
-        // Its UUID is used as the label for persistent TLSIdentity
-        alloc_slice uuid = CBLDatabase_PublicUUID(CBLCollection_Database(cy[0]));
-        persistentLabel = alloc_slice{uuid.hexString()};
-        CBLTLSIdentity* id = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
-        REQUIRE(id == nullptr);
-#endif
     }
 
     listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, CBLCert* cert) {
@@ -397,24 +384,23 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
     REQUIRE(config.authenticator);
     config.replicatorType = kCBLReplicatorTypePush;
     replicate();
-    
-#if !defined(__linux__) && !defined(__ANDROID__)
-    if (anonymous) {
-        REQUIRE(!!persistentLabel);
-        CBLTLSIdentity* id = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
-        CHECK(id);
-        CBLTLSIdentity_Release(id);
-        CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(persistentLabel, nullptr));
-    }
-#endif
 
     CBLURLEndpointListener_Stop(listener);
 
+    alloc_slice anonymousLabel = CBLURLEndpointListener_AnonymousLabel(listener);
     CBLURLEndpointListener_Release(listener);
     CBLTLSIdentity_Release(clientIdentity);
     if (listenerConfig.authenticator) CBLListenerAuth_Free(listenerConfig.authenticator);
-    if (listenerConfig.tlsIdentity)
+    if (listenerConfig.tlsIdentity) {
         CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
+    } else {
+#if !defined(__linux__) && !defined(__ANDROID__)
+        CHECK(anonymousLabel);
+        identityLabelsToDelete.emplace_back(anonymousLabel);
+#else
+        CHECK(!anonymousLabel);
+#endif
+    }
 }
 
 #ifdef __APPLE__
@@ -499,7 +485,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener Port", "[URLListener]") {
         2,
         12345   // port
     };
-    listenerConfig.disableTLS = false;
+    listenerConfig.disableTLS = true;
     
     CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
     REQUIRE(listener);
@@ -529,7 +515,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Empty Port", "[URLListener]") {
         2,
         0   // port
     };
-    listenerConfig.disableTLS = false;
+    listenerConfig.disableTLS = true;
 
     CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
     REQUIRE(listener);
@@ -557,7 +543,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Busy Port", "[URLListener]") {
         2,
         0   // port
     };
-    listenerConfig.disableTLS = false;
+    listenerConfig.disableTLS = true;
 
     CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
     REQUIRE(listener);
@@ -574,7 +560,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Busy Port", "[URLListener]") {
         2,
         port   // port
     };
-    listener2Config.disableTLS = false;
+    listener2Config.disableTLS = true;
 
     CBLURLEndpointListener* listener2 = CBLURLEndpointListener_Create(&listener2Config, nullptr);
 
@@ -606,14 +592,14 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener URLs", "[URLListener]") {
         2,
         0   // port
     };
-    listenerConfig.disableTLS = false;
+    listenerConfig.disableTLS = true;
     
     CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
     REQUIRE(listener);
     
     // Starts the listener.
     REQUIRE(CBLURLEndpointListener_Start(listener, nullptr));
-    
+
     auto port = CBLURLEndpointListener_Port(listener);
     REQUIRE(port > 0);
     
@@ -717,18 +703,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Anonymous Identity", "[URLListener]")
         0         // port
     };
     listenerConfig.disableTLS = false;
-    alloc_slice persistentLabel;
 
-#if !defined(__linux__) && !defined(__ANDROID__)
-    // cy is the collection used in the Listener.
-    // Its UUID is used as the label for persistent TLSIdentity
-    alloc_slice uuid = CBLDatabase_PublicUUID(CBLCollection_Database(cy[0]));
-    persistentLabel = alloc_slice{uuid.hexString()};
-    CBLTLSIdentity* id = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
-    REQUIRE(id == nullptr);
-#endif
-    config.acceptOnlySelfSignedServerCertificate = true;
-    
     // Anonymous Identity means following two conditions:
     REQUIRE(listenerConfig.tlsIdentity == nullptr);
     REQUIRE( !listenerConfig.disableTLS );
@@ -738,16 +713,24 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Anonymous Identity", "[URLListener]")
 
     //Starts the listener.
     CHECK(CBLURLEndpointListener_Start(listener, nullptr));
-    
+
     // Checks that the listener’s TLS identity is not null.
-    // Q: how to check it
-    
+    CHECK(CBLURLEndpointListener_TLSIdentity(listener));
+
+#if !defined(__linux__) && !defined(__ANDROID__)
+    alloc_slice anonymousLabel = CBLURLEndpointListener_AnonymousLabel(listener);
+    CHECK(anonymousLabel);
+    identityLabelsToDelete.emplace_back(anonymousLabel);
+#endif
+
     // Checks that the listener’s TLS identity contains a self-signed certificate. This step may be skipped on the platform that is difficult to check.
 
     // Starts a continuous replicator to the listener using wss URL and with accept only self-sign cert enabled. This step is valid to use a single shot replicator as well.
     
     std::vector<CBLReplicationCollection> colls;
     configOneShotReplicator(listener, colls);
+    config.acceptOnlySelfSignedServerCertificate = true;
+
     replicate();
 
     //Checks that the replicator becomes IDLE without an error.
@@ -758,15 +741,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Anonymous Identity", "[URLListener]")
 
     // Release
     CBLURLEndpointListener_Release(listener);
-#if !defined(__linux__) && !defined(__ANDROID__)
-    // Anonymous identity is either saved by UUID of the database, or released by the listener.
-    if (persistentLabel) {
-        CBLTLSIdentity* id2 = CBLTLSIdentity_IdentityWithLabel(persistentLabel, nullptr);
-        CHECK(id2);
-        CHECK(CBLTLSIdentity_DeleteIdentityWithLabel(persistentLabel, nullptr));
-        CBLTLSIdentity_Release(id2);
-    }
-#endif
 }
 
 // T0010-7 TestListenerWithSpecifiedIdentity
@@ -999,7 +973,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Client Cert Authenticator with RootCe
         config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
         REQUIRE(config.authenticator);
 
-        
         // Checks that the replicator stoped without an error.
     }
 
@@ -1100,7 +1073,7 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Invalid Network Interface", "[URLList
 
 // T0010-13 TestReplicatorServerCertificate
 TEST_CASE_METHOD(URLEndpointListenerTest, "Replicator Server Certificate", "[URLListener]") {
-    // Initializes a listener with a config with TLS enabled with a TLS identity which could be a self-signed certificate.
+    // Initializes a listener with a config with TLS enabled which could be a self-signed certificate.
 
     
     // Starts the listener.
@@ -1167,6 +1140,9 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Accept Only Self-Signed Certificate",
         expectedDocumentCount = -1;
     }
 
+    // Starts a single shot replicator to the listener with accept only self-signed cert mode enabled.
+    // Starts the listener.
+
     replicate();
 
     // Stops the listener.
@@ -1175,10 +1151,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Accept Only Self-Signed Certificate",
     // Cleanups:
     CBLURLEndpointListener_Release(listener);
     CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
-    
-//    Initializes a listener with a config with TLS enabled with a self-signed certificate.
-//    Starts a single shot replicator to the listener with accept only self-signed cert mode enabled.
-//    Starts the listener.
 }
 
 // T0010-15 TestReadOnly

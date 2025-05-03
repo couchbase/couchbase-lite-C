@@ -40,6 +40,8 @@ CBL_C {
 		CBLCollection_IsIndexTrained;
 		CBLKeyPair_GenerateRSAKeyPair;
 		CBLKeyPair_PublicKeyFromData;
+		CBLURLEndpointListener_AnonymousLabel;
+		CBLURLEndpointListener_TLSIdentity;
 		CBLListenerAuth_CreatePassword;
 		CBLListenerAuth_CreateCertificate;
 		CBLListenerAuth_CreateCertificateWithRootCerts;
