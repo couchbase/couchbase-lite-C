@@ -179,6 +179,7 @@ CBL_C {
 		CBLCollection_LastSequence;
 		CBLDatabase_DeleteDocumentByID;
 		CBLDatabase_LastSequence;
+		CBLDatabase_PublicUUID;
 		CBLDocument_CanonicalRevisionID;
 		CBLDocument_GetRevisionHistory;
 		CBLError_GetCaptureBacktraces;

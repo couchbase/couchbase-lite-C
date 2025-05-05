@@ -25,7 +25,7 @@ CBL_VERSION_STRING                                 = 0.0.0 // The actual version
 CBL_BUILD_NUMBER                                   = 0     // The actual build number will be set by Jenkins Build.
 
 IPHONEOS_DEPLOYMENT_TARGET                         = 12.0
-MACOSX_DEPLOYMENT_TARGET                           = 10.14
+MACOSX_DEPLOYMENT_TARGET                           = 12.0
 TVOS_DEPLOYMENT_TARGET                             = 11.0
 SUPPORTED_PLATFORMS                                = macosx iphoneos iphonesimulator appletvos appletvsimulator
 VALID_ARCHS                                        = arm64 x86_64

@@ -1,0 +1,23 @@
+
+- cert_chain.pem
+  A chain of 4 certificates. The CNs of the respective certificates are,
+  from leaf certicate to the root certificates, are: "localhost", "inter2", "inter1", "root"
+
+- leaf_inter1_root.pem
+  A certificate chain of 3 certificates: leaf, inter1, and root. The root is self-signed CA.
+  At the leaf, the certicate and the associated preivate key are leaf.pem and leaf.key (in PEM format),
+  so that (leaf.key, leaf_inter1_root.pem) can make a TLSIdentity.
+
+- leaf.key
+- leaf.pem
+  A pair of private key and the associated certificate.
+
+- inter1_root.pem
+  A chain of certificate CAs. The root CA is self-signed. leaf.pem (see above) is certified by inter1.
+
+- self_signed_cert.pem
+- private_key_of_self_signed_cert.pem
+  A self signed certificate and the underlying private key
+
+- private_key_pass.pem
+  A private RSA key requirig pass phrase, "pass".

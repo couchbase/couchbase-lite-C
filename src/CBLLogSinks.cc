@@ -44,8 +44,23 @@ CBLFileLogSink CBLLogSinks::_sFileSink { kCBLLogNone, kFLSliceNull };
 
 std::shared_mutex CBLLogSinks::_sMutex;
 
-static const C4LogDomain kC4Domains[] = { kC4DatabaseLog, kC4QueryLog, kC4SyncLog, kC4WebSocketLog };
 static const char* kC4ExtraDomains[] = { "SyncBusy", "Changes", "BLIPMessages", "TLS", "Zip" };
+
+const std::vector<C4LogDomain>& CBLLogSinks::c4LogDomains() {
+    static const std::vector<C4LogDomain> c4Domains = [] {
+        // MUST match CBLLogDomain order
+        std::vector<C4LogDomain> vec = {
+            kC4DatabaseLog,
+            kC4QueryLog,
+            kC4SyncLog,
+            kC4WebSocketLog
+        };
+        C4LogDomain listenerDomain = c4log_getDomain("Listener", true);
+        vec.push_back(listenerDomain);
+        return vec;
+    }();
+    return c4Domains;
+}
 
 static once_flag initFlag;
 void CBLLogSinks::init() {
@@ -98,7 +113,8 @@ void CBLLogSinks::log(CBLLogDomain domain, CBLLogLevel level, const char *msg) {
     logToCustomLogSink(customSink, domain, level, msg);
     
     // To file log:
-    c4slog(kC4Domains[domain], C4LogLevel(level), slice(msg));
+    C4LogDomain c4LogDomain = toC4LogDomain(domain);
+    c4slog(c4LogDomain, C4LogLevel(level), slice(msg));
 }
 
 void CBLLogSinks::validateAPIUsage(LogAPIStyle style) {
@@ -124,7 +140,8 @@ void CBLLogSinks::reset(void) {
 }
 
 void CBLLogSinks::logWithC4Log(CBLLogDomain domain, CBLLogLevel level, const char *msg) {
-    c4log(kC4Domains[domain], C4LogLevel(level), "%s", msg);
+    C4LogDomain c4Domain = toC4LogDomain(domain);
+    c4log(c4Domain, C4LogLevel(level), "%s", msg);
 }
 
 // Private Functions
@@ -189,12 +206,13 @@ void CBLLogSinks::updateLogLevels() {
     C4LogLevel c4LogLevel = C4LogLevel(domainsLogLevel);
     
     if (_sDomainsLogLevel.load() != domainsLogLevel) {
-        for (const auto c4LogDomain : kC4Domains) {
-            c4log_setLevel(c4LogDomain, c4LogLevel);
+        auto domains = c4LogDomains();
+        for (C4LogDomain domain : domains) {
+            c4log_setLevel(domain, c4LogLevel);
         }
 
         for(const auto* extraName : kC4ExtraDomains) {
-            auto* domain = c4log_getDomain(extraName, false);
+            C4LogDomain domain = c4log_getDomain(extraName, false);
             if (domain) {
                 c4log_setLevel(domain, c4LogLevel);
             }
@@ -261,6 +279,13 @@ void CBLLogSinks::logToCustomLogSink(CBLCustomLogSink& customSink,
     customSink.callback(domain, level, FLStr(msg));
 }
 
+C4LogDomain CBLLogSinks::toC4LogDomain(CBLLogDomain domain) {
+    const auto& domains = c4LogDomains();
+    size_t index = static_cast<size_t>(domain);
+    assert(index < domains.size());
+    return domains[index];
+}
+
 CBLLogDomain CBLLogSinks::toCBLLogDomain(C4LogDomain c4Domain) {
     static const unordered_map<string_view, CBLLogDomain> domainMap = {
         {"DB", kCBLLogDomainDatabase},
@@ -272,7 +297,8 @@ CBLLogDomain CBLLogSinks::toCBLLogDomain(C4LogDomain c4Domain) {
         {"BLIPMessages", kCBLLogDomainNetwork},
         {"WS", kCBLLogDomainNetwork},
         {"Zip", kCBLLogDomainNetwork},
-        {"TLS", kCBLLogDomainNetwork}
+        {"TLS", kCBLLogDomainNetwork},
+        {"Listener", kCBLLogDomainListener}
     };
     
     auto domainName = c4log_getDomainName(c4Domain);
@@ -293,6 +319,8 @@ std::string CBLLogSinks::toLogDomainName(CBLLogDomain domain) {
             return "Replicator";
         case kCBLLogDomainNetwork:
             return "Network";
+        case kCBLLogDomainListener:
+            return "Listener";
         default:
             return "Database";
     }

@@ -21,6 +21,11 @@
 #include "CBLReplicator.h"
 #include "CBLDatabase_Internal.hh"
 #include "CBLCollection_Internal.hh"
+
+#ifdef COUCHBASE_ENTERPRISE
+#include "CBLTLSIdentity_Internal.hh"
+#endif
+
 #include "CBLUserAgent.hh"
 #include "Internal.hh"
 #include "c4ReplicatorTypes.h"
@@ -110,7 +115,7 @@ protected:
 
 public:
     virtual ~CBLAuthenticator()                                 =default;
-    virtual void writeOptions(Encoder&) =0;
+    virtual void writeOptions(Encoder&, C4KeyPair* _cbl_nonnull * _cbl_nullable outExternalKey) =0;
     virtual CBLAuthenticator* clone() const =0;
 };
 
@@ -123,7 +128,7 @@ namespace cbl_internal {
         ,_password(password)
         { }
 
-        virtual void writeOptions(Encoder &enc) override {
+        virtual void writeOptions(Encoder &enc, C4KeyPair* _cbl_nonnull * _cbl_nullable /*outExternalKey*/) override {
             enc.writeKey(slice(kC4ReplicatorOptionAuthentication));
             enc.beginDict();
             enc[slice(kC4ReplicatorAuthType)] = kC4AuthTypeBasic;
@@ -140,6 +145,47 @@ namespace cbl_internal {
         alloc_slice _username, _password;
     };
 
+#ifdef COUCHBASE_ENTERPRISE
+    struct CertAuthenticator : public CBLAuthenticator {
+        CertAuthenticator(CBLTLSIdentity* identity)
+        : _identity(identity)
+        { }
+
+        virtual void writeOptions(Encoder &enc, C4KeyPair* _cbl_nullable * _cbl_nullable outExternalKey) override {
+            enc.writeKey(slice(kC4ReplicatorOptionAuthentication));
+            enc.beginDict();
+            enc[slice(kC4ReplicatorAuthType)] = kC4AuthTypeClientCert;
+            enc.writeKey(slice(kC4ReplicatorAuthClientCert));
+            alloc_slice certData;
+            if (_identity->certificates())
+                certData = _identity->certificates()->c4Cert()->getData(false);
+            enc.writeData(certData);
+            alloc_slice privateKeyData;
+            C4KeyPair* privateKey = _identity->privateKey() ? _identity->privateKey()->c4KeyPair() : nullptr;
+            if (outExternalKey) *outExternalKey = nullptr;
+            if ( privateKey ) {
+                // The life of privateKey is tied to _identity
+                privateKeyData = privateKey->getPrivateKeyData();
+                if (privateKeyData) {
+                    enc.writeKey(C4STR(kC4ReplicatorAuthClientCertKey));
+                    enc.writeData(privateKeyData);
+                } else {
+                    if (outExternalKey) *outExternalKey = privateKey;
+                }
+            }
+
+            enc.endDict();
+        }
+
+        virtual CBLAuthenticator* clone() const override {
+            return new CertAuthenticator(*this);
+        }
+
+    private:
+        fleece::Retained<CBLTLSIdentity> _identity;
+    };
+#endif
+
     // Concrete Authenticator for session-cookie auth:
     struct SessionAuthenticator : public CBLAuthenticator {
         SessionAuthenticator(slice sessionID, slice cookieName)
@@ -149,7 +195,7 @@ namespace cbl_internal {
 
         static constexpr const char* kDefaultCookieName = "SyncGatewaySession";
 
-        virtual void writeOptions(Encoder &enc) override {
+        virtual void writeOptions(Encoder &enc, C4KeyPair* _cbl_nonnull * _cbl_nullable /*outExternalKey*/) override {
             enc.writeKey(slice(kC4ReplicatorOptionCookies));
             enc.writeString(_cookieName + "=" + _sessionID);
         }
@@ -277,8 +323,6 @@ namespace cbl_internal
                 enc.writeKey(slice(kC4ReplicatorOptionRootCerts));
                 enc.writeData(trustedRootCertificates);
             }
-            if (authenticator)
-                authenticator->writeOptions(enc);
             if (proxy) {
                 static constexpr const char* kProxyTypeIDs[] = {kC4ProxyTypeHTTP,
                                                                 kC4ProxyTypeHTTPS};
@@ -296,7 +340,13 @@ namespace cbl_internal
                 }
                 enc.endDict();
             }
-            
+
+#ifdef COUCHBASE_ENTERPRISE
+            if  (acceptOnlySelfSignedServerCertificate) {
+                enc.writeKey(C4STR(kC4ReplicatorOptionOnlySelfSignedServerCert));
+                enc.writeBool(true);
+            }
+#endif
             enc.writeKey(slice(kC4ReplicatorOptionAcceptParentDomainCookies));
             enc.writeBool(acceptParentDomainCookies);
             

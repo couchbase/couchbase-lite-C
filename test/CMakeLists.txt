@@ -1,5 +1,5 @@
-cmake_minimum_required (VERSION 3.1)
-cmake_policy(VERSION 3.1)
+cmake_minimum_required (VERSION 3.5)
+cmake_policy(VERSION 3.5)
 project (CBL_C_Tests)
 
 set(TOP ${PROJECT_SOURCE_DIR}/../)
@@ -16,11 +16,11 @@ add_definitions(
 
 include_directories(
     ${TOP}test/
-    ${TOP}include/
     ${TOP}/src/        # Just for CBLPrivate.h
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/API/
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/catch/
     ${TOP}vendor/couchbase-lite-core/vendor/fleece/vendor/libb64/
+    ${TOP}vendor/couchbase-lite-core/vendor/fleece/Fleece/Support/
     ${PROJECT_BINARY_DIR}/../generated_headers/private/cbl/ # Real independent projects won't need this
     ${PROJECT_BINARY_DIR}/../generated_headers/public/cbl/ # or this
 )
@@ -64,11 +64,13 @@ elseif(APPLE)
     target_sources(
         CBL_C_Tests PRIVATE
         Platform_Apple.mm
+        TLSIdentityTest+Apple.mm
     )
     if(BUILD_ENTERPRISE)
         target_link_libraries(CBL_C_Tests PUBLIC  "-framework CoreFoundation"
                                                   "-framework CoreML"
-                                                  "-framework Vision")
+                                                  "-framework Vision"
+                                                  "-framework Security")
     endif()
 elseif(UNIX)
     target_link_libraries(CBL_C_Tests PUBLIC dl)

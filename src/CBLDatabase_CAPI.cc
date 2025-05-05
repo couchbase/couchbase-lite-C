@@ -155,6 +155,12 @@ uint64_t CBLDatabase_LastSequence(const CBLDatabase* db) noexcept {
     } catchAndWarn()
 }
 
+/** Private API */
+FLSliceResult CBLDatabase_PublicUUID(const CBLDatabase* db) noexcept {
+    try {
+        return FLSliceResult(db->publicUUID());
+    } catchAndWarn()
+}
 
 #pragma mark - DOCUMENTS:
 

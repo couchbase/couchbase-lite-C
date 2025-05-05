@@ -7,6 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B21A7D92D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */; };
+		1B21A7DA2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */; };
+		1B21A7DB2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */; };
+		1B7694AC2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1B7694AB2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm */; };
+		1B7694AD2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1B7694AB2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm */; };
+		1B7694AE2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1B7694AB2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm */; };
+		1B7694B12DA49EB9006EEEAB /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277CC9B122BC4E2E00B245CB /* Security.framework */; };
+		1BC5D9602D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1BC5D9612D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1BC5D9662D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */; };
+		1BF219BA2D7F87E2009534EC /* CBLTLSIdentity.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BF219B92D7F87E2009534EC /* CBLTLSIdentity.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1BF219BB2D7F87E2009534EC /* CBLTLSIdentity.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BF219B92D7F87E2009534EC /* CBLTLSIdentity.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1BF219C02D7F930F009534EC /* CBLTLSIdentity_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF219BF2D7F930F009534EC /* CBLTLSIdentity_CAPI.cc */; };
+		1BF21A3D2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
+		1BF21A3E2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
+		1BF21A3F2D84E419009534EC /* TLSIdentityTest.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */; };
+		1BF3E3152DB07E5900B11DD4 /* URLEndpointListenerTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 1B49DBCF2DAF106F000F382E /* URLEndpointListenerTest.hh */; };
+		1BF3E3162DB07E5900B11DD4 /* URLEndpointListenerTest.hh in Headers */ = {isa = PBXBuildFile; fileRef = 1B49DBCF2DAF106F000F382E /* URLEndpointListenerTest.hh */; };
 		271A98B0243FDF56008C032D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 271A98AF243FDF55008C032D /* SystemConfiguration.framework */; };
 		271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2C21CAC98F0045856E /* CBLReplicator.h */; };
 		271C2A3221CAC98F0045856E /* CBLBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 271C2A2D21CAC98F0045856E /* CBLBase.h */; };
@@ -104,6 +122,10 @@
 		4083FCBC2BA8DE200061509D /* CBLPrediction_CAPI.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */; };
 		4083FCC02BAA235F0061509D /* CBLPrediction_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */; };
 		4083FCC22BAA38F30061509D /* CBLPrediction.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4083FCC12BAA38F30061509D /* CBLPrediction.cc */; };
+		408F03092DAEC01500522748 /* CBLTLSIdentity_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 408F03022DAEBB2F00522748 /* CBLTLSIdentity_Internal.hh */; };
+		408F030A2DAEC02500522748 /* CBLURLEndpointListener_Internal.hh in Headers */ = {isa = PBXBuildFile; fileRef = 408F03062DAEBB2F00522748 /* CBLURLEndpointListener_Internal.hh */; };
+		408F038A2DAEF90500522748 /* CBLTLSIdentity+Apple_stub.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21B202D8E3ED0009534EC /* CBLTLSIdentity+Apple_stub.mm */; };
+		408F038B2DAEF90A00522748 /* CBLURLEndpointListener_stub.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BF21BBD2D9C5835009534EC /* CBLURLEndpointListener_stub.cc */; };
 		40ACB2392C2F98B200CBE8F2 /* Prediction.hh in Headers */ = {isa = PBXBuildFile; fileRef = 40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */; };
 		40ACB23A2C2F98B600CBE8F2 /* VectorIndex.hh in Headers */ = {isa = PBXBuildFile; fileRef = 400AB0542C2E7AC300DB6223 /* VectorIndex.hh */; };
 		40D1862529B6D1A50061AA85 /* Collection.hh in Headers */ = {isa = PBXBuildFile; fileRef = FCC064BD287CBD95000C5BD7 /* Collection.hh */; };
@@ -204,6 +226,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1B21A7D42D70E760000CA0D5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 27FC81E71EAAB0D90028E38E;
+			remoteInfo = "LiteCoreREST static";
+		};
 		271A989F243C0852008C032D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 271C2A3821CAD5950045856E /* LiteCore.xcodeproj */;
@@ -405,6 +434,17 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = URLEndpointListenerTest.cc; sourceTree = "<group>"; };
+		1B49DBCF2DAF106F000F382E /* URLEndpointListenerTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = URLEndpointListenerTest.hh; sourceTree = "<group>"; };
+		1B7694AA2DA07261006EEEAB /* TLSIdentityTest.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TLSIdentityTest.hh; sourceTree = "<group>"; };
+		1B7694AB2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "TLSIdentityTest+Apple.mm"; sourceTree = "<group>"; };
+		1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLURLEndpointListener.h; sourceTree = "<group>"; };
+		1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLURLEndpointListener_CAPI.cc; sourceTree = "<group>"; };
+		1BF219B92D7F87E2009534EC /* CBLTLSIdentity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBLTLSIdentity.h; sourceTree = "<group>"; };
+		1BF219BF2D7F930F009534EC /* CBLTLSIdentity_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLTLSIdentity_CAPI.cc; sourceTree = "<group>"; };
+		1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TLSIdentityTest.cc; sourceTree = "<group>"; };
+		1BF21B202D8E3ED0009534EC /* CBLTLSIdentity+Apple_stub.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLTLSIdentity+Apple_stub.mm"; sourceTree = "<group>"; };
+		1BF21BBD2D9C5835009534EC /* CBLURLEndpointListener_stub.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLURLEndpointListener_stub.cc; sourceTree = "<group>"; };
 		2716F8F5247D9D6700BE21D9 /* exports */ = {isa = PBXFileReference; lastKnownFileType = folder; path = exports; sourceTree = "<group>"; };
 		271A98AF243FDF55008C032D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		271C2A2321CAC8920045856E /* libcblite-static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libcblite-static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -513,6 +553,10 @@
 		4083FCBB2BA8DE200061509D /* CBLPrediction_CAPI.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction_CAPI.cc; sourceTree = "<group>"; };
 		4083FCBF2BAA203A0061509D /* CBLPrediction_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLPrediction_Internal.hh; sourceTree = "<group>"; };
 		4083FCC12BAA38F30061509D /* CBLPrediction.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLPrediction.cc; sourceTree = "<group>"; };
+		408F03022DAEBB2F00522748 /* CBLTLSIdentity_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLTLSIdentity_Internal.hh; sourceTree = "<group>"; };
+		408F03032DAEBB2F00522748 /* CBLTLSIdentity+Apple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "CBLTLSIdentity+Apple.mm"; sourceTree = "<group>"; };
+		408F03042DAEBB2F00522748 /* CBLURLEndpointListener.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBLURLEndpointListener.cc; sourceTree = "<group>"; };
+		408F03062DAEBB2F00522748 /* CBLURLEndpointListener_Internal.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBLURLEndpointListener_Internal.hh; sourceTree = "<group>"; };
 		40ACB2382C2F20DA00CBE8F2 /* Prediction.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Prediction.hh; sourceTree = "<group>"; };
 		40BC19242CED333D00143002 /* libCatch2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libCatch2.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		40BC19262CED34AD00143002 /* libCatch2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libCatch2.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -618,6 +662,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1B7694B12DA49EB9006EEEAB /* Security.framework in Frameworks */,
 				27B61DBB21D6FF2D0027CCDB /* libfleeceBase.a in Frameworks */,
 				4073CF102D6D5D6500339E59 /* libCatch2.a in Frameworks */,
 				27B61DB521D6EBDD0027CCDB /* libcblite.dylib in Frameworks */,
@@ -704,6 +749,8 @@
 				406F8D6F2C17E191000223FC /* CBLQueryTypes.h */,
 				271C2A2C21CAC98F0045856E /* CBLReplicator.h */,
 				FCD829B12835ECE0004AA814 /* CBLScope.h */,
+				1BF219B92D7F87E2009534EC /* CBLTLSIdentity.h */,
+				1BC5D95F2D6E3BD10080153E /* CBLURLEndpointListener.h */,
 				271C2A7021CAD6440045856E /* CBL_Compat.h */,
 			);
 			path = cbl;
@@ -733,10 +780,12 @@
 				27DBCF2E246B4352002FD7A7 /* CBLQuery_Internal.hh */,
 				40FE2DD72C0926FF005E99E9 /* CBLQueryIndex.cc */,
 				40FE2DD82C0926FF005E99E9 /* CBLQueryIndex_Internal.hh */,
+				1BF21B202D8E3ED0009534EC /* CBLTLSIdentity+Apple_stub.mm */,
 				4083FC9F2BA3A4390061509D /* CBLVectorIndexConfig.hh */,
 				27D11BFF235140E300C58A70 /* CBLReplicator_Internal.hh */,
 				FCC063C828588DA6000C5BD7 /* CBLScope.cc */,
 				FCD8299C2835AC20004AA814 /* CBLScope_Internal.hh */,
+				1BF21BBD2D9C5835009534EC /* CBLURLEndpointListener_stub.cc */,
 				AE591AB729473A4400E4BDE8 /* CBLUserAgent.hh */,
 				42D1B68F2978AD31003B9871 /* CBLUserAgent.mm */,
 				27D11BEE2351043B00C58A70 /* ConflictResolver.cc */,
@@ -749,6 +798,7 @@
 				27886C8B21F64C1400069BEA /* Listener.hh */,
 				275FA3342236E54D001C392D /* CBLPrivate.h */,
 				27229262260BD3D600A3A41F /* C Glue */,
+				408F03002DAEBAED00522748 /* EE */,
 				27B61D7E21D6B6900027CCDB /* dylib_main.cc */,
 				2716F8F5247D9D6700BE21D9 /* exports */,
 			);
@@ -815,6 +865,8 @@
 				27B61D5521D5ABA60027CCDB /* CBLQuery_CAPI.cc */,
 				277FEE7421ED3C4900B60E3C /* CBLReplicator_CAPI.cc */,
 				FCD829B22835EE39004AA814 /* CBLScope_CAPI.cc */,
+				1BF219BF2D7F930F009534EC /* CBLTLSIdentity_CAPI.cc */,
+				1BC5D9652D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc */,
 				4083FCAE2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc */,
 			);
 			name = "C Glue";
@@ -869,6 +921,11 @@
 				FC82CE0428C6E2BD001FA083 /* ReplicatorCollectionTest_Cpp.cc */,
 				2736A633242E5A74002B9D65 /* ReplicatorEETest.cc */,
 				93C70D1626CB334D0093E927 /* ReplicatorPropEncTest.cc */,
+				1B7694AB2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm */,
+				1BF21A3C2D84E419009534EC /* TLSIdentityTest.cc */,
+				1B7694AA2DA07261006EEEAB /* TLSIdentityTest.hh */,
+				1B21A7D82D711B29000CA0D5 /* URLEndpointListenerTest.cc */,
+				1B49DBCF2DAF106F000F382E /* URLEndpointListenerTest.hh */,
 				40FE2E0F2C12AF52005E99E9 /* VectorSearchTest.hh */,
 				406E46D22BACAEFF0088198C /* VectorSearchTest.cc */,
 				400AB0412C2E669500DB6223 /* VectorSearchTest_Cpp.cc */,
@@ -926,6 +983,26 @@
 			path = platforms;
 			sourceTree = "<group>";
 		};
+		408F03002DAEBAED00522748 /* EE */ = {
+			isa = PBXGroup;
+			children = (
+				408F03072DAEBB2F00522748 /* src */,
+			);
+			name = EE;
+			sourceTree = "<group>";
+		};
+		408F03072DAEBB2F00522748 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				408F03022DAEBB2F00522748 /* CBLTLSIdentity_Internal.hh */,
+				408F03032DAEBB2F00522748 /* CBLTLSIdentity+Apple.mm */,
+				408F03042DAEBB2F00522748 /* CBLURLEndpointListener.cc */,
+				408F03062DAEBB2F00522748 /* CBLURLEndpointListener_Internal.hh */,
+			);
+			name = src;
+			path = "../couchbase-lite-c-ee/src";
+			sourceTree = SOURCE_ROOT;
+		};
 		FC645DFD290852D5007D5536 /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -979,7 +1056,9 @@
 			files = (
 				EA34BC4C2C369895000CEA70 /* CBLPrediction.h in Headers */,
 				277FEE7821ED62AA00B60E3C /* CBLReplicatorConfig.hh in Headers */,
+				1BC5D9602D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */,
 				9320630F26BDB408006917A5 /* CBLPlatform.h in Headers */,
+				1BF219BA2D7F87E2009534EC /* CBLTLSIdentity.h in Headers */,
 				4083FCB02BA3B8C50061509D /* CBLVectorIndexConfig.hh in Headers */,
 				27DBCF2F246B4352002FD7A7 /* CBLQuery_Internal.hh in Headers */,
 				400983522D0769630029F26E /* CBLLogSinks.h in Headers */,
@@ -1000,14 +1079,17 @@
 				FCC064202862B850000C5BD7 /* CBLScope.h in Headers */,
 				40E7CA742BFE7336004BE7E1 /* ContextManager.hh in Headers */,
 				AE591AB829473A4500E4BDE8 /* CBLUserAgent.hh in Headers */,
+				408F030A2DAEC02500522748 /* CBLURLEndpointListener_Internal.hh in Headers */,
 				27B61D6A21D6B60D0027CCDB /* CBLTest.hh in Headers */,
 				271C2A3521CAC98F0045856E /* CBLQuery.h in Headers */,
 				FCC064232862B869000C5BD7 /* CouchbaseLite.h in Headers */,
 				FCC064222862B859000C5BD7 /* CBL_Compat.h in Headers */,
+				1BF3E3152DB07E5900B11DD4 /* URLEndpointListenerTest.hh in Headers */,
 				271C2A3421CAC98F0045856E /* CBLDatabase.h in Headers */,
 				FCC064122862B848000C5BD7 /* CBLBlob.h in Headers */,
 				271C2A3121CAC98F0045856E /* CBLReplicator.h in Headers */,
 				271C2A3221CAC98F0045856E /* CBLBase.h in Headers */,
+				408F03092DAEC01500522748 /* CBLTLSIdentity_Internal.hh in Headers */,
 				FCB96E8529007D50001C4DED /* CBLDefaults.h in Headers */,
 				27886C8D21F64C1400069BEA /* Listener.hh in Headers */,
 				93EC366226C49AF700182B02 /* CBLEncryptable_Internal.hh in Headers */,
@@ -1030,6 +1112,7 @@
 				40D1862529B6D1A50061AA85 /* Collection.hh in Headers */,
 				FCD988BC2821B10400512BBD /* CBLCollection.h in Headers */,
 				27984E2C2249A240000FE777 /* CBLDatabase.h in Headers */,
+				1BF3E3162DB07E5900B11DD4 /* URLEndpointListenerTest.hh in Headers */,
 				27984E2E2249A240000FE777 /* CBLQuery.h in Headers */,
 				27984E2F2249A240000FE777 /* CBLReplicator.h in Headers */,
 				27984E312249A247000FE777 /* CouchbaseLite.hh in Headers */,
@@ -1039,10 +1122,12 @@
 				EA34BC5A2C3698B8000CEA70 /* CBLPrediction.h in Headers */,
 				40E32F402D2F3ED4000CED57 /* LogSinks.hh in Headers */,
 				93C70CE126C4D3F90093E927 /* CBLEncryptable.h in Headers */,
+				1BF219BB2D7F87E2009534EC /* CBLTLSIdentity.h in Headers */,
 				40ACB23A2C2F98B600CBE8F2 /* VectorIndex.hh in Headers */,
 				27984E332249A247000FE777 /* Blob.hh in Headers */,
 				400AB0532C2E66B500DB6223 /* QueryIndex.hh in Headers */,
 				27984E342249A247000FE777 /* Database.hh in Headers */,
+				1BC5D9612D6E3BD10080153E /* CBLURLEndpointListener.h in Headers */,
 				FCC064212862B851000C5BD7 /* CBLScope.h in Headers */,
 				27984E352249A247000FE777 /* Document.hh in Headers */,
 				27DBD0A9246CA667002FD7A7 /* CBLLog.h in Headers */,
@@ -1092,6 +1177,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1B21A7D52D70E760000CA0D5 /* PBXTargetDependency */,
 				271A98A0243C0852008C032D /* PBXTargetDependency */,
 				271C2A7B21CC86E10045856E /* PBXTargetDependency */,
 			);
@@ -1493,6 +1579,7 @@
 				"$(BUILT_PRODUCTS_DIR)/libmbedcrypto.a",
 				"$(BUILT_PRODUCTS_DIR)/libmbedtls.a",
 				"$(BUILT_PRODUCTS_DIR)/libmbedx509.a",
+				"$(BUILT_PRODUCTS_DIR)/libLiteCoreREST-static.a",
 			);
 			name = "Merge static libs";
 			outputFileListPaths = (
@@ -1613,12 +1700,16 @@
 				271C2A6F21CAD5B30045856E /* CBLBase_CAPI.cc in Sources */,
 				93C70CE326C5B4BC0093E927 /* CBLEncryptable_CAPI.cc in Sources */,
 				42D1B69D2978AD31003B9871 /* CBLUserAgent.mm in Sources */,
+				408F038B2DAEF90A00522748 /* CBLURLEndpointListener_stub.cc in Sources */,
 				277B77D5245B44E900B222D3 /* CBLLog.cc in Sources */,
 				40FE2DD92C0926FF005E99E9 /* CBLQueryIndex.cc in Sources */,
 				271C2A7221CADB170045856E /* CBLDatabase.cc in Sources */,
 				276633A62602815000B9BD36 /* CBLDatabase_CAPI.cc in Sources */,
 				27DBD098246C9DE7002FD7A7 /* CBLDatabase+Apple.mm in Sources */,
+				1BF219C02D7F930F009534EC /* CBLTLSIdentity_CAPI.cc in Sources */,
 				FC5FBBB52821CC2E0066157F /* CBLCollection_CAPI.cc in Sources */,
+				408F038A2DAEF90500522748 /* CBLTLSIdentity+Apple_stub.mm in Sources */,
+				1BC5D9662D6E4DA60080153E /* CBLURLEndpointListener_CAPI.cc in Sources */,
 				275BC4DE2201323700DBE7D2 /* CBLBlob_CAPI.cc in Sources */,
 				4083FCAF2BA3B8B00061509D /* CBLVectorIndexConfig_CAPI.cc in Sources */,
 				271C2A7821CC750E0045856E /* CBLDocument.cc in Sources */,
@@ -1646,9 +1737,12 @@
 			files = (
 				40E32F432D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */,
 				93965A6426A7CD50008728EE /* LogTest.cc in Sources */,
+				1B21A7DB2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */,
+				1BF21A3D2D84E419009534EC /* TLSIdentityTest.cc in Sources */,
 				275B3599234C158900FE9CF0 /* CouchbaseLiteTests.mm in Sources */,
 				275B358E23481D0C00FE9CF0 /* CBLTest.c in Sources */,
 				FC645E2E29088211007D5536 /* Platform_Apple.mm in Sources */,
+				1B7694AC2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm in Sources */,
 				2736A635242E5A74002B9D65 /* ReplicatorEETest.cc in Sources */,
 				93C70D3526D01B5A0093E927 /* BlobTest.cc in Sources */,
 				FC0907E828AD763600201B07 /* DocumentTest_Cpp.cc in Sources */,
@@ -1697,8 +1791,11 @@
 				27B61DAF21D6E4B70027CCDB /* CBLTest.cc in Sources */,
 				FCD8298C283591D4004AA814 /* CollectionTest.cc in Sources */,
 				FC645E2D29088211007D5536 /* Platform_Apple.mm in Sources */,
+				1B21A7DA2D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */,
 				93C70D3426D01B5A0093E927 /* BlobTest.cc in Sources */,
+				1B7694AD2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm in Sources */,
 				27B61DB921D6ECA70027CCDB /* DatabaseTest.cc in Sources */,
+				1BF21A3F2D84E419009534EC /* TLSIdentityTest.cc in Sources */,
 				277FEE5321E6BCA500B60E3C /* DatabaseTest_Cpp.cc in Sources */,
 				FC8678F2289C69690023F34F /* ReplicatorCollectionTest.cc in Sources */,
 				93C70D1826CB535D0093E927 /* ReplicatorPropEncTest.cc in Sources */,
@@ -1739,6 +1836,7 @@
 				FC645E1D29085CBF007D5536 /* CBLTest.c in Sources */,
 				FCE497C02907959400EF2354 /* LibC++Debug.cc in Sources */,
 				FC645E1229085C2E007D5536 /* CollectionTest_Cpp.cc in Sources */,
+				1B21A7D92D711B29000CA0D5 /* URLEndpointListenerTest.cc in Sources */,
 				FC645E2C29087777007D5536 /* Platform_Apple.mm in Sources */,
 				FC645E0E29085C05007D5536 /* CollectionTest.cc in Sources */,
 				FC645E1B29085C87007D5536 /* ReplicatorEETest.cc in Sources */,
@@ -1746,9 +1844,11 @@
 				FC645E1529085C63007D5536 /* DocumentTest.cc in Sources */,
 				FCE497D32907963900EF2354 /* CBLCatchTests.mm in Sources */,
 				AED22E7F291BE1B0005F065D /* QueryTest_Cpp.cc in Sources */,
+				1BF21A3E2D84E419009534EC /* TLSIdentityTest.cc in Sources */,
 				FC645E1A29085C84007D5536 /* ReplicatorCollectionTest_Cpp.cc in Sources */,
 				FC645E1029085C26007D5536 /* BlobTest.cc in Sources */,
 				FC645E1129085C2A007D5536 /* BlobTest_Cpp.cc in Sources */,
+				1B7694AE2DA085F4006EEEAB /* TLSIdentityTest+Apple.mm in Sources */,
 				FC645E1429085C5D007D5536 /* DatabaseTest_Cpp.cc in Sources */,
 				40E32F442D2F45A3000CED57 /* LogTest_Cpp.cc in Sources */,
 				FC645E1629085C6B007D5536 /* DocumentTest_Cpp.cc in Sources */,
@@ -1760,6 +1860,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1B21A7D52D70E760000CA0D5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "LiteCoreREST static";
+			targetProxy = 1B21A7D42D70E760000CA0D5 /* PBXContainerItemProxy */;
+		};
 		271A98A0243C0852008C032D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = LiteCoreWebSocket;

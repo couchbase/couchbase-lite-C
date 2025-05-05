@@ -109,14 +109,8 @@ public:
         return c4doc ? c4doc->selectedRev().flags : (kRevNew | kRevLeaf);
     }
     
-    alloc_slice getRevisionHistory() const {
-        auto history = fleece::MutableArray::newArray();
-        auto c4doc = _c4doc.useLocked();
-        if (!c4doc)
-            return fleece::nullslice;
-        return c4doc->getRevisionHistory(UINT_MAX, nullptr, 0);
-    }
-
+    alloc_slice getRevisionHistory() const;
+    
 #pragma mark - Properties:
 
 
@@ -267,13 +261,7 @@ public:
 
 #pragma mark - Utils:
     
-    
-    static void checkCollectionMatches(CBLCollection* _cbl_nullable myCol, CBLCollection *colParam) {
-        if (myCol && myCol != colParam) {
-            C4Error::raise(LiteCoreDomain, kC4ErrorInvalidParameter, "Use document on a wrong collection");
-        }
-    }
-    
+    static void checkCollectionMatches(CBLCollection* _cbl_nullable myCol, CBLCollection *colParam);
 
 #pragma mark - Internals:
 

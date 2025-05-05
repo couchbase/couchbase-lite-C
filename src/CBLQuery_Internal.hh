@@ -197,8 +197,6 @@ namespace cbl_internal {
         :CBLListenerToken((const void*)callback, context)
         ,_query(query)
         {
-            _stoppable = std::make_unique<CBLQueryListenerStoppable>(this);
-            
             auto ctx = ContextManager::shared().registerObject(this);
             
             query->_c4query.useLocked([&](C4Query *c4query) {
@@ -258,22 +256,11 @@ namespace cbl_internal {
         #endif
 
     private:
-        struct CBLQueryListenerStoppable : CBLStoppable {
-        public:
-            CBLQueryListenerStoppable(ListenerToken<CBLQueryChangeListener>* token)
-            :CBLStoppable(token)
-            {}
-            
-            void stop() const override {
-                ((ListenerToken<CBLQueryChangeListener>*)_ref)->setEnabled(false);
-            }
-        };
         
         void queryChanged();    // defn is in CBLDatabase.cc, to prevent circular hdr dependency
 
         Retained<CBLQuery>  _query;
         Retained<C4QueryObserver> _c4obs;
-        std::unique_ptr<CBLQueryListenerStoppable> _stoppable;
         bool _isEnabled {false};
     };
 }

@@ -70,6 +70,13 @@ if [[ "$BUILD_ENTERPRISE" == "ON" ]]; then
   ./scripts/download_vector_search_extension.sh apple
 fi
 
+if [[ -n "$KEYCHAIN_PWD" ]]; then
+    echo "Unlock keychain ..."
+    security -v unlock-keychain -p $KEYCHAIN_PWD $HOME/Library/Keychains/login.keychain-db
+else
+    echo "Cannot unlock keychain as credentials not found ... "
+fi
+
 mkdir -p build_coverage
 pushd build_coverage > /dev/null
 cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_ENTERPRISE=${BUILD_ENTERPRISE} -DCODE_COVERAGE_ENABLED=ON ..    
