@@ -17,6 +17,8 @@ cat ../Fleece_Apple_Exports.txt ../CBL_EE_Apple_Exports.txt exports_ee.txt  >app
 cat ../CBL_Android_Exports.txt exports.txt      >android_exports.txt
 cat ../CBL_Android_Exports.txt exports_ee.txt   >android_exports_ee.txt
 
+cat ../CBL_EE_Windows_Exports.txt exports_ee.txt >windows_exports_ee.txt
+
 ../format_apple.awk   <apple_exports.txt        >CBL.exp
 ../format_linux.awk   <exports.txt              >CBL.gnu
 ../format_linux.awk   <android_exports.txt      >CBL_Android.gnu
@@ -25,6 +27,6 @@ cat ../CBL_Android_Exports.txt exports_ee.txt   >android_exports_ee.txt
 ../format_apple.awk   <apple_exports_ee.txt     >CBL_EE.exp
 ../format_linux.awk   <exports_ee.txt           >CBL_EE.gnu
 ../format_linux.awk   <android_exports_ee.txt   >CBL_EE_Android.gnu
-../format_windows.awk <exports_ee.txt           >CBL_EE.def
+../format_windows.awk <windows_exports_ee.txt   >CBL_EE.def
 
 rm *exports*.txt

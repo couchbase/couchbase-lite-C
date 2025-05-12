@@ -1,10 +1,8 @@
-# CBL_EE_Apple_Exports.txt
+# CBL_EE_Windows_Exports.txt
 #
 # Copyright (c) 2025 Couchbase, Inc All rights reserved.
 #
 # This is the list of symbols that CBL-C for Apple Platform exports.
-
-CBLTLSIdentity_IdentityWithSecIdentity
 
 CBLTLSIdentity_DeleteIdentityWithLabel
 CBLTLSIdentity_IdentityWithCerts
