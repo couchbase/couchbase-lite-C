@@ -151,3 +151,12 @@ CBLListenerToken* CBLReplicator_AddDocumentReplicationListener(CBLReplicator* re
 {
     return retain(repl->addDocumentListener(listener, context));
 }
+
+#ifdef COUCHBASE_ENTERPRISE
+CBLCert* CBLReplicator_ServerCertificate(CBLReplicator* repl) noexcept
+{
+    try {
+        return repl->serverCertificate().detach();
+    } catchAndWarn();
+}
+#endif
