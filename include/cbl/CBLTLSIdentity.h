@@ -69,7 +69,7 @@ CBL_PUBLIC extern const FLString kCBLCertAttrKeySurname;           // "SN",     
 CBL_PUBLIC extern const FLString kCBLCertAttrKeyOrganization;      // "O",               e.g. "Example Corp."
 CBL_PUBLIC extern const FLString kCBLCertAttrKeyOrganizationUnit;  // "OU",              e.g. "Marketing"
 CBL_PUBLIC extern const FLString kCBLCertAttrKeyPostalAddress;     // "postalAddress",   e.g. "123 Example Blvd #2A"
-CBL_PUBLIC extern const FLString kCBLCertAttrKeyLocality;          // "locality",        e.g. "Boston"
+CBL_PUBLIC extern const FLString kCBLCertAttrKeyLocality;          // "L",               e.g. "Boston"
 CBL_PUBLIC extern const FLString kCBLCertAttrKeyPostalCode;        // "postalCode",      e.g. "02134"
 CBL_PUBLIC extern const FLString kCBLCertAttrKeyStateOrProvince;   // "ST",              e.g. "Massachusetts" (or "Quebec", ...)
 CBL_PUBLIC extern const FLString kCBLCertAttrKeyCountry;           // "C",               e.g. "us" (2-letter ISO country code)
