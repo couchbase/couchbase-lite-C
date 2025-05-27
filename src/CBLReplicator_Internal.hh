@@ -293,6 +293,12 @@ public:
         return _desc;
     }
 
+#ifdef COUCHBASE_ENTERPRISE
+    Retained<CBLCert> serverCertificate() {
+        return new CBLCert(_c4repl->getPeerTLSCertificate());
+    }
+#endif
+
 private:
     
     alloc_slice encodeOptions(C4KeyPair* _cbl_nullable * _cbl_nullable outExternalKey) {

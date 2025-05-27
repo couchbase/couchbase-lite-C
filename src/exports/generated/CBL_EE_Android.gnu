@@ -25,6 +25,7 @@ CBL_C {
 		CBL_RegisterPredictiveModel;
 		CBL_UnregisterPredictiveModel;
 		CBLAuth_CreateCertificate;
+		CBLReplicator_ServerCertificate;
 		CBL_EnableVectorSearch;
 		CBLCollection_CreateVectorIndex;
 		CBLVectorEncoding_CreateNone;
