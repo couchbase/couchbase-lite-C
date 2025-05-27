@@ -45,6 +45,7 @@ CBL_UnregisterPredictiveModel
 ### REPLICATOR
 
 CBLAuth_CreateCertificate
+CBLReplicator_ServerCertificate
 
 ### Vector Search
 
