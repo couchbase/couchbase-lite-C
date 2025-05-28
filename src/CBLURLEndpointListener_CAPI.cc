@@ -57,6 +57,10 @@ uint16_t CBLURLEndpointListener_Port(const CBLURLEndpointListener* listener) noe
     return listener->port();
 }
 
+CBLTLSIdentity* CBLURLEndpointListener_TLSIdentity(const CBLURLEndpointListener* listener) noexcept {
+    return listener->identity().get();
+}
+
 FLMutableArray CBLURLEndpointListener_Urls(const CBLURLEndpointListener* listener) noexcept {
     try {
         return (FLMutableArray)FLValue_Retain(listener->getUrls());
@@ -83,9 +87,5 @@ void CBLURLEndpointListener_Stop(CBLURLEndpointListener* listener) noexcept {
 // CBLPrivate.h
 FLSliceResult CBLURLEndpointListener_AnonymousLabel(const CBLURLEndpointListener* listener) noexcept {
     return (FLSliceResult)listener->anonymousLabel();
-}
-
-CBLTLSIdentity* CBLURLEndpointListener_TLSIdentity(const CBLURLEndpointListener* listener) noexcept {
-    return listener->TLSIdentity();
 }
 #endif
