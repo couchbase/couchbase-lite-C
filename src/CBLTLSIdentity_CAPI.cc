@@ -138,13 +138,13 @@ CBLKeyPair* CBLCert_PublicKey(CBLCert* cert) noexcept {
 CBLTLSIdentity* CBLTLSIdentity_CreateIdentityWithKeyPair(CBLKeyUsages usages,
                                                          CBLKeyPair* keypair,
                                                          FLDict attributes,
-                                                         CBLTimestamp expiration,
+                                                         CBLTimestamp validityInMilliseconds,
                                                          CBLError* outError) noexcept {
     try {
         return retain(CBLTLSIdentity::CreateIdentity(usages,
                                                      keypair,
                                                      attributes,
-                                                     expiration));
+                                                     validityInMilliseconds));
     } catchAndBridge(outError);
 }
 
@@ -166,11 +166,11 @@ CBLTimestamp CBLTLSIdentity_Expiration(CBLTLSIdentity* tlsID) noexcept {
 
 CBLTLSIdentity* CBLTLSIdentity_CreateIdentity(CBLKeyUsages usages,
                                               FLDict attrs,
-                                              CBLTimestamp exp,
+                                              int64_t validityInMilliseconds,
                                               FLString label,
                                               CBLError* outError) noexcept {
     try {
-        return retain(CBLTLSIdentity::CreateIdentity(usages, attrs, exp, label));
+        return retain(CBLTLSIdentity::CreateIdentity(usages, attrs, validityInMilliseconds, label));
     } catchAndBridge(outError);
 }
 
