@@ -1303,6 +1303,58 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Close Database Stops Listener", "[URL
     CBLURLEndpointListener_Release(listener);
 }
 
+// T0010-18 TestListgenerTLSIdentity
+TEST_CASE_METHOD(URLEndpointListenerTest, "Listener TLS Identity", "[URLListener]") {
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        1,
+        0         // port
+    };
+    
+    bool useAnonymosIdentity = false;
+    
+    SECTION("Disable TLS") {
+        listenerConfig.disableTLS = true;
+    }
+    
+    SECTION("With TLSIdentity") {
+        listenerConfig.tlsIdentity = createTLSIdentity(true, false);
+    }
+    
+    SECTION("With Anonymous TLSIdentity") {
+        useAnonymosIdentity = true;
+        listenerConfig.tlsIdentity = nullptr;
+    }
+    
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+    
+    CHECK(CBLURLEndpointListener_TLSIdentity(listener) == nullptr);
+    
+    CHECK(CBLURLEndpointListener_Start(listener, nullptr));
+    
+    if (listenerConfig.disableTLS) {
+        CHECK(CBLURLEndpointListener_TLSIdentity(listener) == nullptr);
+    } else {
+        CHECK(CBLURLEndpointListener_TLSIdentity(listener) != nullptr);
+    }
+    
+#if !defined(__linux__) && !defined(__ANDROID__)
+    if (useAnonymosIdentity) {
+        alloc_slice anonymousLabel = CBLURLEndpointListener_AnonymousLabel(listener);
+        CHECK(anonymousLabel);
+        identityLabelsToDelete.emplace_back(anonymousLabel);
+    }
+#endif
+    
+    CBLURLEndpointListener_Stop(listener);
+    
+    CHECK(CBLURLEndpointListener_TLSIdentity(listener) == nullptr);
+    
+    CBLURLEndpointListener_Release(listener);
+    CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
+}
+
 TEST_CASE_METHOD(URLEndpointListenerTest, "Start and Stop Listener", "[URLListener]") {
     CBLURLEndpointListener* listener;
     {
