@@ -32,8 +32,48 @@ using namespace fleece;
 
 #ifdef COUCHBASE_ENTERPRISE
 
+#ifdef  __APPLE__
+namespace {
+    struct ExternalKeyContext {
+        ExternalKeyContext(TLSIdentityTest::ExternalKey* key) : externalKey(key) {}
+        TLSIdentityTest::ExternalKey* externalKey;
+        int counterPublicKeyData = 0;
+        int counterDecrypt       = 0;
+        int counterSign          = 0;
+        int counterFree          = 0;
+        bool badPublicKeyData    = false;
+    };
+
+    bool kc_publicKeyData(void* context, void* output, size_t outputMaxLen, size_t* outputLen) {
+        ExternalKeyContext* ctx = reinterpret_cast<ExternalKeyContext*>(context);
+        if (ctx->badPublicKeyData) return false;
+
+        ctx->counterPublicKeyData++;
+        return ctx->externalKey->publicKeyData(output, outputMaxLen, outputLen);
+    }
+
+    bool kc_decrypt(void* context, FLSlice input, void* output, size_t outputMaxLen, size_t* outputLen) {
+        ExternalKeyContext* ctx = reinterpret_cast<ExternalKeyContext*>(context);
+        ctx->counterDecrypt++;
+        return ctx->externalKey->decrypt(input, output, outputMaxLen, outputLen);
+    }
+
+    bool kc_sign(void* context, CBLSignatureDigestAlgorithm digestAlgorithm, FLSlice inputData, void* outSignature) {
+        ExternalKeyContext* ctx = reinterpret_cast<ExternalKeyContext*>(context);
+        ctx->counterSign++;
+        return ctx->externalKey->sign(digestAlgorithm, inputData, outSignature);
+    }
+
+    void kc_free(void* context) {
+        ExternalKeyContext* ctx = reinterpret_cast<ExternalKeyContext*>(context);
+        ctx->counterFree++;
+        delete ctx->externalKey;
+    }
+
+}; // anonymous namespace for external key
+
 TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity", "[TSLIdentity]") {
-    CBLError outError;
+    CBLError outError{};
 
     CBLKeyPair* keypair = CBLKeyPair_GenerateRSAKeyPair(fleece::nullslice, &outError);
     fleece::MutableDict attributes = fleece::MutableDict::newDict();
@@ -77,6 +117,48 @@ TEST_CASE_METHOD(TLSIdentityTest, "Self-Signed Cert Identity", "[TSLIdentity]") 
     CBLTLSIdentity_Release(identity);
     CBLKeyPair_Release(keypair);
     CBLKeyPair_Release(pkOfCert);
+}
+
+TEST_CASE_METHOD(TLSIdentityTest, "External Keys", "[TSLIdentity]") {
+    CBLError outError{};
+
+    TLSIdentityTest::ExternalKey* externalKey = TLSIdentityTest::ExternalKey::generateRSA(2048);
+    REQUIRE(externalKey);
+    ExternalKeyContext ekContext{externalKey};
+
+    SECTION("Successful Callback") {
+        ekContext.badPublicKeyData = false;
+    }
+
+    SECTION("Failing Callback") {
+        ekContext.badPublicKeyData = true;
+    }
+
+    // Creates a RSA KeyPair from the KeyPair callback.
+    // These callbacks are defined in TLSIdentityTest+Apple.mm
+    CBLKeyPair* cblKeyPair = CBLKeyPair_CreateWithExternalKey(2048,
+                                                              &ekContext,
+                                                              CBLExternalKeyCallbacks{kc_publicKeyData, kc_decrypt, kc_sign, kc_free},
+                                                              &outError);
+
+    REQUIRE(outError.code == 0);
+    REQUIRE(cblKeyPair);
+
+    alloc_slice publicKeyData = CBLKeyPair_PublicKeyData(cblKeyPair);
+    alloc_slice publicKeyDigest = CBLKeyPair_PublicKeyDigest(cblKeyPair);
+    alloc_slice privateKeyData = CBLKeyPair_PrivateKeyData(cblKeyPair);
+
+    if (ekContext.badPublicKeyData) {
+        CHECK(publicKeyData.empty());
+        CHECK(publicKeyDigest.empty());
+    } else {
+        CHECK(!publicKeyData.empty());
+        CHECK(!publicKeyDigest.empty());
+    }
+    // Private Key Data is not available for external keys.
+    CHECK(privateKeyData.empty());
+
+    CBLKeyPair_Release(cblKeyPair);
 }
 
 #if !defined(__linux__) && !defined(__ANDROID__)
@@ -317,43 +399,6 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Self-Signed Identity with Private Key
 }
 
 #endif // #if !defined(__linux__) && !defined(__ANDROID__)
-
-#ifdef  __APPLE__
-namespace {
-    struct ExternalKeyContext {
-        ExternalKeyContext(TLSIdentityTest::ExternalKey* key) : externalKey(key) {}
-        TLSIdentityTest::ExternalKey* externalKey;
-        int counterPublicKeyData = 0;
-        int counterDecrypt       = 0;
-        int counterSign          = 0;
-        int counterFree          = 0;
-    };
-
-    bool kc_publicKeyData(void* context, void* output, size_t outputMaxLen, size_t* outputLen) {
-        ExternalKeyContext* ctx = reinterpret_cast<ExternalKeyContext*>(context);
-        ctx->counterPublicKeyData++;
-        return ctx->externalKey->publicKeyData(output, outputMaxLen, outputLen);
-    }
-
-    bool kc_decrypt(void* context, FLSlice input, void* output, size_t outputMaxLen, size_t* outputLen) {
-        ExternalKeyContext* ctx = reinterpret_cast<ExternalKeyContext*>(context);
-        ctx->counterDecrypt++;
-        return ctx->externalKey->decrypt(input, output, outputMaxLen, outputLen);
-    }
-
-    bool kc_sign(void* context, CBLSignatureDigestAlgorithm digestAlgorithm, FLSlice inputData, void* outSignature) {
-        ExternalKeyContext* ctx = reinterpret_cast<ExternalKeyContext*>(context);
-        ctx->counterSign++;
-        return ctx->externalKey->sign(digestAlgorithm, inputData, outSignature);
-    }
-
-    void kc_free(void* context) {
-        ExternalKeyContext* ctx = reinterpret_cast<ExternalKeyContext*>(context);
-        ctx->counterFree++;
-        delete ctx->externalKey;
-    }
-
-}; // anonymous namespace for external key
 
 // T0011-4 TestCreateAndUseSelfSignedIdentityWithPrivateKeyCallback
 TEST_CASE_METHOD(URLEndpointListenerTest, "Self-Signed Identity with PrivateKey Callback", "[TSLIdentity]") {
