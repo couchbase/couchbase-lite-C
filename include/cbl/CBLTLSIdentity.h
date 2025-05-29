@@ -237,6 +237,7 @@ CBLKeyPair* _cbl_nullable CBLKeyPair_CreateWithPrivateKeyData(FLSlice privateKey
 /** Returns a hex-encoded digest of the public key.
     @param keyPair The key pair from which to extract the public key digest.
     @return A hex-encoded digest of the public key.
+    @note Returns empty result if it's an external key and the callback fails.
     @note You are responsible for releasing the returned data. */
 _cbl_warn_unused
 FLSliceResult CBLKeyPair_PublicKeyDigest(CBLKeyPair* keyPair) CBLAPI;
@@ -244,6 +245,7 @@ FLSliceResult CBLKeyPair_PublicKeyDigest(CBLKeyPair* keyPair) CBLAPI;
 /** Returns the public key data.
     @param keyPair The key pair from which to retrieve the public key.
     @return The public key data.
+    @note Returns empty result if it's an external key ad the callback fails.
     @note You are responsible for releasing the returned data. */
 _cbl_warn_unused
 FLSliceResult CBLKeyPair_PublicKeyData(CBLKeyPair* keyPair) CBLAPI;

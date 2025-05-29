@@ -76,15 +76,21 @@ CBLKeyPair* CBLKeyPair_PublicKeyFromData(FLSlice data,
 }
 
 FLSliceResult CBLKeyPair_PublicKeyDigest(CBLKeyPair* keyPair) noexcept {
-    return (FLSliceResult)keyPair->publicKeyDigest();
+    try {
+        return (FLSliceResult)keyPair->publicKeyDigest();
+    } catchAndWarn();
 }
 
 FLSliceResult CBLKeyPair_PublicKeyData(CBLKeyPair* keyPair) noexcept {
-    return (FLSliceResult)keyPair->publicKeyData();
+    try {
+        return (FLSliceResult)keyPair->publicKeyData();
+    } catchAndWarn();
 }
 
 FLSliceResult CBLKeyPair_PrivateKeyData(CBLKeyPair* keyPair) noexcept {
-    return (FLSliceResult)keyPair->privateKeyData();
+    try {
+        return (FLSliceResult)keyPair->privateKeyData();
+    } catchAndWarn();
 }
 
 // CBLCert:
