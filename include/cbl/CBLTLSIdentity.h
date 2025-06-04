@@ -168,7 +168,8 @@ typedef CBL_ENUM(int, CBLSignatureDigestAlgorithm) {
     The core idea is that all private key operations are delegated to the application's secure key storage,
     ensuring that the private key is never exposed outside the key storage. */
 typedef struct CBLExternalKeyCallbacks {
-    /** Provides the public key's raw data, as an ASN.1 DER sequence of [modulus, exponent].
+    /** Provides the public key data as an ASN.1 DER-encoded SubjectPublicKeyInfo structure.
+        For more information, see RFC 5280: https://datatracker.ietf.org/doc/html/rfc5280
         @param externalKey  The external key pointer given to CBLKeyPair_CreateWithExternalKey.
         @param output  Where to copy the key data.
         @param outputMaxLen  Maximum length of output that can be written.
