@@ -14,16 +14,30 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "27B61D6F21D6B64A0027CCDB"
+               BlueprintIdentifier = "40B32E8C2E53EA7900D48F37"
                BuildableName = "libcblite.dylib"
-               BlueprintName = "CBL_C Dylib"
+               BlueprintName = "CBL_C_EE Dylib"
+               ReferencedContainer = "container:CBL_C.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "275B357B234812C700FE9CF0"
+               BuildableName = "CouchbaseLiteTests.xctest"
+               BlueprintName = "CouchbaseLiteTests"
                ReferencedContainer = "container:CBL_C.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Debug_EE"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "NO"
@@ -62,10 +76,20 @@
          </BuildableReference>
       </CodeCoverageTargets>
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "275B357B234812C700FE9CF0"
+               BuildableName = "CouchbaseLiteTests.xctest"
+               BlueprintName = "CouchbaseLiteTests"
+               ReferencedContainer = "container:CBL_C.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Debug_EE"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -74,18 +98,9 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "27B61D6F21D6B64A0027CCDB"
-            BuildableName = "libcblite.dylib"
-            BlueprintName = "CBL_C Dylib"
-            ReferencedContainer = "container:CBL_C.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Release_EE"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
@@ -93,18 +108,18 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "27B61D6F21D6B64A0027CCDB"
+            BlueprintIdentifier = "40B32E8C2E53EA7900D48F37"
             BuildableName = "libcblite.dylib"
-            BlueprintName = "CBL_C Dylib"
+            BlueprintName = "CBL_C_EE Dylib"
             ReferencedContainer = "container:CBL_C.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = "Debug">
+      buildConfiguration = "Debug_EE">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Release_EE"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

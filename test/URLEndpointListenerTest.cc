@@ -29,8 +29,6 @@ using namespace std::chrono;
 
 #ifdef COUCHBASE_ENTERPRISE
 
-static const string kDefaultDocContent = "{\"greeting\":\"hello\"}";
-
 namespace {
 #ifdef __APPLE__
     TLSIdentityTest::ExternalKey* externalKey(void* context) {
@@ -1264,6 +1262,5 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Start and Stop Listener", "[URLListen
         CBLURLEndpointListener_Release(listener);
     }
 }
-
 
 #endif //#ifdef COUCHBASE_ENTERPRISE
