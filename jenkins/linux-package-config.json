@@ -4,19 +4,19 @@
       "build_os": "debian11-x86_64",
       "toolchain": "Toolchain-cross-x64",
       "target_osname": "linux-x86_64",
-      "target_debs": [ "debian11", "debian12", "ubuntu22.04", "ubuntu24.04" ]
+      "target_debs": [ "debian11", "debian12", "debian13", "ubuntu22.04", "ubuntu24.04" ]
     },
     "arm64": {
       "build_os": "debian11-arm64",
       "toolchain": "Toolchain-cross-arm64",
       "target_osname": "linux-arm64",
-      "target_debs": [ "debian11", "debian12", "ubuntu22.04", "ubuntu24.04" ]
+      "target_debs": [ "debian11", "debian12", "debian13", "ubuntu22.04", "ubuntu24.04" ]
     },
     "armhf": {
         "build_os": "debian11-armhf", 
         "toolchain": "Toolchain-cross-armhf",
         "target_osname": "linux-armhf",
-        "target_debs": [ "debian11", "debian12", "ubuntu22.04", "ubuntu24.04" ]
+        "target_debs": [ "debian11", "debian12", "debian13", "ubuntu22.04", "ubuntu24.04" ]
     }
   },
   "package_distro_config": {
@@ -25,6 +25,9 @@
     },
     "debian12": {
         "extra_deps": "libicu72,libstdc++6"
+    },
+    "debian13": {
+      "extra_deps": "libicu76,libstdc++6"
     },
     "ubuntu22.04": {
         "extra_deps": "libicu70,libstdc++6"
