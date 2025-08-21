@@ -58,7 +58,8 @@ uint16_t CBLURLEndpointListener_Port(const CBLURLEndpointListener* listener) noe
 }
 
 CBLTLSIdentity* CBLURLEndpointListener_TLSIdentity(const CBLURLEndpointListener* listener) noexcept {
-    return listener->identity().get();
+    // The returned identity's lifetime bound to the listener.
+    return listener->identity().unsafe_get();
 }
 
 FLMutableArray CBLURLEndpointListener_Urls(const CBLURLEndpointListener* listener) noexcept {
