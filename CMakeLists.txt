@@ -7,7 +7,7 @@ if(NOT DEFINED CMAKE_OSX_SYSROOT)
 endif()
 
 set(CMAKE_OSX_ARCHITECTURES x86_64 arm64)
-set(CMAKE_OSX_DEPLOYMENT_TARGET 10.14)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 13.0)
 
 if(DEFINED ENV{VERSION})
     message(VERBOSE "Using VERSION:$ENV{VERSION} from environment variable")
@@ -190,11 +190,17 @@ set(CBL_LIBRARIES_PRIVATE
     cblite-static
     ${NO_WHOLE_LIBRARY_FLAG}
     LiteCoreObjects
-    LiteCoreREST_Objects
     LiteCoreWebSocket
     FleeceObjects
     BLIPObjects
 )
+
+if(BUILD_ENTERPRISE)
+    list(APPEND CBL_LIBRARIES_PRIVATE
+        LiteCoreREST_Objects
+        LiteCoreListener_Objects
+    )
+endif()
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^armv[67]")
     # C/C++ atomic operations on ARM6/7 emit calls to functions in libatomic

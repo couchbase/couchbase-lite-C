@@ -24,9 +24,11 @@ if [ -z "$EE" ]
 then
   echo "Build for Community Edition ..."
   CONFIGURATION="Release"
+  SCHEME="CBL_C Framework"
 else
   echo "Build for Enterprise Edition ..."
   CONFIGURATION="Release_EE"
+  SCHEME="CBL_C_EE Framework"
 fi
 
 if [ -z "$VERSION" ]; then
@@ -68,7 +70,7 @@ function xcarchive
   echo "Archiving for ${DESTINATION}..."
   ARCHIVE_PATH=${BUILD_DIR}/${PLATFORM_NAME}
   xcodebuild archive \
-    -scheme "CBL_C Framework" \
+    -scheme "${SCHEME}" \
     -configuration "${CONFIGURATION}" \
     -destination "${DESTINATION}" \
     ${XCODE_BUILD_VERSION} ${XCODE_BUILD_NUMBER} \

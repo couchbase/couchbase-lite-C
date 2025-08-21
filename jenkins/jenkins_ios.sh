@@ -42,4 +42,4 @@ ln -s ../../couchbase-lite-c-ee/couchbase-lite-core-EE couchbase-lite-core-EE
 popd   > /dev/null
 
 # Build Framework
-xcodebuild -project CBL_C.xcodeproj -configuration Debug-EE -derivedDataPath ios -scheme "CBL_C Framework" -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO
+xcodebuild -project CBL_C.xcodeproj -derivedDataPath ios -scheme "CBL_C_EE Framework" -sdk iphonesimulator CODE_SIGNING_ALLOWED=NO

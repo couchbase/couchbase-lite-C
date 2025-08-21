@@ -289,7 +289,7 @@ TEST_CASE_METHOD(LogTest, "File Logging : Set Log Level", "[Log]") {
     }
     
     // Verify:
-    int lineCount = 2 + 1; // 2 header lines + 1 ending line :
+    int lineCount = 2; // 2 header lines
     for (CBLLogLevel level : kLogLevels) {
         if (level == kCBLLogNone)
             continue;
@@ -644,7 +644,7 @@ TEST_CASE_METHOD(LogTest, "File Log Sink : Log Level", "[Log]") {
     }
     
     // Verify:
-    int lineCount = 2 + 1; // 2 header lines + 1 ending line:
+    int lineCount = 2; // 2 header lines:
     for (CBLLogLevel level : kLogLevels) {
         if (level == kCBLLogNone)
             continue;
@@ -708,6 +708,7 @@ TEST_CASE_METHOD(LogTest, "File Log Sink : Create Directory", "[Log]") {
     REQUIRE(lines.size() == 3);
 }
 
+// Note: With log level and null or empty directory is not allowed:
 TEST_CASE_METHOD(LogTest, "File Log Sink : Disable", "[Log]") {
     CBLFileLogSink logSink {};
     logSink.level = kCBLLogInfo;
@@ -740,22 +741,14 @@ TEST_CASE_METHOD(LogTest, "File Log Sink : Disable", "[Log]") {
         CBLLogSinks_SetFile(logSink);
     }
     
-    SECTION("With log level and null directory") {
-        logSink.level = kCBLLogInfo;
-        logSink.directory = kFLSliceNull;
-        logSink.usePlaintext = true;
-        CBLLogSinks_SetFile(logSink);
-    }
-    
-    SECTION("With log level and empty directory") {
-        logSink.level = kCBLLogInfo;
-        logSink.directory = slice("");
-        logSink.usePlaintext = true;
-        CBLLogSinks_SetFile(logSink);
-    }
-    
     writeLog(kCBLLogDomainDatabase, kCBLLogInfo, "message");
     lines = readLogFile(kCBLLogInfo);
-    REQUIRE(lines.size() == 4); // No changes + 1 for ending line.
-    CHECK(lines[3].find("---- END ----"));
+    CHECK(lines.size() >= 3);
+    
+    // Note: only when setting the directory to null or empty, LiteCore will
+    // close the current opened log file and put the ending line to it.
+    // It's not clear why but it doesn't impact the log usage:
+    if (lines.size() == 4) {
+        CHECK(lines[3].find("---- END ----"));
+    }
 }

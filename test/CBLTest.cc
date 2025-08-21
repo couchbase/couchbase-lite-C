@@ -112,7 +112,8 @@ slice const CBLTest::kDatabaseName = "CBLTest";
 CBLDatabaseConfiguration CBLTest::databaseConfig() {
     // One-time setup:
     CBLError_SetCaptureBacktraces(true);
-    CBLDatabaseConfiguration config = {databaseDir()};
+    auto dir = databaseDir();
+    CBLDatabaseConfiguration config = {dir};
     return config;
 }
 

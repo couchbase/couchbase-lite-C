@@ -14,23 +14,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "27B61DA721D6E49D0027CCDB"
+               BlueprintIdentifier = "40B32EE12E53EAF600D48F37"
                BuildableName = "cbl_tests"
-               BlueprintName = "CBL_Tests"
+               BlueprintName = "CBL_EE_Tests"
                ReferencedContainer = "container:CBL_C.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Debug_EE"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Debug_EE"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       enableAddressSanitizer = "YES"
@@ -49,9 +49,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "27B61DA721D6E49D0027CCDB"
+            BlueprintIdentifier = "40B32EE12E53EAF600D48F37"
             BuildableName = "cbl_tests"
-            BlueprintName = "CBL_Tests"
+            BlueprintName = "CBL_EE_Tests"
             ReferencedContainer = "container:CBL_C.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -92,27 +92,17 @@
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Release_EE"
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "27B61DA721D6E49D0027CCDB"
-            BuildableName = "cbl_tests"
-            BlueprintName = "CBL_Tests"
-            ReferencedContainer = "container:CBL_C.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
-      buildConfiguration = "Debug">
+      buildConfiguration = "Debug_EE">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Release_EE"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
