@@ -401,6 +401,72 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication", "
     }
 }
 
+TEST_CASE_METHOD(URLEndpointListenerTest, "Get Peer TLS Certificate", "[URLListener]") {
+    constexpr bool withExternalKey = false;
+
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        2,
+        0         // port
+    };
+    listenerConfig.disableTLS = false;
+    listenerConfig.tlsIdentity = createTLSIdentity(true, withExternalKey);
+
+    listenerConfig.authenticator = CBLListenerAuth_CreateCertificate([](void* ctx, CBLCert* cert) {
+        alloc_slice sname = CBLCert_SubjectName(cert);
+        return sname == slice("CN=URLEndpointListener_Client");
+    }, nullptr);
+    config.acceptOnlySelfSignedServerCertificate = true;
+    expectedDocumentCount = 20;
+
+    REQUIRE(listenerConfig.authenticator);
+
+    createNumberedDocsWithPrefix(cx[0], 10, "doc");
+    createNumberedDocsWithPrefix(cx[1], 10, "doc");
+    createNumberedDocsWithPrefix(cy[0], 20, "doc2");
+    createNumberedDocsWithPrefix(cy[1], 20, "doc2");
+    auto cols = collectionConfigs({cx[0], cx[1]});
+    config.collections = cols.data();
+    config.collectionCount = cols.size();
+    CBLError error {};
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, &error);
+    REQUIRE(listener);
+
+    CHECK(CBLURLEndpointListener_Start(listener, &error));
+
+    config.endpoint = clientEndpoint(listener, &error);
+    REQUIRE(config.endpoint);
+
+    CBLTLSIdentity* clientIdentity = createTLSIdentity(false, withExternalKey);
+    REQUIRE(clientIdentity);
+    config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
+    REQUIRE(config.authenticator);
+    config.replicatorType = kCBLReplicatorTypePush;
+    statusWatcher = [&, this](const CBLReplicatorStatus& status) {
+        if (status.activity > kCBLReplicatorConnecting) {
+            CBLCert* cert = CBLReplicator_ServerCertificate(repl);
+            CHECK(cert);
+            alloc_slice certData = CBLCert_Data(cert, true);
+            CBLCert_Release(cert);
+            CBLCert* listenerCert =  CBLTLSIdentity_Certificates(listenerConfig.tlsIdentity);
+            REQUIRE(listenerCert);
+            alloc_slice listenerData = CBLCert_Data(listenerCert, true);
+            CHECK(certData == listenerData);
+            statusWatcher = nullptr;
+        }
+    };
+    replicate();
+
+    CBLURLEndpointListener_Stop(listener);
+
+    CBLURLEndpointListener_Release(listener);
+    CBLTLSIdentity_Release(clientIdentity);
+    if (listenerConfig.authenticator) CBLListenerAuth_Free(listenerConfig.authenticator);
+    if (listenerConfig.tlsIdentity) {
+        CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
+    }
+}
+
 #ifdef __APPLE__
 TEST_CASE_METHOD(URLEndpointListenerTest, "Listener with Cert Authentication with External KeyPair", "[URLListener]") {
     struct Context {
@@ -1235,6 +1301,58 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Close Database Stops Listener", "[URL
     CHECK(port == 0);
     
     CBLURLEndpointListener_Release(listener);
+}
+
+// T0010-18 TestListgenerTLSIdentity
+TEST_CASE_METHOD(URLEndpointListenerTest, "Listener TLS Identity", "[URLListener]") {
+    CBLURLEndpointListenerConfiguration listenerConfig {
+        cy.data(),
+        1,
+        0         // port
+    };
+    
+    bool useAnonymosIdentity = false;
+    
+    SECTION("Disable TLS") {
+        listenerConfig.disableTLS = true;
+    }
+    
+    SECTION("With TLSIdentity") {
+        listenerConfig.tlsIdentity = createTLSIdentity(true, false);
+    }
+    
+    SECTION("With Anonymous TLSIdentity") {
+        useAnonymosIdentity = true;
+        listenerConfig.tlsIdentity = nullptr;
+    }
+    
+    CBLURLEndpointListener* listener = CBLURLEndpointListener_Create(&listenerConfig, nullptr);
+    REQUIRE(listener);
+    
+    CHECK(CBLURLEndpointListener_TLSIdentity(listener) == nullptr);
+    
+    CHECK(CBLURLEndpointListener_Start(listener, nullptr));
+    
+    if (listenerConfig.disableTLS) {
+        CHECK(CBLURLEndpointListener_TLSIdentity(listener) == nullptr);
+    } else {
+        CHECK(CBLURLEndpointListener_TLSIdentity(listener) != nullptr);
+    }
+    
+#if !defined(__linux__) && !defined(__ANDROID__)
+    if (useAnonymosIdentity) {
+        alloc_slice anonymousLabel = CBLURLEndpointListener_AnonymousLabel(listener);
+        CHECK(anonymousLabel);
+        identityLabelsToDelete.emplace_back(anonymousLabel);
+    }
+#endif
+    
+    CBLURLEndpointListener_Stop(listener);
+    
+    CHECK(CBLURLEndpointListener_TLSIdentity(listener) == nullptr);
+    
+    CBLURLEndpointListener_Release(listener);
+    CBLTLSIdentity_Release(listenerConfig.tlsIdentity);
 }
 
 TEST_CASE_METHOD(URLEndpointListenerTest, "Start and Stop Listener", "[URLListener]") {

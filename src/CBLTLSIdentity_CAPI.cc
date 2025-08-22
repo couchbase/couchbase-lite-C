@@ -30,7 +30,7 @@ const FLString kCBLCertAttrKeySurname          = FLSTR("SN");
 const FLString kCBLCertAttrKeyOrganization     = FLSTR("O");
 const FLString kCBLCertAttrKeyOrganizationUnit = FLSTR("OU");
 const FLString kCBLCertAttrKeyPostalAddress    = FLSTR("postalAddress");
-const FLString kCBLCertAttrKeyLocality         = FLSTR("locality");
+const FLString kCBLCertAttrKeyLocality         = FLSTR("L");
 const FLString kCBLCertAttrKeyPostalCode       = FLSTR("postalCode");
 const FLString kCBLCertAttrKeyStateOrProvince  = FLSTR("ST");
 const FLString kCBLCertAttrKeyCountry          = FLSTR("C");
@@ -76,15 +76,21 @@ CBLKeyPair* CBLKeyPair_PublicKeyFromData(FLSlice data,
 }
 
 FLSliceResult CBLKeyPair_PublicKeyDigest(CBLKeyPair* keyPair) noexcept {
-    return (FLSliceResult)keyPair->publicKeyDigest();
+    try {
+        return (FLSliceResult)keyPair->publicKeyDigest();
+    } catchAndWarn();
 }
 
 FLSliceResult CBLKeyPair_PublicKeyData(CBLKeyPair* keyPair) noexcept {
-    return (FLSliceResult)keyPair->publicKeyData();
+    try {
+        return (FLSliceResult)keyPair->publicKeyData();
+    } catchAndWarn();
 }
 
 FLSliceResult CBLKeyPair_PrivateKeyData(CBLKeyPair* keyPair) noexcept {
-    return (FLSliceResult)keyPair->privateKeyData();
+    try {
+        return (FLSliceResult)keyPair->privateKeyData();
+    } catchAndWarn();
 }
 
 // CBLCert:
@@ -138,13 +144,13 @@ CBLKeyPair* CBLCert_PublicKey(CBLCert* cert) noexcept {
 CBLTLSIdentity* CBLTLSIdentity_CreateIdentityWithKeyPair(CBLKeyUsages usages,
                                                          CBLKeyPair* keypair,
                                                          FLDict attributes,
-                                                         CBLTimestamp expiration,
+                                                         CBLTimestamp validityInMilliseconds,
                                                          CBLError* outError) noexcept {
     try {
         return retain(CBLTLSIdentity::CreateIdentity(usages,
                                                      keypair,
                                                      attributes,
-                                                     expiration));
+                                                     validityInMilliseconds));
     } catchAndBridge(outError);
 }
 
@@ -166,11 +172,11 @@ CBLTimestamp CBLTLSIdentity_Expiration(CBLTLSIdentity* tlsID) noexcept {
 
 CBLTLSIdentity* CBLTLSIdentity_CreateIdentity(CBLKeyUsages usages,
                                               FLDict attrs,
-                                              CBLTimestamp exp,
+                                              int64_t validityInMilliseconds,
                                               FLString label,
                                               CBLError* outError) noexcept {
     try {
-        return retain(CBLTLSIdentity::CreateIdentity(usages, attrs, exp, label));
+        return retain(CBLTLSIdentity::CreateIdentity(usages, attrs, validityInMilliseconds, label));
     } catchAndBridge(outError);
 }
 

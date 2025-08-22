@@ -8,6 +8,7 @@
 #include "CBLTest_Cpp.hh"
 #include "cbl++/CouchbaseLite.hh"
 #include <chrono>
+#include <functional>
 #include <iostream>
 #include <thread>
 #include <set>
@@ -51,6 +52,8 @@ public:
     IdleAction idleAction = IdleAction::kStopReplicator;
     double timeoutSeconds = 30.0;
     
+    std::function<void(const CBLReplicatorStatus& status)> statusWatcher;
+
     CBLError expectedError = {};
     int64_t expectedDocumentCount = -1;
     
@@ -167,6 +170,7 @@ public:
              << ", err=" << status.error.domain << "/" << status.error.code << "\n";
         if (status.error.code && !replError.code)
             replError = status.error;
+        if (statusWatcher) statusWatcher(status);
     }
 
     void docProgress(CBLReplicator *r, bool isPush,

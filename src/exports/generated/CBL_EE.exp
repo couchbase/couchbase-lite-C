@@ -38,6 +38,7 @@ _FLSlot_SetEncryptableValue
 _CBL_RegisterPredictiveModel
 _CBL_UnregisterPredictiveModel
 _CBLAuth_CreateCertificate
+_CBLReplicator_ServerCertificate
 _CBL_EnableVectorSearch
 _CBLCollection_CreateVectorIndex
 _CBLVectorEncoding_CreateNone

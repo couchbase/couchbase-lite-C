@@ -53,7 +53,6 @@ CBL_CAPI_BEGIN
                                              CBLError* _cbl_nullable outError) CBLAPI;
 
     FLSliceResult CBLURLEndpointListener_AnonymousLabel(const CBLURLEndpointListener* listener) CBLAPI;
-    CBLTLSIdentity* CBLURLEndpointListener_TLSIdentity(const CBLURLEndpointListener* listener) CBLAPI;
 #endif
 
 FLMutableArray CBLCollection_GetIndexesInfo(const CBLCollection* collection,
