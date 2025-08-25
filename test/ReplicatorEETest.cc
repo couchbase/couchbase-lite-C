@@ -75,7 +75,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Push to local db", "[Replicator]") {
 
     CHECK(asVector(replicatedDocIDs) == vector<string>{"foo"});
 
-    Document copiedDoc = otherDB.getDocument("foo");
+    Document copiedDoc = otherDBDefaultCol.getDocument("foo");
     REQUIRE(copiedDoc);
     CHECK(copiedDoc["greeting"].asString() == "Howdy!"_sl);
 }
@@ -659,11 +659,11 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Document Replication Listener", "[Replica
 TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Push Filters", "[Replicator]") {
     MutableDocument doc1("foo1");
     doc1["greeting"] = "Howdy!";
-    db.saveDocument(doc1);
+    defaultCollection.saveDocument(doc1);
     
     MutableDocument doc2("foo2");
     doc2["greeting"] = "Howdy!";
-    db.saveDocument(doc2);
+    defaultCollection.saveDocument(doc2);
     
     auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
     config.replicatorType = kCBLReplicatorTypePush;
@@ -678,11 +678,11 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Push Filters", "[Replicator]") {
 TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Pull Filters", "[Replicator]") {
     MutableDocument doc1("foo1");
     doc1["greeting"] = "Howdy!";
-    otherDB.saveDocument(doc1);
+    otherDBDefaultCol.saveDocument(doc1);
     
     MutableDocument doc2("foo2");
     doc2["greeting"] = "Howdy!";
-    otherDB.saveDocument(doc2);
+    otherDBDefaultCol.saveDocument(doc2);
     
     auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
     config.replicatorType = kCBLReplicatorTypePull;

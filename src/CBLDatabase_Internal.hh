@@ -226,7 +226,6 @@ protected:
     friend struct CBLReplicator;
     friend struct CBLURLEndpointListener;
     friend struct cbl_internal::CBLLocalEndpoint;
-    friend struct cbl_internal::ListenerToken<CBLDocumentChangeListener>;
     friend struct cbl_internal::ListenerToken<CBLQueryChangeListener>;
     friend struct cbl_internal::ListenerToken<CBLCollectionDocumentChangeListener>;
     

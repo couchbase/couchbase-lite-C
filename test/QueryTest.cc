@@ -603,9 +603,9 @@ TEST_CASE_METHOD(QueryTest, "Remove Query Listener with Delay Notification", "[Q
     CBLQuery_SetListenerCallbackDelay(2000);
     
     cerr << "Deleting a doc...\n";
-    const CBLDocument *doc = CBLDatabase_GetDocument(db, "0000012"_sl, &error);
+    const CBLDocument *doc = CBLCollection_GetDocument(defaultCollection, "0000012"_sl, &error);
     REQUIRE(doc);
-    CHECK(CBLDatabase_DeleteDocument(db, doc, &error));
+    CHECK(CBLCollection_DeleteDocument(defaultCollection, doc, &error));
     CBLDocument_Release(doc);
     
     cerr << "Removing the listener...\n";
