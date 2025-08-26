@@ -132,7 +132,6 @@ public:
         config.encryptionKey = asCBLKey(c4config.encryptionKey);
 #endif
         config.fullSync = (c4config.flags & kC4DB_DiskSyncFull) == kC4DB_DiskSyncFull;
-        config.mmapDisabled = (c4config.flags & kC4DB_MmapDisabled) == kC4DB_MmapDisabled;
         return config;
     }
 
@@ -323,14 +322,12 @@ private:
             defaultConfig = CBLDatabaseConfiguration_Default();
             config = &defaultConfig;
         }
+        
         C4DatabaseConfig2 c4Config = {};
         c4Config.parentDirectory = effectiveDir(config->directory);
         c4Config.flags = kC4DB_Create | kC4DB_VersionVectors;
         if (config->fullSync) {
             c4Config.flags |= kC4DB_DiskSyncFull;
-        }
-        if (config->mmapDisabled) {
-            c4Config.flags |= kC4DB_MmapDisabled;
         }
         
 #ifdef COUCHBASE_ENTERPRISE
