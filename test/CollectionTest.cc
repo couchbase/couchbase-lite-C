@@ -20,27 +20,39 @@
 #include "CBLPrivate.h"
 #include "fleece/Fleece.hh"
 #include "fleece/Mutable.hh"
+#include <thread>
 
 using namespace fleece;
 using namespace std;
+using namespace std::chrono_literals;
 
-static int defaultListenerCalls = 0;
-static int fooListenerCalls = 0;
-static int barListenerCalls = 0;
-static int notificationsReadyCalls = 0;
+static std::atomic<int> defaultListenerCalls{0};
+static std::atomic<int> defaultListenerDelayMs{1000};
+static std::atomic<int> fooListenerCalls{0};
+static std::atomic<int> barListenerCalls{0};
+static std::atomic<int> notificationsReadyCalls{0};
 
 static void defaultListener(void *context, const CBLCollectionChange* change) {
     ++defaultListenerCalls;
-    auto test = (CBLTest*)context;
-    CHECK(test->defaultCollection == change->collection);
+    auto collection = (CBLCollection*)context;
+    CHECK(collection == change->collection);
     CHECK(change -> numDocs == 1);
     CHECK(slice(change->docIDs[0]) == "foo"_sl);
 }
 
-static void defaultListener2(void *context, const CBLCollectionChange* change) {
+static void defaultListenerWithDelay(void *context, const CBLCollectionChange* change) {
     ++defaultListenerCalls;
-    auto test = (CBLTest*)context;
-    CHECK(test->defaultCollection == change->collection);
+    this_thread::sleep_for(std::chrono::milliseconds(defaultListenerDelayMs.load()));
+    auto collection = (CBLCollection*)context;
+    CHECK(collection == change->collection);
+    CHECK(change -> numDocs == 1);
+    CHECK(slice(change->docIDs[0]) == "foo"_sl);
+}
+
+static void defaultListenerTwoDocs(void *context, const CBLCollectionChange* change) {
+    ++defaultListenerCalls;
+    auto collection = (CBLCollection*)context;
+    CHECK(collection == change->collection);
     CHECK(change -> numDocs == 2);
     CHECK(slice(change->docIDs[0]) == "foo"_sl);
     CHECK(slice(change->docIDs[1]) == "bar"_sl);
@@ -48,22 +60,22 @@ static void defaultListener2(void *context, const CBLCollectionChange* change) {
 
 static void fooListener(void *context, const CBLDocumentChange *change) {
     ++fooListenerCalls;
-    auto test = (CBLTest*)context;
-    CHECK(test->defaultCollection == change->collection);
+    auto collection = (CBLCollection*)context;
+    CHECK(collection == change->collection);
     CHECK(slice(change->docID) == "foo"_sl);
 }
 
 static void barListener(void *context, const CBLDocumentChange *change) {
     ++barListenerCalls;
-    auto test = (CBLTest*)context;
-    CHECK(test->defaultCollection == change->collection);
+    auto collection = (CBLCollection*)context;
+    CHECK(collection == change->collection);
     CHECK(slice(change->docID) == "bar"_sl);
 }
 
 static void notificationsReady(void *context, CBLDatabase* db) {
     ++notificationsReadyCalls;
-    auto test = (CBLTest*)context;
-    CHECK(test->db == db);
+    auto dbCtx = (CBLDatabase*)context;
+    CHECK(dbCtx == db);
 }
 
 class CollectionTest : public CBLTest {
@@ -1010,8 +1022,8 @@ TEST_CASE_METHOD(CollectionTest, "Delete Scope and Close Database then Use Scope
 TEST_CASE_METHOD(CollectionTest, "Collection notifications") {
     // Add a listener:
     defaultListenerCalls = fooListenerCalls = 0;
-    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, this);
-    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, defaultCollection);
+    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, defaultCollection);
 
     // Create a doc, check that the listener was called:
     createDocWithPair(defaultCollection, "foo", "greeting", "Howdy!");
@@ -1031,8 +1043,8 @@ TEST_CASE_METHOD(CollectionTest, "Collection notifications") {
 TEST_CASE_METHOD(CollectionTest, "Remove Collection Listener after releasing collection") {
     // Add a listener:
     defaultListenerCalls = fooListenerCalls = 0;
-    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, this);
-    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, defaultCollection);
+    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, defaultCollection);
 
     // Create a doc, check that the listener was called:
     createDocWithPair(defaultCollection, "foo", "greeting", "Howdy!");
@@ -1049,8 +1061,8 @@ TEST_CASE_METHOD(CollectionTest, "Remove Collection Listener after releasing col
 TEST_CASE_METHOD(CollectionTest, "Remove Listeners After Closing Database", "[Document]") {
     // Add a listener:
     defaultListenerCalls  = fooListenerCalls = 0;
-    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, this);
-    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
+    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener, defaultCollection);
+    auto docToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, defaultCollection);
     
     // Create a doc, check that the listener was called:
     createDocWithPair(defaultCollection, "foo", "greeting", "Howdy!");
@@ -1075,11 +1087,11 @@ TEST_CASE_METHOD(CollectionTest, "Scheduled collection notifications at database
     // Add a listener:
     defaultListenerCalls = fooListenerCalls = barListenerCalls = 0;
 
-    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListener2, this);
-    auto fooToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, this);
-    auto barToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "bar"_sl, barListener, this);
+    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListenerTwoDocs, defaultCollection);
+    auto fooToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "foo"_sl, fooListener, defaultCollection);
+    auto barToken = CBLCollection_AddDocumentChangeListener(defaultCollection, "bar"_sl, barListener, defaultCollection);
 
-    CBLDatabase_BufferNotifications(db, notificationsReady, this);
+    CBLDatabase_BufferNotifications(db, notificationsReady, db);
 
     // Create two docs; no listeners should be called yet:
     createDocWithPair(defaultCollection, "foo", "greeting", "Howdy!");
@@ -1111,3 +1123,38 @@ TEST_CASE_METHOD(CollectionTest, "Scheduled collection notifications at database
     CBLListener_Remove(barToken);
 }
 
+#pragma mark - LISTENERS:
+
+// CBSE-16738
+TEST_CASE_METHOD(CollectionTest, "Collection change notifications from different db threads") {
+    CBLError error {};
+    CBLDatabase* anotherDB = openDB();
+    CBLCollection* anotherDefaultCollection = CBLDatabase_DefaultCollection(anotherDB, &error);
+    
+    defaultListenerCalls = 0;
+    auto token = CBLCollection_AddChangeListener(defaultCollection, defaultListenerWithDelay, defaultCollection);
+    
+    auto createDoc = [&] (CBLCollection* collection)
+    {
+        CBLError error {};
+        CBLDocument* doc = CBLDocument_CreateWithID("foo"_sl);
+        MutableDict props = CBLDocument_MutableProperties(doc);
+        props["greeting"] = "hello";
+        CBLCollection_SaveDocument(collection, doc, &error);
+        CBLDocument_Release(doc);
+    };
+    
+    thread t1([&]() { createDoc(defaultCollection); });
+    
+    thread t2([=]() { createDoc(anotherDefaultCollection); });
+    
+    t1.join();
+    t2.join();
+    
+    CHECK(defaultListenerCalls == 2);
+    CBLListener_Remove(token);
+    
+    CBLDatabase_Close(anotherDB, &error);
+    CBLDatabase_Release(anotherDB);
+    CBLCollection_Release(anotherDefaultCollection);
+}

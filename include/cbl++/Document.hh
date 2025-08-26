@@ -231,59 +231,6 @@ namespace cbl {
         CBLError error;
         check(CBLCollection_PurgeDocument(ref(), doc.ref(), &error), error);
     }
-
-    // Database method bodies:
-
-    inline Document Database::getDocument(slice id) const {
-        CBLError error;
-        return Document::adopt(CBLDatabase_GetDocument(ref(), id, &error), &error);
-    }
-
-    inline MutableDocument Database::getMutableDocument(slice id) const {
-        CBLError error;
-        return MutableDocument::adopt(CBLDatabase_GetMutableDocument(ref(), id, &error), &error);
-    }
-
-    inline void Database::saveDocument(MutableDocument &doc) {
-        (void) saveDocument(doc, kCBLConcurrencyControlLastWriteWins);
-    }
-
-    inline bool Database::saveDocument(MutableDocument &doc, CBLConcurrencyControl c) {
-        CBLError error;
-        return Document::checkSave(
-            CBLDatabase_SaveDocumentWithConcurrencyControl(ref(), doc.ref(), c, &error),
-            error);
-    }
-
-    inline bool Database::saveDocument(MutableDocument &doc,
-                                       ConflictHandler conflictHandler)
-    {
-        CBLConflictHandler cHandler = [](void *context, CBLDocument *myDoc,
-                                             const CBLDocument *otherDoc) -> bool {
-            return (*(ConflictHandler*)context)(MutableDocument(myDoc),
-                                                    Document(otherDoc));
-        };
-        CBLError error;
-        return Document::checkSave(
-            CBLDatabase_SaveDocumentWithConflictHandler(ref(), doc.ref(), cHandler, &conflictHandler, &error),
-            error);
-    }
-
-    inline void Database::deleteDocument(Document &doc) {
-        (void) deleteDocument(doc, kCBLConcurrencyControlLastWriteWins);
-    }
-
-    inline bool Database::deleteDocument(Document &doc, CBLConcurrencyControl cc) {
-        CBLError error;
-        return Document::checkSave(CBLDatabase_DeleteDocumentWithConcurrencyControl(
-                                                                    ref(), doc.ref(), cc, &error),
-                                   error);
-    }
-
-    inline void Database::purgeDocument(Document &doc) {
-        CBLError error;
-        check(CBLDatabase_PurgeDocument(ref(), doc.ref(), &error), error);
-    }
 }
 
 CBL_ASSUME_NONNULL_END

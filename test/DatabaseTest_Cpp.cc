@@ -32,7 +32,6 @@ using namespace cbl;
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database") {
     CHECK(db.name() == string(kDatabaseName));
     CHECK(db.path() == string(CBLTest::databaseDir()) + kPathSeparator + string(kDatabaseName) + ".cblite2" + kPathSeparator);
-    CHECK(db.count() == 0);
 }
 
 TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database Exist") {
@@ -56,9 +55,11 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Copy Database") {
     
     CHECK(Database::exists(copiedDBName, dbDir));
     auto copiedDB = cbl::Database(copiedDBName, config);
-    CHECK(copiedDB.count() == 1);
+    Collection copiedCol = copiedDB.getDefaultCollection();
+    CHECK(copiedCol);
+    CHECK(copiedCol.count() == 1);
     
-    doc = copiedDB.getMutableDocument("foo");
+    doc = copiedCol.getMutableDocument("foo");
     CHECK(doc["greeting"].asString() == "Howdy!");
     
     copiedDB.deleteDatabase();
@@ -169,83 +170,6 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Transaction With Exception", "[!throws]") {
     CHECK(doc["meeting"] == nullptr);
 }
 
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Database notifications") {
-    int dbListenerCalls = 0, fooListenerCalls = 0;
-    {
-        // Add a listener:
-        auto dbListener = db.addChangeListener([&](Database callbackdb, vector<slice> docIDs) {
-            ++dbListenerCalls;
-            CHECK(callbackdb == db);
-            CHECK(docIDs.size() == 1);
-            CHECK(docIDs[0] == "foo");
-        });
-        auto fooListener = db.addDocumentChangeListener("foo", [&](Database callbackdb, slice docID) {
-            ++fooListenerCalls;
-            CHECK(callbackdb == db);
-            CHECK(docID == "foo");
-        });
-        // Create a doc, check that the listener was called:
-        createDocumentInDefault("foo", "greeting", "Howdy!");
-        CHECK(dbListenerCalls == 1);
-        CHECK(fooListenerCalls == 1);
-    }
-    // After being removed, the listener should not be called:
-    dbListenerCalls = fooListenerCalls = 0;
-    createDocumentInDefault("bar", "greeting", "yo.");
-    CHECK(dbListenerCalls == 0);
-    CHECK(fooListenerCalls == 0);
-}
-
-TEST_CASE_METHOD(CBLTest_Cpp, "C++ Scheduled database notifications") {
-    // Add a listener:
-    int dbListenerCalls = 0, fooListenerCalls = 0, barListenerCalls = 0, notificationsReadyCalls = 0;
-    auto dbListener = db.addChangeListener([&](Database callbackdb, vector<slice> docIDs) {
-        ++dbListenerCalls;
-        CHECK(callbackdb == db);
-        CHECK(docIDs.size() == 2);
-        CHECK(docIDs[0] == "foo");
-        CHECK(docIDs[1] == "bar");
-    });
-    auto fooListener = db.addDocumentChangeListener("foo", [&](Database callbackdb, slice docID) {
-        ++fooListenerCalls;
-        CHECK(callbackdb == db);
-        CHECK(docID == "foo");
-    });
-    auto barListener = db.addDocumentChangeListener("bar", [&](Database callbackdb, slice docID) {
-        ++barListenerCalls;
-        CHECK(callbackdb == db);
-        CHECK(docID == "bar");
-    });
-
-    db.bufferNotifications([&](Database callbackdb) {
-        ++notificationsReadyCalls;
-        CHECK(callbackdb == db);
-    });
-
-    // Create two docs; no listeners should be called yet:
-    createDocumentInDefault("foo", "greeting", "Howdy!");
-    CHECK(dbListenerCalls == 0);
-    CHECK(fooListenerCalls == 0);
-    CHECK(barListenerCalls == 0);
-
-    createDocumentInDefault("bar", "greeting", "yo.");
-    CHECK(dbListenerCalls == 0);
-    CHECK(fooListenerCalls == 0);
-    CHECK(barListenerCalls == 0);
-
-    // Now the listeners will be called:
-    db.sendNotifications();
-    CHECK(dbListenerCalls == 1);
-    CHECK(fooListenerCalls == 1);
-    CHECK(barListenerCalls == 1);
-
-    // There should be no more notifications:
-    db.sendNotifications();
-    CHECK(dbListenerCalls == 1);
-    CHECK(fooListenerCalls == 1);
-    CHECK(barListenerCalls == 1);
-}
-
 TEST_CASE_METHOD(CBLTest_Cpp, "Retaining immutable Fleece") {
     MutableDocument mdoc("ubiq");
     {
@@ -270,55 +194,5 @@ TEST_CASE_METHOD(CBLTest_Cpp, "Empty Listener Token") {
     ListenerToken<> listenerToken;
     CHECK(!listenerToken.context());
     CHECK(!listenerToken.token());
-    listenerToken.remove(); // Noops
-}
-
-TEST_CASE_METHOD(CBLTest_Cpp, "Database Listener Token") {
-    int num = 0;
-    auto cb = [&num]() { num++; };
-    ListenerToken<> listenerToken = ListenerToken<>(cb);
-    
-    // Context / Callback:
-    REQUIRE(listenerToken.context());
-    (*(ListenerToken<>::Callback*)listenerToken.context())();
-    CHECK(num == 1);
-    
-    // Token:
-    CHECK(!listenerToken.token());
-    auto dummy = [](void* context, const CBLDatabase *db, unsigned nDocs, FLString *docIDs){ };
-    auto listener = CBLDatabase_AddChangeListener(db.ref(), dummy, nullptr);
-    listenerToken.setToken(listener);
-    CHECK(listenerToken.token() == listener);
-    
-    // Move Constructor:
-    ListenerToken<> listenerToken2 = std::move(listenerToken);
-    REQUIRE(listenerToken2.context());
-    (*(ListenerToken<>::Callback*)listenerToken2.context())();
-    CHECK(num == 2);
-    CHECK(listenerToken2.token() == listener);
-    
-#ifndef __clang_analyzer__ // Exclude the code from being compiled for analyzer
-    CHECK(!listenerToken.context());
-    CHECK(!listenerToken.token());
-    listenerToken.remove(); // Noops
-#endif
-    
-    // Move Assignment:
-    listenerToken = std::move(listenerToken2);
-    REQUIRE(listenerToken.context());
-    (*(ListenerToken<>::Callback*)listenerToken.context())();
-    CHECK(num == 3);
-    CHECK(listenerToken.token() == listener);
-    
-#ifndef __clang_analyzer__ // Exclude the code from being compiled for analyzer
-    CHECK(!listenerToken2.context());
-    CHECK(!listenerToken2.token());
-    listenerToken2.remove(); // Noops
-#endif
-    
-    // Remove:
-    listenerToken.remove();
-    CHECK(!listenerToken.context());
-    CHECK(!listenerToken.context());
     listenerToken.remove(); // Noops
 }
