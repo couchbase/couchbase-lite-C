@@ -117,50 +117,6 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Set Suspended", "[Replicator]") {
     REQUIRE(waitForActivityLevel(kCBLReplicatorStopped, 10.0));
 }
 
-
-TEST_CASE_METHOD(ReplicatorLocalTest, "Pending Documents", "[Replicator]") {
-    config.replicatorType = kCBLReplicatorTypePush;
-    
-    replicate();
-    CHECK(asVector(replicatedDocIDs) == vector<string>{});
-    
-    CBLError error;
-    FLDict ids = CBLReplicator_PendingDocumentIDs(repl, &error);
-    CHECK(FLDict_Count(ids) == 0);
-    FLDict_Release(ids);
-    
-    MutableDocument doc1("foo1");
-    doc1["greeting"] = "Howdy!";
-    defaultCollection.saveDocument(doc1);
-    
-    MutableDocument doc2("foo2");
-    doc2["greeting"] = "Hello!";
-    defaultCollection.saveDocument(doc2);
-    
-    ids = CBLReplicator_PendingDocumentIDs(repl, &error);
-    CHECK(FLDict_Count(ids) == 2);
-    CHECK(FLDict_Get(ids, "foo1"_sl));
-    CHECK(FLDict_Get(ids, "foo2"_sl));
-    FLDict_Release(ids);
-    
-    CHECK(CBLReplicator_IsDocumentPending(repl, "foo1"_sl, &error));
-    CHECK(CBLReplicator_IsDocumentPending(repl, "foo2"_sl, &error));
-    
-    replicate();
-    
-    CHECK(asVector(replicatedDocIDs) == vector<string>{"foo1", "foo2"});
-    
-    ids = CBLReplicator_PendingDocumentIDs(repl, &error);
-    CHECK(FLDict_Count(ids) == 0);
-    FLDict_Release(ids);
-    
-    CHECK(!CBLReplicator_IsDocumentPending(repl, "foo1"_sl, &error));
-    CHECK(error.code == 0);
-    
-    CHECK(!CBLReplicator_IsDocumentPending(repl, "foo2"_sl, &error));
-    CHECK(error.code == 0);
-}
-
 /*
  https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0005-Version-Vector.md
  4. DefaultConflictResolverDeleteWins
@@ -182,11 +138,15 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Pending Documents", "[Replicator]") {
 */
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Replicator][Conflict]") {
     SECTION("No conflict resolved specified") {
-        config.conflictResolver = nullptr;
+        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+            colConfig.conflictResolver = nullptr;
+        });
     }
     
     SECTION("Specify default conflict resolver") {
-        config.conflictResolver = CBLDefaultConflictResolver;
+        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+            colConfig.conflictResolver = CBLDefaultConflictResolver;
+        });
     }
     
     config.replicatorType = kCBLReplicatorTypePull;
@@ -253,11 +213,15 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Last Write Wins - Client", "[Replicator][Conflict]") {
     // Test Step 1 - 4
     SECTION("No conflict resolved specified") {
-        config.conflictResolver = nullptr;
+        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+            colConfig.conflictResolver = nullptr;
+        });
     }
     
     SECTION("Specify default conflict resolver") {
-        config.conflictResolver = CBLDefaultConflictResolver;
+        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+            colConfig.conflictResolver = CBLDefaultConflictResolver;
+        });
     }
     
     config.replicatorType = kCBLReplicatorTypePull;
@@ -321,11 +285,15 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Last Write Wins - Clie
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Last Write Wins - Server", "[Replicator][Conflict]") {
     // Test Step 5 - 7
     SECTION("No conflict resolved specified") {
-        config.conflictResolver = nullptr;
+        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+            colConfig.conflictResolver = nullptr;
+        });
     }
     
     SECTION("Specify default conflict resolver") {
-        config.conflictResolver = CBLDefaultConflictResolver;
+        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+            colConfig.conflictResolver = CBLDefaultConflictResolver;
+        });
     }
     
     config.replicatorType = kCBLReplicatorTypePull;
@@ -421,16 +389,18 @@ public:
         replicatedDocIDs.clear();
         resolverCalled = false;
         
-        config.conflictResolver = [](void *context,
-                                     FLString documentID,
-                                     const CBLDocument *localDocument,
-                                     const CBLDocument *remoteDocument) -> const CBLDocument* {
-            cerr << "--- Entering custom conflict resolver! (local=" << localDocument <<
-                    ", remote=" << remoteDocument << ")\n";
-            auto resolved = ((ReplicatorConflictTest*)context)->conflictResolver(documentID, localDocument, remoteDocument);
-            cerr << "--- Returning " << resolved << " from custom conflict resolver\n";
-            return resolved;
-        };
+        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+            colConfig.conflictResolver = [](void *context,
+                                            FLString documentID,
+                                            const CBLDocument *localDocument,
+                                            const CBLDocument *remoteDocument) -> const CBLDocument* {
+                cerr << "--- Entering custom conflict resolver! (local=" << localDocument <<
+                ", remote=" << remoteDocument << ")\n";
+                auto resolved = ((ReplicatorConflictTest*)context)->conflictResolver(documentID, localDocument, remoteDocument);
+                cerr << "--- Returning " << resolved << " from custom conflict resolver\n";
+                return resolved;
+            };
+        });
         
         // Pull and Resolve Conflict:
         config.replicatorType = kCBLReplicatorTypePull;
@@ -665,9 +635,13 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Push Filters", "[Replicator]") {
     doc2["greeting"] = "Howdy!";
     defaultCollection.saveDocument(doc2);
     
-    auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
     config.replicatorType = kCBLReplicatorTypePush;
-    config.documentIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
+    
+    auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);
+    configureCollectionConfigs(config, [docIDs](CBLReplicationCollection& colConfig) {
+        colConfig.documentIDs = docIDs;
+    });
+    
     expectedDocumentCount = 1;
     replicate();
     CHECK(asVector(replicatedDocIDs) == vector<string>{"foo1"});
@@ -684,9 +658,13 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Pull Filters", "[Replicator]") {
     doc2["greeting"] = "Howdy!";
     otherDBDefaultCol.saveDocument(doc2);
     
-    auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
     config.replicatorType = kCBLReplicatorTypePull;
-    config.documentIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);;
+    
+    auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);
+    configureCollectionConfigs(config, [docIDs](CBLReplicationCollection& colConfig) {
+        colConfig.documentIDs = docIDs;
+    });
+    
     expectedDocumentCount = 1;
     replicate();
     CHECK(asVector(replicatedDocIDs) == vector<string>{"foo1"});
@@ -702,27 +680,29 @@ public:
     bool rejectAll = false;
     
     void testFilter(bool isPush, bool rejectAllChanges) {
-        cbl::Database theDB;
-        cbl::Collection theCol;
+        cbl::Collection sourceCollection;
 
         if (isPush) {
-            theDB = db;
+            sourceCollection = db.getDefaultCollection();
+            
             config.replicatorType = kCBLReplicatorTypePush;
-            config.pushFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
-                ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
-                return test->filter(context, doc, flags);
-            };
-            theCol = theDB.getDefaultCollection();
-        }
-        else
-        {
-            theDB = otherDB;
+            configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+                colConfig.pushFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
+                    ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
+                    return test->filter(context, doc, flags);
+                };
+            });
+            
+        } else {
+            sourceCollection = otherDB.getDefaultCollection();
+            
             config.replicatorType = kCBLReplicatorTypePull;
-            config.pullFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
-                ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
-                return test->filter(context, doc, flags);
-            };
-            theCol = theDB.getDefaultCollection();
+            configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+                colConfig.pullFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
+                    ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
+                    return test->filter(context, doc, flags);
+                };
+            });
             
             // Make local db non-empty for pulling a deleted doc:
             MutableDocument doc0("doc0");
@@ -730,14 +710,14 @@ public:
         }
 
         MutableDocument doc1("doc1");
-        theCol.saveDocument(doc1);
+        sourceCollection.saveDocument(doc1);
         
         MutableDocument doc2("doc2");
-        theCol.saveDocument(doc2);
+        sourceCollection.saveDocument(doc2);
         
         MutableDocument doc3("doc3");
-        theCol.saveDocument(doc3);
-        theCol.deleteDocument(doc3);
+        sourceCollection.saveDocument(doc3);
+        sourceCollection.deleteDocument(doc3);
         
         count = 0;
         deletedCount = 0;

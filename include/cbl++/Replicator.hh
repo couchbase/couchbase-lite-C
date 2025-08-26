@@ -149,18 +149,6 @@ namespace cbl {
     /** The configuration of a replicator. */
     class ReplicatorConfiguration {
     public:
-        /** Creates a config using a database to represent the default collection and an endpoint.
-            @note Only the default collection will be used in the replication.
-            @warning <b>Deprecated :</b>
-                     Use ReplicatorConfiguration::ReplicatorConfiguration(std::vector<ReplicationCollection>collections, Endpoint endpoint)
-                     instead.
-            @param db The database to represent the default collection.
-            @param endpoint The endpoint to replicate with. */
-        ReplicatorConfiguration(Database db, Endpoint endpoint)
-        :_database(db)
-        ,_endpoint(endpoint)
-        { }
-        
         /** Creates a  config with a list of collections and per-collection configurations to replicate and an endpoint
             @param collections The collections and per-collection configurations.
             @param endpoint The endpoint to replicate with. */
@@ -170,12 +158,12 @@ namespace cbl {
         { }
         
         //-- Accessors:
-        /** Returns the configured database. */
-        Database database() const           {return _database;}
-        /** Returns the configured endpoint. */
-        Endpoint endpoint() const           {return _endpoint;}
+        
         /** Returns the configured collections. */
         std::vector<ReplicationCollection> collections() const  {return _collections;}
+        
+        /** Returns the configured endpoint. */
+        Endpoint endpoint() const           {return _endpoint;}
         
         //-- Types:
         /** Replicator type : Push, pull or both  */
@@ -235,38 +223,11 @@ namespace cbl {
         std::string pinnedServerCertificate;
         /** Set of anchor certs (PEM format). */
         std::string trustedRootCertificates;
-
-        //-- Filtering:
-        /** Optional set of channels to pull from when replicating with the default collection.
-            @note This property can only be used when creating the config object with the database instead of collections.
-            @warning <b>Deprecated :</b> Use ReplicationCollection::channels instead. */
-        fleece::MutableArray channels       = fleece::MutableArray::newArray();
-        
-        /** Optional set of document IDs to replicate when replicating with the default collection.
-            @note This property can only be used when creating the config object with the database instead of collections.
-            @warning <b>Deprecated :</b> Use ReplicationCollection::documentIDs instead. */
-        fleece::MutableArray documentIDs    = fleece::MutableArray::newArray();
-
-        /** Optional callback to filter which docs are pushed when replicating with the default collection.
-            @note This property can only be used when creating the config object with the database instead of collections.
-            @warning <b>Deprecated :</b> Use ReplicationCollection::pushFilter instead. */
-        ReplicationFilter pushFilter;
-        
-        /** Optional callback to validate incoming docs when replicating with the default collection.
-            @note This property can only be used when creating the config object with the database instead of collections.
-            @warning <b>Deprecated :</b> Use ReplicationCollection::pullFilter instead. */
-        ReplicationFilter pullFilter;
-        
-        //-- Conflict Resolver:
-        /** Optional conflict-resolver callback.
-            @note This property can only be used when creating the config object with the database instead of collections.
-            @warning <b>Deprecated :</b> Use ReplicationCollection::conflictResolver instead. */
-        ConflictResolver conflictResolver;
         
     protected:
         friend class Replicator;
         
-        /** Base config without database, collections, filters, and conflict resolver set. */
+        /** Base config without collections set. */
         operator CBLReplicatorConfiguration() const {
             CBLReplicatorConfiguration conf = {};
             conf.endpoint = _endpoint.ref();
@@ -294,7 +255,6 @@ namespace cbl {
         }
         
     private:
-        Database _database;
         Endpoint _endpoint;
         std::vector<ReplicationCollection> _collections;
     };
@@ -308,22 +268,6 @@ namespace cbl {
             // Get the current configured collections and populate one for the
             // default collection if the config is configured with the database:
             auto collections = config.collections();
-            
-            auto database = config.database();
-            if (database) {
-                assert(collections.empty());
-                auto defaultCollection = database.getDefaultCollection();
-                if (!defaultCollection) {
-                    throw std::invalid_argument("default collection not exist");
-                }
-                ReplicationCollection col = ReplicationCollection(defaultCollection);
-                col.channels = config.channels;
-                col.documentIDs = config.documentIDs;
-                col.pushFilter = config.pushFilter;
-                col.pullFilter = config.pullFilter;
-                col.conflictResolver = config.conflictResolver;
-                collections.push_back(col);
-            }
             
             // Created a shared collection map. The pointer of the collection map will be
             // used as a context.
@@ -432,41 +376,6 @@ namespace cbl {
 
         /** Returns the replicator's current status. */
         CBLReplicatorStatus status() const  {return CBLReplicator_Status(ref());}
-
-        /** Indicates which documents in the default collection have local changes that have not yet
-            been pushed to the server by this replicator. This is of course a snapshot, that will
-            go out of date as the replicator makes progress and/or documents are saved locally.
-
-            The result is, effectively, a set of document IDs: a dictionary whose keys are the IDs and
-            values are `true`.
-            If there are no pending documents, the dictionary is empty.
-            @note This function can be called on a stopped or un-started replicator.
-            @note Documents that would never be pushed by this replicator, due to its configuration's
-                  `pushFilter` or `docIDs`, are ignored.
-            @warning If the default collection is not part of the replication, an error will be thrown.
-            @warning <b>Deprecated :</b> Use Replicator::pendingDocumentIDs(Collection& collection) instead. */
-        fleece::Dict pendingDocumentIDs() const {
-            CBLError error;
-            fleece::Dict result = CBLReplicator_PendingDocumentIDs(ref(), &error);
-            check(result != nullptr, error);
-            return result;
-        }
-
-        /** Indicates whether the document in the default collection with the given ID has local changes that
-            have not yet been pushed to the server by this replicator.
-
-            This is equivalent to, but faster than, calling \ref Replicator::pendingDocumentIDs() and
-            checking whether the result contains \p docID. See that function's documentation for details.
-            @note A `false` result means the document is not pending, _or_ there was an error.
-                  To tell the difference, compare the error code to zero.
-            @warning If the default collection is not part of the replication, an error will be thrown.
-            @warning <b>Deprecated :</b> Use Replicator::isDocumentPending(fleece::slice docID, Collection& collection) instead. */
-        bool isDocumentPending(fleece::slice docID) const {
-            CBLError error;
-            bool pending = CBLReplicator_IsDocumentPending(ref(), docID, &error);
-            check(pending || error.code == 0, error);
-            return pending;
-        }
         
         /** Indicates which documents in the given collection have local changes that have not yet been
             pushed to the server by this replicator. This is of course a snapshot, that will go out of date

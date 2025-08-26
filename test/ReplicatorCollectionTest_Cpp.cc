@@ -208,29 +208,6 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Create Replicator with zero 
     CheckError(error, kCBLErrorInvalidParameter);
 }
 
-TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Create Replicator with legacy database", "[Replicator]") {
-    Endpoint endpoint = Endpoint::databaseEndpoint(db2);
-    auto c = ReplicatorConfiguration(db, endpoint);
-    
-    auto docIDs = MutableArray::newArray();
-    docIDs.append("doc1"_sl);
-    c.documentIDs = docIDs;
-    
-    auto channels = MutableArray::newArray();
-    channels.append("a"_sl);
-    c.channels = channels;
-    
-    c.pushFilter = [](Document doc, CBLDocumentFlags flags) -> bool { return true; };
-    c.pullFilter = [](Document doc, CBLDocumentFlags flags) -> bool { return true; };
-    
-    c.conflictResolver = [](slice docID, const Document local, const Document remote) -> Document {
-        return remote;
-    };
-    
-    auto r = Replicator(c);
-    CHECK(r);
-}
-
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ URL Endpoint", "[Replicator]") {
     Endpoint endpoint = Endpoint::urlEndpoint("wss://localhost:4985/db");
     auto config = ReplicatorConfiguration({ ReplicationCollection(cx[0]) }, endpoint);
@@ -542,7 +519,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents", "[Replic
     config.replicatorType = kCBLReplicatorTypePush;
     replicate();
     
-    Dict ids = repl.pendingDocumentIDs();
+    Dict ids = repl.pendingDocumentIDs(defaultCollection);
     CHECK(ids.count() == 0);
     
     MutableDocument doc1("foo1");
@@ -553,13 +530,13 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents", "[Replic
     doc2["greeting"] = "Hello!";
     defaultCollection.saveDocument(doc2);
     
-    ids = repl.pendingDocumentIDs();
+    ids = repl.pendingDocumentIDs(defaultCollection);
     CHECK(ids.count() == 2);
     CHECK(ids["foo1"]);
     CHECK(ids["foo2"]);
     
-    CHECK(repl.isDocumentPending("foo1"));
-    CHECK(repl.isDocumentPending("foo2"));
+    CHECK(repl.isDocumentPending("foo1", defaultCollection));
+    CHECK(repl.isDocumentPending("foo2", defaultCollection));
     
     replicate();
 
@@ -568,11 +545,11 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents", "[Replic
     CHECK(col2.getDocument("foo1"));
     CHECK(col2.getDocument("foo2"));
     
-    ids = repl.pendingDocumentIDs();
+    ids = repl.pendingDocumentIDs(defaultCollection);
     CHECK(ids.count() == 0);
     
-    CHECK(!repl.isDocumentPending("foo1"));
-    CHECK(!repl.isDocumentPending("foo2"));
+    CHECK(!repl.isDocumentPending("foo1", defaultCollection));
+    CHECK(!repl.isDocumentPending("foo2", defaultCollection));
 }
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents with Collection", "[Replicator]") {

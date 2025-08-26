@@ -153,81 +153,13 @@ typedef CBL_ENUM(uint8_t, CBLProxyType) {
 /** Proxy settings for the replicator. */
 typedef struct {
     CBLProxyType type;                  ///< Type of proxy
-    FLString hostname;               ///< Proxy server hostname or IP address
+    FLString hostname;                  ///< Proxy server hostname or IP address
     uint16_t port;                      ///< Proxy server port
-    FLString username;               ///< Username for proxy auth (optional)
-    FLString password;               ///< Password for proxy auth
+    FLString username;                  ///< Username for proxy auth (optional)
+    FLString password;                  ///< Password for proxy auth
 } CBLProxySettings;
 
 #ifdef COUCHBASE_ENTERPRISE
-
-/** Callback that encrypts \ref CBLEncryptable properties in the documents of the default collection
-    pushed by the replicator. The callback returns encrypted data as a FLSliceResult object,
-    and the replicator will responsible for releasing the returned FLSliceResult object.
-     
-    If an error occurred during encryption, return a null \ref FLSliceResult with an error set to the
-    out error parameter of the callback. There are two errors that are supported by the callback :
- 
-    1. kCBLDomain / kCBLErrorCrypto : Permanent Crypto Error. When this error is set, the document
-      will fail to replicate, and the document will not be synced again unless the document is updated,
-      or the replicator is reset.
-
-    2. kCBLWebSocketDomain / 503 : Service Unavailable Error. This error is for mostly for a case
-      such as when a crypto service is temporarily unavailable during encryption. When this error
-      is set, the replicator will go into the offline state and will retry again according to the replicator
-      retry logic. As a result, the document will be retried to replicate again, and the encryption callback
-      will be called again to encrypt the properties of the document.
-
-    @note If an error besides the two errors above is set to the out error parameter of the callback,
-          or only a null \ref FLSliceResult object is returned without setting an error, the document
-          will be failed to replicate as the kCBLDomain / kCBLErrorCrypto error is sepecified.
-    @note A null \ref FLSliceResult can be created by calling FLSliceResult_CreateWith(nullptr, 0).
-    @warning  <b>Deprecated :</b> Use CBLDocumentPropertyEncryptor instead. */
-typedef FLSliceResult (*CBLPropertyEncryptor) (
-    void* context,              ///< Replicator’s context
-    FLString documentID,        ///< Document ID
-    FLDict properties,          ///< Document properties
-    FLString keyPath,           ///< Key path of the property to be encrypted
-    FLSlice input,              ///< Property data to be encrypted
-    FLStringResult* algorithm,  ///< On return: algorithm name (Optional: Default Value is 'CB_MOBILE_CUSTOM')
-    FLStringResult* kid,        ///< On return: encryption key identifier (Optional)
-    CBLError* error             ///< On return: error (Optional)
-);
-
-/** Callback that decrypts encrypted \ref CBLEncryptable properties in documents of the default collection
-    pulled by the replicator. The callback returns decrypted data as a FLSliceResult object,
-    and the replicator will responsible for releasing the returned FLSliceResult object.
-     
-    If an error occurred during decryption, return a null \ref FLSliceResult with an error set to the
-    out error parameter of the callback. There are two errors that are supported by the callback :
-
-    1. kCBLDomain / kCBLErrorCrypto : Permanent Crypto Error. When this error is set, the document
-      will fail to replicate, and the document will not be synced again unless the document is updated,
-      or the replicator is reset.
-
-    2. kCBLWebSocketDomain / 503 : Service Unavailable Error. This error is for mostly for a case
-      such as when a crypto service is temporarily unavailable during decryption. When this error
-      is set, the replicator will go into the offline state and will retry again according to the replicator
-      retry logic. As a result, the document will be retried to replicate again, and the decryption callback
-      will be called again to decrypt the properties of the document.
- 
-    If the decryption should be skipped to retain the encrypted data as-is, return a null \ref FLSliceResult
-    object without setting an error set to the out error parameter.
-
-    @note If an error besides the two errors above is set to the out error parameter of the callback,
-          the document will be failed to replicate as getting the kCBLDomain / kCBLErrorCrypto error.
-    @note A null \ref FLSliceResult can be created by calling FLSliceResult_CreateWith(nullptr, 0).
-    @warning <b>Deprecated :</b> Use CBLDocumentPropertyDecryptor instead. */
-typedef FLSliceResult (*CBLPropertyDecryptor) (
-    void* context,              ///< Replicator’s context
-    FLString documentID,        ///< Document ID
-    FLDict properties,          ///< Document properties
-    FLString keyPath,           ///< Key path of the property to be decrypted
-    FLSlice input,              ///< Property data to be decrypted
-    FLString algorithm,         ///< Algorithm name
-    FLString kid,               ///< Encryption key identifier specified when encryting the value
-    CBLError* error             ///< On return: error (Optional)
-);
 
 /** Callback that encrypts \ref CBLEncryptable properties in the documents pushed by the replicator.
     The callback returns encrypted data as a FLSliceResult object, and the replicator will responsible
@@ -318,10 +250,6 @@ typedef struct {
 
 /** The configuration of a replicator. */
 typedef struct {
-    /** The database to replicate. When setting the database, ONLY the default collection will be used for replication.
-        (Required if collections is not set)
-        @warning  <b>Deprecated :</b> Use collections instead. */
-    CBLDatabase* _cbl_nullable database;
     /** The address of the other database to replicate with (Required) */
     CBLEndpoint* endpoint;                              ///<
     
@@ -384,50 +312,11 @@ typedef struct {
     FLSlice pinnedServerCertificate;
     FLSlice trustedRootCertificates;                ///< Set of anchor certs (PEM format)
     
-    //-- Filtering:
-    
-    /** Optional set of channels to pull from when replicating with the default collection.
-        @note This property can only be used when setting the config object with the database instead of collections.
-        @note Channels are not supported in Peer-to-Peer and Database-to-Database replication.
-        @warning  <b>Deprecated :</b> Use CBLReplicationCollection.channels instead. */
-    FLArray _cbl_nullable channels;
-    
-    /** Optional set of document IDs to replicate when replicating with the default collection.
-        @note This property can only be used when setting the config object with the database instead of collections.
-        @warning  <b>Deprecated :</b> Use CBLReplicationCollection.documentIDs instead. */
-    FLArray _cbl_nullable documentIDs;
-    
-    /** Optional callback to filter which docs are pushed when replicating with the default collection.
-        @note This property can only be used when setting the config object with the database instead of collections.
-        @warning  <b>Deprecated :</b> Use CBLReplicationCollection.pushFilter instead. */
-    CBLReplicationFilter _cbl_nullable pushFilter;
-    
-    /** Optional callback to validate incoming docs when replicating with the default collection.
-        @note This property can only be used when setting the config object with the database instead of collections.
-        @warning  <b>Deprecated :</b> Use CBLReplicationCollection.pullFilter instead. */
-    CBLReplicationFilter _cbl_nullable pullFilter;
-    
-    //-- Conflict Resolver:
-    
-    /** Optional conflict-resolver callback.
-        @note This property can only be used when setting the config object with the database instead of collections.
-        @warning  <b>Deprecated :</b> Use CBLReplicationCollection.conflictResolver instead. */
-    CBLConflictResolver _cbl_nullable conflictResolver;
-    
     //-- Context:
     void* _cbl_nullable context;                    ///< Arbitrary value that will be passed to callbacks
     
 #ifdef COUCHBASE_ENTERPRISE
     //-- Property Encryption
-    /** Optional callback to encrypt \ref CBLEncryptable values of the documents in the default collection.
-        @note This property can only be used when setting the config object with the database instead of collections.
-        @warning  <b>Deprecated :</b> Use documentPropertyEncryptor instead. */
-    CBLPropertyEncryptor _cbl_nullable propertyEncryptor;
-    
-    /** Optional callback to decrypt encrypted \ref CBLEncryptable values of the documents in the default collection.
-        @note This property can only be used when setting the config object with the database instead of collections.
-        @warning  <b>Deprecated :</b> Use documentPropertyDecryptor instead. */
-    CBLPropertyDecryptor _cbl_nullable propertyDecryptor;
     
     /** Optional callback to encrypt \ref CBLEncryptable values. */
     CBLDocumentPropertyEncryptor _cbl_nullable documentPropertyEncryptor;
@@ -436,8 +325,8 @@ typedef struct {
     CBLDocumentPropertyDecryptor _cbl_nullable documentPropertyDecryptor;
 #endif
     
-    /** The collections to replicate with the target's endpoint (Required if the database is not set). */
-    CBLReplicationCollection* _cbl_nullable collections;
+    /** The collections to replicate with the target's endpoint. */
+    CBLReplicationCollection* collections;
     
     /** The number of collections (Required if the database is not set */
     size_t collectionCount;
@@ -543,39 +432,6 @@ typedef struct {
 
 /** Returns the replicator's current status. */
 CBLReplicatorStatus CBLReplicator_Status(CBLReplicator*) CBLAPI;
-
-/** Indicates which documents in the default collection have local changes that have not yet
-    been pushed to the server by this replicator. This is of course a snapshot, that will
-    go out of date as the replicator makes progress and/or documents are saved locally.
-
-    The result is, effectively, a set of document IDs: a dictionary whose keys are the IDs and
-    values are `true`.
-    If there are no pending documents, the dictionary is empty.
-    On error, NULL is returned.
-
-    @note  This function can be called on a stopped or un-started replicator.
-    @note  Documents that would never be pushed by this replicator, due to its configuration's
-           `pushFilter` or `docIDs`, are ignored.
-    @warning  You are responsible for releasing the returned array via \ref FLValue_Release.
-    @warning  If the default collection is not part of the replication, a NULL with an error
-              will be returned.
-    @warning  <b>Deprecated :</b> Use CBLReplicator_PendingDocumentIDs2 instead. */
-_cbl_warn_unused
-FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs(CBLReplicator*, CBLError* _cbl_nullable outError) CBLAPI;
-
-/** Indicates whether the document in the default collection with the given ID has local changes that
-    have not yet been pushed to the server by this replicator.
-
-    This is equivalent to, but faster than, calling \ref CBLReplicator_PendingDocumentIDs and
-    checking whether the result contains \p docID. See that function's documentation for details.
-    @note  A `false` result means the document is not pending, _or_ there was an error.
-           To tell the difference, compare the error code to zero.
-    @warning  If the default collection is not part of the replication, a NULL with an error
-              will be returned.
-    @warning  <b>Deprecated :</b> Use CBLReplicator_IsDocumentPending2 instead. */
-bool CBLReplicator_IsDocumentPending(CBLReplicator *repl,
-                                     FLString docID,
-                                     CBLError* _cbl_nullable outError) CBLAPI;
 
 /** Indicates which documents in the given collection have local changes that have not yet been
     pushed to the server by this replicator. This is of course a snapshot, that will go out of date

@@ -26,6 +26,7 @@ class ReplicatorPropertyEncryptionTest : public ReplicatorTest {
 public:
     Database otherDB;
     Collection otherDBDefaultCol = otherDB.getDefaultCollection();
+    
     int encryptCount = 0;
     int decryptCount = 0;
     
@@ -50,41 +51,42 @@ public:
         otherDB = nullptr;
     }
     
-    void resetDBAndReplicator() {
-        db.close();
-        db = nullptr;
-        db = openDatabaseNamed(kDatabaseName, true); // empty
-        defaultCollection = db.getDefaultCollection();
-
-        config.database = db.ref();
+    /** Delete & recreate database and reset replicator instance.  */
+    void reset() {
+        resetDatabase(true);
+        
         resetReplicator();
+        
+        resetDefaultReplicatorConfig();
     }
     
     void setupEncryptionCallback(bool encryptor = true, bool decryptor = true) {
         if (encryptor) {
-            config.propertyEncryptor = [](void* context,
-                                          FLString docID,
-                                          FLDict props,
-                                          FLString path,
-                                          FLSlice input,
-                                          FLStringResult* alg,
-                                          FLStringResult* kid,
-                                          CBLError* error) -> FLSliceResult
-            {
+            config.documentPropertyEncryptor = [](void* context,
+                                                  FLString scope,
+                                                  FLString collection,
+                                                  FLString docID,
+                                                  FLDict props,
+                                                  FLString path,
+                                                  FLSlice input,
+                                                  FLStringResult* alg,
+                                                  FLStringResult* kid,
+                                                  CBLError* error) -> FLSliceResult {
                 return ((ReplicatorPropertyEncryptionTest*)context) -> encrypt(context, docID, props, path, input, alg, kid, error);
             };
         }
         
         if (decryptor) {
-            config.propertyDecryptor = [](void* context,
-                                          FLString docID,
-                                          FLDict props,
-                                          FLString path,
-                                          FLSlice input,
-                                          FLString alg,
-                                          FLString kid,
-                                          CBLError* error) -> FLSliceResult
-            {
+            config.documentPropertyDecryptor = [](void* context,
+                                                  FLString scope,
+                                                  FLString collection,
+                                                  FLString docID,
+                                                  FLDict props,
+                                                  FLString path,
+                                                  FLSlice input,
+                                                  FLString alg,
+                                                  FLString kid,
+                                                  CBLError* error) -> FLSliceResult {
                 return ((ReplicatorPropertyEncryptionTest*)context) -> decrypt(context, docID, props, path, input, alg, kid, error);
             };
         }
@@ -427,7 +429,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt one prop
     }
     
     {
-        resetDBAndReplicator();
+        reset();
         replicate();
         
         CBLError error;
@@ -487,7 +489,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt multiple
     }
     
     {
-        resetDBAndReplicator();
+        reset();
         replicate();
 
         CBLError error;
@@ -555,7 +557,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "No decryptor : ok", "[Replic
     
     {
         replicatedDocs.clear();
-        resetDBAndReplicator();
+        reset();
         replicate();
 
         CBLError error;
@@ -625,7 +627,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Skip decryption : ok", "[Rep
     }
     
     {
-        resetDBAndReplicator();
+        reset();
         skipDecryption = true;
         replicate();
         
@@ -733,7 +735,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Decryption error", "[Replica
     
     {
         replicatedDocs.clear();
-        resetDBAndReplicator();
+        reset();
         
         CBLError expectedDocReplError = { };
         bool willRetryToSyncAgain = false;
@@ -852,7 +854,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Key ID and Algorithm", "[Rep
     }
     
     {
-        resetDBAndReplicator();
+        reset();
         replicate();
         
         CBLError error;
@@ -864,7 +866,7 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Key ID and Algorithm", "[Rep
     }
 }
 
-TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt with collections", "[Replicator][Encryptable]") {
+TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt with multipe collections", "[Replicator][Encryptable]") {
     auto c1x = CreateCollection(db.ref(), "colA", "scopeA");
     auto c2x = CreateCollection(db.ref(), "colB", "scopeA");
     
@@ -918,8 +920,6 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt with col
         return ((ReplicatorPropertyEncryptionTest*)context) -> decrypt(context, docID, props, path,
                                                                        input, alg, kid, error);
     };
-    
-    config.database = nullptr;
     
     vector<CBLReplicationCollection> configs(2);
     configs[0].collection = c1x;

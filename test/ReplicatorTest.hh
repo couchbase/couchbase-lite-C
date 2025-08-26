@@ -32,6 +32,9 @@ public:
     };
 
     CBLReplicatorConfiguration config = {};
+    
+    vector<CBLReplicationCollection> defaultCollectionConfigs = {};
+    
     CBLReplicator *repl = nullptr;
     
     bool enableDocReplicationListener = true;
@@ -56,14 +59,81 @@ public:
 
     CBLError expectedError = {};
     int64_t expectedDocumentCount = -1;
-    
 
     ReplicatorTest() {
-        config.database = db.ref();
+        resetDefaultReplicatorConfig();
+    }
+    
+    ~ReplicatorTest() {
+        if (repl) {
+            CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
+            CBLReplicator_Release(repl);
+        }
+        
+        CBLEndpoint_Free(config.endpoint);
+        
+        if (config.authenticator) {
+            CBLAuth_Free(config.authenticator);
+        }
+        
+        if (config.headers) {
+            FLDict_Release(config.headers);
+        }
+        
+        // For async clean up in Replicator:
+        this_thread::sleep_for(500ms);
+    }
+    
+    /** (Re)initializes the default replicator configuration using the default collection,
+        configured as a pull replicator. */
+    void resetDefaultReplicatorConfig() {
+        defaultCollectionConfigs = collectionConfigs({ defaultCollection.ref() });
+        config.collections = defaultCollectionConfigs.data();
+        config.collectionCount = defaultCollectionConfigs.size();
         config.replicatorType = kCBLReplicatorTypePull;
         config.context = this;
     }
-
+    
+    /** A utility function to create a vector of collection configurations. */
+    std::vector<CBLReplicationCollection> collectionConfigs(
+        const std::vector<CBLCollection*>& collections,
+        std::function<void(CBLReplicationCollection&)> configure = nullptr
+    ) {
+        std::vector<CBLReplicationCollection> configs(collections.size());
+        for (size_t i = 0; i < collections.size(); i++) {
+            configs[i].collection = collections[i];
+            if (configure) {
+                configure(configs[i]);  // apply user customization
+            }
+        }
+        return configs;
+    }
+    
+    /** A utility function to (re)configure the current collection configuration. */
+    inline void configureCollectionConfigs(
+        CBLReplicatorConfiguration& cfg,
+        std::function<void(CBLReplicationCollection&)> configure
+    ) {
+        if (!configure) { return; };
+        
+        for (size_t i = 0; i < cfg.collectionCount; i++) {
+            configure(cfg.collections[i]);
+        }
+    }
+    
+    /** Release and set the current replicator used in tests to nullptr. */
+    void resetReplicator() {
+        if (!repl) {
+            return;
+        }
+        
+        REQUIRE(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
+        CBLReplicator_Release(repl);
+        repl = nullptr;
+    }
+    
+    /** Create a new replicator with the current config if the replicator doesn't exist, and start the replicator.
+        For a continuous replicator, when the replicator is IDLE, the replicator will be stopped. */
     void replicate(bool reset =false) {
         CBLError error;
         CBLReplicatorStatus status;
@@ -135,15 +205,6 @@ public:
         CBLListener_Remove(dtoken);
     }
     
-    void resetReplicator() {
-        if (!repl)
-            return;
-        
-        REQUIRE(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
-        CBLReplicator_Release(repl);
-        repl = nullptr;
-    }
-    
     bool waitForActivityLevel(CBLReplicatorActivityLevel level, double timeout) {
         return waitForActivityLevelAndDocumentCount(level, -1, timeout);
     }
@@ -211,18 +272,6 @@ public:
         REQUIRE(n > 0);
         REQUIRE(n < sizeof(buf));
         return alloc_slice(buf, n);
-    }
-
-    ~ReplicatorTest() {
-        if (repl) {
-            CHECK(CBLReplicator_Status(repl).activity == kCBLReplicatorStopped);
-            CBLReplicator_Release(repl);
-        }
-        CBLAuth_Free(config.authenticator);
-        CBLEndpoint_Free(config.endpoint);
-        
-        // For async clean up in Replicator:
-        this_thread::sleep_for(500ms);
     }
 
     static vector<string> asVector(const set<string> strings) {

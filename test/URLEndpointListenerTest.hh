@@ -26,8 +26,6 @@ public:
     URLEndpointListenerTest()
     :db2(openDatabaseNamed("otherdb", true)) // empty
     {
-        config.database = nullptr;
-
         cx.push_back(CreateCollection(db.ref(), "colA", "scopeA"));
         cx.push_back(CreateCollection(db.ref(), "colB", "scopeA"));
         cx.push_back(CreateCollection(db.ref(), "colC", "scopeA"));
