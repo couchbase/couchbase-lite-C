@@ -193,11 +193,8 @@ void CBLTest::initTestDatabases(bool reset) {
 
 slice const CBLTest_Cpp::kDatabaseName = CBLTest::kDatabaseName;
 
-CBLTest_Cpp::CBLTest_Cpp()
-:db(openDatabaseNamed(kDatabaseName, true)) // empty
-{ 
-    defaultCollection = db.getDefaultCollection();
-    REQUIRE(defaultCollection);
+CBLTest_Cpp::CBLTest_Cpp() {
+    resetDatabase(true);
 }
 
 CBLTest_Cpp::~CBLTest_Cpp() {
@@ -214,9 +211,22 @@ CBLTest_Cpp::~CBLTest_Cpp() {
     }
 }
 
+void CBLTest_Cpp::resetDatabase(bool deleteDatabase) {
+    if (db) {
+        db.close();
+        db = nullptr;
+    }
+    
+    db = openDatabaseNamed(kDatabaseName, deleteDatabase);
+    REQUIRE(db);
+    
+    defaultCollection = db.getDefaultCollection();
+    REQUIRE(defaultCollection);
+}
+
 cbl::Database CBLTest_Cpp::openDatabaseNamed(slice name, bool createEmpty){
     auto config = CBLTest::databaseConfig();
-    if(createEmpty == true){
+    if (createEmpty == true){
         cbl::Database::deleteDatabase(name, config.directory);
     }
     cbl::Database database = cbl::Database(name, config);
@@ -224,7 +234,7 @@ cbl::Database CBLTest_Cpp::openDatabaseNamed(slice name, bool createEmpty){
     return database;
 }
 
-void CBLTest_Cpp::createDocumentInDefault(std::string docID, std::string property, std::string value) {
+void CBLTest_Cpp::createDocument(std::string docID, std::string property, std::string value) {
     cbl::MutableDocument doc(docID);
     MutableDict newProps = MutableDict::newDict();
     newProps[property] = value;

@@ -236,8 +236,6 @@ namespace cbl_internal
 
             authenticator = authenticator ? authenticator->clone() : nullptr;
             headers = FLDict_MutableCopy(headers, kFLDeepCopyImmutables);
-            channels = FLArray_MutableCopy(channels, kFLDeepCopyImmutables);
-            documentIDs = FLArray_MutableCopy(documentIDs, kFLDeepCopyImmutables);
             pinnedServerCertificate = (_pinnedServerCert = pinnedServerCertificate);
             trustedRootCertificates = (_trustedRootCerts = trustedRootCertificates);
         
@@ -257,33 +255,14 @@ namespace cbl_internal
             fleece::Value userAgent = headersDict[kCBLReplicatorUserAgent];
             _userAgent = userAgent ? userAgent.asstring() : userAgentHeader();
             
-            Retained<CBLCollection> defaultCollection = nullptr;
-            if (database) {
-                defaultCollection = database->getDefaultCollection();
-            }
-            
-            if (collections) {
-                // Copy replication collections, channels, and document ids:
-                for (int i = 0; i < collectionCount; i++) {
-                    CBLReplicationCollection col = collections[i];
-                    col.channels = FLArray_MutableCopy(col.channels, kFLDeepCopyImmutables);
-                    col.documentIDs = FLArray_MutableCopy(col.documentIDs, kFLDeepCopyImmutables);
-                    _effectiveCollections.push_back(col);
-                }
-                collections = _effectiveCollections.data();
-            } else {
-                // Create a replication collection using the default collection:
-                assert(defaultCollection);
-                
-                CBLReplicationCollection col {};
-                col.collection = defaultCollection;
-                col.conflictResolver = conflictResolver;
-                col.pushFilter = pushFilter;
-                col.pullFilter = pullFilter;
-                col.channels = FLArray_Retain(channels);        // Already copied
-                col.documentIDs = FLArray_Retain(documentIDs);  // Already copied
+            // Copy replication collections, channels, and document ids:
+            for (int i = 0; i < collectionCount; i++) {
+                CBLReplicationCollection col = collections[i];
+                col.channels = FLArray_MutableCopy(col.channels, kFLDeepCopyImmutables);
+                col.documentIDs = FLArray_MutableCopy(col.documentIDs, kFLDeepCopyImmutables);
                 _effectiveCollections.push_back(col);
             }
+            collections = _effectiveCollections.data();
             
             // Retain the collections and database:
             for (auto& col : _effectiveCollections) {
@@ -298,8 +277,6 @@ namespace cbl_internal
             CBLEndpoint_Free(endpoint);
             CBLAuth_Free(authenticator);
             FLDict_Release(headers);
-            FLArray_Release(channels);
-            FLArray_Release(documentIDs);
             
             for (auto& col : _effectiveCollections) {
                 FLArray_Release(col.channels);
@@ -410,31 +387,18 @@ namespace cbl_internal
         
         void validate() const {
             const char *problem = nullptr;
-            if (!database && !collections)
-                problem = "Invalid config: Missing both database and collections";
-            else if (database && collections)
-                problem = "Invalid config: Both database and collections are set at same time";
-            else if (collections && collectionCount == 0)
+            if (!collections)
+                problem = "Invalid config: Missing collections";
+            else if (collectionCount == 0)
                 problem = "Invalid config: collectionCount is zero";
-            else if ((documentIDs || channels || pushFilter || pullFilter) && !database)
-                problem = "Invalid config: Cannot use documentIDs, channels, pushFilter or "
-                          "pullFilter when collections is set. Set the properties in "
-                          "CBLReplicationCollection instead.";
-            else if (conflictResolver && !database)
-                problem = "Invalid config: Cannot use conflictResolver when collections is set. "
-                          "Set the property in CBLReplicationCollection instead.";
-        #ifdef COUCHBASE_ENTERPRISE
-            else if ((propertyEncryptor || propertyDecryptor ) && !database)
-                problem = "Invalid config: Cannot use propertyEncryptor or propertyDecryptor "
-                          "when collections is set. Use documentPropertyEncryptor or "
-                          "documentPropertyDecryptor instead.";
-        #endif
-            else if (!endpoint || replicatorType > kCBLReplicatorTypePull)
-                problem = "Invalid config: Missing endpoints or bad type";
+            else if (!endpoint)
+                problem = "Invalid config: Missing endpoint";
             else if (!endpoint->valid())
                 problem = "Invalid endpoint";
+            else if (replicatorType > kCBLReplicatorTypePull)
+                problem = "Invalid config: Bad replicator type";
             else if (proxy && (proxy->type > kCBLProxyHTTPS ||
-                                                    !proxy->hostname.buf || !proxy->port))
+                               !proxy->hostname.buf || !proxy->port))
                 problem = "Invalid replicator proxy settings";
             
             if (collections) {

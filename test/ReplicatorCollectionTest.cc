@@ -30,7 +30,6 @@ public:
     ReplicatorCollectionTest()
     :db2(openDatabaseNamed("otherDB", true)) // empty
     {
-        config.database = nullptr;
         config.endpoint = CBLEndpoint_CreateWithLocalDB(db2.ref());
         
         cx.push_back(CreateCollection(db.ref(), "colA", "scopeA"));
@@ -52,14 +51,6 @@ public:
         }
     }
     
-    vector<CBLReplicationCollection> collectionConfigs(vector<CBLCollection*>collections) {
-        vector<CBLReplicationCollection> configs(collections.size());
-        for (int i = 0; i < collections.size(); i++) {
-            configs[i].collection = collections[i];
-        }
-        return configs;
-    }
-    
     static string docKey(CBLCollection* collection, string docID) {
         return CollectionPath(collection) + "." + docID;
     }
@@ -69,134 +60,12 @@ public:
     vector<CBLCollection*> cy;
 };
 
-TEST_CASE_METHOD(ReplicatorCollectionTest, "Create Replicator with no collections", "[Replicator]") {
-    ExpectingExceptions x;
-    CBLError error {};
-    CBLReplicator* r = CBLReplicator_Create(&config, &error);
-    CHECK(!r);
-    CheckError(error, kCBLErrorInvalidParameter);
-}
-
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Create Replicator with zero collections", "[Replicator]") {
     ExpectingExceptions x;
     
     vector<CBLReplicationCollection> collections(0);
     config.collections = collections.data();
     config.collectionCount = 0;
-    
-    CBLError error {};
-    CBLReplicator* r = CBLReplicator_Create(&config, &error);
-    CHECK(!r);
-    CheckError(error, kCBLErrorInvalidParameter);
-}
-
-TEST_CASE_METHOD(ReplicatorCollectionTest, "Use both database and collections", "[Replicator]") {
-    ExpectingExceptions x;
-    
-    config.database = db.ref();
-    
-    auto cols = collectionConfigs({cx[0]});
-    config.collections = cols.data();
-    config.collectionCount = cols.size();
-    
-    CBLError error {};
-    CBLReplicator* r = CBLReplicator_Create(&config, &error);
-    CHECK(!r);
-    CheckError(error, kCBLErrorInvalidParameter);
-}
-
-TEST_CASE_METHOD(ReplicatorCollectionTest, "Use outer level filters with collections", "[Replicator]") {
-    ExpectingExceptions x;
-    
-    auto cols = collectionConfigs({cx[0]});
-    config.collections = cols.data();
-    config.collectionCount = cols.size();
-    
-    SECTION("DOC IDS") {
-        config.documentIDs = FLMutableArray_New();
-    }
-    
-    SECTION("CHANNELS") {
-        config.channels = FLMutableArray_New();
-    }
-    
-    SECTION("PUSH FILTER") {
-        config.pushFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
-            return true;
-        };
-    }
-    
-    SECTION("PULL FILTER") {
-        config.pullFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
-            return true;
-        };
-    }
-    
-    CBLError error {};
-    CBLReplicator* r = CBLReplicator_Create(&config, &error);
-    CHECK(!r);
-    CheckError(error, kCBLErrorInvalidParameter);
-    
-    FLArray_Release(config.documentIDs);
-    FLArray_Release(config.channels);
-}
-
-TEST_CASE_METHOD(ReplicatorCollectionTest, "Use outer level conflict resolver with collections", "[Replicator]") {
-    ExpectingExceptions x;
-    
-    auto cols = collectionConfigs({cx[0]});
-    config.collections = cols.data();
-    config.collectionCount = cols.size();
-    
-    config.conflictResolver = [](void *context,
-                                 FLString documentID,
-                                 const CBLDocument *localDocument,
-                                 const CBLDocument *remoteDocument) -> const CBLDocument*
-    {
-        return nullptr;
-    };
-    
-    CBLError error {};
-    CBLReplicator* r = CBLReplicator_Create(&config, &error);
-    CHECK(!r);
-    CheckError(error, kCBLErrorInvalidParameter);
-    
-    FLArray_Release(config.documentIDs);
-    FLArray_Release(config.channels);
-}
-
-TEST_CASE_METHOD(ReplicatorCollectionTest, "Use property encryption with collections", "[Replicator]") {
-    ExpectingExceptions x;
-    
-    auto cols = collectionConfigs({cx[0]});
-    config.collections = cols.data();
-    config.collectionCount = cols.size();
-    
-    SECTION("ENCRYPTOR") {
-        config.propertyEncryptor = [](void* context,
-                                      FLString docID,
-                                      FLDict props,
-                                      FLString path,
-                                      FLSlice input,
-                                      FLStringResult* alg,
-                                      FLStringResult* kid,
-                                      CBLError* error) -> FLSliceResult {
-            return {nullptr, 0};
-        };
-    }
-    
-    SECTION("DECRYPTOR") {
-        config.propertyDecryptor = [](void* context,
-                                      FLString docID,
-                                      FLDict props,
-                                      FLString path,
-                                      FLSlice input,
-                                      FLString alg,
-                                      FLString kid,
-                                      CBLError* error) -> FLSliceResult {
-            return {nullptr, 0};
-        };
-    }
     
     CBLError error {};
     CBLReplicator* r = CBLReplicator_Create(&config, &error);

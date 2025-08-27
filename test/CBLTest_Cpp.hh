@@ -44,12 +44,15 @@ public:
     CBLTest_Cpp();
     ~CBLTest_Cpp();
     
+    /** Close test database and create a new database and its default collection instance. */
+    void resetDatabase(bool deleteDatabase = false);
+    
+    void createDocument(std::string docID, std::string property, std::string value);
+    
     cbl::Database openDatabaseNamed(fleece::slice name, bool createEmpty = 0);
-
+    
     cbl::Database db;
     cbl::Collection defaultCollection;
-
-    void createDocumentInDefault(std::string docID, std::string property, std::string value);
 };
 
 void createDocWithJSON(cbl::Collection& collection, std::string docID, std::string jsonContent);

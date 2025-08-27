@@ -25,17 +25,10 @@ using namespace fleece;
 
 
 TEST_CASE_METHOD(ReplicatorTest, "Bad config", "[Replicator]") {
-    CBLProxySettings proxy = {};
+    CBLProxySettings proxy {};
     CBLError error;
     {
         ExpectingExceptions x;
-
-#ifndef __clang__
-        config.database = nullptr;
-        CHECK(!CBLReplicator_Create(&config, &error));
-#endif
-        
-        config.database = db.ref();
         CHECK(!CBLReplicator_Create(&config, &error));
         
         config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg:9999/foobar"_sl, &error);
@@ -75,17 +68,8 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate", "[Replicator]") {
     CBLError error;
     config.endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
     CHECK(config.endpoint);
-    
     config.authenticator = CBLAuth_CreateSession("SyncGatewaySession"_sl, "NOM_NOM_NOM"_sl);
-
-    config.pullFilter = [](void *context, CBLDocument* document, CBLDocumentFlags flags) -> bool {
-        return true;
-    };
-
-    config.pushFilter = [](void *context, CBLDocument* document, CBLDocumentFlags flags) -> bool {
-        return true;
-    };
-
+    
     expectedError = {kCBLNetworkDomain, kCBLNetErrUnknownHost};
     replicate();
 }
@@ -100,7 +84,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with auth and proxy", "[Replica
     
     config.authenticator = CBLAuth_CreatePassword("username"_sl, "p@ssw0RD"_sl);
 
-    CBLProxySettings proxy = {};
+    CBLProxySettings proxy {};
     proxy.type = kCBLProxyHTTP;
     proxy.hostname = "jxnbgotn.dvmwk"_sl;
     proxy.port = 9998;
@@ -137,10 +121,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Fake Replicate with freed auth and doc listene
 }
 #endif
 
-TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs", "[Replicator]") {
-    CBLReplicatorConfiguration config = {};
-    config.database = db.ref();
-    
+TEST_CASE_METHOD(ReplicatorTest, "Get replicator config", "[Replicator]") {
     CBLError error;
     CBLEndpoint* endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
     config.endpoint = endpoint;
@@ -154,13 +135,13 @@ TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs", "[Replicator]") {
     }
     config.authenticator = auth;
     
-    CBLProxySettings* proxy = new CBLProxySettings();
-    proxy->type = kCBLProxyHTTP;
-    proxy->hostname = "jxnbgotn.dvmwk"_sl;
-    proxy->port = 9998;
-    proxy->username = "User Name"_sl;
-    proxy->password = "123456"_sl;
-    config.proxy = proxy;
+    CBLProxySettings proxy {};
+    proxy.type = kCBLProxyHTTP;
+    proxy.hostname = "jxnbgotn.dvmwk"_sl;
+    proxy.port = 9998;
+    proxy.username = "User Name"_sl;
+    proxy.password = "123456"_sl;
+    config.proxy = &proxy;
     
     auto headers = FLMutableDict_New();
     FLMutableDict_SetString(headers, "sessionid"_sl, "abc"_sl);
@@ -169,29 +150,33 @@ TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs", "[Replicator]") {
     auto repl1 = CBLReplicator_Create(&config, &error);
     REQUIRE(repl1);
     
-    CBLEndpoint_Free(endpoint);
-    CBLAuth_Free(auth);
-    delete(proxy);
-    FLMutableDict_Release(headers);
+    auto replConfig = CBLReplicator_Config(repl1);
+    REQUIRE(replConfig);
     
-    auto copiedConfig = CBLReplicator_Config(repl1);
-    REQUIRE(copiedConfig);
-    CHECK(copiedConfig->endpoint);
-    CHECK(copiedConfig->authenticator);
+    CHECK(replConfig->collectionCount == 1);
+    CHECK(replConfig->collections[0].collection == defaultCollection.ref());
+    CHECK(replConfig->collections[0].channels == nullptr);
+    CHECK(replConfig->collections[0].documentIDs == nullptr);
+    CHECK(replConfig->collections[0].pullFilter == nullptr);
+    CHECK(replConfig->collections[0].pushFilter == nullptr);
+    CHECK(replConfig->collections[0].conflictResolver == nullptr);
     
-    REQUIRE(copiedConfig->proxy);
-    CHECK(copiedConfig->proxy->type == kCBLProxyHTTP);
-    CHECK(copiedConfig->proxy->hostname == "jxnbgotn.dvmwk"_sl);
-    CHECK(copiedConfig->proxy->port == 9998);
-    CHECK(copiedConfig->proxy->username == "User Name"_sl);
-    CHECK(copiedConfig->proxy->password == "123456"_sl);
+    CHECK(replConfig->endpoint);
+    CHECK(replConfig->authenticator);
     
-    REQUIRE(copiedConfig->headers);
-    FLValue sessionid = FLDict_Get(copiedConfig->headers, "sessionid"_sl);
+    REQUIRE(replConfig->proxy);
+    CHECK(replConfig->proxy->type == kCBLProxyHTTP);
+    CHECK(replConfig->proxy->hostname == "jxnbgotn.dvmwk"_sl);
+    CHECK(replConfig->proxy->port == 9998);
+    CHECK(replConfig->proxy->username == "User Name"_sl);
+    CHECK(replConfig->proxy->password == "123456"_sl);
+    
+    REQUIRE(replConfig->headers);
+    FLValue sessionid = FLDict_Get(replConfig->headers, "sessionid"_sl);
     REQUIRE(sessionid);
     CHECK(FLValue_AsString(sessionid) == "abc"_sl);
 
-    auto repl2 = CBLReplicator_Create(copiedConfig, &error);
+    auto repl2 = CBLReplicator_Create(replConfig, &error);
     CHECK(repl2);
     
     CBLReplicator_Release(repl1);
@@ -199,10 +184,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs", "[Replicator]") {
 }
 
 
-TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs with nullptr value", "[Replicator]") {
-    CBLReplicatorConfiguration config = {};
-    config.database = db.ref();
-    
+TEST_CASE_METHOD(ReplicatorTest, "Get replicator config without auth proxy headers", "[Replicator]") {
     CBLError error;
     CBLEndpoint* endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
     config.endpoint = endpoint;
@@ -225,9 +207,6 @@ TEST_CASE_METHOD(ReplicatorTest, "Copy pointer configs with nullptr value", "[Re
 }
 
 TEST_CASE_METHOD(ReplicatorTest, "Check userAgent header", "[Replicator]") {
-    CBLReplicatorConfiguration config = {};
-    config.database = db.ref();
-
     CBLError error;
     CBLEndpoint* endpoint = CBLEndpoint_CreateWithURL("ws://fsdfds.vzcsg/foobar"_sl, &error);
     config.endpoint = endpoint;

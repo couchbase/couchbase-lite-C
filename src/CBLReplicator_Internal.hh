@@ -145,7 +145,7 @@ public:
         };
         
 #ifdef COUCHBASE_ENTERPRISE
-        if (_conf.propertyEncryptor || _conf.documentPropertyEncryptor) {
+        if (_conf.documentPropertyEncryptor) {
             params.propertyEncryptor = [](void* ctx,
                                           C4CollectionSpec spec,
                                           C4String documentID,
@@ -161,7 +161,7 @@ public:
             };
         }
         
-        if (_conf.propertyDecryptor || _conf.documentPropertyDecryptor) {
+        if (_conf.documentPropertyDecryptor) {
             params.propertyDecryptor = [](void* ctx,
                                           C4CollectionSpec spec,
                                           C4String documentID,
@@ -454,15 +454,8 @@ private:
                            C4StringResult* keyID, C4Error* outError)
     {
         CBLError error {};
-        C4SliceResult result;
-        if (_conf.propertyEncryptor) {
-            assert(spec == kC4DefaultCollectionSpec);
-            result = _conf.propertyEncryptor(_conf.context, documentID, properties, keyPath, input,
-                                             algorithm, keyID, &error);
-        } else {
-            result = _conf.documentPropertyEncryptor(_conf.context, spec.scope, spec.name, documentID,
-                                                     properties, keyPath, input, algorithm, keyID, &error);
-        }
+        C4SliceResult result=  _conf.documentPropertyEncryptor(_conf.context, spec.scope, spec.name, documentID,
+                                                               properties, keyPath, input, algorithm, keyID, &error);
         *outError = internal(error);
         return result;
     }
@@ -472,15 +465,8 @@ private:
                            C4String keyID, C4Error* outError)
     {
         CBLError error {};
-        C4SliceResult result;
-        if (_conf.propertyDecryptor) {
-            assert(spec == kC4DefaultCollectionSpec);
-            result = _conf.propertyDecryptor(_conf.context, documentID, properties, keyPath, input,
-                                             algorithm, keyID, &error);
-        } else {
-            result = _conf.documentPropertyDecryptor(_conf.context, spec.scope, spec.name, documentID,
-                                                     properties, keyPath, input, algorithm, keyID, &error);
-        }
+        C4SliceResult result = _conf.documentPropertyDecryptor(_conf.context, spec.scope, spec.name, documentID,
+                                                               properties, keyPath, input, algorithm, keyID, &error);
         *outError = internal(error);
         return result;
     }
