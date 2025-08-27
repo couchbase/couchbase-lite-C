@@ -58,7 +58,7 @@ TEST_CASE_METHOD(LogTest_Cpp, "Console Log Sink Cpp: Set and Get", "[Log]") {
 }
 
 TEST_CASE_METHOD(LogTest_Cpp, "Custom Log Sink Cpp: Set and Get", "[Log]") {
-    CBLLogCallback callback = [](CBLLogDomain domain, CBLLogLevel level, FLString msg) { };
+    CBLLogSinkCallback callback = [](CBLLogDomain domain, CBLLogLevel level, FLString msg) { };
     LogSinks::setCustom({ kCBLLogVerbose, callback, kCBLLogDomainMaskAll});
     CBLCustomLogSink logSink = LogSinks::custom();
     CHECK(logSink.level == kCBLLogVerbose);

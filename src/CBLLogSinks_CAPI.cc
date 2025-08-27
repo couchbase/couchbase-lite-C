@@ -1,7 +1,7 @@
 //
 // CBLLogSinks_CAPI.cc
 //
-// Copyright © 2024 Couchbase. All rights reserved.
+// Copyright © 2025 Couchbase. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,31 +19,25 @@
 #include "CBLLogSinks_Internal.hh"
 
 void CBLLogSinks_SetConsole(CBLConsoleLogSink logSink) noexcept {
-    try { CBLLogSinks::validateAPIUsage(CBLLogSinks::LogAPIStyle::newStyle); } catchAndAbort()
-    CBLLogSinks::setConsoleLogSink(logSink);
+    try { CBLLogSinks::setConsoleLogSink(logSink); } catchAndWarnNoReturn();
 }
 
 CBLConsoleLogSink CBLLogSinks_Console(void) noexcept {
-    try { CBLLogSinks::validateAPIUsage(CBLLogSinks::LogAPIStyle::newStyle); } catchAndAbort()
-    return CBLLogSinks::consoleLogSink();
+    try { return CBLLogSinks::consoleLogSink(); } catchAndWarn();
 }
 
 void CBLLogSinks_SetCustom(CBLCustomLogSink logSink) noexcept {
-    try { CBLLogSinks::validateAPIUsage(CBLLogSinks::LogAPIStyle::newStyle); } catchAndAbort()
-    CBLLogSinks::setCustomLogSink(logSink);
+    try { CBLLogSinks::setCustomLogSink(logSink); } catchAndWarnNoReturn();
 }
 
 CBLCustomLogSink CBLLogSinks_CustomSink(void) noexcept {
-    try { CBLLogSinks::validateAPIUsage(CBLLogSinks::LogAPIStyle::newStyle); } catchAndAbort()
-    return CBLLogSinks::customLogSink();
+    try { return CBLLogSinks::customLogSink(); } catchAndWarn();
 }
 
 void CBLLogSinks_SetFile(CBLFileLogSink logSink) noexcept {
-    try { CBLLogSinks::validateAPIUsage(CBLLogSinks::LogAPIStyle::newStyle); } catchAndAbort()
     try { CBLLogSinks::setFileLogSink(logSink); } catchAndWarnNoReturn();
 }
 
 CBLFileLogSink CBLLogSinks_File(void) noexcept {
-    try { CBLLogSinks::validateAPIUsage(CBLLogSinks::LogAPIStyle::newStyle); } catchAndAbort()
-    return CBLLogSinks::fileLogSink();
+    try { return CBLLogSinks::fileLogSink(); } catchAndWarn();
 }

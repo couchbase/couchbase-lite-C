@@ -1,7 +1,7 @@
 //
 // CBLLogSink_Internal.hh
 //
-// Copyright © 2024 Couchbase. All rights reserved.
+// Copyright © 2025 Couchbase. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,23 +45,13 @@ public:
     
     static void log(CBLLogDomain domain, CBLLogLevel level, const char *msg);
     
-    // Temporarily until removing the old logging API
-    enum class LogAPIStyle {
-        none,
-        oldStyle,
-        newStyle,
-    };
-    static void validateAPIUsage(LogAPIStyle usage);
-    
     // For testing purpose
     static void reset(void);
     static void logWithC4Log(CBLLogDomain domain, CBLLogLevel level, const char *msg);
     
 private:
-    static std::atomic<LogAPIStyle> _sAPIStyle;
-    
-    static std::atomic<CBLLogLevel> _sDomainsLogLevel;
-    static std::atomic<CBLLogLevel> _sCallbackLogLevel;
+    static CBLLogLevel _sDomainsLogLevel;
+    static CBLLogLevel _sCallbackLogLevel;
     
     static CBLConsoleLogSink _sConsoleSink;
     static CBLCustomLogSink _sCustomSink;
@@ -72,10 +62,8 @@ private:
     static const std::vector<C4LogDomain>& c4LogDomains();
     static C4LogDomain toC4LogDomain(CBLLogDomain);
     
-    static void _setConsoleLogSink(const CBLConsoleLogSink&);
-    static void _setCustomLogSink(const CBLCustomLogSink&);
-    static void _setFileLogSink(const CBLFileLogSink&);
-    static void updateLogLevels();
+    static void setFileLogSinkNoLock(const CBLFileLogSink&);
+    static void updateLogLevelsNoLock();
     
     static void c4LogCallback(C4LogDomain c4Domain, C4LogLevel c4Level, const char *msg, va_list args);
     static void logToConsoleLogSink(CBLConsoleLogSink&, CBLLogDomain, CBLLogLevel, const char *);
