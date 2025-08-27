@@ -194,14 +194,6 @@ CBL_C {
 		CBLDocument_SetJSON;
 		CBL_Log;
 		CBL_LogMessage;
-		CBLLog_Callback;
-		CBLLog_SetCallback;
-		CBLLog_CallbackLevel;
-		CBLLog_SetCallbackLevel;
-		CBLLog_ConsoleLevel;
-		CBLLog_SetConsoleLevel;
-		CBLLog_FileConfig;
-		CBLLog_SetFileConfig;
 		CBLLogSinks_SetConsole;
 		CBLLogSinks_Console;
 		CBLLogSinks_SetCustom;

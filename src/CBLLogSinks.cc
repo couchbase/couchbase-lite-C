@@ -1,7 +1,7 @@
 //
 // CBLLogSinks.cc
 //
-// Copyright © 2024 Couchbase. All rights reserved.
+// Copyright © 2025 Couchbase. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,10 +33,8 @@ using namespace std;
 using namespace fleece;
 using namespace litecore;
 
-std::atomic<CBLLogSinks::LogAPIStyle> CBLLogSinks::_sAPIStyle {LogAPIStyle::none};
-
-std::atomic<CBLLogLevel> CBLLogSinks::_sDomainsLogLevel{kCBLLogNone};
-std::atomic<CBLLogLevel> CBLLogSinks::_sCallbackLogLevel{kCBLLogNone};
+CBLLogLevel CBLLogSinks::_sDomainsLogLevel { kCBLLogNone };
+CBLLogLevel CBLLogSinks::_sCallbackLogLevel{ kCBLLogNone };
 
 CBLConsoleLogSink CBLLogSinks::_sConsoleSink { kCBLLogWarning };
 CBLCustomLogSink CBLLogSinks::_sCustomSink { kCBLLogNone };
@@ -44,19 +42,19 @@ CBLFileLogSink CBLLogSinks::_sFileSink { kCBLLogNone, kFLSliceNull };
 
 std::shared_mutex CBLLogSinks::_sMutex;
 
-static const char* kC4ExtraDomains[] = { "SyncBusy", "Changes", "BLIPMessages", "TLS", "Zip" };
+static const char* kC4LogDomains[] = { "DB", "Query", "Sync", "WS", "Listener", "SyncBusy",
+                                       "Changes", "BLIPMessages", "TLS", "Zip" };
 
 const std::vector<C4LogDomain>& CBLLogSinks::c4LogDomains() {
     static const std::vector<C4LogDomain> c4Domains = [] {
-        // MUST match CBLLogDomain order
-        std::vector<C4LogDomain> vec = {
-            kC4DatabaseLog,
-            kC4QueryLog,
-            kC4SyncLog,
-            kC4WebSocketLog
-        };
-        C4LogDomain listenerDomain = c4log_getDomain("Listener", true);
-        vec.push_back(listenerDomain);
+        std::vector<C4LogDomain> vec;
+        vec.reserve(std::size(kC4LogDomains));
+        for (const char* name : kC4LogDomains) {
+            C4LogDomain domain = c4log_getDomain(name, true);
+            if (domain) {
+                vec.push_back(domain);
+            }
+        }
         return vec;
     }();
     return c4Domains;
@@ -65,13 +63,15 @@ const std::vector<C4LogDomain>& CBLLogSinks::c4LogDomains() {
 static once_flag initFlag;
 void CBLLogSinks::init() {
     call_once(initFlag, [](){
-        updateLogLevels();
+        std::unique_lock<std::shared_mutex> lock(_sMutex);
+        updateLogLevelsNoLock();
     });
 }
 
 void CBLLogSinks::setConsoleLogSink(CBLConsoleLogSink consoleSink) {
-    _setConsoleLogSink(consoleSink);
-    updateLogLevels();
+    std::unique_lock<std::shared_mutex> lock(_sMutex);
+    _sConsoleSink = consoleSink;
+    updateLogLevelsNoLock();
 }
 
 CBLConsoleLogSink CBLLogSinks::consoleLogSink(void) {
@@ -80,8 +80,9 @@ CBLConsoleLogSink CBLLogSinks::consoleLogSink(void) {
 }
 
 void CBLLogSinks::setCustomLogSink(CBLCustomLogSink customSink) {
-    _setCustomLogSink(customSink);
-    updateLogLevels();
+    std::unique_lock<std::shared_mutex> lock(_sMutex);
+    _sCustomSink = customSink;
+    updateLogLevelsNoLock();
 }
 
 CBLCustomLogSink CBLLogSinks::customLogSink(void) {
@@ -90,8 +91,9 @@ CBLCustomLogSink CBLLogSinks::customLogSink(void) {
 }
 
 void CBLLogSinks::setFileLogSink(CBLFileLogSink fileSink) {
-    _setFileLogSink(fileSink);
-    updateLogLevels();
+    std::unique_lock<std::shared_mutex> lock(_sMutex);
+    setFileLogSinkNoLock(fileSink);
+    updateLogLevelsNoLock();
 }
 
 CBLFileLogSink CBLLogSinks::fileLogSink(void) {
@@ -105,10 +107,10 @@ void CBLLogSinks::log(CBLLogDomain domain, CBLLogLevel level, const char *msg) {
     {
         std::shared_lock<std::shared_mutex> lock(_sMutex);
         consoleSink = _sConsoleSink;
-        customSink = _sCustomSink;
+        customSink  = _sCustomSink;
     }
     
-    // To cosole and custom log:
+    // To console and custom log:
     logToConsoleLogSink(consoleSink, domain, level, msg);
     logToCustomLogSink(customSink, domain, level, msg);
     
@@ -117,26 +119,10 @@ void CBLLogSinks::log(CBLLogDomain domain, CBLLogLevel level, const char *msg) {
     c4slog(c4LogDomain, C4LogLevel(level), slice(msg));
 }
 
-void CBLLogSinks::validateAPIUsage(LogAPIStyle style) {
-    LogAPIStyle current = _sAPIStyle.load();
-    if (current == LogAPIStyle::none) {
-        if (!_sAPIStyle.compare_exchange_strong(current, style)) {
-            if (current != style) {
-                C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
-                               "Cannot use both new and old logging API simultaneously");
-            }
-        }
-    } else if (current != style) {
-        C4Error::raise(LiteCoreDomain, kC4ErrorUnsupported,
-                       "Cannot use both new and old logging API simultaneously");
-    }
-}
-
 void CBLLogSinks::reset(void) {
     setConsoleLogSink({ kCBLLogWarning });
     setCustomLogSink({ kCBLLogNone });
     setFileLogSink({ kCBLLogNone, kFLSliceNull });
-    _sAPIStyle.store(LogAPIStyle::none);
 }
 
 void CBLLogSinks::logWithC4Log(CBLLogDomain domain, CBLLogLevel level, const char *msg) {
@@ -146,19 +132,7 @@ void CBLLogSinks::logWithC4Log(CBLLogDomain domain, CBLLogLevel level, const cha
 
 // Private Functions
 
-void CBLLogSinks::_setConsoleLogSink(const CBLConsoleLogSink& consoleSink) {
-    std::unique_lock<std::shared_mutex> lock(_sMutex);
-    _sConsoleSink = consoleSink;
-}
-
-void CBLLogSinks::_setCustomLogSink(const CBLCustomLogSink& customSink) {
-    std::unique_lock<std::shared_mutex> lock(_sMutex);
-    _sCustomSink = customSink;
-}
-
-void CBLLogSinks::_setFileLogSink(const CBLFileLogSink& fileSink) {
-    std::unique_lock<std::shared_mutex> lock(_sMutex);
-    
+void CBLLogSinks::setFileLogSinkNoLock(const CBLFileLogSink& fileSink) {
     if (fileSink.level != kCBLLogNone) {
         auto directory = slice(fileSink.directory);
         if (!directory.empty()) {
@@ -180,7 +154,7 @@ void CBLLogSinks::_setFileLogSink(const CBLFileLogSink& fileSink) {
     c4opt.max_rotate_count  = maxKeptFiles - 1;
     
     string header = "Generated by Couchbase Lite for C / " + userAgentHeader();
-    c4opt.header            = slice(header);
+    c4opt.header            = slice(header); // Will be copied by c4log_writeToBinaryFile
     
     C4Error err {};
     if (!c4log_writeToBinaryFile(c4opt, &err)) {
@@ -190,39 +164,23 @@ void CBLLogSinks::_setFileLogSink(const CBLFileLogSink& fileSink) {
     _sFileSink = fileSink;
 }
 
-void CBLLogSinks::updateLogLevels() {
-    // A shared-read-lock (allows multiple reads) is used here to ensure that _sConsoleSink,
-    // _sCustomSink, and _sFileSink from being modified while this function is executing.
-    //
-    // The c4LogCallback() also uses shared-read-lock when accessing the _sConsoleSink and
-    // _sCustomSink, therefore, the deadlock will not happen if the c4LogCallback() is called
-    // at the same time from a different thread while this function is updating to LiteCore's
-    // callback log level.
-    std::shared_lock<std::shared_mutex> lock(_sMutex);
-    
+void CBLLogSinks::updateLogLevelsNoLock() {
     CBLLogLevel customLogLevel = _sCustomSink.callback != nullptr ? _sCustomSink.level : kCBLLogNone;
     CBLLogLevel callbackLogLevel = std::min(_sConsoleSink.level, customLogLevel);
     CBLLogLevel domainsLogLevel = std::min(callbackLogLevel, _sFileSink.level);
     C4LogLevel c4LogLevel = C4LogLevel(domainsLogLevel);
     
-    if (_sDomainsLogLevel.load() != domainsLogLevel) {
+    if (_sDomainsLogLevel != domainsLogLevel) {
         auto domains = c4LogDomains();
         for (C4LogDomain domain : domains) {
             c4log_setLevel(domain, c4LogLevel);
         }
-
-        for(const auto* extraName : kC4ExtraDomains) {
-            C4LogDomain domain = c4log_getDomain(extraName, false);
-            if (domain) {
-                c4log_setLevel(domain, c4LogLevel);
-            }
-        }
-        _sDomainsLogLevel.store(domainsLogLevel);
+        _sDomainsLogLevel = domainsLogLevel;
     }
     
-    if (_sCallbackLogLevel.load() != callbackLogLevel) {
+    if (_sCallbackLogLevel != callbackLogLevel) {
         c4log_writeToCallback(c4LogLevel, &c4LogCallback, true);
-        _sCallbackLogLevel.store(callbackLogLevel);
+        _sCallbackLogLevel =callbackLogLevel;
     }
 }
 
@@ -232,7 +190,7 @@ void CBLLogSinks::c4LogCallback(C4LogDomain c4Domain, C4LogLevel c4Level, const 
     {
         std::shared_lock<std::shared_mutex> lock(_sMutex);
         consoleSink = _sConsoleSink;
-        customSink = _sCustomSink;
+        customSink  = _sCustomSink;
     }
 
     auto domain = toCBLLogDomain(c4Domain);
@@ -287,6 +245,11 @@ C4LogDomain CBLLogSinks::toC4LogDomain(CBLLogDomain domain) {
 }
 
 CBLLogDomain CBLLogSinks::toCBLLogDomain(C4LogDomain c4Domain) {
+    const char* domainName = c4log_getDomainName(c4Domain);
+    if (!domainName) {
+        return kCBLLogDomainDatabase;
+    }
+    
     static const unordered_map<string_view, CBLLogDomain> domainMap = {
         {"DB", kCBLLogDomainDatabase},
         {"Query", kCBLLogDomainQuery},
@@ -301,9 +264,8 @@ CBLLogDomain CBLLogSinks::toCBLLogDomain(C4LogDomain c4Domain) {
         {"Listener", kCBLLogDomainListener}
     };
     
-    auto domainName = c4log_getDomainName(c4Domain);
-    auto it = domainMap.find(domainName);
-    if (it != domainMap.end()) {
+    std::string_view name{domainName};
+    if (auto it = domainMap.find(name); it != domainMap.end()) {
         return it->second;
     }
     return kCBLLogDomainDatabase;
