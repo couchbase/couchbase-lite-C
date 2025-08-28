@@ -139,7 +139,9 @@ CBL_C {
 		CBLReplicator_SetHostReachable;
 		CBLReplicator_SetSuspended;
 		CBLReplicator_Status;
+		CBLReplicator_PendingDocumentIDs;
 		CBLReplicator_PendingDocumentIDs2;
+		CBLReplicator_IsDocumentPending;
 		CBLReplicator_IsDocumentPending2;
 		CBLReplicator_AddChangeListener;
 		CBLReplicator_AddDocumentReplicationListener;

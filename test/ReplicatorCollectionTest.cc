@@ -765,7 +765,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Document Pending", "[Repl
     repl = CBLReplicator_Create(&config, &error);
     
     // Check Pending Docs:
-    FLDict pending1 = CBLReplicator_PendingDocumentIDs2(repl, cx[0], &error);
+    FLDict pending1 = CBLReplicator_PendingDocumentIDs(repl, cx[0], &error);
     REQUIRE(pending1);
     CHECK(FLDict_Count(pending1) == 3);
     CHECK(FLValue_AsBool(FLDict_Get(pending1, "foo1"_sl)));
@@ -773,38 +773,38 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Document Pending", "[Repl
     CHECK(FLValue_AsBool(FLDict_Get(pending1, "foo3"_sl)));
     FLDict_Release(pending1);
     
-    CHECK(CBLReplicator_IsDocumentPending2(repl, "foo1"_sl, cx[0], &error));
-    CHECK(CBLReplicator_IsDocumentPending2(repl, "foo1"_sl, cx[0], &error));
-    CHECK(CBLReplicator_IsDocumentPending2(repl, "foo1"_sl, cx[0], &error));
+    CHECK(CBLReplicator_IsDocumentPending(repl, "foo1"_sl, cx[0], &error));
+    CHECK(CBLReplicator_IsDocumentPending(repl, "foo1"_sl, cx[0], &error));
+    CHECK(CBLReplicator_IsDocumentPending(repl, "foo1"_sl, cx[0], &error));
     
-    FLDict pending2 = CBLReplicator_PendingDocumentIDs2(repl, cx[1], &error);
+    FLDict pending2 = CBLReplicator_PendingDocumentIDs(repl, cx[1], &error);
     REQUIRE(pending2);
     CHECK(FLDict_Count(pending2) == 2);
     CHECK(FLValue_AsBool(FLDict_Get(pending2, "bar1"_sl)));
     CHECK(FLValue_AsBool(FLDict_Get(pending2, "bar2"_sl)));
     FLDict_Release(pending2);
     
-    CHECK(CBLReplicator_IsDocumentPending2(repl, "bar1"_sl, cx[1], &error));
-    CHECK(CBLReplicator_IsDocumentPending2(repl, "bar2"_sl, cx[1], &error));
+    CHECK(CBLReplicator_IsDocumentPending(repl, "bar1"_sl, cx[1], &error));
+    CHECK(CBLReplicator_IsDocumentPending(repl, "bar2"_sl, cx[1], &error));
 
     // Replicate:
     expectedDocumentCount = 5;
     replicate();
     
     // Check Pending Docs:
-    pending1 = CBLReplicator_PendingDocumentIDs2(repl, cx[0], &error);
+    pending1 = CBLReplicator_PendingDocumentIDs(repl, cx[0], &error);
     REQUIRE(pending1);
     CHECK(FLDict_Count(pending1) == 0);
     FLDict_Release(pending1);
     
-    CHECK(!CBLReplicator_IsDocumentPending2(repl, "foo2"_sl, cx[0], &error));
+    CHECK(!CBLReplicator_IsDocumentPending(repl, "foo2"_sl, cx[0], &error));
     
-    pending2 = CBLReplicator_PendingDocumentIDs2(repl, cx[1], &error);
+    pending2 = CBLReplicator_PendingDocumentIDs(repl, cx[1], &error);
     REQUIRE(pending2);
     CHECK(FLDict_Count(pending2) == 0);
     FLDict_Release(pending2);
     
-    CHECK(!CBLReplicator_IsDocumentPending2(repl, "bar1"_sl, cx[1], &error));
+    CHECK(!CBLReplicator_IsDocumentPending(repl, "bar1"_sl, cx[1], &error));
     
     // Upadate Docs:
     auto foo2 = CBLCollection_GetMutableDocument(cx[0], "foo2"_sl, &error);
@@ -820,21 +820,21 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Document Pending", "[Repl
     CBLDocument_Release(bar1);
     
     // Check Pending Docs:
-    pending1 = CBLReplicator_PendingDocumentIDs2(repl, cx[0], &error);
+    pending1 = CBLReplicator_PendingDocumentIDs(repl, cx[0], &error);
     REQUIRE(pending1);
     CHECK(FLDict_Count(pending1) == 1);
     CHECK(FLValue_AsBool(FLDict_Get(pending1, "foo2"_sl)));
     FLDict_Release(pending1);
     
-    CHECK(CBLReplicator_IsDocumentPending2(repl, "foo2"_sl, cx[0], &error));
+    CHECK(CBLReplicator_IsDocumentPending(repl, "foo2"_sl, cx[0], &error));
     
-    pending2 = CBLReplicator_PendingDocumentIDs2(repl, cx[1], &error);
+    pending2 = CBLReplicator_PendingDocumentIDs(repl, cx[1], &error);
     REQUIRE(pending2);
     CHECK(FLDict_Count(pending2) == 1);
     CHECK(FLValue_AsBool(FLDict_Get(pending2, "bar1"_sl)));
     FLDict_Release(pending2);
     
-    CHECK(CBLReplicator_IsDocumentPending2(repl, "bar1"_sl, cx[1], &error));
+    CHECK(CBLReplicator_IsDocumentPending(repl, "bar1"_sl, cx[1], &error));
 }
 
 #endif
