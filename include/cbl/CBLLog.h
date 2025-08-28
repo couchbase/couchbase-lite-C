@@ -22,7 +22,7 @@
 
 CBL_CAPI_BEGIN
 
-/** \defgroup logging_deprecated   Logging (Deprecated)
+/** \defgroup logging   Logging
      @{
     Managing messages that Couchbase Lite logs at runtime.
  */
