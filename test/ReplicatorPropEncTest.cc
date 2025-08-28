@@ -921,11 +921,9 @@ TEST_CASE_METHOD(ReplicatorPropertyEncryptionTest, "Encrypt and decrypt with mul
                                                                        input, alg, kid, error);
     };
     
-    vector<CBLReplicationCollection> configs(2);
-    configs[0].collection = c1x;
-    configs[1].collection = c2x;
-    config.collections = configs.data();
-    config.collectionCount = configs.size();
+    vector<CBLCollectionConfiguration> colConfigs = collectionConfigs( {c1x, c2x });
+    config.collections = colConfigs.data();
+    config.collectionCount = colConfigs.size();
     
     // Push:
     replicate();

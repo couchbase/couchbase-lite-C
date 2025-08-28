@@ -48,7 +48,7 @@ public:
     
     ReplicatorCollectionTest_Cpp()
     :db2(openDatabaseNamed("otherDB", true)) // empty
-    ,config({vector<ReplicationCollection>(), Endpoint::databaseEndpoint(db2)})
+    ,config({vector<CollectionConfiguration>(), Endpoint::databaseEndpoint(db2)})
     {
         cx.push_back(db.createCollection("colA"_sl, "scopeA"_sl));
         cx.push_back(db.createCollection("colB"_sl, "scopeA"_sl));
@@ -61,29 +61,21 @@ public:
     
     ~ReplicatorCollectionTest_Cpp() { }
     
-    vector<ReplicationCollection> replicationCollections(vector<Collection>collections) {
-        auto rcols = vector<ReplicationCollection>();
+    vector<CollectionConfiguration> collectionConfigs(vector<Collection>collections) {
+        auto rcols = vector<CollectionConfiguration>();
         for (auto col : collections) {
-            rcols.push_back(ReplicationCollection(col));
+            rcols.push_back(CollectionConfiguration(col));
         }
         return rcols;
     }
     
     void createConfigWithCollections(vector<Collection>collections) {
-        createConfig(replicationCollections(collections));
+        createConfig(collectionConfigs(collections));
     }
     
-    void createConfig(vector<ReplicationCollection>collections) {
+    void createConfig(vector<CollectionConfiguration>collections) {
         Endpoint endpoint = Endpoint::databaseEndpoint(db2);
         config = ReplicatorConfiguration(collections, endpoint);
-    }
-    
-    vector<CBLReplicationCollection> collectionConfigs(vector<CBLCollection*>collections) {
-        vector<CBLReplicationCollection> configs(collections.size());
-        for (int i = 0; i < collections.size(); i++) {
-            configs[i].collection = collections[i];
-        }
-        return configs;
     }
     
     void replicate(bool reset =false) {
@@ -210,7 +202,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Create Replicator with zero 
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ URL Endpoint", "[Replicator]") {
     Endpoint endpoint = Endpoint::urlEndpoint("wss://localhost:4985/db");
-    auto config = ReplicatorConfiguration({ ReplicationCollection(cx[0]) }, endpoint);
+    auto config = ReplicatorConfiguration({ CollectionConfiguration(cx[0]) }, endpoint);
     
     Replicator repl = Replicator(config);
     CBLReplicator* cRepl = repl.ref();
@@ -220,7 +212,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ URL Endpoint", "[Replicator]
 
 TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Authenticator", "[Replicator]") {
     Endpoint endpoint = Endpoint::databaseEndpoint(db2);
-    auto config = ReplicatorConfiguration({ ReplicationCollection(cx[0]) }, endpoint);
+    auto config = ReplicatorConfiguration({ CollectionConfiguration(cx[0]) }, endpoint);
     
     SECTION("Basic") {
         Authenticator auth = Authenticator::basicAuthenticator("user1", "pa55w0rd");
@@ -302,7 +294,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Push Filters", "[
     createDocWithJSON(cx[1], "bar2", kDefaultDocContent);
     createDocWithJSON(cx[1], "bar3", kDefaultDocContent);
     
-    auto rcol1 = ReplicationCollection(cx[0]);
+    auto rcol1 = CollectionConfiguration(cx[0]);
     rcol1.pushFilter = [](Document doc, CBLDocumentFlags flags) -> bool {
         string id = doc.id();
         CHECK(doc.collection().name() == "colA");
@@ -310,7 +302,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Push Filters", "[
         return id == "foo1" || id == "foo3";
     };
     
-    auto rcol2 = ReplicationCollection(cx[1]);
+    auto rcol2 = CollectionConfiguration(cx[1]);
     rcol2.pushFilter = [](Document doc, CBLDocumentFlags flags) -> bool {
         string id = doc.id();
         CHECK(doc.collection().name() == "colB");
@@ -356,7 +348,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Pull Filters", "[
     createDocWithJSON(cy[1], "bar2", kDefaultDocContent);
     createDocWithJSON(cy[1], "bar3", kDefaultDocContent);
     
-    auto rcol1 = ReplicationCollection(cx[0]);
+    auto rcol1 = CollectionConfiguration(cx[0]);
     rcol1.pullFilter = [](Document doc, CBLDocumentFlags flags) -> bool {
         string id = doc.id();
         CHECK(doc.collection().name() == "colA");
@@ -364,7 +356,7 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection Pull Filters", "[
         return id == "foo1" || id == "foo3";
     };
     
-    auto rcol2 = ReplicationCollection(cx[1]);
+    auto rcol2 = CollectionConfiguration(cx[1]);
     rcol2.pullFilter = [](Document doc, CBLDocumentFlags flags) -> bool {
         string id = doc.id();
         CHECK(doc.collection().name() == "colB");
@@ -410,16 +402,16 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Collection DocIDs Push Filte
     createDocWithJSON(cx[1], "bar2", kDefaultDocContent);
     createDocWithJSON(cx[1], "bar3", kDefaultDocContent);
     
-    auto rcol1 = ReplicationCollection(cx[0]);
-    rcol1.documentIDs = MutableArray::newArray();
-    rcol1.documentIDs.append("foo1");
-    rcol1.documentIDs.append("foo3");
+    auto col1 = CollectionConfiguration(cx[0]);
+    col1.documentIDs = MutableArray::newArray();
+    col1.documentIDs.append("foo1");
+    col1.documentIDs.append("foo3");
     
-    auto rcol2 = ReplicationCollection(cx[1]);
-    rcol2.documentIDs = MutableArray::newArray();
-    rcol2.documentIDs.append("bar2");
+    auto col2 = CollectionConfiguration(cx[1]);
+    col2.documentIDs = MutableArray::newArray();
+    col2.documentIDs.append("bar2");
     
-    createConfig({rcol1, rcol2});
+    createConfig({col1, col2});
     
     config.replicatorType = kCBLReplicatorTypePush;
     expectedDocumentCount = 3;
@@ -457,10 +449,10 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Conflict Resolver with Colle
         return (docID == "foo1"_sl) ? localDoc : remoteDoc;
     };
     
-    auto rcol1 = ReplicationCollection(cx[0]);
+    auto rcol1 = CollectionConfiguration(cx[0]);
     rcol1.conflictResolver = conflictResolver;
     
-    auto rcol2 = ReplicationCollection(cx[1]);
+    auto rcol2 = CollectionConfiguration(cx[1]);
     rcol2.conflictResolver = conflictResolver;
     
     createConfig({rcol1, rcol2});

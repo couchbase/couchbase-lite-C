@@ -257,15 +257,15 @@ namespace cbl_internal
             
             // Copy replication collections, channels, and document ids:
             for (int i = 0; i < collectionCount; i++) {
-                CBLReplicationCollection col = collections[i];
-                col.channels = FLArray_MutableCopy(col.channels, kFLDeepCopyImmutables);
-                col.documentIDs = FLArray_MutableCopy(col.documentIDs, kFLDeepCopyImmutables);
-                _effectiveCollections.push_back(col);
+                CBLCollectionConfiguration colConfig = collections[i];
+                colConfig.channels = FLArray_MutableCopy(colConfig.channels, kFLDeepCopyImmutables);
+                colConfig.documentIDs = FLArray_MutableCopy(colConfig.documentIDs, kFLDeepCopyImmutables);
+                _effectiveCollectionConfigs.push_back(colConfig);
             }
-            collections = _effectiveCollections.data();
+            collections = _effectiveCollectionConfigs.data();
             
             // Retain the collections and database:
-            for (auto& col : _effectiveCollections) {
+            for (auto& col : _effectiveCollectionConfigs) {
                 _retainedCollections.push_back(col.collection);
                 if (!_retainedDatabase) {
                     _retainedDatabase = col.collection->database();
@@ -278,7 +278,7 @@ namespace cbl_internal
             CBLAuth_Free(authenticator);
             FLDict_Release(headers);
             
-            for (auto& col : _effectiveCollections) {
+            for (auto& col : _effectiveCollectionConfigs) {
                 FLArray_Release(col.channels);
                 FLArray_Release(col.documentIDs);
             }
@@ -363,15 +363,17 @@ namespace cbl_internal
         #endif
         }
         
-        void writeCollectionOptions(CBLReplicationCollection& collection, Encoder &enc) const {
-            writeOptionalKey(enc, kC4ReplicatorOptionDocIDs,        Array(collection.documentIDs));
-            writeOptionalKey(enc, kC4ReplicatorOptionChannels,      Array(collection.channels));
+        void writeCollectionOptions(CBLCollectionConfiguration& colConfig, Encoder &enc) const {
+            writeOptionalKey(enc, kC4ReplicatorOptionDocIDs,        Array(colConfig.documentIDs));
+            writeOptionalKey(enc, kC4ReplicatorOptionChannels,      Array(colConfig.channels));
         }
 
         slice getUserAgent() const                                                  { return slice(_userAgent); }
         
         CBLDatabase* effectiveDatabase() const                                      { return _retainedDatabase; }
-        const std::vector<CBLReplicationCollection>& effectiveCollections() const   { return _effectiveCollections; }
+        const std::vector<CBLCollectionConfiguration>& effectiveCollectionConfigs() const {
+            return _effectiveCollectionConfigs;
+        }
 
         ReplicatorConfiguration(const ReplicatorConfiguration&) =delete;
         ReplicatorConfiguration& operator=(const ReplicatorConfiguration&) =delete;
@@ -424,7 +426,7 @@ namespace cbl_internal
         }
 
         string                                  _userAgent;
-        std::vector<CBLReplicationCollection>   _effectiveCollections;
+        std::vector<CBLCollectionConfiguration> _effectiveCollectionConfigs;
         std::vector<Retained<CBLCollection>>    _retainedCollections;
         Retained<CBLDatabase>                   _retainedDatabase;
         alloc_slice                             _pinnedServerCert, _trustedRootCerts;

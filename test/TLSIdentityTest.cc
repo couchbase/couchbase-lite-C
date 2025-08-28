@@ -297,8 +297,8 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Use Identity Created with Label", "[T
     CHECK(outError.code == 0);
 
     // Starts a single shot replicator to the listener connecting to the listener.
-    std::vector<CBLReplicationCollection> colls;
-    configOneShotReplicator(listener, colls);
+    std::vector<CBLCollectionConfiguration> colConfigs;
+    configOneShotReplicator(listener, colConfigs);
     CBLTLSIdentity* clientIdentity = createTLSIdentity(false, false);
     REQUIRE(clientIdentity);
     config.authenticator = CBLAuth_CreateCertificate(clientIdentity);
@@ -380,8 +380,8 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Self-Signed Identity with Private Key
 
     // Starts a single shot replicator to the listener connecting to the listener.
 
-    std::vector<CBLReplicationCollection> colls;
-    configOneShotReplicator(listener, colls);
+    std::vector<CBLCollectionConfiguration> colConfigs;
+    configOneShotReplicator(listener, colConfigs);
     config.authenticator = CBLAuth_CreatePassword(TLSIdentityTest::kUser, TLSIdentityTest::kPassword);
     REQUIRE(config.authenticator);
 
@@ -467,8 +467,8 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Self-Signed Identity with PrivateKey 
 
     // Starts a single shot replicator to the listener connecting to the listener.
 
-    std::vector<CBLReplicationCollection> colls;
-    configOneShotReplicator(listener, colls);
+    std::vector<CBLCollectionConfiguration> colConfigs;
+    configOneShotReplicator(listener, colConfigs);
     config.authenticator = CBLAuth_CreatePassword(TLSIdentityTest::kUser, TLSIdentityTest::kPassword);
     REQUIRE(config.authenticator);
 
@@ -549,8 +549,8 @@ TEST_CASE_METHOD(URLEndpointListenerTest, "Identity from KeyPair and Certs", "[T
 
     // Starts a single shot replicator to the listener connecting to the listener.
 
-    std::vector<CBLReplicationCollection> colls;
-    configOneShotReplicator(listener, colls);
+    std::vector<CBLCollectionConfiguration> colConfigs;
+    configOneShotReplicator(listener, colConfigs);
 
     replicate();
 

@@ -77,56 +77,56 @@ public:
         // are from the same database instance:
         auto type = _conf.continuous ? kC4Continuous : kC4OneShot;
         
-        auto effectiveCollections = _conf.effectiveCollections();
+        auto effectiveCollectionConfigs = _conf.effectiveCollectionConfigs();
         
         std::vector<C4ReplicationCollection> c4ReplCols;
-        c4ReplCols.reserve(effectiveCollections.size());
+        c4ReplCols.reserve(effectiveCollectionConfigs.size());
         
         std::vector<alloc_slice> optionDicts;
-        optionDicts.reserve(effectiveCollections.size());
+        optionDicts.reserve(effectiveCollectionConfigs.size());
         
-        for (CBLReplicationCollection& replCol : effectiveCollections) {
-            auto& col = c4ReplCols.emplace_back();
+        for (CBLCollectionConfiguration& colConfig : effectiveCollectionConfigs) {
+            auto& c4ReplCol = c4ReplCols.emplace_back();
             
-            auto spec = replCol.collection->spec();
-            col.collection = spec;
+            auto spec = colConfig.collection->spec();
+            c4ReplCol.collection = spec;
             
             if (_conf.replicatorType != kCBLReplicatorTypePull)
-                col.push = type;
+                c4ReplCol.push = type;
             if (_conf.replicatorType != kCBLReplicatorTypePush)
-                col.pull = type;
+                c4ReplCol.pull = type;
             
-            if (replCol.pushFilter) {
-                col.pushFilter = [](C4CollectionSpec collectionSpec,
-                                    C4String docID,
-                                    C4String revID,
-                                    C4RevisionFlags flags,
-                                    FLDict body,
-                                    void* ctx) {
+            if (colConfig.pushFilter) {
+                c4ReplCol.pushFilter = [](C4CollectionSpec collectionSpec,
+                                          C4String docID,
+                                          C4String revID,
+                                          C4RevisionFlags flags,
+                                          FLDict body,
+                                          void* ctx) {
                     return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, true);
                 };
             }
             
-            if (replCol.pullFilter) {
-                col.pullFilter = [](C4CollectionSpec collectionSpec,
-                                    C4String docID,
-                                    C4String revID,
-                                    C4RevisionFlags flags,
-                                    FLDict body,
-                                    void* ctx) {
+            if (colConfig.pullFilter) {
+                c4ReplCol.pullFilter = [](C4CollectionSpec collectionSpec,
+                                          C4String docID,
+                                          C4String revID,
+                                          C4RevisionFlags flags,
+                                          FLDict body,
+                                          void* ctx) {
                     return ((CBLReplicator*)ctx)->_filter(collectionSpec, docID, revID, flags, body, false);
                 };
             }
             
-            if (replCol.documentIDs || replCol.channels) {
-                auto& optDict = optionDicts.emplace_back(encodeCollectionOptions(replCol));
-                col.optionsDictFleece = optDict;
+            if (colConfig.documentIDs || colConfig.channels) {
+                auto& optDict = optionDicts.emplace_back(encodeCollectionOptions(colConfig));
+                c4ReplCol.optionsDictFleece = optDict;
             }
             
-            col.callbackContext = this;
+            c4ReplCol.callbackContext = this;
             
             // For callback to access replicator collection object by collection spec:
-            _collections.insert({spec, replCol});
+            _collections.insert({spec, colConfig});
         }
         
         params.collections = c4ReplCols.data();
@@ -312,10 +312,10 @@ private:
         return enc.finish();
     }
     
-    alloc_slice encodeCollectionOptions(CBLReplicationCollection& collection) {
+    alloc_slice encodeCollectionOptions(CBLCollectionConfiguration& colConfig) {
         Encoder enc;
         enc.beginDict();
-        _conf.writeCollectionOptions(collection, enc);
+        _conf.writeCollectionOptions(colConfig, enc);
         enc.endDict();
         return enc.finish();
     }
@@ -497,7 +497,7 @@ private:
         return ss.str();
     }
     
-    using ReplicationCollectionsMap = std::unordered_map<C4Database::CollectionSpec, CBLReplicationCollection>;
+    using CollectionConfigurationMap = std::unordered_map<C4Database::CollectionSpec, CBLCollectionConfiguration>;
 
     recursive_mutex                             _mutex;
     ReplicatorConfiguration const               _conf;
@@ -505,7 +505,7 @@ private:
     Retained<C4Replicator>                      _c4repl;
     string                                      _replID;
     string                                      _desc;
-    ReplicationCollectionsMap                   _collections;       // For filters and conflict resolver
+    CollectionConfigurationMap                  _collections;       // For filters and conflict resolver
     bool                                        _useInitialStatus;  // For returning status before first start
     C4ReplicatorStatus                          _c4status {kC4Stopped};
     int                                         _activeConflictResolvers {0};
