@@ -135,9 +135,9 @@ typedef bool (*CBLReplicationFilter)(void* _cbl_nullable context,
         a mutable copy of either one and modify it appropriately.
         Or return NULL if the resolution is to delete the document. */
 typedef const CBLDocument* _cbl_nullable (*CBLConflictResolver)(void* _cbl_nullable context,
-                                                  FLString documentID,
-                                                  const CBLDocument* _cbl_nullable localDocument,
-                                                  const CBLDocument* _cbl_nullable remoteDocument);
+                                                                FLString documentID,
+                                                                const CBLDocument* _cbl_nullable localDocument,
+                                                                const CBLDocument* _cbl_nullable remoteDocument);
 
 /** Default conflict resolver. This always returns `localDocument`. */
 CBL_PUBLIC extern const CBLConflictResolver CBLDefaultConflictResolver;
@@ -250,88 +250,73 @@ typedef struct {
 
 /** The configuration of a replicator. */
 typedef struct {
-    /** The address of the other database to replicate with (Required) */
+    //-- Required fields:
+    
+    /** The collections to replicate with the target's endpoint (Required).  */
+    CBLReplicationCollection* collections;
+    
+    /** The number of collections (Required).
+        Must match the number of items in `collections`. */
+    size_t collectionCount;
+    
+    /** The replication endpoint to replicate with (Required). */
     CBLEndpoint* endpoint;                              ///<
     
-    //-- Types:
+    //-- Core options and context:
     
-    /** Push, pull or both. The default value is \ref kCBLDefaultReplicatorType. */
+    /** Push, pull or both. Default is \ref kCBLDefaultReplicatorType. */
     CBLReplicatorType replicatorType;
     
-    /** Continuous replication?. The default value is \ref kCBLDefaultReplicatorContinuous. */
+    /** Continuous replication?. Default is \ref kCBLDefaultReplicatorContinuous. */
     bool continuous;
+    
+    /** Authentication credentials, if needed */
+    CBLAuthenticator* _cbl_nullable authenticator;
+    
+    /** Arbitrary value that will be passed to callbacks */
+    void* _cbl_nullable context;
+    
+    //-- TLS settings:
+    
+    /** X.509 certificate (PEM or DER) to pin for TLS connections. The cert chain is valid
+        only if it contains this cert. */
+    FLSlice pinnedServerCertificate;
     
     //-- Auto Purge:
     
-    /** If auto purge is active, then the library will automatically purge any documents that
-        the replicating user loses access to via the Sync Function on Sync Gateway.
-        If disableAutoPurge is true, this behavior is disabled and an access removed
-        event will be sent to any document listeners that are active on the replicator.
-        The default value is \ref kCBLDefaultReplicatorDisableAutoPurge. 
-        
-        \note Auto Purge will not be performed when documentIDs filter is specified. 
-    */
+    /** If auto purge is active, documents that the replicating user loses access to will be purged automatically.
+        If disableAutoPurge is true, this behavior is disabled and an access removed event will be sent to
+        document replication listeners if specified. Default is \ref kCBLDefaultReplicatorDisableAutoPurge.
+     
+        \note Auto Purge is only applicable when replicating with Sync Gateway,
+              and will not be performed when a documentIDs filter is specified. */
     bool disableAutoPurge;
     
     //-- Retry Logic:
     
     /** Max retry attempts where the initial connect to replicate counts toward the given value.
-        The default value is  \ref kCBLDefaultReplicatorMaxAttemptsSingleShot for a one-shot replicator
+        Default is  \ref kCBLDefaultReplicatorMaxAttemptsSingleShot for a one-shot replicator
         and \ref kCBLDefaultReplicatorMaxAttemptsContinuous for a continuous replicator.
         Specify 1 means there will be no retry after the first attempt. */
     unsigned maxAttempts;
     
     /** Max wait time between retry attempts in seconds.
-        The default value \ref kCBLDefaultReplicatorMaxAttemptsWaitTime. */
+        Default is \ref kCBLDefaultReplicatorMaxAttemptsWaitTime. */
     unsigned maxAttemptWaitTime;
     
     //-- WebSocket:
     
     /** The heartbeat interval in seconds.
-        The default value is \ref kCBLDefaultReplicatorHeartbeat. */
+        Default is \ref kCBLDefaultReplicatorHeartbeat. */
     unsigned heartbeat;
-    
-#ifdef __CBL_REPLICATOR_NETWORK_INTERFACE__
-    /** The specific network interface to be used by the replicator to connect to the remote server.
-        If not specified, an active network interface based on the OS's routing table will be used.
-        @NOTE The networkInterface configuration is not supported.
-     */
-    FLString networkInterface;
-#endif
     
     //-- HTTP settings:
     
-    CBLAuthenticator* _cbl_nullable authenticator;  ///< Authentication credentials, if needed
-    const CBLProxySettings* _cbl_nullable proxy;    ///< HTTP client proxy settings
-    FLDict _cbl_nullable headers;                   ///< Extra HTTP headers to add to the WebSocket request
+    /** Extra HTTP headers to add to the WebSocket request */
+    FLDict _cbl_nullable headers;
     
-    //-- TLS settings:
-    
-    /** An X.509 cert (PEM or DER) to "pin" for TLS connections. The pinned cert will be evaluated against any certs
-        in a cert chain, and the cert chain will be valid only if the cert chain contains the pinned cert. */
-    FLSlice pinnedServerCertificate;
-    FLSlice trustedRootCertificates;                ///< Set of anchor certs (PEM format)
-    
-    //-- Context:
-    void* _cbl_nullable context;                    ///< Arbitrary value that will be passed to callbacks
-    
-#ifdef COUCHBASE_ENTERPRISE
-    //-- Property Encryption
-    
-    /** Optional callback to encrypt \ref CBLEncryptable values. */
-    CBLDocumentPropertyEncryptor _cbl_nullable documentPropertyEncryptor;
-    
-    /** Optional callback to decrypt encrypted \ref CBLEncryptable values. */
-    CBLDocumentPropertyDecryptor _cbl_nullable documentPropertyDecryptor;
-#endif
-    
-    /** The collections to replicate with the target's endpoint. */
-    CBLReplicationCollection* collections;
-    
-    /** The number of collections (Required if the database is not set */
-    size_t collectionCount;
-    
-    //-- Advanced HTTP settings:
+    /** HTTP client proxy settings */
+    const CBLProxySettings* _cbl_nullable proxy;
     
     /** The option to remove the restriction that does not allow the replicator to save the parent-domain
         cookies, the cookies whose domains are the parent domain of the remote host, from the HTTP
@@ -342,14 +327,33 @@ typedef struct {
         This option is disabled by default (see \ref kCBLDefaultReplicatorAcceptParentCookies) which means
         that the parent-domain cookies are not permitted to save by default. */
     bool acceptParentDomainCookies;
-
+    
+#ifdef __CBL_REPLICATOR_NETWORK_INTERFACE__
+    /** Specific network interface to use for connecting to the remote server.
+        \note The networkInterface configuration is not supported. */
+    FLString networkInterface;
+#endif
+    
+    //-- Advance TLS Settings:
+    
+    /** Set of anchor certs (PEM format) */
+    FLSlice trustedRootCertificates;
+    
 #ifdef COUCHBASE_ENTERPRISE
-    /** Specify the replicator to accept only self-signed certs. Any non-self-signed certs will be rejected
-        to avoid accidentally using this mode with the non-self-signed certs in production. */
+    /** Accept only self-signed certificates; any other certificates are rejected. */
     bool acceptOnlySelfSignedServerCertificate;
 #endif
+    
+#ifdef COUCHBASE_ENTERPRISE
+    //-- Property Encryption
+    
+    /** Callback to encrypt \ref CBLEncryptable values. */
+    CBLDocumentPropertyEncryptor _cbl_nullable documentPropertyEncryptor;
+    
+    /** Callback to decrypt encrypted \ref CBLEncryptable values. */
+    CBLDocumentPropertyDecryptor _cbl_nullable documentPropertyDecryptor;
+#endif
 } CBLReplicatorConfiguration;
-
 
 /** @} */
 
