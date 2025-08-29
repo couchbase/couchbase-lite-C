@@ -138,13 +138,13 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Set Suspended", "[Replicator]") {
 */
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Replicator][Conflict]") {
     SECTION("No conflict resolved specified") {
-        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+        configureCollectionConfigs(config, [](CBLCollectionConfiguration& colConfig) {
             colConfig.conflictResolver = nullptr;
         });
     }
     
     SECTION("Specify default conflict resolver") {
-        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+        configureCollectionConfigs(config, [](CBLCollectionConfiguration& colConfig) {
             colConfig.conflictResolver = CBLDefaultConflictResolver;
         });
     }
@@ -213,13 +213,13 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Deleted Wins", "[Repli
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Last Write Wins - Client", "[Replicator][Conflict]") {
     // Test Step 1 - 4
     SECTION("No conflict resolved specified") {
-        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+        configureCollectionConfigs(config, [](CBLCollectionConfiguration& colConfig) {
             colConfig.conflictResolver = nullptr;
         });
     }
     
     SECTION("Specify default conflict resolver") {
-        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+        configureCollectionConfigs(config, [](CBLCollectionConfiguration& colConfig) {
             colConfig.conflictResolver = CBLDefaultConflictResolver;
         });
     }
@@ -285,13 +285,13 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Last Write Wins - Clie
 TEST_CASE_METHOD(ReplicatorLocalTest, "Default Resolver : Last Write Wins - Server", "[Replicator][Conflict]") {
     // Test Step 5 - 7
     SECTION("No conflict resolved specified") {
-        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+        configureCollectionConfigs(config, [](CBLCollectionConfiguration& colConfig) {
             colConfig.conflictResolver = nullptr;
         });
     }
     
     SECTION("Specify default conflict resolver") {
-        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+        configureCollectionConfigs(config, [](CBLCollectionConfiguration& colConfig) {
             colConfig.conflictResolver = CBLDefaultConflictResolver;
         });
     }
@@ -389,7 +389,7 @@ public:
         replicatedDocIDs.clear();
         resolverCalled = false;
         
-        configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+        configureCollectionConfigs(config, [](CBLCollectionConfiguration& colConfig) {
             colConfig.conflictResolver = [](void *context,
                                             FLString documentID,
                                             const CBLDocument *localDocument,
@@ -638,7 +638,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Push Filters", "[Replicator]") {
     config.replicatorType = kCBLReplicatorTypePush;
     
     auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);
-    configureCollectionConfigs(config, [docIDs](CBLReplicationCollection& colConfig) {
+    configureCollectionConfigs(config, [docIDs](CBLCollectionConfiguration& colConfig) {
         colConfig.documentIDs = docIDs;
     });
     
@@ -661,7 +661,7 @@ TEST_CASE_METHOD(ReplicatorLocalTest, "DocIDs Pull Filters", "[Replicator]") {
     config.replicatorType = kCBLReplicatorTypePull;
     
     auto docIDs = FLMutableArray_NewFromJSON("[\"foo1\"]"_sl, NULL);
-    configureCollectionConfigs(config, [docIDs](CBLReplicationCollection& colConfig) {
+    configureCollectionConfigs(config, [docIDs](CBLCollectionConfiguration& colConfig) {
         colConfig.documentIDs = docIDs;
     });
     
@@ -686,7 +686,7 @@ public:
             sourceCollection = db.getDefaultCollection();
             
             config.replicatorType = kCBLReplicatorTypePush;
-            configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+            configureCollectionConfigs(config, [](CBLCollectionConfiguration& colConfig) {
                 colConfig.pushFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
                     ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
                     return test->filter(context, doc, flags);
@@ -697,7 +697,7 @@ public:
             sourceCollection = otherDB.getDefaultCollection();
             
             config.replicatorType = kCBLReplicatorTypePull;
-            configureCollectionConfigs(config, [](CBLReplicationCollection& colConfig) {
+            configureCollectionConfigs(config, [](CBLCollectionConfiguration& colConfig) {
                 colConfig.pullFilter = [](void *context, CBLDocument* doc, CBLDocumentFlags flags) -> bool {
                     ReplicatorFilterTest* test = ((ReplicatorFilterTest*)context);
                     return test->filter(context, doc, flags);

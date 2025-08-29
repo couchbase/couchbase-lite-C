@@ -114,10 +114,10 @@ namespace cbl {
                                                     const Document remoteDoc)>;
 
     /** The collection and the configuration that can be configured specifically for the replication. */
-    class ReplicationCollection {
+    class CollectionConfiguration {
     public:
-        /** Creates  ReplicationCollection with the collection. */
-        ReplicationCollection(Collection collection)
+        /** Creates CollectionConfiguration with the collection. */
+        CollectionConfiguration(Collection collection)
         :_collection(collection)
         { }
         
@@ -135,7 +135,7 @@ namespace cbl {
         /** Optional callback to filter which docs are pushed. */
         ReplicationFilter pushFilter;
         
-        /** Optional callback to validate incoming docs. */
+        /** Optional callback to filter which docs are pulled. */
         ReplicationFilter pullFilter;
         
         //-- Conflict Resolver:
@@ -146,13 +146,17 @@ namespace cbl {
         Collection _collection;
     };
 
+    /** Deprecated alias for backward compatibility
+        @warning <b>Deprecated :</b> Use CollectionConfiguration instead. */
+    using ReplicationCollection = CollectionConfiguration;
+
     /** The configuration of a replicator. */
     class ReplicatorConfiguration {
     public:
         /** Creates a  config with a list of collections and per-collection configurations to replicate and an endpoint
             @param collections The collections and per-collection configurations.
             @param endpoint The endpoint to replicate with. */
-        ReplicatorConfiguration(std::vector<ReplicationCollection>collections, Endpoint endpoint)
+        ReplicatorConfiguration(std::vector<CollectionConfiguration>collections, Endpoint endpoint)
         :_collections(collections)
         ,_endpoint(endpoint)
         { }
@@ -160,7 +164,7 @@ namespace cbl {
         //-- Accessors:
         
         /** Returns the configured collections. */
-        std::vector<ReplicationCollection> collections() const  {return _collections;}
+        std::vector<CollectionConfiguration> collections() const  {return _collections;}
         
         /** Returns the configured endpoint. */
         Endpoint endpoint() const           {return _endpoint;}
@@ -256,7 +260,7 @@ namespace cbl {
         
     private:
         Endpoint _endpoint;
-        std::vector<ReplicationCollection> _collections;
+        std::vector<CollectionConfiguration> _collections;
     };
 
     /** Replicator for replicating documents in collections in local database and targeted database. */
@@ -277,25 +281,25 @@ namespace cbl {
             CBLReplicatorConfiguration c_config = config;
             
             // Construct C replication collections to set to the c_config:
-            std::vector<CBLReplicationCollection> replCols;
+            std::vector<CBLCollectionConfiguration> colConfigs;
             for (int i = 0; i < collections.size(); i++) {
-                ReplicationCollection& col = collections[i];
+                CollectionConfiguration& col = collections[i];
                 
-                CBLReplicationCollection replCol {};
-                replCol.collection = col.collection().ref();
+                CBLCollectionConfiguration colConfig {};
+                colConfig.collection = col.collection().ref();
                 
                 if (!col.channels.empty()) {
-                    replCol.channels = col.channels;
+                    colConfig.channels = col.channels;
                 }
 
                 if (!col.documentIDs.empty()) {
-                    replCol.documentIDs = col.documentIDs;
+                    colConfig.documentIDs = col.documentIDs;
                 }
 
                 if (col.pushFilter) {
-                    replCol.pushFilter = [](void* context,
-                                            CBLDocument* cDoc,
-                                            CBLDocumentFlags flags) -> bool {
+                    colConfig.pushFilter = [](void* context,
+                                              CBLDocument* cDoc,
+                                              CBLDocumentFlags flags) -> bool {
                         auto doc = Document(cDoc);
                         auto map = (CollectionToReplCollectionMap*)context;
                         return map->find(doc.collection())->second.pushFilter(doc, flags);
@@ -303,9 +307,9 @@ namespace cbl {
                 }
                 
                 if (col.pullFilter) {
-                    replCol.pullFilter = [](void* context,
-                                            CBLDocument* cDoc,
-                                            CBLDocumentFlags flags) -> bool {
+                    colConfig.pullFilter = [](void* context,
+                                              CBLDocument* cDoc,
+                                              CBLDocumentFlags flags) -> bool {
                         auto doc = Document(cDoc);
                         auto map = (CollectionToReplCollectionMap*)context;
                         return map->find(doc.collection())->second.pullFilter(doc, flags);
@@ -313,10 +317,10 @@ namespace cbl {
                 }
                 
                 if (col.conflictResolver) {
-                    replCol.conflictResolver = [](void* context,
-                                                 FLString docID,
-                                                 const CBLDocument* cLocalDoc,
-                                                 const CBLDocument* cRemoteDoc) -> const CBLDocument*
+                    colConfig.conflictResolver = [](void* context,
+                                                    FLString docID,
+                                                    const CBLDocument* cLocalDoc,
+                                                    const CBLDocument* cRemoteDoc) -> const CBLDocument*
                     {
                         auto localDoc = Document(cLocalDoc);
                         auto remoteDoc = Document(cRemoteDoc);
@@ -333,12 +337,12 @@ namespace cbl {
                         return ref;
                     };
                 }
-                replCols.push_back(replCol);
+                colConfigs.push_back(colConfig);
                 _collectionMap->insert({col.collection(), col});
             }
             
-            c_config.collections = replCols.data();
-            c_config.collectionCount = replCols.size();
+            c_config.collections = colConfigs.data();
+            c_config.collectionCount = colConfigs.size();
             c_config.context = _collectionMap.get();
             
             CBLError error {};
@@ -456,7 +460,7 @@ namespace cbl {
             DocumentReplicationListener::call(context, Replicator(repl), isPush, docs);
         }
         
-        using CollectionToReplCollectionMap = std::unordered_map<Collection, ReplicationCollection>;
+        using CollectionToReplCollectionMap = std::unordered_map<Collection, CollectionConfiguration>;
         std::shared_ptr<CollectionToReplCollectionMap> _collectionMap;
         
         CBL_REFCOUNTED_WITHOUT_COPY_MOVE_BOILERPLATE(Replicator, RefCounted, CBLReplicator)

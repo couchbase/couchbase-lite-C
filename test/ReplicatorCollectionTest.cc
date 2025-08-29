@@ -63,9 +63,9 @@ public:
 TEST_CASE_METHOD(ReplicatorCollectionTest, "Create Replicator with zero collections", "[Replicator]") {
     ExpectingExceptions x;
     
-    vector<CBLReplicationCollection> collections(0);
-    config.collections = collections.data();
-    config.collectionCount = 0;
+    auto cols = collectionConfigs({ cx[0] });
+    config.collections = cols.data();
+    config.collectionCount = 0; // Use Zero Size to test error
     
     CBLError error {};
     CBLReplicator* r = CBLReplicator_Create(&config, &error);

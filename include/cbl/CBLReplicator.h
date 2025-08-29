@@ -235,25 +235,35 @@ typedef FLSliceResult (*CBLDocumentPropertyDecryptor) (
 
 /** The collection and the configuration that can be configured specifically for the replication. */
 typedef struct {
-    CBLCollection* collection;                          ///< The collection.
+    /** The collection (Required) */
+    CBLCollection* collection;
     
-    CBLConflictResolver _cbl_nullable conflictResolver; ///< Optional conflict-resolver callback
+    /** Conflict-resolver callback. */
+    CBLConflictResolver _cbl_nullable conflictResolver;
     
-    CBLReplicationFilter _cbl_nullable pushFilter;      ///< Optional callback to filter which docs are pushed
-    CBLReplicationFilter _cbl_nullable pullFilter;      ///< Optional callback to validate incoming docs.
+    /** Callback to filter which docs are pushed. */
+    CBLReplicationFilter _cbl_nullable pushFilter;
     
-    /** Optional set of channels to pull from.
-        @note Channels are not supported in Peer-to-Peer and Database-to-Database replication. */
+    /** Callback to filter which docs are pulled. */
+    CBLReplicationFilter _cbl_nullable pullFilter;
+    
+    /** Set of channels to pull from. Only applicable when replicating with Sync Gateway. */
     FLArray _cbl_nullable channels;
-    FLArray _cbl_nullable documentIDs;                  ///< Optional set of document IDs to replicate
-} CBLReplicationCollection;
+    
+    /** Set of document IDs to replicate. */
+    FLArray _cbl_nullable documentIDs;
+} CBLCollectionConfiguration;
+
+/** Deprecated alias for backward compatibility
+    @warning <b>Deprecated :</b> Use CBLCollectionConfiguration instead. */
+typedef CBLCollectionConfiguration CBLReplicationCollection;
 
 /** The configuration of a replicator. */
 typedef struct {
     //-- Required fields:
     
     /** The collections to replicate with the target's endpoint (Required).  */
-    CBLReplicationCollection* collections;
+    CBLCollectionConfiguration* collections;
     
     /** The number of collections (Required).
         Must match the number of items in `collections`. */
