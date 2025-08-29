@@ -244,7 +244,7 @@ typedef struct {
     /** Callback to filter which docs are pushed. */
     CBLReplicationFilter _cbl_nullable pushFilter;
     
-    /** Callback to validate incoming docs. */
+    /** Callback to filter which docs are pulled. */
     CBLReplicationFilter _cbl_nullable pullFilter;
     
     /** Set of channels to pull from. Only applicable when replicating with Sync Gateway. */

@@ -135,7 +135,7 @@ namespace cbl {
         /** Optional callback to filter which docs are pushed. */
         ReplicationFilter pushFilter;
         
-        /** Optional callback to validate incoming docs. */
+        /** Optional callback to filter which docs are pulled. */
         ReplicationFilter pullFilter;
         
         //-- Conflict Resolver:
