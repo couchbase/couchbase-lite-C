@@ -91,9 +91,9 @@ void CBLReplicator_Stop(CBLReplicator* repl) noexcept                     {repl-
 void CBLReplicator_SetHostReachable(CBLReplicator* repl, bool r) noexcept {repl->setHostReachable(r);}
 void CBLReplicator_SetSuspended(CBLReplicator* repl, bool sus) noexcept   {repl->setSuspended(sus);}
 
-FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator* repl,
-                                                       const CBLCollection* collection,
-                                                       CBLError* _cbl_nullable outError) noexcept {
+FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs(CBLReplicator* repl,
+                                                      const CBLCollection* collection,
+                                                      CBLError* _cbl_nullable outError) noexcept {
     try {
         auto result = FLDict_Retain(repl->pendingDocumentIDs(collection));
         if (!result) {
@@ -104,16 +104,29 @@ FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator* repl,
     } catchAndBridge(outError)
 }
 
-bool CBLReplicator_IsDocumentPending2(CBLReplicator *repl,
-                                      FLString docID,
-                                      const CBLCollection* collection,
-                                      CBLError* _cbl_nullable outError) noexcept {
+bool CBLReplicator_IsDocumentPending(CBLReplicator *repl,
+                                     FLString docID,
+                                     const CBLCollection* collection,
+                                     CBLError* _cbl_nullable outError) noexcept {
     try {
         bool result = repl->isDocumentPending(docID, collection);
         if (!result)
             if (outError) outError->code = 0;
         return result;
     } catchAndBridge(outError)
+}
+
+FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator* repl,
+                                                       const CBLCollection* collection,
+                                                       CBLError* _cbl_nullable outError) noexcept {
+    return CBLReplicator_PendingDocumentIDs(repl, collection, outError);
+}
+
+bool CBLReplicator_IsDocumentPending2(CBLReplicator *repl,
+                                      FLString docID,
+                                      const CBLCollection* collection,
+                                      CBLError* _cbl_nullable outError) noexcept {
+    return CBLReplicator_IsDocumentPending(repl, docID, collection, outError);
 }
 
 CBLListenerToken* CBLReplicator_AddChangeListener(CBLReplicator* repl,

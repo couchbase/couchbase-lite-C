@@ -456,6 +456,33 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator*) CBLAPI;
     If there are no pending documents, the dictionary is empty.
     On error, NULL is returned.
     @warning If the given collection is not part of the replication, a NULL with an error will be returned. */
+FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs(CBLReplicator*,
+                                                      const CBLCollection* collection,
+                                                      CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Indicates whether the document with the given ID in the given collection has local changes
+    that have not yet been pushed to the server by this replicator.
+ 
+    This is equivalent to, but faster than, calling \ref CBLReplicator_PendingDocumentIDs2 and
+    checking whether the result contains \p docID. See that function's documentation for details.
+    @note  A `false` result means the document is not pending, _or_ there was an error.
+         To tell the difference, compare the error code to zero.
+    @warning  If the given collection is not part of the replication, a NULL with an error will be returned. */
+bool CBLReplicator_IsDocumentPending(CBLReplicator *repl,
+                                     FLString docID,
+                                     const CBLCollection* collection,
+                                     CBLError* _cbl_nullable outError) CBLAPI;
+
+/** Indicates which documents in the given collection have local changes that have not yet been
+    pushed to the server by this replicator. This is of course a snapshot, that will go out of date
+    as the replicator makes progress and/or documents are saved locally.
+    
+    The result is, effectively, a set of document IDs: a dictionary whose keys are the IDs and
+    values are `true`.
+    If there are no pending documents, the dictionary is empty.
+    On error, NULL is returned.
+    @warning If the given collection is not part of the replication, a NULL with an error will be returned.
+    @warning <b>Deprecated :</b> Use CBLReplicator_PendingDocumentIDs(CBLReplicator*, const CBLCollection*, CBLError*) instead. */
 FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator*,
                                                        const CBLCollection* collection,
                                                        CBLError* _cbl_nullable outError) CBLAPI;
@@ -467,7 +494,8 @@ FLDict _cbl_nullable CBLReplicator_PendingDocumentIDs2(CBLReplicator*,
     checking whether the result contains \p docID. See that function's documentation for details.
     @note  A `false` result means the document is not pending, _or_ there was an error.
          To tell the difference, compare the error code to zero.
-    @warning  If the given collection is not part of the replication, a NULL with an error will be returned. */
+    @warning  If the given collection is not part of the replication, a NULL with an error will be returned.
+    @warning <b>Deprecated :</b> Use CBLReplicator_IsDocumentPending(CBLReplicator*, FLString, const CBLCollection*, CBLError*) instead.*/
 bool CBLReplicator_IsDocumentPending2(CBLReplicator *repl,
                                       FLString docID,
                                       const CBLCollection* collection,

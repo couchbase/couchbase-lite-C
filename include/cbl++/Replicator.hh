@@ -391,7 +391,7 @@ namespace cbl {
             @warning If the given collection is not part of the replication, an error will be thrown. */
         fleece::Dict pendingDocumentIDs(Collection& collection) const {
             CBLError error;
-            fleece::Dict result = CBLReplicator_PendingDocumentIDs2(ref(), collection.ref(), &error);
+            fleece::Dict result = CBLReplicator_PendingDocumentIDs(ref(), collection.ref(), &error);
             check(result != nullptr, error);
             return result;
         }
@@ -406,7 +406,7 @@ namespace cbl {
             @warning If the given collection is not part of the replication, an error will be thrown. */
         bool isDocumentPending(fleece::slice docID, Collection& collection) const {
             CBLError error;
-            bool pending = CBLReplicator_IsDocumentPending2(ref(), docID, collection.ref(), &error);
+            bool pending = CBLReplicator_IsDocumentPending(ref(), docID, collection.ref(), &error);
             check(pending || error.code == 0, error);
             return pending;
         }
