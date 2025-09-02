@@ -83,12 +83,12 @@ Java_com_couchbase_tests_CouchbaseLiteTest_runTests(
     env->ReleaseStringUTFChars(tmpDir, cAssetsDir);
 
     // Set custom logging:
-    CBLLog_SetCallback([](CBLLogDomain domain, CBLLogLevel level, FLString msg) {
+    CBLLogSinkCallback callback = [](CBLLogDomain domain, CBLLogLevel level, FLString msg) {
         string m = slice(msg).asString();
         AndroidLog::log(level, m);
-    });
-    CBLLog_SetCallbackLevel(kCBLLogInfo);
-
+    };
+    CBLLogSinks_SetCustom({ kCBLLogInfo, callback, kCBLLogDomainMaskAll});
+    
     redirectCatchToLogcat();
 
     // Preparing Catch test arguments:

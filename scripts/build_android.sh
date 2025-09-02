@@ -31,8 +31,8 @@ fi
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 pushd $SCRIPT_DIR/..
 
-NDK_DEFAULT_VERSION="27.0.12077973"
-CMAKE_DEFAULT_VERSION="3.28.1"
+NDK_DEFAULT_VERSION="27.2.12479018"
+CMAKE_DEFAULT_VERSION="3.31.0"
 
 if [ -z "${ANDROID_SDK_ROOT}" ]; then
     echo "Error: ANDROID_SDK_ROOT not set, aborting..."
