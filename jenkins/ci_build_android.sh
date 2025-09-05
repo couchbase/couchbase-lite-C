@@ -77,10 +77,10 @@ function build_variant {
 	    -DANDROID_ABI=$1 \
 	    -DCMAKE_INSTALL_PREFIX=$(pwd)/../libcblite-$VERSION \
 	    -DCMAKE_BUILD_TYPE=MinSizeRel \
-            -DEDITION=$EDITION \
+        -DEDITION=$EDITION \
 	    ..
 
-    ${NINJA} install/strip
+    ${NINJA} install
 }
 
 if [ "$EDITION" = "enterprise" ]; then

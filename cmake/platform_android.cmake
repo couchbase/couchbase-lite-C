@@ -19,8 +19,14 @@ function(set_platform_include_directories)
     # No-op
 endfunction()
 
+function(setup_android_minsizerel_flags)
+    set(CMAKE_C_FLAGS_MINSIZEREL   "-Os -DNDEBUG -g" CACHE INTERNAL "")
+    set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG -g" CACHE INTERNAL "")
+endfunction()
+
 function(init_vars)
     init_vars_linux()
+    setup_android_minsizerel_flags()
 endfunction()
 
 function(set_android_exported_symbols_file_and_linker_flags)
