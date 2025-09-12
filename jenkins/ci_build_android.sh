@@ -81,7 +81,7 @@ function build_variant {
             -DEDITION=$EDITION \
 	    ..
 
-    ${NINJA} install/strip
+    ${NINJA} install
 }
 
 if [ "$EDITION" = "enterprise" ]; then
