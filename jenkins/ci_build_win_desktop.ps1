@@ -100,13 +100,14 @@ $Build_Dir = "build_${Architecture}"
 Remove-Item -Recurse -Force -ErrorAction Ignore "${env:WORKSPACE}\${Build_Dir}\libcblite-${Version}"
 New-Item -Type Junction -Target ${env:WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE -Path ${env:WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
 
-if ("${Edition}" -eq "enterprise") {
+# Only download extension and run tests if enterprise edition AND SKIP_TESTS is not set
+if (($Edition -eq "enterprise") -and [string]::IsNullOrEmpty($env:SKIP_TESTS)) {
     DownloadVectorSearchExtension
 }
 
 Build "${env:WORKSPACE}\${Build_Dir}"
 
-if ("${Edition}" -eq "enterprise") {
+if (($Edition -eq "enterprise") -and [string]::IsNullOrEmpty($env:SKIP_TESTS)) {
     Run-UnitTest "${env:WORKSPACE}\${Build_Dir}"
 }
 

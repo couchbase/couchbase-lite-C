@@ -43,7 +43,7 @@ echo VERSION=${VERSION}
 
 ln -sf ${WORKSPACE}/couchbase-lite-c-ee/couchbase-lite-core-EE ${WORKSPACE}/couchbase-lite-c/vendor/couchbase-lite-core-EE
 
-if [[ ${EDITION} == 'enterprise'* ]]; then
+if [[ -z ${SKIP_TESTS} ]] && [[ ${EDITION} == 'enterprise'* ]]; then
     echo "==== Download Vector Search Extension for Tests  ==="
     pushd ${project_dir}
     if [[ $OSTYPE == 'darwin'* ]]; then
