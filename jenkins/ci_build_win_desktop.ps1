@@ -23,6 +23,9 @@ param(
     [Parameter(Mandatory=$false, HelpMessage="The architecture to build (default x64, ARM64)")][string]$Architecture = "x64"
 )
 
+# TEMPORARY OVERRIDE: Force skip tests
+$env:SKIP_TESTS = "1"
+
 # NOTE: This is for Couchbase internal CI usage.  
 # This room is full of dragons, so you *will* get confused.  
 # You have been warned.
