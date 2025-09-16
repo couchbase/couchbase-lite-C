@@ -7,7 +7,7 @@ if ($VersionNumber -like "*-*") {
     $Version = $VersionNumber.Split('-')[0]
     $BuildNum = $VersionNumber.Split('-')[1]
     $ZipFilename = "couchbase-lite-vector-search-${Version}-${BuildNum}-windows-x86_64.zip"
-    $Url = "http://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/${Version}/${BlNum}/${ZipFilename}"
+    $Url = "http://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/${Version}/${BuildNum}/${ZipFilename}"
 } else {
     $Version = $VersionNumber
     $ZipFilename = "couchbase-lite-vector-search-${Version}-windows-x86_64.zip"

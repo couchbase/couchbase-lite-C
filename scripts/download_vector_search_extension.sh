@@ -33,7 +33,7 @@ if [[ "$VERSION_NUMBER" == *"-"* ]]; then
   BLD_NUM="${VERSION_NUMBER##*-}"
   XCFRAMEWORK_ZIP_FILENAME="couchbase-lite-vector-search_xcframework_${VERSION}-${BLD_NUM}.zip"
   BASE_ZIP_FILENAME="couchbase-lite-vector-search-${VERSION}-${BLD_NUM}"
-  BASE_DOWNLOAD_URL="http://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-c/${VERSION}/${BLD_NUM}"
+  BASE_DOWNLOAD_URL="https://latestbuilds.service.couchbase.com/builds/latestbuilds/couchbase-lite-vector-search/${VERSION}/${BLD_NUM}"
 else
   VERSION="$VERSION_NUMBER"
   XCFRAMEWORK_ZIP_FILENAME="couchbase-lite-vector-search_xcframework_${VERSION}.zip"
