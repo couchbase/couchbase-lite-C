@@ -40,6 +40,8 @@ CBLConsoleLogSink CBLLogSinks::_sConsoleSink { kCBLLogWarning };
 CBLCustomLogSink CBLLogSinks::_sCustomSink { kCBLLogNone };
 CBLFileLogSink CBLLogSinks::_sFileSink { kCBLLogNone, kFLSliceNull };
 
+alloc_slice CBLLogSinks::_sLogFileDir;
+
 std::shared_mutex CBLLogSinks::_sMutex;
 
 static const char* kC4LogDomains[] = { "DB", "Query", "Sync", "WS", "Listener", "SyncBusy",
@@ -144,9 +146,11 @@ void CBLLogSinks::setFileLogSinkNoLock(const CBLFileLogSink& fileSink) {
         }
     }
     
+    alloc_slice logFileDir(fileSink.directory); // Make an owned copy of directory
+    
     C4LogFileOptions c4opt {};
     c4opt.log_level         = C4LogLevel(fileSink.level);
-    c4opt.base_path         = fileSink.directory;
+    c4opt.base_path         = logFileDir;
     c4opt.use_plaintext     = fileSink.usePlaintext;
     c4opt.max_size_bytes    = fileSink.maxSize > 0 ? fileSink.maxSize : kCBLDefaultFileLogSinkMaxSize;
     
@@ -162,6 +166,10 @@ void CBLLogSinks::setFileLogSinkNoLock(const CBLFileLogSink& fileSink) {
     }
     
     _sFileSink = fileSink;
+    
+    // Point to the owned copy of directory
+    _sLogFileDir = std::move(logFileDir);
+    _sFileSink.directory = _sLogFileDir;
 }
 
 void CBLLogSinks::updateLogLevelsNoLock() {

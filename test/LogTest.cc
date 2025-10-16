@@ -302,7 +302,11 @@ TEST_CASE_METHOD(LogTest, "Custom Log Sink : Set and Get", "[Log]") {
 }
 
 TEST_CASE_METHOD(LogTest, "File Log Sink : Set and Get", "[Log]") {
-    CBLLogSinks_SetFile({ kCBLLogVerbose, slice(logDir()), 5, 1024 * 1024, true});
+    {
+        string copiedLogDir = string(logDir()); // For testing that directory is copied properly
+        CBLLogSinks_SetFile({ kCBLLogVerbose, slice(copiedLogDir), 5, 1024 * 1024, true});
+    }
+    
     CBLFileLogSink logSink = CBLLogSinks_File();
     CHECK(logSink.level == kCBLLogVerbose);
     CHECK(FLSlice_Equal(logSink.directory, slice(logDir())));
