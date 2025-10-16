@@ -56,6 +56,7 @@ private:
     static CBLConsoleLogSink _sConsoleSink;
     static CBLCustomLogSink _sCustomSink;
     static CBLFileLogSink _sFileSink;
+    static fleece::alloc_slice _sLogFileDir;
     
     static std::shared_mutex _sMutex;
     
