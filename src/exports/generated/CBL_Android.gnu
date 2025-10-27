@@ -180,6 +180,7 @@ CBL_C {
 		CBLDatabase_LastSequence;
 		CBLDatabase_PublicUUID;
 		CBLDocument_CanonicalRevisionID;
+		CBLDocument_Exists;
 		CBLDocument_Generation;
 		CBLDocument_GetRevisionHistory;
 		CBLError_GetCaptureBacktraces;

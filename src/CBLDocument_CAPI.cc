@@ -51,6 +51,10 @@ unsigned CBLDocument_Generation(const CBLDocument* doc) noexcept {
     return doc->generation();
 }
 
+bool CBLDocument_Exists(const CBLDocument* doc) noexcept {
+    return doc->exists();
+}
+
 /** Private API */
 FLSliceResult CBLDocument_GetRevisionHistory(const CBLDocument* doc) noexcept {
     return FLSliceResult(doc->getRevisionHistory());

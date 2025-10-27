@@ -84,6 +84,8 @@ FLMutableArray CBLCollection_GetIndexesInfo(const CBLCollection* collection,
 
     unsigned CBLDocument_Generation(const CBLDocument* doc) CBLAPI;
 
+    bool CBLDocument_Exists(const CBLDocument* doc) CBLAPI;
+
     FLSliceResult CBLDocument_GetRevisionHistory(const CBLDocument* doc) CBLAPI;
     
     FLSlice CBLReplicator_UserAgent(const CBLReplicator* repl) CBLAPI;
