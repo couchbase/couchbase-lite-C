@@ -288,9 +288,26 @@ public:
     slice getUserAgent() const {
         return _conf.getUserAgent();
     }
-    
+
     std::string desc() const {
         return _desc;
+    }
+
+    slice getCorrelationID() const {
+        // Get response headers from LiteCore
+        alloc_slice headersData = _c4repl->getResponseHeaders();
+        if (!headersData) {
+            return nullslice;
+        }
+
+        // Parse Fleece dictionary and extract X-Correlation-ID
+        Doc headers(headersData, kFLTrusted);
+        Dict dict = headers.asDict();
+        if (!dict) {
+            return nullslice;
+        }
+
+        return dict["X-Correlation-ID"].asString();
     }
 
 #ifdef COUCHBASE_ENTERPRISE

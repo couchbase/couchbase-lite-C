@@ -549,6 +549,20 @@ CBLListenerToken* CBLReplicator_AddDocumentReplicationListener(CBLReplicator*,
                                                                CBLDocumentReplicationListener,
                                                                void* _cbl_nullable context) CBLAPI;
 
+/** Returns the correlation ID sent by Sync Gateway in the X-Correlation-ID header.
+
+    The correlation ID can be used to correlate client-side replication logs with
+    server-side logs for debugging purposes. This header is specific to Sync Gateway.
+
+    @param replicator  The replicator instance.
+    @return  The correlation ID as a FLString, or a null/empty slice if:
+             - The replicator hasn't connected yet
+             - The server didn't send an X-Correlation-ID header
+             - The replication target is not Sync Gateway
+    @note  The returned string is valid until the replicator is freed.
+    @note  This function is thread-safe. */
+FLString CBLReplicator_GetCorrelationID(const CBLReplicator* replicator) CBLAPI;
+
 #ifdef COUCHBASE_ENTERPRISE
 
 /** Gets the TLS certificate received when connecting to the server.

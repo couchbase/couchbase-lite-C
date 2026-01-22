@@ -72,6 +72,10 @@ FLSlice CBLReplicator_UserAgent(const CBLReplicator* repl) noexcept {
     return repl->getUserAgent();
 }
 
+FLString CBLReplicator_GetCorrelationID(const CBLReplicator* repl) noexcept {
+    return repl->getCorrelationID();
+}
+
 CBLReplicator* CBLReplicator_Create(const CBLReplicatorConfiguration* conf, CBLError *outError) noexcept {
     try {
         return retain(new CBLReplicator(*conf));

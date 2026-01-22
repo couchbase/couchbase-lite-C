@@ -219,6 +219,26 @@ TEST_CASE_METHOD(ReplicatorTest, "Check userAgent header", "[Replicator]") {
     CBLReplicator_Release(repl1);
 }
 
+TEST_CASE_METHOD(ReplicatorTest, "Get correlation ID", "[Replicator]") {
+    CBLError error;
+    CBLEndpoint* endpoint = CBLEndpoint_CreateWithURL("ws://example.com/db"_sl, &error);
+    REQUIRE(endpoint);
+    config.endpoint = endpoint;
+
+    auto repl1 = CBLReplicator_Create(&config, &error);
+    REQUIRE(repl1);
+
+    // Before connection, should return empty
+    auto correlationID = slice(CBLReplicator_GetCorrelationID(repl1));
+    CHECK(correlationID.size == 0);
+
+    // Verify function is callable and doesn't crash
+    CHECK(correlationID.buf == nullptr || correlationID.size == 0);
+
+    CBLReplicator_Release(repl1);
+    CBLEndpoint_Free(endpoint);
+}
+
 #pragma mark - ACTUAL-NETWORK TESTS:
 
 
