@@ -233,7 +233,7 @@ TEST_CASE_METHOD(ReplicatorTest, "Get correlation ID", "[Replicator]") {
     CHECK(correlationID.size == 0);
 
     // Verify function is callable and doesn't crash
-    CHECK(correlationID.buf == nullptr || correlationID.size == 0);
+    CHECK((correlationID.buf == nullptr || correlationID.size == 0));
 
     CBLReplicator_Release(repl1);
     CBLEndpoint_Free(endpoint);
