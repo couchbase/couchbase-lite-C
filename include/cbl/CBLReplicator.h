@@ -549,15 +549,18 @@ CBLListenerToken* CBLReplicator_AddDocumentReplicationListener(CBLReplicator*,
                                                                CBLDocumentReplicationListener,
                                                                void* _cbl_nullable context) CBLAPI;
 
-/** Returns the correlation ID sent by Sync Gateway in the X-Correlation-ID header.
+/** Returns the correlation ID sent by Sync Gateway in the HTTP response header.
 
-    The correlation ID can be used to correlate client-side replication logs with
-    server-side logs for debugging purposes. This header is specific to Sync Gateway.
+    Sync Gateway sends a correlation ID in the X-Correlation-ID HTTP response header
+    during the WebSocket handshake for replication. This correlation ID can be used to
+    correlate client-side replication logs with server-side logs for debugging purposes.
+
+    In Sync Gateway logs, the correlation ID appears with a "c:" prefix, e.g., "c:[abc123]".
 
     @param replicator  The replicator instance.
     @return  The correlation ID as a FLString, or a null/empty slice if:
              - The replicator hasn't connected yet
-             - The server didn't send an X-Correlation-ID header
+             - The server didn't send a correlation ID header
              - The replication target is not Sync Gateway
     @note  The returned string is valid until the replicator is freed.
     @note  This function is thread-safe. */

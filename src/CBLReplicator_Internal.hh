@@ -297,17 +297,20 @@ public:
         // Get response headers from LiteCore
         alloc_slice headersData = _c4repl->getResponseHeaders();
         if (!headersData) {
-            return nullslice;
+            return fleece::nullslice;
         }
 
-        // Parse Fleece dictionary and extract X-Correlation-ID
+        // Parse Fleece dictionary and extract X-Correlation-Id header
+        // Note: This header is sent by Sync Gateway during WebSocket handshake.
+        // LiteCore captures it in Replicator.cc and stores it in the response headers dict.
         Doc headers(headersData, kFLTrusted);
         Dict dict = headers.asDict();
         if (!dict) {
-            return nullslice;
+            return fleece::nullslice;
         }
 
-        return dict["X-Correlation-ID"].asString();
+        // Use exact case as stored by LiteCore (see Replicator.cc:639)
+        return dict["X-Correlation-Id"].asString();
     }
 
 #ifdef COUCHBASE_ENTERPRISE
