@@ -6,9 +6,9 @@
 set -e
 
 # Copy Fleece Headers:
-cp -R vendor/couchbase-lite-core/vendor/fleece/API/fleece/ "$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/"
+cp vendor/couchbase-lite-core/vendor/fleece/API/fleece/* "$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/"
 
 # Remove internal headers:
-pushd "$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/"
+cd "$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/"
 rm -f FLExpert.h
 rm -f Expert.hh

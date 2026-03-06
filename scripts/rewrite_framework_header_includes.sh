@@ -6,6 +6,6 @@
 
 set -e
 
-pushd "$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/"
+cd "$BUILT_PRODUCTS_DIR/$PUBLIC_HEADERS_FOLDER_PATH/"
 
 sed -i '' -E 's/#include "([^"]*\/)?([^"]+)"/#include <CouchbaseLite\/\2>/' *

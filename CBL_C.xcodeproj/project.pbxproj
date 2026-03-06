@@ -1873,7 +1873,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${SRCROOT}/scripts/copy_fleece_headers.sh\n";
+			shellScript = "\"${SRCROOT}/scripts/copy_fleece_headers.sh\"\n";
 		};
 		27DBD088246C94B2002FD7A7 /* Merge static libs */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1975,7 +1975,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${SRCROOT}/scripts/copy_fleece_headers.sh\n";
+			shellScript = "\"${SRCROOT}/scripts/copy_fleece_headers.sh\"\n";
 		};
 		40B32FAE2E54034500D48F37 /* Copy CBL_Edition Header */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2013,7 +2013,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${SRCROOT}/scripts/rewrite_framework_header_includes.sh\n";
+			shellScript = "\"${SRCROOT}/scripts/rewrite_framework_header_includes.sh\"\n";
 		};
 		42F2DAB72655DC4B001C9EC3 /* Rewrite Framework Includes */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2031,7 +2031,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${SRCROOT}/scripts/rewrite_framework_header_includes.sh\n";
+			shellScript = "\"${SRCROOT}/scripts/rewrite_framework_header_includes.sh\"\n";
 		};
 		93D0AF88262557D200777AFC /* Generate CBL_Edition.h */ = {
 			isa = PBXShellScriptBuildPhase;
