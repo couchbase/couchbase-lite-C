@@ -26,7 +26,7 @@
 #include <utility>
 
 #if DEBUG
-#   include "cbl/CBLLog.h"
+#include "cbl/CBLLog.h"
 #endif
 
 // VOLATILE API: Couchbase Lite C++ API is not finalized, and may change in
