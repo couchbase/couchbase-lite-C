@@ -51,7 +51,9 @@ TEST_CASE_METHOD(CBLTest_Cpp, "C++ Copy Database") {
     Database::deleteDatabase(copiedDBName, dbDir);
     REQUIRE(!Database::exists(copiedDBName, dbDir));
     
-    Database::copyDatabase(db.path(), copiedDBName, config);
+    string dbpath = db.path();
+    db.close(); // Close the source db
+    Database::copyDatabase(dbpath, copiedDBName, config);
     
     CHECK(Database::exists(copiedDBName, dbDir));
     auto copiedDB = cbl::Database(copiedDBName, config);

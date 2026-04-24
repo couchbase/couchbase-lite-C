@@ -409,6 +409,7 @@ TEST_CASE_METHOD(DatabaseTest, "Copy Database") {
 
     // Copy:
     alloc_slice path = CBLDatabase_Path(db);
+    REQUIRE(CBLDatabase_Close(db, &error));
     REQUIRE(CBL_CopyDatabase(path, "copy"_sl, &config, &error));
     
     // Check:
