@@ -57,7 +57,7 @@ if(MSVC)
         COMMAND ${CMAKE_COMMAND}
         -DFilesToCopy="${FilesToCopy}"
         -DDestinationDirectory=${PROJECT_BINARY_DIR}/\$\(Configuration\)
-        -P ${TOP}vendor/couchbase-lite-core/MSVC/copy_artifacts.cmake)
+        -P ${TOP}test/cmake/MSVC/copy_artifacts.cmake)
 elseif(ANDROID)
     target_link_libraries(CBL_C_Tests PUBLIC  "log")
 elseif(APPLE)

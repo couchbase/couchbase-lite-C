@@ -29,6 +29,8 @@ public:
     }
     
     ~LogTest_Cpp() {
+        LogSinks::setFile({ kCBLLogNone, kFLSliceNull });
+        LogSinks::setCustom({ kCBLLogNone });
         LogSinks::setConsole(_backupConsoleLogSink);
     }
 private:
