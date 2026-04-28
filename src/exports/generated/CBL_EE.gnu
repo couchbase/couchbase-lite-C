@@ -230,6 +230,7 @@ CBL_C {
 		CBLReplicator_SetHostReachable;
 		CBLReplicator_SetSuspended;
 		CBLReplicator_Status;
+		CBLReplicator_CorrelationID;
 		CBLReplicator_PendingDocumentIDs;
 		CBLReplicator_PendingDocumentIDs2;
 		CBLReplicator_IsDocumentPending;

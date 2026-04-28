@@ -86,6 +86,10 @@ CBLReplicatorStatus CBLReplicator_Status(CBLReplicator* repl) noexcept {
     return repl->status();
 }
 
+FLStringResult CBLReplicator_CorrelationID(CBLReplicator* repl) noexcept {
+    return FLStringResult(repl->correlationID());
+}
+
 void CBLReplicator_Start(CBLReplicator* repl, bool reset) noexcept        {repl->start(reset);}
 void CBLReplicator_Stop(CBLReplicator* repl) noexcept                     {repl->stop();}
 void CBLReplicator_SetHostReachable(CBLReplicator* repl, bool r) noexcept {repl->setHostReachable(r);}

@@ -288,6 +288,10 @@ public:
     slice getUserAgent() const {
         return _conf.getUserAgent();
     }
+
+    alloc_slice correlationID() const {
+        return _c4repl->correlationID();
+    }
     
     std::string desc() const {
         return _desc;

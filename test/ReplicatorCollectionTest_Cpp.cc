@@ -21,7 +21,6 @@
 #include "fleece/Mutable.hh"
 #include <string>
 #include <chrono>
-//#include <iostream>
 #include <thread>
 
 #include "cbl++/CouchbaseLite.hh"
@@ -579,6 +578,38 @@ TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Pending Documents with Colle
     
     CHECK(!repl.isDocumentPending("foo1", col));
     CHECK(!repl.isDocumentPending("foo2", col));
+}
+
+// Note: This test is not an ideal fit for ReplicatorCollectionTest_Cpp, but it is the best available location for now.
+// TODO: Restructure the replicator tests so both the C and C++ APIs can be tested.
+//
+// Spec: https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0013-CorrelationID.md
+//
+// 1. TestGetCorrelationID
+//
+// Description:
+//   Test get the correlation id from the replicator.
+//   Note: Alternatively this test can be tested DatabaseEndpoint.
+//
+// Steps:
+//   1. Start a URLEndpointListener.
+//   2. Creates a replicator with an endpoint connecting the URLEndpointListener.
+//        - Continuous: No
+//        - Type: Push-and-Pull
+//   3. Gets the correlationID and checks that the value is null.
+//   4. Starts the replicator and wait until the replicator stopped.
+//   5. Gets the correlationID and checks that the value is not null or empty.
+//
+TEST_CASE_METHOD(ReplicatorCollectionTest_Cpp, "C++ Correlation ID", "[Replicator]") {
+    createConfigWithCollections({cx[0], cx[1]});
+    config.replicatorType = kCBLReplicatorTypePushAndPull;
+    repl = Replicator(config);
+    
+    CHECK(repl.correlationID().empty());
+    
+    replicate();
+    
+    CHECK(!repl.correlationID().empty());
 }
 
 #endif
