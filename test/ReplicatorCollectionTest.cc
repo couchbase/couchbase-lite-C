@@ -837,4 +837,44 @@ TEST_CASE_METHOD(ReplicatorCollectionTest, "Collection Document Pending", "[Repl
     CHECK(CBLReplicator_IsDocumentPending(repl, "bar1"_sl, cx[1], &error));
 }
 
+// Note: This test is not an ideal fit for ReplicatorCollectionTest, but it is the best available location for now.
+// TODO: Restructure the replicator tests so both the C and C++ APIs can be tested.
+//
+// Spec: https://github.com/couchbaselabs/couchbase-lite-api/blob/master/spec/tests/T0013-CorrelationID.md
+//
+// 1. TestGetCorrelationID
+//
+// Description:
+//   Test get the correlation id from the replicator.
+//   Note: Alternatively this test can be tested DatabaseEndpoint.
+//
+// Steps:
+//   1. Start a URLEndpointListener.
+//   2. Creates a replicator with an endpoint connecting the URLEndpointListener.
+//        - Continuous: No
+//        - Type: Push-and-Pull
+//   3. Gets the correlationID and checks that the value is null.
+//   4. Starts the replicator and wait until the replicator stopped.
+//   5. Gets the correlationID and checks that the value is not null or empty.
+//
+TEST_CASE_METHOD(ReplicatorCollectionTest, "Correlation ID", "[Replicator]") {
+    auto cols = collectionConfigs({cx[0], cx[1]});
+    config.collections = cols.data();
+    config.collectionCount = cols.size();
+    config.replicatorType = kCBLReplicatorTypePushAndPull;
+    
+    CBLError error {};
+    repl = CBLReplicator_Create(&config, &error);
+    
+    FLStringResult correlationID = CBLReplicator_CorrelationID(repl);
+    CHECK(correlationID == kFLSliceNull);
+    FLSliceResult_Release(correlationID);
+    
+    replicate();
+    
+    correlationID = CBLReplicator_CorrelationID(repl);
+    CHECK(correlationID != kFLSliceNull);
+    FLSliceResult_Release(correlationID);
+}
+
 #endif

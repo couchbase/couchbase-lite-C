@@ -380,7 +380,12 @@ namespace cbl {
 
         /** Returns the replicator's current status. */
         CBLReplicatorStatus status() const  {return CBLReplicator_Status(ref());}
-        
+
+        /** Returns the ID used to correlate the replication session with the remote endpoint.
+            This value is intended for logging and diagnostics, and is an empty string until the
+            replicator receives a correlation ID from the remote endpoint. */
+        std::string correlationID() const  {return asString(CBLReplicator_CorrelationID(ref()));}
+
         /** Indicates which documents in the given collection have local changes that have not yet been
             pushed to the server by this replicator. This is of course a snapshot, that will go out of date
             as the replicator makes progress and/or documents are saved locally.
