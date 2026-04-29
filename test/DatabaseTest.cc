@@ -851,8 +851,9 @@ TEST_CASE_METHOD(DatabaseTest, "Legacy - Database change notifications from diff
         CBLDocument_Release(doc);
     };
     
-    thread t1([=]() { createDoc(db); });
-    thread t2([=]() { createDoc(anotherDB); });
+    auto database = db;
+    thread t1([&createDoc, database]() { createDoc(database); });
+    thread t2([&createDoc, anotherDB]() { createDoc(anotherDB); });
     
     t1.join();
     t2.join();

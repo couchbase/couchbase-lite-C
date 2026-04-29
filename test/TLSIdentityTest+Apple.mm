@@ -107,22 +107,24 @@ struct TLSIdentityTest::ExternalKey::Impl {
         CBL_Log(kCBLLogDomainListener, kCBLLogInfo, "Signing using Keychain private key");
         @autoreleasepool {
             // Map mbedTLS digest algorithm ID to SecKey algorithm ID:
-            static const SecKeyAlgorithm kDigestAlgorithmMap[9] = {
-                kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw,
-                NULL,
-                NULL,
-                NULL,
-                kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1,
-                kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224,
-                kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256,
-                kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384,
-                kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512,
+            static const std::unordered_map<int, SecKeyAlgorithm> kDigestAlgorithmMap{
+                {0 /*MBEDTLS_MD_NONE*/, kSecKeyAlgorithmRSASignatureDigestPKCS1v15Raw},
+                {5 /*MBEDTLS_MD_SHA1*/, kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA1},
+                {8 /*MBEDTLS_MD_SHA224*/, kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA224},
+                {9 /*MBEDTLS_MD_SHA256*/, kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA256},
+                {10 /*MBEDTLS_MD_SHA384*/, kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA384},
+                {11 /*MBEDTLS_MD_SHA512*/, kSecKeyAlgorithmRSASignatureDigestPKCS1v15SHA512}
             };
+            
             SecKeyAlgorithm digestAlgorithm = nullptr;
-            if (mbedDigestAlgorithm >= 0 && mbedDigestAlgorithm < 9)
-                digestAlgorithm = kDigestAlgorithmMap[mbedDigestAlgorithm];
+            auto i = kDigestAlgorithmMap.find(mbedDigestAlgorithm);
+            if (i != kDigestAlgorithmMap.end()) {
+                digestAlgorithm = i->second;
+            }
+            
             if (!digestAlgorithm) {
-                CBL_Log(kCBLLogDomainListener, kCBLLogWarning, "Keychain private key: unsupported mbedTLS digest algorithm %d", mbedDigestAlgorithm);
+                CBL_Log(kCBLLogDomainListener, kCBLLogWarning,
+                        "Keychain private key: unsupported mbedTLS digest algorithm %d", mbedDigestAlgorithm);
                 return false;
             }
 

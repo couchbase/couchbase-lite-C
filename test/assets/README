@@ -1,7 +1,8 @@
+* To run Tests, "Identity from KeyPair and Certs", "Client Cert Authenticator with RootCert", "Accept Only Self-Signed Certificate", we need following certs. 
 
 - cert_chain.pem
   A chain of 4 certificates. The CNs of the respective certificates are,
-  from leaf certicate to the root certificates, are: "localhost", "inter2", "inter1", "root"
+  from leaf certicate to the root certificates, are: "Intermediate3 CA", "Intermediate2 CA", "Intermediate1 CA", "My Root CA"
 
 - leaf_inter1_root.pem
   A certificate chain of 3 certificates: leaf, inter1, and root. The root is self-signed CA.
@@ -21,3 +22,29 @@
 
 - private_key_pass.pem
   A private RSA key requirig pass phrase, "pass".
+
+* To generate the chain and the * leaf, use gen_cert_chain.sh.
+
+1) run gen_cert_chain.sh
+   This script will generate root, int1, int2, int3, in a work directory, of patter GEN-CERT-CHAIN-WORK-n, where is it finds not existing in the current working directory.
+
+2) Let w=GEN-CERT-CHAIN-WORK-n,
+   cp $w/leaf.key $w/leaf.pem .
+   cat $w/int3.pem $w/int2.pem $w/int1.pem $/root.pem > cert_chain.pem
+   cat $w/leaf.pem $w/int1.pem $w/root.pem > leaf_inter1_root.pem
+   cat $w/int1.pem $w/root.pem > inter1_root.pem
+
+$w may be deleted afterwards. The new certs will be valid for 20 years.
+
+* To renew self_signed_cert.pem for 20 years, run
+
+cat > ext.cnf <<'EOF'
+subjectKeyIdentifier = hash
+EOF
+
+openssl x509 -x509toreq -in self_signed_cert.pem -signkey private_key_of_self_signed_cert.pem -out renew.csr
+
+openssl x509 -req -in renew.csr -signkey private_key_of_self_signed_cert.pem \
+    -days 7300 -sha256 \
+    -extfile ext.cnf \
+    -out self_signed_cert_new.pem

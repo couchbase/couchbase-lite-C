@@ -603,7 +603,7 @@ TEST_CASE_METHOD(TLSIdentityTest, "Get CertChain", "[TSLIdentity]") {
     // For each cert chain, verify that the cert is not expired.
 
     constexpr const char* CNs[] = {
-        "localhost", "inter2", "inter1", "root"
+        "Intermediate3 CA", "Intermediate2 CA", "Intermediate1 CA", "My Root CA"
     };
     constexpr int CNCount = sizeof(CNs) / sizeof(CNs[0]);
     int i = 0;
