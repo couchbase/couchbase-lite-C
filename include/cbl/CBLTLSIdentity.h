@@ -276,6 +276,13 @@ CBL_REFCOUNTED(CBLTLSIdentity*, TLSIdentity);
 _cbl_warn_unused
 CBLCert* CBLTLSIdentity_Certificates(CBLTLSIdentity* identity) CBLAPI;
 
+/** Returns the private key with the given TLS identity.
+    @param identity The TLS identity.
+    @return The private key of the given TLS identity
+    @note It returns NULL if the identity is persistent in the platform's secure storage.*/
+_cbl_warn_unused
+CBLKeyPair* CBLTLSIdentity_PrivateKey(CBLTLSIdentity* identity) CBLAPI;
+
 /** Returns the date/time at which the first certificate in the chain expires. */
 
 /** Returns the expiration date/time of the first certificate in the chain.
