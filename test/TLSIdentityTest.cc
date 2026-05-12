@@ -185,7 +185,7 @@ TEST_CASE_METHOD(TLSIdentityTest, "Identity With Label", "[TSLIdentity]") {
         alloc_slice msg = CBLError_Message(&outError);
         WARN("Error Code=" << outError.code << ", msg=" << msg.asString());
     }
-    CHECK(identity);
+    REQUIRE(identity);
 
     // The private key of a persistent cert is stored in the platform by Label.
     CBLKeyPair* privateKey = CBLTLSIdentity_PrivateKey(identity);
@@ -654,7 +654,7 @@ TEST_CASE_METHOD(TLSIdentityTest, "Get Private Key of Identity", "[TSLIdentity]"
     REQUIRE(identity);
 
     CBLKeyPair* keypair = CBLTLSIdentity_PrivateKey(identity);
-    CHECK(keypair);
+    REQUIRE(keypair);
     alloc_slice privateKeyData = CBLKeyPair_PrivateKeyData(keypair);
     CHECK(privateKeyData.size > 0);
 

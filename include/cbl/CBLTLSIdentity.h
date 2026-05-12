@@ -272,16 +272,18 @@ CBL_REFCOUNTED(CBLTLSIdentity*, TLSIdentity);
 
 /** Returns the certificate chain associated with the given TLS identity.
     @param identity The TLS identity.
-    @return The first certificate in the chain. Use CBLCert_CertNextInChain to access additional certificates. */
+    @return The first certificate in the chain. Use CBLCert_CertNextInChain to access additional certificates.
+    @note Lifetime of returned pointer is tied to the parent identity.*/
 _cbl_warn_unused
 CBLCert* CBLTLSIdentity_Certificates(CBLTLSIdentity* identity) CBLAPI;
 
 /** Returns the private key with the given TLS identity.
     @param identity The TLS identity.
     @return The private key of the given TLS identity
-    @note It returns NULL if the identity is persistent in the platform's secure storage.*/
+    @note It returns NULL if the identity is persistent in the platform's secure storage.
+    @note Lifetime of returned pointer is tied to the parent identity.*/
 _cbl_warn_unused
-CBLKeyPair* CBLTLSIdentity_PrivateKey(CBLTLSIdentity* identity) CBLAPI;
+CBLKeyPair* _cbl_nullable CBLTLSIdentity_PrivateKey(CBLTLSIdentity* identity) CBLAPI;
 
 /** Returns the date/time at which the first certificate in the chain expires. */
 
