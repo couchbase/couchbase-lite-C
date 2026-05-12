@@ -83,6 +83,7 @@ CBL_C {
 		CBLCert_PublicKey;
 		CBLTLSIdentity_Certificates;
 		CBLTLSIdentity_Expiration;
+		CBLTLSIdentity_PrivateKey;
 		CBLTLSIdentity_CreateIdentity;
 		CBLTLSIdentity_CreateIdentityWithKeyPair;
 		CBLTLSIdentity_IdentityWithKeyPairAndCerts;

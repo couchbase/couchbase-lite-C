@@ -185,7 +185,11 @@ TEST_CASE_METHOD(TLSIdentityTest, "Identity With Label", "[TSLIdentity]") {
         alloc_slice msg = CBLError_Message(&outError);
         WARN("Error Code=" << outError.code << ", msg=" << msg.asString());
     }
-    CHECK(identity);
+    REQUIRE(identity);
+
+    // The private key of a persistent cert is stored in the platform by Label.
+    CBLKeyPair* privateKey = CBLTLSIdentity_PrivateKey(identity);
+    CHECK(privateKey == nullptr);
 
     // Gets an identity with label = "CBL-Server-Cert".
 
@@ -628,4 +632,33 @@ TEST_CASE_METHOD(TLSIdentityTest, "Get CertChain", "[TSLIdentity]") {
         CBLCert_Release(c);
     }
 }
+
+TEST_CASE_METHOD(TLSIdentityTest, "Get Private Key of Identity", "[TSLIdentity]") {
+    CBLError outError{};
+
+    // Creates a self-signed identity with CN = "CBL-Server” and label = NULL.
+
+    fleece::MutableDict attributes = fleece::MutableDict::newDict();
+    attributes[kCBLCertAttrKeyCommonName] = CN;
+    CBLTLSIdentity* identity = CBLTLSIdentity_CreateIdentity(kCBLKeyUsagesServerAuth,
+                                                             attributes,
+                                                             duration_cast<milliseconds>(OneYear).count(),
+                                                             nullslice,
+                                                             &outError);
+
+    // Checks that the identity was created successfully.
+    if (outError.code) {
+        alloc_slice msg = CBLError_Message(&outError);
+        WARN("Error Code=" << outError.code << ", msg=" << msg.asString());
+    }
+    REQUIRE(identity);
+
+    CBLKeyPair* keypair = CBLTLSIdentity_PrivateKey(identity);
+    REQUIRE(keypair);
+    alloc_slice privateKeyData = CBLKeyPair_PrivateKeyData(keypair);
+    CHECK(privateKeyData.size > 0);
+
+    CBLTLSIdentity_Release(identity);
+}
+
 #endif // #ifdef COUCHBASE_ENTERPRISE

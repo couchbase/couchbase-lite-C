@@ -97,6 +97,7 @@ _CBLCert_ValidTimespan
 _CBLCert_PublicKey
 _CBLTLSIdentity_Certificates
 _CBLTLSIdentity_Expiration
+_CBLTLSIdentity_PrivateKey
 _CBLTLSIdentity_CreateIdentity
 _CBLTLSIdentity_CreateIdentityWithKeyPair
 _CBLTLSIdentity_IdentityWithKeyPairAndCerts

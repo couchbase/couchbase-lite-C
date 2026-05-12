@@ -166,6 +166,10 @@ CBLCert* CBLTLSIdentity_Certificates(CBLTLSIdentity* tlsID) noexcept {
     return tlsID->certificates();
 }
 
+CBLKeyPair* CBLTLSIdentity_PrivateKey(CBLTLSIdentity* tlsID) noexcept {
+    return tlsID->privateKey();
+}
+
 CBLTimestamp CBLTLSIdentity_Expiration(CBLTLSIdentity* tlsID) noexcept {
     return tlsID->expiration();
 }
