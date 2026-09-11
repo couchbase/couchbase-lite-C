@@ -119,7 +119,7 @@ namespace cbl {
 
     namespace internal {
         inline std::string asString(FLSlice s)          {return slice(s).asString();}
-        inline std::string asString(FLSliceResult &&s)  {return alloc_slice(s).asString();}
+        inline std::string asString(FLSliceResult &&s)  {return alloc_slice(std::move(s)).asString();}
 
         inline void check(bool ok, CBLError &error) {
             if (!ok) {
